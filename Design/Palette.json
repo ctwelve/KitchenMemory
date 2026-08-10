@@ -1,0 +1,10 @@
+{
+  "tokens": {
+    "iconBackground": "IconBackground",
+    "iconCardFront": "IconCardFront",
+    "iconCardMiddle": "IconCardMiddle",
+    "iconCardRear": "IconCardRear",
+    "iconMark": "IconMark",
+    "iconTray": "IconTray"
+  }
+}

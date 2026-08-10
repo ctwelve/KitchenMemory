@@ -27,6 +27,43 @@
 		A1C4E79E302A63B800E2C0DB /* KitchenMemory.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KitchenMemory.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1C4E7AD302A63B900E2C0DB /* KitchenMemoryTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KitchenMemoryTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1C4E7B7302A63B900E2C0DB /* KitchenMemoryUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KitchenMemoryUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A1C4E7CA302A6F7500E2C0DB /* 01-RearCard.svg */ = {isa = PBXFileReference; lastKnownFileType = text; path = "01-RearCard.svg"; sourceTree = "<group>"; };
+		A1C4E7CB302A6F7500E2C0DB /* 02-MiddleCard.svg */ = {isa = PBXFileReference; lastKnownFileType = text; path = "02-MiddleCard.svg"; sourceTree = "<group>"; };
+		A1C4E7CC302A6F7500E2C0DB /* 03-FeaturedCard.svg */ = {isa = PBXFileReference; lastKnownFileType = text; path = "03-FeaturedCard.svg"; sourceTree = "<group>"; };
+		A1C4E7CD302A6F7500E2C0DB /* 04-RecipeMarks.svg */ = {isa = PBXFileReference; lastKnownFileType = text; path = "04-RecipeMarks.svg"; sourceTree = "<group>"; };
+		A1C4E7CE302A6F7500E2C0DB /* 05-LowTray.svg */ = {isa = PBXFileReference; lastKnownFileType = text; path = "05-LowTray.svg"; sourceTree = "<group>"; };
+		A1C4E7D0302A6F7500E2C0DB /* Preview-Dark.svg */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Preview-Dark.svg"; sourceTree = "<group>"; };
+		A1C4E7D1302A6F7500E2C0DB /* Preview-Light.svg */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Preview-Light.svg"; sourceTree = "<group>"; };
+		A1C4E7D3302A6F7500E2C0DB /* 01-RearCard.svgpart */ = {isa = PBXFileReference; lastKnownFileType = text; path = "01-RearCard.svgpart"; sourceTree = "<group>"; };
+		A1C4E7D4302A6F7500E2C0DB /* 02-MiddleCard.svgpart */ = {isa = PBXFileReference; lastKnownFileType = text; path = "02-MiddleCard.svgpart"; sourceTree = "<group>"; };
+		A1C4E7D5302A6F7500E2C0DB /* 03-FeaturedCard.svgpart */ = {isa = PBXFileReference; lastKnownFileType = text; path = "03-FeaturedCard.svgpart"; sourceTree = "<group>"; };
+		A1C4E7D6302A6F7500E2C0DB /* 04-RecipeMarks.svgpart */ = {isa = PBXFileReference; lastKnownFileType = text; path = "04-RecipeMarks.svgpart"; sourceTree = "<group>"; };
+		A1C4E7D7302A6F7500E2C0DB /* 05-LowTray.svgpart */ = {isa = PBXFileReference; lastKnownFileType = text; path = "05-LowTray.svgpart"; sourceTree = "<group>"; };
+		A1C4E7D9302A6F7500E2C0DB /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		A1C4E7DB302A6F7500E2C0DB /* generate-theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "generate-theme.swift"; sourceTree = "<group>"; };
+		A1C4E7DC302A6F7500E2C0DB /* Palette.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Palette.json; sourceTree = "<group>"; };
+		A1C4E7ED302A6F8D00E2C0DB /* 0001-apple-platform.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "0001-apple-platform.md"; sourceTree = "<group>"; };
+		A1C4E7EE302A6F8D00E2C0DB /* 0002-gpl-3-only.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "0002-gpl-3-only.md"; sourceTree = "<group>"; };
+		A1C4E7EF302A6F8D00E2C0DB /* 0003-domain-persistence-boundary.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "0003-domain-persistence-boundary.md"; sourceTree = "<group>"; };
+		A1C4E7F0302A6F8D00E2C0DB /* 0004-apple-persistence-and-portability.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "0004-apple-persistence-and-portability.md"; sourceTree = "<group>"; };
+		A1C4E7F1302A6F8D00E2C0DB /* 0005-testing-and-comprehension.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "0005-testing-and-comprehension.md"; sourceTree = "<group>"; };
+		A1C4E7F3302A6F8D00E2C0DB /* apple-platform.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "apple-platform.md"; sourceTree = "<group>"; };
+		A1C4E7F4302A6F8D00E2C0DB /* continuous-integration.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "continuous-integration.md"; sourceTree = "<group>"; };
+		A1C4E7F5302A6F8D00E2C0DB /* cooking-sessions.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "cooking-sessions.md"; sourceTree = "<group>"; };
+		A1C4E7F6302A6F8D00E2C0DB /* domain-architecture.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "domain-architecture.md"; sourceTree = "<group>"; };
+		A1C4E7F7302A6F8D00E2C0DB /* fuzzy-pantry.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "fuzzy-pantry.md"; sourceTree = "<group>"; };
+		A1C4E7F8302A6F8D00E2C0DB /* naming.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = naming.md; sourceTree = "<group>"; };
+		A1C4E7F9302A6F8D00E2C0DB /* open-questions.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "open-questions.md"; sourceTree = "<group>"; };
+		A1C4E7FA302A6F8D00E2C0DB /* planned-cooks.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "planned-cooks.md"; sourceTree = "<group>"; };
+		A1C4E7FB302A6F8D00E2C0DB /* product-brief.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "product-brief.md"; sourceTree = "<group>"; };
+		A1C4E7FC302A6F8D00E2C0DB /* product-doctrine.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "product-doctrine.md"; sourceTree = "<group>"; };
+		A1C4E7FD302A6F8D00E2C0DB /* recipe-domain-model.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "recipe-domain-model.md"; sourceTree = "<group>"; };
+		A1C4E7FE302A6F8D00E2C0DB /* web-import.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "web-import.md"; sourceTree = "<group>"; };
+		A1C4E7FF302A6F8D00E2C0DB /* workflows.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = workflows.md; sourceTree = "<group>"; };
+		A1C4E837302A6FCA00E2C0DB /* AI.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = AI.md; sourceTree = "<group>"; };
+		A1C4E838302A6FCA00E2C0DB /* COPYRIGHT */ = {isa = PBXFileReference; lastKnownFileType = text; path = COPYRIGHT; sourceTree = "<group>"; };
+		A1C4E839302A6FCA00E2C0DB /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
+		A1C4E83A302A6FCA00E2C0DB /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -75,6 +112,12 @@
 		A1C4E795302A63B800E2C0DB = {
 			isa = PBXGroup;
 			children = (
+				A1C4E837302A6FCA00E2C0DB /* AI.md */,
+				A1C4E838302A6FCA00E2C0DB /* COPYRIGHT */,
+				A1C4E839302A6FCA00E2C0DB /* LICENSE */,
+				A1C4E83A302A6FCA00E2C0DB /* README.md */,
+				A1C4E800302A6F8D00E2C0DB /* Docs */,
+				A1C4E7DD302A6F7500E2C0DB /* Design */,
 				A1C4E7A0302A63B800E2C0DB /* KitchenMemory */,
 				A1C4E7B0302A63B900E2C0DB /* KitchenMemoryTests */,
 				A1C4E7BA302A63B900E2C0DB /* KitchenMemoryUITests */,
@@ -92,6 +135,93 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		A1C4E7CF302A6F7500E2C0DB /* Layers */ = {
+			isa = PBXGroup;
+			children = (
+				A1C4E7CA302A6F7500E2C0DB /* 01-RearCard.svg */,
+				A1C4E7CB302A6F7500E2C0DB /* 02-MiddleCard.svg */,
+				A1C4E7CC302A6F7500E2C0DB /* 03-FeaturedCard.svg */,
+				A1C4E7CD302A6F7500E2C0DB /* 04-RecipeMarks.svg */,
+				A1C4E7CE302A6F7500E2C0DB /* 05-LowTray.svg */,
+			);
+			path = Layers;
+			sourceTree = "<group>";
+		};
+		A1C4E7D2302A6F7500E2C0DB /* Generated */ = {
+			isa = PBXGroup;
+			children = (
+				A1C4E7CF302A6F7500E2C0DB /* Layers */,
+				A1C4E7D0302A6F7500E2C0DB /* Preview-Dark.svg */,
+				A1C4E7D1302A6F7500E2C0DB /* Preview-Light.svg */,
+			);
+			path = Generated;
+			sourceTree = "<group>";
+		};
+		A1C4E7D8302A6F7500E2C0DB /* Layers */ = {
+			isa = PBXGroup;
+			children = (
+				A1C4E7D3302A6F7500E2C0DB /* 01-RearCard.svgpart */,
+				A1C4E7D4302A6F7500E2C0DB /* 02-MiddleCard.svgpart */,
+				A1C4E7D5302A6F7500E2C0DB /* 03-FeaturedCard.svgpart */,
+				A1C4E7D6302A6F7500E2C0DB /* 04-RecipeMarks.svgpart */,
+				A1C4E7D7302A6F7500E2C0DB /* 05-LowTray.svgpart */,
+			);
+			path = Layers;
+			sourceTree = "<group>";
+		};
+		A1C4E7DA302A6F7500E2C0DB /* AppIcon */ = {
+			isa = PBXGroup;
+			children = (
+				A1C4E7D2302A6F7500E2C0DB /* Generated */,
+				A1C4E7D8302A6F7500E2C0DB /* Layers */,
+				A1C4E7D9302A6F7500E2C0DB /* README.md */,
+			);
+			path = AppIcon;
+			sourceTree = "<group>";
+		};
+		A1C4E7DD302A6F7500E2C0DB /* Design */ = {
+			isa = PBXGroup;
+			children = (
+				A1C4E7DA302A6F7500E2C0DB /* AppIcon */,
+				A1C4E7DB302A6F7500E2C0DB /* generate-theme.swift */,
+				A1C4E7DC302A6F7500E2C0DB /* Palette.json */,
+			);
+			path = Design;
+			sourceTree = "<group>";
+		};
+		A1C4E7F2302A6F8D00E2C0DB /* decisions */ = {
+			isa = PBXGroup;
+			children = (
+				A1C4E7ED302A6F8D00E2C0DB /* 0001-apple-platform.md */,
+				A1C4E7EE302A6F8D00E2C0DB /* 0002-gpl-3-only.md */,
+				A1C4E7EF302A6F8D00E2C0DB /* 0003-domain-persistence-boundary.md */,
+				A1C4E7F0302A6F8D00E2C0DB /* 0004-apple-persistence-and-portability.md */,
+				A1C4E7F1302A6F8D00E2C0DB /* 0005-testing-and-comprehension.md */,
+			);
+			path = decisions;
+			sourceTree = "<group>";
+		};
+		A1C4E800302A6F8D00E2C0DB /* Docs */ = {
+			isa = PBXGroup;
+			children = (
+				A1C4E7F2302A6F8D00E2C0DB /* decisions */,
+				A1C4E7F3302A6F8D00E2C0DB /* apple-platform.md */,
+				A1C4E7F4302A6F8D00E2C0DB /* continuous-integration.md */,
+				A1C4E7F5302A6F8D00E2C0DB /* cooking-sessions.md */,
+				A1C4E7F6302A6F8D00E2C0DB /* domain-architecture.md */,
+				A1C4E7F7302A6F8D00E2C0DB /* fuzzy-pantry.md */,
+				A1C4E7F8302A6F8D00E2C0DB /* naming.md */,
+				A1C4E7F9302A6F8D00E2C0DB /* open-questions.md */,
+				A1C4E7FA302A6F8D00E2C0DB /* planned-cooks.md */,
+				A1C4E7FB302A6F8D00E2C0DB /* product-brief.md */,
+				A1C4E7FC302A6F8D00E2C0DB /* product-doctrine.md */,
+				A1C4E7FD302A6F8D00E2C0DB /* recipe-domain-model.md */,
+				A1C4E7FE302A6F8D00E2C0DB /* web-import.md */,
+				A1C4E7FF302A6F8D00E2C0DB /* workflows.md */,
+			);
+			path = Docs;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -99,6 +229,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = A1C4E7C1302A63B900E2C0DB /* Build configuration list for PBXNativeTarget "KitchenMemory" */;
 			buildPhases = (
+				A1C4E850302A750000E2C0DB /* Generate App Icon */,
 				A1C4E79A302A63B800E2C0DB /* Sources */,
 				A1C4E79B302A63B800E2C0DB /* Frameworks */,
 				A1C4E79C302A63B800E2C0DB /* Resources */,
@@ -230,6 +361,53 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		A1C4E850302A750000E2C0DB /* Generate App Icon */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/Design/Palette.json",
+				"$(SRCROOT)/Design/generate-theme.swift",
+				"$(SRCROOT)/Design/AppIcon/Layers/01-RearCard.svgpart",
+				"$(SRCROOT)/Design/AppIcon/Layers/02-MiddleCard.svgpart",
+				"$(SRCROOT)/Design/AppIcon/Layers/03-FeaturedCard.svgpart",
+				"$(SRCROOT)/Design/AppIcon/Layers/04-RecipeMarks.svgpart",
+				"$(SRCROOT)/Design/AppIcon/Layers/05-LowTray.svgpart",
+				"$(SRCROOT)/KitchenMemory/Assets.xcassets/IconBackground.colorset/Contents.json",
+				"$(SRCROOT)/KitchenMemory/Assets.xcassets/IconCardFront.colorset/Contents.json",
+				"$(SRCROOT)/KitchenMemory/Assets.xcassets/IconCardMiddle.colorset/Contents.json",
+				"$(SRCROOT)/KitchenMemory/Assets.xcassets/IconCardRear.colorset/Contents.json",
+				"$(SRCROOT)/KitchenMemory/Assets.xcassets/IconMark.colorset/Contents.json",
+				"$(SRCROOT)/KitchenMemory/Assets.xcassets/IconTray.colorset/Contents.json",
+			);
+			name = "Generate App Icon";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(SRCROOT)/Design/AppIcon/Generated/Layers/01-RearCard.svg",
+				"$(SRCROOT)/Design/AppIcon/Generated/Layers/02-MiddleCard.svg",
+				"$(SRCROOT)/Design/AppIcon/Generated/Layers/03-FeaturedCard.svg",
+				"$(SRCROOT)/Design/AppIcon/Generated/Layers/04-RecipeMarks.svg",
+				"$(SRCROOT)/Design/AppIcon/Generated/Layers/05-LowTray.svg",
+				"$(SRCROOT)/Design/AppIcon/Generated/Preview-Light.svg",
+				"$(SRCROOT)/Design/AppIcon/Generated/Preview-Dark.svg",
+				"$(SRCROOT)/KitchenMemory/AppIcon.icon/Assets/01-RearCard.svg",
+				"$(SRCROOT)/KitchenMemory/AppIcon.icon/Assets/02-MiddleCard.svg",
+				"$(SRCROOT)/KitchenMemory/AppIcon.icon/Assets/03-FeaturedCard.svg",
+				"$(SRCROOT)/KitchenMemory/AppIcon.icon/Assets/04-RecipeMarks.svg",
+				"$(SRCROOT)/KitchenMemory/AppIcon.icon/Assets/05-LowTray.svg",
+				"$(SRCROOT)/KitchenMemory/AppIcon.icon/icon.json",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cd \"$SRCROOT\"\nxcrun --sdk macosx swift -module-cache-path \"$TMPDIR/KitchenMemoryThemeGeneratorModuleCache\" \"$SRCROOT/Design/generate-theme.swift\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		A1C4E79A302A63B800E2C0DB /* Sources */ = {

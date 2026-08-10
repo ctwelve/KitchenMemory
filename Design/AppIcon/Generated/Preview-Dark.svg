@@ -1,0 +1,11 @@
+<!-- Copyright © 2026 the Kitchen Memory contributors. SPDX-License-Identifier: GPL-3.0-only -->
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <rect width="1024" height="1024" rx="224" fill="#171310"/>
+  <rect x="242" y="210" width="540" height="540" rx="48" fill="#5D493E"/>
+  <rect x="206" y="258" width="612" height="520" rx="50" fill="#8A7062"/>
+  <rect x="170" y="314" width="684" height="490" rx="54" fill="#E8D9CB"/>
+  <path d="M250 430C254 374 266 469 277 409C284 378 293 454 310 421C340 399 370 443 404 421S468 399 502 421S566 443 600 421S626 411 650 421" fill="none" stroke="#A64B2A" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M240 504C276 484 312 524 348 504S420 483 456 504S528 525 564 504S636 484 672 504S694 513 704 504" fill="none" stroke="#A64B2A" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+  <path fill="#745143" d="M110 650c0-29 23-52 52-52h700c29 0 52 23 52 52v154c0 39-31 70-70 70H180c-39 0-70-31-70-70V650Z"/>
+
+</svg>
