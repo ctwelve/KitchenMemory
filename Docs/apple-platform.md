@@ -108,6 +108,18 @@ application use cases while supplying its own focused presentation layer. Its
 future existence must not force television interaction constraints into the
 Mac, iPhone, or iPad interface.
 
+## Comprehension and modularity
+
+Keep modules aligned with durable responsibilities rather than creating one
+module per entity or feature screen. Within them, prefer small types, explicit
+data flow, domain vocabulary, and the fewest layers that preserve the accepted
+boundaries.
+
+This application does not need speculative infrastructure for hypothetical
+scale. Optimize first for correctness and comprehension; measure before adding
+performance complexity. Use comments to explain non-obvious framework idioms
+and constraints, not to restate clear code.
+
 ## macOS as a first-class platform
 
 The Mac experience should eventually take advantage of:

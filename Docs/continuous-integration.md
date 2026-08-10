@@ -34,6 +34,10 @@ One `macos-26` job performs the same checks used during local development:
 4. Build the app for a generic iOS Simulator destination.
 5. Build the native DocC documentation.
 
+Application, integration, and UI targets use XCTest as their common test model.
+Independent domain and support packages may use Swift Testing when it improves
+their tests without mixing conventions inside one target.
+
 The commands disable code signing because these checks produce no distributable
 application and require no development certificate. A shared temporary Derived
 Data directory lets later Xcode steps reuse compatible work from earlier steps.
@@ -46,8 +50,8 @@ not persist credentials because no step needs to write to the repository.
 All checks run in one job to keep the first workflow understandable and avoid
 provisioning several macOS runners for the same commit. The job has a 20-minute
 timeout to prevent an unexpected hang from consuming runner time indefinitely.
-Because this is a private repository, macOS jobs consume the account's GitHub
-Actions minutes.
+The repository is public. CI should nevertheless remain economical and avoid
+unnecessary duplicate macOS jobs.
 
 ## Maintenance
 
