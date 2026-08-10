@@ -1,0 +1,7 @@
+<!-- Copyright © 2026 the Kitchen Memory contributors. SPDX-License-Identifier: GPL-3.0-only -->
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <circle cx="248" cy="421" r="22" fill="#8F3F24"/>
+  <rect x="296" y="401" width="340" height="40" rx="20" fill="#8F3F24"/>
+  <rect x="224" y="487" width="464" height="34" rx="17" fill="#8F3F24"/>
+
+</svg>

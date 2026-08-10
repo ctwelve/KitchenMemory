@@ -1,8 +1,8 @@
 # App icon source
 
 The face-on recipe tray is assembled from simple SVG fragments in `Layers`.
-`Design/Palette.json` is the source of truth for its colors and for the named
-colors in the application asset catalog.
+Named colors in `KitchenMemory/Assets.xcassets` are the source of truth.
+`Design/Palette.json` maps the SVG tokens to those color-set names.
 
 From the repository root, regenerate the committed SVG artwork and color sets:
 
@@ -16,10 +16,14 @@ Verify that generated files match their sources without changing them:
 swift Design/generate-theme.swift --check
 ```
 
-The generated layer SVGs use the default appearance and are the files to import
-into Icon Composer. Use the dark values from `Design/Palette.json` for Icon
-Composer's dark fill specializations. Glass, shadows, translucency, and mono
-appearance tuning remain Icon Composer concerns rather than SVG effects.
+The generator writes reviewable layers and previews under `Generated`, and
+builds `KitchenMemory/AppIcon.icon` with light and dark fill specializations.
+The app target runs it before resource compilation, so an icon color changed in
+the asset catalog is incorporated by the next build.
+
+Glass, shadows, and translucency are fixed in the generated Icon Composer
+document. Further visual tuning should be made in the generator rather than
+directly in generated files, so subsequent builds do not discard it.
 
 The preview SVGs are flattened design checks only. Do not import their rounded
 background into Icon Composer; configure the canvas background there so the
