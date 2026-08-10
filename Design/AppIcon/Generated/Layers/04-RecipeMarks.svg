@@ -1,7 +1,6 @@
 <!-- Copyright © 2026 the Kitchen Memory contributors. SPDX-License-Identifier: GPL-3.0-only -->
 <svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
-  <circle cx="248" cy="421" r="22" fill="#8F3F24"/>
-  <rect x="296" y="401" width="340" height="40" rx="20" fill="#8F3F24"/>
-  <rect x="224" y="487" width="464" height="34" rx="17" fill="#8F3F24"/>
+  <path d="M250 430C254 374 266 469 277 409C284 378 293 454 310 421C340 399 370 443 404 421S468 399 502 421S566 443 600 421S626 411 650 421" fill="none" stroke="#8F3F24" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M240 504C276 484 312 524 348 504S420 483 456 504S528 525 564 504S636 484 672 504S694 513 704 504" fill="none" stroke="#8F3F24" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
 
 </svg>
