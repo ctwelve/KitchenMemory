@@ -1,0 +1,17 @@
+Kitchen Memory
+Copyright © 2026 the Kitchen Memory contributors.
+
+This notice applies to the original source code, tests, documentation, and
+design assets in this repository unless a file or component carries a different
+notice. It also covers original material in generated or structured files that
+cannot safely contain an inline copyright comment.
+
+Kitchen Memory is free software distributed under the GNU General Public
+License, version 3 only (GPL-3.0-only). See LICENSE for the complete license
+terms.
+
+Individual contributors retain copyright in their contributions unless they
+explicitly agree otherwise. The collective notice above does not erase or
+replace that individual authorship.
+
+Third-party components, if added, retain their own copyright and license terms.
