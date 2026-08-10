@@ -6,10 +6,8 @@ SPDX-License-Identifier: GPL-3.0-only
 
 # Continuous integration
 
-The bootstrap repository used GitHub Actions to repeat the project's core
-verification on a clean, GitHub-hosted Mac. Equivalent continuous integration
-will be reinstated after the standard multiplatform project and
-`KitchenMemoryDomain` package are integrated.
+GitHub Actions repeats the project's core verification on a clean,
+GitHub-hosted Mac.
 
 ## When CI runs
 
@@ -29,10 +27,9 @@ control cancels the older run.
 One `macos-26` job performs the same checks used during local development:
 
 1. Report the selected Xcode version in the log.
-2. Run the KitchenMemoryDomain Swift package tests.
-3. Build the macOS app and run its tests.
-4. Build the app for a generic iOS Simulator destination.
-5. Build the native DocC documentation.
+2. Build the macOS app and run its tests.
+3. Build the app for a generic iOS Simulator destination.
+4. Build the native DocC documentation.
 
 Application, integration, and UI targets use XCTest as their common test model.
 Independent domain and support packages may use Swift Testing when it improves
@@ -61,7 +58,8 @@ visible in the log. Update the runner label or select a specific installed Xcode
 when the project needs a deliberate migration rather than accepting the hosted
 image's default.
 
-If CI becomes slow or expensive, useful later refinements include running the
-portable KitchenMemoryDomain tests on Linux, separating documentation into a less
-frequent job, or adding dependency caching. Those optimizations are intentionally
-deferred until measurements justify their complexity.
+When KitchenMemoryDomain is integrated, its package tests should join this
+verification sequence. If CI becomes slow or expensive, useful later refinements
+include running portable domain tests on Linux, separating documentation into a
+less frequent job, or adding dependency caching. Those optimizations are
+intentionally deferred until measurements justify their complexity.
