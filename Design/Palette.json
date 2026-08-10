@@ -1,0 +1,53 @@
+{
+  "colors": {
+    "accent": {
+      "assetName": "AccentColor",
+      "dark": "#E58B61",
+      "light": "#A64B2A"
+    },
+    "appBackground": {
+      "assetName": "AppBackground",
+      "dark": "#171310",
+      "light": "#F7F1E8"
+    },
+    "contentSurface": {
+      "assetName": "ContentSurface",
+      "dark": "#211B17",
+      "light": "#FFFDFC"
+    },
+    "iconBackground": {
+      "dark": "#171310",
+      "light": "#A64B2A"
+    },
+    "iconCardFront": {
+      "dark": "#E8D9CB",
+      "light": "#FFFDFC"
+    },
+    "iconCardMiddle": {
+      "dark": "#8A7062",
+      "light": "#EDE1D2"
+    },
+    "iconCardRear": {
+      "dark": "#5D493E",
+      "light": "#D8C7B5"
+    },
+    "iconMark": {
+      "dark": "#A64B2A",
+      "light": "#8F3F24"
+    },
+    "iconTray": {
+      "dark": "#745143",
+      "light": "#51362B"
+    },
+    "subtleBorder": {
+      "assetName": "SubtleBorder",
+      "dark": "#4A3C33",
+      "light": "#D8C7B5"
+    },
+    "subtleFill": {
+      "assetName": "SubtleFill",
+      "dark": "#302720",
+      "light": "#EDE1D2"
+    }
+  }
+}

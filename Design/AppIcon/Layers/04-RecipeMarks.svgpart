@@ -1,0 +1,3 @@
+  <circle cx="248" cy="421" r="22" fill="{{iconMark}}"/>
+  <rect x="296" y="401" width="340" height="40" rx="20" fill="{{iconMark}}"/>
+  <rect x="224" y="487" width="464" height="34" rx="17" fill="{{iconMark}}"/>
