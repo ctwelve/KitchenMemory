@@ -405,7 +405,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd \"$SRCROOT\"\nxcrun --sdk macosx swift -module-cache-path \"$DERIVED_FILE_DIR/ThemeGeneratorModuleCache\" \"$SRCROOT/Design/generate-theme.swift\"\n";
+			shellScript = "cd \"$SRCROOT\"\nxcrun --sdk macosx swift -module-cache-path \"$TMPDIR/KitchenMemoryThemeGeneratorModuleCache\" \"$SRCROOT/Design/generate-theme.swift\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
