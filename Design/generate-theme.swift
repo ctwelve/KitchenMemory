@@ -232,9 +232,14 @@ private func iconLayer(_ spec: LayerSpec, colors: [String: AdaptiveColor]) throw
         "fill-specializations": fillSpecializations(for: color),
         "image-name": "\(spec.filename).svg",
         "name": spec.name,
+        "position": [
+            "scale": 1,
+            "translation-in-points": [0, -30],
+        ],
     ]
     if spec.token == "iconMark" {
         layer["glass"] = false
+        layer["hidden"] = false
     }
     return layer
 }
@@ -251,13 +256,9 @@ private func iconDocument(colors: [String: AdaptiveColor]) throws -> String {
         "fill-specializations": fillSpecializations(for: background),
         "groups": [
             [
-                "layers": [
-                    layers["iconCardFront"]!,
-                    layers["iconCardMiddle"]!,
-                    layers["iconCardRear"]!,
-                ],
-                "shadow": ["kind": "neutral", "opacity": 0.25],
-                "translucency": ["enabled": true, "value": 0.08],
+                "layers": [layers["iconTray"]!],
+                "shadow": ["kind": "neutral", "opacity": 0.35],
+                "translucency": ["enabled": true, "value": 0.18],
             ],
             [
                 "layers": [layers["iconMark"]!],
@@ -265,9 +266,13 @@ private func iconDocument(colors: [String: AdaptiveColor]) throws -> String {
                 "translucency": ["enabled": false, "value": 0.0],
             ],
             [
-                "layers": [layers["iconTray"]!],
-                "shadow": ["kind": "neutral", "opacity": 0.35],
-                "translucency": ["enabled": true, "value": 0.18],
+                "layers": [
+                    layers["iconCardFront"]!,
+                    layers["iconCardMiddle"]!,
+                    layers["iconCardRear"]!,
+                ],
+                "shadow": ["kind": "neutral", "opacity": 0.25],
+                "translucency": ["enabled": true, "value": 0.08],
             ],
         ],
         "supported-platforms": ["squares": "shared"],
