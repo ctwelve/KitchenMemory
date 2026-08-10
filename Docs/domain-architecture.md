@@ -144,6 +144,7 @@ Use one `KitchenMemoryDomain` Swift package, organized by feature. Separate
 packages for recipes, kitchens, pantry, planning, and sessions would create
 dependencies among concepts that intentionally share identities and rules.
 
-The current `RecipeDomain` bootstrap package will become
-`KitchenMemoryDomain`; its recipe types form the first feature area of the
-larger domain.
+The implemented `KitchenMemoryDomain` package begins with the
+`Kitchen → Recipe → RecipeRevision` slice. Its sibling
+`KitchenMemorySampleData` target owns deterministic sample resources without
+introducing Apple resource APIs into the domain target.
