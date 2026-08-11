@@ -77,6 +77,25 @@ final class KitchenMemoryUITests: XCTestCase {
   }
 
   @MainActor
+  func testCanCreateARecipeFromTheEditor() throws {
+    let app = launchApp()
+    let newRecipe = app.descendants(matching: .any)["new-recipe"]
+    XCTAssertTrue(newRecipe.waitForExistence(timeout: 2))
+    activate(newRecipe)
+
+    let title = app.descendants(matching: .any)["recipe-editor-title"]
+    XCTAssertTrue(title.waitForExistence(timeout: 2))
+    activate(title)
+    title.typeText("Sunday Tomato Soup")
+
+    let save = app.descendants(matching: .any)["recipe-editor-save"]
+    XCTAssertTrue(save.waitForExistence(timeout: 2))
+    activate(save)
+
+    XCTAssertTrue(textElement(in: app, equalTo: "Sunday Tomato Soup").waitForExistence(timeout: 5))
+  }
+
+  @MainActor
   func testRecipeLibraryPassesAccessibilityAudit() throws {
     let device = XCUIDevice.shared
     let originalAppearance = device.appearance

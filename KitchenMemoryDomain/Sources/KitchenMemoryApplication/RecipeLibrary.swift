@@ -24,4 +24,12 @@ public struct RecipeLibrary {
   public func recipe(id: Recipe.ID) throws -> StoredRecipe? {
     try repository.recipe(id: id)
   }
+
+  /// Lists saved content versions without exposing persistence records.
+  ///
+  /// The current revision remains available through ``recipe(id:)``. This
+  /// separate operation is for history, comparison, and preparing a later edit.
+  public func revisions(for recipeID: Recipe.ID) throws -> [RecipeRevision] {
+    try repository.revisions(for: recipeID)
+  }
 }

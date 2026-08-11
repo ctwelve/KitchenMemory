@@ -64,7 +64,10 @@ Open `KitchenMemory.xcodeproj` in Xcode and run the **KitchenMemory** scheme on
 My Mac or an iOS Simulator. The application is based on Xcode's standard
 multiplatform SwiftUI structure and uses SwiftData as its first local persistence
 implementation. On first launch, it installs the bundled Tuna Noodle Hotdish as
-starter content and opens the read-only recipe library.
+starter content into a newly created local Kitchen and opens the read-only
+recipe library. The Kitchen gets an installation-specific identity; bundled
+recipes retain their hand-assigned identities so linked Kitchens can recognize
+the same samples instead of accumulating duplicates.
 
 The persistence-independent domain lives in the `KitchenMemoryDomain` Swift
 package. Run its tests with:

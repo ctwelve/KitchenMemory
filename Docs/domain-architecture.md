@@ -153,8 +153,14 @@ The package also exposes `KitchenMemoryPersistence`, the first SwiftData adapter
 It uses internal relational records with application-owned UUID foreign keys and
 explicit ordering columns. A domain-facing repository performs all mapping, so
 neither callers nor domain values depend on SwiftData model identity. The first
-repository supports saving and loading a kitchen and a recipe's current revision;
-revision-history queries and application use cases arrive with their workflows.
+repository supports saving and loading a kitchen, a recipe's current revision,
+and its saved revision history (newest first).
+
+The initial local store uses SwiftData's standard location and is explicitly
+local-only: synchronization remains behind the same repository boundary until
+the shared-Kitchen prototype selects its CloudKit behavior. The database is not
+the export format. It is installed through an explicit V1 migration plan; later
+schema changes add immutable versions and deliberate migration stages.
 
 `KitchenMemoryApplication` now supplies the first such use case. `RecipeLibrary`
 provides Kitchen-scoped listing and stable-identifier lookup to SwiftUI without

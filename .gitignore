@@ -5,6 +5,7 @@ xcuserdata/
 # Build products
 DerivedData/
 .build/
+.swiftpm/
 
 # macOS
 .DS_Store

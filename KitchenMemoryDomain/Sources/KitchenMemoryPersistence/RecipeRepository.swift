@@ -7,7 +7,8 @@ import KitchenMemoryDomain
 import SwiftData
 
 /// A recipe together with the revision selected as its current content.
-public struct StoredRecipe: Equatable, Sendable {
+public struct StoredRecipe: Equatable, Identifiable, Sendable {
+  public var id: Recipe.ID { recipe.id }
   public let recipe: Recipe
   public let revision: RecipeRevision
 
@@ -25,9 +26,12 @@ public struct StoredRecipe: Equatable, Sendable {
 public protocol RecipeRepository: AnyObject {
   func save(_ kitchen: Kitchen) throws
   func save(recipe: Recipe, revision: RecipeRevision) throws
+  func kitchens() throws -> [Kitchen]
   func kitchen(id: Kitchen.ID) throws -> Kitchen?
   func recipe(id: Recipe.ID) throws -> StoredRecipe?
   func recipes(in kitchenID: Kitchen.ID) throws -> [StoredRecipe]
+  /// Returns every saved revision for a recipe, newest revision first.
+  func revisions(for recipeID: Recipe.ID) throws -> [RecipeRevision]
 }
 
 /// Failures detected while translating between domain values and stored rows.
@@ -91,6 +95,13 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     }
   }
 
+  public func kitchens() throws -> [Kitchen] {
+    let descriptor = FetchDescriptor<KitchenRecord>(sortBy: [SortDescriptor(\.name)])
+    return try context.fetch(descriptor).map {
+      Kitchen(id: .init(rawValue: $0.id), name: $0.name)
+    }
+  }
+
   public func recipe(id: Recipe.ID) throws -> StoredRecipe? {
     let identifier = id.rawValue
     let recipeDescriptor = FetchDescriptor<RecipeRecord>(
@@ -121,6 +132,15 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
       .sorted {
         $0.revision.title.localizedStandardCompare($1.revision.title) == .orderedAscending
       }
+  }
+
+  public func revisions(for recipeID: Recipe.ID) throws -> [RecipeRevision] {
+    let identifier = recipeID.rawValue
+    let descriptor = FetchDescriptor<RecipeRevisionRecord>(
+      predicate: #Predicate { $0.recipeID == identifier },
+      sortBy: [SortDescriptor(\.revisionNumber, order: .reverse)]
+    )
+    return try context.fetch(descriptor).map(domainRevision)
   }
 
   private func upsert(_ recipe: Recipe) throws {

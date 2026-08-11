@@ -32,23 +32,19 @@ struct KitchenMemoryApp: App {
 
 @MainActor
 struct AppDependencies {
-  static let starterKitchen = Kitchen(
-    id: .init(rawValue: UUID(uuidString: "B8C29EAC-AB61-4F27-961D-BD2E0D91B0B9")!),
-    name: "Home Kitchen"
-  )
-
   let modelContainer: ModelContainer
   let libraryModel: RecipeLibraryModel
 
   init(inMemory: Bool = false) throws {
     let modelContainer = try KitchenMemorySchema.makeContainer(inMemory: inMemory)
     let repository = SwiftDataRecipeRepository(modelContainer: modelContainer)
-    try Self.seedStarterRecipeIfNeeded(repository: repository)
+    let kitchen = try Self.prepareInitialKitchen(repository: repository)
 
     self.modelContainer = modelContainer
     libraryModel = RecipeLibraryModel(
-      kitchenID: Self.starterKitchen.id,
-      library: RecipeLibrary(repository: repository)
+      kitchenID: kitchen.id,
+      library: RecipeLibrary(repository: repository),
+      editor: RecipeEditor(repository: repository)
     )
   }
 
@@ -60,16 +56,26 @@ struct AppDependencies {
     }
   }
 
-  private static func seedStarterRecipeIfNeeded(repository: any RecipeRepository) throws {
-    if try repository.kitchen(id: starterKitchen.id) == nil {
-      try repository.save(starterKitchen)
+  /// Opens the existing local kitchen, or creates and seeds one new install.
+  ///
+  /// A Kitchen identity belongs to an installation, so it is generated when a
+  /// new store has no kitchens. Sample recipe identities are deliberately
+  /// supplied by the sample pack: a later linked Kitchen can recognize the
+  /// same starter recipe instead of accumulating duplicate Hotdishes.
+  static func prepareInitialKitchen(repository: any RecipeRepository) throws -> Kitchen {
+    if let existingKitchen = try repository.kitchens().first {
+      return existingKitchen
     }
 
+    let kitchen = Kitchen(name: "Home Kitchen")
+    try repository.save(kitchen)
+
     let manifest = try SampleRecipeCatalog.loadManifest()
-    for reference in manifest.recipes where try repository.recipe(id: reference.recipeID) == nil {
+    for reference in manifest.recipes {
       let document = try SampleRecipeCatalog.loadRecipe(reference)
-      let materialized = try document.materialize(in: starterKitchen.id)
+      let materialized = try document.materialize(in: kitchen.id)
       try repository.save(recipe: materialized.recipe, revision: materialized.revision)
     }
+    return kitchen
   }
 }
