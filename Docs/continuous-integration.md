@@ -57,33 +57,22 @@ that optimization is deferred until measurements justify its complexity.
 
 The UI suite treats accessibility semantics as part of the app's test contract.
 It verifies stable identifiers and reading order for the starter recipe, then
-runs XCTest accessibility audits in light and dark appearances. The audits cover
-contrast, element detection, hit regions, descriptions, Dynamic Type, clipped
-text, and traits.
+runs semantic XCTest accessibility audits in light and dark appearances. The
+audits cover element detection, hit regions, descriptions, Dynamic Type,
+clipped text, traits, actions, and parent-child relationships.
 
-Recipe metadata combines each decorative SF Symbol and adjacent label into one
-phrase so VoiceOver announces, for example, “Yield” instead of “person.2,
-Yield.” Xcode 26 cannot infer the font behavior of the inner native `Text` nodes
-after SwiftUI creates that combined accessibility node, so it reports a Dynamic
-Type false positive. The audit handler accepts only Dynamic Type findings whose
-identifiers begin with `recipe-metadata-label-` or `recipe-metadata-value-`.
-Every other finding remains fatal. The metadata text uses SwiftUI's unmodified
-Dynamic Type behavior, and its grid becomes a single flexible column at
-accessibility sizes to prevent genuine clipping.
+The app-wide XCTest contrast audit is intentionally excluded. Xcode 26 samples
+wholly offscreen macOS `ScrollView` text against unrelated onscreen pixels,
+making that audit nondeterministic. The palette uses semantic text colors and
+defined light/dark asset variants; a deterministic contrast specimen is a
+finish-polish follow-up.
 
-On macOS, SwiftUI exposes non-interactive layout groups to XCTest while keeping
-their native `Text` nodes separate in the query tree. Xcode 26 then reports
-those structural groups as having no description even though VoiceOver reaches
-the labeled native elements. The macOS audit accepts only
-sufficient-description findings whose reported element is an empty-labeled,
-non-hittable `Group`. It also accepts Xcode's “Unknown role” trait finding only
-for labeled, hittable `Button` elements whose identifier begins with
-`recipe-row-`; these are native SwiftUI sidebar `NavigationLink` values that
-XCTest can activate successfully. Other controls, roles, and audit categories
-remain fatal. The read-flow test separately proves both that each stable
-automation identifier exists and that its expected native static-text label or
-value exists, without assuming macOS and iOS organize those facts on the same
-node.
+SwiftUI and XCTest expose several platform-specific structural and system-owned
+elements. Every accepted false positive is matched by its audit type and exact
+element evidence rather than by broad error text. The full semantic model,
+exception boundaries, local runner-signing requirements, and result-bundle
+debugging workflow are documented in
+[Accessibility engineering](accessibility-engineering.md).
 
 ## Security and resource choices
 

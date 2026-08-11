@@ -53,6 +53,7 @@ Pantry inventory, meal planning, and shopping follow after this slice is useful.
 - [Product workflows](Docs/workflows.md)
 - [Apple platform and automation architecture](Docs/apple-platform.md)
 - [Continuous integration](Docs/continuous-integration.md)
+- [Accessibility engineering](Docs/accessibility-engineering.md)
 - [Open questions](Docs/open-questions.md)
 - [Architecture decisions](Docs/decisions/)
 - [Artificial intelligence use](AI.md)
