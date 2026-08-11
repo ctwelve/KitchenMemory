@@ -46,8 +46,13 @@ struct ContentView: View {
         NavigationLink(value: storedRecipe.recipe.id) {
           RecipeRow(storedRecipe: storedRecipe)
         }
+        // Keep the stable identity on the interactive NavigationLink, not on
+        // RecipeRow's visual children. UI tests and assistive technologies
+        // must activate the same element a person clicks to open the recipe.
         .accessibilityIdentifier("recipe-row-\(storedRecipe.recipe.id.rawValue.uuidString)")
       }
+      // This identifier is also our launch-complete signal in UI tests. It is
+      // applied to the List itself so it survives row reuse and empty states.
       .accessibilityIdentifier("recipe-library")
       .accessibilityLabel("Recipe library")
       .listStyle(.sidebar)
@@ -88,6 +93,9 @@ private struct RecipeRow: View {
       )
       .frame(width: 56, height: 56)
       .clipShape(.rect(cornerRadius: 10))
+      // The image repeats the recipe represented by the NavigationLink. If it
+      // remained exposed, VoiceOver would announce an extra image before the
+      // title without adding information or an independent action.
       .accessibilityHidden(true)
 
       VStack(alignment: .leading, spacing: 3) {

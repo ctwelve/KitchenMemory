@@ -9,6 +9,9 @@ import SwiftUI
 struct RecipeDetailView: View {
   let storedRecipe: StoredRecipe
 
+  // The metadata grid collapses before large text makes its cards cramped.
+  // @ScaledMetric separately keeps the numbered instruction badge in step
+  // with the text size instead of clipping a larger numeral in a fixed circle.
   @Environment(\.dynamicTypeSize) private var dynamicTypeSize
   @ScaledMetric(relativeTo: .headline) private var stepNumberSize = 30
 
@@ -94,6 +97,9 @@ struct RecipeDetailView: View {
       .padding(.vertical, 28)
       .frame(maxWidth: .infinity)
     }
+    // The detail identifier marks the navigation destination for UI tests.
+    // The label describes the screen as a whole; children remain contained
+    // and navigable rather than being collapsed into one enormous utterance.
     .accessibilityIdentifier("recipe-detail")
     .accessibilityLabel("\(revision.title) recipe")
     .background(Color("AppBackground"))
@@ -126,6 +132,8 @@ struct RecipeDetailView: View {
         .foregroundStyle(.primary)
         .accessibilityLabel(revision.title)
         .accessibilityHeading(.h1)
+        // Tests locate this semantic title instead of depending on SwiftUI's
+        // platform-specific navigation-bar hierarchy.
         .accessibilityIdentifier("recipe-title")
 
       if let summary = revision.summary {
@@ -144,6 +152,8 @@ struct RecipeDetailView: View {
           .accessibilityIdentifier("recipe-author")
       }
     }
+    // Explicit containment preserves the heading hierarchy while preventing
+    // SwiftUI from flattening the title, summary, and author into one element.
     .accessibilityElement(children: .contain)
   }
 
@@ -165,8 +175,16 @@ struct RecipeDetailView: View {
           .frame(maxWidth: .infinity, alignment: .leading)
           .padding(14)
           .background(Color("SubtleFill"), in: .rect(cornerRadius: 12))
+          // The card is visually two Text views plus a decorative symbol, but
+          // semantically it is one fact. A native Text representation gives a
+          // predictable spoken phrase and role on both platforms. Combining
+          // the visual children directly produced unstable macOS roles and
+          // different label/value exposure between iOS and macOS.
           .accessibilityRepresentation {
             Text("\(value.label), \(value.value)")
+              // The identifier names the concept, while the spoken value may
+              // change with recipe content. Tests can therefore find Yield
+              // without encoding its current wording into the query.
               .accessibilityIdentifier("recipe-metadata-\(value.label.lowercased())")
           }
         }
@@ -175,6 +193,9 @@ struct RecipeDetailView: View {
   }
 
   private var metadataColumns: [GridItem] {
+    // Adaptive cards work well at ordinary sizes. Accessibility sizes use one
+    // column so long localized labels and values can reflow without competing
+    // horizontally for space.
     if dynamicTypeSize.isAccessibilitySize {
       return [GridItem(.flexible(), alignment: .leading)]
     }
@@ -242,6 +263,8 @@ struct RecipeDetailView: View {
     VStack(alignment: .leading, spacing: 18) {
       HStack(spacing: 8) {
         Image(systemName: systemImage)
+          // The adjacent heading supplies the section name; announcing the SF
+          // Symbol would duplicate it and expose an implementation detail.
           .accessibilityHidden(true)
         Text(title)
           .accessibilityLabel(title)
@@ -259,6 +282,9 @@ struct RecipeDetailView: View {
       RoundedRectangle(cornerRadius: 16)
         .stroke(Color("SubtleBorder"), lineWidth: 1)
     }
+    // Each section is a navigable landmark whose headings and content remain
+    // separate descendants. `.combine` would turn an entire ingredient or
+    // instruction section into one unwieldy accessibility element.
     .accessibilityElement(children: .contain)
   }
 
@@ -267,6 +293,9 @@ struct RecipeDetailView: View {
       Image(systemName: "circle.fill")
         .font(.system(size: 5))
         .foregroundStyle(Color("AccentColor"))
+        // This dot conveys list styling only. The ingredient/equipment Text is
+        // already a complete description and retains its native static-text
+        // role, which is especially important to macOS accessibility audits.
         .accessibilityHidden(true)
       Text(text)
         .textSelection(.enabled)
@@ -295,6 +324,9 @@ struct RecipeDetailView: View {
         }
       }
     }
+    // A cooking step is one idea even though its visual treatment uses several
+    // views. Supply an explicit sentence so VoiceOver reads the step number,
+    // optional name, instruction, and duration in the intended order.
     .accessibilityElement(children: .combine)
     .accessibilityLabel(instructionAccessibilityLabel(number, step: step))
   }
@@ -312,6 +344,8 @@ struct RecipeDetailView: View {
   }
 
   private func accessibilitySentence(_ text: String) -> String {
+    // Separators alone do not reliably create a pause in synthesized speech.
+    // Preserve authored punctuation and add a period only when one is absent.
     guard let lastCharacter = text.last, ".!?".contains(lastCharacter) else {
       return "\(text)."
     }

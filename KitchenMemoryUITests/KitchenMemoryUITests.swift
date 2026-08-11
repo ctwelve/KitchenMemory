@@ -11,6 +11,9 @@ final class KitchenMemoryUITests: XCTestCase {
 
   @MainActor
   func testStarterRecipeCanBeRead() throws {
+    // This is a semantic reading-order smoke test, not a pixel/layout test. It
+    // walks the same landmarks a screen-reader user needs: library row, recipe
+    // identity, metadata, ingredient hierarchy, and ordered instructions.
     let app = launchApp()
 
     let recipeRow = app.descendants(matching: .any)
@@ -41,6 +44,9 @@ final class KitchenMemoryUITests: XCTestCase {
 
     let recipeYield = app.descendants(matching: .any)["recipe-metadata-yield"]
     XCTAssertTrue(scroll(detail, untilVisible: recipeYield))
+    // accessibilityRepresentation is exposed as `label` on iOS and commonly
+    // as `value` on macOS. Both represent the same spoken phrase, so normalize
+    // that platform difference before asserting the user-facing contract.
     let spokenYield = recipeYield.label.isEmpty
       ? recipeYield.value as? String
       : recipeYield.label
@@ -97,11 +103,16 @@ final class KitchenMemoryUITests: XCTestCase {
 #endif
 
     let app = XCUIApplication()
+    // The app uses this argument to select deterministic, disposable sample
+    // data. UI tests must never depend on or modify a developer's local store.
     app.launchArguments.append("--ui-testing")
     app.launch()
 
     let recipeLibrary = app.descendants(matching: .any)["recipe-library"]
     if !recipeLibrary.waitForExistence(timeout: 2) {
+      // macOS can restore the previous NavigationSplitView selection between
+      // launches. Return to the library when that system restoration wins the
+      // race, then require our normal launch landmark below.
       let backToRecipes = app.buttons["Recipes"].firstMatch
       if backToRecipes.waitForExistence(timeout: 3) {
         activate(backToRecipes)
@@ -114,6 +125,10 @@ final class KitchenMemoryUITests: XCTestCase {
 
   @MainActor
   private func auditRecipeLibrary(using app: XCUIApplication) throws {
+    // Audit three meaningful states rather than only the launch viewport:
+    // library, recipe header/metadata, and the scrolled instruction region.
+    // ScrollView laziness means the last state can contain a different set of
+    // realized accessibility elements from the top of the recipe.
     let recipeRow = app.descendants(matching: .any)
       .matching(NSPredicate(format: "identifier BEGINSWITH %@", "recipe-row-"))
       .firstMatch
@@ -281,6 +296,8 @@ final class KitchenMemoryUITests: XCTestCase {
     in app: XCUIApplication,
     equalTo label: String
   ) -> XCUIElement {
+    // Native SwiftUI Text appears as a label on iOS but may be surfaced as a
+    // value by the macOS XCTest bridge. Query both without weakening equality.
     app.staticTexts
       .matching(NSPredicate(format: "label == %@ OR value == %@", label, label))
       .firstMatch
@@ -291,6 +308,8 @@ final class KitchenMemoryUITests: XCTestCase {
     in app: XCUIApplication,
     containing label: String
   ) -> XCUIElement {
+    // Keep partial-text matching in one helper so cross-platform label/value
+    // handling is identical to the exact-text query above.
     app.staticTexts
       .matching(
         NSPredicate(
@@ -308,6 +327,9 @@ final class KitchenMemoryUITests: XCTestCase {
     untilVisible element: XCUIElement,
     attempts: Int = 6
   ) -> Bool {
+    // Waiting before every swipe handles elements that exist but are realized
+    // asynchronously. The bounded loop prevents a missing landmark from
+    // turning into an unbounded gesture sequence with an opaque timeout.
     if element.waitForExistence(timeout: 1) { return true }
 
     for _ in 0..<attempts {
@@ -320,6 +342,8 @@ final class KitchenMemoryUITests: XCTestCase {
 
   @MainActor
   private func activate(_ element: XCUIElement) {
+    // XCTest models the same user action with different APIs on AppKit and
+    // UIKit. Centralizing the distinction keeps navigation tests shared.
 #if os(macOS)
     element.click()
 #else
