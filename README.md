@@ -61,8 +61,9 @@ Pantry inventory, meal planning, and shopping follow after this slice is useful.
 
 Open `KitchenMemory.xcodeproj` in Xcode and run the **KitchenMemory** scheme on
 My Mac or an iOS Simulator. The application is based on Xcode's standard
-multiplatform SwiftUI template and uses SwiftData as its first local persistence
-implementation.
+multiplatform SwiftUI structure and uses SwiftData as its first local persistence
+implementation. On first launch, it installs the bundled Tuna Noodle Hotdish as
+starter content and opens the read-only recipe library.
 
 The persistence-independent domain lives in the `KitchenMemoryDomain` Swift
 package. Run its tests with:

@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		A1C4E901302B100000E2C0DB /* KitchenMemoryDomain in Frameworks */ = {isa = PBXBuildFile; productRef = A1C4E903302B100000E2C0DB /* KitchenMemoryDomain */; };
+		A1C4EA01302B200000E2C0DB /* KitchenMemoryApplication in Frameworks */ = {isa = PBXBuildFile; productRef = A1C4EA04302B200000E2C0DB /* KitchenMemoryApplication */; };
+		A1C4EA02302B200000E2C0DB /* KitchenMemoryPersistence in Frameworks */ = {isa = PBXBuildFile; productRef = A1C4EA05302B200000E2C0DB /* KitchenMemoryPersistence */; };
+		A1C4EA03302B200000E2C0DB /* KitchenMemorySampleData in Frameworks */ = {isa = PBXBuildFile; productRef = A1C4EA06302B200000E2C0DB /* KitchenMemorySampleData */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -93,7 +96,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A1C4EA01302B200000E2C0DB /* KitchenMemoryApplication in Frameworks */,
 				A1C4E901302B100000E2C0DB /* KitchenMemoryDomain in Frameworks */,
+				A1C4EA02302B200000E2C0DB /* KitchenMemoryPersistence in Frameworks */,
+				A1C4EA03302B200000E2C0DB /* KitchenMemorySampleData in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -248,7 +254,10 @@
 			);
 			name = KitchenMemory;
 			packageProductDependencies = (
+				A1C4EA04302B200000E2C0DB /* KitchenMemoryApplication */,
 				A1C4E903302B100000E2C0DB /* KitchenMemoryDomain */,
+				A1C4EA05302B200000E2C0DB /* KitchenMemoryPersistence */,
+				A1C4EA06302B200000E2C0DB /* KitchenMemorySampleData */,
 			);
 			productName = KitchenMemory;
 			productReference = A1C4E79E302A63B800E2C0DB /* KitchenMemory.app */;
@@ -806,6 +815,18 @@
 		A1C4E903302B100000E2C0DB /* KitchenMemoryDomain */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = KitchenMemoryDomain;
+		};
+		A1C4EA04302B200000E2C0DB /* KitchenMemoryApplication */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = KitchenMemoryApplication;
+		};
+		A1C4EA05302B200000E2C0DB /* KitchenMemoryPersistence */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = KitchenMemoryPersistence;
+		};
+		A1C4EA06302B200000E2C0DB /* KitchenMemorySampleData */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = KitchenMemorySampleData;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

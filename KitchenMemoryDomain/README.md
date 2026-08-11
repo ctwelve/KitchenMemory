@@ -3,11 +3,18 @@
 `KitchenMemoryDomain` contains Kitchen Memory concepts and rules without
 SwiftData, CloudKit, or user-interface dependencies.
 
-The package currently exposes three library products:
+The package currently exposes four library products:
 
 - `KitchenMemoryDomain` — persistence-independent domain values.
 - `KitchenMemorySampleData` — deterministic sample resources and their loader.
 - `KitchenMemoryPersistence` — SwiftData records and domain-facing repositories.
+- `KitchenMemoryApplication` — reusable use cases that coordinate domain-facing repositories.
+
+## Application
+
+`KitchenMemoryApplication` begins with `RecipeLibrary`, the read capability used
+to list recipes in a Kitchen and retrieve a recipe by stable identifier. SwiftUI
+and future automation call this boundary rather than reaching into SwiftData.
 
 ## Persistence
 
