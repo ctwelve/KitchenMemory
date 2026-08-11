@@ -83,6 +83,16 @@ public struct RecipeYield: Codable, Equatable, Sendable {
     }
 }
 
+public struct PackageDescription: Codable, Equatable, Sendable {
+    public var quantity: QuantityExpression
+    public var unitText: String
+
+    public init(quantity: QuantityExpression, unitText: String) {
+        self.quantity = quantity
+        self.unitText = unitText
+    }
+}
+
 public struct RecipeMedia: Codable, Equatable, Identifiable, Sendable {
     public typealias ID = StableIdentifier<RecipeMedia>
 
@@ -127,8 +137,10 @@ public struct RecipeIngredient: Codable, Equatable, Identifiable, Sendable {
     public var displayText: String
     public var quantity: QuantityExpression?
     public var unitText: String?
+    public var package: PackageDescription?
     public var ingredientText: String?
     public var preparation: String?
+    public var note: String?
     public var isOptional: Bool
     public var scalingBehavior: ScalingBehavior
     public var parseState: ParseState
@@ -139,8 +151,10 @@ public struct RecipeIngredient: Codable, Equatable, Identifiable, Sendable {
         displayText: String,
         quantity: QuantityExpression? = nil,
         unitText: String? = nil,
+        package: PackageDescription? = nil,
         ingredientText: String? = nil,
         preparation: String? = nil,
+        note: String? = nil,
         isOptional: Bool = false,
         scalingBehavior: ScalingBehavior = .linear,
         parseState: ParseState = .unparsed
@@ -150,8 +164,10 @@ public struct RecipeIngredient: Codable, Equatable, Identifiable, Sendable {
         self.displayText = displayText
         self.quantity = quantity
         self.unitText = unitText
+        self.package = package
         self.ingredientText = ingredientText
         self.preparation = preparation
+        self.note = note
         self.isOptional = isOptional
         self.scalingBehavior = scalingBehavior
         self.parseState = parseState
@@ -179,11 +195,57 @@ public struct InstructionStep: Codable, Equatable, Identifiable, Sendable {
     public var name: String?
     public var text: String
     public var duration: RecipeDuration?
+    public var temperature: RecipeTemperature?
 
-    public init(id: ID = ID(), name: String? = nil, text: String, duration: RecipeDuration? = nil) {
+    public init(
+        id: ID = ID(),
+        name: String? = nil,
+        text: String,
+        duration: RecipeDuration? = nil,
+        temperature: RecipeTemperature? = nil
+    ) {
         self.id = id
         self.name = name
         self.text = text
         self.duration = duration
+        self.temperature = temperature
+    }
+}
+
+public struct RecipeTemperature: Codable, Equatable, Sendable {
+    public enum Unit: String, Codable, Sendable {
+        case celsius, fahrenheit
+    }
+
+    public var value: RationalQuantity
+    public var unit: Unit
+
+    public init(value: RationalQuantity, unit: Unit) {
+        self.value = value
+        self.unit = unit
+    }
+}
+
+public struct EquipmentItem: Codable, Equatable, Identifiable, Sendable {
+    public typealias ID = StableIdentifier<EquipmentItem>
+
+    public let id: ID
+    public var originalText: String
+    public var quantity: QuantityExpression?
+    public var name: String
+    public var isOptional: Bool
+
+    public init(
+        id: ID = ID(),
+        originalText: String,
+        quantity: QuantityExpression? = nil,
+        name: String,
+        isOptional: Bool = false
+    ) {
+        self.id = id
+        self.originalText = originalText
+        self.quantity = quantity
+        self.name = name
+        self.isOptional = isOptional
     }
 }

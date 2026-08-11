@@ -21,6 +21,7 @@ public struct RecipeRevision: Codable, Equatable, Identifiable, Sendable {
     public var categories: [String]
     public var keywords: [String]
     public var media: [RecipeMedia]
+    public var equipment: [EquipmentItem]
     public var ingredientSections: [IngredientSection]
     public var instructionSections: [InstructionSection]
 
@@ -40,6 +41,7 @@ public struct RecipeRevision: Codable, Equatable, Identifiable, Sendable {
         categories: [String] = [],
         keywords: [String] = [],
         media: [RecipeMedia] = [],
+        equipment: [EquipmentItem] = [],
         ingredientSections: [IngredientSection] = [],
         instructionSections: [InstructionSection] = []
     ) {
@@ -58,6 +60,7 @@ public struct RecipeRevision: Codable, Equatable, Identifiable, Sendable {
         self.categories = categories
         self.keywords = keywords
         self.media = media
+        self.equipment = equipment
         self.ingredientSections = ingredientSections
         self.instructionSections = instructionSections
     }
