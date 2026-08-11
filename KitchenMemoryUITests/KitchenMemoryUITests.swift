@@ -1,43 +1,50 @@
-//
-//  KitchenMemoryUITests.swift
-//  KitchenMemoryUITests
-//
-//  Created by Justin Croonenberghs on 8/10/26.
-//
+// Kitchen Memory
+// Copyright © 2026 the Kitchen Memory contributors.
+// SPDX-License-Identifier: GPL-3.0-only
 
 import XCTest
 
 final class KitchenMemoryUITests: XCTestCase {
+  override func setUpWithError() throws {
+    continueAfterFailure = false
+  }
 
-    override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+  @MainActor
+  func testStarterRecipeCanBeRead() throws {
+    let app = XCUIApplication()
+    app.launchArguments.append("--ui-testing")
+    app.launch()
 
-        // In UI tests it is usually best to stop immediately when a failure occurs.
-        continueAfterFailure = false
+    let recipeRow = app.descendants(matching: .any)
+      .matching(NSPredicate(format: "identifier BEGINSWITH %@", "recipe-row-"))
+      .firstMatch
+    XCTAssertTrue(recipeRow.waitForExistence(timeout: 5))
+    XCTAssertTrue(recipeRow.label.contains("Tuna Noodle Hotdish"))
+    recipeRow.click()
 
-        // In UI tests it’s important to set the initial state - such as interface orientation - required for your tests before they run. The setUp method is a good place to do this.
+    let detail = app.descendants(matching: .any)["recipe-detail"]
+    XCTAssertTrue(detail.waitForExistence(timeout: 5))
+
+    let ingredients = app.descendants(matching: .any)["ingredients-section"]
+    XCTAssertTrue(scroll(detail, untilVisible: ingredients))
+
+    let instructions = app.descendants(matching: .any)["instructions-section"]
+    XCTAssertTrue(scroll(detail, untilVisible: instructions))
+  }
+
+  @MainActor
+  private func scroll(
+    _ container: XCUIElement,
+    untilVisible element: XCUIElement,
+    attempts: Int = 6
+  ) -> Bool {
+    if element.waitForExistence(timeout: 1) { return true }
+
+    for _ in 0..<attempts {
+      container.swipeUp()
+      if element.waitForExistence(timeout: 1) { return true }
     }
 
-    override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-    }
-
-    @MainActor
-    func testExample() throws {
-        // UI tests must launch the application that they test.
-        let app = XCUIApplication()
-        app.launch()
-
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-        // XCUIAutomation Documentation
-        // https://developer.apple.com/documentation/xcuiautomation
-    }
-
-    @MainActor
-    func testLaunchPerformance() throws {
-        // This measures how long it takes to launch your application.
-        measure(metrics: [XCTApplicationLaunchMetric()]) {
-            XCUIApplication().launch()
-        }
-    }
+    return false
+  }
 }

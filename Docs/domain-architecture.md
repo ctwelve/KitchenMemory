@@ -155,3 +155,8 @@ explicit ordering columns. A domain-facing repository performs all mapping, so
 neither callers nor domain values depend on SwiftData model identity. The first
 repository supports saving and loading a kitchen and a recipe's current revision;
 revision-history queries and application use cases arrive with their workflows.
+
+`KitchenMemoryApplication` now supplies the first such use case. `RecipeLibrary`
+provides Kitchen-scoped listing and stable-identifier lookup to SwiftUI without
+exposing SwiftData records. The app's first read-only recipe view exercises that
+path from the persistent current revision through ordered ingredients and steps.

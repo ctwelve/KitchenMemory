@@ -16,6 +16,7 @@ let package = Package(
         .library(name: "KitchenMemoryDomain", targets: ["KitchenMemoryDomain"]),
         .library(name: "KitchenMemorySampleData", targets: ["KitchenMemorySampleData"]),
         .library(name: "KitchenMemoryPersistence", targets: ["KitchenMemoryPersistence"]),
+        .library(name: "KitchenMemoryApplication", targets: ["KitchenMemoryApplication"]),
     ],
     targets: [
         .target(name: "KitchenMemoryDomain"),
@@ -27,6 +28,13 @@ let package = Package(
         .target(
             name: "KitchenMemoryPersistence",
             dependencies: ["KitchenMemoryDomain"]
+        ),
+        .target(
+            name: "KitchenMemoryApplication",
+            dependencies: [
+                "KitchenMemoryDomain",
+                "KitchenMemoryPersistence",
+            ]
         ),
         .testTarget(
             name: "KitchenMemoryDomainTests",
@@ -41,6 +49,14 @@ let package = Package(
             dependencies: [
                 "KitchenMemoryPersistence",
                 "KitchenMemorySampleData",
+            ]
+        ),
+        .testTarget(
+            name: "KitchenMemoryApplicationTests",
+            dependencies: [
+                "KitchenMemoryApplication",
+                "KitchenMemoryDomain",
+                "KitchenMemoryPersistence",
             ]
         ),
     ]

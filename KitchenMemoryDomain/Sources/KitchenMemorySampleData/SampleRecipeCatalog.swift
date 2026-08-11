@@ -7,6 +7,7 @@ import AppKit
 #elseif canImport(UIKit)
 import UIKit
 #endif
+import DeveloperToolsSupport
 import Foundation
 import KitchenMemoryDomain
 
@@ -72,13 +73,26 @@ public enum SampleRecipeCatalog {
         return document
     }
 
+    /// Locates an image in the bundled sample pack.
+    ///
+    /// Production media storage will eventually supply recipe images. This
+    /// bridge keeps deterministic sample media available to previews and the
+    /// first read-only recipe surface without exposing the package bundle.
+    public static func imageResource(named name: String) -> ImageResource {
+        ImageResource(name: name, bundle: .module)
+    }
+
     private static func decodeAsset<Value: Decodable>(named name: String, as type: Value.Type) throws -> Value {
         try PropertyListDecoder().decode(Value.self, from: data(named: name))
     }
 
     private static func data(named name: String) throws -> Data {
-#if canImport(AppKit) || canImport(UIKit)
+#if canImport(AppKit)
         if let asset = NSDataAsset(name: NSDataAsset.Name(name), bundle: .module) {
+            return asset.data
+        }
+#elseif canImport(UIKit)
+        if let asset = NSDataAsset(name: name, bundle: .module) {
             return asset.data
         }
 #endif
