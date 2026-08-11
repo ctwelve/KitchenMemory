@@ -26,6 +26,10 @@ own stable recipe, revision, and media identities, while the importing use case
 attaches it to the destination Kitchen created for that installation or sharing
 context.
 
+Recipe media refers to logical asset names and semantic roles such as `hero`,
+`thumbnail`, and `gallery`. File encoding and pixel dimensions remain asset-
+catalog concerns rather than domain properties.
+
 The loader first uses `NSDataAsset` when Xcode compiles the catalog. It also
 supports SwiftPM's command-line behavior, which copies the catalog source into
 the package resource bundle during `swift test`.

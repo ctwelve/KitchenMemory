@@ -96,12 +96,25 @@ public struct PackageDescription: Codable, Equatable, Sendable {
 public struct RecipeMedia: Codable, Equatable, Identifiable, Sendable {
     public typealias ID = StableIdentifier<RecipeMedia>
 
+    public enum Role: String, Codable, Sendable {
+        case hero
+        case thumbnail
+        case gallery
+    }
+
     public let id: ID
+    public var role: Role
     public var assetName: String
     public var accessibilityLabel: String?
 
-    public init(id: ID = ID(), assetName: String, accessibilityLabel: String? = nil) {
+    public init(
+        id: ID = ID(),
+        role: Role,
+        assetName: String,
+        accessibilityLabel: String? = nil
+    ) {
         self.id = id
+        self.role = role
         self.assetName = assetName
         self.accessibilityLabel = accessibilityLabel
     }
