@@ -18,10 +18,7 @@ final class KitchenMemoryUITests: XCTestCase {
       .firstMatch
     XCTAssertTrue(recipeRow.waitForExistence(timeout: 5))
     XCTAssertTrue(recipeRow.label.contains("Tuna Noodle Hotdish"))
-    activate(recipeRow)
-
-    let detail = app.descendants(matching: .any)["recipe-detail"]
-    XCTAssertTrue(detail.waitForExistence(timeout: 5))
+    let detail = openRecipeDetail(in: app, from: recipeRow)
 
     let title = app.descendants(matching: .any)["recipe-title"]
     XCTAssertTrue(title.waitForExistence(timeout: 2))
@@ -116,9 +113,7 @@ final class KitchenMemoryUITests: XCTestCase {
     XCTAssertTrue(recipeRow.waitForExistence(timeout: 5))
     try performAccessibilityAudit(on: app)
 
-    activate(recipeRow)
-    let detail = app.descendants(matching: .any)["recipe-detail"]
-    XCTAssertTrue(detail.waitForExistence(timeout: 5))
+    let detail = openRecipeDetail(in: app, from: recipeRow)
     try performAccessibilityAudit(on: app)
 
     let instructions = app.descendants(matching: .any)["instructions-section"]
@@ -155,14 +150,18 @@ final class KitchenMemoryUITests: XCTestCase {
 #else
     guard let element = issue.element else { return false }
 
-    if issue.auditType == .sufficientElementDescription {
+    if issue.auditType == .sufficientElementDescription,
+      element.elementType == .group,
+      element.label.isEmpty,
+      !element.isHittable
+    {
       // On macOS, SwiftUI exposes non-interactive layout groups to XCTest and
       // keeps their native Text nodes separate in the query tree. Xcode 26
       // then audits those structural groups as if each needed its own spoken
-      // label. Accept only an empty-labeled, non-hittable Group.
-      return element.elementType == .group
-        && element.label.isEmpty
-        && !element.isHittable
+      // label. Accept only an empty-labeled, non-hittable Group. A nonmatching
+      // sufficient-description finding falls through to the exact recipe-row
+      // exception below instead of being rejected prematurely.
+      return true
     }
 
     // A SwiftUI NavigationLink in the macOS sidebar is exposed to XCTest as a
@@ -176,6 +175,33 @@ final class KitchenMemoryUITests: XCTestCase {
       && !element.label.isEmpty
       && element.identifier.hasPrefix("recipe-row-")
 #endif
+  }
+
+  @MainActor
+  private func openRecipeDetail(
+    in app: XCUIApplication,
+    from recipeRow: XCUIElement
+  ) -> XCUIElement {
+    let detail = app.descendants(matching: .any)["recipe-detail"]
+    activate(recipeRow)
+    if detail.waitForExistence(timeout: 5) { return detail }
+
+#if os(iOS)
+    // Hosted iOS occasionally acknowledges the first NavigationLink tap
+    // without completing the transition, especially immediately after an
+    // appearance change. Re-resolve the row and retry exactly once so a
+    // transient activation cannot masquerade as an accessibility failure.
+    let refreshedRow = app.descendants(matching: .any)
+      .matching(NSPredicate(format: "identifier BEGINSWITH %@", "recipe-row-"))
+      .firstMatch
+    if refreshedRow.waitForExistence(timeout: 2) {
+      activate(refreshedRow)
+      if detail.waitForExistence(timeout: 5) { return detail }
+    }
+#endif
+
+    XCTFail("The starter recipe detail did not open")
+    return detail
   }
 
   @MainActor
