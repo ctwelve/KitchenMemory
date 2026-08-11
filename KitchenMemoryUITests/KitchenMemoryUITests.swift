@@ -15,9 +15,17 @@ final class KitchenMemoryUITests: XCTestCase {
     app.launchArguments.append("--ui-testing")
     app.launch()
 
-    XCTAssertTrue(app.staticTexts["recipe-title"].waitForExistence(timeout: 5))
-    XCTAssertTrue(app.staticTexts["recipe-title"].label.contains("Tuna Noodle Hotdish"))
-    XCTAssertTrue(app.staticTexts["Ingredients"].exists)
-    XCTAssertTrue(app.staticTexts["Instructions"].exists)
+    let title = app.descendants(matching: .any)["recipe-title"]
+    XCTAssertTrue(title.waitForExistence(timeout: 5))
+    XCTAssertTrue(title.label.contains("Tuna Noodle Hotdish"))
+
+    let ingredients = app.descendants(matching: .any)
+      .matching(NSPredicate(format: "label CONTAINS[c] %@", "Ingredients"))
+      .firstMatch
+    let instructions = app.descendants(matching: .any)
+      .matching(NSPredicate(format: "label CONTAINS[c] %@", "Instructions"))
+      .firstMatch
+    XCTAssertTrue(ingredients.waitForExistence(timeout: 2))
+    XCTAssertTrue(instructions.waitForExistence(timeout: 2))
   }
 }
