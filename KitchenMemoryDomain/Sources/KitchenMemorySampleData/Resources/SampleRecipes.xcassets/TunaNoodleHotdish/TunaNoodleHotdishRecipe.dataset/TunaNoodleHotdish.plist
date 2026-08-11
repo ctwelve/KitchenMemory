@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>formatVersion</key><integer>1</integer>
+	<key>recipeID</key><string>95781805-F5D3-46B0-B685-A660F8AC69F2</string>
+	<key>revision</key>
+	<dict>
+		<key>id</key><string>CD477A1F-A876-4C08-8AC9-1915ACD71E88</string>
+		<key>recipeID</key><string>95781805-F5D3-46B0-B685-A660F8AC69F2</string>
+		<key>revisionNumber</key><integer>1</integer>
+		<key>title</key><string>Tuna Noodle Hotdish</string>
+		<key>summary</key><string>A deeply savory Midwestern tuna noodle hotdish with peas and a buttery crouton-and-cracker topping.</string>
+		<key>authorName</key><string>Kitchen Memory contributors</string>
+		<key>source</key><dict><key>kind</key><string>original</string><key>title</key><string>Made for dinner on August 10, 2026</string></dict>
+		<key>recipeYield</key>
+		<dict>
+			<key>quantity</key><dict><key>kind</key><string>exact</string><key>lowerBound</key><dict><key>numerator</key><integer>8</integer><key>denominator</key><integer>1</integer></dict></dict>
+			<key>unitText</key><string>servings</string>
+			<key>originalText</key><string>Serves 8 generously</string>
+		</dict>
+		<key>cuisines</key><array><string>Midwestern</string></array>
+		<key>categories</key><array><string>Dinner</string><string>Hotdish</string></array>
+		<key>keywords</key><array><string>casserole</string><string>comfort food</string><string>tuna</string><string>noodles</string></array>
+		<key>media</key>
+		<array>
+			<dict><key>id</key><string>A1111111-1111-4111-8111-111111111111</string><key>role</key><string>hero</string><key>assetName</key><string>TunaNoodleHotdishHero</string><key>accessibilityLabel</key><string>Tuna noodle hotdish with a deeply browned crouton and cracker topping</string></dict>
+			<dict><key>id</key><string>A2222222-2222-4222-8222-222222222222</string><key>role</key><string>thumbnail</string><key>assetName</key><string>TunaNoodleHotdishThumbnail</string><key>accessibilityLabel</key><string>Square detail of tuna noodle hotdish with a browned crouton and cracker topping</string></dict>
+			<dict><key>id</key><string>A3333333-3333-4333-8333-333333333333</string><key>role</key><string>gallery</string><key>assetName</key><string>TunaNoodleHotdishGallery0</string><key>accessibilityLabel</key><string>Side view of a serving of tuna noodle hotdish showing noodles, tuna, peas, and crisp topping</string></dict>
+		</array>
+		<key>equipment</key>
+		<array>
+			<dict><key>id</key><string>F0000001-0000-4000-8000-000000000001</string><key>originalText</key><string>1 9x13&quot; baking dish</string><key>quantity</key><dict><key>kind</key><string>exact</string><key>lowerBound</key><dict><key>numerator</key><integer>1</integer><key>denominator</key><integer>1</integer></dict></dict><key>name</key><string>9-by-13-inch baking dish</string><key>isOptional</key><false/></dict>
+			<dict><key>id</key><string>F0000002-0000-4000-8000-000000000002</string><key>originalText</key><string>1 8 qt pot</string><key>quantity</key><dict><key>kind</key><string>exact</string><key>lowerBound</key><dict><key>numerator</key><integer>1</integer><key>denominator</key><integer>1</integer></dict></dict><key>name</key><string>8-quart pot</string><key>isOptional</key><false/></dict>
+			<dict><key>id</key><string>F0000003-0000-4000-8000-000000000003</string><key>originalText</key><string>1 strainer</string><key>quantity</key><dict><key>kind</key><string>exact</string><key>lowerBound</key><dict><key>numerator</key><integer>1</integer><key>denominator</key><integer>1</integer></dict></dict><key>name</key><string>strainer</string><key>isOptional</key><false/></dict>
+			<dict><key>id</key><string>F0000004-0000-4000-8000-000000000004</string><key>originalText</key><string>1 rimmed sheet tray, recommended</string><key>quantity</key><dict><key>kind</key><string>exact</string><key>lowerBound</key><dict><key>numerator</key><integer>1</integer><key>denominator</key><integer>1</integer></dict></dict><key>name</key><string>rimmed sheet tray</string><key>isOptional</key><true/></dict>
+			<dict><key>id</key><string>F0000005-0000-4000-8000-000000000005</string><key>originalText</key><string>cheese grater, optional</string><key>name</key><string>cheese grater</string><key>isOptional</key><true/></dict>
+		</array>
+		<key>ingredientSections</key>
+		<array>
+			<dict>
+				<key>id</key><string>B1111111-1111-4111-8111-111111111111</string><key>title</key><string>Hotdish</string><key>ingredients</key>
+				<array>
+					<dict><key>id</key><string>C0000001-0000-4000-8000-000000000001</string><key>originalText</key><string>4 5 oz cans of chunk light tuna</string><key>displayText</key><string>4 (5-ounce) cans chunk light tuna</string><key>quantity</key><dict><key>kind</key><string>exact</string><key>lowerBound</key><dict><key>numerator</key><integer>4</integer><key>denominator</key><integer>1</integer></dict></dict><key>unitText</key><string>cans</string><key>package</key><dict><key>quantity</key><dict><key>kind</key><string>exact</string><key>lowerBound</key><dict><key>numerator</key><integer>5</integer><key>denominator</key><integer>1</integer></dict></dict><key>unitText</key><string>ounces</string></dict><key>ingredientText</key><string>chunk light tuna</string><key>isOptional</key><false/><key>scalingBehavior</key><string>linear</string><key>parseState</key><string>reviewed</string></dict>
+					<dict><key>id</key><string>C0000002-0000-4000-8000-000000000002</string><key>originalText</key><string>1 1 lb bag of wavy egg noodles</string><key>displayText</key><string>1 (1-pound) bag wavy egg noodles</string><key>quantity</key><dict><key>kind</key><string>exact</string><key>lowerBound</key><dict><key>numerator</key><integer>1</integer><key>denominator</key><integer>1</integer></dict></dict><key>unitText</key><string>bag</string><key>package</key><dict><key>quantity</key><dict><key>kind</key><string>exact</string><key>lowerBound</key><dict><key>numerator</key><integer>1</integer><key>denominator</key><integer>1</integer></dict></dict><key>unitText</key><string>pound</string></dict><key>ingredientText</key><string>wavy egg noodles</string><key>isOptional</key><false/><key>scalingBehavior</key><string>linear</string><key>parseState</key><string>reviewed</string></dict>
+					<dict><key>id</key><string>C0000003-0000-4000-8000-000000000003</string><key>originalText</key><string>1 28 oz can condensed cream of mushroom soup</string><key>displayText</key><string>1 (28-ounce) can condensed cream of mushroom soup</string><key>quantity</key><dict><key>kind</key><string>exact</string><key>lowerBound</key><dict><key>numerator</key><integer>1</integer><key>denominator</key><integer>1</integer></dict></dict><key>unitText</key><string>can</string><key>package</key><dict><key>quantity</key><dict><key>kind</key><string>exact</string><key>lowerBound</key><dict><key>numerator</key><integer>28</integer><key>denominator</key><integer>1</integer></dict></dict><key>unitText</key><string>ounces</string></dict><key>ingredientText</key><string>condensed cream of mushroom soup</string><key>isOptional</key><false/><key>scalingBehavior</key><string>linear</string><key>parseState</key><string>reviewed</string></dict>
+					<dict><key>id</key><string>C0000004-0000-4000-8000-000000000004</string><key>originalText</key><string>2 cups milk</string><key>displayText</key><string>2 cups milk</string><key>quantity</key><dict><key>kind</key><string>exact</string><key>lowerBound</key><dict><key>numerator</key><integer>2</integer><key>denominator</key><integer>1</integer></dict></dict><key>unitText</key><string>cups</string><key>ingredientText</key><string>milk</string><key>isOptional</key><false/><key>scalingBehavior</key><string>linear</string><key>parseState</key><string>reviewed</string></dict>
+					<dict><key>id</key><string>C0000005-0000-4000-8000-000000000005</string><key>originalText</key><string>1 steamer bag of frozen peas</string><key>displayText</key><string>1 steamer bag frozen peas</string><key>quantity</key><dict><key>kind</key><string>exact</string><key>lowerBound</key><dict><key>numerator</key><integer>1</integer><key>denominator</key><integer>1</integer></dict></dict><key>unitText</key><string>steamer bag</string><key>ingredientText</key><string>frozen peas</string><key>isOptional</key><false/><key>scalingBehavior</key><string>linear</string><key>parseState</key><string>reviewed</string></dict>
+					<dict><key>id</key><string>C0000006-0000-4000-8000-000000000006</string><key>originalText</key><string>2 medium (or equivalent) onions, yellow</string><key>displayText</key><string>2 medium yellow onions (or equivalent), finely diced</string><key>quantity</key><dict><key>kind</key><string>exact</string><key>lowerBound</key><dict><key>numerator</key><integer>2</integer><key>denominator</key><integer>1</integer></dict></dict><key>unitText</key><string>medium</string><key>ingredientText</key><string>yellow onions</string><key>preparation</key><string>finely diced</string><key>note</key><string>or equivalent</string><key>isOptional</key><false/><key>scalingBehavior</key><string>linear</string><key>parseState</key><string>reviewed</string></dict>
+				</array>
+			</dict>
+			<dict>
+				<key>id</key><string>B2222222-2222-4222-8222-222222222222</string><key>title</key><string>Cooking and seasoning</string><key>ingredients</key>
+				<array>
+					<dict><key>id</key><string>C0000007-0000-4000-8000-000000000007</string><key>originalText</key><string>butter, unsalted</string><key>displayText</key><string>About 6 tablespoons unsalted butter, divided</string><key>quantity</key><dict><key>kind</key><string>approximate</string><key>lowerBound</key><dict><key>numerator</key><integer>6</integer><key>denominator</key><integer>1</integer></dict></dict><key>unitText</key><string>tablespoons</string><key>ingredientText</key><string>unsalted butter</string><key>preparation</key><string>divided</string><key>isOptional</key><false/><key>scalingBehavior</key><string>linear</string><key>parseState</key><string>edited</string></dict>
+					<dict><key>id</key><string>C0000008-0000-4000-8000-000000000008</string><key>originalText</key><string>olive oil</string><key>displayText</key><string>Olive oil, as needed</string><key>ingredientText</key><string>olive oil</string><key>isOptional</key><false/><key>scalingBehavior</key><string>manualReview</string><key>parseState</key><string>edited</string></dict>
+					<dict><key>id</key><string>C0000009-0000-4000-8000-000000000009</string><key>originalText</key><string>salt</string><key>displayText</key><string>Salt, plus 1 heaping tablespoon for the pasta water</string><key>ingredientText</key><string>salt</string><key>note</key><string>plus 1 heaping tablespoon for the pasta water</string><key>isOptional</key><false/><key>scalingBehavior</key><string>manualReview</string><key>parseState</key><string>edited</string></dict>
+					<dict><key>id</key><string>C000000A-0000-4000-8000-00000000000A</string><key>originalText</key><string>pepper</string><key>displayText</key><string>Freshly ground black pepper, to taste</string><key>ingredientText</key><string>black pepper</string><key>preparation</key><string>freshly ground</string><key>isOptional</key><false/><key>scalingBehavior</key><string>manualReview</string><key>parseState</key><string>edited</string></dict>
+					<dict><key>id</key><string>C000000B-0000-4000-8000-00000000000B</string><key>originalText</key><string>onion powder</string><key>displayText</key><string>Onion powder, to taste</string><key>ingredientText</key><string>onion powder</string><key>isOptional</key><false/><key>scalingBehavior</key><string>manualReview</string><key>parseState</key><string>edited</string></dict>
+					<dict><key>id</key><string>C000000C-0000-4000-8000-00000000000C</string><key>originalText</key><string>garlic powder</string><key>displayText</key><string>Garlic powder, to taste</string><key>ingredientText</key><string>garlic powder</string><key>isOptional</key><false/><key>scalingBehavior</key><string>manualReview</string><key>parseState</key><string>edited</string></dict>
+					<dict><key>id</key><string>C000000D-0000-4000-8000-00000000000D</string><key>originalText</key><string>cayenne pepper</string><key>displayText</key><string>Cayenne pepper, to taste</string><key>ingredientText</key><string>cayenne pepper</string><key>isOptional</key><false/><key>scalingBehavior</key><string>manualReview</string><key>parseState</key><string>edited</string></dict>
+					<dict><key>id</key><string>C000000E-0000-4000-8000-00000000000E</string><key>originalText</key><string>italian seasoning</string><key>displayText</key><string>Italian seasoning, to taste</string><key>ingredientText</key><string>Italian seasoning</string><key>isOptional</key><false/><key>scalingBehavior</key><string>manualReview</string><key>parseState</key><string>edited</string></dict>
+					<dict><key>id</key><string>C000000F-0000-4000-8000-00000000000F</string><key>originalText</key><string>Worcestershire sauce</string><key>displayText</key><string>Worcestershire sauce, to taste</string><key>ingredientText</key><string>Worcestershire sauce</string><key>isOptional</key><false/><key>scalingBehavior</key><string>manualReview</string><key>parseState</key><string>edited</string></dict>
+					<dict><key>id</key><string>C0000010-0000-4000-8000-000000000010</string><key>originalText</key><string>Montreal steak seasoning</string><key>displayText</key><string>Montreal steak seasoning, to taste</string><key>ingredientText</key><string>Montreal steak seasoning</string><key>isOptional</key><false/><key>scalingBehavior</key><string>manualReview</string><key>parseState</key><string>edited</string></dict>
+				</array>
+			</dict>
+			<dict>
+				<key>id</key><string>B3333333-3333-4333-8333-333333333333</string><key>title</key><string>Topping</string><key>ingredients</key>
+				<array>
+					<dict><key>id</key><string>C0000011-0000-4000-8000-000000000011</string><key>originalText</key><string>1 5 oz bag of pre-seasoned croutons</string><key>displayText</key><string>1 (5-ounce) bag pre-seasoned croutons</string><key>quantity</key><dict><key>kind</key><string>exact</string><key>lowerBound</key><dict><key>numerator</key><integer>1</integer><key>denominator</key><integer>1</integer></dict></dict><key>unitText</key><string>bag</string><key>package</key><dict><key>quantity</key><dict><key>kind</key><string>exact</string><key>lowerBound</key><dict><key>numerator</key><integer>5</integer><key>denominator</key><integer>1</integer></dict></dict><key>unitText</key><string>ounces</string></dict><key>ingredientText</key><string>pre-seasoned croutons</string><key>isOptional</key><false/><key>scalingBehavior</key><string>linear</string><key>parseState</key><string>reviewed</string></dict>
+					<dict><key>id</key><string>C0000012-0000-4000-8000-000000000012</string><key>originalText</key><string>1 half sleeve Ritz crackers</string><key>displayText</key><string>½ sleeve Ritz crackers</string><key>quantity</key><dict><key>kind</key><string>exact</string><key>lowerBound</key><dict><key>numerator</key><integer>1</integer><key>denominator</key><integer>2</integer></dict></dict><key>unitText</key><string>sleeve</string><key>ingredientText</key><string>Ritz crackers</string><key>isOptional</key><false/><key>scalingBehavior</key><string>linear</string><key>parseState</key><string>reviewed</string></dict>
+					<dict><key>id</key><string>C0000013-0000-4000-8000-000000000013</string><key>originalText</key><string>freshly grated pecorino</string><key>displayText</key><string>Freshly grated pecorino, to taste (optional but highly recommended)</string><key>ingredientText</key><string>pecorino</string><key>preparation</key><string>freshly grated</string><key>note</key><string>optional but highly recommended</string><key>isOptional</key><true/><key>scalingBehavior</key><string>manualReview</string><key>parseState</key><string>edited</string></dict>
+				</array>
+			</dict>
+		</array>
+		<key>instructionSections</key>
+		<array>
+			<dict>
+				<key>id</key><string>D1111111-1111-4111-8111-111111111111</string><key>title</key><string>Noodles</string><key>steps</key>
+				<array>
+					<dict><key>id</key><string>E0000001-0000-4000-8000-000000000001</string><key>text</key><string>Fill the 8-quart pot with cold, fresh water to 1 inch below the top.</string></dict>
+					<dict><key>id</key><string>E0000002-0000-4000-8000-000000000002</string><key>text</key><string>Salt the water with a heaping tablespoon of salt and bring it to a rolling boil.</string></dict>
+					<dict><key>id</key><string>E0000003-0000-4000-8000-000000000003</string><key>text</key><string>Add the noodles and cook according to the package directions for firm or al dente, usually about 6 minutes.</string><key>duration</key><dict><key>seconds</key><integer>360</integer></dict></dict>
+					<dict><key>id</key><string>E0000004-0000-4000-8000-000000000004</string><key>text</key><string>Strain the noodles immediately and transfer them to the baking dish.</string></dict>
+					<dict><key>id</key><string>E0000005-0000-4000-8000-000000000005</string><key>text</key><string>Toss the noodles with a bit of olive oil, 2 tablespoons butter, black pepper, Italian seasoning, garlic powder, and onion powder to taste.</string></dict>
+					<dict><key>id</key><string>E0000006-0000-4000-8000-000000000006</string><key>text</key><string>Set the noodles aside while preparing the sauce.</string></dict>
+				</array>
+			</dict>
+			<dict>
+				<key>id</key><string>D2222222-2222-4222-8222-222222222222</string><key>title</key><string>Sauce and assembly</string><key>steps</key>
+				<array>
+					<dict><key>id</key><string>E0000007-0000-4000-8000-000000000007</string><key>text</key><string>Preheat the oven to 400°F.</string><key>temperature</key><dict><key>value</key><dict><key>numerator</key><integer>400</integer><key>denominator</key><integer>1</integer></dict><key>unit</key><string>fahrenheit</string></dict></dict>
+					<dict><key>id</key><string>E0000008-0000-4000-8000-000000000008</string><key>text</key><string>Finely dice the onions. Sauté them in a generous amount of butter, about 2 tablespoons, seasoning with Montreal steak seasoning, salt, and pepper to taste.</string></dict>
+					<dict><key>id</key><string>E0000009-0000-4000-8000-000000000009</string><key>text</key><string>Cook until softened or very lightly browned. There is no need for much caramelization here; the peas will provide ample sweetness.</string></dict>
+					<dict><key>id</key><string>E000000A-0000-4000-8000-00000000000A</string><key>text</key><string>Add the cream of mushroom soup, milk, and tuna. Warm through, then add a dash of Worcestershire sauce and cayenne pepper to taste.</string></dict>
+					<dict><key>id</key><string>E000000B-0000-4000-8000-00000000000B</string><key>text</key><string>Taste the sauce. At this point it should be a bit “too much”: just a bit too salty, too savory, and tuna-forward. It should otherwise be well balanced and look a bit runny. This is ideal; the noodles will absorb and soften the sauce.</string></dict>
+					<dict><key>id</key><string>E000000C-0000-4000-8000-00000000000C</string><key>text</key><string>Cook just until simmering. CAUTION: It is very easy to burn this sauce! A very gentle fond is nice, but the difference between “fond” and “burned electrical wire” taste is about 15 seconds of high heat, so tame that heat or pay attention.</string></dict>
+					<dict><key>id</key><string>E000000D-0000-4000-8000-00000000000D</string><key>text</key><string>Immediately pour the sauce over the noodles. Add the frozen peas and fold everything together gently.</string></dict>
+					<dict><key>id</key><string>E000000E-0000-4000-8000-00000000000E</string><key>text</key><string>Place the baking dish in the center of the preheated oven, preferably on a rimmed sheet tray to catch possible drips. Check after 10 minutes; the hotdish should just begin to bubble.</string><key>duration</key><dict><key>seconds</key><integer>600</integer></dict><key>temperature</key><dict><key>value</key><dict><key>numerator</key><integer>400</integer><key>denominator</key><integer>1</integer></dict><key>unit</key><string>fahrenheit</string></dict></dict>
+				</array>
+			</dict>
+			<dict>
+				<key>id</key><string>D3333333-3333-4333-8333-333333333333</string><key>title</key><string>Topping</string><key>steps</key>
+				<array>
+					<dict><key>id</key><string>E000000F-0000-4000-8000-00000000000F</string><key>text</key><string>While the hotdish begins baking, crush the croutons and Ritz crackers into a coarse powder.</string></dict>
+					<dict><key>id</key><string>E0000010-0000-4000-8000-000000000010</string><key>text</key><string>Melt 2 tablespoons butter and stir it into the topping.</string></dict>
+					<dict><key>id</key><string>E0000011-0000-4000-8000-000000000011</string><key>text</key><string>Season with pepper. Salt will not be needed.</string></dict>
+					<dict><key>id</key><string>E0000012-0000-4000-8000-000000000012</string><key>text</key><string>Optionally—but highly recommended—grate pecorino into the topping and stir to combine.</string></dict>
+					<dict><key>id</key><string>E0000013-0000-4000-8000-000000000013</string><key>text</key><string>Once the hotdish has begun to bubble, top it evenly and return it to the oven to brown.</string></dict>
+					<dict><key>id</key><string>E0000014-0000-4000-8000-000000000014</string><key>text</key><string>Check after 8 minutes, then every 2 minutes thereafter.</string><key>duration</key><dict><key>seconds</key><integer>480</integer></dict></dict>
+					<dict><key>id</key><string>E0000015-0000-4000-8000-000000000015</string><key>text</key><string>Brown to the desired level and remove promptly.</string></dict>
+					<dict><key>id</key><string>E0000016-0000-4000-8000-000000000016</string><key>text</key><string>Let the hotdish rest for about 10 minutes before serving.</string><key>duration</key><dict><key>seconds</key><integer>600</integer></dict></dict>
+				</array>
+			</dict>
+		</array>
+	</dict>
+</dict>
+</plist>

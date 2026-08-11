@@ -64,9 +64,15 @@ My Mac or an iOS Simulator. The application is based on Xcode's standard
 multiplatform SwiftUI template and uses SwiftData as its first local persistence
 implementation.
 
-The persistence-independent domain will live in a `KitchenMemoryDomain` Swift
-package. CloudKit is the selected synchronization and collaboration platform;
-the precise shared-Kitchen integration will be selected after a focused
+The persistence-independent domain lives in the `KitchenMemoryDomain` Swift
+package. Run its tests with:
+
+```sh
+swift test --package-path KitchenMemoryDomain
+```
+
+CloudKit is the selected synchronization and collaboration platform; the
+precise shared-Kitchen integration will be selected after a focused
 collaboration prototype.
 
 ## License

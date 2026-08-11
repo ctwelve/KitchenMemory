@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		A1C4E901302B100000E2C0DB /* KitchenMemoryDomain in Frameworks */ = {isa = PBXBuildFile; productRef = A1C4E903302B100000E2C0DB /* KitchenMemoryDomain */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		A1C4E7AE302A63B900E2C0DB /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -89,6 +93,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A1C4E901302B100000E2C0DB /* KitchenMemoryDomain in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -243,6 +248,7 @@
 			);
 			name = KitchenMemory;
 			packageProductDependencies = (
+				A1C4E903302B100000E2C0DB /* KitchenMemoryDomain */,
 			);
 			productName = KitchenMemory;
 			productReference = A1C4E79E302A63B800E2C0DB /* KitchenMemory.app */;
@@ -328,6 +334,9 @@
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
 			productRefGroup = A1C4E79F302A63B800E2C0DB /* Products */;
+			packageReferences = (
+				A1C4E902302B100000E2C0DB /* XCLocalSwiftPackageReference "KitchenMemoryDomain" */,
+			);
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -785,6 +794,20 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		A1C4E902302B100000E2C0DB /* XCLocalSwiftPackageReference "KitchenMemoryDomain" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = KitchenMemoryDomain;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A1C4E903302B100000E2C0DB /* KitchenMemoryDomain */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = KitchenMemoryDomain;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = A1C4E796302A63B800E2C0DB /* Project object */;
 }

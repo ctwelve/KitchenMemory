@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>id</key>
+	<string>6B4F6E7D-7E08-4E9A-B188-3D692F6B96B8</string>
+	<key>formatVersion</key>
+	<integer>1</integer>
+	<key>name</key>
+	<string>Kitchen Memory Samples</string>
+	<key>recipes</key>
+	<array>
+		<dict>
+			<key>recipeID</key>
+			<string>95781805-F5D3-46B0-B685-A660F8AC69F2</string>
+			<key>dataAssetName</key>
+			<string>TunaNoodleHotdishRecipe</string>
+			<key>heroImageAssetName</key>
+			<string>TunaNoodleHotdishHero</string>
+		</dict>
+	</array>
+</dict>
+</plist>
