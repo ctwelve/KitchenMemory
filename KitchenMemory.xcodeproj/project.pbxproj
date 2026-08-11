@@ -31,6 +31,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		A15962C5302BC01A00926925 /* KitchenMemory.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = KitchenMemory.xctestplan; sourceTree = "<group>"; };
 		A1C4E79E302A63B800E2C0DB /* KitchenMemory.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KitchenMemory.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1C4E7AD302A63B900E2C0DB /* KitchenMemoryTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KitchenMemoryTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1C4E7B7302A63B900E2C0DB /* KitchenMemoryUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KitchenMemoryUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -123,6 +124,7 @@
 		A1C4E795302A63B800E2C0DB = {
 			isa = PBXGroup;
 			children = (
+				A15962C5302BC01A00926925 /* KitchenMemory.xctestplan */,
 				A1C4E837302A6FCA00E2C0DB /* AI.md */,
 				A1C4E838302A6FCA00E2C0DB /* COPYRIGHT */,
 				A1C4E839302A6FCA00E2C0DB /* LICENSE */,
@@ -341,11 +343,11 @@
 			);
 			mainGroup = A1C4E795302A63B800E2C0DB;
 			minimizedProjectReferenceProxies = 1;
-			preferredProjectObjectVersion = 77;
-			productRefGroup = A1C4E79F302A63B800E2C0DB /* Products */;
 			packageReferences = (
 				A1C4E902302B100000E2C0DB /* XCLocalSwiftPackageReference "KitchenMemoryDomain" */,
 			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = A1C4E79F302A63B800E2C0DB /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (

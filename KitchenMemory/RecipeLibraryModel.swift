@@ -12,15 +12,17 @@ import Observation
 final class RecipeLibraryModel {
   private let kitchenID: Kitchen.ID
   private let library: RecipeLibrary
+  private let editor: RecipeEditor
 
   private(set) var recipes: [StoredRecipe] = []
   var selectedRecipeID: Recipe.ID?
   private(set) var errorMessage: String?
   private(set) var hasLoaded = false
 
-  init(kitchenID: Kitchen.ID, library: RecipeLibrary) {
+  init(kitchenID: Kitchen.ID, library: RecipeLibrary, editor: RecipeEditor) {
     self.kitchenID = kitchenID
     self.library = library
+    self.editor = editor
   }
 
   var selectedRecipe: StoredRecipe? {
@@ -45,5 +47,29 @@ final class RecipeLibraryModel {
       errorMessage = "Kitchen Memory could not read this recipe library."
     }
     hasLoaded = true
+  }
+
+  func createRecipe(from draft: RecipeDraft) -> Bool {
+    do {
+      let stored = try editor.create(in: kitchenID, from: draft)
+      reload()
+      selectedRecipeID = stored.recipe.id
+      return true
+    } catch {
+      errorMessage = "Kitchen Memory could not save this recipe."
+      return false
+    }
+  }
+
+  func reviseRecipe(id: Recipe.ID, from draft: RecipeDraft) -> Bool {
+    do {
+      let stored = try editor.revise(recipeID: id, from: draft)
+      reload()
+      selectedRecipeID = stored.recipe.id
+      return true
+    } catch {
+      errorMessage = "Kitchen Memory could not save this recipe."
+      return false
+    }
   }
 }

@@ -7,7 +7,8 @@ import KitchenMemoryDomain
 import SwiftData
 
 /// A recipe together with the revision selected as its current content.
-public struct StoredRecipe: Equatable, Sendable {
+public struct StoredRecipe: Equatable, Identifiable, Sendable {
+  public var id: Recipe.ID { recipe.id }
   public let recipe: Recipe
   public let revision: RecipeRevision
 

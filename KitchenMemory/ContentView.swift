@@ -2,12 +2,15 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: GPL-3.0-only
 
+import KitchenMemoryApplication
 import KitchenMemoryDomain
 import KitchenMemoryPersistence
 import SwiftUI
 
 struct ContentView: View {
   @Bindable var model: RecipeLibraryModel
+  @State private var isCreatingRecipe = false
+  @State private var recipeBeingEdited: StoredRecipe?
 
   var body: some View {
     NavigationSplitView {
@@ -21,6 +24,26 @@ struct ContentView: View {
     }
     .task {
       model.loadIfNeeded()
+    }
+    .toolbar {
+      ToolbarItem(placement: .primaryAction) {
+        Button {
+          isCreatingRecipe = true
+        } label: {
+          Label("New Recipe", systemImage: "plus")
+        }
+        .accessibilityIdentifier("new-recipe")
+      }
+    }
+    .sheet(isPresented: $isCreatingRecipe) {
+      RecipeEditorView(mode: .create) { draft in
+        model.createRecipe(from: draft)
+      }
+    }
+    .sheet(item: $recipeBeingEdited) { storedRecipe in
+      RecipeEditorView(mode: .revise, draft: RecipeDraft(revision: storedRecipe.revision)) { draft in
+        model.reviseRecipe(id: storedRecipe.recipe.id, from: draft)
+      }
     }
     .tint(Color("AccentColor"))
   }
@@ -69,6 +92,12 @@ struct ContentView: View {
     if let selectedRecipe = model.selectedRecipe {
       RecipeDetailView(storedRecipe: selectedRecipe)
         .id(selectedRecipe.recipe.id)
+        .toolbar {
+          ToolbarItem(placement: .primaryAction) {
+            Button("Edit") { recipeBeingEdited = selectedRecipe }
+              .accessibilityIdentifier("edit-recipe")
+          }
+        }
     } else {
       ContentUnavailableView(
         "Select a Recipe",

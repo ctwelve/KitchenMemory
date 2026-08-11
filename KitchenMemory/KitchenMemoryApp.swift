@@ -43,7 +43,8 @@ struct AppDependencies {
     self.modelContainer = modelContainer
     libraryModel = RecipeLibraryModel(
       kitchenID: kitchen.id,
-      library: RecipeLibrary(repository: repository)
+      library: RecipeLibrary(repository: repository),
+      editor: RecipeEditor(repository: repository)
     )
   }
 
