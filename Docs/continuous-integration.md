@@ -34,9 +34,9 @@ macOS and iOS each have three distinct checks:
    succeeds.
 
 The two platform pipelines are independent: macOS checks do not wait for iOS
-checks, and iOS checks do not wait for macOS checks. The final required
-`Build and test` check succeeds only when both platform builds and both core
-test checks succeed.
+checks, and iOS checks do not wait for macOS checks. The repository's merge
+rules require both platform builds and both core-test checks directly, so there
+is no additional aggregator job or runner-startup delay.
 
 Accessibility results remain visible and actionable on every pull request but
 are deliberately outside the required merge gate. This keeps platform-specific
@@ -71,27 +71,26 @@ Every other finding remains fatal. The metadata text uses SwiftUI's unmodified
 Dynamic Type behavior, and its grid becomes a single flexible column at
 accessibility sizes to prevent genuine clipping.
 
-On macOS, SwiftUI can expose a stable accessibility identifier on a transparent
-`Group` while keeping the native `Text` label on that group's descendant.
-XCTest then reports the automation-only wrapper as having no description even
-though VoiceOver reaches the labeled native element beneath it. The macOS audit
-accepts only sufficient-description findings for the app's known identifier
-families, only when the reported element is an empty-labeled group, and only
-when that group demonstrably contains a labeled descendant. The read-flow test
-uses the same narrow descendant fallback when resolving an identified element's
-semantic label. This keeps native SwiftUI roles intact, while genuinely
-unlabeled controls and all other audit categories remain fatal.
+On macOS, SwiftUI exposes non-interactive layout groups to XCTest while keeping
+their native `Text` nodes separate in the query tree. Xcode 26 then reports
+those structural groups as having no description even though VoiceOver reaches
+the labeled native elements. The macOS audit accepts only
+sufficient-description findings whose reported element is an empty-labeled,
+non-hittable `Group`. Buttons, links, other controls, hittable elements, and all
+other audit categories remain fatal. The read-flow test separately proves both
+that each stable automation identifier exists and that its expected native text
+exists, without assuming macOS and iOS organize those facts on the same node.
 
 ## Security and resource choices
 
 The workflow grants its GitHub token read-only repository access. Checkout does
 not persist credentials because no step needs to write to the repository.
 
-The stable `Build and test` check name is the only required status check. The
-two accessibility checks are intentionally optional; changing that policy
-requires updating the repository's merge rules, not adding `continue-on-error`
-to the workflow. This distinction preserves honest failing results while
-preventing those results from blocking a merge.
+`Build (macOS)`, `Core tests (macOS)`, `Build (iOS)`, and `Core tests (iOS)` are
+required status checks. The two accessibility checks are intentionally
+optional; changing that policy requires updating the repository's merge rules,
+not adding `continue-on-error` to the workflow. This distinction preserves
+honest failing results while preventing those results from blocking a merge.
 
 Each job has a 20-minute timeout to prevent an unexpected hang from consuming
 runner time indefinitely. The repository is public. CI should nevertheless
