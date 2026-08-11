@@ -18,6 +18,11 @@ catalog separate from the application's visual assets.
 will use pre-generated stable identifiers so importing the catalog into a fresh
 store is repeatable and can be made idempotent.
 
+The catalog does not contain a Kitchen identifier. A sample recipe retains its
+own stable recipe, revision, and media identities, while the importing use case
+attaches it to the destination Kitchen created for that installation or sharing
+context.
+
 The loader first uses `NSDataAsset` when Xcode compiles the catalog. It also
 supports SwiftPM's command-line behavior, which copies the catalog source into
 the package resource bundle during `swift test`.

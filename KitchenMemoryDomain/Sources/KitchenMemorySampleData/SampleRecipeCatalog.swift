@@ -13,12 +13,10 @@ import KitchenMemoryDomain
 /// The versioned index of sample content bundled with the package.
 public struct SampleRecipeManifest: Codable, Equatable, Sendable {
     public let formatVersion: Int
-    public let kitchenID: Kitchen.ID
     public let recipeIDs: [Recipe.ID]
 
-    public init(formatVersion: Int, kitchenID: Kitchen.ID, recipeIDs: [Recipe.ID]) {
+    public init(formatVersion: Int, recipeIDs: [Recipe.ID]) {
         self.formatVersion = formatVersion
-        self.kitchenID = kitchenID
         self.recipeIDs = recipeIDs
     }
 }
