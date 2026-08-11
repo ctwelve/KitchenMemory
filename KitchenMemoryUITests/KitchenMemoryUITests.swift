@@ -25,11 +25,11 @@ final class KitchenMemoryUITests: XCTestCase {
 
     let title = app.descendants(matching: .any)["recipe-title"]
     XCTAssertTrue(title.waitForExistence(timeout: 2))
-    XCTAssertTrue(labeledElement(in: app, equalTo: "Tuna Noodle Hotdish").waitForExistence(timeout: 2))
+    XCTAssertTrue(textElement(in: app, equalTo: "Tuna Noodle Hotdish").waitForExistence(timeout: 2))
 
     let summary = app.descendants(matching: .any)["recipe-summary"]
     XCTAssertTrue(summary.waitForExistence(timeout: 2))
-    let summaryText = labeledElement(
+    let summaryText = textElement(
       in: app,
       containing: "Midwestern tuna noodle hotdish"
     )
@@ -38,7 +38,7 @@ final class KitchenMemoryUITests: XCTestCase {
     let author = app.descendants(matching: .any)["recipe-author"]
     XCTAssertTrue(author.waitForExistence(timeout: 2))
     XCTAssertTrue(
-      labeledElement(in: app, equalTo: "By Kitchen Memory contributors")
+      textElement(in: app, equalTo: "By Kitchen Memory contributors")
         .waitForExistence(timeout: 2)
     )
 
@@ -49,7 +49,7 @@ final class KitchenMemoryUITests: XCTestCase {
       .matching(NSPredicate(format: "identifier BEGINSWITH %@", "ingredient-subsection-"))
       .firstMatch
     XCTAssertTrue(scroll(detail, untilVisible: ingredientSubsection))
-    XCTAssertTrue(scroll(detail, untilVisible: labeledElement(in: app, equalTo: "Hotdish")))
+    XCTAssertTrue(scroll(detail, untilVisible: textElement(in: app, equalTo: "Hotdish")))
 
     let instructions = app.descendants(matching: .any)["instructions-section"]
     XCTAssertTrue(scroll(detail, untilVisible: instructions))
@@ -58,7 +58,7 @@ final class KitchenMemoryUITests: XCTestCase {
       .matching(NSPredicate(format: "identifier BEGINSWITH %@", "instruction-subsection-"))
       .firstMatch
     XCTAssertTrue(scroll(detail, untilVisible: instructionSubsection))
-    XCTAssertTrue(scroll(detail, untilVisible: labeledElement(in: app, equalTo: "Noodles")))
+    XCTAssertTrue(scroll(detail, untilVisible: textElement(in: app, equalTo: "Noodles")))
 
     let timedInstruction = app.descendants(matching: .any)
       .matching(NSPredicate(format: "label CONTAINS[c] %@", "Duration 6 min"))
@@ -166,10 +166,11 @@ final class KitchenMemoryUITests: XCTestCase {
     }
 
     // A SwiftUI NavigationLink in the macOS sidebar is exposed to XCTest as a
-    // labeled, hittable Button. Xcode 26 nevertheless reports “Unknown role.”
-    // Accept only that trait finding for our recipe-row identifier family;
-    // other controls, roles, and audit categories remain fatal.
-    return issue.auditType == macOSTraitAuditType
+    // labeled, hittable Button. Xcode 26 nevertheless reports “Unknown role”
+    // from a macOS-only audit category. Accept only that exact finding for our
+    // recipe-row identifier family; other controls, roles, descriptions, and
+    // audit categories remain fatal.
+    return issue.compactDescription == "Unknown role"
       && element.elementType == .button
       && element.isHittable
       && !element.label.isEmpty
@@ -177,32 +178,29 @@ final class KitchenMemoryUITests: XCTestCase {
 #endif
   }
 
-#if os(macOS)
-  // XCUIAccessibilityAuditTypeTrait is declared as bit 18 in Xcode's macOS
-  // XCUIAutomation headers, but the macOS Swift overlay omits the `.trait`
-  // convenience member that the iOS overlay exposes.
-  private var macOSTraitAuditType: XCUIAccessibilityAuditType {
-    XCUIAccessibilityAuditType(rawValue: 1 << 18)
-  }
-#endif
-
   @MainActor
-  private func labeledElement(
+  private func textElement(
     in app: XCUIApplication,
     equalTo label: String
   ) -> XCUIElement {
-    app.descendants(matching: .any)
-      .matching(NSPredicate(format: "label == %@", label))
+    app.staticTexts
+      .matching(NSPredicate(format: "label == %@ OR value == %@", label, label))
       .firstMatch
   }
 
   @MainActor
-  private func labeledElement(
+  private func textElement(
     in app: XCUIApplication,
     containing label: String
   ) -> XCUIElement {
-    app.descendants(matching: .any)
-      .matching(NSPredicate(format: "label CONTAINS %@", label))
+    app.staticTexts
+      .matching(
+        NSPredicate(
+          format: "label CONTAINS[c] %@ OR value CONTAINS[c] %@",
+          label,
+          label
+        )
+      )
       .firstMatch
   }
 

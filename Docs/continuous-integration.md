@@ -81,8 +81,9 @@ for labeled, hittable `Button` elements whose identifier begins with
 `recipe-row-`; these are native SwiftUI sidebar `NavigationLink` values that
 XCTest can activate successfully. Other controls, roles, and audit categories
 remain fatal. The read-flow test separately proves both that each stable
-automation identifier exists and that its expected native label exists, without
-assuming macOS and iOS organize those facts on the same node or element type.
+automation identifier exists and that its expected native static-text label or
+value exists, without assuming macOS and iOS organize those facts on the same
+node.
 
 ## Security and resource choices
 
