@@ -5,23 +5,11 @@
 import Foundation
 import SwiftData
 
-/// The complete SwiftData schema owned by the persistence module.
+/// Access to Kitchen Memory's current versioned SwiftData schema.
 ///
-/// Keeping this list in one place makes app setup, previews, and tests use the
-/// same schema. Add migrations here when the first shipped schema must evolve.
+/// App setup, previews, and tests use the same migration plan. Add a new
+/// immutable ``VersionedSchema`` and an explicit stage when this store evolves.
 public enum KitchenMemorySchema {
-  public static let models: [any PersistentModel.Type] = [
-    KitchenRecord.self,
-    RecipeRecord.self,
-    RecipeRevisionRecord.self,
-    RecipeMediaRecord.self,
-    EquipmentRecord.self,
-    IngredientSectionRecord.self,
-    RecipeIngredientRecord.self,
-    InstructionSectionRecord.self,
-    InstructionStepRecord.self,
-  ]
-
   /// Creates an in-memory test container or the app's durable local container.
   ///
   /// The default persistent location remains SwiftData-managed. Persistent
@@ -31,7 +19,7 @@ public enum KitchenMemorySchema {
     inMemory: Bool = false,
     storeURL: URL? = nil
   ) throws -> ModelContainer {
-    let schema = Schema(models)
+    let schema = Schema(versionedSchema: KitchenMemorySchemaV1.self)
     let configuration: ModelConfiguration
     if let storeURL {
       configuration = ModelConfiguration(
@@ -48,6 +36,10 @@ public enum KitchenMemorySchema {
         cloudKitDatabase: .none
       )
     }
-    return try ModelContainer(for: schema, configurations: [configuration])
+    return try ModelContainer(
+      for: schema,
+      migrationPlan: KitchenMemoryMigrationPlan.self,
+      configurations: [configuration]
+    )
   }
 }

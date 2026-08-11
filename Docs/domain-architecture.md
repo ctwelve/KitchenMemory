@@ -159,7 +159,8 @@ and its saved revision history (newest first).
 The initial local store uses SwiftData's standard location and is explicitly
 local-only: synchronization remains behind the same repository boundary until
 the shared-Kitchen prototype selects its CloudKit behavior. The database is not
-the export format.
+the export format. It is installed through an explicit V1 migration plan; later
+schema changes add immutable versions and deliberate migration stages.
 
 `KitchenMemoryApplication` now supplies the first such use case. `RecipeLibrary`
 provides Kitchen-scoped listing and stable-identifier lookup to SwiftUI without

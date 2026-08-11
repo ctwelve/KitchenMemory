@@ -5,10 +5,18 @@
 import KitchenMemoryDomain
 import KitchenMemoryPersistence
 import KitchenMemorySampleData
+import SwiftData
 import XCTest
 
 @MainActor
 final class SwiftDataRecipeRepositoryTests: XCTestCase {
+  func testContainerUsesTheInitialVersionedSchemaAndMigrationPlan() throws {
+    let container = try KitchenMemorySchema.makeContainer(inMemory: true)
+
+    XCTAssertEqual(container.schema.version, Schema.Version(1, 0, 0))
+    XCTAssertNotNil(container.migrationPlan)
+  }
+
   func testTunaNoodleHotdishRoundTripsThroughSwiftData() throws {
     let kitchen = Kitchen(name: "Test Kitchen")
     let manifest = try SampleRecipeCatalog.loadManifest()

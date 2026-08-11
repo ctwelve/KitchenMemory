@@ -42,6 +42,11 @@ be added behind this boundary after the collaboration prototype. In-memory
 containers remain available for previews and tests, and callers may provide an
 explicit URL for isolated tests or migration work.
 
+The store begins at `KitchenMemorySchemaV1` under
+`KitchenMemoryMigrationPlan`. Every later schema change must add a new immutable
+version and an explicit migration stage; V1's models are never edited in place
+after release.
+
 ## Sample resources
 
 Sample content belongs in
