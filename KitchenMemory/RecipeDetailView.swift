@@ -131,7 +131,7 @@ struct RecipeDetailView: View {
       if let summary = revision.summary {
         Text(summary)
           .font(.title3)
-          .foregroundStyle(.secondary)
+          .foregroundStyle(.primary)
           .accessibilityLabel(summary)
           .accessibilityIdentifier("recipe-summary")
       }
@@ -154,26 +154,21 @@ struct RecipeDetailView: View {
       LazyVGrid(columns: metadataColumns, spacing: 12) {
         ForEach(values) { value in
           VStack(alignment: .leading, spacing: 5) {
-            // Treat the decorative symbol and its label as one phrase so
-            // VoiceOver announces "Yield" rather than "person.2, Yield."
-            // Keep identifiers on the text nodes because XCTest associates
-            // its Dynamic Type findings with those inner nodes.
             HStack(spacing: 5) {
               Image(systemName: value.systemImage)
+                .accessibilityHidden(true)
               Text(value.label)
-                .accessibilityLabel(value.label)
-                .accessibilityIdentifier("recipe-metadata-label-\(value.label.lowercased())")
             }
             .foregroundStyle(Color("IconMark"))
-            .accessibilityElement(children: .combine)
-            .accessibilityLabel(value.label)
             Text(value.value)
-              .accessibilityLabel(value.value)
-              .accessibilityIdentifier("recipe-metadata-value-\(value.label.lowercased())")
           }
           .frame(maxWidth: .infinity, alignment: .leading)
           .padding(14)
           .background(Color("SubtleFill"), in: .rect(cornerRadius: 12))
+          .accessibilityRepresentation {
+            Text("\(value.label), \(value.value)")
+              .accessibilityIdentifier("recipe-metadata-\(value.label.lowercased())")
+          }
         }
       }
     }
@@ -276,7 +271,6 @@ struct RecipeDetailView: View {
       Text(text)
         .textSelection(.enabled)
     }
-    .accessibilityElement(children: .combine)
   }
 
   private func instructionStep(_ number: Int, step: InstructionStep) -> some View {
