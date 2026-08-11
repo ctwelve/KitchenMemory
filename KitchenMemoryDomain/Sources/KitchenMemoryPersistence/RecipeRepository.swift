@@ -28,6 +28,8 @@ public protocol RecipeRepository: AnyObject {
   func kitchen(id: Kitchen.ID) throws -> Kitchen?
   func recipe(id: Recipe.ID) throws -> StoredRecipe?
   func recipes(in kitchenID: Kitchen.ID) throws -> [StoredRecipe]
+  /// Returns every saved revision for a recipe, newest revision first.
+  func revisions(for recipeID: Recipe.ID) throws -> [RecipeRevision]
 }
 
 /// Failures detected while translating between domain values and stored rows.
@@ -121,6 +123,15 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
       .sorted {
         $0.revision.title.localizedStandardCompare($1.revision.title) == .orderedAscending
       }
+  }
+
+  public func revisions(for recipeID: Recipe.ID) throws -> [RecipeRevision] {
+    let identifier = recipeID.rawValue
+    let descriptor = FetchDescriptor<RecipeRevisionRecord>(
+      predicate: #Predicate { $0.recipeID == identifier },
+      sortBy: [SortDescriptor(\.revisionNumber, order: .reverse)]
+    )
+    return try context.fetch(descriptor).map(domainRevision)
   }
 
   private func upsert(_ recipe: Recipe) throws {

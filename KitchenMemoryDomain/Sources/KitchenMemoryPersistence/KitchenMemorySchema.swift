@@ -2,6 +2,7 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: GPL-3.0-only
 
+import Foundation
 import SwiftData
 
 /// The complete SwiftData schema owned by the persistence module.
@@ -21,10 +22,32 @@ public enum KitchenMemorySchema {
     InstructionStepRecord.self,
   ]
 
-  /// Creates a container suitable for the app or for an in-memory test.
-  public static func makeContainer(inMemory: Bool = false) throws -> ModelContainer {
+  /// Creates an in-memory test container or the app's durable local container.
+  ///
+  /// The default persistent location remains SwiftData-managed. Persistent
+  /// stores are local-only for this slice: CloudKit is selected at the
+  /// synchronization boundary later, rather than enabled implicitly here.
+  public static func makeContainer(
+    inMemory: Bool = false,
+    storeURL: URL? = nil
+  ) throws -> ModelContainer {
     let schema = Schema(models)
-    let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: inMemory)
+    let configuration: ModelConfiguration
+    if let storeURL {
+      configuration = ModelConfiguration(
+        "KitchenMemory",
+        schema: schema,
+        url: storeURL,
+        cloudKitDatabase: .none
+      )
+    } else {
+      configuration = ModelConfiguration(
+        "KitchenMemory",
+        schema: schema,
+        isStoredInMemoryOnly: inMemory,
+        cloudKitDatabase: .none
+      )
+    }
     return try ModelContainer(for: schema, configurations: [configuration])
   }
 }

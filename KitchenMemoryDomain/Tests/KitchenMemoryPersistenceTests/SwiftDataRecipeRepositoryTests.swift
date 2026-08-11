@@ -80,6 +80,45 @@ final class SwiftDataRecipeRepositoryTests: XCTestCase {
     let stored = try XCTUnwrap(repository.recipe(id: recipeID))
     XCTAssertEqual(stored.recipe.currentRevisionID, secondRevision.id)
     XCTAssertEqual(stored.revision, secondRevision)
+    XCTAssertEqual(
+      try repository.revisions(for: recipeID),
+      [secondRevision, firstRevision]
+    )
+  }
+
+  func testDiskStoreSurvivesANewContainer() throws {
+    let storeURL = FileManager.default.temporaryDirectory
+      .appending(path: "KitchenMemoryPersistenceTests")
+      .appending(path: UUID().uuidString)
+      .appending(path: "KitchenMemory.store")
+    defer {
+      try? FileManager.default.removeItem(at: storeURL.deletingLastPathComponent())
+    }
+    try FileManager.default.createDirectory(
+      at: storeURL.deletingLastPathComponent(),
+      withIntermediateDirectories: true
+    )
+
+    let kitchen = Kitchen(name: "Persistent Kitchen")
+    let recipeID = Recipe.ID()
+    let revision = RecipeRevision(recipeID: recipeID, revisionNumber: 1, title: "Keepsake Soup")
+    let recipe = Recipe(
+      id: recipeID,
+      kitchenID: kitchen.id,
+      currentRevisionID: revision.id
+    )
+
+    let firstRepository = SwiftDataRecipeRepository(
+      modelContainer: try KitchenMemorySchema.makeContainer(storeURL: storeURL)
+    )
+    try firstRepository.save(kitchen)
+    try firstRepository.save(recipe: recipe, revision: revision)
+
+    let reopenedRepository = SwiftDataRecipeRepository(
+      modelContainer: try KitchenMemorySchema.makeContainer(storeURL: storeURL)
+    )
+    XCTAssertEqual(try reopenedRepository.kitchen(id: kitchen.id), kitchen)
+    XCTAssertEqual(try reopenedRepository.recipe(id: recipeID)?.revision, revision)
   }
 
   func testRecipeListIsKitchenScopedAndSortedByTitle() throws {

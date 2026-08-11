@@ -30,6 +30,17 @@ final class RecipeLibraryTests: XCTestCase {
     XCTAssertEqual(try library.recipe(id: stored.recipe.id), stored)
   }
 
+  func testListsSavedRevisionsNewestFirst() throws {
+    let repository = InMemoryRecipeRepository()
+    let library = RecipeLibrary(repository: repository)
+    let recipeID = Recipe.ID()
+    let older = RecipeRevision(recipeID: recipeID, revisionNumber: 1, title: "First Draft")
+    let newer = RecipeRevision(recipeID: recipeID, revisionNumber: 2, title: "Family Draft")
+    repository.revisionsByRecipeID[recipeID] = [newer, older]
+
+    XCTAssertEqual(try library.revisions(for: recipeID), [newer, older])
+  }
+
   private func makeStoredRecipe(title: String, kitchenID: Kitchen.ID) -> StoredRecipe {
     let recipeID = Recipe.ID()
     let revision = RecipeRevision(recipeID: recipeID, revisionNumber: 1, title: title)
@@ -47,6 +58,7 @@ final class RecipeLibraryTests: XCTestCase {
 @MainActor
 private final class InMemoryRecipeRepository: RecipeRepository {
   var storedRecipes: [StoredRecipe] = []
+  var revisionsByRecipeID: [Recipe.ID: [RecipeRevision]] = [:]
 
   func save(_ kitchen: Kitchen) throws {}
   func save(recipe: Recipe, revision: RecipeRevision) throws {}
@@ -58,5 +70,9 @@ private final class InMemoryRecipeRepository: RecipeRepository {
 
   func recipes(in kitchenID: Kitchen.ID) throws -> [StoredRecipe] {
     storedRecipes.filter { $0.recipe.kitchenID == kitchenID }
+  }
+
+  func revisions(for recipeID: Recipe.ID) throws -> [RecipeRevision] {
+    revisionsByRecipeID[recipeID, default: []]
   }
 }

@@ -36,6 +36,12 @@ rather than moving SwiftData records between actors. The repository enforces the
 Kitchen ownership boundary when saving and exposes Kitchen-scoped recipe lists
 already reconstructed as domain values.
 
+`KitchenMemorySchema.makeContainer()` uses SwiftData's standard permanent local
+store location, deliberately configured without CloudKit. Synchronization will
+be added behind this boundary after the collaboration prototype. In-memory
+containers remain available for previews and tests, and callers may provide an
+explicit URL for isolated tests or migration work.
+
 ## Sample resources
 
 Sample content belongs in
