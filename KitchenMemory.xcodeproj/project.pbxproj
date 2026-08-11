@@ -32,6 +32,8 @@
 
 /* Begin PBXFileReference section */
 		A15962C5302BC01A00926925 /* KitchenMemory.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = KitchenMemory.xctestplan; sourceTree = "<group>"; };
+		A1596308302BCCE600926925 /* accessibility-engineering.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "accessibility-engineering.md"; sourceTree = "<group>"; };
+		A1596309302BCCE600926925 /* alpha-roadmap.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "alpha-roadmap.md"; sourceTree = "<group>"; };
 		A1C4E79E302A63B800E2C0DB /* KitchenMemory.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KitchenMemory.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1C4E7AD302A63B900E2C0DB /* KitchenMemoryTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KitchenMemoryTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1C4E7B7302A63B900E2C0DB /* KitchenMemoryUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KitchenMemoryUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -217,6 +219,8 @@
 		A1C4E800302A6F8D00E2C0DB /* Docs */ = {
 			isa = PBXGroup;
 			children = (
+				A1596308302BCCE600926925 /* accessibility-engineering.md */,
+				A1596309302BCCE600926925 /* alpha-roadmap.md */,
 				A1C4E7F2302A6F8D00E2C0DB /* decisions */,
 				A1C4E7F3302A6F8D00E2C0DB /* apple-platform.md */,
 				A1C4E7F4302A6F8D00E2C0DB /* continuous-integration.md */,

@@ -42,6 +42,7 @@ Pantry inventory, meal planning, and shopping follow after this slice is useful.
 ## Documentation
 
 - [Product doctrine](Docs/product-doctrine.md) — consolidated product direction
+- [Alpha roadmap](Docs/alpha-roadmap.md) — remaining slices to a working alpha
 - [Naming and voice](Docs/naming.md)
 - [Product brief](Docs/product-brief.md)
 - [Recipe domain model](Docs/recipe-domain-model.md)

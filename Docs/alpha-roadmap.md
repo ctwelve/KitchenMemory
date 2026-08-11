@@ -1,0 +1,158 @@
+<!--
+Kitchen Memory
+Copyright © 2026 the Kitchen Memory contributors.
+SPDX-License-Identifier: GPL-3.0-only
+-->
+
+# Alpha roadmap
+
+- Status: Accepted direction
+- Date: 2026-08-11
+
+This roadmap divides the remaining work between the completed local-persistence
+foundation and a full working alpha. It is intentionally outcome-oriented: each
+slice should leave the app more useful on its own and have clear acceptance
+criteria.
+
+## Alpha definition
+
+Kitchen Memory reaches alpha when one household can locally save or import
+recipes faithfully, correct them without re-entry, scale usable quantities, and
+cook from the application without returning to the source webpage.
+
+The alpha validates the recipe loop:
+
+```text
+Manual entry or webpage URL
+            ↓
+     Review and correction
+            ↓
+       Saved recipe revision
+            ↓
+         Scale and cook
+            ↓
+  Cooking-session record of reality
+```
+
+The app remains local first throughout this work. Each slice preserves original
+source text and keeps canonical recipe editing distinct from a cooking session.
+
+## Completed slices
+
+### Slice 1 — Proof of concept
+
+Established that the project direction, Apple-native approach, and basic recipe
+experience were viable.
+
+### Slice 2 — Skeleton
+
+Created the SwiftUI application, domain/application boundaries, sample content,
+accessibility foundation, tests, and continuous integration.
+
+### Slice 3 — Local persistence
+
+Added SwiftData storage, first-launch kitchen setup and sample seeding, a local
+recipe library, manual creation and editing, and immutable recipe revisions.
+
+## Remaining slices
+
+### Slice 4 — Structured recipe editing
+
+Make manual entry genuinely useful rather than a text-only fallback.
+
+- Edit metadata, yield, times, and source attribution.
+- Create, name, reorder, and remove ingredient and instruction sections.
+- Add, edit, reorder, delete, and move ingredient rows and instruction steps.
+- Preserve each ingredient's original text alongside its editable structured
+  interpretation.
+- Keep incomplete and imprecise recipes valid.
+
+**Complete when:** a person can enter a multi-section family recipe, revise it,
+and retain its meaningful structure and source details after relaunching.
+
+### Slice 5 — Import engine
+
+Build the deterministic, lossless Schema.org `Recipe` JSON-LD pipeline behind a
+testable boundary.
+
+- Decode saved HTML and JSON-LD without executing page scripts.
+- Discover candidates in standalone blocks and `@graph` structures.
+- Support common text, object, array, `HowToStep`, and `HowToSection` shapes.
+- Preserve raw source material, canonical URL, and provenance.
+- Provisional ingredient parsing must retain the original input and allow partial
+  results rather than rejecting a recipe.
+
+**Complete when:** checked-in fixtures cover the documented input families and
+produce reviewable recipe drafts with no lost meaningful recipe text.
+
+### Slice 6 — URL import and review
+
+Turn the import engine into a trustworthy person-facing acquisition workflow.
+
+- Accept a webpage URL and fetch it with privacy and safety limits.
+- Automatically select one clear candidate or ask the person to choose.
+- Present the resulting draft and emphasize only uncertain or incomplete fields.
+- Allow direct corrections before saving through the same editing model as manual
+  entry.
+- Show visible attribution and a link to the original source after saving.
+
+**Complete when:** a person can import varied public recipe pages, repair an
+imperfect import faster than re-entering it, and save the result locally.
+
+### Slice 7 — Scaling and recipe reading
+
+Make recipes adaptable to the intended yield while remaining honest about
+quantities that cannot be scaled automatically.
+
+- Select a working yield from a recipe's usable numeric yield.
+- Scale exact and ranged linear quantities with rational arithmetic.
+- Leave text, fixed, and manual-review quantities intact and visibly explain why.
+- Provide accessible, readable base and scaled recipe presentations.
+
+**Complete when:** representative recipes scale predictably without converting
+fractions to inaccurate floating-point text or silently changing ambiguous
+amounts.
+
+### Slice 8 — Cooking sessions
+
+Support real cooking without silently changing the maintained recipe.
+
+- Start and resume a session for a specific recipe revision and working scale.
+- Provide full-recipe and step-by-step cooking presentations.
+- Persist ingredient and step checkoffs.
+- Record quick notes, skips, substitutions, and other deviations.
+- Finish or abandon a session while retaining its history and recipe-revision
+  reference.
+
+**Complete when:** a cook can prepare a recipe entirely from the app, return
+later to a session, and see what happened without altering the canonical recipe.
+
+### Slice 9 — Alpha hardening
+
+Prove that the completed loop is dependable enough for household use.
+
+- Add migration, error, and recovery coverage for persisted local data.
+- Expand importer fixtures and domain/application/UI regression tests.
+- Audit the finished workflows for accessibility on supported Apple platforms.
+- Validate macOS and iOS builds and document local backup/export expectations.
+- Run an alpha acceptance set of roughly twenty varied real recipes.
+
+**Complete when:** all acceptance recipes import or enter successfully, retain
+their meaningful content after relaunch, scale safely where supported, and can be
+cooked through in the application.
+
+## Sequence and boundaries
+
+```text
+Structured editing
+  → Import engine
+    → URL import and review
+      → Scaling and reading
+        → Cooking sessions
+          → Alpha hardening
+```
+
+Pantry holdings, shopping lists, planned cooks, meal planning, synchronization,
+OCR, and social features are intentionally outside the alpha. The domain seams
+for them remain important, but they should not delay validation of the complete
+recipe import, correction, scaling, and cooking loop.
