@@ -6,8 +6,8 @@ SPDX-License-Identifier: GPL-3.0-only
 
 # Continuous integration
 
-GitHub Actions repeats the project's core verification on a clean,
-GitHub-hosted Mac.
+GitHub Actions repeats the project's core and accessibility verification on
+clean, GitHub-hosted Macs.
 
 ## When CI runs
 
@@ -24,21 +24,36 @@ control cancels the older run.
 
 ## What CI verifies
 
-One `macos-26` job performs the same checks used during local development:
+macOS and iOS each have three distinct checks:
 
-1. Report the selected Xcode version in the log.
-2. Run the KitchenMemoryDomain and sample-data package tests.
-3. Build the macOS app and run its tests.
-4. Build the iOS app and run its tests on an iPhone Simulator.
-5. Build the native DocC documentation.
+1. `Build` compiles the application. The macOS build also builds the native
+   DocC documentation.
+2. `Core tests` runs after that platform's build succeeds. The macOS check also
+   runs the KitchenMemoryDomain and sample-data package tests.
+3. `Accessibility` runs the UI test target after that platform's build
+   succeeds.
+
+The two platform pipelines are independent: macOS checks do not wait for iOS
+checks, and iOS checks do not wait for macOS checks. The final required
+`Build and test` check succeeds only when both platform builds and both core
+test checks succeed.
+
+Accessibility results remain visible and actionable on every pull request but
+are deliberately outside the required merge gate. This keeps platform-specific
+accessibility regressions explicit without making unrelated feature work wait
+on differences in SwiftUI's platform accessibility trees.
 
 Application, integration, and UI targets use XCTest as their common test model.
 Independent domain and support packages may use Swift Testing when it improves
 their tests without mixing conventions inside one target.
 
 The commands disable code signing because these checks produce no distributable
-application and require no development certificate. A shared temporary Derived
-Data directory lets later Xcode steps reuse compatible work from earlier steps.
+application and require no development certificate. Each job receives a clean
+runner and its own temporary Derived Data directory. GitHub jobs do not share
+build products automatically, so test jobs compile the test products they need
+after the preceding build has established that the application itself compiles.
+Sharing those products would require transferring large Derived Data artifacts;
+that optimization is deferred until measurements justify its complexity.
 
 The UI suite treats accessibility semantics as part of the app's test contract.
 It verifies stable identifiers and reading order for the starter recipe, then
@@ -61,11 +76,15 @@ accessibility sizes to prevent genuine clipping.
 The workflow grants its GitHub token read-only repository access. Checkout does
 not persist credentials because no step needs to write to the repository.
 
-All checks run in one job to keep the first workflow understandable and avoid
-provisioning several macOS runners for the same commit. The job has a 20-minute
-timeout to prevent an unexpected hang from consuming runner time indefinitely.
-The repository is public. CI should nevertheless remain economical and avoid
-unnecessary duplicate macOS jobs.
+The stable `Build and test` check name is the only required status check. The
+two accessibility checks are intentionally optional; changing that policy
+requires updating the repository's merge rules, not adding `continue-on-error`
+to the workflow. This distinction preserves honest failing results while
+preventing those results from blocking a merge.
+
+Each job has a 20-minute timeout to prevent an unexpected hang from consuming
+runner time indefinitely. The repository is public. CI should nevertheless
+remain economical and avoid unnecessary duplicate work.
 
 ## Maintenance
 

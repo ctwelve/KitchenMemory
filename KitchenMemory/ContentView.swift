@@ -49,6 +49,7 @@ struct ContentView: View {
         .accessibilityIdentifier("recipe-row-\(storedRecipe.recipe.id.rawValue.uuidString)")
       }
       .accessibilityIdentifier("recipe-library")
+      .accessibilityLabel("Recipe library")
       .listStyle(.sidebar)
       .overlay {
         if !model.hasLoaded {

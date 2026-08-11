@@ -48,6 +48,7 @@ struct RecipeDetailView: View {
                   Text(title)
                     .font(.headline)
                     .foregroundStyle(Color("IconMark"))
+                    .accessibilityLabel(title)
                     .accessibilityHeading(.h3)
                     .accessibilityIdentifier(
                       "ingredient-subsection-\(section.id.rawValue.uuidString)"
@@ -73,6 +74,7 @@ struct RecipeDetailView: View {
                   Text(title)
                     .font(.headline)
                     .foregroundStyle(Color("IconMark"))
+                    .accessibilityLabel(title)
                     .accessibilityHeading(.h3)
                     .accessibilityIdentifier(
                       "instruction-subsection-\(section.id.rawValue.uuidString)"
@@ -93,6 +95,7 @@ struct RecipeDetailView: View {
       .frame(maxWidth: .infinity)
     }
     .accessibilityIdentifier("recipe-detail")
+    .accessibilityLabel("\(revision.title) recipe")
     .background(Color("AppBackground"))
     .navigationTitle(revision.title)
 #if os(iOS)
@@ -121,6 +124,7 @@ struct RecipeDetailView: View {
       Text(revision.title)
         .font(.largeTitle.bold())
         .foregroundStyle(.primary)
+        .accessibilityLabel(revision.title)
         .accessibilityHeading(.h1)
         .accessibilityIdentifier("recipe-title")
 
@@ -128,6 +132,7 @@ struct RecipeDetailView: View {
         Text(summary)
           .font(.title3)
           .foregroundStyle(.secondary)
+          .accessibilityLabel(summary)
           .accessibilityIdentifier("recipe-summary")
       }
 
@@ -135,6 +140,7 @@ struct RecipeDetailView: View {
         Text("By \(authorName)")
           .font(.subheadline)
           .foregroundStyle(.primary)
+          .accessibilityLabel("By \(authorName)")
           .accessibilityIdentifier("recipe-author")
       }
     }
@@ -155,12 +161,14 @@ struct RecipeDetailView: View {
             HStack(spacing: 5) {
               Image(systemName: value.systemImage)
               Text(value.label)
+                .accessibilityLabel(value.label)
                 .accessibilityIdentifier("recipe-metadata-label-\(value.label.lowercased())")
             }
             .foregroundStyle(Color("IconMark"))
             .accessibilityElement(children: .combine)
             .accessibilityLabel(value.label)
             Text(value.value)
+              .accessibilityLabel(value.value)
               .accessibilityIdentifier("recipe-metadata-value-\(value.label.lowercased())")
           }
           .frame(maxWidth: .infinity, alignment: .leading)
@@ -241,6 +249,7 @@ struct RecipeDetailView: View {
         Image(systemName: systemImage)
           .accessibilityHidden(true)
         Text(title)
+          .accessibilityLabel(title)
           .accessibilityHeading(.h2)
           .accessibilityIdentifier(accessibilityIdentifier)
       }
