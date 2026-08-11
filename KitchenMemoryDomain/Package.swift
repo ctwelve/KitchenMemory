@@ -8,9 +8,14 @@ import PackageDescription
 
 let package = Package(
     name: "KitchenMemoryDomain",
+    platforms: [
+        .iOS(.v17),
+        .macOS(.v14),
+    ],
     products: [
         .library(name: "KitchenMemoryDomain", targets: ["KitchenMemoryDomain"]),
         .library(name: "KitchenMemorySampleData", targets: ["KitchenMemorySampleData"]),
+        .library(name: "KitchenMemoryPersistence", targets: ["KitchenMemoryPersistence"]),
     ],
     targets: [
         .target(name: "KitchenMemoryDomain"),
@@ -19,6 +24,10 @@ let package = Package(
             dependencies: ["KitchenMemoryDomain"],
             resources: [.process("Resources")]
         ),
+        .target(
+            name: "KitchenMemoryPersistence",
+            dependencies: ["KitchenMemoryDomain"]
+        ),
         .testTarget(
             name: "KitchenMemoryDomainTests",
             dependencies: ["KitchenMemoryDomain"]
@@ -26,6 +35,13 @@ let package = Package(
         .testTarget(
             name: "KitchenMemorySampleDataTests",
             dependencies: ["KitchenMemorySampleData"]
+        ),
+        .testTarget(
+            name: "KitchenMemoryPersistenceTests",
+            dependencies: [
+                "KitchenMemoryPersistence",
+                "KitchenMemorySampleData",
+            ]
         ),
     ]
 )

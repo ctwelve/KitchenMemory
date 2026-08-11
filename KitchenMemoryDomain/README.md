@@ -3,10 +3,31 @@
 `KitchenMemoryDomain` contains Kitchen Memory concepts and rules without
 SwiftData, CloudKit, or user-interface dependencies.
 
-The package currently exposes two library products:
+The package currently exposes three library products:
 
 - `KitchenMemoryDomain` — persistence-independent domain values.
 - `KitchenMemorySampleData` — deterministic sample resources and their loader.
+- `KitchenMemoryPersistence` — SwiftData records and domain-facing repositories.
+
+## Persistence
+
+`KitchenMemoryPersistence` is the first adapter behind the domain boundary. Its
+record types are intentionally internal: application and interface code exchange
+`Kitchen`, `Recipe`, and `RecipeRevision` values through `RecipeRepository` and
+never retain SwiftData models.
+
+The initial schema stores kitchens, recipes, revisions, media, equipment,
+sections, ingredients, and instruction steps as separate rows connected by
+stable UUID foreign keys. Ordered children carry an explicit `sortIndex`, since
+database fetch order is not meaningful by itself. Small atomic value objects
+such as rational quantity expressions are encoded into individual columns; they
+can later become queryable records without changing the domain API.
+
+`SwiftDataRecipeRepository` is main-actor isolated because each `ModelContext`
+is an actor-bound unit of work. Background import will use a separate context
+rather than moving SwiftData records between actors. The repository enforces the
+Kitchen ownership boundary when saving and exposes Kitchen-scoped recipe lists
+already reconstructed as domain values.
 
 ## Sample resources
 
