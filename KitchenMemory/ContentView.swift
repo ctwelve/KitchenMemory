@@ -48,6 +48,7 @@ struct ContentView: View {
         }
         .accessibilityIdentifier("recipe-row-\(storedRecipe.recipe.id.rawValue.uuidString)")
       }
+      .accessibilityIdentifier("recipe-library")
       .listStyle(.sidebar)
       .overlay {
         if !model.hasLoaded {
@@ -86,16 +87,15 @@ private struct RecipeRow: View {
       )
       .frame(width: 56, height: 56)
       .clipShape(.rect(cornerRadius: 10))
+      .accessibilityHidden(true)
 
       VStack(alignment: .leading, spacing: 3) {
         Text(storedRecipe.revision.title)
           .font(.headline)
-          .lineLimit(2)
         if let summary = storedRecipe.revision.summary {
           Text(summary)
             .font(.caption)
-            .foregroundStyle(.secondary)
-            .lineLimit(2)
+            .foregroundStyle(.primary)
         }
       }
     }

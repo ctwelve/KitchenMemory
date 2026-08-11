@@ -9,6 +9,9 @@ import SwiftUI
 struct RecipeDetailView: View {
   let storedRecipe: StoredRecipe
 
+  @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+  @ScaledMetric(relativeTo: .headline) private var stepNumberSize = 30
+
   private var revision: RecipeRevision { storedRecipe.revision }
 
   var body: some View {
@@ -20,7 +23,11 @@ struct RecipeDetailView: View {
         source
 
         if !revision.equipment.isEmpty {
-          recipeSection("Equipment", systemImage: "frying.pan") {
+          recipeSection(
+            "Equipment",
+            systemImage: "frying.pan",
+            accessibilityIdentifier: "equipment-section"
+          ) {
             VStack(alignment: .leading, spacing: 10) {
               ForEach(revision.equipment) { item in
                 bullet(item.originalText)
@@ -29,7 +36,11 @@ struct RecipeDetailView: View {
           }
         }
 
-        recipeSection("Ingredients", systemImage: "carrot") {
+        recipeSection(
+          "Ingredients",
+          systemImage: "carrot",
+          accessibilityIdentifier: "ingredients-section"
+        ) {
           VStack(alignment: .leading, spacing: 22) {
             ForEach(revision.ingredientSections) { section in
               VStack(alignment: .leading, spacing: 10) {
@@ -37,17 +48,24 @@ struct RecipeDetailView: View {
                   Text(title)
                     .font(.headline)
                     .foregroundStyle(Color("IconMark"))
+                    .accessibilityHeading(.h3)
+                    .accessibilityIdentifier(
+                      "ingredient-subsection-\(section.id.rawValue.uuidString)"
+                    )
                 }
                 ForEach(section.ingredients) { ingredient in
                   bullet(ingredient.displayText)
                 }
               }
+              .accessibilityElement(children: .contain)
             }
           }
         }
-        .accessibilityIdentifier("ingredients-section")
-
-        recipeSection("Instructions", systemImage: "list.number") {
+        recipeSection(
+          "Instructions",
+          systemImage: "list.number",
+          accessibilityIdentifier: "instructions-section"
+        ) {
           VStack(alignment: .leading, spacing: 24) {
             ForEach(revision.instructionSections) { section in
               VStack(alignment: .leading, spacing: 14) {
@@ -55,15 +73,19 @@ struct RecipeDetailView: View {
                   Text(title)
                     .font(.headline)
                     .foregroundStyle(Color("IconMark"))
+                    .accessibilityHeading(.h3)
+                    .accessibilityIdentifier(
+                      "instruction-subsection-\(section.id.rawValue.uuidString)"
+                    )
                 }
                 ForEach(Array(section.steps.enumerated()), id: \.element.id) { index, step in
                   instructionStep(index + 1, step: step)
                 }
               }
+              .accessibilityElement(children: .contain)
             }
           }
         }
-        .accessibilityIdentifier("instructions-section")
       }
       .frame(maxWidth: 860, alignment: .leading)
       .padding(.horizontal, 24)
@@ -99,34 +121,47 @@ struct RecipeDetailView: View {
       Text(revision.title)
         .font(.largeTitle.bold())
         .foregroundStyle(.primary)
+        .accessibilityHeading(.h1)
         .accessibilityIdentifier("recipe-title")
 
       if let summary = revision.summary {
         Text(summary)
           .font(.title3)
           .foregroundStyle(.secondary)
+          .accessibilityIdentifier("recipe-summary")
       }
 
       if let authorName = revision.authorName {
         Text("By \(authorName)")
           .font(.subheadline)
-          .foregroundStyle(.secondary)
+          .foregroundStyle(.primary)
+          .accessibilityIdentifier("recipe-author")
       }
     }
+    .accessibilityElement(children: .contain)
   }
 
   @ViewBuilder
   private var metadata: some View {
     let values = metadataValues
     if !values.isEmpty {
-      LazyVGrid(columns: [GridItem(.adaptive(minimum: 130), alignment: .leading)], spacing: 12) {
+      LazyVGrid(columns: metadataColumns, spacing: 12) {
         ForEach(values) { value in
           VStack(alignment: .leading, spacing: 5) {
-            Label(value.label, systemImage: value.systemImage)
-              .font(.caption.weight(.semibold))
-              .foregroundStyle(Color("IconMark"))
+            // Treat the decorative symbol and its label as one phrase so
+            // VoiceOver announces "Yield" rather than "person.2, Yield."
+            // Keep identifiers on the text nodes because XCTest associates
+            // its Dynamic Type findings with those inner nodes.
+            HStack(spacing: 5) {
+              Image(systemName: value.systemImage)
+              Text(value.label)
+                .accessibilityIdentifier("recipe-metadata-label-\(value.label.lowercased())")
+            }
+            .foregroundStyle(Color("IconMark"))
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel(value.label)
             Text(value.value)
-              .font(.body)
+              .accessibilityIdentifier("recipe-metadata-value-\(value.label.lowercased())")
           }
           .frame(maxWidth: .infinity, alignment: .leading)
           .padding(14)
@@ -134,6 +169,13 @@ struct RecipeDetailView: View {
         }
       }
     }
+  }
+
+  private var metadataColumns: [GridItem] {
+    if dynamicTypeSize.isAccessibilitySize {
+      return [GridItem(.flexible(), alignment: .leading)]
+    }
+    return [GridItem(.adaptive(minimum: 130), alignment: .leading)]
   }
 
   private var metadataValues: [MetadataValue] {
@@ -161,10 +203,15 @@ struct RecipeDetailView: View {
           Link(recipeSource.title ?? url.host() ?? "Open Source", destination: url)
         } else {
           Text(recipeSource.title ?? recipeSource.kind.rawValue.capitalized)
+            .foregroundStyle(.primary)
         }
       } label: {
-        Label("Source", systemImage: "link")
-          .foregroundStyle(Color("IconMark"))
+        HStack(spacing: 8) {
+          Image(systemName: "link")
+            .accessibilityHidden(true)
+          Text("Source")
+        }
+        .foregroundStyle(Color("IconMark"))
       }
       .padding(16)
       .background(Color("ContentSurface"), in: .rect(cornerRadius: 12))
@@ -186,12 +233,19 @@ struct RecipeDetailView: View {
   private func recipeSection<Content: View>(
     _ title: String,
     systemImage: String,
+    accessibilityIdentifier: String,
     @ViewBuilder content: () -> Content
   ) -> some View {
     VStack(alignment: .leading, spacing: 18) {
-      Label(title, systemImage: systemImage)
-        .font(.title2.bold())
-        .foregroundStyle(Color("IconMark"))
+      HStack(spacing: 8) {
+        Image(systemName: systemImage)
+          .accessibilityHidden(true)
+        Text(title)
+          .accessibilityHeading(.h2)
+          .accessibilityIdentifier(accessibilityIdentifier)
+      }
+      .font(.title2.bold())
+      .foregroundStyle(Color("IconMark"))
       content()
     }
     .frame(maxWidth: .infinity, alignment: .leading)
@@ -201,6 +255,7 @@ struct RecipeDetailView: View {
       RoundedRectangle(cornerRadius: 16)
         .stroke(Color("SubtleBorder"), lineWidth: 1)
     }
+    .accessibilityElement(children: .contain)
   }
 
   private func bullet(_ text: String) -> some View {
@@ -208,6 +263,7 @@ struct RecipeDetailView: View {
       Image(systemName: "circle.fill")
         .font(.system(size: 5))
         .foregroundStyle(Color("AccentColor"))
+        .accessibilityHidden(true)
       Text(text)
         .textSelection(.enabled)
     }
@@ -219,7 +275,7 @@ struct RecipeDetailView: View {
       Text(number, format: .number)
         .font(.headline)
         .foregroundStyle(Color("ContentSurface"))
-        .frame(width: 30, height: 30)
+        .frame(width: stepNumberSize, height: stepNumberSize)
         .background(Color("AccentColor"), in: Circle())
 
       VStack(alignment: .leading, spacing: 5) {
@@ -237,7 +293,26 @@ struct RecipeDetailView: View {
       }
     }
     .accessibilityElement(children: .combine)
-    .accessibilityLabel("Step \(number). \(step.text)")
+    .accessibilityLabel(instructionAccessibilityLabel(number, step: step))
+  }
+
+  private func instructionAccessibilityLabel(_ number: Int, step: InstructionStep) -> String {
+    var parts = ["Step \(number)."]
+    if let name = step.name {
+      parts.append(accessibilitySentence(name))
+    }
+    parts.append(accessibilitySentence(step.text))
+    if let duration = step.duration {
+      parts.append("Duration \(self.duration(duration)).")
+    }
+    return parts.joined(separator: " ")
+  }
+
+  private func accessibilitySentence(_ text: String) -> String {
+    guard let lastCharacter = text.last, ".!?".contains(lastCharacter) else {
+      return "\(text)."
+    }
+    return text
   }
 }
 

@@ -29,7 +29,7 @@ One `macos-26` job performs the same checks used during local development:
 1. Report the selected Xcode version in the log.
 2. Run the KitchenMemoryDomain and sample-data package tests.
 3. Build the macOS app and run its tests.
-4. Build the app for a generic iOS Simulator destination.
+4. Build the iOS app and run its tests on an iPhone Simulator.
 5. Build the native DocC documentation.
 
 Application, integration, and UI targets use XCTest as their common test model.
@@ -39,6 +39,22 @@ their tests without mixing conventions inside one target.
 The commands disable code signing because these checks produce no distributable
 application and require no development certificate. A shared temporary Derived
 Data directory lets later Xcode steps reuse compatible work from earlier steps.
+
+The UI suite treats accessibility semantics as part of the app's test contract.
+It verifies stable identifiers and reading order for the starter recipe, then
+runs XCTest accessibility audits in light and dark appearances. The audits cover
+contrast, element detection, hit regions, descriptions, Dynamic Type, clipped
+text, and traits.
+
+Recipe metadata combines each decorative SF Symbol and adjacent label into one
+phrase so VoiceOver announces, for example, “Yield” instead of “person.2,
+Yield.” Xcode 26 cannot infer the font behavior of the inner native `Text` nodes
+after SwiftUI creates that combined accessibility node, so it reports a Dynamic
+Type false positive. The audit handler accepts only Dynamic Type findings whose
+identifiers begin with `recipe-metadata-label-` or `recipe-metadata-value-`.
+Every other finding remains fatal. The metadata text uses SwiftUI's unmodified
+Dynamic Type behavior, and its grid becomes a single flexible column at
+accessibility sizes to prevent genuine clipping.
 
 ## Security and resource choices
 
