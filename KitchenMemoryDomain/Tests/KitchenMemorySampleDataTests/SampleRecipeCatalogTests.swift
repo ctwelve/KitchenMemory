@@ -14,7 +14,7 @@ final class SampleRecipeCatalogTests: XCTestCase {
         XCTAssertEqual(manifest.name, "Kitchen Memory Samples")
         XCTAssertEqual(manifest.formatVersion, 1)
         XCTAssertEqual(manifest.recipes.count, 1)
-        XCTAssertEqual(manifest.recipes.first?.dataAssetName, "TunaNoodleHotdish")
+        XCTAssertEqual(manifest.recipes.first?.dataAssetName, "TunaNoodleHotdishRecipe")
     }
 
     func testTunaNoodleHotdishUsesFullRecipeContentAndDestinationKitchen() throws {
@@ -26,10 +26,14 @@ final class SampleRecipeCatalogTests: XCTestCase {
         XCTAssertEqual(materialization.recipe.kitchenID, destinationKitchenID)
         XCTAssertEqual(materialization.revision.title, "Tuna Noodle Hotdish")
         XCTAssertEqual(materialization.revision.recipeYield?.originalText, "Serves 8 generously")
-        XCTAssertEqual(materialization.revision.media.map(\.role), [.hero, .thumbnail])
+        XCTAssertEqual(materialization.revision.media.map(\.role), [.hero, .thumbnail, .gallery])
         XCTAssertEqual(
             materialization.revision.media.map(\.assetName),
-            ["TunaNoodleHotdishHero", "TunaNoodleHotdishThumbnail"]
+            [
+                "TunaNoodleHotdishHero",
+                "TunaNoodleHotdishThumbnail",
+                "TunaNoodleHotdishGallery0",
+            ]
         )
         XCTAssertEqual(materialization.revision.equipment.count, 5)
         XCTAssertEqual(materialization.revision.ingredientSections.map(\.ingredients.count), [6, 10, 3])

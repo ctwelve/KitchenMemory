@@ -83,17 +83,44 @@ public enum SampleRecipeCatalog {
         }
 #endif
 
-        guard let url = Bundle.module.url(
+        if let url = Bundle.module.url(
             forResource: name,
             withExtension: "plist",
             subdirectory: "SampleRecipes.xcassets/\(name).dataset"
-        ) else {
-#if canImport(AppKit) || canImport(UIKit)
-            throw SampleRecipeCatalogError.missingAsset(name)
-#else
-            throw SampleRecipeCatalogError.unsupportedPlatform
-#endif
+        ) {
+            return try Data(contentsOf: url)
         }
-        return try Data(contentsOf: url)
+
+        if let url = copiedDataSetURL(named: name) {
+            return try Data(contentsOf: url)
+        }
+
+#if canImport(AppKit) || canImport(UIKit)
+        throw SampleRecipeCatalogError.missingAsset(name)
+#else
+        throw SampleRecipeCatalogError.unsupportedPlatform
+#endif
+    }
+
+    private static func copiedDataSetURL(named name: String) -> URL? {
+        guard let catalogURL = Bundle.module.url(
+            forResource: "SampleRecipes",
+            withExtension: "xcassets"
+        ) else {
+            return nil
+        }
+
+        let keys: [URLResourceKey] = [.isRegularFileKey]
+        guard let enumerator = FileManager.default.enumerator(
+            at: catalogURL,
+            includingPropertiesForKeys: keys
+        ) else {
+            return nil
+        }
+
+        return enumerator.compactMap { $0 as? URL }.first { url in
+            url.pathExtension == "plist"
+                && url.deletingLastPathComponent().lastPathComponent == "\(name).dataset"
+        }
     }
 }

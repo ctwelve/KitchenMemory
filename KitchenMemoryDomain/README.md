@@ -14,6 +14,10 @@ Sample content belongs in
 `Sources/KitchenMemorySampleData/Resources/SampleRecipes.xcassets`. Keep the
 catalog separate from the application's visual assets.
 
+Assets for one recipe may be collected in an organizational asset-catalog group.
+The sample loader supports nested data sets during command-line SwiftPM tests;
+ordinary Xcode builds continue to resolve the compiled catalog by logical name.
+
 `SampleManifest.dataset` is a versioned recipe-pack index. Its XML property list
 names each recipe data asset and optional hero image asset. Recipe data sets use
 Foundation property lists so Xcode can provide structured editing without adding
