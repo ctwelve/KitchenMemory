@@ -45,6 +45,7 @@ struct RecipeDetailView: View {
             }
           }
         }
+        .accessibilityIdentifier("ingredients-section")
 
         recipeSection("Instructions", systemImage: "list.number") {
           VStack(alignment: .leading, spacing: 24) {
@@ -62,6 +63,7 @@ struct RecipeDetailView: View {
             }
           }
         }
+        .accessibilityIdentifier("instructions-section")
       }
       .frame(maxWidth: 860, alignment: .leading)
       .padding(.horizontal, 24)

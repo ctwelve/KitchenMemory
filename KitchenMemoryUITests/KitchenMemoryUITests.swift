@@ -25,13 +25,26 @@ final class KitchenMemoryUITests: XCTestCase {
     let detail = app.descendants(matching: .any)["recipe-detail"]
     XCTAssertTrue(detail.waitForExistence(timeout: 5))
 
-    let ingredients = app.descendants(matching: .any)
-      .matching(NSPredicate(format: "label CONTAINS[c] %@", "Ingredients"))
-      .firstMatch
-    let instructions = app.descendants(matching: .any)
-      .matching(NSPredicate(format: "label CONTAINS[c] %@", "Instructions"))
-      .firstMatch
-    XCTAssertTrue(ingredients.waitForExistence(timeout: 2))
-    XCTAssertTrue(instructions.waitForExistence(timeout: 2))
+    let ingredients = app.descendants(matching: .any)["ingredients-section"]
+    XCTAssertTrue(scroll(detail, untilVisible: ingredients))
+
+    let instructions = app.descendants(matching: .any)["instructions-section"]
+    XCTAssertTrue(scroll(detail, untilVisible: instructions))
+  }
+
+  @MainActor
+  private func scroll(
+    _ container: XCUIElement,
+    untilVisible element: XCUIElement,
+    attempts: Int = 6
+  ) -> Bool {
+    if element.waitForExistence(timeout: 1) { return true }
+
+    for _ in 0..<attempts {
+      container.swipeUp()
+      if element.waitForExistence(timeout: 1) { return true }
+    }
+
+    return false
   }
 }
