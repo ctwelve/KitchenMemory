@@ -30,6 +30,27 @@ Recipe media refers to logical asset names and semantic roles such as `hero`,
 `thumbnail`, and `gallery`. File encoding and pixel dimensions remain asset-
 catalog concerns rather than domain properties.
 
+### Sample image specifications
+
+Place each rendition in its own Single Scale image set. Different aspect ratios
+are semantic assets, not 1x, 2x, and 3x density variants of one image.
+
+| Role | Preferred dimensions | Aspect ratio | Purpose |
+| --- | ---: | ---: | --- |
+| `hero` | 2400 × 1800 | 4:3 landscape | Recipe detail headers and prominent cards |
+| `thumbnail` | 900 × 900 | 1:1 | Library rows, compact cards, and search results |
+| `gallery` | 2400 × 1600 | 3:2 landscape | Additional process, ingredient, or finished-dish photographs |
+
+Gallery photographs may instead use 1600 × 2400 at 2:3 when the original
+composition is portrait. Runtime gallery presentation must accommodate both
+orientations rather than forcing every user photograph into a landscape crop.
+
+Use HEIC when preserving Apple-native wide-color or HDR photography is useful;
+use JPEG when broader external-tool compatibility matters. Both are supported
+source formats. Prefer sRGB or Display P3, omit transparency, keep the subject
+away from crop-sensitive edges, and do not bake interface decoration or text
+into recipe photographs.
+
 The loader first uses `NSDataAsset` when Xcode compiles the catalog. It also
 supports SwiftPM's command-line behavior, which copies the catalog source into
 the package resource bundle during `swift test`.

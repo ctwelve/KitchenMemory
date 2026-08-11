@@ -26,8 +26,11 @@ final class SampleRecipeCatalogTests: XCTestCase {
         XCTAssertEqual(materialization.recipe.kitchenID, destinationKitchenID)
         XCTAssertEqual(materialization.revision.title, "Tuna Noodle Hotdish")
         XCTAssertEqual(materialization.revision.recipeYield?.originalText, "Serves 8 generously")
-        XCTAssertEqual(materialization.revision.media.first?.assetName, "TunaNoodleHotdishHero")
-        XCTAssertEqual(materialization.revision.media.first?.role, .hero)
+        XCTAssertEqual(materialization.revision.media.map(\.role), [.hero, .thumbnail])
+        XCTAssertEqual(
+            materialization.revision.media.map(\.assetName),
+            ["TunaNoodleHotdishHero", "TunaNoodleHotdishThumbnail"]
+        )
         XCTAssertEqual(materialization.revision.equipment.count, 5)
         XCTAssertEqual(materialization.revision.ingredientSections.map(\.ingredients.count), [6, 10, 3])
         XCTAssertEqual(materialization.revision.instructionSections.map(\.steps.count), [6, 8, 8])
