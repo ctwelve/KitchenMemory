@@ -148,3 +148,10 @@ The implemented `KitchenMemoryDomain` package begins with the
 `Kitchen → Recipe → RecipeRevision` slice. Its sibling
 `KitchenMemorySampleData` target owns deterministic sample resources without
 introducing Apple resource APIs into the domain target.
+
+The package also exposes `KitchenMemoryPersistence`, the first SwiftData adapter.
+It uses internal relational records with application-owned UUID foreign keys and
+explicit ordering columns. A domain-facing repository performs all mapping, so
+neither callers nor domain values depend on SwiftData model identity. The first
+repository supports saving and loading a kitchen and a recipe's current revision;
+revision-history queries and application use cases arrive with their workflows.

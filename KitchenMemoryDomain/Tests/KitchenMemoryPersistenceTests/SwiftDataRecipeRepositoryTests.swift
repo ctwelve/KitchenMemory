@@ -1,0 +1,229 @@
+// Kitchen Memory
+// Copyright © 2026 the Kitchen Memory contributors.
+// SPDX-License-Identifier: GPL-3.0-only
+
+import KitchenMemoryDomain
+import KitchenMemoryPersistence
+import KitchenMemorySampleData
+import XCTest
+
+@MainActor
+final class SwiftDataRecipeRepositoryTests: XCTestCase {
+  func testTunaNoodleHotdishRoundTripsThroughSwiftData() throws {
+    let kitchen = Kitchen(name: "Test Kitchen")
+    let manifest = try SampleRecipeCatalog.loadManifest()
+    let document = try SampleRecipeCatalog.loadRecipe(try XCTUnwrap(manifest.recipes.first))
+    let sample = try document.materialize(in: kitchen.id)
+    let repository = SwiftDataRecipeRepository(
+      modelContainer: try KitchenMemorySchema.makeContainer(inMemory: true)
+    )
+
+    try repository.save(kitchen)
+    try repository.save(recipe: sample.recipe, revision: sample.revision)
+
+    XCTAssertEqual(try repository.kitchen(id: kitchen.id), kitchen)
+    let stored = try XCTUnwrap(repository.recipe(id: sample.recipe.id))
+    XCTAssertEqual(stored.recipe, sample.recipe)
+    XCTAssertEqual(stored.revision, sample.revision)
+  }
+
+  func testSavingTheSameRecipeUpdatesInsteadOfDuplicatingItsChildren() throws {
+    let kitchen = Kitchen(name: "Test Kitchen")
+    let manifest = try SampleRecipeCatalog.loadManifest()
+    let document = try SampleRecipeCatalog.loadRecipe(try XCTUnwrap(manifest.recipes.first))
+    let sample = try document.materialize(in: kitchen.id)
+    var editedRevision = sample.revision
+    editedRevision.title = "Leftover Tuna Noodle Hotdish"
+    let repository = SwiftDataRecipeRepository(
+      modelContainer: try KitchenMemorySchema.makeContainer(inMemory: true)
+    )
+
+    try repository.save(kitchen)
+    try repository.save(recipe: sample.recipe, revision: sample.revision)
+    try repository.save(recipe: sample.recipe, revision: editedRevision)
+
+    let stored = try XCTUnwrap(repository.recipe(id: sample.recipe.id))
+    XCTAssertEqual(stored.revision.title, "Leftover Tuna Noodle Hotdish")
+    XCTAssertEqual(stored.revision.media, sample.revision.media)
+    XCTAssertEqual(stored.revision.ingredientSections, sample.revision.ingredientSections)
+    XCTAssertEqual(stored.revision.instructionSections, sample.revision.instructionSections)
+    XCTAssertEqual(try repository.recipes(in: kitchen.id), [stored])
+  }
+
+  func testSavingANewRevisionMakesItCurrent() throws {
+    let kitchen = Kitchen(name: "Test Kitchen")
+    let recipeID = Recipe.ID()
+    let firstRevision = RecipeRevision(
+      recipeID: recipeID,
+      revisionNumber: 1,
+      title: "First Draft"
+    )
+    let secondRevision = RecipeRevision(
+      recipeID: recipeID,
+      revisionNumber: 2,
+      title: "Family Draft"
+    )
+    var recipe = Recipe(
+      id: recipeID,
+      kitchenID: kitchen.id,
+      currentRevisionID: firstRevision.id
+    )
+    let repository = SwiftDataRecipeRepository(
+      modelContainer: try KitchenMemorySchema.makeContainer(inMemory: true)
+    )
+
+    try repository.save(kitchen)
+    try repository.save(recipe: recipe, revision: firstRevision)
+    recipe.currentRevisionID = secondRevision.id
+    try repository.save(recipe: recipe, revision: secondRevision)
+
+    let stored = try XCTUnwrap(repository.recipe(id: recipeID))
+    XCTAssertEqual(stored.recipe.currentRevisionID, secondRevision.id)
+    XCTAssertEqual(stored.revision, secondRevision)
+  }
+
+  func testRecipeListIsKitchenScopedAndSortedByTitle() throws {
+    let kitchen = Kitchen(name: "Test Kitchen")
+    let otherKitchen = Kitchen(name: "Other Kitchen")
+    let repository = SwiftDataRecipeRepository(
+      modelContainer: try KitchenMemorySchema.makeContainer(inMemory: true)
+    )
+    try repository.save(kitchen)
+    try repository.save(otherKitchen)
+
+    for (title, owner) in [
+      ("Zucchini Bread", kitchen),
+      ("Apple Crisp", kitchen),
+      ("Mushroom Soup", kitchen),
+      ("Banana Bread", otherKitchen),
+    ] {
+      let recipeID = Recipe.ID()
+      let revision = RecipeRevision(recipeID: recipeID, revisionNumber: 1, title: title)
+      let recipe = Recipe(
+        id: recipeID,
+        kitchenID: owner.id,
+        currentRevisionID: revision.id
+      )
+      try repository.save(recipe: recipe, revision: revision)
+    }
+
+    XCTAssertEqual(
+      try repository.recipes(in: kitchen.id).map(\.revision.title),
+      ["Apple Crisp", "Mushroom Soup", "Zucchini Bread"]
+    )
+  }
+
+  func testOrderedRecipeContentRoundTripsInUseOrder() throws {
+    let kitchen = Kitchen(name: "Test Kitchen")
+    let recipeID = Recipe.ID()
+    let revision = RecipeRevision(
+      recipeID: recipeID,
+      revisionNumber: 1,
+      title: "Order Test",
+      media: [
+        RecipeMedia(role: .hero, assetName: "First"),
+        RecipeMedia(role: .gallery, assetName: "Second"),
+      ],
+      equipment: [
+        EquipmentItem(originalText: "First bowl", name: "bowl"),
+        EquipmentItem(originalText: "Second whisk", name: "whisk"),
+      ],
+      ingredientSections: [
+        IngredientSection(
+          title: "First section",
+          ingredients: [
+            RecipeIngredient(originalText: "First ingredient", displayText: "First ingredient"),
+            RecipeIngredient(originalText: "Second ingredient", displayText: "Second ingredient"),
+          ]
+        ),
+        IngredientSection(
+          title: "Second section",
+          ingredients: [
+            RecipeIngredient(originalText: "Third ingredient", displayText: "Third ingredient")
+          ]
+        ),
+      ],
+      instructionSections: [
+        InstructionSection(
+          title: "First stage",
+          steps: [
+            InstructionStep(text: "First step"),
+            InstructionStep(text: "Second step"),
+          ]
+        ),
+        InstructionSection(
+          title: "Second stage",
+          steps: [InstructionStep(text: "Third step")]
+        ),
+      ]
+    )
+    let recipe = Recipe(
+      id: recipeID,
+      kitchenID: kitchen.id,
+      currentRevisionID: revision.id
+    )
+    let repository = SwiftDataRecipeRepository(
+      modelContainer: try KitchenMemorySchema.makeContainer(inMemory: true)
+    )
+
+    try repository.save(kitchen)
+    try repository.save(recipe: recipe, revision: revision)
+
+    let stored = try XCTUnwrap(repository.recipe(id: recipeID)).revision
+    XCTAssertEqual(stored.media.map(\.assetName), ["First", "Second"])
+    XCTAssertEqual(stored.equipment.map(\.originalText), ["First bowl", "Second whisk"])
+    XCTAssertEqual(stored.ingredientSections.map(\.title), ["First section", "Second section"])
+    XCTAssertEqual(
+      stored.ingredientSections.flatMap(\.ingredients).map(\.originalText),
+      ["First ingredient", "Second ingredient", "Third ingredient"]
+    )
+    XCTAssertEqual(stored.instructionSections.map(\.title), ["First stage", "Second stage"])
+    XCTAssertEqual(
+      stored.instructionSections.flatMap(\.steps).map(\.text),
+      ["First step", "Second step", "Third step"]
+    )
+  }
+
+  func testRejectsMismatchedRecipeAndRevision() throws {
+    let repository = SwiftDataRecipeRepository(
+      modelContainer: try KitchenMemorySchema.makeContainer(inMemory: true)
+    )
+    let revision = RecipeRevision(
+      recipeID: Recipe.ID(),
+      revisionNumber: 1,
+      title: "Mismatch"
+    )
+    let recipe = Recipe(
+      kitchenID: Kitchen.ID(),
+      currentRevisionID: revision.id
+    )
+
+    XCTAssertThrowsError(try repository.save(recipe: recipe, revision: revision)) { error in
+      XCTAssertEqual(
+        error as? KitchenMemoryPersistenceError,
+        .inconsistentRecipeIdentity
+      )
+    }
+  }
+
+  func testRejectsRecipeWhoseKitchenHasNotBeenSaved() throws {
+    let repository = SwiftDataRecipeRepository(
+      modelContainer: try KitchenMemorySchema.makeContainer(inMemory: true)
+    )
+    let recipeID = Recipe.ID()
+    let revision = RecipeRevision(
+      recipeID: recipeID,
+      revisionNumber: 1,
+      title: "Orphan"
+    )
+    let recipe = Recipe(
+      id: recipeID,
+      kitchenID: Kitchen.ID(),
+      currentRevisionID: revision.id
+    )
+
+    XCTAssertThrowsError(try repository.save(recipe: recipe, revision: revision)) { error in
+      XCTAssertEqual(error as? KitchenMemoryPersistenceError, .missingKitchen)
+    }
+  }
+}
