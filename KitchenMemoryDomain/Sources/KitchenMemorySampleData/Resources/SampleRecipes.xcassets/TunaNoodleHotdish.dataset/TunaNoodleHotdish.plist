@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>formatVersion</key>
+	<integer>1</integer>
+	<key>recipeID</key>
+	<string>95781805-F5D3-46B0-B685-A660F8AC69F2</string>
+	<key>revision</key>
+	<dict>
+		<key>id</key>
+		<string>CD477A1F-A876-4C08-8AC9-1915ACD71E88</string>
+		<key>recipeID</key>
+		<string>95781805-F5D3-46B0-B685-A660F8AC69F2</string>
+		<key>revisionNumber</key>
+		<integer>1</integer>
+		<key>title</key>
+		<string>Tuna Noodle Hotdish</string>
+		<key>summary</key>
+		<string>A creamy Midwestern baked noodle casserole with tuna, peas, cheddar, and a crisp potato-chip topping.</string>
+		<key>authorName</key>
+		<string>Kitchen Memory contributors</string>
+		<key>source</key>
+		<dict>
+			<key>kind</key>
+			<string>original</string>
+			<key>title</key>
+			<string>Kitchen Memory sample recipe</string>
+		</dict>
+		<key>recipeYield</key>
+		<dict>
+			<key>quantity</key>
+			<dict>
+				<key>kind</key>
+				<string>exact</string>
+				<key>lowerBound</key>
+				<dict>
+					<key>numerator</key>
+					<integer>6</integer>
+					<key>denominator</key>
+					<integer>1</integer>
+				</dict>
+			</dict>
+			<key>unitText</key>
+			<string>servings</string>
+			<key>originalText</key>
+			<string>6 servings</string>
+		</dict>
+		<key>prepDuration</key>
+		<dict><key>seconds</key><integer>1200</integer></dict>
+		<key>cookDuration</key>
+		<dict><key>seconds</key><integer>1800</integer></dict>
+		<key>totalDuration</key>
+		<dict><key>seconds</key><integer>3000</integer></dict>
+		<key>cuisines</key>
+		<array><string>Midwestern</string></array>
+		<key>categories</key>
+		<array><string>Dinner</string><string>Hotdish</string></array>
+		<key>keywords</key>
+		<array><string>casserole</string><string>comfort food</string><string>make-ahead</string></array>
+		<key>media</key>
+		<array>
+			<dict>
+				<key>id</key>
+				<string>A1111111-1111-4111-8111-111111111111</string>
+				<key>assetName</key>
+				<string>TunaNoodleHotdishHero</string>
+				<key>accessibilityLabel</key>
+				<string>Tuna noodle hotdish baked with a golden, crisp topping</string>
+			</dict>
+		</array>
+		<key>ingredientSections</key>
+		<array>
+			<dict>
+				<key>id</key>
+				<string>B1111111-1111-4111-8111-111111111111</string>
+				<key>ingredients</key>
+				<array>
+					<dict>
+						<key>id</key><string>C0000001-0000-4000-8000-000000000001</string>
+						<key>originalText</key><string>12 ounces wide egg noodles</string>
+						<key>displayText</key><string>12 ounces wide egg noodles</string>
+						<key>quantity</key><dict><key>kind</key><string>exact</string><key>lowerBound</key><dict><key>numerator</key><integer>12</integer><key>denominator</key><integer>1</integer></dict></dict>
+						<key>unitText</key><string>ounces</string><key>ingredientText</key><string>wide egg noodles</string>
+						<key>isOptional</key><false/><key>scalingBehavior</key><string>linear</string><key>parseState</key><string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key><string>C0000002-0000-4000-8000-000000000002</string>
+						<key>originalText</key><string>2 (5-ounce) cans tuna, drained</string><key>displayText</key><string>2 (5-ounce) cans tuna, drained</string>
+						<key>quantity</key><dict><key>kind</key><string>exact</string><key>lowerBound</key><dict><key>numerator</key><integer>2</integer><key>denominator</key><integer>1</integer></dict></dict>
+						<key>unitText</key><string>cans</string><key>ingredientText</key><string>tuna</string><key>preparation</key><string>drained</string>
+						<key>isOptional</key><false/><key>scalingBehavior</key><string>linear</string><key>parseState</key><string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key><string>C0000003-0000-4000-8000-000000000003</string><key>originalText</key><string>1 (10.5-ounce) can condensed cream of mushroom soup</string><key>displayText</key><string>1 (10.5-ounce) can condensed cream of mushroom soup</string>
+						<key>quantity</key><dict><key>kind</key><string>exact</string><key>lowerBound</key><dict><key>numerator</key><integer>1</integer><key>denominator</key><integer>1</integer></dict></dict><key>unitText</key><string>can</string><key>ingredientText</key><string>condensed cream of mushroom soup</string>
+						<key>isOptional</key><false/><key>scalingBehavior</key><string>linear</string><key>parseState</key><string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key><string>C0000004-0000-4000-8000-000000000004</string><key>originalText</key><string>1 cup frozen peas</string><key>displayText</key><string>1 cup frozen peas</string>
+						<key>quantity</key><dict><key>kind</key><string>exact</string><key>lowerBound</key><dict><key>numerator</key><integer>1</integer><key>denominator</key><integer>1</integer></dict></dict><key>unitText</key><string>cup</string><key>ingredientText</key><string>frozen peas</string>
+						<key>isOptional</key><false/><key>scalingBehavior</key><string>linear</string><key>parseState</key><string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key><string>C0000005-0000-4000-8000-000000000005</string><key>originalText</key><string>1 cup whole milk</string><key>displayText</key><string>1 cup whole milk</string>
+						<key>quantity</key><dict><key>kind</key><string>exact</string><key>lowerBound</key><dict><key>numerator</key><integer>1</integer><key>denominator</key><integer>1</integer></dict></dict><key>unitText</key><string>cup</string><key>ingredientText</key><string>whole milk</string>
+						<key>isOptional</key><false/><key>scalingBehavior</key><string>linear</string><key>parseState</key><string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key><string>C0000006-0000-4000-8000-000000000006</string><key>originalText</key><string>1 cup shredded sharp cheddar cheese</string><key>displayText</key><string>1 cup shredded sharp cheddar cheese</string>
+						<key>quantity</key><dict><key>kind</key><string>exact</string><key>lowerBound</key><dict><key>numerator</key><integer>1</integer><key>denominator</key><integer>1</integer></dict></dict><key>unitText</key><string>cup</string><key>ingredientText</key><string>sharp cheddar cheese</string><key>preparation</key><string>shredded</string>
+						<key>isOptional</key><false/><key>scalingBehavior</key><string>linear</string><key>parseState</key><string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key><string>C0000007-0000-4000-8000-000000000007</string><key>originalText</key><string>1/2 teaspoon ground black pepper</string><key>displayText</key><string>½ teaspoon ground black pepper</string>
+						<key>quantity</key><dict><key>kind</key><string>exact</string><key>lowerBound</key><dict><key>numerator</key><integer>1</integer><key>denominator</key><integer>2</integer></dict></dict><key>unitText</key><string>teaspoon</string><key>ingredientText</key><string>ground black pepper</string>
+						<key>isOptional</key><false/><key>scalingBehavior</key><string>linear</string><key>parseState</key><string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key><string>C0000008-0000-4000-8000-000000000008</string><key>originalText</key><string>1 cup lightly crushed potato chips</string><key>displayText</key><string>1 cup lightly crushed potato chips</string>
+						<key>quantity</key><dict><key>kind</key><string>exact</string><key>lowerBound</key><dict><key>numerator</key><integer>1</integer><key>denominator</key><integer>1</integer></dict></dict><key>unitText</key><string>cup</string><key>ingredientText</key><string>potato chips</string><key>preparation</key><string>lightly crushed</string>
+						<key>isOptional</key><false/><key>scalingBehavior</key><string>linear</string><key>parseState</key><string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key><string>C0000009-0000-4000-8000-000000000009</string><key>originalText</key><string>2 tablespoons unsalted butter, melted</string><key>displayText</key><string>2 tablespoons unsalted butter, melted</string>
+						<key>quantity</key><dict><key>kind</key><string>exact</string><key>lowerBound</key><dict><key>numerator</key><integer>2</integer><key>denominator</key><integer>1</integer></dict></dict><key>unitText</key><string>tablespoons</string><key>ingredientText</key><string>unsalted butter</string><key>preparation</key><string>melted</string>
+						<key>isOptional</key><false/><key>scalingBehavior</key><string>linear</string><key>parseState</key><string>reviewed</string>
+					</dict>
+				</array>
+			</dict>
+		</array>
+		<key>instructionSections</key>
+		<array>
+			<dict>
+				<key>id</key><string>D1111111-1111-4111-8111-111111111111</string>
+				<key>steps</key>
+				<array>
+					<dict><key>id</key><string>E0000001-0000-4000-8000-000000000001</string><key>text</key><string>Heat the oven to 375°F. Lightly butter a 9-by-13-inch baking dish.</string></dict>
+					<dict><key>id</key><string>E0000002-0000-4000-8000-000000000002</string><key>text</key><string>Cook the egg noodles in salted water until just shy of tender. Drain well.</string></dict>
+					<dict><key>id</key><string>E0000003-0000-4000-8000-000000000003</string><key>text</key><string>Stir together the soup and milk until smooth. Fold in the tuna, peas, cheddar, pepper, and drained noodles.</string></dict>
+					<dict><key>id</key><string>E0000004-0000-4000-8000-000000000004</string><key>text</key><string>Spread the mixture evenly in the prepared baking dish.</string></dict>
+					<dict><key>id</key><string>E0000005-0000-4000-8000-000000000005</string><key>text</key><string>Toss the crushed potato chips with the melted butter and scatter them over the hotdish.</string></dict>
+					<dict><key>id</key><string>E0000006-0000-4000-8000-000000000006</string><key>text</key><string>Bake until bubbling around the edges and golden on top, about 30 minutes. Rest for 5 minutes before serving.</string><key>duration</key><dict><key>seconds</key><integer>1800</integer></dict></dict>
+				</array>
+			</dict>
+		</array>
+	</dict>
+</dict>
+</plist>

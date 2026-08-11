@@ -14,9 +14,12 @@ Sample content belongs in
 `Sources/KitchenMemorySampleData/Resources/SampleRecipes.xcassets`. Keep the
 catalog separate from the application's visual assets.
 
-`SampleManifest.dataset` is the versioned index. Recipe data sets and image sets
-will use pre-generated stable identifiers so importing the catalog into a fresh
-store is repeatable and can be made idempotent.
+`SampleManifest.dataset` is a versioned recipe-pack index. Its XML property list
+names each recipe data asset and optional hero image asset. Recipe data sets use
+Foundation property lists so Xcode can provide structured editing without adding
+a parser dependency. Recipe, revision, row, step, and media identities are
+pre-generated so importing the catalog into a fresh store is repeatable and can
+be made idempotent.
 
 The catalog does not contain a Kitchen identifier. A sample recipe retains its
 own stable recipe, revision, and media identities, while the importing use case
