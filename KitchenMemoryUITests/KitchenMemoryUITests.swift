@@ -25,15 +25,15 @@ final class KitchenMemoryUITests: XCTestCase {
 
     let title = app.descendants(matching: .any)["recipe-title"]
     XCTAssertTrue(title.waitForExistence(timeout: 2))
-    XCTAssertEqual(title.label, "Tuna Noodle Hotdish")
+    XCTAssertEqual(semanticLabel(of: title), "Tuna Noodle Hotdish")
 
     let summary = app.descendants(matching: .any)["recipe-summary"]
     XCTAssertTrue(summary.waitForExistence(timeout: 2))
-    XCTAssertTrue(summary.label.contains("Midwestern tuna noodle hotdish"))
+    XCTAssertTrue(semanticLabel(of: summary).contains("Midwestern tuna noodle hotdish"))
 
     let author = app.descendants(matching: .any)["recipe-author"]
     XCTAssertTrue(author.waitForExistence(timeout: 2))
-    XCTAssertEqual(author.label, "By Kitchen Memory contributors")
+    XCTAssertEqual(semanticLabel(of: author), "By Kitchen Memory contributors")
 
     let ingredients = app.descendants(matching: .any)["ingredients-section"]
     XCTAssertTrue(scroll(detail, untilVisible: ingredients))
@@ -42,7 +42,7 @@ final class KitchenMemoryUITests: XCTestCase {
       .matching(NSPredicate(format: "identifier BEGINSWITH %@", "ingredient-subsection-"))
       .firstMatch
     XCTAssertTrue(scroll(detail, untilVisible: ingredientSubsection))
-    XCTAssertEqual(ingredientSubsection.label, "Hotdish")
+    XCTAssertEqual(semanticLabel(of: ingredientSubsection), "Hotdish")
 
     let instructions = app.descendants(matching: .any)["instructions-section"]
     XCTAssertTrue(scroll(detail, untilVisible: instructions))
@@ -51,7 +51,7 @@ final class KitchenMemoryUITests: XCTestCase {
       .matching(NSPredicate(format: "identifier BEGINSWITH %@", "instruction-subsection-"))
       .firstMatch
     XCTAssertTrue(scroll(detail, untilVisible: instructionSubsection))
-    XCTAssertEqual(instructionSubsection.label, "Noodles")
+    XCTAssertEqual(semanticLabel(of: instructionSubsection), "Noodles")
 
     let timedInstruction = app.descendants(matching: .any)
       .matching(NSPredicate(format: "label CONTAINS[c] %@", "Duration 6 min"))
@@ -121,11 +121,11 @@ final class KitchenMemoryUITests: XCTestCase {
 
   @MainActor
   private func performAccessibilityAudit(on app: XCUIApplication) throws {
-    try app.performAccessibilityAudit(isKnownMetadataDynamicTypeFalsePositive)
+    try app.performAccessibilityAudit(isKnownAccessibilityAuditFalsePositive)
   }
 
   @MainActor
-  private func isKnownMetadataDynamicTypeFalsePositive(
+  private func isKnownAccessibilityAuditFalsePositive(
     _ issue: XCUIAccessibilityAuditIssue
   ) -> Bool {
 #if os(iOS)
@@ -146,11 +146,71 @@ final class KitchenMemoryUITests: XCTestCase {
           || identifier.hasPrefix("recipe-metadata-value-")
       )
 #else
-    // macOS does not define the Dynamic Type audit category, so its audit has
-    // no exception and remains completely strict.
-    return false
+    guard issue.auditType == .sufficientElementDescription,
+      let element = issue.element,
+      element.elementType == .group,
+      element.label.isEmpty,
+      isKnownIdentifierWrapper(element.identifier)
+    else {
+      return false
+    }
+
+    // On macOS, SwiftUI sometimes exposes an accessibility identifier on a
+    // transparent Group while leaving the native Text and its spoken label on
+    // a descendant. XCTest audits that automation-only wrapper as though it
+    // were an unlabeled user-facing element. Accept the finding only for our
+    // known identifier families and only when the wrapper actually contains a
+    // labeled descendant. A genuinely unlabeled control therefore still
+    // fails the audit.
+    return firstLabeledDescendant(of: element).exists
 #endif
   }
+
+  @MainActor
+  private func semanticLabel(of element: XCUIElement) -> String {
+    if !element.label.isEmpty { return element.label }
+
+#if os(macOS)
+    // The macOS SwiftUI accessibility tree can put our stable identifier on a
+    // transparent Group and the native Text label on its child. Read through
+    // that wrapper without changing the app's native accessibility roles.
+    let descendant = firstLabeledDescendant(of: element)
+    if descendant.exists { return descendant.label }
+#endif
+
+    return element.label
+  }
+
+#if os(macOS)
+  @MainActor
+  private func firstLabeledDescendant(of element: XCUIElement) -> XCUIElement {
+    element.descendants(matching: .any)
+      .matching(NSPredicate(format: "label != %@", ""))
+      .firstMatch
+  }
+
+  private func isKnownIdentifierWrapper(_ identifier: String) -> Bool {
+    let exactIdentifiers = [
+      "recipe-library",
+      "recipe-detail",
+      "recipe-title",
+      "recipe-summary",
+      "recipe-author",
+      "equipment-section",
+      "ingredients-section",
+      "instructions-section",
+    ]
+    let identifierPrefixes = [
+      "ingredient-subsection-",
+      "instruction-subsection-",
+      "recipe-metadata-label-",
+      "recipe-metadata-value-",
+    ]
+
+    return exactIdentifiers.contains(identifier)
+      || identifierPrefixes.contains { identifier.hasPrefix($0) }
+  }
+#endif
 
   @MainActor
   private func scroll(

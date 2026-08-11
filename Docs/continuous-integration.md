@@ -71,6 +71,17 @@ Every other finding remains fatal. The metadata text uses SwiftUI's unmodified
 Dynamic Type behavior, and its grid becomes a single flexible column at
 accessibility sizes to prevent genuine clipping.
 
+On macOS, SwiftUI can expose a stable accessibility identifier on a transparent
+`Group` while keeping the native `Text` label on that group's descendant.
+XCTest then reports the automation-only wrapper as having no description even
+though VoiceOver reaches the labeled native element beneath it. The macOS audit
+accepts only sufficient-description findings for the app's known identifier
+families, only when the reported element is an empty-labeled group, and only
+when that group demonstrably contains a labeled descendant. The read-flow test
+uses the same narrow descendant fallback when resolving an identified element's
+semantic label. This keeps native SwiftUI roles intact, while genuinely
+unlabeled controls and all other audit categories remain fatal.
+
 ## Security and resource choices
 
 The workflow grants its GitHub token read-only repository access. Checkout does
