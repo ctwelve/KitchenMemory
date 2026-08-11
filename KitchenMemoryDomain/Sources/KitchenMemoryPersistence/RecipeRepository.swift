@@ -25,6 +25,7 @@ public struct StoredRecipe: Equatable, Sendable {
 public protocol RecipeRepository: AnyObject {
   func save(_ kitchen: Kitchen) throws
   func save(recipe: Recipe, revision: RecipeRevision) throws
+  func kitchens() throws -> [Kitchen]
   func kitchen(id: Kitchen.ID) throws -> Kitchen?
   func recipe(id: Recipe.ID) throws -> StoredRecipe?
   func recipes(in kitchenID: Kitchen.ID) throws -> [StoredRecipe]
@@ -89,6 +90,13 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     let identifier = id.rawValue
     let descriptor = FetchDescriptor<KitchenRecord>(predicate: #Predicate { $0.id == identifier })
     return try context.fetch(descriptor).first.map {
+      Kitchen(id: .init(rawValue: $0.id), name: $0.name)
+    }
+  }
+
+  public func kitchens() throws -> [Kitchen] {
+    let descriptor = FetchDescriptor<KitchenRecord>(sortBy: [SortDescriptor(\.name)])
+    return try context.fetch(descriptor).map {
       Kitchen(id: .init(rawValue: $0.id), name: $0.name)
     }
   }

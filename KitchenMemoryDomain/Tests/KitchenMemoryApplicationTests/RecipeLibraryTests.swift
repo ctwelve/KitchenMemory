@@ -62,6 +62,7 @@ private final class InMemoryRecipeRepository: RecipeRepository {
 
   func save(_ kitchen: Kitchen) throws {}
   func save(recipe: Recipe, revision: RecipeRevision) throws {}
+  func kitchens() throws -> [Kitchen] { [] }
   func kitchen(id: Kitchen.ID) throws -> Kitchen? { nil }
 
   func recipe(id: Recipe.ID) throws -> StoredRecipe? {

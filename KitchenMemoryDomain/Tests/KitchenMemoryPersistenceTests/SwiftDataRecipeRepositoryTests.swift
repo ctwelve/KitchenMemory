@@ -152,6 +152,19 @@ final class SwiftDataRecipeRepositoryTests: XCTestCase {
     )
   }
 
+  func testKitchenListLoadsAllSavedKitchensInNameOrder() throws {
+    let repository = SwiftDataRecipeRepository(
+      modelContainer: try KitchenMemorySchema.makeContainer(inMemory: true)
+    )
+    let cabin = Kitchen(name: "Cabin")
+    let home = Kitchen(name: "Home")
+
+    try repository.save(home)
+    try repository.save(cabin)
+
+    XCTAssertEqual(try repository.kitchens(), [cabin, home])
+  }
+
   func testOrderedRecipeContentRoundTripsInUseOrder() throws {
     let kitchen = Kitchen(name: "Test Kitchen")
     let recipeID = Recipe.ID()
