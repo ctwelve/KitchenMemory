@@ -19,11 +19,11 @@ final class KitchenMemoryUITests: XCTestCase {
       .matching(NSPredicate(format: "identifier BEGINSWITH %@", "recipe-row-"))
       .firstMatch
     XCTAssertTrue(recipeRow.waitForExistence(timeout: 5))
+    XCTAssertTrue(recipeRow.label.contains("Tuna Noodle Hotdish"))
     recipeRow.click()
 
-    let title = app.descendants(matching: .any)["recipe-title"]
-    XCTAssertTrue(title.waitForExistence(timeout: 5))
-    XCTAssertTrue(title.label.contains("Tuna Noodle Hotdish"))
+    let detail = app.descendants(matching: .any)["recipe-detail"]
+    XCTAssertTrue(detail.waitForExistence(timeout: 5))
 
     let ingredients = app.descendants(matching: .any)
       .matching(NSPredicate(format: "label CONTAINS[c] %@", "Ingredients"))

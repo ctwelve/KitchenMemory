@@ -68,6 +68,7 @@ struct RecipeDetailView: View {
       .padding(.vertical, 28)
       .frame(maxWidth: .infinity)
     }
+    .accessibilityIdentifier("recipe-detail")
     .background(Color("AppBackground"))
     .navigationTitle(revision.title)
 #if os(iOS)
