@@ -25,19 +25,21 @@ final class KitchenMemoryUITests: XCTestCase {
 
     let title = app.descendants(matching: .any)["recipe-title"]
     XCTAssertTrue(title.waitForExistence(timeout: 2))
-    XCTAssertTrue(app.staticTexts["Tuna Noodle Hotdish"].waitForExistence(timeout: 2))
+    XCTAssertTrue(labeledElement(in: app, equalTo: "Tuna Noodle Hotdish").waitForExistence(timeout: 2))
 
     let summary = app.descendants(matching: .any)["recipe-summary"]
     XCTAssertTrue(summary.waitForExistence(timeout: 2))
-    let summaryText = app.staticTexts
-      .matching(NSPredicate(format: "label CONTAINS %@", "Midwestern tuna noodle hotdish"))
-      .firstMatch
+    let summaryText = labeledElement(
+      in: app,
+      containing: "Midwestern tuna noodle hotdish"
+    )
     XCTAssertTrue(summaryText.waitForExistence(timeout: 2))
 
     let author = app.descendants(matching: .any)["recipe-author"]
     XCTAssertTrue(author.waitForExistence(timeout: 2))
     XCTAssertTrue(
-      app.staticTexts["By Kitchen Memory contributors"].waitForExistence(timeout: 2)
+      labeledElement(in: app, equalTo: "By Kitchen Memory contributors")
+        .waitForExistence(timeout: 2)
     )
 
     let ingredients = app.descendants(matching: .any)["ingredients-section"]
@@ -47,7 +49,7 @@ final class KitchenMemoryUITests: XCTestCase {
       .matching(NSPredicate(format: "identifier BEGINSWITH %@", "ingredient-subsection-"))
       .firstMatch
     XCTAssertTrue(scroll(detail, untilVisible: ingredientSubsection))
-    XCTAssertTrue(scroll(detail, untilVisible: app.staticTexts["Hotdish"]))
+    XCTAssertTrue(scroll(detail, untilVisible: labeledElement(in: app, equalTo: "Hotdish")))
 
     let instructions = app.descendants(matching: .any)["instructions-section"]
     XCTAssertTrue(scroll(detail, untilVisible: instructions))
@@ -56,7 +58,7 @@ final class KitchenMemoryUITests: XCTestCase {
       .matching(NSPredicate(format: "identifier BEGINSWITH %@", "instruction-subsection-"))
       .firstMatch
     XCTAssertTrue(scroll(detail, untilVisible: instructionSubsection))
-    XCTAssertTrue(scroll(detail, untilVisible: app.staticTexts["Noodles"]))
+    XCTAssertTrue(scroll(detail, untilVisible: labeledElement(in: app, equalTo: "Noodles")))
 
     let timedInstruction = app.descendants(matching: .any)
       .matching(NSPredicate(format: "label CONTAINS[c] %@", "Duration 6 min"))
@@ -151,24 +153,57 @@ final class KitchenMemoryUITests: XCTestCase {
           || identifier.hasPrefix("recipe-metadata-value-")
       )
 #else
-    guard issue.auditType == .sufficientElementDescription,
-      let element = issue.element,
-      element.elementType == .group,
-      element.label.isEmpty,
-      !element.isHittable
-    else {
-      return false
+    guard let element = issue.element else { return false }
+
+    if issue.auditType == .sufficientElementDescription {
+      // On macOS, SwiftUI exposes non-interactive layout groups to XCTest and
+      // keeps their native Text nodes separate in the query tree. Xcode 26
+      // then audits those structural groups as if each needed its own spoken
+      // label. Accept only an empty-labeled, non-hittable Group.
+      return element.elementType == .group
+        && element.label.isEmpty
+        && !element.isHittable
     }
 
-    // On macOS, SwiftUI exposes non-interactive layout groups to XCTest and
-    // keeps their native Text nodes separate in the query tree. Xcode 26 then
-    // audits those structural groups as if each needed its own spoken label.
-    // Accept only an empty-labeled, non-hittable Group. Buttons, links, other
-    // controls, hittable elements, and every other audit category remain
-    // fatal. The read-flow test separately proves the expected native text is
-    // present alongside each stable automation identifier.
-    return true
+    // A SwiftUI NavigationLink in the macOS sidebar is exposed to XCTest as a
+    // labeled, hittable Button. Xcode 26 nevertheless reports “Unknown role.”
+    // Accept only that trait finding for our recipe-row identifier family;
+    // other controls, roles, and audit categories remain fatal.
+    return issue.auditType == macOSTraitAuditType
+      && element.elementType == .button
+      && element.isHittable
+      && !element.label.isEmpty
+      && element.identifier.hasPrefix("recipe-row-")
 #endif
+  }
+
+#if os(macOS)
+  // XCUIAccessibilityAuditTypeTrait is declared as bit 18 in Xcode's macOS
+  // XCUIAutomation headers, but the macOS Swift overlay omits the `.trait`
+  // convenience member that the iOS overlay exposes.
+  private var macOSTraitAuditType: XCUIAccessibilityAuditType {
+    XCUIAccessibilityAuditType(rawValue: 1 << 18)
+  }
+#endif
+
+  @MainActor
+  private func labeledElement(
+    in app: XCUIApplication,
+    equalTo label: String
+  ) -> XCUIElement {
+    app.descendants(matching: .any)
+      .matching(NSPredicate(format: "label == %@", label))
+      .firstMatch
+  }
+
+  @MainActor
+  private func labeledElement(
+    in app: XCUIApplication,
+    containing label: String
+  ) -> XCUIElement {
+    app.descendants(matching: .any)
+      .matching(NSPredicate(format: "label CONTAINS %@", label))
+      .firstMatch
   }
 
   @MainActor

@@ -76,10 +76,13 @@ their native `Text` nodes separate in the query tree. Xcode 26 then reports
 those structural groups as having no description even though VoiceOver reaches
 the labeled native elements. The macOS audit accepts only
 sufficient-description findings whose reported element is an empty-labeled,
-non-hittable `Group`. Buttons, links, other controls, hittable elements, and all
-other audit categories remain fatal. The read-flow test separately proves both
-that each stable automation identifier exists and that its expected native text
-exists, without assuming macOS and iOS organize those facts on the same node.
+non-hittable `Group`. It also accepts Xcode's “Unknown role” trait finding only
+for labeled, hittable `Button` elements whose identifier begins with
+`recipe-row-`; these are native SwiftUI sidebar `NavigationLink` values that
+XCTest can activate successfully. Other controls, roles, and audit categories
+remain fatal. The read-flow test separately proves both that each stable
+automation identifier exists and that its expected native label exists, without
+assuming macOS and iOS organize those facts on the same node or element type.
 
 ## Security and resource choices
 
