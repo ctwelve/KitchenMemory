@@ -9,6 +9,12 @@ import SwiftUI
 struct RecipeDetailView: View {
   let storedRecipe: StoredRecipe
 
+  // The metadata grid collapses before large text makes its cards cramped.
+  // @ScaledMetric separately keeps the numbered instruction badge in step
+  // with the text size instead of clipping a larger numeral in a fixed circle.
+  @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+  @ScaledMetric(relativeTo: .headline) private var stepNumberSize = 30
+
   private var revision: RecipeRevision { storedRecipe.revision }
 
   var body: some View {
@@ -20,7 +26,11 @@ struct RecipeDetailView: View {
         source
 
         if !revision.equipment.isEmpty {
-          recipeSection("Equipment", systemImage: "frying.pan") {
+          recipeSection(
+            "Equipment",
+            systemImage: "frying.pan",
+            accessibilityIdentifier: "equipment-section"
+          ) {
             VStack(alignment: .leading, spacing: 10) {
               ForEach(revision.equipment) { item in
                 bullet(item.originalText)
@@ -29,7 +39,11 @@ struct RecipeDetailView: View {
           }
         }
 
-        recipeSection("Ingredients", systemImage: "carrot") {
+        recipeSection(
+          "Ingredients",
+          systemImage: "carrot",
+          accessibilityIdentifier: "ingredients-section"
+        ) {
           VStack(alignment: .leading, spacing: 22) {
             ForEach(revision.ingredientSections) { section in
               VStack(alignment: .leading, spacing: 10) {
@@ -37,17 +51,25 @@ struct RecipeDetailView: View {
                   Text(title)
                     .font(.headline)
                     .foregroundStyle(Color("IconMark"))
+                    .accessibilityLabel(title)
+                    .accessibilityHeading(.h3)
+                    .accessibilityIdentifier(
+                      "ingredient-subsection-\(section.id.rawValue.uuidString)"
+                    )
                 }
                 ForEach(section.ingredients) { ingredient in
                   bullet(ingredient.displayText)
                 }
               }
+              .accessibilityElement(children: .contain)
             }
           }
         }
-        .accessibilityIdentifier("ingredients-section")
-
-        recipeSection("Instructions", systemImage: "list.number") {
+        recipeSection(
+          "Instructions",
+          systemImage: "list.number",
+          accessibilityIdentifier: "instructions-section"
+        ) {
           VStack(alignment: .leading, spacing: 24) {
             ForEach(revision.instructionSections) { section in
               VStack(alignment: .leading, spacing: 14) {
@@ -55,22 +77,31 @@ struct RecipeDetailView: View {
                   Text(title)
                     .font(.headline)
                     .foregroundStyle(Color("IconMark"))
+                    .accessibilityLabel(title)
+                    .accessibilityHeading(.h3)
+                    .accessibilityIdentifier(
+                      "instruction-subsection-\(section.id.rawValue.uuidString)"
+                    )
                 }
                 ForEach(Array(section.steps.enumerated()), id: \.element.id) { index, step in
                   instructionStep(index + 1, step: step)
                 }
               }
+              .accessibilityElement(children: .contain)
             }
           }
         }
-        .accessibilityIdentifier("instructions-section")
       }
       .frame(maxWidth: 860, alignment: .leading)
       .padding(.horizontal, 24)
       .padding(.vertical, 28)
       .frame(maxWidth: .infinity)
     }
+    // The detail identifier marks the navigation destination for UI tests.
+    // The label describes the screen as a whole; children remain contained
+    // and navigable rather than being collapsed into one enormous utterance.
     .accessibilityIdentifier("recipe-detail")
+    .accessibilityLabel("\(revision.title) recipe")
     .background(Color("AppBackground"))
     .navigationTitle(revision.title)
 #if os(iOS)
@@ -99,41 +130,76 @@ struct RecipeDetailView: View {
       Text(revision.title)
         .font(.largeTitle.bold())
         .foregroundStyle(.primary)
+        .accessibilityLabel(revision.title)
+        .accessibilityHeading(.h1)
+        // Tests locate this semantic title instead of depending on SwiftUI's
+        // platform-specific navigation-bar hierarchy.
         .accessibilityIdentifier("recipe-title")
 
       if let summary = revision.summary {
         Text(summary)
           .font(.title3)
-          .foregroundStyle(.secondary)
+          .foregroundStyle(.primary)
+          .accessibilityLabel(summary)
+          .accessibilityIdentifier("recipe-summary")
       }
 
       if let authorName = revision.authorName {
         Text("By \(authorName)")
           .font(.subheadline)
-          .foregroundStyle(.secondary)
+          .foregroundStyle(.primary)
+          .accessibilityLabel("By \(authorName)")
+          .accessibilityIdentifier("recipe-author")
       }
     }
+    // Explicit containment preserves the heading hierarchy while preventing
+    // SwiftUI from flattening the title, summary, and author into one element.
+    .accessibilityElement(children: .contain)
   }
 
   @ViewBuilder
   private var metadata: some View {
     let values = metadataValues
     if !values.isEmpty {
-      LazyVGrid(columns: [GridItem(.adaptive(minimum: 130), alignment: .leading)], spacing: 12) {
+      LazyVGrid(columns: metadataColumns, spacing: 12) {
         ForEach(values) { value in
           VStack(alignment: .leading, spacing: 5) {
-            Label(value.label, systemImage: value.systemImage)
-              .font(.caption.weight(.semibold))
-              .foregroundStyle(Color("IconMark"))
+            HStack(spacing: 5) {
+              Image(systemName: value.systemImage)
+                .accessibilityHidden(true)
+              Text(value.label)
+            }
+            .foregroundStyle(Color("IconMark"))
             Text(value.value)
-              .font(.body)
           }
           .frame(maxWidth: .infinity, alignment: .leading)
           .padding(14)
           .background(Color("SubtleFill"), in: .rect(cornerRadius: 12))
+          // The card is visually two Text views plus a decorative symbol, but
+          // semantically it is one fact. A native Text representation gives a
+          // predictable spoken phrase and role on both platforms. Combining
+          // the visual children directly produced unstable macOS roles and
+          // different label/value exposure between iOS and macOS.
+          .accessibilityRepresentation {
+            Text("\(value.label), \(value.value)")
+              // The identifier names the concept, while the spoken value may
+              // change with recipe content. Tests can therefore find Yield
+              // without encoding its current wording into the query.
+              .accessibilityIdentifier("recipe-metadata-\(value.label.lowercased())")
+          }
         }
       }
     }
+  }
+
+  private var metadataColumns: [GridItem] {
+    // Adaptive cards work well at ordinary sizes. Accessibility sizes use one
+    // column so long localized labels and values can reflow without competing
+    // horizontally for space.
+    if dynamicTypeSize.isAccessibilitySize {
+      return [GridItem(.flexible(), alignment: .leading)]
+    }
+    return [GridItem(.adaptive(minimum: 130), alignment: .leading)]
   }
 
   private var metadataValues: [MetadataValue] {
@@ -161,10 +227,15 @@ struct RecipeDetailView: View {
           Link(recipeSource.title ?? url.host() ?? "Open Source", destination: url)
         } else {
           Text(recipeSource.title ?? recipeSource.kind.rawValue.capitalized)
+            .foregroundStyle(.primary)
         }
       } label: {
-        Label("Source", systemImage: "link")
-          .foregroundStyle(Color("IconMark"))
+        HStack(spacing: 8) {
+          Image(systemName: "link")
+            .accessibilityHidden(true)
+          Text("Source")
+        }
+        .foregroundStyle(Color("IconMark"))
       }
       .padding(16)
       .background(Color("ContentSurface"), in: .rect(cornerRadius: 12))
@@ -186,12 +257,22 @@ struct RecipeDetailView: View {
   private func recipeSection<Content: View>(
     _ title: String,
     systemImage: String,
+    accessibilityIdentifier: String,
     @ViewBuilder content: () -> Content
   ) -> some View {
     VStack(alignment: .leading, spacing: 18) {
-      Label(title, systemImage: systemImage)
-        .font(.title2.bold())
-        .foregroundStyle(Color("IconMark"))
+      HStack(spacing: 8) {
+        Image(systemName: systemImage)
+          // The adjacent heading supplies the section name; announcing the SF
+          // Symbol would duplicate it and expose an implementation detail.
+          .accessibilityHidden(true)
+        Text(title)
+          .accessibilityLabel(title)
+          .accessibilityHeading(.h2)
+          .accessibilityIdentifier(accessibilityIdentifier)
+      }
+      .font(.title2.bold())
+      .foregroundStyle(Color("IconMark"))
       content()
     }
     .frame(maxWidth: .infinity, alignment: .leading)
@@ -201,6 +282,10 @@ struct RecipeDetailView: View {
       RoundedRectangle(cornerRadius: 16)
         .stroke(Color("SubtleBorder"), lineWidth: 1)
     }
+    // Each section is a navigable landmark whose headings and content remain
+    // separate descendants. `.combine` would turn an entire ingredient or
+    // instruction section into one unwieldy accessibility element.
+    .accessibilityElement(children: .contain)
   }
 
   private func bullet(_ text: String) -> some View {
@@ -208,10 +293,13 @@ struct RecipeDetailView: View {
       Image(systemName: "circle.fill")
         .font(.system(size: 5))
         .foregroundStyle(Color("AccentColor"))
+        // This dot conveys list styling only. The ingredient/equipment Text is
+        // already a complete description and retains its native static-text
+        // role, which is especially important to macOS accessibility audits.
+        .accessibilityHidden(true)
       Text(text)
         .textSelection(.enabled)
     }
-    .accessibilityElement(children: .combine)
   }
 
   private func instructionStep(_ number: Int, step: InstructionStep) -> some View {
@@ -219,7 +307,7 @@ struct RecipeDetailView: View {
       Text(number, format: .number)
         .font(.headline)
         .foregroundStyle(Color("ContentSurface"))
-        .frame(width: 30, height: 30)
+        .frame(width: stepNumberSize, height: stepNumberSize)
         .background(Color("AccentColor"), in: Circle())
 
       VStack(alignment: .leading, spacing: 5) {
@@ -236,8 +324,32 @@ struct RecipeDetailView: View {
         }
       }
     }
+    // A cooking step is one idea even though its visual treatment uses several
+    // views. Supply an explicit sentence so VoiceOver reads the step number,
+    // optional name, instruction, and duration in the intended order.
     .accessibilityElement(children: .combine)
-    .accessibilityLabel("Step \(number). \(step.text)")
+    .accessibilityLabel(instructionAccessibilityLabel(number, step: step))
+  }
+
+  private func instructionAccessibilityLabel(_ number: Int, step: InstructionStep) -> String {
+    var parts = ["Step \(number)."]
+    if let name = step.name {
+      parts.append(accessibilitySentence(name))
+    }
+    parts.append(accessibilitySentence(step.text))
+    if let duration = step.duration {
+      parts.append("Duration \(self.duration(duration)).")
+    }
+    return parts.joined(separator: " ")
+  }
+
+  private func accessibilitySentence(_ text: String) -> String {
+    // Separators alone do not reliably create a pause in synthesized speech.
+    // Preserve authored punctuation and add a period only when one is absent.
+    guard let lastCharacter = text.last, ".!?".contains(lastCharacter) else {
+      return "\(text)."
+    }
+    return text
   }
 }
 
