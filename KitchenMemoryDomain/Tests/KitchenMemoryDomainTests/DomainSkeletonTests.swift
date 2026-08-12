@@ -32,4 +32,40 @@ final class DomainSkeletonTests: XCTestCase {
 
         XCTAssertEqual(try JSONDecoder().decode(Kitchen.self, from: data), kitchen)
     }
+
+    func testIngredientPresentationIsComputedFromStructuredFields() {
+        let ingredient = RecipeIngredient(
+            originalText: "two cups of flour",
+            quantity: QuantityExpression(
+                kind: .exact,
+                lowerBound: RationalQuantity(numerator: 2)
+            ),
+            unitText: "cups",
+            ingredientText: "flour",
+            preparation: "sifted"
+        )
+
+        XCTAssertEqual(ingredient.effectiveDisplayText, "2 cups flour, sifted")
+    }
+
+    func testIngredientCanPresentPreservedOriginalOrCustomText() {
+        var ingredient = RecipeIngredient(
+            originalText: "a couple glugs olive oil",
+            ingredientText: "olive oil"
+        )
+
+        ingredient.presentationMode = .original
+        XCTAssertEqual(ingredient.effectiveDisplayText, "a couple glugs olive oil")
+
+        ingredient.presentationMode = .custom
+        ingredient.customDisplayText = "Olive oil, as needed"
+        XCTAssertEqual(ingredient.effectiveDisplayText, "Olive oil, as needed")
+    }
+
+    func testIncompleteStructuredPresentationFallsBackToOriginalText() {
+        let ingredient = RecipeIngredient(originalText: "salt to taste")
+
+        XCTAssertEqual(ingredient.effectiveDisplayText, "salt to taste")
+    }
+
 }

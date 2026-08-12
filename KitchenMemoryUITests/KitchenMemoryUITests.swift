@@ -96,6 +96,44 @@ final class KitchenMemoryUITests: XCTestCase {
   }
 
   @MainActor
+  func testRecipeEditorCanScrollToItsLastSection() throws {
+    let app = launchApp()
+    let newRecipe = app.descendants(matching: .any)["new-recipe"]
+    XCTAssertTrue(newRecipe.waitForExistence(timeout: 2))
+    activate(newRecipe)
+
+    let editor = app.descendants(matching: .any)["recipe-editor-scroll"]
+    XCTAssertTrue(editor.waitForExistence(timeout: 2))
+    let addInstructionSection = app.descendants(matching: .any)["add-instruction-section"]
+    XCTAssertTrue(scroll(editor, untilVisible: addInstructionSection))
+  }
+
+  @MainActor
+  func testRecipeEditorCanExpandAnIngredientSection() throws {
+    let app = launchApp()
+    let recipeRow = app.descendants(matching: .any)
+      .matching(NSPredicate(format: "identifier BEGINSWITH %@", "recipe-row-"))
+      .firstMatch
+    let detail = openRecipeDetail(in: app, from: recipeRow)
+    let edit = app.descendants(matching: .any)["edit-recipe"]
+    XCTAssertTrue(edit.waitForExistence(timeout: 2))
+    activate(edit)
+
+    let editor = app.descendants(matching: .any)["recipe-editor-scroll"]
+    let ingredientSection = app.descendants(matching: .any)
+      .matching(NSPredicate(format: "identifier BEGINSWITH %@", "ingredient-editor-section-"))
+      .firstMatch
+    XCTAssertTrue(scroll(editor, untilVisible: ingredientSection))
+    activate(ingredientSection)
+
+    let addIngredient = app.descendants(matching: .any)
+      .matching(NSPredicate(format: "identifier BEGINSWITH %@", "add-ingredient-"))
+      .firstMatch
+    XCTAssertTrue(addIngredient.waitForExistence(timeout: 2))
+    _ = detail
+  }
+
+  @MainActor
   func testRecipeLibraryPassesAccessibilityAudit() throws {
     let device = XCUIDevice.shared
     let originalAppearance = device.appearance

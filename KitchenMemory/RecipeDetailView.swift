@@ -58,7 +58,7 @@ struct RecipeDetailView: View {
                     )
                 }
                 ForEach(section.ingredients) { ingredient in
-                  bullet(ingredient.displayText)
+                  bullet(ingredient.effectiveDisplayText)
                 }
               }
               .accessibilityElement(children: .contain)

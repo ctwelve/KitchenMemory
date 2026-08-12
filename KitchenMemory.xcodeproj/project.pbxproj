@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A1532353302C2FF100C8D534 /* Documentation.docc in Sources */ = {isa = PBXBuildFile; fileRef = A1532352302C2FF100C8D534 /* Documentation.docc */; };
+		A1532354302C2FF100C8D534 /* Documentation.docc in Sources */ = {isa = PBXBuildFile; fileRef = A1532352302C2FF100C8D534 /* Documentation.docc */; };
+		A1532355302C2FF100C8D534 /* Documentation.docc in Sources */ = {isa = PBXBuildFile; fileRef = A1532352302C2FF100C8D534 /* Documentation.docc */; };
 		A1C4E901302B100000E2C0DB /* KitchenMemoryDomain in Frameworks */ = {isa = PBXBuildFile; productRef = A1C4E903302B100000E2C0DB /* KitchenMemoryDomain */; };
 		A1C4EA01302B200000E2C0DB /* KitchenMemoryApplication in Frameworks */ = {isa = PBXBuildFile; productRef = A1C4EA04302B200000E2C0DB /* KitchenMemoryApplication */; };
 		A1C4EA02302B200000E2C0DB /* KitchenMemoryPersistence in Frameworks */ = {isa = PBXBuildFile; productRef = A1C4EA05302B200000E2C0DB /* KitchenMemoryPersistence */; };
@@ -31,6 +34,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		A1532352302C2FF100C8D534 /* Documentation.docc */ = {isa = PBXFileReference; lastKnownFileType = folder.documentationcatalog; path = Documentation.docc; sourceTree = "<group>"; };
 		A15962C5302BC01A00926925 /* KitchenMemory.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = KitchenMemory.xctestplan; sourceTree = "<group>"; };
 		A1596308302BCCE600926925 /* accessibility-engineering.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "accessibility-engineering.md"; sourceTree = "<group>"; };
 		A1596309302BCCE600926925 /* alpha-roadmap.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "alpha-roadmap.md"; sourceTree = "<group>"; };
@@ -126,6 +130,7 @@
 		A1C4E795302A63B800E2C0DB = {
 			isa = PBXGroup;
 			children = (
+				A1532352302C2FF100C8D534 /* Documentation.docc */,
 				A15962C5302BC01A00926925 /* KitchenMemory.xctestplan */,
 				A1C4E837302A6FCA00E2C0DB /* AI.md */,
 				A1C4E838302A6FCA00E2C0DB /* COPYRIGHT */,
@@ -438,6 +443,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A1532353302C2FF100C8D534 /* Documentation.docc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -445,6 +451,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A1532354302C2FF100C8D534 /* Documentation.docc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -452,6 +459,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A1532355302C2FF100C8D534 /* Documentation.docc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -615,6 +623,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
+				RUN_DOCUMENTATION_COMPILER = YES;
 				SDKROOT = auto;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
@@ -658,6 +667,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
+				RUN_DOCUMENTATION_COMPILER = YES;
 				SDKROOT = auto;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
@@ -683,6 +693,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemoryTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				RUN_DOCUMENTATION_COMPILER = YES;
 				SDKROOT = auto;
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
@@ -708,6 +719,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemoryTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				RUN_DOCUMENTATION_COMPILER = YES;
 				SDKROOT = auto;
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
@@ -732,6 +744,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemoryUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				RUN_DOCUMENTATION_COMPILER = YES;
 				SDKROOT = auto;
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
@@ -756,6 +769,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemoryUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				RUN_DOCUMENTATION_COMPILER = YES;
 				SDKROOT = auto;
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
