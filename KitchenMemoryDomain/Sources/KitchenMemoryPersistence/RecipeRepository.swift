@@ -205,7 +205,8 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
         context.insert(
           RecipeIngredientRecord(
             id: item.id.rawValue, sectionID: section.id.rawValue, sortIndex: itemIndex,
-            originalText: item.originalText, displayText: item.displayText,
+            originalText: item.originalText, presentationMode: item.presentationMode.rawValue,
+            customDisplayText: item.customDisplayText,
             quantityData: try encodeOptional(item.quantity), unitText: item.unitText,
             packageData: try encodeOptional(item.package), ingredientText: item.ingredientText,
             preparation: item.preparation, note: item.note, isOptional: item.isOptional,
@@ -260,19 +261,23 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
       ))
     let ingredientSections = try ingredientSectionRecords.map { section in
       let sectionID = section.id
-      let items = try context.fetch(
+      let storedItems = try context.fetch(
         FetchDescriptor<RecipeIngredientRecord>(
           predicate: #Predicate { $0.sectionID == sectionID }, sortBy: [SortDescriptor(\.sortIndex)]
         )
-      ).map { item in
-        guard let scaling = RecipeIngredient.ScalingBehavior(rawValue: item.scalingBehavior),
+      )
+      var seenItemIDs = Set<UUID>()
+      let items = try storedItems.filter { seenItemIDs.insert($0.id).inserted }.map { item in
+        guard let presentationMode = RecipeIngredient.PresentationMode(rawValue: item.presentationMode),
+          let scaling = RecipeIngredient.ScalingBehavior(rawValue: item.scalingBehavior),
           let parseState = RecipeIngredient.ParseState(rawValue: item.parseState)
         else {
           throw KitchenMemoryPersistenceError.invalidStoredValue(field: "ingredient enum")
         }
         return RecipeIngredient(
           id: .init(rawValue: item.id), originalText: item.originalText,
-          displayText: item.displayText,
+          presentationMode: presentationMode,
+          customDisplayText: item.customDisplayText,
           quantity: try decodeOptional(
             QuantityExpression.self, from: item.quantityData, field: "ingredient.quantity"),
           unitText: item.unitText,
@@ -292,11 +297,13 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
       ))
     let instructionSections = try instructionSectionRecords.map { section in
       let sectionID = section.id
-      let steps = try context.fetch(
+      let storedSteps = try context.fetch(
         FetchDescriptor<InstructionStepRecord>(
           predicate: #Predicate { $0.sectionID == sectionID }, sortBy: [SortDescriptor(\.sortIndex)]
         )
-      ).map { step in
+      )
+      var seenStepIDs = Set<UUID>()
+      let steps = try storedSteps.filter { seenStepIDs.insert($0.id).inserted }.map { step in
         InstructionStep(
           id: .init(rawValue: step.id), name: step.name, text: step.text,
           duration: step.durationSeconds.map(RecipeDuration.init(seconds:)),

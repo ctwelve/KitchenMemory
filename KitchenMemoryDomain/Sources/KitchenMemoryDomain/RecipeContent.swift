@@ -5,7 +5,7 @@
 import Foundation
 
 public struct RecipeSource: Codable, Equatable, Sendable {
-    public enum Kind: String, Codable, Sendable {
+    public enum Kind: String, Codable, CaseIterable, Sendable {
         case original, webpage, book, person, imported
     }
 
@@ -45,6 +45,12 @@ public struct RationalQuantity: Codable, Equatable, Sendable {
     public init(numerator: Int, denominator: Int = 1) {
         self.numerator = numerator
         self.denominator = denominator
+    }
+}
+
+public extension RationalQuantity {
+    var renderedText: String {
+        denominator == 1 ? String(numerator) : "\(numerator)/\(denominator)"
     }
 }
 
@@ -145,9 +151,14 @@ public struct RecipeIngredient: Codable, Equatable, Identifiable, Sendable {
         case unparsed, parsed, reviewed, edited
     }
 
+    public enum PresentationMode: String, Codable, CaseIterable, Sendable {
+        case structured, original, custom
+    }
+
     public let id: ID
     public var originalText: String
-    public var displayText: String
+    public var presentationMode: PresentationMode
+    public var customDisplayText: String?
     public var quantity: QuantityExpression?
     public var unitText: String?
     public var package: PackageDescription?
@@ -160,8 +171,9 @@ public struct RecipeIngredient: Codable, Equatable, Identifiable, Sendable {
 
     public init(
         id: ID = ID(),
-        originalText: String,
-        displayText: String,
+        originalText: String = "",
+        presentationMode: PresentationMode = .structured,
+        customDisplayText: String? = nil,
         quantity: QuantityExpression? = nil,
         unitText: String? = nil,
         package: PackageDescription? = nil,
@@ -174,7 +186,8 @@ public struct RecipeIngredient: Codable, Equatable, Identifiable, Sendable {
     ) {
         self.id = id
         self.originalText = originalText
-        self.displayText = displayText
+        self.presentationMode = presentationMode
+        self.customDisplayText = customDisplayText
         self.quantity = quantity
         self.unitText = unitText
         self.package = package
@@ -184,6 +197,124 @@ public struct RecipeIngredient: Codable, Equatable, Identifiable, Sendable {
         self.isOptional = isOptional
         self.scalingBehavior = scalingBehavior
         self.parseState = parseState
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case id
+        case originalText
+        case presentationMode
+        case customDisplayText
+        case quantity
+        case unitText
+        case package
+        case ingredientText
+        case preparation
+        case note
+        case isOptional
+        case scalingBehavior
+        case parseState
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(ID.self, forKey: .id)
+        originalText = try container.decodeIfPresent(String.self, forKey: .originalText) ?? ""
+        quantity = try container.decodeIfPresent(QuantityExpression.self, forKey: .quantity)
+        unitText = try container.decodeIfPresent(String.self, forKey: .unitText)
+        package = try container.decodeIfPresent(PackageDescription.self, forKey: .package)
+        ingredientText = try container.decodeIfPresent(String.self, forKey: .ingredientText)
+        preparation = try container.decodeIfPresent(String.self, forKey: .preparation)
+        note = try container.decodeIfPresent(String.self, forKey: .note)
+        isOptional = try container.decodeIfPresent(Bool.self, forKey: .isOptional) ?? false
+        scalingBehavior = try container.decodeIfPresent(ScalingBehavior.self, forKey: .scalingBehavior) ?? .linear
+        parseState = try container.decodeIfPresent(ParseState.self, forKey: .parseState) ?? .unparsed
+
+        if let mode = try container.decodeIfPresent(PresentationMode.self, forKey: .presentationMode) {
+            presentationMode = mode
+            customDisplayText = try container.decodeIfPresent(String.self, forKey: .customDisplayText)
+        } else {
+            presentationMode = .structured
+            customDisplayText = nil
+        }
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(originalText, forKey: .originalText)
+        try container.encode(presentationMode, forKey: .presentationMode)
+        try container.encodeIfPresent(customDisplayText, forKey: .customDisplayText)
+        try container.encodeIfPresent(quantity, forKey: .quantity)
+        try container.encodeIfPresent(unitText, forKey: .unitText)
+        try container.encodeIfPresent(package, forKey: .package)
+        try container.encodeIfPresent(ingredientText, forKey: .ingredientText)
+        try container.encodeIfPresent(preparation, forKey: .preparation)
+        try container.encodeIfPresent(note, forKey: .note)
+        try container.encode(isOptional, forKey: .isOptional)
+        try container.encode(scalingBehavior, forKey: .scalingBehavior)
+        try container.encode(parseState, forKey: .parseState)
+    }
+
+    /// The text readers and cooking surfaces should present.
+    ///
+    /// Structured presentation is the default, but incomplete structure falls
+    /// back to preserved source evidence. A custom override is explicit rather
+    /// than a second stored value that can silently drift from its components.
+    public var effectiveDisplayText: String {
+        switch presentationMode {
+        case .original:
+            return nonempty(originalText) ?? structuredDisplayText ?? "Ingredient"
+        case .custom:
+            return nonempty(customDisplayText) ?? structuredDisplayText
+                ?? nonempty(originalText) ?? "Ingredient"
+        case .structured:
+            return structuredDisplayText ?? nonempty(originalText) ?? "Ingredient"
+        }
+    }
+
+    public var structuredDisplayText: String? {
+        guard let ingredientName = nonempty(ingredientText) else { return nil }
+        var components: [String] = []
+        if let quantityText = quantity?.renderedText { components.append(quantityText) }
+        if let package,
+           let packageQuantity = package.quantity.renderedText,
+           let packageUnitText = nonempty(package.unitText) {
+            let packageUnit = packageUnitText.hasSuffix("s")
+                ? String(packageUnitText.dropLast())
+                : packageUnitText
+            components.append("(\(packageQuantity)-\(packageUnit))")
+        }
+        if let unit = nonempty(unitText) { components.append(unit) }
+        components.append(ingredientName)
+
+        var result = components.joined(separator: " ")
+        if let preparation = nonempty(preparation) { result += ", \(preparation)" }
+        if let note = nonempty(note) { result += ", \(note)" }
+        if isOptional { result += ", optional" }
+        return result
+    }
+
+    private func nonempty(_ text: String?) -> String? {
+        let trimmed = text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        return trimmed.isEmpty ? nil : trimmed
+    }
+}
+
+public extension QuantityExpression {
+    var renderedText: String? {
+        switch kind {
+        case .none:
+            return nil
+        case .exact:
+            return lowerBound?.renderedText
+        case .range:
+            guard let lowerBound, let upperBound else { return text }
+            return "\(lowerBound.renderedText)–\(upperBound.renderedText)"
+        case .approximate:
+            return lowerBound.map { "about \($0.renderedText)" } ?? text
+        case .text:
+            return text
+        }
     }
 }
 

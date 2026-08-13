@@ -33,7 +33,7 @@ jobs:
 
       - name: Build macOS app
         run: >-
-          xcodebuild build
+          xcodebuild -skipPackagePluginValidation build
           -project KitchenMemory.xcodeproj
           -scheme KitchenMemory
           -destination 'platform=macOS'
@@ -42,7 +42,7 @@ jobs:
 
       - name: Build documentation
         run: >-
-          xcodebuild docbuild
+          xcodebuild -skipPackagePluginValidation docbuild
           -project KitchenMemory.xcodeproj
           -scheme KitchenMemory
           -destination 'platform=macOS'
@@ -69,7 +69,7 @@ jobs:
 
       - name: Test macOS core
         run: >-
-          xcodebuild test
+          xcodebuild -skipPackagePluginValidation test
           -project KitchenMemory.xcodeproj
           -scheme KitchenMemory
           -destination 'platform=macOS'
@@ -94,7 +94,7 @@ jobs:
 
       - name: Test macOS accessibility
         run: >-
-          xcodebuild test
+          xcodebuild -skipPackagePluginValidation test
           -project KitchenMemory.xcodeproj
           -scheme KitchenMemory
           -destination 'platform=macOS'
@@ -119,7 +119,7 @@ jobs:
 
       - name: Build iOS app
         run: >-
-          xcodebuild build
+          xcodebuild -skipPackagePluginValidation build
           -project KitchenMemory.xcodeproj
           -scheme KitchenMemory
           -destination 'platform=iOS Simulator,name=iPhone 17 Pro'
@@ -143,7 +143,7 @@ jobs:
 
       - name: Test iOS core
         run: >-
-          xcodebuild test
+          xcodebuild -skipPackagePluginValidation test
           -project KitchenMemory.xcodeproj
           -scheme KitchenMemory
           -destination 'platform=iOS Simulator,name=iPhone 17 Pro'
@@ -168,7 +168,7 @@ jobs:
 
       - name: Test iOS accessibility
         run: >-
-          xcodebuild test
+          xcodebuild -skipPackagePluginValidation test
           -project KitchenMemory.xcodeproj
           -scheme KitchenMemory
           -destination 'platform=iOS Simulator,name=iPhone 17 Pro'

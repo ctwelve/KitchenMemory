@@ -58,7 +58,7 @@ struct RecipeDetailView: View {
                     )
                 }
                 ForEach(section.ingredients) { ingredient in
-                  bullet(ingredient.displayText)
+                  bullet(ingredient.effectiveDisplayText)
                 }
               }
               .accessibilityElement(children: .contain)
@@ -125,6 +125,7 @@ struct RecipeDetailView: View {
     }
   }
 
+
   private var header: some View {
     VStack(alignment: .leading, spacing: 10) {
       Text(revision.title)
@@ -156,6 +157,7 @@ struct RecipeDetailView: View {
     // SwiftUI from flattening the title, summary, and author into one element.
     .accessibilityElement(children: .contain)
   }
+
 
   @ViewBuilder
   private var metadata: some View {

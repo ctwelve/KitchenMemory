@@ -56,12 +56,6 @@ struct AppDependencies {
     }
   }
 
-  /// Opens the existing local kitchen, or creates and seeds one new install.
-  ///
-  /// A Kitchen identity belongs to an installation, so it is generated when a
-  /// new store has no kitchens. Sample recipe identities are deliberately
-  /// supplied by the sample pack: a later linked Kitchen can recognize the
-  /// same starter recipe instead of accumulating duplicate Hotdishes.
   static func prepareInitialKitchen(repository: any RecipeRepository) throws -> Kitchen {
     if let existingKitchen = try repository.kitchens().first {
       return existingKitchen

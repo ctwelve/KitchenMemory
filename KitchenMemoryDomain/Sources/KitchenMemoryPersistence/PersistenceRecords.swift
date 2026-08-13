@@ -137,7 +137,8 @@ import SwiftData
   var sectionID: UUID
   var sortIndex: Int
   var originalText: String
-  var displayText: String
+  var presentationMode: String
+  var customDisplayText: String?
   var quantityData: Data?
   var unitText: String?
   var packageData: Data?
@@ -149,7 +150,8 @@ import SwiftData
   var parseState: String
 
   init(
-    id: UUID, sectionID: UUID, sortIndex: Int, originalText: String, displayText: String,
+    id: UUID, sectionID: UUID, sortIndex: Int, originalText: String,
+    presentationMode: String, customDisplayText: String?,
     quantityData: Data?, unitText: String?, packageData: Data?, ingredientText: String?,
     preparation: String?, note: String?, isOptional: Bool, scalingBehavior: String,
     parseState: String
@@ -158,7 +160,8 @@ import SwiftData
     self.sectionID = sectionID
     self.sortIndex = sortIndex
     self.originalText = originalText
-    self.displayText = displayText
+    self.presentationMode = presentationMode
+    self.customDisplayText = customDisplayText
     self.quantityData = quantityData
     self.unitText = unitText
     self.packageData = packageData

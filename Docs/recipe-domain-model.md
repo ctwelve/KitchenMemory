@@ -109,7 +109,8 @@ This is the ingredient **as used by this recipe**, not the canonical food.
 | Field | Meaning |
 | --- | --- |
 | `originalText` | Untouched imported or entered line |
-| `displayText` | User-edited preferred presentation |
+| `presentationMode` | Whether to show structured, original, or custom text |
+| `customDisplayText` | Optional explicit presentation override |
 | `quantity` | Parsed quantity expression, if any |
 | `unit` | Parsed or selected recipe unit, if any |
 | `ingredient` | Link to a normalized ingredient concept, if resolved |
@@ -130,8 +131,13 @@ ingredientText:  whole tomatoes
 preparation:     crushed by hand
 ```
 
+The normal ingredient presentation is computed from the structured fields.
+When those fields are incomplete it falls back to `originalText`. A person may
+explicitly choose the original wording or a custom override, but computed text
+is not persisted separately where it could drift out of sync.
+
 The package size is meaningful but does not fit cleanly into a single quantity
-and unit. A future `PackageDescription` value can represent it without blocking
+and unit. `PackageDescription` represents it without blocking
 the first implementation.
 
 ### Ingredient

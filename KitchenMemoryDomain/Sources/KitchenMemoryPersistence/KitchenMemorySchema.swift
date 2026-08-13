@@ -5,10 +5,6 @@
 import Foundation
 import SwiftData
 
-/// Access to Kitchen Memory's current versioned SwiftData schema.
-///
-/// App setup, previews, and tests use the same migration plan. Add a new
-/// immutable ``VersionedSchema`` and an explicit stage when this store evolves.
 public enum KitchenMemorySchema {
   /// Creates an in-memory test container or the app's durable local container.
   ///

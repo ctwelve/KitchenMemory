@@ -94,6 +94,47 @@ final class SwiftDataRecipeRepositoryTests: XCTestCase {
     )
   }
 
+  func testLoadsLegacyRevisionsWithoutMultiplyingReusedChildIdentifiers() throws {
+    let kitchen = Kitchen(name: "Test Kitchen")
+    let recipeID = Recipe.ID()
+    let ingredient = RecipeIngredient(originalText: "4 tomatoes", presentationMode: .original)
+    let step = InstructionStep(text: "Simmer.")
+    let ingredientSection = IngredientSection(ingredients: [ingredient])
+    let instructionSection = InstructionSection(steps: [step])
+    let firstRevision = RecipeRevision(
+      recipeID: recipeID,
+      revisionNumber: 1,
+      title: "Tomato Soup",
+      ingredientSections: [ingredientSection],
+      instructionSections: [instructionSection]
+    )
+    let secondRevision = RecipeRevision(
+      recipeID: recipeID,
+      revisionNumber: 2,
+      title: "Tomato Soup",
+      authorName: "Aunt Jo",
+      ingredientSections: [ingredientSection],
+      instructionSections: [instructionSection]
+    )
+    var recipe = Recipe(
+      id: recipeID,
+      kitchenID: kitchen.id,
+      currentRevisionID: firstRevision.id
+    )
+    let repository = SwiftDataRecipeRepository(
+      modelContainer: try KitchenMemorySchema.makeContainer(inMemory: true)
+    )
+
+    try repository.save(kitchen)
+    try repository.save(recipe: recipe, revision: firstRevision)
+    recipe.currentRevisionID = secondRevision.id
+    try repository.save(recipe: recipe, revision: secondRevision)
+
+    let reloaded = try XCTUnwrap(repository.recipe(id: recipeID))
+    XCTAssertEqual(reloaded.revision.ingredientSections.first?.ingredients, [ingredient])
+    XCTAssertEqual(reloaded.revision.instructionSections.first?.steps, [step])
+  }
+
   func testDiskStoreSurvivesANewContainer() throws {
     let storeURL = FileManager.default.temporaryDirectory
       .appending(path: "KitchenMemoryPersistenceTests")
@@ -192,14 +233,14 @@ final class SwiftDataRecipeRepositoryTests: XCTestCase {
         IngredientSection(
           title: "First section",
           ingredients: [
-            RecipeIngredient(originalText: "First ingredient", displayText: "First ingredient"),
-            RecipeIngredient(originalText: "Second ingredient", displayText: "Second ingredient"),
+            RecipeIngredient(originalText: "First ingredient", presentationMode: .original),
+            RecipeIngredient(originalText: "Second ingredient", presentationMode: .original),
           ]
         ),
         IngredientSection(
           title: "Second section",
           ingredients: [
-            RecipeIngredient(originalText: "Third ingredient", displayText: "Third ingredient")
+            RecipeIngredient(originalText: "Third ingredient", presentationMode: .original)
           ]
         ),
       ],
