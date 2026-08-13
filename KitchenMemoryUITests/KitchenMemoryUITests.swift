@@ -109,7 +109,7 @@ final class KitchenMemoryUITests: XCTestCase {
   }
 
   @MainActor
-  func testRecipeEditorCanExpandAnIngredientSection() throws {
+  func testRecipeEditorKeepsIngredientAndInstructionSectionsDistinct() throws {
     let app = launchApp()
     let recipeRow = app.descendants(matching: .any)
       .matching(NSPredicate(format: "identifier BEGINSWITH %@", "recipe-row-"))
@@ -130,6 +130,18 @@ final class KitchenMemoryUITests: XCTestCase {
       .matching(NSPredicate(format: "identifier BEGINSWITH %@", "add-ingredient-"))
       .firstMatch
     XCTAssertTrue(addIngredient.waitForExistence(timeout: 2))
+
+    let ingredient = app.descendants(matching: .any)
+      .matching(NSPredicate(format: "identifier BEGINSWITH %@", "ingredient-editor-row-"))
+      .firstMatch
+    XCTAssertTrue(ingredient.waitForExistence(timeout: 2))
+    XCTAssertTrue(ingredient.label.contains("4 (5-ounce) cans chunk light tuna"))
+
+    let instructionSection = app.descendants(matching: .any)
+      .matching(NSPredicate(format: "identifier BEGINSWITH %@", "instruction-editor-section-"))
+      .firstMatch
+    XCTAssertTrue(scroll(editor, untilVisible: instructionSection))
+    XCTAssertEqual(instructionSection.value as? String, "Collapsed")
     _ = detail
   }
 

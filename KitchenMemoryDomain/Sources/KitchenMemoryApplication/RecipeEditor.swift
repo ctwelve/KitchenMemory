@@ -85,11 +85,56 @@ public enum RecipeEditorError: Error, Equatable {
   case missingRecipe
 }
 
-/// Write operations for manually created and edited recipes.
+/// A high-level, main-actor–bound coordinator for creating and revising recipes.
 ///
-/// Saving an edit never changes an existing ``RecipeRevision``. It writes a
-/// new revision, makes that revision current, and leaves previous content for
-/// recipe history and later comparison.
+/// RecipeEditor encapsulates the domain logic required to transform an editable
+/// in-memory draft (RecipeDraft) into an immutable RecipeRevision and persist it
+/// alongside its parent Recipe. It ensures that user-entered text is normalized,
+/// empty fields are discarded, and section/child identifiers are handled safely
+/// across revisions.
+///
+/// Responsibilities:
+/// - Validates essential fields (for example, non-empty title) and surfaces
+///   domain-specific validation failures via RecipeEditorError.
+/// - Normalizes and cleans draft content by trimming whitespace, removing empty
+///   sections/steps/ingredients, and stripping placeholder values.
+/// - Creates a new Recipe with its initial revision, or appends a new immutable
+///   revision to an existing Recipe while preserving non-authored metadata
+///   (e.g., cuisines, categories, keywords, media, equipment).
+/// - Prevents identifier collisions across revisions by re-identifying section
+///   and child entities when creating subsequent revisions.
+///
+/// Concurrency:
+/// - Constrained to the main actor because it is typically driven by UI flows
+///   and interacts with UI-owned state. Persistence calls should be designed to
+///   be main-actor–safe by the repository implementation.
+///
+/// Persistence:
+/// - Delegates storage and retrieval to an injected RecipeRepository, allowing
+///   the editor to remain platform- and storage-agnostic.
+///
+/// Typical usage:
+/// - Build a RecipeDraft from user input or an existing RecipeRevision.
+/// - Call create(in:from:) to persist an entirely new Recipe with its initial
+///   revision.
+/// - Call revise(recipeID:from:) to append a new revision to an existing Recipe,
+///   preserving non-authored metadata and re-identifying section/child content.
+///
+/// Errors:
+/// - Throws RecipeEditorError.missingTitle when the draft lacks a valid title.
+/// - Throws RecipeEditorError.missingRecipe when attempting to revise a recipe
+///   that cannot be found in the repository.
+///
+/// Testing considerations:
+/// - Provide a test double for RecipeRepository to verify that the editor emits
+///   the expected Recipe and RecipeRevision given a draft, including cleanup of
+///   whitespace and removal of empty sections/steps/ingredients.
+/// - Assert that follow-up revisions preserve non-authored metadata and do not
+///   reuse section/child identifiers from previous revisions.
+///
+/// Dependencies:
+/// - KitchenMemoryDomain for Recipe, RecipeRevision, and related value types.
+/// - KitchenMemoryPersistence for RecipeRepository and storage operations.
 @MainActor
 public struct RecipeEditor {
   private let repository: any RecipeRepository
@@ -175,7 +220,9 @@ public struct RecipeEditor {
         ingredient.originalText = text(ingredient.originalText) ?? ""
         ingredient.customDisplayText = optional(ingredient.customDisplayText)
         ingredient.ingredientText = optional(ingredient.ingredientText)
+        ingredient.quantity = cleaned(ingredient.quantity)
         ingredient.unitText = optional(ingredient.unitText)
+        ingredient.package = cleaned(ingredient.package)
         ingredient.preparation = optional(ingredient.preparation)
         ingredient.note = optional(ingredient.note)
         guard ingredient.effectiveDisplayText != "Ingredient" else { return nil }
@@ -183,6 +230,62 @@ public struct RecipeEditor {
       }
       return section.ingredients.isEmpty && section.title == nil ? nil : section
     }
+  }
+
+  private func cleaned(_ quantity: QuantityExpression?) -> QuantityExpression? {
+    guard var quantity else { return nil }
+    quantity.text = optional(quantity.text)
+
+    switch quantity.kind {
+    case .none:
+      return nil
+    case .exact:
+      guard let lowerBound = cleaned(quantity.lowerBound) else {
+        return textualFallback(for: quantity)
+      }
+      quantity.lowerBound = lowerBound
+      quantity.upperBound = nil
+    case .range:
+      guard let lowerBound = cleaned(quantity.lowerBound),
+        let upperBound = cleaned(quantity.upperBound)
+      else {
+        return textualFallback(for: quantity)
+      }
+      quantity.lowerBound = lowerBound
+      quantity.upperBound = upperBound
+    case .approximate:
+      guard let lowerBound = cleaned(quantity.lowerBound) else {
+        return textualFallback(for: quantity)
+      }
+      quantity.lowerBound = lowerBound
+      quantity.upperBound = nil
+    case .text:
+      guard quantity.text != nil else { return nil }
+      quantity.lowerBound = nil
+      quantity.upperBound = nil
+    }
+
+    return quantity
+  }
+
+  private func cleaned(_ quantity: RationalQuantity?) -> RationalQuantity? {
+    guard let quantity,
+      quantity.numerator >= 0,
+      quantity.denominator > 0
+    else { return nil }
+    return quantity
+  }
+
+  private func cleaned(_ package: PackageDescription?) -> PackageDescription? {
+    guard let package,
+      let quantity = cleaned(package.quantity),
+      let unit = optional(package.unitText)
+    else { return nil }
+    return PackageDescription(quantity: quantity, unitText: unit)
+  }
+
+  private func textualFallback(for quantity: QuantityExpression) -> QuantityExpression? {
+    quantity.text.map { QuantityExpression(kind: .text, text: $0) }
   }
 
   private func cleaned(_ sections: [InstructionSection]) -> [InstructionSection] {

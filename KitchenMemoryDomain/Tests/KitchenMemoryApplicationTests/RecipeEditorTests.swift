@@ -150,6 +150,48 @@ final class RecipeEditorTests: XCTestCase {
     XCTAssertEqual(try repository.recipe(id: stored.recipe.id), stored)
   }
 
+  func testStructuredAndFreeFormQuantitiesRemainOptionalAndRoundTrip() throws {
+    let (kitchen, _, editor) = try makeEditor()
+    let preciseIngredient = RecipeIngredient(
+      quantity: QuantityExpression(
+        kind: .range,
+        lowerBound: RationalQuantity(numerator: 2),
+        upperBound: RationalQuantity(numerator: 3)
+      ),
+      unitText: "  cups  ",
+      package: PackageDescription(
+        quantity: QuantityExpression(
+          kind: .exact,
+          lowerBound: RationalQuantity(numerator: 14)
+        ),
+        unitText: "  ounces  "
+      ),
+      ingredientText: "  tomatoes  "
+    )
+    let freeFormIngredient = RecipeIngredient(
+      quantity: QuantityExpression(kind: .text, text: "  to taste  "),
+      ingredientText: "  salt  "
+    )
+
+    let stored = try editor.create(
+      in: kitchen.id,
+      from: RecipeDraft(
+        title: "Tomato Soup",
+        ingredientSections: [
+          IngredientSection(ingredients: [preciseIngredient, freeFormIngredient])
+        ]
+      )
+    )
+    let ingredients = stored.revision.ingredientSections.flatMap(\.ingredients)
+
+    XCTAssertEqual(ingredients[0].quantity?.renderedText, "2–3")
+    XCTAssertEqual(ingredients[0].unitText, "cups")
+    XCTAssertEqual(ingredients[0].package?.unitText, "ounces")
+    XCTAssertEqual(ingredients[1].quantity?.renderedText, "to taste")
+    XCTAssertNil(ingredients[1].unitText)
+    XCTAssertNil(ingredients[1].package)
+  }
+
   func testRejectsAnUntitledDraft() throws {
     let (kitchen, _, editor) = try makeEditor()
 

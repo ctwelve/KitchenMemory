@@ -68,4 +68,49 @@ final class DomainSkeletonTests: XCTestCase {
         XCTAssertEqual(ingredient.effectiveDisplayText, "salt to taste")
     }
 
+    func testEveryQuantityKindRendersWithoutInventingPrecision() {
+        let exact = QuantityExpression(
+            kind: .exact,
+            lowerBound: RationalQuantity(numerator: 1, denominator: 2)
+        )
+        let range = QuantityExpression(
+            kind: .range,
+            lowerBound: RationalQuantity(numerator: 2),
+            upperBound: RationalQuantity(numerator: 3)
+        )
+        let approximate = QuantityExpression(
+            kind: .approximate,
+            lowerBound: RationalQuantity(numerator: 2)
+        )
+        let text = QuantityExpression(kind: .text, text: "to taste")
+
+        XCTAssertEqual(exact.renderedText, "1/2")
+        XCTAssertEqual(range.renderedText, "2–3")
+        XCTAssertEqual(approximate.renderedText, "about 2")
+        XCTAssertEqual(text.renderedText, "to taste")
+        XCTAssertNil(QuantityExpression(kind: .none).renderedText)
+    }
+
+    func testPackageQuantityParticipatesInComputedPresentation() {
+        let ingredient = RecipeIngredient(
+            quantity: QuantityExpression(
+                kind: .exact,
+                lowerBound: RationalQuantity(numerator: 4)
+            ),
+            unitText: "cans",
+            package: PackageDescription(
+                quantity: QuantityExpression(
+                    kind: .exact,
+                    lowerBound: RationalQuantity(numerator: 5)
+                ),
+                unitText: "ounces"
+            ),
+            ingredientText: "chunk light tuna"
+        )
+
+        XCTAssertEqual(
+            ingredient.effectiveDisplayText,
+            "4 (5-ounce) cans chunk light tuna"
+        )
+    }
 }

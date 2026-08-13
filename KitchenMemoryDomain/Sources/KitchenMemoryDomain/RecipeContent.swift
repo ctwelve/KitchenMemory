@@ -5,7 +5,7 @@
 import Foundation
 
 public struct RecipeSource: Codable, Equatable, Sendable {
-    public enum Kind: String, Codable, Sendable {
+    public enum Kind: String, Codable, CaseIterable, Sendable {
         case original, webpage, book, person, imported
     }
 
@@ -276,11 +276,13 @@ public struct RecipeIngredient: Codable, Equatable, Identifiable, Sendable {
         guard let ingredientName = nonempty(ingredientText) else { return nil }
         var components: [String] = []
         if let quantityText = quantity?.renderedText { components.append(quantityText) }
-        if let package {
-            let packageUnit = package.unitText.hasSuffix("s")
-                ? String(package.unitText.dropLast())
-                : package.unitText
-            components.append("(\(package.quantity.renderedText)-\(packageUnit))")
+        if let package,
+           let packageQuantity = package.quantity.renderedText,
+           let packageUnitText = nonempty(package.unitText) {
+            let packageUnit = packageUnitText.hasSuffix("s")
+                ? String(packageUnitText.dropLast())
+                : packageUnitText
+            components.append("(\(packageQuantity)-\(packageUnit))")
         }
         if let unit = nonempty(unitText) { components.append(unit) }
         components.append(ingredientName)
@@ -298,7 +300,7 @@ public struct RecipeIngredient: Codable, Equatable, Identifiable, Sendable {
     }
 }
 
-private extension QuantityExpression {
+public extension QuantityExpression {
     var renderedText: String? {
         switch kind {
         case .none:
