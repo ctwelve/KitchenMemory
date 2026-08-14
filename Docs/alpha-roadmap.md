@@ -54,21 +54,16 @@ accessibility foundation, tests, and continuous integration.
 Added SwiftData storage, first-launch kitchen setup and sample seeding, a local
 recipe library, manual creation and editing, and immutable recipe revisions.
 
-## Remaining slices
-
 ### Slice 4 — Structured recipe editing
 
-Make manual entry genuinely useful rather than a text-only fallback.
+Made manual entry genuinely useful rather than a text-only fallback.
 
-- Edit metadata, yield, times, and source attribution.
-- Create, name, reorder, and remove ingredient and instruction sections.
-- Add, edit, reorder, delete, and move ingredient rows and instruction steps.
-- Preserve each ingredient's original text alongside its editable structured
-  interpretation.
-- Keep incomplete and imprecise recipes valid.
+The editor now handles metadata, yield, times, source attribution, multi-section
+ingredients and instructions, and optional structured ingredient details. It
+preserves original ingredient wording, keeps incomplete recipes valid, and saves
+edits as immutable revisions that retain their structure after relaunching.
 
-**Complete when:** a person can enter a multi-section family recipe, revise it,
-and retain its meaningful structure and source details after relaunching.
+## Remaining slices
 
 ### Slice 5 — Import engine
 

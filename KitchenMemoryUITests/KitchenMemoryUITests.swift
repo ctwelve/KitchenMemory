@@ -79,7 +79,7 @@ final class KitchenMemoryUITests: XCTestCase {
   @MainActor
   func testCanCreateARecipeFromTheEditor() throws {
     let app = launchApp()
-    let newRecipe = app.descendants(matching: .any)["new-recipe"]
+    let newRecipe = app.buttons["new-recipe"]
     XCTAssertTrue(newRecipe.waitForExistence(timeout: 2))
     activate(newRecipe)
 
@@ -88,7 +88,7 @@ final class KitchenMemoryUITests: XCTestCase {
     activate(title)
     title.typeText("Sunday Tomato Soup")
 
-    let save = app.descendants(matching: .any)["recipe-editor-save"]
+    let save = app.buttons["recipe-editor-save"]
     XCTAssertTrue(save.waitForExistence(timeout: 2))
     activate(save)
 
@@ -98,7 +98,7 @@ final class KitchenMemoryUITests: XCTestCase {
   @MainActor
   func testRecipeEditorCanScrollToItsLastSection() throws {
     let app = launchApp()
-    let newRecipe = app.descendants(matching: .any)["new-recipe"]
+    let newRecipe = app.buttons["new-recipe"]
     XCTAssertTrue(newRecipe.waitForExistence(timeout: 2))
     activate(newRecipe)
 
@@ -115,7 +115,7 @@ final class KitchenMemoryUITests: XCTestCase {
       .matching(NSPredicate(format: "identifier BEGINSWITH %@", "recipe-row-"))
       .firstMatch
     let detail = openRecipeDetail(in: app, from: recipeRow)
-    let edit = app.descendants(matching: .any)["edit-recipe"]
+    let edit = app.buttons["edit-recipe"]
     XCTAssertTrue(edit.waitForExistence(timeout: 2))
     activate(edit)
 
@@ -241,14 +241,27 @@ final class KitchenMemoryUITests: XCTestCase {
     systemFullScreenButtonFrame: CGRect
   ) -> Bool {
 #if os(iOS)
+    guard issue.auditType == .dynamicType, let element = issue.element else {
+      return false
+    }
+
     // The metadata card uses native Dynamic Type Text views and switches to a
     // single-column grid at accessibility sizes. Xcode 26 cannot trace those
-    // fonts through accessibilityRepresentation and reports the replacement
-    // element as only partially supported. Accept only that audit type for
-    // the single tested metadata identifier family.
-    let identifier = issue.element?.identifier ?? ""
-    return issue.auditType == .dynamicType
-      && identifier.hasPrefix("recipe-metadata-")
+    // fonts through accessibilityRepresentation and may report either the
+    // identified Text or its same-sized, system-created wrapper.
+    if element.identifier.hasPrefix("recipe-metadata-") {
+      return true
+    }
+
+    let metadataDescendants = element.descendants(matching: .staticText)
+      .matching(NSPredicate(format: "identifier BEGINSWITH %@", "recipe-metadata-"))
+    if element.identifier.isEmpty,
+      metadataDescendants.count == 1,
+      metadataDescendants.firstMatch.frame == element.frame
+    {
+      return true
+    }
+    return false
 #else
     guard let element = issue.element else { return false }
 
