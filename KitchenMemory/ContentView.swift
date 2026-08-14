@@ -19,21 +19,21 @@ struct ContentView: View {
 #if os(macOS)
         .navigationSplitViewColumnWidth(min: 240, ideal: 300)
 #endif
+        .toolbar {
+          ToolbarItem(placement: .primaryAction) {
+            Button {
+              isCreatingRecipe = true
+            } label: {
+              Label("New Recipe", systemImage: "plus")
+            }
+            .accessibilityIdentifier("new-recipe")
+          }
+        }
     } detail: {
       detail
     }
     .task {
       model.loadIfNeeded()
-    }
-    .toolbar {
-      ToolbarItem(placement: .primaryAction) {
-        Button {
-          isCreatingRecipe = true
-        } label: {
-          Label("New Recipe", systemImage: "plus")
-        }
-        .accessibilityIdentifier("new-recipe")
-      }
     }
     .sheet(isPresented: $isCreatingRecipe) {
       RecipeEditorView(mode: .create) { draft in
@@ -94,7 +94,9 @@ struct ContentView: View {
         .id(selectedRecipe.recipe.id)
         .toolbar {
           ToolbarItem(placement: .primaryAction) {
-            Button("Edit") { recipeBeingEdited = selectedRecipe }
+            Button { recipeBeingEdited = selectedRecipe } label: {
+              Label("Edit", systemImage: "pencil")
+            }
               .accessibilityIdentifier("edit-recipe")
           }
         }
