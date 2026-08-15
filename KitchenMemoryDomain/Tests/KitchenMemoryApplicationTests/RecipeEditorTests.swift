@@ -37,6 +37,32 @@ final class RecipeEditorTests: XCTestCase {
     XCTAssertEqual(try repository.recipe(id: stored.recipe.id), stored)
   }
 
+  func testCreatesImportedRevisionWithTaxonomyAndSourceEvidence() throws {
+    let (kitchen, _, editor) = try makeEditor()
+    let capture = RecipeSourceCapture(
+      kind: .schemaOrgJSONLD,
+      sourceURL: URL(string: "https://example.com/soup")!,
+      capturedAt: Date(timeIntervalSince1970: 1_800_000_000),
+      mediaType: "application/ld+json",
+      payload: Data("source".utf8),
+      blockIndex: 1,
+      objectIndex: 2
+    )
+
+    let stored = try editor.create(in: kitchen.id, from: RecipeDraft(
+      title: "Soup",
+      sourceCapture: capture,
+      cuisines: ["French"],
+      categories: ["Dinner"],
+      keywords: ["quick"]
+    ))
+
+    XCTAssertEqual(stored.revision.sourceCapture, capture)
+    XCTAssertEqual(stored.revision.cuisines, ["French"])
+    XCTAssertEqual(stored.revision.categories, ["Dinner"])
+    XCTAssertEqual(stored.revision.keywords, ["quick"])
+  }
+
   func testEditingCreatesANewCurrentRevisionAndKeepsTheOldOne() throws {
     let (kitchen, repository, editor) = try makeEditor()
     let first = try editor.create(in: kitchen.id, from: RecipeDraft(title: "Tomato Soup"))

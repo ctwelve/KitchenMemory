@@ -74,21 +74,18 @@ ingredient quantities without losing their original wording. Checked-in fixtures
 cover ambiguous, malformed, nested, partial, structured, relative-URL, and unsafe
 input families.
 
-## Remaining slices
-
 ### Slice 6 — URL import and review
 
-Turn the import engine into a trustworthy person-facing acquisition workflow.
+Connected the deterministic engine to a person-facing acquisition workflow.
+Kitchen Memory now accepts a webpage URL, fetches it through a bounded ephemeral
+`URLSession`, automatically advances one clear candidate or presents a choice,
+and opens the result in the structured editor for review before saving. Imported
+revisions retain bounded JSON-LD source evidence and visible source attribution.
+The fetcher runs no page scripts, stores no cookies, downloads no images, limits
+redirects, response bytes, and candidate fan-out, and rejects obvious local or
+credential-bearing destinations.
 
-- Accept a webpage URL and fetch it with privacy and safety limits.
-- Automatically select one clear candidate or ask the person to choose.
-- Present the resulting draft and emphasize only uncertain or incomplete fields.
-- Allow direct corrections before saving through the same editing model as manual
-  entry.
-- Show visible attribution and a link to the original source after saving.
-
-**Complete when:** a person can import varied public recipe pages, repair an
-imperfect import faster than re-entering it, and save the result locally.
+## Remaining slices
 
 ### Slice 7 — Scaling and recipe reading
 

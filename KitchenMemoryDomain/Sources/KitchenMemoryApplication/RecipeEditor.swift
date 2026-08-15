@@ -15,10 +15,14 @@ public struct RecipeDraft: Equatable, Sendable {
   public var summary: String?
   public var authorName: String?
   public var source: RecipeSource?
+  public var sourceCapture: RecipeSourceCapture?
   public var recipeYield: RecipeYield?
   public var prepDuration: RecipeDuration?
   public var cookDuration: RecipeDuration?
   public var totalDuration: RecipeDuration?
+  public var cuisines: [String]
+  public var categories: [String]
+  public var keywords: [String]
   public var ingredientSections: [IngredientSection]
   public var instructionSections: [InstructionSection]
 
@@ -27,10 +31,14 @@ public struct RecipeDraft: Equatable, Sendable {
     summary: String? = nil,
     authorName: String? = nil,
     source: RecipeSource? = nil,
+    sourceCapture: RecipeSourceCapture? = nil,
     recipeYield: RecipeYield? = nil,
     prepDuration: RecipeDuration? = nil,
     cookDuration: RecipeDuration? = nil,
     totalDuration: RecipeDuration? = nil,
+    cuisines: [String] = [],
+    categories: [String] = [],
+    keywords: [String] = [],
     ingredientSections: [IngredientSection] = [],
     instructionSections: [InstructionSection] = []
   ) {
@@ -38,10 +46,14 @@ public struct RecipeDraft: Equatable, Sendable {
     self.summary = summary
     self.authorName = authorName
     self.source = source
+    self.sourceCapture = sourceCapture
     self.recipeYield = recipeYield
     self.prepDuration = prepDuration
     self.cookDuration = cookDuration
     self.totalDuration = totalDuration
+    self.cuisines = cuisines
+    self.categories = categories
+    self.keywords = keywords
     self.ingredientSections = ingredientSections
     self.instructionSections = instructionSections
   }
@@ -69,10 +81,14 @@ public struct RecipeDraft: Equatable, Sendable {
       summary: revision.summary,
       authorName: revision.authorName,
       source: revision.source,
+      sourceCapture: revision.sourceCapture,
       recipeYield: revision.recipeYield,
       prepDuration: revision.prepDuration,
       cookDuration: revision.cookDuration,
       totalDuration: revision.totalDuration,
+      cuisines: revision.cuisines,
+      categories: revision.categories,
+      keywords: revision.keywords,
       ingredientSections: revision.ingredientSections,
       instructionSections: revision.instructionSections
     )
@@ -185,13 +201,14 @@ public struct RecipeEditor {
       summary: summary?.isEmpty == true ? nil : summary,
       authorName: optional(draft.authorName),
       source: draft.source,
+      sourceCapture: draft.sourceCapture ?? existing?.sourceCapture,
       recipeYield: draft.recipeYield,
       prepDuration: draft.prepDuration,
       cookDuration: draft.cookDuration,
       totalDuration: draft.totalDuration,
-      cuisines: existing?.cuisines ?? [],
-      categories: existing?.categories ?? [],
-      keywords: existing?.keywords ?? [],
+      cuisines: draft.cuisines,
+      categories: draft.categories,
+      keywords: draft.keywords,
       media: existing?.media ?? [],
       equipment: existing?.equipment ?? [],
       // Section and child identifiers are local to one immutable revision.

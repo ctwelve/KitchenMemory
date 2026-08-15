@@ -10,13 +10,28 @@ struct RecipeEditorView: View {
   enum Mode {
     case create
     case revise
+    case importReview
 
-    var title: String { self == .create ? "New Recipe" : "Edit Recipe" }
-    var saveLabel: String { self == .create ? "Create Recipe" : "Save Revision" }
+    var title: String {
+      switch self {
+      case .create: "New Recipe"
+      case .revise: "Edit Recipe"
+      case .importReview: "Review Import"
+      }
+    }
+
+    var saveLabel: String {
+      self == .revise ? "Save Revision" : "Create Recipe"
+    }
   }
 
   let mode: Mode
   let save: (RecipeDraft) -> Bool
+  let reviewConcerns: [RecipeImportConcern]
+  private let preservedSourceCapture: RecipeSourceCapture?
+  private let preservedCuisines: [String]
+  private let preservedCategories: [String]
+  private let preservedKeywords: [String]
 
   @Environment(\.dismiss) private var dismiss
   @State private var title: String
@@ -34,9 +49,19 @@ struct RecipeEditorView: View {
   @State private var ingredientSections: [IngredientSection]
   @State private var instructionSections: [InstructionSection]
 
-  init(mode: Mode, draft: RecipeDraft = RecipeDraft(), save: @escaping (RecipeDraft) -> Bool) {
+  init(
+    mode: Mode,
+    draft: RecipeDraft = RecipeDraft(),
+    reviewConcerns: [RecipeImportConcern] = [],
+    save: @escaping (RecipeDraft) -> Bool
+  ) {
     self.mode = mode
     self.save = save
+    self.reviewConcerns = reviewConcerns
+    preservedSourceCapture = draft.sourceCapture
+    preservedCuisines = draft.cuisines
+    preservedCategories = draft.categories
+    preservedKeywords = draft.keywords
     _title = State(initialValue: draft.title)
     _summary = State(initialValue: draft.summary ?? "")
     _authorName = State(initialValue: draft.authorName ?? "")
@@ -100,11 +125,32 @@ struct RecipeEditorView: View {
 
   @ViewBuilder
   private var editorSections: some View {
+    if mode == .importReview {
+      importReviewSection
+    }
     recipeSection
     timingSection
     sourceSection
     ingredientsSection
     instructionsSection
+  }
+
+  private var importReviewSection: some View {
+    Section {
+      if reviewConcerns.isEmpty {
+        Label("No obvious problems found", systemImage: "checkmark.circle")
+          .foregroundStyle(.secondary)
+      } else {
+        ForEach(Array(reviewConcerns.enumerated()), id: \.offset) { _, concern in
+          Label(concern.reviewMessage, systemImage: "exclamationmark.triangle")
+            .foregroundStyle(.orange)
+        }
+      }
+    } header: {
+      Text("Import Review")
+    } footer: {
+      Text("Check the imported wording and structure before saving. The source page is not contacted again.")
+    }
   }
 
   private var recipeSection: some View {
@@ -181,8 +227,10 @@ struct RecipeEditorView: View {
   private var draft: RecipeDraft {
     RecipeDraft(
       title: title, summary: summary, authorName: authorName, source: source,
+      sourceCapture: preservedSourceCapture,
       recipeYield: text(yieldText).map { RecipeYield(originalText: $0) },
       prepDuration: duration(prepMinutes), cookDuration: duration(cookMinutes), totalDuration: duration(totalMinutes),
+      cuisines: preservedCuisines, categories: preservedCategories, keywords: preservedKeywords,
       ingredientSections: ingredientSections, instructionSections: instructionSections
     )
   }
@@ -223,6 +271,18 @@ struct RecipeEditorView: View {
   }
   private static func minutes(_ duration: RecipeDuration?) -> String {
     duration.map { String($0.seconds / 60) } ?? ""
+  }
+}
+
+private extension RecipeImportConcern {
+  var reviewMessage: String {
+    switch self {
+    case .missingTitle: "Title needs attention"
+    case .missingIngredients: "No ingredients were found"
+    case .missingInstructions: "No instructions were found"
+    case .unparsedIngredients(let count):
+      "\(count) ingredient \(count == 1 ? "line is" : "lines are") preserved but unparsed"
+    }
   }
 }
 

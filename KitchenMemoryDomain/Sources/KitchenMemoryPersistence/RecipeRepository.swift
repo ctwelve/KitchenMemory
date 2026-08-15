@@ -60,6 +60,14 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
   private let encoder = JSONEncoder()
   private let decoder = JSONDecoder()
 
+  /// New captures share the existing optional source blob so adding source
+  /// evidence does not mutate the released SwiftData V1 schema. The decoder
+  /// below still accepts the original blob, which contained RecipeSource alone.
+  private struct StoredSource: Codable {
+    var source: RecipeSource?
+    var capture: RecipeSourceCapture
+  }
+
   public init(modelContainer: ModelContainer) {
     context = ModelContext(modelContainer)
   }
@@ -172,7 +180,7 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
         title: revision.title,
         summary: revision.summary,
         authorName: revision.authorName,
-        sourceData: try encodeOptional(revision.source),
+        sourceData: try encodeSource(revision.source, capture: revision.sourceCapture),
         yieldData: try encodeOptional(revision.recipeYield),
         prepSeconds: revision.prepDuration?.seconds,
         cookSeconds: revision.cookDuration?.seconds,
@@ -230,6 +238,7 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
   }
 
   private func domainRevision(from record: RecipeRevisionRecord) throws -> RecipeRevision {
+    let storedSource = try decodeSource(record.sourceData)
     let revisionID = record.id
     let media = try context.fetch(
       FetchDescriptor<RecipeMediaRecord>(
@@ -317,8 +326,8 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
       id: .init(rawValue: record.id), recipeID: .init(rawValue: record.recipeID),
       revisionNumber: record.revisionNumber,
       title: record.title, summary: record.summary, authorName: record.authorName,
-      source: try decodeOptional(
-        RecipeSource.self, from: record.sourceData, field: "revision.source"),
+      source: storedSource.source,
+      sourceCapture: storedSource.capture,
       recipeYield: try decodeOptional(
         RecipeYield.self, from: record.yieldData, field: "revision.yield"),
       prepDuration: record.prepSeconds.map(RecipeDuration.init(seconds:)),
@@ -364,6 +373,27 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
 
   private func encodeOptional<Value: Encodable>(_ value: Value?) throws -> Data? {
     try value.map(encoder.encode)
+  }
+
+  private func encodeSource(
+    _ source: RecipeSource?,
+    capture: RecipeSourceCapture?
+  ) throws -> Data? {
+    guard let capture else { return try encodeOptional(source) }
+    return try encoder.encode(StoredSource(source: source, capture: capture))
+  }
+
+  private func decodeSource(_ data: Data?) throws -> (
+    source: RecipeSource?, capture: RecipeSourceCapture?
+  ) {
+    guard let data else { return (nil, nil) }
+    if let stored = try? decoder.decode(StoredSource.self, from: data) {
+      return (stored.source, stored.capture)
+    }
+    return (
+      try decode(RecipeSource.self, from: data, field: "revision.source"),
+      nil
+    )
   }
 
   private func decode<Value: Decodable>(_ type: Value.Type, from data: Data, field: String) throws

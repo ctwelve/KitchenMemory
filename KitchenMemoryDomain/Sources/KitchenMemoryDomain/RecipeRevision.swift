@@ -13,6 +13,7 @@ public struct RecipeRevision: Codable, Equatable, Identifiable, Sendable {
     public var summary: String?
     public var authorName: String?
     public var source: RecipeSource?
+    public var sourceCapture: RecipeSourceCapture?
     public var recipeYield: RecipeYield?
     public var prepDuration: RecipeDuration?
     public var cookDuration: RecipeDuration?
@@ -33,6 +34,7 @@ public struct RecipeRevision: Codable, Equatable, Identifiable, Sendable {
         summary: String? = nil,
         authorName: String? = nil,
         source: RecipeSource? = nil,
+        sourceCapture: RecipeSourceCapture? = nil,
         recipeYield: RecipeYield? = nil,
         prepDuration: RecipeDuration? = nil,
         cookDuration: RecipeDuration? = nil,
@@ -52,6 +54,7 @@ public struct RecipeRevision: Codable, Equatable, Identifiable, Sendable {
         self.summary = summary
         self.authorName = authorName
         self.source = source
+        self.sourceCapture = sourceCapture
         self.recipeYield = recipeYield
         self.prepDuration = prepDuration
         self.cookDuration = cookDuration

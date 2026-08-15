@@ -39,9 +39,16 @@ URL
  → save recipe
 ```
 
-Network fetching should eventually live behind a small interface so the same
-pipeline can consume a Safari share extension, a saved HTML file, or test
+Network fetching lives behind a small interface so the same pipeline can later
+consume a Safari share extension or saved HTML file and already consumes test
 fixtures without knowing where the document came from.
+
+`URLSessionRecipeDocumentLoader` now provides that interface for person-entered
+URLs. It uses a fresh ephemeral session, accepts only HTTP and HTTPS, carries no
+cookies or URL cache, limits redirects and elapsed time, and streams at most 2
+MiB into memory. It accepts HTML content only, rejects credential-bearing and
+obvious local destinations, and cancels when the import surface closes. Parsed
+results are capped at 25 candidates before reaching review UI.
 
 ## Deterministic import boundary
 
@@ -53,7 +60,14 @@ applied without fetching the page again or relying on today's interpretation.
 
 Missing titles and malformed sibling blocks are diagnostics rather than reasons
 to discard other meaningful recipe content. Candidate selection, URL fetching,
-person-facing review, and saving remain responsibilities of later layers.
+person-facing review, and saving remain responsibilities of the application
+layer rather than the deterministic parser.
+
+When a reviewed candidate is saved, the revision retains one bounded JSON-LD
+block and the selected candidate coordinates. It does not persist the full HTML
+document, download referenced images, or duplicate the normalized candidate
+payload. Existing stores use the same optional encoded source field, so this
+addition remains compatible with the released V1 SwiftData schema.
 
 ## Candidate discovery
 

@@ -9,8 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
   @Bindable var model: RecipeLibraryModel
-  @State private var isCreatingRecipe = false
-  @State private var recipeBeingEdited: StoredRecipe?
+  @State private var activeSheet: ActiveRecipeSheet?
 
   var body: some View {
     NavigationSplitView {
@@ -22,11 +21,19 @@ struct ContentView: View {
         .toolbar {
           ToolbarItem(placement: .primaryAction) {
             Button {
-              isCreatingRecipe = true
+              activeSheet = .create
             } label: {
               Label("New Recipe", systemImage: "plus")
             }
             .accessibilityIdentifier("new-recipe")
+          }
+          ToolbarItem(placement: .primaryAction) {
+            Button {
+              activeSheet = .importURL
+            } label: {
+              Label("Import Recipe", systemImage: "square.and.arrow.down")
+            }
+            .accessibilityIdentifier("import-recipe")
           }
         }
     } detail: {
@@ -35,15 +42,8 @@ struct ContentView: View {
     .task {
       model.loadIfNeeded()
     }
-    .sheet(isPresented: $isCreatingRecipe) {
-      RecipeEditorView(mode: .create) { draft in
-        model.createRecipe(from: draft)
-      }
-    }
-    .sheet(item: $recipeBeingEdited) { storedRecipe in
-      RecipeEditorView(mode: .revise, draft: RecipeDraft(revision: storedRecipe.revision)) { draft in
-        model.reviseRecipe(id: storedRecipe.recipe.id, from: draft)
-      }
+    .sheet(item: $activeSheet) { sheet in
+      sheetContent(sheet)
     }
     .tint(Color("AccentColor"))
   }
@@ -94,7 +94,7 @@ struct ContentView: View {
         .id(selectedRecipe.recipe.id)
         .toolbar {
           ToolbarItem(placement: .primaryAction) {
-            Button { recipeBeingEdited = selectedRecipe } label: {
+            Button { activeSheet = .edit(selectedRecipe) } label: {
               Label("Edit", systemImage: "pencil")
             }
               .accessibilityIdentifier("edit-recipe")
@@ -108,6 +108,50 @@ struct ContentView: View {
       )
       .frame(maxWidth: .infinity, maxHeight: .infinity)
       .background(Color("AppBackground"))
+    }
+  }
+
+  @ViewBuilder
+  private func sheetContent(_ sheet: ActiveRecipeSheet) -> some View {
+    switch sheet {
+    case .create:
+      RecipeEditorView(mode: .create) { draft in
+        model.createRecipe(from: draft)
+      }
+    case .edit(let storedRecipe):
+      RecipeEditorView(mode: .revise, draft: RecipeDraft(revision: storedRecipe.revision)) { draft in
+        model.reviseRecipe(id: storedRecipe.recipe.id, from: draft)
+      }
+    case .importURL:
+      RecipeURLImportView(
+        load: { url in try await model.importRecipe(from: url) },
+        select: { activeSheet = .review($0) }
+      )
+    case .review(let option):
+      RecipeEditorView(
+        mode: .importReview,
+        draft: option.draft,
+        reviewConcerns: option.concerns
+      ) { draft in
+        model.createRecipe(from: draft)
+      }
+    }
+  }
+}
+
+private enum ActiveRecipeSheet: Identifiable {
+  case create
+  case edit(StoredRecipe)
+  case importURL
+  case review(RecipeImportOption)
+
+  var id: String {
+    switch self {
+    case .create: "create"
+    case .edit(let recipe): "edit-\(recipe.recipe.id.rawValue.uuidString)"
+    case .importURL: "import-url"
+    case .review(let option):
+      "review-\(option.id.blockIndex)-\(option.id.objectIndex)"
     }
   }
 }
