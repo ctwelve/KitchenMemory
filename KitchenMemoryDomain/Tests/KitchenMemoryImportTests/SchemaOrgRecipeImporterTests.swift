@@ -69,6 +69,61 @@ final class SchemaOrgRecipeImporterTests: XCTestCase {
         XCTAssertEqual(result.diagnostics, [.init(blockIndex: 1, kind: .malformedJSONLD)])
     }
 
+    func testJSONLDDiscoveryHandlesAttributeSyntaxAndIgnoresHTMLComments() throws {
+        let html = #"""
+        <!-- <script type="application/ld+json">{"@type":"Recipe","name":"Comment"}</script> -->
+        <script data-label=recipe TYPE = 'APPLICATION/LD+JSON' data-angle=">">
+          {"@type":"Recipe","name":"Visible"}
+        </SCRIPT   >
+        """#
+
+        let candidate = try XCTUnwrap(importer.importHTML(html).unambiguousCandidate)
+
+        XCTAssertEqual(candidate.draft.title, "Visible")
+    }
+
+    func testJSONLDDiscoveryIgnoresMarkupInsideOrdinaryScripts() throws {
+        let html = #"""
+        <script type="text/javascript">
+          const example = '<script type="application/ld+json">{"@type":"Recipe","name":"Wrong"}';
+        </script>
+        <script type="application/ld+json">{"@type":"Recipe","name":"Right"}</script>
+        """#
+
+        let candidate = try XCTUnwrap(importer.importHTML(html).unambiguousCandidate)
+
+        XCTAssertEqual(candidate.draft.title, "Right")
+    }
+
+    func testJSONLDDiscoveryUsesTheFirstDuplicateTypeAttribute() {
+        let html = #"""
+        <script type="text/plain" type="application/ld+json">
+          {"@type":"Recipe","name":"Not JSON-LD"}
+        </script>
+        """#
+
+        XCTAssertTrue(importer.importHTML(html).candidates.isEmpty)
+    }
+
+    func testUnclosedJSONLDOpenersAreScannedInBoundedTime() {
+        let html = String(
+            repeating: #"<script type="application/ld+json">"#,
+            count: 5_000
+        )
+        let clock = ContinuousClock()
+        let start = clock.now
+
+        let result = importer.importHTML(html)
+
+        let elapsed = start.duration(to: clock.now)
+        XCTAssertTrue(result.candidates.isEmpty)
+        XCTAssertLessThan(
+            elapsed,
+            .seconds(2),
+            "Discovery must remain linear when opening tags have no closing tag."
+        )
+    }
+
     func testMissingTitleIsReviewDiagnosticAndMarkupIsRemoved() throws {
         let result = importer.importHTML(try fixture("missing-title-and-malicious"))
 
