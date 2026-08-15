@@ -18,14 +18,19 @@ struct RecipeURLImportView: View {
 
   var body: some View {
     NavigationStack {
-      Form {
-        if candidates.isEmpty {
-          urlSection
-          privacySection
-        } else {
-          candidateSection
+      Group {
+#if os(macOS)
+        List {
+          importSections
         }
+        .listStyle(.inset)
+#else
+        Form {
+          importSections
+        }
+#endif
       }
+      .accessibilityIdentifier("recipe-url-import-scroll")
       .navigationTitle(candidates.isEmpty ? "Import Recipe" : "Choose Recipe")
 #if os(iOS)
       .navigationBarTitleDisplayMode(.inline)
@@ -37,22 +42,24 @@ struct RecipeURLImportView: View {
       }
       .onDisappear { importTask?.cancel() }
 #if os(macOS)
-      .frame(minWidth: 480, idealWidth: 560, minHeight: 330, idealHeight: 440)
+      .frame(minWidth: 520, idealWidth: 600, minHeight: 360, idealHeight: 460)
 #endif
     }
   }
 
+  @ViewBuilder
+  private var importSections: some View {
+    if candidates.isEmpty {
+      urlSection
+      privacySection
+    } else {
+      candidateSection
+    }
+  }
+
   private var urlSection: some View {
-    Section("Recipe webpage") {
-      TextField("https://example.com/recipe", text: $enteredURL)
-        .textContentType(.URL)
-#if os(iOS)
-        .keyboardType(.URL)
-        .textInputAutocapitalization(.never)
-#endif
-        .autocorrectionDisabled()
-        .accessibilityLabel("Recipe webpage URL")
-        .onSubmit { beginImport() }
+    Section {
+      urlField
 
       if let errorMessage {
         Label(errorMessage, systemImage: "exclamationmark.triangle")
@@ -72,6 +79,42 @@ struct RecipeURLImportView: View {
       .disabled(isLoading || normalizedURL == nil)
       .accessibilityIdentifier("recipe-import-fetch")
     }
+  }
+
+  @ViewBuilder
+  private var urlField: some View {
+#if os(macOS)
+    LabeledContent {
+      urlTextField
+        .labelsHidden()
+    } label: {
+      Text("Recipe webpage")
+        .font(.subheadline.weight(.semibold))
+    }
+#else
+    VStack(alignment: .leading, spacing: 6) {
+      Text("Recipe webpage")
+        .font(.subheadline.weight(.semibold))
+      urlTextField
+    }
+#endif
+  }
+
+  private var urlTextField: some View {
+    TextField(
+      "Recipe webpage",
+      text: $enteredURL,
+      prompt: Text("https://example.com/recipe").foregroundStyle(.secondary)
+    )
+    .foregroundStyle(.primary)
+    .textContentType(.URL)
+#if os(iOS)
+    .keyboardType(.URL)
+    .textInputAutocapitalization(.never)
+#endif
+    .autocorrectionDisabled()
+    .accessibilityLabel("Recipe webpage URL")
+    .onSubmit { beginImport() }
   }
 
   private var privacySection: some View {
@@ -122,9 +165,19 @@ struct RecipeURLImportView: View {
 
   private var normalizedURL: URL? {
     let trimmed = enteredURL.trimmingCharacters(in: .whitespacesAndNewlines)
-    guard !trimmed.isEmpty else { return nil }
-    let value = trimmed.contains("://") ? trimmed : "https://\(trimmed)"
-    return URL(string: value)
+    // URL text is person-controlled and can be pasted from another process.
+    // A modest ceiling prevents the UI and Foundation parser from doing
+    // disproportionate work on a value that cannot be a practical recipe URL.
+    guard !trimmed.isEmpty, trimmed.utf8.count <= 4_096 else { return nil }
+
+    let parsed = URL(string: trimmed)
+    let url = parsed?.scheme == nil ? URL(string: "https://\(trimmed)") : parsed
+    guard let url,
+          let scheme = url.scheme?.lowercased(),
+          scheme == "http" || scheme == "https",
+          url.host != nil
+    else { return nil }
+    return url
   }
 
   private func beginImport() {
