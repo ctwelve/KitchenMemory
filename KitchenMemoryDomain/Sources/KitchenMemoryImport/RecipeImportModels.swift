@@ -7,11 +7,13 @@ import KitchenMemoryDomain
 
 /// Resource limits applied while interpreting untrusted recipe JSON-LD.
 ///
-/// The byte ceiling in the network loader limits transport memory, while these
-/// limits bound structural expansion after download. Defaults are intentionally
-/// generous for real recipes but finite so a compact document cannot create an
-/// unbounded object graph, candidate list, or editor model.
+/// The same byte ceiling applies to fetched and direct inputs, while the other
+/// limits bound structural expansion after acquisition. Defaults are
+/// intentionally generous for real recipes but finite so a compact document
+/// cannot create an unbounded object graph, candidate list, or editor model.
 public struct RecipeImportLimits: Equatable, Sendable {
+    /// Maximum encoded bytes accepted by a direct HTML or JSON-LD import call.
+    public let maximumInputBytes: Int
     public let maximumJSONLDBlocks: Int
     public let maximumJSONDepth: Int
     public let maximumJSONTokens: Int
@@ -28,6 +30,7 @@ public struct RecipeImportLimits: Equatable, Sendable {
     public let maximumInstructionItems: Int
 
     public init(
+        maximumInputBytes: Int = 2 * 1_024 * 1_024,
         maximumJSONLDBlocks: Int = 32,
         maximumJSONDepth: Int = 32,
         maximumJSONTokens: Int = 100_000,
@@ -40,6 +43,7 @@ public struct RecipeImportLimits: Equatable, Sendable {
         maximumIngredients: Int = 500,
         maximumInstructionItems: Int = 1_000
     ) {
+        precondition(maximumInputBytes > 0)
         precondition(maximumJSONLDBlocks > 0)
         precondition(maximumJSONDepth > 0)
         precondition(maximumJSONTokens > 0)
@@ -51,6 +55,7 @@ public struct RecipeImportLimits: Equatable, Sendable {
         precondition(maximumImageURLs > 0)
         precondition(maximumIngredients > 0)
         precondition(maximumInstructionItems > 0)
+        self.maximumInputBytes = maximumInputBytes
         self.maximumJSONLDBlocks = maximumJSONLDBlocks
         self.maximumJSONDepth = maximumJSONDepth
         self.maximumJSONTokens = maximumJSONTokens
@@ -66,6 +71,7 @@ public struct RecipeImportLimits: Equatable, Sendable {
 
     func limitingCandidates(to maximum: Int) -> Self {
         Self(
+            maximumInputBytes: maximumInputBytes,
             maximumJSONLDBlocks: maximumJSONLDBlocks,
             maximumJSONDepth: maximumJSONDepth,
             maximumJSONTokens: maximumJSONTokens,
@@ -171,6 +177,7 @@ public struct RecipeImportCandidate: Equatable, Identifiable, Sendable {
 
 public struct RecipeImportDiagnostic: Equatable, Sendable {
     public enum ProcessingLimit: Equatable, Sendable {
+        case inputBytes
         case jsonLDBlocks
         case jsonStructure
         case topLevelObjects

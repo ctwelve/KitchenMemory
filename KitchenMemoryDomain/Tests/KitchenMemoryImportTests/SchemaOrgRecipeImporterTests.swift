@@ -228,6 +228,167 @@ final class SchemaOrgRecipeImporterTests: XCTestCase {
         XCTAssertEqual(result.unambiguousCandidate?.snapshot.jsonLD, data)
     }
 
+    func testDirectJSONLDNormalizesSupportedUnicodeEncodingsToUTF8() throws {
+        let json = #"{"@type":"Recipe","name":"Crème 🍲"}"#
+        let variants: [(String.Encoding, [UInt8])] = [
+            (.utf8, [0xEF, 0xBB, 0xBF]),
+            (.utf16LittleEndian, [0xFF, 0xFE]),
+            (.utf16BigEndian, [0xFE, 0xFF]),
+            (.utf32LittleEndian, [0xFF, 0xFE, 0x00, 0x00]),
+            (.utf32BigEndian, [0x00, 0x00, 0xFE, 0xFF]),
+        ]
+
+        for (encoding, byteOrderMark) in variants {
+            let result = importer.importJSONLD(try encoded(
+                json,
+                as: encoding,
+                byteOrderMark: byteOrderMark
+            ))
+            let candidate = try XCTUnwrap(result.unambiguousCandidate)
+
+            XCTAssertEqual(candidate.draft.title, "Crème 🍲")
+            XCTAssertEqual(candidate.snapshot.jsonLD, Data(json.utf8))
+        }
+    }
+
+    func testDirectJSONLDRejectsMalformedAndTruncatedEncodings() {
+        let malformedUTF8 = Data([0xEF, 0xBB, 0xBF, 0xC3, 0x28])
+        let truncatedUTF16 = Data([0xFF, 0xFE, 0x7B])
+        let truncatedUTF32 = Data([0x00, 0x00, 0xFE, 0xFF, 0x00, 0x00, 0x00])
+
+        for data in [malformedUTF8, truncatedUTF16, truncatedUTF32] {
+            let result = importer.importJSONLD(data)
+            XCTAssertTrue(result.candidates.isEmpty)
+            XCTAssertEqual(result.diagnostics, [
+                .init(blockIndex: 0, kind: .malformedJSONLD),
+            ])
+        }
+    }
+
+    func testDirectJSONLDRejectsTrailingPartialUnicodeCodeUnits() throws {
+        let json = #"{"@type":"Recipe","name":"Complete prefix"}"#
+        let variants: [(String.Encoding, [UInt8], ClosedRange<Int>)] = [
+            (.utf16LittleEndian, [0xFF, 0xFE], 1...1),
+            (.utf16BigEndian, [0xFE, 0xFF], 1...1),
+            (.utf32LittleEndian, [0xFF, 0xFE, 0x00, 0x00], 1...3),
+            (.utf32BigEndian, [0x00, 0x00, 0xFE, 0xFF], 1...3),
+        ]
+
+        for (encoding, byteOrderMark, fragmentCounts) in variants {
+            for fragmentCount in fragmentCounts {
+                var data = try encoded(
+                    json,
+                    as: encoding,
+                    byteOrderMark: byteOrderMark
+                )
+                data.append(contentsOf: repeatElement(UInt8(0), count: fragmentCount))
+
+                let result = importer.importJSONLD(data)
+                XCTAssertTrue(result.candidates.isEmpty)
+                XCTAssertEqual(result.diagnostics.last?.kind, .malformedJSONLD)
+            }
+        }
+    }
+
+    func testDirectJSONLDDoesNotReplaceInvalidUnicodeScalars() throws {
+        let prefix = #"{"@type":"Recipe","name":""#
+        let suffix = #""}"#
+        let variants: [(String.Encoding, [UInt8], [UInt8])] = [
+            (.utf16LittleEndian, [0xFF, 0xFE], [0x00, 0xD8]),
+            (.utf16BigEndian, [0xFE, 0xFF], [0xD8, 0x00]),
+            (.utf32LittleEndian, [0xFF, 0xFE, 0x00, 0x00], [0x00, 0x00, 0x11, 0x00]),
+            (.utf32BigEndian, [0x00, 0x00, 0xFE, 0xFF], [0x00, 0x11, 0x00, 0x00]),
+        ]
+
+        for (encoding, byteOrderMark, invalidScalar) in variants {
+            var data = try encoded(prefix, as: encoding, byteOrderMark: byteOrderMark)
+            data.append(contentsOf: invalidScalar)
+            let suffixData = try encoded(suffix, as: encoding, byteOrderMark: byteOrderMark)
+            data.append(suffixData.dropFirst(byteOrderMark.count))
+
+            let result = importer.importJSONLD(data)
+            XCTAssertTrue(result.candidates.isEmpty)
+            XCTAssertEqual(result.diagnostics.last?.kind, .malformedJSONLD)
+        }
+    }
+
+    func testBOMlessNonUTF8JSONIsNotGuessed() throws {
+        let json = #"{"@type":"Recipe","name":"UTF-16"}"#
+        let withBOM = try encoded(
+            json,
+            as: .utf16LittleEndian,
+            byteOrderMark: [0xFF, 0xFE]
+        )
+        let data = Data(withBOM.dropFirst(2))
+
+        let result = importer.importJSONLD(data)
+
+        XCTAssertTrue(result.candidates.isEmpty)
+        XCTAssertEqual(result.diagnostics.last?.kind, .malformedJSONLD)
+    }
+
+    func testDirectInputByteLimitAppliesBeforeAndAfterTranscoding() throws {
+        let utf8JSON = Data(#"{"@type":"Recipe","name":"A"}"#.utf8)
+        let exactImporter = SchemaOrgRecipeImporter(limits: .init(
+            maximumInputBytes: utf8JSON.count
+        ))
+        let sourceLimitImporter = SchemaOrgRecipeImporter(limits: .init(
+            maximumInputBytes: utf8JSON.count - 1
+        ))
+
+        XCTAssertNotNil(exactImporter.importJSONLD(utf8JSON).unambiguousCandidate)
+        assertInputByteLimit(sourceLimitImporter.importJSONLD(utf8JSON))
+
+        let expandingJSON = "[\"" + String(repeating: "€", count: 100) + "\"]"
+        let utf16 = try encoded(
+            expandingJSON,
+            as: .utf16LittleEndian,
+            byteOrderMark: [0xFF, 0xFE]
+        )
+        let normalizedCount = expandingJSON.utf8.count
+        XCTAssertLessThan(utf16.count, normalizedCount)
+        let normalizedLimitImporter = SchemaOrgRecipeImporter(limits: .init(
+            maximumInputBytes: utf16.count
+        ))
+
+        assertInputByteLimit(normalizedLimitImporter.importJSONLD(utf16))
+    }
+
+    func testHTMLInputByteLimitAppliesBeforeScanning() {
+        let limitedImporter = SchemaOrgRecipeImporter(limits: .init(maximumInputBytes: 32))
+
+        assertInputByteLimit(limitedImporter.importHTML(String(repeating: " ", count: 33)))
+    }
+
+    func testUTF16QuoteBytesCannotBypassTheJSONDepthLimit() throws {
+        let json = #"{"@type":"Recipe","name":"Collision","mask":"Ģ","deep":[[[[0]]]]}"#
+        let data = try encoded(
+            json,
+            as: .utf16LittleEndian,
+            byteOrderMark: [0xFF, 0xFE]
+        )
+        let limitedImporter = SchemaOrgRecipeImporter(limits: .init(maximumJSONDepth: 3))
+
+        let result = limitedImporter.importJSONLD(data)
+
+        XCTAssertTrue(result.candidates.isEmpty)
+        XCTAssertEqual(
+            result.diagnostics.last?.kind,
+            .processingLimitExceeded(.jsonStructure)
+        )
+    }
+
+    func testMalformedCloserCannotSkipStructuralScanningOfItsSuffix() {
+        let limitedImporter = SchemaOrgRecipeImporter(limits: .init(maximumJSONDepth: 3))
+        let result = limitedImporter.importJSONLD(Data(#"][[[[0]]]]"#.utf8))
+
+        XCTAssertTrue(result.candidates.isEmpty)
+        XCTAssertEqual(
+            result.diagnostics.last?.kind,
+            .processingLimitExceeded(.jsonStructure)
+        )
+    }
+
     func testIngredientParsingIsProvisionalAndAlwaysKeepsOriginalText() throws {
         let data = Data(#"""
         {
@@ -565,5 +726,33 @@ final class SchemaOrgRecipeImporterTests: XCTestCase {
             file: file,
             line: line
         )
+    }
+
+    private func assertInputByteLimit(
+        _ result: RecipeImportResult,
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) {
+        XCTAssertTrue(result.candidates.isEmpty, file: file, line: line)
+        XCTAssertEqual(
+            result.diagnostics.last?.kind,
+            .processingLimitExceeded(.inputBytes),
+            file: file,
+            line: line
+        )
+    }
+
+    private func encoded(
+        _ text: String,
+        as encoding: String.Encoding,
+        byteOrderMark: [UInt8]
+    ) throws -> Data {
+        var payload = try XCTUnwrap(text.data(using: encoding))
+        if payload.starts(with: byteOrderMark) {
+            payload.removeFirst(byteOrderMark.count)
+        }
+        var result = Data(byteOrderMark)
+        result.append(payload)
+        return result
     }
 }
