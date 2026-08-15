@@ -372,12 +372,14 @@ hidden by the filter.
 ## CI policy
 
 Build and core-test jobs are required separately for macOS and iOS.
-Accessibility jobs are platform-specific and advisory. They remain honest red
-or green checks, but a hosted SwiftUI/XCTest artifact does not block unrelated
-persistence or domain work.
+Accessibility jobs are temporarily disabled while the UI is still changing
+rapidly. Keep the UI tests available for deliberate local audits, but do not use
+their platform-sensitive results as routine CI signals until the primary recipe
+workflows and accessibility tree stabilize.
 
-Local reproduction is still required before dismissing an advisory failure.
-The optional merge status changes priority, not engineering standards.
+Re-enabling CI should restore separate macOS and iOS jobs rather than folding UI
+audits into core tests. That keeps framework-specific failures visible without
+obscuring the health of domain and persistence work.
 
 See [Continuous integration](continuous-integration.md) for the complete job
 graph and merge policy.

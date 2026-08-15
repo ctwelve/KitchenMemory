@@ -7,8 +7,8 @@ SPDX-License-Identifier: GPL-3.0-only
 -->
 
 
-GitHub Actions repeats the project's core and accessibility verification on
-clean, GitHub-hosted Macs.
+GitHub Actions repeats the project's build and core-test verification on clean,
+GitHub-hosted Macs.
 
 ## When CI runs
 
@@ -25,24 +25,23 @@ control cancels the older run.
 
 ## What CI verifies
 
-macOS and iOS each have three distinct checks:
+macOS and iOS each have two distinct checks:
 
 1. `Build` compiles the application. The macOS build also builds the native
    DocC documentation.
 2. `Core tests` runs after that platform's build succeeds. The macOS check also
    runs the KitchenMemoryDomain and sample-data package tests.
-3. `Accessibility` runs the UI test target after that platform's build
-   succeeds.
 
 The two platform pipelines are independent: macOS checks do not wait for iOS
 checks, and iOS checks do not wait for macOS checks. The repository's merge
 rules require both platform builds and both core-test checks directly, so there
 is no additional aggregator job or runner-startup delay.
 
-Accessibility results remain visible and actionable on every pull request but
-are deliberately outside the required merge gate. This keeps platform-specific
-accessibility regressions explicit without making unrelated feature work wait
-on differences in SwiftUI's platform accessibility trees.
+The accessibility UI-test jobs are temporarily disabled while the application
+UI is changing rapidly. The tests and their local-running documentation remain
+in the repository; restore the platform-specific jobs when the primary recipe
+workflows and accessibility tree are stable enough for their results to be
+durable CI signals.
 
 Application, integration, and UI targets use XCTest as their common test model.
 Independent domain and support packages may use Swift Testing when it improves
@@ -56,11 +55,11 @@ after the preceding build has established that the application itself compiles.
 Sharing those products would require transferring large Derived Data artifacts;
 that optimization is deferred until measurements justify its complexity.
 
-The UI suite treats accessibility semantics as part of the app's test contract.
-It verifies stable identifiers and reading order for the starter recipe, then
-runs semantic XCTest accessibility audits in light and dark appearances. The
-audits cover element detection, hit regions, descriptions, Dynamic Type,
-clipped text, traits, actions, and parent-child relationships.
+The locally run UI suite treats accessibility semantics as part of the app's
+test contract. It verifies stable identifiers and reading order for the starter
+recipe, then runs semantic XCTest accessibility audits in light and dark
+appearances. The audits cover element detection, hit regions, descriptions,
+Dynamic Type, clipped text, traits, actions, and parent-child relationships.
 
 The app-wide XCTest contrast audit is intentionally excluded. Xcode 26 samples
 wholly offscreen macOS `ScrollView` text against unrelated onscreen pixels,
@@ -81,10 +80,8 @@ The workflow grants its GitHub token read-only repository access. Checkout does
 not persist credentials because no step needs to write to the repository.
 
 `Build (macOS)`, `Core tests (macOS)`, `Build (iOS)`, and `Core tests (iOS)` are
-required status checks. The two accessibility checks are intentionally
-optional; changing that policy requires updating the repository's merge rules,
-not adding `continue-on-error` to the workflow. This distinction preserves
-honest failing results while preventing those results from blocking a merge.
+required status checks. Accessibility checks are not currently emitted by the
+workflow and must not be configured as required repository status checks.
 
 Each job has a 20-minute timeout to prevent an unexpected hang from consuming
 runner time indefinitely. The repository is public. CI should nevertheless

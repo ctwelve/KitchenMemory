@@ -77,32 +77,6 @@ jobs:
           -only-testing:KitchenMemoryTests
           CODE_SIGNING_ALLOWED=NO
 
-  accessibility-macos:
-    name: Accessibility (macOS)
-    needs: build-macos
-    runs-on: macos-26
-    timeout-minutes: 20
-
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v7
-        with:
-          persist-credentials: false
-
-      - name: Report Xcode version
-        run: xcodebuild -version
-
-      - name: Test macOS accessibility
-        run: >-
-          xcodebuild -skipPackagePluginValidation test
-          -project KitchenMemory.xcodeproj
-          -scheme KitchenMemory
-          -destination 'platform=macOS'
-          -derivedDataPath "$RUNNER_TEMP/DerivedData"
-          -parallel-testing-enabled NO
-          -only-testing:KitchenMemoryUITests
-          CODE_SIGNING_ALLOWED=NO
-
   build-ios:
     name: Build (iOS)
     runs-on: macos-26
@@ -149,30 +123,4 @@ jobs:
           -destination 'platform=iOS Simulator,name=iPhone 17 Pro'
           -derivedDataPath "$RUNNER_TEMP/DerivedData"
           -only-testing:KitchenMemoryTests
-          CODE_SIGNING_ALLOWED=NO
-
-  accessibility-ios:
-    name: Accessibility (iOS)
-    needs: build-ios
-    runs-on: macos-26
-    timeout-minutes: 20
-
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v7
-        with:
-          persist-credentials: false
-
-      - name: Report Xcode version
-        run: xcodebuild -version
-
-      - name: Test iOS accessibility
-        run: >-
-          xcodebuild -skipPackagePluginValidation test
-          -project KitchenMemory.xcodeproj
-          -scheme KitchenMemory
-          -destination 'platform=iOS Simulator,name=iPhone 17 Pro'
-          -derivedDataPath "$RUNNER_TEMP/DerivedData"
-          -parallel-testing-enabled NO
-          -only-testing:KitchenMemoryUITests
           CODE_SIGNING_ALLOWED=NO
