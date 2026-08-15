@@ -46,9 +46,11 @@ fixtures without knowing where the document came from.
 `URLSessionRecipeDocumentLoader` now provides that interface for person-entered
 URLs. It uses a fresh ephemeral session, accepts only HTTP and HTTPS, carries no
 cookies or URL cache, limits redirects and elapsed time, and streams at most 2
-MiB into memory. It accepts HTML content only, rejects credential-bearing and
-obvious local destinations, and cancels when the import surface closes. Parsed
-results are capped at 25 candidates before reaching review UI.
+MiB into memory. It accepts HTML content only, rejects credentials and
+nonstandard ports, resolves hostnames with the system resolver, and refuses a
+request if any returned IPv4 or IPv6 address is not globally routable. The same
+policy is applied to every redirect. Loading cancels when the import surface
+closes. Parsed results are capped at 25 candidates before reaching review UI.
 
 ## Deterministic import boundary
 
@@ -161,10 +163,30 @@ successful even if every ingredient remains unparsed.
 - Never execute page scripts.
 - Sanitize markup before display.
 - Apply response-size and redirect limits.
-- Restrict URL schemes and defend against requests to local/private services if
-  fetching occurs on a server.
+- Restrict URL schemes, ports, literal address syntax, resolved addresses, and
+  every redirect so a recipe import cannot intentionally reach local or private
+  services.
 - Avoid downloading all media during the initial parse.
 - Make external image loading visible and controllable for privacy.
+
+### Destination-validation boundary
+
+String inspection alone cannot establish that a hostname is public. Alternate
+numeric spellings can disguise literal addresses, and an ordinary-looking domain
+can resolve to loopback, link-local, private, documentation, benchmarking,
+multicast, or reserved space. Kitchen Memory therefore parses literal addresses
+with system IP routines and resolves domain names before both the initial request
+and each redirect. If a name has multiple answers, every answer must be public.
+
+There is still a time-of-check/time-of-use boundary between system DNS resolution
+and `URLSession` opening its connection. `URLSession` does not expose an API that
+pins its TLS connection to the exact validated DNS answer while retaining normal
+hostname verification. The checks materially reduce accidental and straightforward
+local-network access, but they are not described as perfect protection against a
+hostile authoritative DNS server performing a precisely timed rebinding attack.
+The importer remains a person-initiated, credential-free `GET` client with no
+cookies, a small response limit, and no script execution; those independent
+controls reduce the consequence of that residual boundary.
 
 ## Test strategy
 

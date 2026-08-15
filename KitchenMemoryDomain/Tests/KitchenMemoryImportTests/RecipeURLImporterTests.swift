@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 import Foundation
-import KitchenMemoryImport
+@testable import KitchenMemoryImport
 import XCTest
 
 final class RecipeURLImporterTests: XCTestCase {
@@ -36,22 +36,54 @@ final class RecipeURLImporterTests: XCTestCase {
       "http://router.local/recipe",
       "http://127.0.0.1/recipe",
       "http://127.1/recipe",
+      "http://[::ffff:127.0.0.1]/recipe",
+      "http://0177.0.0.1/recipe",
+      "http://0x7f.0.0.1/recipe",
       "http://10.0.0.4/recipe",
       "http://172.20.1.2/recipe",
       "http://192.168.1.1/recipe",
       "https://person:secret@example.com/recipe",
       "https://intranet/recipe",
+      "https://localhost./recipe",
+      "https://example.com:8443/recipe",
     ]
 
     for value in rejected {
       XCTAssertFalse(
-        URLSessionRecipeDocumentLoader.isAllowed(URL(string: value)!),
+        URLSessionRecipeDocumentLoader.isStructurallyAllowed(URL(string: value)!),
         value
       )
     }
-    XCTAssertTrue(URLSessionRecipeDocumentLoader.isAllowed(
+    XCTAssertTrue(URLSessionRecipeDocumentLoader.isStructurallyAllowed(
       URL(string: "https://recipes.example.com/toast")!
     ))
+  }
+
+  func testRejectsPublicHostnameWhenAnyResolvedAddressIsNotPublic() async {
+    let loader = URLSessionRecipeDocumentLoader(hostResolver: StubHostResolver(addresses: [
+      IPAddress("93.184.216.34")!,
+      IPAddress("192.168.1.20")!,
+    ]))
+
+    do {
+      _ = try await loader.load(URL(string: "https://recipes.example.com/toast")!)
+      XCTFail("Expected private DNS result to be rejected before fetching")
+    } catch {
+      XCTAssertEqual(error as? RecipeURLImportError, .disallowedURL)
+    }
+  }
+
+  func testIPAddressPolicyRejectsNonGlobalNetworks() {
+    let rejected = [
+      "0.0.0.0", "100.64.0.1", "169.254.169.254", "192.0.2.1",
+      "198.18.0.1", "198.51.100.1", "203.0.113.1", "224.0.0.1",
+      "::1", "::ffff:8.8.8.8", "2001:db8::1", "fc00::1", "fe80::1",
+    ]
+    for address in rejected {
+      XCTAssertFalse(IPAddress(address)!.isPublic, address)
+    }
+    XCTAssertTrue(IPAddress("93.184.216.34")!.isPublic)
+    XCTAssertTrue(IPAddress("2606:2800:220:1:248:1893:25c8:1946")!.isPublic)
   }
 
   func testInvalidTextEncodingFailsWithoutAttemptingFallbackInterpretation() async {
@@ -87,6 +119,14 @@ final class RecipeURLImporterTests: XCTestCase {
     } catch {
       XCTAssertEqual(error as? RecipeURLImportError, .tooManyCandidates(maximum: 2))
     }
+  }
+}
+
+private struct StubHostResolver: RecipeHostResolving {
+  var addresses: [IPAddress]
+
+  func resolve(_ host: String) throws -> [IPAddress] {
+    addresses
   }
 }
 
