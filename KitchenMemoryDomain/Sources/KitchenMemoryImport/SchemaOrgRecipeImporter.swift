@@ -104,15 +104,9 @@ public struct SchemaOrgRecipeImporter: Sendable {
                     ))
                     return RecipeImportResult(candidates: [], diagnostics: diagnostics)
                 }
-                guard let snapshotData = try? JSONSerialization.data(
-                    withJSONObject: object,
-                    options: [.sortedKeys]
-                ) else { continue }
-
                 let snapshot = RecipeImportSourceSnapshot(
                     documentURL: documentURL,
-                    jsonLD: data,
-                    candidateJSONLD: snapshotData
+                    jsonLD: data
                 )
                 candidates.append(
                     RecipeImportCandidate(

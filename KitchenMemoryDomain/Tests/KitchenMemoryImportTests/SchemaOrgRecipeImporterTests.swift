@@ -54,8 +54,12 @@ final class SchemaOrgRecipeImporterTests: XCTestCase {
         XCTAssertEqual(candidate.draft.instructionSections[0].steps.map(\.text), ["Mix the batter.", "Bake until done."])
         XCTAssertEqual(candidate.draft.instructionSections[1].steps.map(\.text), ["Cool completely."])
 
+        let sourceDocument = try XCTUnwrap(
+            JSONSerialization.jsonObject(with: candidate.snapshot.jsonLD) as? [String: Any]
+        )
+        let sourceObjects = try XCTUnwrap(sourceDocument["@graph"] as? [[String: Any]])
         let sourceObject = try XCTUnwrap(
-            JSONSerialization.jsonObject(with: candidate.snapshot.candidateJSONLD) as? [String: Any]
+            sourceObjects.first { $0["futurePublisherField"] != nil }
         )
         XCTAssertNotNil(sourceObject["nutrition"])
         XCTAssertNotNil(sourceObject["futurePublisherField"])
@@ -67,6 +71,23 @@ final class SchemaOrgRecipeImporterTests: XCTestCase {
         XCTAssertNil(result.unambiguousCandidate)
         XCTAssertEqual(result.candidates.map(\.draft.title), ["First", "Second"])
         XCTAssertEqual(result.diagnostics, [.init(blockIndex: 1, kind: .malformedJSONLD)])
+    }
+
+    func testNestedCandidatesShareOneContainingSourceBlock() throws {
+        var root: [String: Any] = ["@type": "Recipe", "name": "Recipe 0"]
+        for index in 1...15 {
+            root = [
+                "@type": "Recipe",
+                "name": "Recipe \(index)",
+                "@graph": [root],
+            ]
+        }
+        let data = try JSONSerialization.data(withJSONObject: root)
+
+        let result = importer.importJSONLD(data)
+
+        XCTAssertEqual(result.candidates.count, 16)
+        XCTAssertTrue(result.candidates.allSatisfy { $0.snapshot.jsonLD == data })
     }
 
     func testJSONLDDiscoveryHandlesAttributeSyntaxAndIgnoresHTMLComments() throws {

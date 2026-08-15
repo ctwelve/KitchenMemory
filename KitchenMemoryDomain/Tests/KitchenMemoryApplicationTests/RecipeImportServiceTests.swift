@@ -36,8 +36,7 @@ final class RecipeImportServiceTests: XCTestCase {
       ),
       snapshot: RecipeImportSourceSnapshot(
         documentURL: sourceURL,
-        jsonLD: payload,
-        candidateJSONLD: Data("normalized duplicate is not persisted".utf8)
+        jsonLD: payload
       )
     )
 
