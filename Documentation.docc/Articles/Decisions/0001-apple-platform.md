@@ -1,10 +1,11 @@
+# ADR 0001: Build a native SwiftUI application
+
 <!--
 Kitchen Memory
 Copyright © 2026 the Kitchen Memory contributors.
 SPDX-License-Identifier: GPL-3.0-only
 -->
 
-# ADR 0001: Build a native SwiftUI application
 
 - Status: Accepted
 - Date: 2026-08-09

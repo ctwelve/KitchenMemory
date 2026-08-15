@@ -1,10 +1,11 @@
+# ADR 0003: Separate the domain from persistence and synchronization
+
 <!--
 Kitchen Memory
 Copyright © 2026 the Kitchen Memory contributors.
 SPDX-License-Identifier: GPL-3.0-only
 -->
 
-# ADR 0003: Separate the domain from persistence and synchronization
 
 - Status: Accepted
 - Date: 2026-08-10

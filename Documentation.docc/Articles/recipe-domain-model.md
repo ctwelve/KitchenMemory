@@ -1,10 +1,11 @@
+# Recipe domain model
+
 <!--
 Kitchen Memory
 Copyright © 2026 the Kitchen Memory contributors.
 SPDX-License-Identifier: GPL-3.0-only
 -->
 
-# Recipe domain model
 
 This is a conceptual model, not yet a persistence schema. Names should be judged
 by whether they describe the cooking domain clearly; storage-framework concerns

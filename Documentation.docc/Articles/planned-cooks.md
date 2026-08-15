@@ -1,10 +1,11 @@
+# Planned cooks and readiness
+
 <!--
 Kitchen Memory
 Copyright © 2026 the Kitchen Memory contributors.
 SPDX-License-Identifier: GPL-3.0-only
 -->
 
-# Planned cooks and readiness
 
 - Status: Accepted direction
 

@@ -1,10 +1,11 @@
+# Domain architecture
+
 <!--
 Kitchen Memory
 Copyright © 2026 the Kitchen Memory contributors.
 SPDX-License-Identifier: GPL-3.0-only
 -->
 
-# Domain architecture
 
 - Status: Accepted direction
 - Date: 2026-08-10

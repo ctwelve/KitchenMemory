@@ -1,10 +1,11 @@
+# ADR 0004: Use SwiftData, CloudKit, and versioned import and export
+
 <!--
 Kitchen Memory
 Copyright © 2026 the Kitchen Memory contributors.
 SPDX-License-Identifier: GPL-3.0-only
 -->
 
-# ADR 0004: Use SwiftData, CloudKit, and versioned import and export
 
 - Status: Accepted
 - Date: 2026-08-10

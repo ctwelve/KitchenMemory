@@ -36,8 +36,6 @@
 /* Begin PBXFileReference section */
 		A1532352302C2FF100C8D534 /* Documentation.docc */ = {isa = PBXFileReference; lastKnownFileType = folder.documentationcatalog; path = Documentation.docc; sourceTree = "<group>"; };
 		A15962C5302BC01A00926925 /* KitchenMemory.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = KitchenMemory.xctestplan; sourceTree = "<group>"; };
-		A1596308302BCCE600926925 /* accessibility-engineering.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "accessibility-engineering.md"; sourceTree = "<group>"; };
-		A1596309302BCCE600926925 /* alpha-roadmap.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "alpha-roadmap.md"; sourceTree = "<group>"; };
 		A1C4E79E302A63B800E2C0DB /* KitchenMemory.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KitchenMemory.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1C4E7AD302A63B900E2C0DB /* KitchenMemoryTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KitchenMemoryTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1C4E7B7302A63B900E2C0DB /* KitchenMemoryUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KitchenMemoryUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -56,24 +54,6 @@
 		A1C4E7D9302A6F7500E2C0DB /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		A1C4E7DB302A6F7500E2C0DB /* generate-theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "generate-theme.swift"; sourceTree = "<group>"; };
 		A1C4E7DC302A6F7500E2C0DB /* Palette.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Palette.json; sourceTree = "<group>"; };
-		A1C4E7ED302A6F8D00E2C0DB /* 0001-apple-platform.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "0001-apple-platform.md"; sourceTree = "<group>"; };
-		A1C4E7EE302A6F8D00E2C0DB /* 0002-gpl-3-only.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "0002-gpl-3-only.md"; sourceTree = "<group>"; };
-		A1C4E7EF302A6F8D00E2C0DB /* 0003-domain-persistence-boundary.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "0003-domain-persistence-boundary.md"; sourceTree = "<group>"; };
-		A1C4E7F0302A6F8D00E2C0DB /* 0004-apple-persistence-and-portability.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "0004-apple-persistence-and-portability.md"; sourceTree = "<group>"; };
-		A1C4E7F1302A6F8D00E2C0DB /* 0005-testing-and-comprehension.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "0005-testing-and-comprehension.md"; sourceTree = "<group>"; };
-		A1C4E7F3302A6F8D00E2C0DB /* apple-platform.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "apple-platform.md"; sourceTree = "<group>"; };
-		A1C4E7F4302A6F8D00E2C0DB /* continuous-integration.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "continuous-integration.md"; sourceTree = "<group>"; };
-		A1C4E7F5302A6F8D00E2C0DB /* cooking-sessions.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "cooking-sessions.md"; sourceTree = "<group>"; };
-		A1C4E7F6302A6F8D00E2C0DB /* domain-architecture.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "domain-architecture.md"; sourceTree = "<group>"; };
-		A1C4E7F7302A6F8D00E2C0DB /* fuzzy-pantry.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "fuzzy-pantry.md"; sourceTree = "<group>"; };
-		A1C4E7F8302A6F8D00E2C0DB /* naming.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = naming.md; sourceTree = "<group>"; };
-		A1C4E7F9302A6F8D00E2C0DB /* open-questions.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "open-questions.md"; sourceTree = "<group>"; };
-		A1C4E7FA302A6F8D00E2C0DB /* planned-cooks.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "planned-cooks.md"; sourceTree = "<group>"; };
-		A1C4E7FB302A6F8D00E2C0DB /* product-brief.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "product-brief.md"; sourceTree = "<group>"; };
-		A1C4E7FC302A6F8D00E2C0DB /* product-doctrine.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "product-doctrine.md"; sourceTree = "<group>"; };
-		A1C4E7FD302A6F8D00E2C0DB /* recipe-domain-model.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "recipe-domain-model.md"; sourceTree = "<group>"; };
-		A1C4E7FE302A6F8D00E2C0DB /* web-import.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "web-import.md"; sourceTree = "<group>"; };
-		A1C4E7FF302A6F8D00E2C0DB /* workflows.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = workflows.md; sourceTree = "<group>"; };
 		A1C4E837302A6FCA00E2C0DB /* AI.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = AI.md; sourceTree = "<group>"; };
 		A1C4E838302A6FCA00E2C0DB /* COPYRIGHT */ = {isa = PBXFileReference; lastKnownFileType = text; path = COPYRIGHT; sourceTree = "<group>"; };
 		A1C4E839302A6FCA00E2C0DB /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
@@ -136,7 +116,6 @@
 				A1C4E838302A6FCA00E2C0DB /* COPYRIGHT */,
 				A1C4E839302A6FCA00E2C0DB /* LICENSE */,
 				A1C4E83A302A6FCA00E2C0DB /* README.md */,
-				A1C4E800302A6F8D00E2C0DB /* Docs */,
 				A1C4E7DD302A6F7500E2C0DB /* Design */,
 				A1C4E7A0302A63B800E2C0DB /* KitchenMemory */,
 				A1C4E7B0302A63B900E2C0DB /* KitchenMemoryTests */,
@@ -207,41 +186,6 @@
 				A1C4E7DC302A6F7500E2C0DB /* Palette.json */,
 			);
 			path = Design;
-			sourceTree = "<group>";
-		};
-		A1C4E7F2302A6F8D00E2C0DB /* decisions */ = {
-			isa = PBXGroup;
-			children = (
-				A1C4E7ED302A6F8D00E2C0DB /* 0001-apple-platform.md */,
-				A1C4E7EE302A6F8D00E2C0DB /* 0002-gpl-3-only.md */,
-				A1C4E7EF302A6F8D00E2C0DB /* 0003-domain-persistence-boundary.md */,
-				A1C4E7F0302A6F8D00E2C0DB /* 0004-apple-persistence-and-portability.md */,
-				A1C4E7F1302A6F8D00E2C0DB /* 0005-testing-and-comprehension.md */,
-			);
-			path = decisions;
-			sourceTree = "<group>";
-		};
-		A1C4E800302A6F8D00E2C0DB /* Docs */ = {
-			isa = PBXGroup;
-			children = (
-				A1596308302BCCE600926925 /* accessibility-engineering.md */,
-				A1596309302BCCE600926925 /* alpha-roadmap.md */,
-				A1C4E7F2302A6F8D00E2C0DB /* decisions */,
-				A1C4E7F3302A6F8D00E2C0DB /* apple-platform.md */,
-				A1C4E7F4302A6F8D00E2C0DB /* continuous-integration.md */,
-				A1C4E7F5302A6F8D00E2C0DB /* cooking-sessions.md */,
-				A1C4E7F6302A6F8D00E2C0DB /* domain-architecture.md */,
-				A1C4E7F7302A6F8D00E2C0DB /* fuzzy-pantry.md */,
-				A1C4E7F8302A6F8D00E2C0DB /* naming.md */,
-				A1C4E7F9302A6F8D00E2C0DB /* open-questions.md */,
-				A1C4E7FA302A6F8D00E2C0DB /* planned-cooks.md */,
-				A1C4E7FB302A6F8D00E2C0DB /* product-brief.md */,
-				A1C4E7FC302A6F8D00E2C0DB /* product-doctrine.md */,
-				A1C4E7FD302A6F8D00E2C0DB /* recipe-domain-model.md */,
-				A1C4E7FE302A6F8D00E2C0DB /* web-import.md */,
-				A1C4E7FF302A6F8D00E2C0DB /* workflows.md */,
-			);
-			path = Docs;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

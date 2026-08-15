@@ -1,10 +1,11 @@
+# Fuzzy pantry concept
+
 <!--
 Kitchen Memory
 Copyright © 2026 the Kitchen Memory contributors.
 SPDX-License-Identifier: GPL-3.0-only
 -->
 
-# Fuzzy pantry concept
 
 - Status: Exploration
 

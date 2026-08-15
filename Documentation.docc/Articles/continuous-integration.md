@@ -1,10 +1,11 @@
+# Continuous integration
+
 <!--
 Kitchen Memory
 Copyright © 2026 the Kitchen Memory contributors.
 SPDX-License-Identifier: GPL-3.0-only
 -->
 
-# Continuous integration
 
 GitHub Actions repeats the project's core and accessibility verification on
 clean, GitHub-hosted Macs.
