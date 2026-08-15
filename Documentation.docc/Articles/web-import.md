@@ -43,6 +43,18 @@ Network fetching should eventually live behind a small interface so the same
 pipeline can consume a Safari share extension, a saved HTML file, or test
 fixtures without knowing where the document came from.
 
+## Deterministic import boundary
+
+`KitchenMemoryImport` implements the pipeline from captured HTML or JSON-LD
+through reviewable candidates. `SchemaOrgRecipeImporter` has no networking or
+persistence dependency. Its result retains both the untouched containing JSON-LD
+block and the selected candidate object, so later parsing improvements can be
+applied without fetching the page again or relying on today's interpretation.
+
+Missing titles and malformed sibling blocks are diagnostics rather than reasons
+to discard other meaningful recipe content. Candidate selection, URL fetching,
+person-facing review, and saving remain responsibilities of later layers.
+
 ## Candidate discovery
 
 A page may contain:
