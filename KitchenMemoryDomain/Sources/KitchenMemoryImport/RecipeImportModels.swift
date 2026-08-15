@@ -18,6 +18,12 @@ public struct RecipeImportLimits: Equatable, Sendable {
     public let maximumTopLevelObjects: Int
     public let maximumCandidates: Int
     public let maximumFieldCharacters: Int
+    /// Total UTF-8 bytes retained across every candidate returned by one import.
+    public let maximumNormalizedUTF8Bytes: Int
+    /// Maximum emitted cuisine, category, and keyword values per recipe.
+    public let maximumTaxonomyItems: Int
+    /// Maximum emitted image URLs per recipe.
+    public let maximumImageURLs: Int
     public let maximumIngredients: Int
     public let maximumInstructionItems: Int
 
@@ -28,6 +34,9 @@ public struct RecipeImportLimits: Equatable, Sendable {
         maximumTopLevelObjects: Int = 1_000,
         maximumCandidates: Int = 25,
         maximumFieldCharacters: Int = 20_000,
+        maximumNormalizedUTF8Bytes: Int = 2 * 1_024 * 1_024,
+        maximumTaxonomyItems: Int = 2_000,
+        maximumImageURLs: Int = 500,
         maximumIngredients: Int = 500,
         maximumInstructionItems: Int = 1_000
     ) {
@@ -37,6 +46,9 @@ public struct RecipeImportLimits: Equatable, Sendable {
         precondition(maximumTopLevelObjects > 0)
         precondition(maximumCandidates > 0)
         precondition(maximumFieldCharacters > 0)
+        precondition(maximumNormalizedUTF8Bytes > 0)
+        precondition(maximumTaxonomyItems > 0)
+        precondition(maximumImageURLs > 0)
         precondition(maximumIngredients > 0)
         precondition(maximumInstructionItems > 0)
         self.maximumJSONLDBlocks = maximumJSONLDBlocks
@@ -45,6 +57,9 @@ public struct RecipeImportLimits: Equatable, Sendable {
         self.maximumTopLevelObjects = maximumTopLevelObjects
         self.maximumCandidates = maximumCandidates
         self.maximumFieldCharacters = maximumFieldCharacters
+        self.maximumNormalizedUTF8Bytes = maximumNormalizedUTF8Bytes
+        self.maximumTaxonomyItems = maximumTaxonomyItems
+        self.maximumImageURLs = maximumImageURLs
         self.maximumIngredients = maximumIngredients
         self.maximumInstructionItems = maximumInstructionItems
     }
@@ -57,6 +72,9 @@ public struct RecipeImportLimits: Equatable, Sendable {
             maximumTopLevelObjects: maximumTopLevelObjects,
             maximumCandidates: min(maximumCandidates, maximum),
             maximumFieldCharacters: maximumFieldCharacters,
+            maximumNormalizedUTF8Bytes: maximumNormalizedUTF8Bytes,
+            maximumTaxonomyItems: maximumTaxonomyItems,
+            maximumImageURLs: maximumImageURLs,
             maximumIngredients: maximumIngredients,
             maximumInstructionItems: maximumInstructionItems
         )
@@ -159,6 +177,7 @@ public struct RecipeImportDiagnostic: Equatable, Sendable {
         case topLevelObjects
         case candidates
         case consumedFields
+        case normalizedOutput
     }
 
     public enum Kind: Equatable, Sendable {

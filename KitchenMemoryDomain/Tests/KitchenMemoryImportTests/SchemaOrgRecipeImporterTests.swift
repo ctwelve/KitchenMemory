@@ -293,6 +293,223 @@ final class SchemaOrgRecipeImporterTests: XCTestCase {
         )
     }
 
+    func testInstructionScalarCannotExpandPastTheStepLimit() throws {
+        let limitedImporter = SchemaOrgRecipeImporter(limits: .init(maximumInstructionItems: 2))
+        let exactData = try JSONSerialization.data(withJSONObject: [
+            "@type": "Recipe",
+            "name": "Two steps",
+            "recipeInstructions": "First\nSecond",
+        ])
+        let excessiveData = try JSONSerialization.data(withJSONObject: [
+            "@type": "Recipe",
+            "name": "Three steps",
+            "recipeInstructions": "First\nSecond\nThird",
+        ])
+
+        XCTAssertEqual(
+            limitedImporter.importJSONLD(exactData).unambiguousCandidate?
+                .draft.instructionSections[0].steps.count,
+            2
+        )
+        assertNormalizedOutputLimit(limitedImporter.importJSONLD(excessiveData))
+    }
+
+    func testHostileInstructionScalarStopsAtTheConfiguredStepLimit() throws {
+        let limitedImporter = SchemaOrgRecipeImporter(limits: .init(maximumInstructionItems: 1_000))
+        let data = try JSONSerialization.data(withJSONObject: [
+            "@type": "Recipe",
+            "name": "Many lines",
+            "recipeInstructions": String(repeating: "a\n", count: 10_000),
+        ])
+
+        assertNormalizedOutputLimit(limitedImporter.importJSONLD(data))
+    }
+
+    func testInstructionScalarRecognizesCRLFAndUnicodeNewlines() throws {
+        let data = try JSONSerialization.data(withJSONObject: [
+            "@type": "Recipe",
+            "name": "Newlines",
+            "recipeInstructions": "First\r\n\r\nSecond\u{0085}Third\u{2028}Fourth\u{2029}Fifth",
+        ])
+
+        let steps = try XCTUnwrap(
+            importer.importJSONLD(data).unambiguousCandidate
+        ).draft.instructionSections[0].steps
+
+        XCTAssertEqual(steps.map(\.text), ["First", "Second", "Third", "Fourth", "Fifth"])
+    }
+
+    func testInstructionArraysAndNestedSectionsShareOneExactStepLimit() throws {
+        let limitedImporter = SchemaOrgRecipeImporter(limits: .init(maximumInstructionItems: 2))
+        let exactArrayData = try JSONSerialization.data(withJSONObject: [
+            "@type": "Recipe",
+            "name": "Exact array",
+            "recipeInstructions": ["One", "Two"],
+        ])
+        let arrayData = try JSONSerialization.data(withJSONObject: [
+            "@type": "Recipe",
+            "name": "Array steps",
+            "recipeInstructions": ["One", "Two", "Three"],
+        ])
+        let sectionData = try JSONSerialization.data(withJSONObject: [
+            "@type": "Recipe",
+            "name": "Nested steps",
+            "recipeInstructions": [[
+                "@type": "HowToSection",
+                "name": "Section",
+                "itemListElement": ["One", "Two", "Three"],
+            ]],
+        ])
+        let exactSectionData = try JSONSerialization.data(withJSONObject: [
+            "@type": "Recipe",
+            "name": "Exact section",
+            "recipeInstructions": [[
+                "@type": "HowToSection",
+                "name": "Section",
+                "itemListElement": ["One", "Two"],
+            ]],
+        ])
+
+        XCTAssertEqual(
+            limitedImporter.importJSONLD(exactArrayData).unambiguousCandidate?
+                .draft.instructionSections[0].steps.count,
+            2
+        )
+        XCTAssertEqual(
+            limitedImporter.importJSONLD(exactSectionData).unambiguousCandidate?
+                .draft.instructionSections[0].steps.count,
+            2
+        )
+        assertNormalizedOutputLimit(limitedImporter.importJSONLD(arrayData))
+        assertNormalizedOutputLimit(limitedImporter.importJSONLD(sectionData))
+    }
+
+    func testCommaSeparatedKeywordsCannotExpandPastTheTaxonomyLimit() throws {
+        let limitedImporter = SchemaOrgRecipeImporter(limits: .init(maximumTaxonomyItems: 2))
+        let exactData = try JSONSerialization.data(withJSONObject: [
+            "@type": "Recipe", "name": "Exact", "keywords": "one,two",
+        ])
+        let excessiveData = try JSONSerialization.data(withJSONObject: [
+            "@type": "Recipe", "name": "Excessive", "keywords": "one,two,three",
+        ])
+
+        XCTAssertEqual(
+            limitedImporter.importJSONLD(exactData).unambiguousCandidate?.draft.keywords,
+            ["one", "two"]
+        )
+        assertNormalizedOutputLimit(limitedImporter.importJSONLD(excessiveData))
+    }
+
+    func testEmptyNormalizedKeywordDoesNotConsumeTheTaxonomyBudget() throws {
+        let limitedImporter = SchemaOrgRecipeImporter(limits: .init(maximumTaxonomyItems: 1))
+        let data = try JSONSerialization.data(withJSONObject: [
+            "@type": "Recipe",
+            "name": "Keywords",
+            "keywords": "one,, ,<script></script>,",
+        ])
+
+        XCTAssertEqual(
+            limitedImporter.importJSONLD(data).unambiguousCandidate?.draft.keywords,
+            ["one"]
+        )
+    }
+
+    func testTaxonomyFieldsShareOneAggregateItemLimit() throws {
+        let limitedImporter = SchemaOrgRecipeImporter(limits: .init(maximumTaxonomyItems: 2))
+        let exactImporter = SchemaOrgRecipeImporter(limits: .init(maximumTaxonomyItems: 3))
+        let data = try JSONSerialization.data(withJSONObject: [
+            "@type": "Recipe",
+            "name": "Taxonomy",
+            "recipeCuisine": "Italian",
+            "recipeCategory": "Dinner",
+            "keywords": "quick",
+        ])
+
+        XCTAssertNotNil(exactImporter.importJSONLD(data).unambiguousCandidate)
+        assertNormalizedOutputLimit(limitedImporter.importJSONLD(data))
+    }
+
+    func testJoinedAuthorAndStructuredIngredientRespectFinalFieldLimit() throws {
+        let limitedImporter = SchemaOrgRecipeImporter(limits: .init(maximumFieldCharacters: 5))
+        let exactAuthorImporter = SchemaOrgRecipeImporter(limits: .init(maximumFieldCharacters: 6))
+        let exactIngredientImporter = SchemaOrgRecipeImporter(limits: .init(maximumFieldCharacters: 7))
+        let authorData = try JSONSerialization.data(withJSONObject: [
+            "@type": "Recipe",
+            "name": "A",
+            "author": [["name": "aa"], ["name": "bb"]],
+        ])
+        let ingredientData = try JSONSerialization.data(withJSONObject: [
+            "@type": "Recipe",
+            "name": "Food",
+            "recipeIngredient": [["value": "flour", "unitText": "g"]],
+        ])
+
+        XCTAssertEqual(
+            exactAuthorImporter.importJSONLD(authorData).unambiguousCandidate?.draft.authorName,
+            "aa, bb"
+        )
+        XCTAssertEqual(
+            exactIngredientImporter.importJSONLD(ingredientData).unambiguousCandidate?
+                .draft.ingredientSections[0].ingredients[0].originalText,
+            "flour g"
+        )
+        assertNormalizedOutputLimit(limitedImporter.importJSONLD(authorData))
+        assertNormalizedOutputLimit(limitedImporter.importJSONLD(ingredientData))
+    }
+
+    func testNormalizedUTF8BudgetCountsTheFinalStoredDraft() {
+        let data = Data(#"{"@type":"Recipe","name":"é"}"#.utf8)
+        let exactImporter = SchemaOrgRecipeImporter(limits: .init(maximumNormalizedUTF8Bytes: 4))
+        let excessiveImporter = SchemaOrgRecipeImporter(limits: .init(maximumNormalizedUTF8Bytes: 3))
+
+        // The two-byte title is stored as both content and source attribution.
+        XCTAssertNotNil(exactImporter.importJSONLD(data).unambiguousCandidate)
+        assertNormalizedOutputLimit(excessiveImporter.importJSONLD(data))
+    }
+
+    func testNormalizedUTF8BudgetIsSharedAcrossImportCandidates() {
+        let data = Data(#"""
+        [
+          {"@type":"Recipe","name":"A"},
+          {"@type":"Recipe","name":"B"}
+        ]
+        """#.utf8)
+        let exactImporter = SchemaOrgRecipeImporter(limits: .init(maximumNormalizedUTF8Bytes: 4))
+        let excessiveImporter = SchemaOrgRecipeImporter(limits: .init(maximumNormalizedUTF8Bytes: 3))
+
+        XCTAssertEqual(exactImporter.importJSONLD(data).candidates.count, 2)
+        assertNormalizedOutputLimit(excessiveImporter.importJSONLD(data))
+    }
+
+    func testImageURLsRespectTheirOwnOutputLimit() throws {
+        let limitedImporter = SchemaOrgRecipeImporter(limits: .init(maximumImageURLs: 1))
+        let exactImporter = SchemaOrgRecipeImporter(limits: .init(maximumImageURLs: 2))
+        let data = try JSONSerialization.data(withJSONObject: [
+            "@type": "Recipe",
+            "name": "Images",
+            "image": ["https://example.com/one.jpg", "https://example.com/two.jpg"],
+        ])
+
+        XCTAssertEqual(
+            exactImporter.importJSONLD(data).unambiguousCandidate?.draft.imageURLs.count,
+            2
+        )
+        assertNormalizedOutputLimit(limitedImporter.importJSONLD(data))
+    }
+
+    func testExtremeConfiguredLimitsDoNotOverflowPreflightArithmetic() {
+        let limitedImporter = SchemaOrgRecipeImporter(limits: .init(
+            maximumIngredients: .max,
+            maximumInstructionItems: .max
+        ))
+
+        XCTAssertNotNil(
+            limitedImporter.importJSONLD(
+                Data(#"{"@type":"Recipe","name":"Safe"}"#.utf8)
+            ).unambiguousCandidate
+        )
+    }
+
     func testUntrustedLinkSchemesDoNotBecomeActiveRecipeLinks() throws {
         let data = Data(#"""
         {
@@ -313,5 +530,19 @@ final class SchemaOrgRecipeImporterTests: XCTestCase {
     private func fixture(_ name: String) throws -> String {
         let url = try XCTUnwrap(Bundle.module.url(forResource: name, withExtension: "html"))
         return try String(contentsOf: url, encoding: .utf8)
+    }
+
+    private func assertNormalizedOutputLimit(
+        _ result: RecipeImportResult,
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) {
+        XCTAssertTrue(result.candidates.isEmpty, file: file, line: line)
+        XCTAssertEqual(
+            result.diagnostics.last?.kind,
+            .processingLimitExceeded(.normalizedOutput),
+            file: file,
+            line: line
+        )
     }
 }

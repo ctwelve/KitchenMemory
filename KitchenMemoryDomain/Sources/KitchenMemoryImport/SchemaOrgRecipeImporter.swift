@@ -31,6 +31,9 @@ public struct SchemaOrgRecipeImporter: Sendable {
     private func importJSONLDBlocks(_ blocks: [Data], documentURL: URL?) -> RecipeImportResult {
         var candidates: [RecipeImportCandidate] = []
         var diagnostics: [RecipeImportDiagnostic] = []
+        var normalizedOutputBudget = NormalizedOutputBudget(
+            maximumUTF8Bytes: limits.maximumNormalizedUTF8Bytes
+        )
 
         for (blockIndex, data) in blocks.enumerated() {
             guard JSONStructurePreflight.isWithinLimits(data, limits: limits) else {
@@ -85,6 +88,22 @@ public struct SchemaOrgRecipeImporter: Sendable {
                     title = ""
                     diagnostics.append(.init(blockIndex: blockIndex, kind: .missingTitle))
                 }
+                let draft: RecipeImportDraft
+                do {
+                    draft = try Self.makeDraft(
+                        from: object,
+                        title: title,
+                        documentURL: documentURL,
+                        limits: limits,
+                        normalizedOutputBudget: &normalizedOutputBudget
+                    )
+                } catch {
+                    diagnostics.append(.init(
+                        blockIndex: blockIndex,
+                        kind: .processingLimitExceeded(.normalizedOutput)
+                    ))
+                    return RecipeImportResult(candidates: [], diagnostics: diagnostics)
+                }
                 guard let snapshotData = try? JSONSerialization.data(
                     withJSONObject: object,
                     options: [.sortedKeys]
@@ -95,7 +114,6 @@ public struct SchemaOrgRecipeImporter: Sendable {
                     jsonLD: data,
                     candidateJSONLD: snapshotData
                 )
-                let draft = Self.makeDraft(from: object, title: title, documentURL: documentURL)
                 candidates.append(
                     RecipeImportCandidate(
                         id: .init(blockIndex: blockIndex, objectIndex: objectIndex),
@@ -167,14 +185,14 @@ private extension SchemaOrgRecipeImporter {
         }
         guard ConsumedFieldPreflight.isWithinLimits(
             object["recipeIngredient"],
-            maximumNodes: limits.maximumIngredients * 16,
+            maximumNodes: saturatedProduct(limits.maximumIngredients, 16),
             maximumCollectionElements: limits.maximumIngredients,
             maximumCharacters: limits.maximumFieldCharacters
         ) else { return false }
         return ConsumedFieldPreflight.isWithinLimits(
             object["recipeInstructions"],
-            maximumNodes: limits.maximumInstructionItems * 16,
-            maximumCollectionElements: limits.maximumInstructionItems * 2,
+            maximumNodes: saturatedProduct(limits.maximumInstructionItems, 16),
+            maximumCollectionElements: saturatedProduct(limits.maximumInstructionItems, 2),
             maximumCharacters: limits.maximumFieldCharacters
         )
     }
@@ -182,15 +200,34 @@ private extension SchemaOrgRecipeImporter {
     static func makeDraft(
         from object: [String: Any],
         title: String,
-        documentURL: URL?
-    ) -> RecipeImportDraft {
+        documentURL: URL?,
+        limits: RecipeImportLimits,
+        normalizedOutputBudget: inout NormalizedOutputBudget
+    ) throws(NormalizedOutputLimitExceeded) -> RecipeImportDraft {
         let canonicalURL = resolvedWebURL(
             from: object["url"] ?? mainEntityURL(object["mainEntityOfPage"]),
             relativeTo: documentURL
         ) ?? documentURL
-        let author = authorName(object["author"])
+        let author = try authorName(
+            object["author"],
+            maximumCharacters: limits.maximumFieldCharacters,
+            maximumUTF8Bytes: limits.maximumNormalizedUTF8Bytes
+        )
+        var remainingTaxonomyItems = limits.maximumTaxonomyItems
+        let cuisines = try cleanedStrings(
+            object["recipeCuisine"],
+            remaining: &remainingTaxonomyItems
+        )
+        let categories = try cleanedStrings(
+            object["recipeCategory"],
+            remaining: &remainingTaxonomyItems
+        )
+        let keywords = try keywords(
+            object["keywords"],
+            remaining: &remainingTaxonomyItems
+        )
 
-        return RecipeImportDraft(
+        let draft = RecipeImportDraft(
             title: cleanText(title),
             summary: text(object["description"]).map(cleanText),
             authorName: author,
@@ -205,13 +242,27 @@ private extension SchemaOrgRecipeImporter {
             prepDuration: duration(object["prepTime"]),
             cookDuration: duration(object["cookTime"]),
             totalDuration: duration(object["totalTime"]),
-            cuisines: strings(object["recipeCuisine"]).map(cleanText),
-            categories: strings(object["recipeCategory"]).map(cleanText),
-            keywords: keywords(object["keywords"]),
-            imageURLs: imageURLs(object["image"], relativeTo: documentURL),
-            ingredientSections: ingredientSections(object["recipeIngredient"]),
-            instructionSections: instructionSections(object["recipeInstructions"])
+            cuisines: cuisines,
+            categories: categories,
+            keywords: keywords,
+            imageURLs: try imageURLs(
+                object["image"],
+                relativeTo: documentURL,
+                maximum: limits.maximumImageURLs
+            ),
+            ingredientSections: try ingredientSections(
+                object["recipeIngredient"],
+                maximum: limits.maximumIngredients,
+                maximumFieldCharacters: limits.maximumFieldCharacters,
+                maximumUTF8Bytes: limits.maximumNormalizedUTF8Bytes
+            ),
+            instructionSections: try instructionSections(
+                object["recipeInstructions"],
+                maximumItems: limits.maximumInstructionItems
+            )
         )
+        try normalizedOutputBudget.validate(draft)
+        return draft
     }
 
     static func mainEntityURL(_ value: Any?) -> Any? {
@@ -219,11 +270,34 @@ private extension SchemaOrgRecipeImporter {
         return object["@id"] ?? object["url"]
     }
 
-    static func authorName(_ value: Any?) -> String? {
+    static func authorName(
+        _ value: Any?,
+        maximumCharacters: Int,
+        maximumUTF8Bytes: Int
+    ) throws(NormalizedOutputLimitExceeded) -> String? {
         if let direct = text(value) { return cleanText(direct) }
         if let values = value as? [Any] {
-            let names = values.compactMap(authorName)
-            return names.isEmpty ? nil : names.joined(separator: ", ")
+            var result = ""
+            result.reserveCapacity(min(maximumCharacters, 256))
+            var charactersUsed = 0
+            var utf8BytesUsed = 0
+            for value in values {
+                guard let name = try authorName(
+                    value,
+                    maximumCharacters: maximumCharacters,
+                    maximumUTF8Bytes: maximumUTF8Bytes
+                ) else { continue }
+                try appendBounded(
+                    name,
+                    to: &result,
+                    separator: ", ",
+                    charactersUsed: &charactersUsed,
+                    utf8BytesUsed: &utf8BytesUsed,
+                    maximumCharacters: maximumCharacters,
+                    maximumUTF8Bytes: maximumUTF8Bytes
+                )
+            }
+            return result.isEmpty ? nil : result
         }
         guard let object = value as? [String: Any] else { return nil }
         return text(object["name"]).map(cleanText)
@@ -279,16 +353,82 @@ private extension SchemaOrgRecipeImporter {
         return RecipeDuration(seconds: total)
     }
 
-    static func keywords(_ value: Any?) -> [String] {
-        if let string = text(value) {
-            return string.split(separator: ",").map { cleanText(String($0)) }.filter { !$0.isEmpty }
+    static func keywords(
+        _ value: Any?,
+        remaining: inout Int
+    ) throws(NormalizedOutputLimitExceeded) -> [String] {
+        if let string = scalarText(value) {
+            var output: [String] = []
+            output.reserveCapacity(min(remaining, 16))
+            let scalars = string.unicodeScalars
+            var pieceStart = scalars.startIndex
+            var cursor = scalars.startIndex
+
+            func appendPiece(
+                endingAt end: String.UnicodeScalarView.Index
+            ) throws(NormalizedOutputLimitExceeded) {
+                let cleaned = cleanText(String(scalars[pieceStart..<end]))
+                guard !cleaned.isEmpty else { return }
+                guard remaining > 0 else { throw NormalizedOutputLimitExceeded() }
+                remaining -= 1
+                output.append(cleaned)
+            }
+
+            while cursor < scalars.endIndex {
+                guard scalars[cursor].value == 0x2C else {
+                    cursor = scalars.index(after: cursor)
+                    continue
+                }
+                try appendPiece(endingAt: cursor)
+                cursor = scalars.index(after: cursor)
+                pieceStart = cursor
+            }
+            try appendPiece(endingAt: scalars.endIndex)
+            return output
         }
-        return strings(value).map(cleanText)
+        return try cleanedStrings(value, remaining: &remaining)
     }
 
-    static func imageURLs(_ value: Any?, relativeTo baseURL: URL?) -> [URL] {
+    static func cleanedStrings(
+        _ value: Any?,
+        remaining: inout Int
+    ) throws(NormalizedOutputLimitExceeded) -> [String] {
+        var output: [String] = []
+        var stack = value.map { [$0] } ?? []
+        while let next = stack.popLast() {
+            if let string = next as? String {
+                let cleaned = cleanText(string)
+                guard !cleaned.isEmpty else { continue }
+                guard remaining > 0 else { throw NormalizedOutputLimitExceeded() }
+                remaining -= 1
+                output.append(cleaned)
+            } else if let number = next as? NSNumber {
+                let cleaned = cleanText(number.stringValue)
+                guard !cleaned.isEmpty else { continue }
+                guard remaining > 0 else { throw NormalizedOutputLimitExceeded() }
+                remaining -= 1
+                output.append(cleaned)
+            } else if let array = next as? [Any] {
+                stack.append(contentsOf: array.reversed())
+            }
+        }
+        return output
+    }
+
+    static func imageURLs(
+        _ value: Any?,
+        relativeTo baseURL: URL?,
+        maximum: Int
+    ) throws(NormalizedOutputLimitExceeded) -> [URL] {
         if let array = value as? [Any] {
-            return array.compactMap { resolvedImageURL($0, relativeTo: baseURL) }
+            var output: [URL] = []
+            output.reserveCapacity(min(array.count, maximum))
+            for item in array {
+                guard let url = resolvedImageURL(item, relativeTo: baseURL) else { continue }
+                guard output.count < maximum else { throw NormalizedOutputLimitExceeded() }
+                output.append(url)
+            }
+            return output
         }
         return resolvedImageURL(value, relativeTo: baseURL).map { [$0] } ?? []
     }
@@ -320,24 +460,69 @@ private extension SchemaOrgRecipeImporter {
         return url
     }
 
-    static func ingredientSections(_ value: Any?) -> [IngredientSection] {
+    static func ingredientSections(
+        _ value: Any?,
+        maximum: Int,
+        maximumFieldCharacters: Int,
+        maximumUTF8Bytes: Int
+    ) throws(NormalizedOutputLimitExceeded) -> [IngredientSection] {
         let values = value as? [Any] ?? value.map { [$0] } ?? []
-        let ingredients = values.compactMap { ingredientText($0) }.map(IngredientLineParser.parse)
+        guard values.count <= maximum else { throw NormalizedOutputLimitExceeded() }
+        var ingredients: [RecipeIngredient] = []
+        ingredients.reserveCapacity(values.count)
+        for value in values {
+            guard let text = try ingredientText(
+                value,
+                maximumFieldCharacters: maximumFieldCharacters,
+                maximumUTF8Bytes: maximumUTF8Bytes
+            ) else { continue }
+            guard ingredients.count < maximum else { throw NormalizedOutputLimitExceeded() }
+            ingredients.append(IngredientLineParser.parse(text))
+        }
         return ingredients.isEmpty ? [] : [IngredientSection(ingredients: ingredients)]
     }
 
-    static func ingredientText(_ value: Any) -> String? {
-        if let string = text(value) { return string }
+    static func ingredientText(
+        _ value: Any,
+        maximumFieldCharacters: Int,
+        maximumUTF8Bytes: Int
+    ) throws(NormalizedOutputLimitExceeded) -> String? {
+        if let string = scalarText(value) { return string }
         guard let object = value as? [String: Any] else { return nil }
         if let value = text(object["value"]), let unit = text(object["unitText"]) {
-            return "\(value) \(unit)"
+            var result = ""
+            var charactersUsed = 0
+            var utf8BytesUsed = 0
+            try appendBounded(
+                value,
+                to: &result,
+                separator: "",
+                charactersUsed: &charactersUsed,
+                utf8BytesUsed: &utf8BytesUsed,
+                maximumCharacters: maximumFieldCharacters,
+                maximumUTF8Bytes: maximumUTF8Bytes
+            )
+            try appendBounded(
+                unit,
+                to: &result,
+                separator: " ",
+                charactersUsed: &charactersUsed,
+                utf8BytesUsed: &utf8BytesUsed,
+                maximumCharacters: maximumFieldCharacters,
+                maximumUTF8Bytes: maximumUTF8Bytes
+            )
+            return result
         }
         return text(object["value"]) ?? text(object["name"])
     }
 
-    static func instructionSections(_ value: Any?) -> [InstructionSection] {
-        if let string = text(value) {
-            let steps = splitInstructionText(string).map { InstructionStep(text: cleanText($0)) }
+    static func instructionSections(
+        _ value: Any?,
+        maximumItems: Int
+    ) throws(NormalizedOutputLimitExceeded) -> [InstructionSection] {
+        var remainingItems = maximumItems
+        if let string = scalarText(value) {
+            let steps = try splitInstructionText(string, remainingItems: &remainingItems)
             return steps.isEmpty ? [] : [InstructionSection(steps: steps)]
         }
         let values = value as? [Any] ?? value.map { [$0] } ?? []
@@ -345,18 +530,28 @@ private extension SchemaOrgRecipeImporter {
         var sections: [InstructionSection] = []
 
         for value in values {
-            if let string = text(value) {
-                looseSteps.append(InstructionStep(text: cleanText(string)))
+            if let string = scalarText(value) {
+                looseSteps.append(try instructionStep(
+                    text: string,
+                    name: nil,
+                    remainingItems: &remainingItems
+                ))
                 continue
             }
             guard let object = value as? [String: Any] else { continue }
             if hasType(object, "HowToSection") {
                 let childValues = object["itemListElement"] as? [Any] ?? []
-                let steps = instructionSteps(childValues)
+                let steps = try instructionSteps(
+                    childValues,
+                    remainingItems: &remainingItems
+                )
                 if !steps.isEmpty {
                     sections.append(InstructionSection(title: text(object["name"]).map(cleanText), steps: steps))
                 }
-            } else if let step = instructionStep(object) {
+            } else if let step = try instructionStep(
+                object,
+                remainingItems: &remainingItems
+            ) {
                 looseSteps.append(step)
             }
         }
@@ -364,27 +559,104 @@ private extension SchemaOrgRecipeImporter {
         return sections
     }
 
-    static func instructionSteps(_ values: [Any]) -> [InstructionStep] {
-        values.flatMap { value -> [InstructionStep] in
-            if let string = text(value) { return [InstructionStep(text: cleanText(string))] }
-            guard let object = value as? [String: Any] else { return [] }
-            if hasType(object, "HowToSection") {
-                return instructionSteps(object["itemListElement"] as? [Any] ?? [])
+    static func instructionSteps(
+        _ values: [Any],
+        remainingItems: inout Int
+    ) throws(NormalizedOutputLimitExceeded) -> [InstructionStep] {
+        var steps: [InstructionStep] = []
+        steps.reserveCapacity(min(values.count, remainingItems))
+        for value in values {
+            if let string = scalarText(value) {
+                steps.append(try instructionStep(
+                    text: string,
+                    name: nil,
+                    remainingItems: &remainingItems
+                ))
+                continue
             }
-            return instructionStep(object).map { [$0] } ?? []
+            guard let object = value as? [String: Any] else { continue }
+            if hasType(object, "HowToSection") {
+                steps.append(contentsOf: try instructionSteps(
+                    object["itemListElement"] as? [Any] ?? [],
+                    remainingItems: &remainingItems
+                ))
+            } else if let step = try instructionStep(
+                object,
+                remainingItems: &remainingItems
+            ) {
+                steps.append(step)
+            }
         }
+        return steps
     }
 
-    static func instructionStep(_ object: [String: Any]) -> InstructionStep? {
+    static func instructionStep(
+        _ object: [String: Any],
+        remainingItems: inout Int
+    ) throws(NormalizedOutputLimitExceeded) -> InstructionStep? {
         guard let body = text(object["text"]) ?? text(object["name"]) else { return nil }
-        return InstructionStep(
-            name: text(object["name"]).map(cleanText),
-            text: cleanText(body)
+        return try instructionStep(
+            text: body,
+            name: text(object["name"]),
+            remainingItems: &remainingItems
         )
     }
 
-    static func splitInstructionText(_ value: String) -> [String] {
-        value.components(separatedBy: .newlines).filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }
+    static func instructionStep(
+        text: String,
+        name: String?,
+        remainingItems: inout Int
+    ) throws(NormalizedOutputLimitExceeded) -> InstructionStep {
+        guard remainingItems > 0 else { throw NormalizedOutputLimitExceeded() }
+        remainingItems -= 1
+        return InstructionStep(
+            name: name.map(cleanText),
+            text: cleanText(text)
+        )
+    }
+
+    /// Emits newline-delimited steps incrementally so a short scalar cannot
+    /// allocate thousands of model objects before the item ceiling is noticed.
+    static func splitInstructionText(
+        _ value: String,
+        remainingItems: inout Int
+    ) throws(NormalizedOutputLimitExceeded) -> [InstructionStep] {
+        var steps: [InstructionStep] = []
+        steps.reserveCapacity(min(remainingItems, 32))
+        let scalars = value.unicodeScalars
+        var lineStart = scalars.startIndex
+        var cursor = scalars.startIndex
+
+        func appendLine(
+            endingAt end: String.UnicodeScalarView.Index
+        ) throws(NormalizedOutputLimitExceeded) {
+            let line = String(scalars[lineStart..<end])
+            guard !line.trimmingCharacters(in: .whitespaces).isEmpty else { return }
+            steps.append(try instructionStep(
+                text: line,
+                name: nil,
+                remainingItems: &remainingItems
+            ))
+        }
+
+        while cursor < scalars.endIndex {
+            let scalar = scalars[cursor]
+            guard CharacterSet.newlines.contains(scalar) else {
+                cursor = scalars.index(after: cursor)
+                continue
+            }
+            try appendLine(endingAt: cursor)
+            var next = scalars.index(after: cursor)
+            if scalar.value == 0x0D,
+               next < scalars.endIndex,
+               scalars[next].value == 0x0A {
+                next = scalars.index(after: next)
+            }
+            cursor = next
+            lineStart = next
+        }
+        try appendLine(endingAt: scalars.endIndex)
+        return steps
     }
 
     static func hasType(_ object: [String: Any], _ expected: String) -> Bool {
@@ -402,8 +674,150 @@ private extension SchemaOrgRecipeImporter {
         strings(value).first
     }
 
+    static func scalarText(_ value: Any?) -> String? {
+        if let string = value as? String { return string }
+        if let number = value as? NSNumber { return number.stringValue }
+        return nil
+    }
+
+    /// Appends a joined field without first allocating an unbounded temporary.
+    /// Both counters are maintained by the caller so repeated appends never
+    /// recompute `String.count` over an ever-growing result.
+    static func appendBounded(
+        _ value: String,
+        to output: inout String,
+        separator: String,
+        charactersUsed: inout Int,
+        utf8BytesUsed: inout Int,
+        maximumCharacters: Int,
+        maximumUTF8Bytes: Int
+    ) throws(NormalizedOutputLimitExceeded) {
+        guard charactersUsed >= 0,
+              charactersUsed <= maximumCharacters,
+              utf8BytesUsed >= 0,
+              utf8BytesUsed <= maximumUTF8Bytes
+        else { throw NormalizedOutputLimitExceeded() }
+        let actualSeparator = output.isEmpty ? "" : separator
+        let separatorCharacters = actualSeparator.count
+        let separatorBytes = actualSeparator.utf8.count
+        let valueCharacters = value.count
+        let valueBytes = value.utf8.count
+        guard separatorCharacters <= maximumCharacters - charactersUsed,
+              valueCharacters <= maximumCharacters - charactersUsed - separatorCharacters,
+              separatorBytes <= maximumUTF8Bytes - utf8BytesUsed,
+              valueBytes <= maximumUTF8Bytes - utf8BytesUsed - separatorBytes
+        else { throw NormalizedOutputLimitExceeded() }
+
+        output.append(actualSeparator)
+        output.append(value)
+        charactersUsed += separatorCharacters + valueCharacters
+        utf8BytesUsed += separatorBytes + valueBytes
+    }
+
+    /// Multiplies a caller-selected model ceiling without letting an extreme
+    /// (but otherwise valid) configuration trap before untrusted input is read.
+    static func saturatedProduct(_ value: Int, _ multiplier: Int) -> Int {
+        let (product, overflow) = value.multipliedReportingOverflow(by: multiplier)
+        return overflow ? Int.max : product
+    }
+
     static func cleanText(_ value: String) -> String {
         ImportedPlainTextNormalizer.normalize(value)
+    }
+}
+
+/// Marker error used when normalized values would exceed a model-output limit.
+private struct NormalizedOutputLimitExceeded: Error {}
+
+/// Accounts for every variable-length value retained by an import draft.
+///
+/// JSON tree limits alone cannot bound the normalized model: one scalar can be
+/// split into thousands of steps, and several individually valid fields can be
+/// joined into a much larger value. This second, independent budget is debited
+/// only after normalization, using UTF-8 byte counts because `String.count`
+/// measures grapheme clusters rather than storage. Every debit compares against
+/// the remaining allowance before subtraction, so hostile sizes cannot overflow
+/// integer arithmetic.
+private struct NormalizedOutputBudget {
+    private var remainingUTF8Bytes: Int
+
+    init(maximumUTF8Bytes: Int) {
+        remainingUTF8Bytes = maximumUTF8Bytes
+    }
+
+    mutating func validate(
+        _ draft: RecipeImportDraft
+    ) throws(NormalizedOutputLimitExceeded) {
+        try consume(draft.title)
+        try consume(draft.summary)
+        try consume(draft.authorName)
+
+        try consume(draft.source.title)
+        try consume(draft.source.authorName)
+        try consume(draft.source.publisherName)
+        try consume(draft.source.canonicalURL)
+
+        if let recipeYield = draft.recipeYield {
+            try consume(recipeYield.quantity?.text)
+            try consume(recipeYield.unitText)
+            try consume(recipeYield.originalText)
+        }
+
+        try consume(draft.cuisines)
+        try consume(draft.categories)
+        try consume(draft.keywords)
+        for imageURL in draft.imageURLs {
+            try consume(imageURL)
+        }
+
+        for section in draft.ingredientSections {
+            try consume(section.title)
+            for ingredient in section.ingredients {
+                try consume(ingredient.originalText)
+                try consume(ingredient.customDisplayText)
+                try consume(ingredient.quantity?.text)
+                try consume(ingredient.unitText)
+                try consume(ingredient.package?.quantity.text)
+                try consume(ingredient.package?.unitText)
+                try consume(ingredient.ingredientText)
+                try consume(ingredient.preparation)
+                try consume(ingredient.note)
+            }
+        }
+
+        for section in draft.instructionSections {
+            try consume(section.title)
+            for step in section.steps {
+                try consume(step.name)
+                try consume(step.text)
+            }
+        }
+    }
+
+    private mutating func consume(
+        _ values: [String]
+    ) throws(NormalizedOutputLimitExceeded) {
+        for value in values {
+            try consume(value)
+        }
+    }
+
+    private mutating func consume(
+        _ value: URL?
+    ) throws(NormalizedOutputLimitExceeded) {
+        guard let value else { return }
+        try consume(value.absoluteString)
+    }
+
+    private mutating func consume(
+        _ value: String?
+    ) throws(NormalizedOutputLimitExceeded) {
+        guard let value else { return }
+        let byteCount = value.utf8.count
+        guard byteCount <= remainingUTF8Bytes else {
+            throw NormalizedOutputLimitExceeded()
+        }
+        remainingUTF8Bytes -= byteCount
     }
 }
 
