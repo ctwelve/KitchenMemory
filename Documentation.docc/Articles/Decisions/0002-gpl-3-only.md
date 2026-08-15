@@ -1,10 +1,11 @@
+# ADR 0002: License the project under GPLv3 only
+
 <!--
 Kitchen Memory
 Copyright © 2026 the Kitchen Memory contributors.
 SPDX-License-Identifier: GPL-3.0-only
 -->
 
-# ADR 0002: License the project under GPLv3 only
 
 - Status: Accepted
 - Date: 2026-08-09

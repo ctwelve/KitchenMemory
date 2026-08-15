@@ -1,10 +1,11 @@
+# Open questions
+
 <!--
 Kitchen Memory
 Copyright © 2026 the Kitchen Memory contributors.
 SPDX-License-Identifier: GPL-3.0-only
 -->
 
-# Open questions
 
 These are decisions to explore through prototypes and real recipes rather than
 settle abstractly.

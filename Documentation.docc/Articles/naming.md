@@ -1,10 +1,11 @@
+# Naming and voice
+
 <!--
 Kitchen Memory
 Copyright © 2026 the Kitchen Memory contributors.
 SPDX-License-Identifier: GPL-3.0-only
 -->
 
-# Naming and voice
 
 - Status: Working direction
 - Date: 2026-08-09

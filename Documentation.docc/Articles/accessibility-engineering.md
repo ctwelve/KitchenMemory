@@ -1,10 +1,11 @@
+# Accessibility engineering
+
 <!--
 Kitchen Memory
 Copyright © 2026 the Kitchen Memory contributors.
 SPDX-License-Identifier: GPL-3.0-only
 -->
 
-# Accessibility engineering
 
 Accessibility is part of Kitchen Memory's UI contract, not a final decorative
 pass. It also anchors the UI test harness: stable semantics are a more durable

@@ -1,10 +1,11 @@
+# Web recipe import
+
 <!--
 Kitchen Memory
 Copyright © 2026 the Kitchen Memory contributors.
 SPDX-License-Identifier: GPL-3.0-only
 -->
 
-# Web recipe import
 
 ## Interoperability target
 

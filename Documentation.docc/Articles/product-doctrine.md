@@ -1,10 +1,11 @@
+# Product doctrine
+
 <!--
 Kitchen Memory
 Copyright © 2026 the Kitchen Memory contributors.
 SPDX-License-Identifier: GPL-3.0-only
 -->
 
-# Product doctrine
 
 - Status: Accepted direction
 - Date: 2026-08-09

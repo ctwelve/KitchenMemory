@@ -1,10 +1,11 @@
+# Alpha roadmap
+
 <!--
 Kitchen Memory
 Copyright © 2026 the Kitchen Memory contributors.
 SPDX-License-Identifier: GPL-3.0-only
 -->
 
-# Alpha roadmap
 
 - Status: Accepted direction
 - Date: 2026-08-11

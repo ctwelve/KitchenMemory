@@ -1,10 +1,11 @@
+# Apple platform and automation architecture
+
 <!--
 Kitchen Memory
 Copyright © 2026 the Kitchen Memory contributors.
 SPDX-License-Identifier: GPL-3.0-only
 -->
 
-# Apple platform and automation architecture
 
 The product is a native SwiftUI application for iPhone, iPad, and Mac, with a
 display-centric tvOS client planned for a later phase. The Mac application is not
@@ -22,6 +23,21 @@ The platforms share a recipe domain, but they do not need feature parity.
 | iPhone | Capture, shopping, quick edits, and cooking |
 | iPad | Cooking, planning, and comfortable recipe editing |
 | tvOS | Hands-off, display-centric cooking guidance |
+
+## Current shared UI strategy
+
+During the foundation slices, one basic SwiftUI interface exercises the shared
+domain and application behavior on Mac, iPhone, and iPad. This is deliberately
+development scaffolding rather than a requirement that the mature products
+share screens or a presentation framework.
+
+Keep the current interface coherent and accessible, and introduce small
+platform differences when needed. Defer serious visual-editor architecture
+until representative Mac and mobile interactions can be compared. The later
+Mac product may use AppKit and Storyboards for precise interaction and visual
+design, while mobile may retain SwiftUI, use UIKit, or adopt a hybrid. Whatever
+the result, the platforms continue to share the product core rather than a
+compromised interface. See <doc:0006-shared-ui-for-foundation-slices>.
 
 The tvOS client should emphasize legibility at kitchen distance, simple remote
 navigation, clear progress through instructions, timers, and reliable access to

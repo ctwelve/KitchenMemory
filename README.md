@@ -41,22 +41,23 @@ Pantry inventory, meal planning, and shopping follow after this slice is useful.
 
 ## Documentation
 
-- [Product doctrine](Docs/product-doctrine.md) — consolidated product direction
-- [Alpha roadmap](Docs/alpha-roadmap.md) — remaining slices to a working alpha
-- [Naming and voice](Docs/naming.md)
-- [Product brief](Docs/product-brief.md)
-- [Recipe domain model](Docs/recipe-domain-model.md)
-- [Domain architecture](Docs/domain-architecture.md)
-- [Web import design](Docs/web-import.md)
-- [Fuzzy pantry concept](Docs/fuzzy-pantry.md)
-- [Planned cooks and readiness](Docs/planned-cooks.md)
-- [Cooking sessions and deviations](Docs/cooking-sessions.md)
-- [Product workflows](Docs/workflows.md)
-- [Apple platform and automation architecture](Docs/apple-platform.md)
-- [Continuous integration](Docs/continuous-integration.md)
-- [Accessibility engineering](Docs/accessibility-engineering.md)
-- [Open questions](Docs/open-questions.md)
-- [Architecture decisions](Docs/decisions/)
+- [Documentation library](Documentation.docc/Documentation.md) — complete guide
+- [Product doctrine](Documentation.docc/Articles/product-doctrine.md) — consolidated product direction
+- [Alpha roadmap](Documentation.docc/Articles/alpha-roadmap.md) — remaining slices to a working alpha
+- [Naming and voice](Documentation.docc/Articles/naming.md)
+- [Product brief](Documentation.docc/Articles/product-brief.md)
+- [Recipe domain model](Documentation.docc/Articles/recipe-domain-model.md)
+- [Domain architecture](Documentation.docc/Articles/domain-architecture.md)
+- [Web import design](Documentation.docc/Articles/web-import.md)
+- [Fuzzy pantry concept](Documentation.docc/Articles/fuzzy-pantry.md)
+- [Planned cooks and readiness](Documentation.docc/Articles/planned-cooks.md)
+- [Cooking sessions and deviations](Documentation.docc/Articles/cooking-sessions.md)
+- [Product workflows](Documentation.docc/Articles/workflows.md)
+- [Apple platform and automation architecture](Documentation.docc/Articles/apple-platform.md)
+- [Continuous integration](Documentation.docc/Articles/continuous-integration.md)
+- [Accessibility engineering](Documentation.docc/Articles/accessibility-engineering.md)
+- [Open questions](Documentation.docc/Articles/open-questions.md)
+- [Architecture decisions](Documentation.docc/Documentation.md#Architecture-decisions)
 - [Artificial intelligence use](AI.md)
 
 ## Development

@@ -1,10 +1,11 @@
+# ADR 0005: Prefer a consistent test model and code optimized for comprehension
+
 <!--
 Kitchen Memory
 Copyright © 2026 the Kitchen Memory contributors.
 SPDX-License-Identifier: GPL-3.0-only
 -->
 
-# ADR 0005: Prefer a consistent test model and code optimized for comprehension
 
 - Status: Accepted
 - Date: 2026-08-10
