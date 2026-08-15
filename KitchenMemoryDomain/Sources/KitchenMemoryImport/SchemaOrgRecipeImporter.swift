@@ -403,26 +403,7 @@ private extension SchemaOrgRecipeImporter {
     }
 
     static func cleanText(_ value: String) -> String {
-        let decoded = value
-            .replacingOccurrences(of: "&nbsp;", with: " ")
-            .replacingOccurrences(of: "&amp;", with: "&")
-            .replacingOccurrences(of: "&lt;", with: "<")
-            .replacingOccurrences(of: "&gt;", with: ">")
-            .replacingOccurrences(of: "&quot;", with: "\"")
-            .replacingOccurrences(of: "&#39;", with: "'")
-        let withoutExecutableContent = decoded.replacingOccurrences(
-            of: #"(?is)<(script|style)\b[^>]*>.*?</\1\s*>"#,
-            with: " ",
-            options: .regularExpression
-        )
-        let withoutTags = withoutExecutableContent.replacingOccurrences(
-            of: #"<[^>]+>"#,
-            with: " ",
-            options: .regularExpression
-        )
-        return withoutTags.components(separatedBy: .whitespacesAndNewlines)
-            .filter { !$0.isEmpty }
-            .joined(separator: " ")
+        ImportedPlainTextNormalizer.normalize(value)
     }
 }
 

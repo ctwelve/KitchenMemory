@@ -133,6 +133,72 @@ final class SchemaOrgRecipeImporterTests: XCTestCase {
         XCTAssertEqual(result.candidates[1].draft.instructionSections[0].steps[0].text, "Simmer.")
     }
 
+    func testTextNormalizationDecodesEntitiesAndSuppressesExecutableContent() throws {
+        let data = try JSONSerialization.data(withJSONObject: [
+            "@type": "Recipe",
+            "name": "Text",
+            "description": "One&nbsp;<b title='>'>two</b> &amp; <SCRIPT>bad()</SCRIPT>three",
+        ])
+
+        let draft = try XCTUnwrap(importer.importJSONLD(data).unambiguousCandidate).draft
+
+        XCTAssertEqual(draft.summary, "One two & three")
+    }
+
+    func testTextNormalizationDoesNotDecodeMultipleEntityLayers() throws {
+        let data = try JSONSerialization.data(withJSONObject: [
+            "@type": "Recipe",
+            "name": "Entities",
+            "description": "Show &amp;lt;em&amp;gt; literally",
+        ])
+
+        let draft = try XCTUnwrap(importer.importJSONLD(data).unambiguousCandidate).draft
+
+        XCTAssertEqual(draft.summary, "Show &lt;em&gt; literally")
+    }
+
+    func testMalformedMarkupNormalizationCompletesInBoundedTime() throws {
+        let hostileText = String(repeating: "<", count: 20_000)
+        let data = try JSONSerialization.data(withJSONObject: [
+            "@type": "Recipe",
+            "name": "Malformed markup",
+            "description": hostileText,
+        ])
+        let clock = ContinuousClock()
+        let start = clock.now
+
+        let result = importer.importJSONLD(data)
+
+        let elapsed = start.duration(to: clock.now)
+        XCTAssertEqual(result.unambiguousCandidate?.draft.summary, "")
+        XCTAssertLessThan(
+            elapsed,
+            .seconds(2),
+            "Malformed tags must be consumed once rather than searched repeatedly."
+        )
+    }
+
+    func testUnclosedScriptNormalizationCompletesInBoundedTime() throws {
+        let hostileText = String(repeating: "<script>", count: 2_500)
+        let data = try JSONSerialization.data(withJSONObject: [
+            "@type": "Recipe",
+            "name": "Malformed script",
+            "description": hostileText,
+        ])
+        let clock = ContinuousClock()
+        let start = clock.now
+
+        let result = importer.importJSONLD(data)
+
+        let elapsed = start.duration(to: clock.now)
+        XCTAssertEqual(result.unambiguousCandidate?.draft.summary, "")
+        XCTAssertLessThan(
+            elapsed,
+            .seconds(2),
+            "Unclosed raw-text elements must consume their suffix only once."
+        )
+    }
+
     func testDirectJSONLDInputSupportsTopLevelArrayAndNumericYield() throws {
         let data = Data(#"[{"@type":"Recipe","name":"One","recipeYield":4}]"#.utf8)
         let result = importer.importJSONLD(data)
