@@ -172,6 +172,23 @@ final class SchemaOrgRecipeImporterTests: XCTestCase {
         )
     }
 
+    func testUntrustedLinkSchemesDoNotBecomeActiveRecipeLinks() throws {
+        let data = Data(#"""
+        {
+          "@type":"Recipe","name":"Suspicious links",
+          "url":"file:///etc/passwd",
+          "image":["javascript:alert(1)","http://127.0.0.1/private.jpg"]
+        }
+        """#.utf8)
+        let documentURL = URL(string: "https://publisher.example/recipe")!
+
+        let draft = try XCTUnwrap(
+            importer.importJSONLD(data, documentURL: documentURL).unambiguousCandidate
+        ).draft
+        XCTAssertEqual(draft.source.canonicalURL, documentURL)
+        XCTAssertTrue(draft.imageURLs.isEmpty)
+    }
+
     private func fixture(_ name: String) throws -> String {
         let url = try XCTUnwrap(Bundle.module.url(forResource: name, withExtension: "html"))
         return try String(contentsOf: url, encoding: .utf8)

@@ -198,7 +198,7 @@ private extension SchemaOrgRecipeImporter {
         title: String,
         documentURL: URL?
     ) -> RecipeImportDraft {
-        let canonicalURL = resolvedURL(
+        let canonicalURL = resolvedWebURL(
             from: object["url"] ?? mainEntityURL(object["mainEntityOfPage"]),
             relativeTo: documentURL
         ) ?? documentURL
@@ -309,14 +309,29 @@ private extension SchemaOrgRecipeImporter {
 
     static func resolvedImageURL(_ value: Any?, relativeTo baseURL: URL?) -> URL? {
         if let object = value as? [String: Any] {
-            return resolvedURL(from: object["url"] ?? object["contentUrl"], relativeTo: baseURL)
+            return resolvedWebURL(
+                from: object["url"] ?? object["contentUrl"],
+                relativeTo: baseURL
+            )
         }
-        return resolvedURL(from: value, relativeTo: baseURL)
+        return resolvedWebURL(from: value, relativeTo: baseURL)
     }
 
-    static func resolvedURL(from value: Any?, relativeTo baseURL: URL?) -> URL? {
+    /// Resolves a publisher-provided link without promoting arbitrary URL
+    /// schemes into an active application link.
+    ///
+    /// JSON-LD is untrusted data. `URL(string:)` also accepts `file:`, custom
+    /// application schemes, credentials, and private literal destinations.
+    /// Keeping only structurally public HTTP(S) URLs prevents a recipe from
+    /// turning passive metadata into a surprising local or inter-app action.
+    /// The untouched value remains in the captured JSON-LD if future correction
+    /// or parser improvements need it.
+    static func resolvedWebURL(from value: Any?, relativeTo baseURL: URL?) -> URL? {
         guard let string = text(value) else { return nil }
-        return URL(string: string, relativeTo: baseURL)?.absoluteURL
+        guard let url = URL(string: string, relativeTo: baseURL)?.absoluteURL,
+              URLSessionRecipeDocumentLoader.isStructurallyAllowed(url)
+        else { return nil }
+        return url
     }
 
     static func ingredientSections(_ value: Any?) -> [IngredientSection] {

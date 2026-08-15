@@ -96,7 +96,7 @@ user which recipe to save.
 | `name` | `Recipe.name` | Required for a clean import; user may supply if absent |
 | `description` | `Recipe.description` | Strip unsafe markup, preserve text |
 | `author` | `Recipe.authorName` | Accept person, organization, text, or arrays |
-| `url`, `mainEntityOfPage` | `RecipeSource.canonicalURL` | Resolve relative URLs |
+| `url`, `mainEntityOfPage` | `RecipeSource.canonicalURL` | Resolve relative URLs; retain only structurally public HTTP(S) links |
 | `datePublished` | Source metadata | Not a local creation date |
 | `image` | `Recipe.images` | Accept URL, object, or array |
 | `prepTime` | `Recipe.prepDuration` | ISO 8601 duration |
