@@ -2,6 +2,7 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: GPL-3.0-only
 
+import Accessibility
 import KitchenMemoryApplication
 import SwiftUI
 
@@ -70,13 +71,22 @@ struct RecipeURLImportView: View {
       Button {
         beginImport()
       } label: {
-        if isLoading {
-          ProgressView().controlSize(.small)
-        } else {
-          Label("Fetch Recipe", systemImage: "arrow.down.doc")
+        Label {
+          Text(isLoading ? "Fetching Recipe" : "Fetch Recipe")
+        } icon: {
+          if isLoading {
+            ProgressView()
+              .controlSize(.small)
+              // The button's changing text communicates progress. Exposing the
+              // spinner separately would make VoiceOver announce two controls.
+              .accessibilityHidden(true)
+          } else {
+            Image(systemName: "arrow.down.doc")
+          }
         }
       }
       .disabled(isLoading || normalizedURL == nil)
+      .accessibilityLabel(isLoading ? "Fetching recipe" : "Fetch recipe")
       .accessibilityIdentifier("recipe-import-fetch")
     }
   }
@@ -184,6 +194,11 @@ struct RecipeURLImportView: View {
     guard let url = normalizedURL, !isLoading else { return }
     isLoading = true
     errorMessage = nil
+    // Changing a button label is visible feedback, but assistive technology
+    // does not necessarily revisit that button when an asynchronous operation
+    // begins. Announce the state transition without moving keyboard or
+    // VoiceOver focus away from the URL field.
+    AccessibilityNotification.Announcement("Fetching recipe").post()
     importTask?.cancel()
     importTask = Task {
       do {
@@ -194,11 +209,20 @@ struct RecipeURLImportView: View {
           select(candidate)
         } else {
           candidates = loaded
+          AccessibilityNotification.Announcement(
+            "\(loaded.count) recipes found. Choose a recipe to review."
+          ).post()
         }
       } catch {
         guard !Task.isCancelled else { return }
         isLoading = false
-        errorMessage = Self.message(for: error)
+        let message = Self.message(for: error)
+        errorMessage = message
+        // The identifier on the visible error supports automation only; it
+        // does not make newly inserted text a live region. A native
+        // announcement ensures the failure is heard while preserving the
+        // person's current focus so they can correct the URL immediately.
+        AccessibilityNotification.Announcement("Recipe import failed. \(message)").post()
       }
     }
   }
