@@ -184,7 +184,7 @@ struct RecipeURLImportView: View {
     let url = parsed?.scheme == nil ? URL(string: "https://\(trimmed)") : parsed
     guard let url,
           let scheme = url.scheme?.lowercased(),
-          scheme == "http" || scheme == "https",
+          scheme == "https",
           url.host != nil
     else { return nil }
     return url

@@ -155,18 +155,42 @@ public struct URLSessionRecipeDocumentLoader: RecipeDocumentLoading, Sendable {
     )
   }
 
-  /// Performs the non-network portion of the public-web destination policy.
+  /// Performs the non-network portion of the recipe-fetch destination policy.
   ///
-  /// This check rejects malformed URLs, credentials, local names, ambiguous IP
-  /// spellings, and nonstandard ports. A caller that will perform a request
-  /// must additionally resolve the hostname and validate every returned IP
-  /// address; a public-looking hostname can still resolve to a private host.
-  public static func isStructurallyAllowed(_ url: URL) -> Bool {
+  /// Recipe import deliberately accepts HTTPS only. An HTTP page or redirect
+  /// would expose both the requested path and the returned recipe document to
+  /// modification in transit. This check also rejects credentials, local
+  /// names, ambiguous IP spellings, and nonstandard ports. A caller that will
+  /// perform a request must additionally resolve the hostname and validate
+  /// every returned IP address; a public-looking hostname can still resolve to
+  /// a private host.
+  public static func isStructurallyAllowedFetchURL(_ url: URL) -> Bool {
+    isStructurallyAllowedHTTPSURL(url)
+  }
+
+  /// Whether untrusted recipe metadata may become a retained web link.
+  ///
+  /// This is intentionally named separately from fetch policy. Retaining a URL
+  /// for later person-initiated navigation and issuing a background request are
+  /// different trust boundaries, even though this release chooses the same
+  /// local-destination rules for both. Source metadata may retain ordinary
+  /// HTTP provenance for display and correction, but the fetcher never issues
+  /// an HTTP request and the UI must revalidate a URL before activating it.
+  static func isStructurallyAllowedSourceURL(_ url: URL) -> Bool {
+    isStructurallyAllowedWebURL(url, allowsHTTP: true)
+  }
+
+  private static func isStructurallyAllowedHTTPSURL(_ url: URL) -> Bool {
+    isStructurallyAllowedWebURL(url, allowsHTTP: false)
+  }
+
+  private static func isStructurallyAllowedWebURL(_ url: URL, allowsHTTP: Bool) -> Bool {
     guard let scheme = url.scheme?.lowercased(),
-          scheme == "http" || scheme == "https",
+          scheme == "https" || (allowsHTTP && scheme == "http"),
           url.user == nil,
           url.password == nil,
-          isAllowedPort(url.port, for: scheme),
+          url.port == nil || (scheme == "https" ? url.port == 443 : url.port == 80),
+          url.absoluteString.utf8.count <= 4_096,
           let rawHost = url.host?.lowercased(),
           !rawHost.isEmpty
     else { return false }
@@ -180,14 +204,16 @@ public struct URLSessionRecipeDocumentLoader: RecipeDocumentLoading, Sendable {
           !isAmbiguousNumericHost(host)
     else { return false }
 
-    if let address = IPAddress(host) {
-      return address.isPublic
-    }
+    // Keep URLSession on its normal hostname/TLS path. Accepting literal IP
+    // addresses adds no useful recipe-site compatibility and makes it much
+    // easier for pasted metadata to target a particular local or reserved
+    // endpoint.
+    if IPAddress(host) != nil { return false }
     return host.contains(".")
   }
 
   private func validateDestination(_ url: URL) async throws {
-    guard Self.isStructurallyAllowed(url), let host = url.host else {
+    guard Self.isStructurallyAllowedFetchURL(url), let host = url.host else {
       throw RecipeURLImportError.disallowedURL
     }
     if IPAddress(host) != nil { return }
@@ -201,11 +227,6 @@ public struct URLSessionRecipeDocumentLoader: RecipeDocumentLoading, Sendable {
     guard !addresses.isEmpty, addresses.allSatisfy(\.isPublic) else {
       throw RecipeURLImportError.disallowedURL
     }
-  }
-
-  private static func isAllowedPort(_ port: Int?, for scheme: String) -> Bool {
-    guard let port else { return true }
-    return (scheme == "https" && port == 443) || (scheme == "http" && port == 80)
   }
 
   private static func isAmbiguousNumericHost(_ host: String) -> Bool {
@@ -438,7 +459,7 @@ private final class RedirectController: NSObject, URLSessionTaskDelegate, @unche
       // to reach a private service. This delegate runs on URLSession's operation
       // queue, so synchronous system DNS resolution does not block SwiftUI.
       guard let url = request.url,
-            URLSessionRecipeDocumentLoader.isStructurallyAllowed(url),
+            URLSessionRecipeDocumentLoader.isStructurallyAllowedFetchURL(url),
             Self.resolvesOnlyToPublicAddresses(url, using: hostResolver)
       else {
         storedError = .disallowedURL

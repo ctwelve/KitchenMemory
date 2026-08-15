@@ -471,7 +471,7 @@ private extension SchemaOrgRecipeImporter {
     static func resolvedWebURL(from value: Any?, relativeTo baseURL: URL?) -> URL? {
         guard let string = text(value) else { return nil }
         guard let url = URL(string: string, relativeTo: baseURL)?.absoluteURL,
-              URLSessionRecipeDocumentLoader.isStructurallyAllowed(url)
+              URLSessionRecipeDocumentLoader.isStructurallyAllowedSourceURL(url)
         else { return nil }
         return url
     }

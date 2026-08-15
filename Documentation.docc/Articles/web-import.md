@@ -44,7 +44,7 @@ consume a Safari share extension or saved HTML file and already consumes test
 fixtures without knowing where the document came from.
 
 `URLSessionRecipeDocumentLoader` now provides that interface for person-entered
-URLs. It uses a fresh ephemeral session, accepts only HTTP and HTTPS, carries no
+URLs. It uses a fresh ephemeral session, accepts only HTTPS, carries no
 cookies or URL cache, limits redirects and elapsed time, and streams at most 2
 MiB into memory. It accepts HTML content only, rejects credentials and
 nonstandard ports, resolves hostnames with the system resolver, and refuses a
@@ -111,7 +111,7 @@ user which recipe to save.
 | `name` | `Recipe.name` | Required for a clean import; user may supply if absent |
 | `description` | `Recipe.description` | Strip unsafe markup, preserve text |
 | `author` | `Recipe.authorName` | Accept person, organization, text, or arrays |
-| `url`, `mainEntityOfPage` | `RecipeSource.canonicalURL` | Resolve relative URLs; retain only structurally public HTTP(S) links |
+| `url`, `mainEntityOfPage` | `RecipeSource.canonicalURL` | Resolve relative URLs; retain only structurally public HTTP(S) metadata; revalidate before activation |
 | `datePublished` | Source metadata | Not a local creation date |
 | `image` | `Recipe.images` | Accept URL, object, or array |
 | `prepTime` | `Recipe.prepDuration` | ISO 8601 duration |

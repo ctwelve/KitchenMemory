@@ -51,6 +51,7 @@ final class RecipeURLImporterTests: XCTestCase {
   func testURLPolicyRejectsLocalAndCredentialBearingDestinations() {
     let rejected = [
       "file:///tmp/recipe.html",
+      "http://example.com/recipe",
       "http://localhost/recipe",
       "http://router.local/recipe",
       "http://127.0.0.1/recipe",
@@ -63,19 +64,39 @@ final class RecipeURLImporterTests: XCTestCase {
       "http://192.168.1.1/recipe",
       "https://person:secret@example.com/recipe",
       "https://intranet/recipe",
+      "https://93.184.216.34/recipe",
       "https://localhost./recipe",
       "https://example.com:8443/recipe",
     ]
 
     for value in rejected {
       XCTAssertFalse(
-        URLSessionRecipeDocumentLoader.isStructurallyAllowed(URL(string: value)!),
+        URLSessionRecipeDocumentLoader.isStructurallyAllowedFetchURL(URL(string: value)!),
         value
       )
     }
-    XCTAssertTrue(URLSessionRecipeDocumentLoader.isStructurallyAllowed(
+    XCTAssertTrue(URLSessionRecipeDocumentLoader.isStructurallyAllowedFetchURL(
       URL(string: "https://recipes.example.com/toast")!
     ))
+  }
+
+  func testFetchAndRetainedSourcePoliciesAreDeliberatelySeparate() {
+    let legacySource = URL(string: "http://publisher.example/recipe")!
+
+    XCTAssertFalse(
+      URLSessionRecipeDocumentLoader.isStructurallyAllowedFetchURL(legacySource)
+    )
+    XCTAssertTrue(
+      URLSessionRecipeDocumentLoader.isStructurallyAllowedSourceURL(legacySource)
+    )
+  }
+
+  func testURLPolicyRejectsImplausiblyLongInput() {
+    let oversized = URL(
+      string: "https://example.com/" + String(repeating: "a", count: 4_096)
+    )!
+
+    XCTAssertFalse(URLSessionRecipeDocumentLoader.isStructurallyAllowedFetchURL(oversized))
   }
 
   func testRejectsPublicHostnameWhenAnyResolvedAddressIsNotPublic() async {
