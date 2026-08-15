@@ -143,7 +143,7 @@ struct RecipeURLImportView: View {
                 .lineLimit(3)
             }
             if !candidate.concerns.isEmpty {
-              Text("\(candidate.concerns.count) item\(candidate.concerns.count == 1 ? "" : "s") to review")
+              Text("\(candidate.concerns.count) review note\(candidate.concerns.count == 1 ? "" : "s")")
                 .font(.caption)
                 .foregroundStyle(.orange)
             }

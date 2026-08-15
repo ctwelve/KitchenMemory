@@ -151,6 +151,9 @@ The review experience is a core product surface, not an error dialog.
 
 - Show the recipe as it will be saved.
 - Emphasize only low-confidence or incomplete fields.
+- Distinguish machine-parsed ingredients from person-reviewed ingredients.
+- Surface malformed sibling blocks, referenced-but-undownloaded images, and
+  taxonomy that is preserved even when the current editor cannot change it.
 - Allow bulk acceptance of high-confidence rows.
 - Let the user edit its structure, choose the original line, or supply an
   explicit custom presentation.

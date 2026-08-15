@@ -11,6 +11,17 @@ public enum RecipeImportConcern: Equatable, Sendable {
   case missingIngredients
   case missingInstructions
   case unparsedIngredients(count: Int)
+  case provisionalIngredients(count: Int)
+  case ignoredSourceBlocks(count: Int)
+  case preservedTaxonomy(cuisines: [String], categories: [String], keywords: [String])
+  case referencedImages(count: Int)
+
+  public var isInformational: Bool {
+    switch self {
+    case .preservedTaxonomy, .referencedImages: true
+    default: false
+    }
+  }
 }
 
 public struct RecipeImportOption: Equatable, Identifiable, Sendable {
@@ -96,6 +107,30 @@ public struct RecipeImportService: RecipeImportServing, Sendable {
       }
       let unparsedCount = ingredients.count { $0.parseState == .unparsed }
       if unparsedCount > 0 { concerns.append(.unparsedIngredients(count: unparsedCount)) }
+      // `parsed` means a deterministic machine interpretation was possible. It
+      // does not mean a person confirmed the quantity, unit, or ingredient
+      // boundary. Keeping that state visible prevents an apparently clean
+      // import from quietly turning a parser guess into canonical truth.
+      let provisionalCount = ingredients.count { $0.parseState == .parsed }
+      if provisionalCount > 0 {
+        concerns.append(.provisionalIngredients(count: provisionalCount))
+      }
+      let ignoredBlockCount = result.diagnostics.count { diagnostic in
+        diagnostic.kind == .malformedJSONLD || diagnostic.kind == .unsupportedTopLevel
+      }
+      if ignoredBlockCount > 0 {
+        concerns.append(.ignoredSourceBlocks(count: ignoredBlockCount))
+      }
+      if !draft.cuisines.isEmpty || !draft.categories.isEmpty || !draft.keywords.isEmpty {
+        concerns.append(.preservedTaxonomy(
+          cuisines: draft.cuisines,
+          categories: draft.categories,
+          keywords: draft.keywords
+        ))
+      }
+      if !draft.imageURLs.isEmpty {
+        concerns.append(.referencedImages(count: draft.imageURLs.count))
+      }
 
       let sourceURL = candidate.snapshot.documentURL
         ?? draft.source.canonicalURL

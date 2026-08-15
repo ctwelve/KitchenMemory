@@ -21,8 +21,17 @@ final class RecipeImportServiceTests: XCTestCase {
         cuisines: ["French"],
         categories: ["Dinner"],
         keywords: ["quick"],
+        imageURLs: [
+          URL(string: "https://example.com/soup.jpg")!,
+          URL(string: "https://example.com/soup-2.jpg")!,
+        ],
         ingredientSections: [IngredientSection(ingredients: [
-          RecipeIngredient(originalText: "salt", presentationMode: .original)
+          RecipeIngredient(originalText: "salt", presentationMode: .original),
+          RecipeIngredient(
+            originalText: "2 cups water",
+            presentationMode: .original,
+            parseState: .parsed
+          ),
         ])]
       ),
       snapshot: RecipeImportSourceSnapshot(
@@ -33,7 +42,10 @@ final class RecipeImportServiceTests: XCTestCase {
     )
 
     let options = try RecipeImportService.options(
-      from: RecipeImportResult(candidates: [candidate]),
+      from: RecipeImportResult(
+        candidates: [candidate],
+        diagnostics: [.init(blockIndex: 7, kind: .malformedJSONLD)]
+      ),
       requestedURL: sourceURL,
       capturedAt: capturedAt
     )
@@ -42,7 +54,15 @@ final class RecipeImportServiceTests: XCTestCase {
     XCTAssertEqual(option.draft.cuisines, ["French"])
     XCTAssertEqual(option.draft.categories, ["Dinner"])
     XCTAssertEqual(option.draft.keywords, ["quick"])
-    XCTAssertEqual(option.concerns, [.missingInstructions, .unparsedIngredients(count: 1)])
+    XCTAssertEqual(option.concerns, [
+      .missingInstructions,
+      .unparsedIngredients(count: 1),
+      .provisionalIngredients(count: 1),
+      .ignoredSourceBlocks(count: 1),
+      .preservedTaxonomy(cuisines: ["French"], categories: ["Dinner"], keywords: ["quick"]),
+      .referencedImages(count: 2),
+    ])
+    XCTAssertTrue(option.concerns.last?.isInformational == true)
     XCTAssertEqual(option.draft.sourceCapture?.payload, payload)
     XCTAssertEqual(option.draft.sourceCapture?.capturedAt, capturedAt)
     XCTAssertEqual(option.draft.sourceCapture?.blockIndex, 2)

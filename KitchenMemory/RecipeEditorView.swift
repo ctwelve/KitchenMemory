@@ -138,12 +138,17 @@ struct RecipeEditorView: View {
   private var importReviewSection: some View {
     Section {
       if reviewConcerns.isEmpty {
-        Label("No obvious problems found", systemImage: "checkmark.circle")
+        Label("Import is ready for your review", systemImage: "eye")
           .foregroundStyle(.secondary)
       } else {
         ForEach(Array(reviewConcerns.enumerated()), id: \.offset) { _, concern in
-          Label(concern.reviewMessage, systemImage: "exclamationmark.triangle")
-            .foregroundStyle(.orange)
+          if concern.isInformational {
+            Label(concern.reviewMessage, systemImage: "info.circle")
+              .foregroundStyle(.secondary)
+          } else {
+            Label(concern.reviewMessage, systemImage: "exclamationmark.triangle")
+              .foregroundStyle(.orange)
+          }
         }
       }
     } header: {
@@ -289,7 +294,27 @@ private extension RecipeImportConcern {
     case .missingInstructions: "No instructions were found"
     case .unparsedIngredients(let count):
       "\(count) ingredient \(count == 1 ? "line is" : "lines are") preserved but unparsed"
+    case .provisionalIngredients(let count):
+      "\(count) ingredient \(count == 1 ? "interpretation needs" : "interpretations need") review"
+    case .ignoredSourceBlocks(let count):
+      "\(count) malformed or unsupported source \(count == 1 ? "block was" : "blocks were") ignored"
+    case .preservedTaxonomy(let cuisines, let categories, let keywords):
+      "Preserved metadata — \(taxonomySummary(cuisines: cuisines, categories: categories, keywords: keywords))"
+    case .referencedImages(let count):
+      "\(count) source \(count == 1 ? "image is" : "images are") referenced but not downloaded"
     }
+  }
+
+  private func taxonomySummary(
+    cuisines: [String],
+    categories: [String],
+    keywords: [String]
+  ) -> String {
+    var groups: [String] = []
+    if !cuisines.isEmpty { groups.append("cuisine: \(cuisines.joined(separator: ", "))") }
+    if !categories.isEmpty { groups.append("categories: \(categories.joined(separator: ", "))") }
+    if !keywords.isEmpty { groups.append("keywords: \(keywords.joined(separator: ", "))") }
+    return groups.joined(separator: "; ")
   }
 }
 
