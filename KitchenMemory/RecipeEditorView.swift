@@ -266,12 +266,19 @@ struct RecipeEditorView: View {
     return trimmed.isEmpty ? nil : trimmed
   }
   private func duration(_ minutes: String) -> RecipeDuration? {
-    guard let value = Int(minutes), value >= 0 else { return nil }
+    let maximumMinutes = ImportEditorLimits.maximumDurationSeconds / 60
+    guard let value = Int(minutes), value >= 0, value <= maximumMinutes else { return nil }
     return RecipeDuration(seconds: value * 60)
   }
   private static func minutes(_ duration: RecipeDuration?) -> String {
     duration.map { String($0.seconds / 60) } ?? ""
   }
+}
+
+private enum ImportEditorLimits {
+  // Match the importer's generous one-year ceiling. Bounding before
+  // multiplication prevents pasted numeric text from trapping on overflow.
+  static let maximumDurationSeconds = 366 * 24 * 60 * 60
 }
 
 private extension RecipeImportConcern {

@@ -174,13 +174,30 @@ private extension SchemaOrgRecipeImporter {
         guard let regex = try? NSRegularExpression(pattern: pattern),
               let match = regex.firstMatch(in: string, range: NSRange(string.startIndex..., in: string))
         else { return nil }
-        func component(_ index: Int) -> Int {
+        func component(_ index: Int) -> Int? {
             guard let range = Range(match.range(at: index), in: string) else { return 0 }
-            return Int(string[range]) ?? 0
+            return Int(string[range])
         }
-        let seconds = component(1) * 86_400 + component(2) * 3_600
-            + component(3) * 60 + component(4)
-        return seconds > 0 ? RecipeDuration(seconds: seconds) : nil
+        guard let days = component(1), let hours = component(2),
+              let minutes = component(3), let seconds = component(4)
+        else { return nil }
+
+        // These values came from an untrusted JSON string. Swift deliberately
+        // traps on integer overflow, so ordinary `days * 86_400` arithmetic
+        // would let a webpage terminate the process. Checked operations turn an
+        // unrepresentable duration into an omitted interpretation; the exact
+        // JSON-LD remains available in the immutable source capture.
+        var total = 0
+        for (component, multiplier) in [
+            (days, 86_400), (hours, 3_600), (minutes, 60), (seconds, 1),
+        ] {
+            let (subtotal, multiplyOverflow) = component.multipliedReportingOverflow(by: multiplier)
+            let (newTotal, additionOverflow) = total.addingReportingOverflow(subtotal)
+            guard !multiplyOverflow, !additionOverflow else { return nil }
+            total = newTotal
+        }
+        guard total > 0, total <= ImportValueLimits.maximumDurationSeconds else { return nil }
+        return RecipeDuration(seconds: total)
     }
 
     static func keywords(_ value: Any?) -> [String] {
@@ -313,4 +330,13 @@ private extension SchemaOrgRecipeImporter {
             .filter { !$0.isEmpty }
             .joined(separator: " ")
     }
+}
+
+/// Semantic limits keep syntactically valid web values within recipe-scale
+/// ranges. They are deliberately generous rather than claims about what a
+/// recipe "should" contain. Values outside them remain losslessly recoverable
+/// from source evidence but are not promoted into trusted structured fields.
+enum ImportValueLimits {
+    static let maximumDurationSeconds = 366 * 24 * 60 * 60
+    static let maximumQuantityComponent = 1_000_000
 }

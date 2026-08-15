@@ -81,12 +81,23 @@ enum IngredientLineParser {
         let value = source.trimmingCharacters(in: .whitespaces)
         let pieces = value.split(separator: " ", maxSplits: 1).map(String.init)
         if pieces.count == 2, let whole = Int(pieces[0]), let part = fraction(pieces[1]) {
+            guard whole >= 0, whole <= ImportValueLimits.maximumQuantityComponent else { return nil }
+            let (scaledWhole, multiplyOverflow) = whole.multipliedReportingOverflow(
+                by: part.denominator
+            )
+            let (numerator, additionOverflow) = scaledWhole.addingReportingOverflow(part.numerator)
+            guard !multiplyOverflow, !additionOverflow,
+                  numerator <= ImportValueLimits.maximumQuantityComponent
+            else { return nil }
             return RationalQuantity(
-                numerator: whole * part.denominator + part.numerator,
+                numerator: numerator,
                 denominator: part.denominator
             )
         }
-        if let integer = Int(value) { return RationalQuantity(numerator: integer) }
+        if let integer = Int(value),
+           integer >= 0, integer <= ImportValueLimits.maximumQuantityComponent {
+            return RationalQuantity(numerator: integer)
+        }
         if let part = fraction(value) { return part }
 
         let unicodeFractions: [Character: RationalQuantity] = [
@@ -103,9 +114,18 @@ enum IngredientLineParser {
         guard let last = value.last, let fraction = unicodeFractions[last] else { return nil }
         let wholeText = String(value.dropLast())
         let whole = wholeText.isEmpty ? 0 : Int(wholeText)
-        guard let whole else { return nil }
+        guard let whole, whole >= 0, whole <= ImportValueLimits.maximumQuantityComponent else {
+            return nil
+        }
+        let (scaledWhole, multiplyOverflow) = whole.multipliedReportingOverflow(
+            by: fraction.denominator
+        )
+        let (numerator, additionOverflow) = scaledWhole.addingReportingOverflow(fraction.numerator)
+        guard !multiplyOverflow, !additionOverflow,
+              numerator <= ImportValueLimits.maximumQuantityComponent
+        else { return nil }
         return RationalQuantity(
-            numerator: whole * fraction.denominator + fraction.numerator,
+            numerator: numerator,
             denominator: fraction.denominator
         )
     }
@@ -115,7 +135,10 @@ enum IngredientLineParser {
         guard parts.count == 2,
               let numerator = Int(parts[0]),
               let denominator = Int(parts[1]),
-              denominator != 0
+              numerator >= 0,
+              denominator > 0,
+              numerator <= ImportValueLimits.maximumQuantityComponent,
+              denominator <= ImportValueLimits.maximumQuantityComponent
         else { return nil }
         return RationalQuantity(numerator: numerator, denominator: denominator)
     }

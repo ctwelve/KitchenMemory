@@ -125,6 +125,25 @@ final class SchemaOrgRecipeImporterTests: XCTestCase {
         XCTAssertEqual(ingredients[4].parseState, .unparsed)
     }
 
+    func testExtremeNumericValuesRemainSourceTextInsteadOfOverflowing() throws {
+        let data = Data(#"""
+        {
+          "@type":"Recipe",
+          "name":"Hostile arithmetic",
+          "prepTime":"P9223372036854775807D",
+          "recipeIngredient":["9223372036854775807 1/2 cups flour", "9223372036854775807½ onions"]
+        }
+        """#.utf8)
+
+        let draft = try XCTUnwrap(importer.importJSONLD(data).unambiguousCandidate).draft
+        XCTAssertNil(draft.prepDuration)
+        XCTAssertEqual(
+            draft.ingredientSections[0].ingredients.map(\.originalText),
+            ["9223372036854775807 1/2 cups flour", "9223372036854775807½ onions"]
+        )
+        XCTAssertTrue(draft.ingredientSections[0].ingredients.allSatisfy { $0.quantity == nil })
+    }
+
     private func fixture(_ name: String) throws -> String {
         let url = try XCTUnwrap(Bundle.module.url(forResource: name, withExtension: "html"))
         return try String(contentsOf: url, encoding: .utf8)
