@@ -68,7 +68,8 @@ edits as immutable revisions that retain their structure after relaunching.
 
 Added a pure `KitchenMemoryImport` package layer for deterministic Schema.org
 `Recipe` JSON-LD discovery and normalization. It accepts captured HTML or JSON-LD,
-collects candidates across blocks and `@graph`, retains untouched source evidence,
+collects candidates across blocks and `@graph`, retains source-faithful JSON-LD
+evidence,
 maps recipe metadata, normalizes instruction shapes, and conservatively interprets
 ingredient quantities without losing their original wording. Checked-in fixtures
 cover ambiguous, malformed, nested, partial, structured, relative-URL, and unsafe

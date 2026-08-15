@@ -89,14 +89,20 @@ public struct RecipeImportLimits: Equatable, Sendable {
 
 /// Immutable evidence retained alongside an interpreted import candidate.
 ///
-/// Keeping the containing JSON-LD block makes the first interpretation
-/// reversible: fields that Kitchen Memory does not understand yet are not
-/// discarded. The candidate's block and object indices identify the selected
-/// interpretation without retaining a second serialized copy of its subtree.
+/// Keeping a UTF-8 transcription of the containing JSON-LD block makes the
+/// first interpretation reversible: fields that Kitchen Memory does not
+/// understand yet are not discarded. The candidate's block and object indices
+/// identify the selected interpretation without retaining a second serialized
+/// copy of its subtree.
 public struct RecipeImportSourceSnapshot: Equatable, Sendable {
-    public var documentURL: URL?
-    /// The untouched bytes from the containing JSON-LD script block.
-    public var jsonLD: Data
+    public let documentURL: URL?
+    /// Source-faithful UTF-8 text from the containing JSON-LD script block.
+    ///
+    /// The data preserves JSON spelling, whitespace, key order, unknown
+    /// properties, and Unicode scalar content after the surrounding document is
+    /// decoded. It does not preserve the HTTP response's original byte encoding,
+    /// byte-order mark, or surrounding HTML.
+    public let jsonLD: Data
 
     public init(documentURL: URL?, jsonLD: Data) {
         self.documentURL = documentURL

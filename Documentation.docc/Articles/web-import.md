@@ -52,16 +52,19 @@ request if any returned IPv4 or IPv6 address is not globally routable. The same
 policy is applied to every redirect. Loading cancels when the import surface
 closes. Parsing then applies independent budgets for JSON-LD blocks, nesting,
 structural tokens, discovered objects, candidates, interpreted field lengths,
-ingredients, and instruction items. These limits are enforced while traversing,
-not after an oversized editor model has already been allocated.
+ingredients, and instruction items. Structural and item ceilings are enforced
+while traversing. An aggregate UTF-8 ceiling bounds the candidate models retained
+for review, while the direct-input ceiling and item counts separately bound
+transient construction memory.
 
 ## Deterministic import boundary
 
 `KitchenMemoryImport` implements the pipeline from captured HTML or JSON-LD
 through reviewable candidates. `SchemaOrgRecipeImporter` has no networking or
-persistence dependency. Its result retains both the untouched containing JSON-LD
-block and the selected candidate object, so later parsing improvements can be
-applied without fetching the page again or relying on today's interpretation.
+persistence dependency. Its result retains a source-faithful UTF-8 transcription
+of the containing JSON-LD block plus the selected candidate coordinates, so
+later parsing improvements can be applied without fetching the page again or
+relying on today's interpretation.
 
 Missing titles and malformed sibling blocks are diagnostics rather than reasons
 to discard other meaningful recipe content. Candidate selection, URL fetching,
@@ -73,6 +76,18 @@ block and the selected candidate coordinates. It does not persist the full HTML
 document, download referenced images, or duplicate the normalized candidate
 payload. Existing stores use the same optional encoded source field, so this
 addition remains compatible with the released V1 SwiftData schema.
+
+The transcription preserves the decoded JSON text's spelling, whitespace, key
+order, unknown properties, and Unicode scalar content. It does not preserve the
+HTTP response's original byte encoding, byte-order mark, byte offsets, or the
+surrounding HTML. Exact network-byte provenance would require retaining the
+bounded response plus encoding metadata; this release deliberately keeps only
+the smaller recipe metadata block. The payload remains untrusted opaque data:
+Kitchen Memory must not execute it or insert it into an HTML surface.
+
+`blockIndex` and `objectIndex` describe the traversal performed by the importer
+that created the capture. They are not permanent JSON Pointers, and a later
+importer may discover candidates differently as Schema.org support improves.
 
 ## Candidate discovery
 

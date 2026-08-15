@@ -6,21 +6,31 @@ import Foundation
 
 /// Bounded source evidence retained with an imported recipe revision.
 ///
-/// The initial web importer stores the containing JSON-LD block once, plus the
-/// coordinates of the selected recipe. It intentionally does not retain the
-/// entire HTML document or duplicate the normalized candidate payload.
+/// The web importer stores a UTF-8 transcription of the containing JSON-LD
+/// block once, plus the coordinates of the selected recipe. It intentionally
+/// does not retain the entire HTML document, its original network encoding, or
+/// a duplicate normalized candidate payload.
 public struct RecipeSourceCapture: Codable, Equatable, Sendable {
   public enum Kind: String, Codable, Sendable {
     case schemaOrgJSONLD
   }
 
-  public var kind: Kind
-  public var sourceURL: URL
-  public var capturedAt: Date
-  public var mediaType: String
-  public var payload: Data
-  public var blockIndex: Int
-  public var objectIndex: Int
+  public let kind: Kind
+  /// The final fetched document URL, after redirects.
+  public let sourceURL: URL
+  public let capturedAt: Date
+  public let mediaType: String
+  /// Untrusted opaque JSON text, encoded as UTF-8.
+  ///
+  /// Never execute this payload or insert it into an HTML surface. The current
+  /// native UI treats it only as source evidence for future reinterpretation.
+  public let payload: Data
+  /// Candidate traversal coordinates from the importer version that captured it.
+  ///
+  /// These values are not a permanent JSON Pointer. A later importer may walk
+  /// the same document differently as its Schema.org support improves.
+  public let blockIndex: Int
+  public let objectIndex: Int
 
   public init(
     kind: Kind,

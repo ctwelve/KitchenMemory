@@ -29,6 +29,25 @@ final class RecipeURLImporterTests: XCTestCase {
     XCTAssertEqual(result.unambiguousCandidate?.snapshot.documentURL, finalURL)
   }
 
+  func testLegacyEncodedHTMLCapturesAUTF8JSONLDTranscription() async throws {
+    let json = #"{"@type":"Recipe","name":"Crème brûlée","future":"mañana"}"#
+    let html = "<script type=\"application/ld+json\">\(json)</script>"
+    let loader = StubLoader(document: FetchedRecipeDocument(
+      data: try XCTUnwrap(html.data(using: .isoLatin1)),
+      finalURL: URL(string: "https://example.com/recipe")!,
+      mediaType: "text/html",
+      textEncodingName: "iso-8859-1"
+    ))
+
+    let result = try await RecipeURLImporter(loader: loader).importRecipe(
+      from: URL(string: "https://example.com/recipe")!
+    )
+    let snapshot = try XCTUnwrap(result.unambiguousCandidate?.snapshot)
+
+    XCTAssertEqual(snapshot.jsonLD, Data(json.utf8))
+    XCTAssertNotEqual(snapshot.jsonLD, try XCTUnwrap(json.data(using: .isoLatin1)))
+  }
+
   func testURLPolicyRejectsLocalAndCredentialBearingDestinations() {
     let rejected = [
       "file:///tmp/recipe.html",
