@@ -64,22 +64,17 @@ ingredients and instructions, and optional structured ingredient details. It
 preserves original ingredient wording, keeps incomplete recipes valid, and saves
 edits as immutable revisions that retain their structure after relaunching.
 
-## Remaining slices
-
 ### Slice 5 — Import engine
 
-Build the deterministic, lossless Schema.org `Recipe` JSON-LD pipeline behind a
-testable boundary.
+Added a pure `KitchenMemoryImport` package layer for deterministic Schema.org
+`Recipe` JSON-LD discovery and normalization. It accepts captured HTML or JSON-LD,
+collects candidates across blocks and `@graph`, retains untouched source evidence,
+maps recipe metadata, normalizes instruction shapes, and conservatively interprets
+ingredient quantities without losing their original wording. Checked-in fixtures
+cover ambiguous, malformed, nested, partial, structured, relative-URL, and unsafe
+input families.
 
-- Decode saved HTML and JSON-LD without executing page scripts.
-- Discover candidates in standalone blocks and `@graph` structures.
-- Support common text, object, array, `HowToStep`, and `HowToSection` shapes.
-- Preserve raw source material, canonical URL, and provenance.
-- Provisional ingredient parsing must retain the original input and allow partial
-  results rather than rejecting a recipe.
-
-**Complete when:** checked-in fixtures cover the documented input families and
-produce reviewable recipe drafts with no lost meaningful recipe text.
+## Remaining slices
 
 ### Slice 6 — URL import and review
 

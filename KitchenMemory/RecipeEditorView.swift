@@ -298,13 +298,17 @@ private struct IngredientEditor: View {
         EditorFieldLabel("Presentation")
       }
       if ingredient.presentationMode == .custom {
-        EditorTextField("Custom text", text: optionalBinding(\.customDisplayText))
+        EditorTextField(
+          "Custom text",
+          text: optionalBinding(\.customDisplayText),
+          multiline: true
+        )
       }
       EditorTextField("Ingredient name", text: optionalBinding(\.ingredientText))
       IngredientQuantityEditor(quantity: $ingredient.quantity, package: $ingredient.package)
       EditorTextField("Unit", text: optionalBinding(\.unitText))
-      EditorTextField("Preparation", text: optionalBinding(\.preparation))
-      EditorTextField("Note", text: optionalBinding(\.note))
+      EditorTextField("Preparation", text: optionalBinding(\.preparation), multiline: true)
+      EditorTextField("Note", text: optionalBinding(\.note), multiline: true)
       Toggle(isOn: $ingredient.isOptional) {
         EditorFieldLabel("Optional")
       }
@@ -761,11 +765,24 @@ private struct EditorTextField: View {
   }
 
   var body: some View {
+#if os(iOS)
+    if multiline {
+      VStack(alignment: .leading, spacing: 6) {
+        EditorFieldLabel(label)
+        multilineField
+      }
+    } else {
+      labeledField
+    }
+#else
+    labeledField
+#endif
+  }
+
+  private var labeledField: some View {
     LabeledContent {
       if multiline {
-        TextField(label, text: $text, prompt: promptText, axis: .vertical)
-          .labelsHidden()
-          .lineLimit(2...5)
+        multilineField
       } else {
         TextField(label, text: $text, prompt: promptText)
           .labelsHidden()
@@ -773,6 +790,13 @@ private struct EditorTextField: View {
     } label: {
       EditorFieldLabel(label)
     }
+  }
+
+  private var multilineField: some View {
+    TextField(label, text: $text, prompt: promptText, axis: .vertical)
+      .labelsHidden()
+      .lineLimit(2...8)
+      .fixedSize(horizontal: false, vertical: true)
   }
 
   private var promptText: Text? {

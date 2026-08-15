@@ -14,12 +14,17 @@ let package = Package(
     ],
     products: [
         .library(name: "KitchenMemoryDomain", targets: ["KitchenMemoryDomain"]),
+        .library(name: "KitchenMemoryImport", targets: ["KitchenMemoryImport"]),
         .library(name: "KitchenMemorySampleData", targets: ["KitchenMemorySampleData"]),
         .library(name: "KitchenMemoryPersistence", targets: ["KitchenMemoryPersistence"]),
         .library(name: "KitchenMemoryApplication", targets: ["KitchenMemoryApplication"]),
     ],
     targets: [
         .target(name: "KitchenMemoryDomain"),
+        .target(
+            name: "KitchenMemoryImport",
+            dependencies: ["KitchenMemoryDomain"]
+        ),
         .target(
             name: "KitchenMemorySampleData",
             dependencies: ["KitchenMemoryDomain"],
@@ -39,6 +44,11 @@ let package = Package(
         .testTarget(
             name: "KitchenMemoryDomainTests",
             dependencies: ["KitchenMemoryDomain"]
+        ),
+        .testTarget(
+            name: "KitchenMemoryImportTests",
+            dependencies: ["KitchenMemoryImport"],
+            resources: [.process("Fixtures")]
         ),
         .testTarget(
             name: "KitchenMemorySampleDataTests",

@@ -1,0 +1,34 @@
+<script type='application/ld+json'>
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {"@type": "Organization", "name": "Example Kitchen"},
+    {
+      "@type": ["Thing", "Recipe"],
+      "name": "Layer Cake",
+      "publisher": {"@type": "Organization", "name": "Example Kitchen"},
+      "recipeIngredient": [
+        {"@type": "PropertyValue", "value": "2", "unitText": "cups flour"},
+        "1½ cups sugar"
+      ],
+      "recipeInstructions": [
+        {
+          "@type": "HowToSection",
+          "name": "Cake",
+          "itemListElement": [
+            {"@type": "HowToStep", "name": "Mix", "text": "Mix the batter."},
+            {"@type": "HowToStep", "text": "Bake until done."}
+          ]
+        },
+        {
+          "@type": "HowToSection",
+          "name": "Finish",
+          "itemListElement": ["Cool completely."]
+        }
+      ],
+      "nutrition": {"calories": "500 calories"},
+      "futurePublisherField": {"meaningful": "preserve me"}
+    }
+  ]
+}
+</script>
