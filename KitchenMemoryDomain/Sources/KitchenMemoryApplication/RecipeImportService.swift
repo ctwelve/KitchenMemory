@@ -62,7 +62,7 @@ public struct RecipeImportService: RecipeImportServing, Sendable {
       switch error {
       case .disallowedURL, .tooManyRedirects:
         throw RecipeImportServiceError.disallowedAddress
-      case .responseTooLarge, .tooManyCandidates:
+      case .responseTooLarge, .tooManyCandidates, .processingLimitExceeded:
         throw RecipeImportServiceError.pageTooLarge
       case .unsupportedContentType, .undecodableDocument, .invalidResponse:
         throw RecipeImportServiceError.unsupportedPage

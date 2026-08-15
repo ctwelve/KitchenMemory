@@ -10,10 +10,18 @@ import KitchenMemoryDomain
 /// This type deliberately has no network or persistence dependency. Callers
 /// retain control of acquisition, candidate choice, review, and saving.
 public struct SchemaOrgRecipeImporter: Sendable {
-    public init() {}
+    public let limits: RecipeImportLimits
+
+    public init(limits: RecipeImportLimits = .init()) {
+        self.limits = limits
+    }
 
     public func importHTML(_ html: String, documentURL: URL? = nil) -> RecipeImportResult {
-        importJSONLDBlocks(Self.jsonLDBlocks(in: html), documentURL: documentURL)
+        let discovery = Self.jsonLDBlocks(in: html, maximum: limits.maximumJSONLDBlocks)
+        guard !discovery.exceededLimit else {
+            return Self.limitExceededResult(.jsonLDBlocks)
+        }
+        return importJSONLDBlocks(discovery.blocks, documentURL: documentURL)
     }
 
     public func importJSONLD(_ data: Data, documentURL: URL? = nil) -> RecipeImportResult {
@@ -25,6 +33,13 @@ public struct SchemaOrgRecipeImporter: Sendable {
         var diagnostics: [RecipeImportDiagnostic] = []
 
         for (blockIndex, data) in blocks.enumerated() {
+            guard JSONStructurePreflight.isWithinLimits(data, limits: limits) else {
+                diagnostics.append(.init(
+                    blockIndex: blockIndex,
+                    kind: .processingLimitExceeded(.jsonStructure)
+                ))
+                return RecipeImportResult(candidates: [], diagnostics: diagnostics)
+            }
             let value: Any
             do {
                 value = try JSONSerialization.jsonObject(with: data)
@@ -33,13 +48,36 @@ public struct SchemaOrgRecipeImporter: Sendable {
                 continue
             }
 
-            let objects = Self.topLevelObjects(in: value)
+            guard let objects = Self.topLevelObjects(
+                in: value,
+                maximum: limits.maximumTopLevelObjects
+            ) else {
+                diagnostics.append(.init(
+                    blockIndex: blockIndex,
+                    kind: .processingLimitExceeded(.topLevelObjects)
+                ))
+                return RecipeImportResult(candidates: [], diagnostics: diagnostics)
+            }
             if objects.isEmpty {
                 diagnostics.append(.init(blockIndex: blockIndex, kind: .unsupportedTopLevel))
                 continue
             }
 
             for (objectIndex, object) in objects.enumerated() where Self.isRecipe(object) {
+                guard candidates.count < limits.maximumCandidates else {
+                    diagnostics.append(.init(
+                        blockIndex: blockIndex,
+                        kind: .processingLimitExceeded(.candidates)
+                    ))
+                    return RecipeImportResult(candidates: [], diagnostics: diagnostics)
+                }
+                guard Self.consumedFieldsAreWithinLimits(object, limits: limits) else {
+                    diagnostics.append(.init(
+                        blockIndex: blockIndex,
+                        kind: .processingLimitExceeded(.consumedFields)
+                    ))
+                    return RecipeImportResult(candidates: [], diagnostics: diagnostics)
+                }
                 let title: String
                 if let sourceTitle = Self.text(object["name"]) {
                     title = sourceTitle
@@ -70,34 +108,89 @@ public struct SchemaOrgRecipeImporter: Sendable {
 
         return RecipeImportResult(candidates: candidates, diagnostics: diagnostics)
     }
+
+    private static func limitExceededResult(
+        _ limit: RecipeImportDiagnostic.ProcessingLimit
+    ) -> RecipeImportResult {
+        RecipeImportResult(
+            candidates: [],
+            diagnostics: [.init(blockIndex: 0, kind: .processingLimitExceeded(limit))]
+        )
+    }
 }
 
 private extension SchemaOrgRecipeImporter {
-    static func jsonLDBlocks(in html: String) -> [Data] {
+    static func jsonLDBlocks(in html: String, maximum: Int) -> (blocks: [Data], exceededLimit: Bool) {
         let pattern = #"(?is)<script\b(?=[^>]*\btype\s*=\s*(['\"]?)application/ld\+json\1)[^>]*>(.*?)</script\s*>"#
-        guard let expression = try? NSRegularExpression(pattern: pattern) else { return [] }
+        guard let expression = try? NSRegularExpression(pattern: pattern) else { return ([], false) }
         let range = NSRange(html.startIndex..<html.endIndex, in: html)
-        return expression.matches(in: html, range: range).compactMap { match in
-            guard let contentRange = Range(match.range(at: 2), in: html) else { return nil }
-            return Data(html[contentRange].utf8)
+        var blocks: [Data] = []
+        var exceededLimit = false
+        expression.enumerateMatches(in: html, range: range) { match, _, stop in
+            guard let match, let contentRange = Range(match.range(at: 2), in: html) else { return }
+            guard blocks.count < maximum else {
+                exceededLimit = true
+                stop.pointee = true
+                return
+            }
+            blocks.append(Data(html[contentRange].utf8))
         }
+        return (blocks, exceededLimit)
     }
 
-    static func topLevelObjects(in value: Any) -> [[String: Any]] {
-        if let array = value as? [Any] {
-            return array.flatMap(topLevelObjects)
+    static func topLevelObjects(in value: Any, maximum: Int) -> [[String: Any]]? {
+        var objects: [[String: Any]] = []
+        var stack: [Any] = [value]
+        while let next = stack.popLast() {
+            if let array = next as? [Any] {
+                stack.append(contentsOf: array.reversed())
+                continue
+            }
+            guard let object = next as? [String: Any] else { continue }
+            guard objects.count < maximum else { return nil }
+            objects.append(object)
+            if let graph = object["@graph"] as? [Any] {
+                stack.append(contentsOf: graph.reversed())
+            }
         }
-        guard let object = value as? [String: Any] else { return [] }
-        if let graph = object["@graph"] as? [Any] {
-            return [object] + graph.flatMap(topLevelObjects)
-        }
-        return [object]
+        return objects
     }
 
     static func isRecipe(_ object: [String: Any]) -> Bool {
         strings(object["@type"]).contains { type in
             type.split(separator: "/").last?.caseInsensitiveCompare("Recipe") == .orderedSame
         }
+    }
+
+    static func consumedFieldsAreWithinLimits(
+        _ object: [String: Any],
+        limits: RecipeImportLimits
+    ) -> Bool {
+        let ordinaryFields = [
+            "name", "description", "author", "publisher", "url", "mainEntityOfPage",
+            "recipeYield", "prepTime", "cookTime", "totalTime", "recipeCuisine",
+            "recipeCategory", "keywords", "image",
+        ]
+        for key in ordinaryFields {
+            guard ConsumedFieldPreflight.isWithinLimits(
+                object[key],
+                maximumNodes: 2_000,
+                maximumCollectionElements: 2_000,
+                maximumCharacters: limits.maximumFieldCharacters
+            ) else { return false }
+        }
+        guard ConsumedFieldPreflight.isWithinLimits(
+            object["recipeIngredient"],
+            maximumNodes: limits.maximumIngredients * 16,
+            maximumCollectionElements: limits.maximumIngredients,
+            maximumCharacters: limits.maximumFieldCharacters
+        ) else { return false }
+        return ConsumedFieldPreflight.isWithinLimits(
+            object["recipeInstructions"],
+            maximumNodes: limits.maximumInstructionItems * 16,
+            maximumCollectionElements: limits.maximumInstructionItems * 2,
+            maximumCharacters: limits.maximumFieldCharacters
+        )
     }
 
     static func makeDraft(
@@ -339,4 +432,83 @@ private extension SchemaOrgRecipeImporter {
 enum ImportValueLimits {
     static let maximumDurationSeconds = 366 * 24 * 60 * 60
     static let maximumQuantityComponent = 1_000_000
+}
+
+private enum JSONStructurePreflight {
+    /// Scans raw JSON before `JSONSerialization` builds Foundation containers.
+    ///
+    /// A transport byte limit alone does not prevent a compact document from
+    /// containing extreme nesting or hundreds of thousands of tiny values. This
+    /// scanner recognizes JSON string escaping and counts structural tokens
+    /// without allocating a second object graph. Malformed syntax is still left
+    /// to `JSONSerialization`; this pass exists only to enforce resource limits.
+    static func isWithinLimits(_ data: Data, limits: RecipeImportLimits) -> Bool {
+        var depth = 0
+        var tokens = 0
+        var isInsideString = false
+        var isEscaped = false
+
+        for byte in data {
+            if isInsideString {
+                if isEscaped {
+                    isEscaped = false
+                } else if byte == 0x5C {
+                    isEscaped = true
+                } else if byte == 0x22 {
+                    isInsideString = false
+                }
+                continue
+            }
+
+            switch byte {
+            case 0x22:
+                isInsideString = true
+                tokens += 1
+            case 0x7B, 0x5B:
+                depth += 1
+                tokens += 1
+                if depth > limits.maximumJSONDepth { return false }
+            case 0x7D, 0x5D:
+                depth -= 1
+                if depth < 0 { return true }
+            case 0x2C, 0x3A:
+                tokens += 1
+            default:
+                break
+            }
+            if tokens > limits.maximumJSONTokens { return false }
+        }
+        return true
+    }
+}
+
+private enum ConsumedFieldPreflight {
+    /// Bounds only values that Kitchen Memory interprets. Large unknown fields
+    /// remain available in source evidence and do not make an otherwise useful
+    /// recipe fail simply because the publisher included unrelated metadata.
+    static func isWithinLimits(
+        _ root: Any?,
+        maximumNodes: Int,
+        maximumCollectionElements: Int,
+        maximumCharacters: Int
+    ) -> Bool {
+        guard let root else { return true }
+        var remainingNodes = maximumNodes
+        var remainingCollectionElements = maximumCollectionElements
+        var stack: [Any] = [root]
+        while let value = stack.popLast() {
+            guard remainingNodes > 0 else { return false }
+            remainingNodes -= 1
+            if let text = value as? String {
+                guard text.count <= maximumCharacters else { return false }
+            } else if let array = value as? [Any] {
+                guard array.count <= remainingCollectionElements else { return false }
+                remainingCollectionElements -= array.count
+                stack.append(contentsOf: array)
+            } else if let object = value as? [String: Any] {
+                stack.append(contentsOf: object.values)
+            }
+        }
+        return true
+    }
 }

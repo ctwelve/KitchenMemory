@@ -50,7 +50,10 @@ MiB into memory. It accepts HTML content only, rejects credentials and
 nonstandard ports, resolves hostnames with the system resolver, and refuses a
 request if any returned IPv4 or IPv6 address is not globally routable. The same
 policy is applied to every redirect. Loading cancels when the import surface
-closes. Parsed results are capped at 25 candidates before reaching review UI.
+closes. Parsing then applies independent budgets for JSON-LD blocks, nesting,
+structural tokens, discovered objects, candidates, interpreted field lengths,
+ingredients, and instruction items. These limits are enforced while traversing,
+not after an oversized editor model has already been allocated.
 
 ## Deterministic import boundary
 
@@ -163,6 +166,9 @@ successful even if every ingredient remains unparsed.
 - Never execute page scripts.
 - Sanitize markup before display.
 - Apply response-size and redirect limits.
+- Bound post-download expansion as well as transport bytes. JSON nesting,
+  collections, candidates, and interpreted strings need limits before model
+  allocation.
 - Restrict URL schemes, ports, literal address syntax, resolved addresses, and
   every redirect so a recipe import cannot intentionally reach local or private
   services.

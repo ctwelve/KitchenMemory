@@ -5,6 +5,64 @@
 import Foundation
 import KitchenMemoryDomain
 
+/// Resource limits applied while interpreting untrusted recipe JSON-LD.
+///
+/// The byte ceiling in the network loader limits transport memory, while these
+/// limits bound structural expansion after download. Defaults are intentionally
+/// generous for real recipes but finite so a compact document cannot create an
+/// unbounded object graph, candidate list, or editor model.
+public struct RecipeImportLimits: Equatable, Sendable {
+    public let maximumJSONLDBlocks: Int
+    public let maximumJSONDepth: Int
+    public let maximumJSONTokens: Int
+    public let maximumTopLevelObjects: Int
+    public let maximumCandidates: Int
+    public let maximumFieldCharacters: Int
+    public let maximumIngredients: Int
+    public let maximumInstructionItems: Int
+
+    public init(
+        maximumJSONLDBlocks: Int = 32,
+        maximumJSONDepth: Int = 32,
+        maximumJSONTokens: Int = 100_000,
+        maximumTopLevelObjects: Int = 1_000,
+        maximumCandidates: Int = 25,
+        maximumFieldCharacters: Int = 20_000,
+        maximumIngredients: Int = 500,
+        maximumInstructionItems: Int = 1_000
+    ) {
+        precondition(maximumJSONLDBlocks > 0)
+        precondition(maximumJSONDepth > 0)
+        precondition(maximumJSONTokens > 0)
+        precondition(maximumTopLevelObjects > 0)
+        precondition(maximumCandidates > 0)
+        precondition(maximumFieldCharacters > 0)
+        precondition(maximumIngredients > 0)
+        precondition(maximumInstructionItems > 0)
+        self.maximumJSONLDBlocks = maximumJSONLDBlocks
+        self.maximumJSONDepth = maximumJSONDepth
+        self.maximumJSONTokens = maximumJSONTokens
+        self.maximumTopLevelObjects = maximumTopLevelObjects
+        self.maximumCandidates = maximumCandidates
+        self.maximumFieldCharacters = maximumFieldCharacters
+        self.maximumIngredients = maximumIngredients
+        self.maximumInstructionItems = maximumInstructionItems
+    }
+
+    func limitingCandidates(to maximum: Int) -> Self {
+        Self(
+            maximumJSONLDBlocks: maximumJSONLDBlocks,
+            maximumJSONDepth: maximumJSONDepth,
+            maximumJSONTokens: maximumJSONTokens,
+            maximumTopLevelObjects: maximumTopLevelObjects,
+            maximumCandidates: min(maximumCandidates, maximum),
+            maximumFieldCharacters: maximumFieldCharacters,
+            maximumIngredients: maximumIngredients,
+            maximumInstructionItems: maximumInstructionItems
+        )
+    }
+}
+
 /// Immutable evidence retained alongside an interpreted import candidate.
 ///
 /// Keeping the exact JSON-LD bytes makes the first interpretation reversible:
@@ -95,10 +153,19 @@ public struct RecipeImportCandidate: Equatable, Identifiable, Sendable {
 }
 
 public struct RecipeImportDiagnostic: Equatable, Sendable {
+    public enum ProcessingLimit: Equatable, Sendable {
+        case jsonLDBlocks
+        case jsonStructure
+        case topLevelObjects
+        case candidates
+        case consumedFields
+    }
+
     public enum Kind: Equatable, Sendable {
         case malformedJSONLD
         case unsupportedTopLevel
         case missingTitle
+        case processingLimitExceeded(ProcessingLimit)
     }
 
     public var blockIndex: Int

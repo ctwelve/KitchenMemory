@@ -144,6 +144,34 @@ final class SchemaOrgRecipeImporterTests: XCTestCase {
         XCTAssertTrue(draft.ingredientSections[0].ingredients.allSatisfy { $0.quantity == nil })
     }
 
+    func testRejectsJSONThatExceedsTheStructuralBudget() {
+        let limitedImporter = SchemaOrgRecipeImporter(limits: .init(maximumJSONDepth: 3))
+        let result = limitedImporter.importJSONLD(Data(#"[[[[{"@type":"Recipe","name":"Deep"}]]]]"#.utf8))
+
+        XCTAssertTrue(result.candidates.isEmpty)
+        XCTAssertEqual(
+            result.diagnostics.last?.kind,
+            .processingLimitExceeded(.jsonStructure)
+        )
+    }
+
+    func testRejectsConsumedCollectionsBeforeBuildingAnOversizedDraft() {
+        let limitedImporter = SchemaOrgRecipeImporter(limits: .init(maximumIngredients: 2))
+        let data = Data(#"""
+        {
+          "@type":"Recipe","name":"Crowded",
+          "recipeIngredient":["one","two","three"]
+        }
+        """#.utf8)
+        let result = limitedImporter.importJSONLD(data)
+
+        XCTAssertTrue(result.candidates.isEmpty)
+        XCTAssertEqual(
+            result.diagnostics.last?.kind,
+            .processingLimitExceeded(.consumedFields)
+        )
+    }
+
     private func fixture(_ name: String) throws -> String {
         let url = try XCTUnwrap(Bundle.module.url(forResource: name, withExtension: "html"))
         return try String(contentsOf: url, encoding: .utf8)

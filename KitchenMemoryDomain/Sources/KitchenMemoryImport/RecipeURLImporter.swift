@@ -43,6 +43,7 @@ public enum RecipeURLImportError: Error, Equatable, Sendable {
   case unsupportedContentType
   case undecodableDocument
   case tooManyCandidates(maximum: Int)
+  case processingLimitExceeded
 }
 
 /// Privacy-conscious system networking for person-initiated recipe imports.
@@ -239,7 +240,9 @@ public struct RecipeURLImporter<Loader: RecipeDocumentLoading>: Sendable {
   ) {
     precondition(maximumCandidates > 0)
     self.loader = loader
-    self.importer = importer
+    self.importer = SchemaOrgRecipeImporter(
+      limits: importer.limits.limitingCandidates(to: maximumCandidates)
+    )
     self.maximumCandidates = maximumCandidates
   }
 
@@ -249,6 +252,18 @@ public struct RecipeURLImporter<Loader: RecipeDocumentLoading>: Sendable {
       throw RecipeURLImportError.undecodableDocument
     }
     let result = importer.importHTML(html, documentURL: document.finalURL)
+    if result.diagnostics.contains(where: { diagnostic in
+      if case .processingLimitExceeded(.candidates) = diagnostic.kind { return true }
+      return false
+    }) {
+      throw RecipeURLImportError.tooManyCandidates(maximum: maximumCandidates)
+    }
+    if result.diagnostics.contains(where: { diagnostic in
+      if case .processingLimitExceeded = diagnostic.kind { return true }
+      return false
+    }) {
+      throw RecipeURLImportError.processingLimitExceeded
+    }
     guard result.candidates.count <= maximumCandidates else {
       throw RecipeURLImportError.tooManyCandidates(maximum: maximumCandidates)
     }
