@@ -36,6 +36,7 @@ jobs:
           xcodebuild -skipPackagePluginValidation build
           -project KitchenMemory.xcodeproj
           -scheme KitchenMemory
+          -configuration Release
           -destination 'platform=macOS'
           -derivedDataPath "$RUNNER_TEMP/DerivedData"
           CODE_SIGNING_ALLOWED=NO
@@ -45,6 +46,7 @@ jobs:
           xcodebuild -skipPackagePluginValidation docbuild
           -project KitchenMemory.xcodeproj
           -scheme KitchenMemory
+          -configuration Release
           -destination 'platform=macOS'
           -derivedDataPath "$RUNNER_TEMP/DerivedData"
           CODE_SIGNING_ALLOWED=NO
@@ -96,6 +98,7 @@ jobs:
           xcodebuild -skipPackagePluginValidation build
           -project KitchenMemory.xcodeproj
           -scheme KitchenMemory
+          -configuration Release
           -destination 'platform=iOS Simulator,name=iPhone 17 Pro'
           -derivedDataPath "$RUNNER_TEMP/DerivedData"
           CODE_SIGNING_ALLOWED=NO
