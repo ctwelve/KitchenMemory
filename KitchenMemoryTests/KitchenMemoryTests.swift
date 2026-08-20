@@ -75,4 +75,15 @@ final class KitchenMemoryTests: XCTestCase {
       XCTAssertNil(RecipeSourceURLPolicy.validatedURL(from: value), value)
     }
   }
+
+#if DEBUG
+  func testUITestingUsesDisposableStorageOnlyWhenExplicitlyRequestedInDebug() {
+    XCTAssertTrue(AppRuntimeConfiguration.usesInMemoryStore(
+      arguments: ["KitchenMemory", "--ui-testing"]
+    ))
+    XCTAssertFalse(AppRuntimeConfiguration.usesInMemoryStore(
+      arguments: ["KitchenMemory"]
+    ))
+  }
+#endif
 }

@@ -16,7 +16,9 @@ struct KitchenMemoryApp: App {
   init() {
     do {
       dependencies = try AppDependencies(
-        inMemory: ProcessInfo.processInfo.arguments.contains("--ui-testing")
+        inMemory: AppRuntimeConfiguration.usesInMemoryStore(
+          arguments: ProcessInfo.processInfo.arguments
+        )
       )
     } catch {
       fatalError("Could not prepare Kitchen Memory: \(error)")
@@ -27,6 +29,23 @@ struct KitchenMemoryApp: App {
     WindowGroup {
       ContentView(model: dependencies.libraryModel)
     }
+  }
+}
+
+enum AppRuntimeConfiguration {
+  /// Whether this process may replace durable storage with an in-memory store.
+  ///
+  /// UI automation needs deterministic disposable state, but launch arguments
+  /// are also ordinary process input on macOS. A production app must never let
+  /// an argument make entered or imported recipes appear to save and then
+  /// vanish at process exit. Compile the switch out of Release rather than
+  /// relying on callers to avoid an undocumented flag.
+  static func usesInMemoryStore(arguments: [String]) -> Bool {
+#if DEBUG
+    arguments.contains("--ui-testing")
+#else
+    false
+#endif
   }
 }
 
