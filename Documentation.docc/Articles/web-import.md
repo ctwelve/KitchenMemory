@@ -199,9 +199,11 @@ successful even if every ingredient remains unparsed.
 - Bound post-download expansion as well as transport bytes. JSON nesting,
   collections, candidates, and interpreted strings need limits before model
   allocation.
-- Restrict URL schemes, ports, literal address syntax, resolved addresses, and
-  every redirect so a recipe import cannot intentionally reach local or private
-  services.
+- Restrict fetch URL schemes, ports, literal address syntax, and every redirect;
+  leave DNS and connection policy to URLSession's finite system task.
+- Revalidate editable and legacy source metadata immediately before activation.
+  Only bounded, credential-free HTTP(S) links become system-browser actions,
+  and the destination host remains visible beside any untrusted source title.
 - Avoid downloading all media during the initial parse.
 - Make external image loading visible and controllable for privacy.
 

@@ -106,7 +106,10 @@ struct RecipeEditorView: View {
         ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
         ToolbarItem(placement: .confirmationAction) {
           Button(mode.saveLabel) { if save(draft) { dismiss() } }
-            .disabled(title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            .disabled(
+              title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
+                sourceURLValidationMessage != nil
+            )
             .accessibilityIdentifier("recipe-editor-save")
         }
       }
@@ -188,6 +191,11 @@ struct RecipeEditorView: View {
       EditorTextField("Source author", text: $sourceAuthor)
       EditorTextField("Publisher", text: $sourcePublisher)
       EditorTextField("Source URL", text: $sourceURL)
+      if let sourceURLValidationMessage {
+        Label(sourceURLValidationMessage, systemImage: "exclamationmark.triangle")
+          .foregroundStyle(.red)
+          .accessibilityIdentifier("recipe-editor-source-url-error")
+      }
     }
   }
 
@@ -241,19 +249,26 @@ struct RecipeEditorView: View {
   }
 
   private var source: RecipeSource? {
-    guard (
+    let canonicalURL = RecipeSourceURLPolicy.validatedURL(from: sourceURL)
+    guard
       text(sourceTitle) != nil ||
         text(sourceAuthor) != nil ||
         text(sourcePublisher) != nil ||
-        URL(string: sourceURL) != nil
-    ) else { return nil }
+        canonicalURL != nil
+    else { return nil }
     return RecipeSource(
         kind: sourceKind,
         title: text(sourceTitle),
         authorName: text(sourceAuthor),
         publisherName: text(sourcePublisher),
-        canonicalURL: URL(string: sourceURL)
+        canonicalURL: canonicalURL
     )
+  }
+
+  private var sourceURLValidationMessage: String? {
+    guard text(sourceURL) != nil else { return nil }
+    guard RecipeSourceURLPolicy.validatedURL(from: sourceURL) == nil else { return nil }
+    return "Enter a complete http or https URL without embedded credentials."
   }
 
   private func moveIngredientSection(_ index: Int, by offset: Int) {
