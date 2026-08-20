@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 import Foundation
+import KitchenMemoryDomain
 import KitchenMemoryImport
 import XCTest
 
@@ -710,7 +711,8 @@ final class SchemaOrgRecipeImporterTests: XCTestCase {
     }
 
     private func fixture(_ name: String) throws -> String {
-        let url = try XCTUnwrap(Bundle.module.url(forResource: name, withExtension: "html"))
+        let bundle = Bundle(for: Self.self)
+        let url = try XCTUnwrap(bundle.url(forResource: name, withExtension: "html"))
         return try String(contentsOf: url, encoding: .utf8)
     }
 

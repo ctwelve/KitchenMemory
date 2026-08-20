@@ -61,6 +61,8 @@ public enum SampleRecipeCatalogError: Error, Equatable {
 
 /// Loads deterministic sample content from the package's asset catalog.
 public enum SampleRecipeCatalog {
+    private static let resourceBundle = Bundle(for: SampleRecipeCatalogBundleToken.self)
+
     public static func loadManifest() throws -> SampleRecipePackManifest {
         try decodeAsset(named: "SampleManifest", as: SampleRecipePackManifest.self)
     }
@@ -79,7 +81,7 @@ public enum SampleRecipeCatalog {
     /// bridge keeps deterministic sample media available to previews and the
     /// first read-only recipe surface without exposing the package bundle.
     public static func imageResource(named name: String) -> ImageResource {
-        ImageResource(name: name, bundle: .module)
+        ImageResource(name: name, bundle: resourceBundle)
     }
 
     private static func decodeAsset<Value: Decodable>(named name: String, as type: Value.Type) throws -> Value {
@@ -88,16 +90,16 @@ public enum SampleRecipeCatalog {
 
     private static func data(named name: String) throws -> Data {
 #if canImport(AppKit)
-        if let asset = NSDataAsset(name: NSDataAsset.Name(name), bundle: .module) {
+        if let asset = NSDataAsset(name: NSDataAsset.Name(name), bundle: resourceBundle) {
             return asset.data
         }
 #elseif canImport(UIKit)
-        if let asset = NSDataAsset(name: name, bundle: .module) {
+        if let asset = NSDataAsset(name: name, bundle: resourceBundle) {
             return asset.data
         }
 #endif
 
-        if let url = Bundle.module.url(
+        if let url = resourceBundle.url(
             forResource: name,
             withExtension: "plist",
             subdirectory: "SampleRecipes.xcassets/\(name).dataset"
@@ -117,7 +119,7 @@ public enum SampleRecipeCatalog {
     }
 
     private static func copiedDataSetURL(named name: String) -> URL? {
-        guard let catalogURL = Bundle.module.url(
+        guard let catalogURL = resourceBundle.url(
             forResource: "SampleRecipes",
             withExtension: "xcassets"
         ) else {
@@ -138,3 +140,6 @@ public enum SampleRecipeCatalog {
         }
     }
 }
+
+/// Resolves resources from the native framework that owns the sample catalog.
+private final class SampleRecipeCatalogBundleToken: NSObject {}

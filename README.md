@@ -71,11 +71,15 @@ recipe library. The Kitchen gets an installation-specific identity; bundled
 recipes retain their hand-assigned identities so linked Kitchens can recognize
 the same samples instead of accumulating duplicates.
 
-The persistence-independent domain lives in the `KitchenMemoryDomain` Swift
-package. Run its tests with:
+The app's internal domain, import, persistence, application, and sample-data
+modules live under `Modules` as native Xcode framework targets. Their tests run
+with the app tests in the shared `KitchenMemory` scheme and committed test plan:
 
 ```sh
-swift test --package-path KitchenMemoryDomain
+xcodebuild test \
+  -project KitchenMemory.xcodeproj \
+  -scheme KitchenMemory \
+  -destination 'platform=macOS'
 ```
 
 CloudKit is the selected synchronization and collaboration platform; the

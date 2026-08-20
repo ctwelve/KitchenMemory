@@ -250,7 +250,7 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
       }
       return RecipeMedia(
         id: .init(rawValue: item.id), role: role, assetName: item.assetName,
-        accessibilityLabel: item.accessibilityLabel)
+        accessibilityLabel: item.mediaAccessibilityLabel)
     }
     let equipment = try context.fetch(
       FetchDescriptor<EquipmentRecord>(
