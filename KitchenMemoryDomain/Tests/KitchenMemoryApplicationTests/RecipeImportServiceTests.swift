@@ -10,14 +10,18 @@ import XCTest
 
 final class RecipeImportServiceTests: XCTestCase {
   func testMapsCandidateToEditableDraftWithBoundedSourceCaptureAndConcerns() throws {
-    let sourceURL = URL(string: "https://example.com/recipe")!
-    let payload = Data(#"{"@type":"Recipe","name":"Soup"}"#.utf8)
+    let requestedURL = URL(string: "https://short.example/soup")!
+    let sourceURL = URL(string: "https://fetched.example/recipe")!
+    let publisherCanonicalURL = URL(string: "https://canonical.example/soup")!
+    let payload = Data(
+      #"{"@type":"Recipe","name":"Soup","url":"https://canonical.example/soup"}"#.utf8
+    )
     let capturedAt = Date(timeIntervalSince1970: 1_800_000_000)
     let candidate = RecipeImportCandidate(
       id: .init(blockIndex: 2, objectIndex: 4),
       draft: RecipeImportDraft(
         title: "Soup",
-        source: RecipeSource(kind: .webpage, canonicalURL: sourceURL),
+        source: RecipeSource(kind: .webpage, canonicalURL: publisherCanonicalURL),
         cuisines: ["French"],
         categories: ["Dinner"],
         keywords: ["quick"],
@@ -45,7 +49,7 @@ final class RecipeImportServiceTests: XCTestCase {
         candidates: [candidate],
         diagnostics: [.init(blockIndex: 7, kind: .malformedJSONLD)]
       ),
-      requestedURL: sourceURL,
+      requestedURL: requestedURL,
       capturedAt: capturedAt
     )
     let option = try XCTUnwrap(options.first)
@@ -62,6 +66,8 @@ final class RecipeImportServiceTests: XCTestCase {
       .referencedImages(count: 2),
     ])
     XCTAssertTrue(option.concerns.last?.isInformational == true)
+    XCTAssertEqual(option.draft.source?.canonicalURL, sourceURL)
+    XCTAssertEqual(option.draft.sourceCapture?.sourceURL, sourceURL)
     XCTAssertEqual(option.draft.sourceCapture?.payload, payload)
     XCTAssertEqual(option.draft.sourceCapture?.capturedAt, capturedAt)
     XCTAssertEqual(option.draft.sourceCapture?.blockIndex, 2)

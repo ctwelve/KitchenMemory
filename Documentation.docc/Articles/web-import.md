@@ -83,6 +83,12 @@ document, download referenced images, or duplicate the normalized candidate
 payload. Existing stores use the same optional encoded source field, so this
 addition remains compatible with the released V1 SwiftData schema.
 
+The editable source link for a URL import is anchored to the final document URL
+that URLSession actually fetched after redirects. A publisher-declared
+`url` or `mainEntityOfPage` may describe a different origin, so it remains
+available in the captured JSON-LD rather than silently becoming the active
+attribution link.
+
 The transcription preserves the decoded JSON text's spelling, whitespace, key
 order, unknown properties, and Unicode scalar content. It does not preserve the
 HTTP response's original byte encoding, byte-order mark, byte offsets, or the

@@ -135,6 +135,13 @@ public struct RecipeImportService: RecipeImportServing, Sendable {
       let sourceURL = candidate.snapshot.documentURL
         ?? draft.source.canonicalURL
         ?? url
+      // Publisher-declared canonical URLs are useful evidence, but they are
+      // untrusted fields inside the downloaded JSON-LD and may point to a
+      // different origin. The final URL that URLSession actually fetched is
+      // the honest active attribution for this import. The bounded raw capture
+      // still preserves the publisher value for inspection or future parsing.
+      var attributedSource = draft.source
+      attributedSource.canonicalURL = sourceURL
       return RecipeImportOption(
         id: .init(
           blockIndex: candidate.id.blockIndex,
@@ -144,7 +151,7 @@ public struct RecipeImportService: RecipeImportServing, Sendable {
           title: draft.title,
           summary: draft.summary,
           authorName: draft.authorName,
-          source: draft.source,
+          source: attributedSource,
           sourceCapture: RecipeSourceCapture(
             kind: .schemaOrgJSONLD,
             sourceURL: sourceURL,
