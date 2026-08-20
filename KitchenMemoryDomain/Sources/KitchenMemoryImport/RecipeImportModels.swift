@@ -5,21 +5,108 @@
 import Foundation
 import KitchenMemoryDomain
 
+/// Resource limits applied while interpreting untrusted recipe JSON-LD.
+///
+/// The same byte ceiling applies to fetched and direct inputs, while the other
+/// limits bound structural expansion after acquisition. Defaults are
+/// intentionally generous for real recipes but finite so a compact document
+/// cannot create an unbounded object graph, candidate list, or editor model.
+public struct RecipeImportLimits: Equatable, Sendable {
+    /// Maximum encoded bytes accepted by a direct HTML or JSON-LD import call.
+    public let maximumInputBytes: Int
+    public let maximumJSONLDBlocks: Int
+    public let maximumJSONDepth: Int
+    public let maximumJSONTokens: Int
+    public let maximumTopLevelObjects: Int
+    public let maximumCandidates: Int
+    public let maximumFieldCharacters: Int
+    /// Total UTF-8 bytes retained across every candidate returned by one import.
+    public let maximumNormalizedUTF8Bytes: Int
+    /// Maximum emitted cuisine, category, and keyword values per recipe.
+    public let maximumTaxonomyItems: Int
+    /// Maximum emitted image URLs per recipe.
+    public let maximumImageURLs: Int
+    public let maximumIngredients: Int
+    public let maximumInstructionItems: Int
+
+    public init(
+        maximumInputBytes: Int = 2 * 1_024 * 1_024,
+        maximumJSONLDBlocks: Int = 32,
+        maximumJSONDepth: Int = 32,
+        maximumJSONTokens: Int = 100_000,
+        maximumTopLevelObjects: Int = 1_000,
+        maximumCandidates: Int = 25,
+        maximumFieldCharacters: Int = 20_000,
+        maximumNormalizedUTF8Bytes: Int = 2 * 1_024 * 1_024,
+        maximumTaxonomyItems: Int = 2_000,
+        maximumImageURLs: Int = 500,
+        maximumIngredients: Int = 500,
+        maximumInstructionItems: Int = 1_000
+    ) {
+        precondition(maximumInputBytes > 0)
+        precondition(maximumJSONLDBlocks > 0)
+        precondition(maximumJSONDepth > 0)
+        precondition(maximumJSONTokens > 0)
+        precondition(maximumTopLevelObjects > 0)
+        precondition(maximumCandidates > 0)
+        precondition(maximumFieldCharacters > 0)
+        precondition(maximumNormalizedUTF8Bytes > 0)
+        precondition(maximumTaxonomyItems > 0)
+        precondition(maximumImageURLs > 0)
+        precondition(maximumIngredients > 0)
+        precondition(maximumInstructionItems > 0)
+        self.maximumInputBytes = maximumInputBytes
+        self.maximumJSONLDBlocks = maximumJSONLDBlocks
+        self.maximumJSONDepth = maximumJSONDepth
+        self.maximumJSONTokens = maximumJSONTokens
+        self.maximumTopLevelObjects = maximumTopLevelObjects
+        self.maximumCandidates = maximumCandidates
+        self.maximumFieldCharacters = maximumFieldCharacters
+        self.maximumNormalizedUTF8Bytes = maximumNormalizedUTF8Bytes
+        self.maximumTaxonomyItems = maximumTaxonomyItems
+        self.maximumImageURLs = maximumImageURLs
+        self.maximumIngredients = maximumIngredients
+        self.maximumInstructionItems = maximumInstructionItems
+    }
+
+    func limitingCandidates(to maximum: Int) -> Self {
+        Self(
+            maximumInputBytes: maximumInputBytes,
+            maximumJSONLDBlocks: maximumJSONLDBlocks,
+            maximumJSONDepth: maximumJSONDepth,
+            maximumJSONTokens: maximumJSONTokens,
+            maximumTopLevelObjects: maximumTopLevelObjects,
+            maximumCandidates: min(maximumCandidates, maximum),
+            maximumFieldCharacters: maximumFieldCharacters,
+            maximumNormalizedUTF8Bytes: maximumNormalizedUTF8Bytes,
+            maximumTaxonomyItems: maximumTaxonomyItems,
+            maximumImageURLs: maximumImageURLs,
+            maximumIngredients: maximumIngredients,
+            maximumInstructionItems: maximumInstructionItems
+        )
+    }
+}
+
 /// Immutable evidence retained alongside an interpreted import candidate.
 ///
-/// Keeping the exact JSON-LD bytes makes the first interpretation reversible:
-/// fields that Kitchen Memory does not understand yet are not discarded.
+/// Keeping a UTF-8 transcription of the containing JSON-LD block makes the
+/// first interpretation reversible: fields that Kitchen Memory does not
+/// understand yet are not discarded. The candidate's block and object indices
+/// identify the selected interpretation without retaining a second serialized
+/// copy of its subtree.
 public struct RecipeImportSourceSnapshot: Equatable, Sendable {
-    public var documentURL: URL?
-    /// The untouched bytes from the containing JSON-LD script block.
-    public var jsonLD: Data
-    /// The selected object, including properties the importer does not model.
-    public var candidateJSONLD: Data
+    public let documentURL: URL?
+    /// Source-faithful UTF-8 text from the containing JSON-LD script block.
+    ///
+    /// The data preserves JSON spelling, whitespace, key order, unknown
+    /// properties, and Unicode scalar content after the surrounding document is
+    /// decoded. It does not preserve the HTTP response's original byte encoding,
+    /// byte-order mark, or surrounding HTML.
+    public let jsonLD: Data
 
-    public init(documentURL: URL?, jsonLD: Data, candidateJSONLD: Data) {
+    public init(documentURL: URL?, jsonLD: Data) {
         self.documentURL = documentURL
         self.jsonLD = jsonLD
-        self.candidateJSONLD = candidateJSONLD
     }
 }
 
@@ -95,10 +182,21 @@ public struct RecipeImportCandidate: Equatable, Identifiable, Sendable {
 }
 
 public struct RecipeImportDiagnostic: Equatable, Sendable {
+    public enum ProcessingLimit: Equatable, Sendable {
+        case inputBytes
+        case jsonLDBlocks
+        case jsonStructure
+        case topLevelObjects
+        case candidates
+        case consumedFields
+        case normalizedOutput
+    }
+
     public enum Kind: Equatable, Sendable {
         case malformedJSONLD
         case unsupportedTopLevel
         case missingTitle
+        case processingLimitExceeded(ProcessingLimit)
     }
 
     public var blockIndex: Int

@@ -225,11 +225,29 @@ struct RecipeDetailView: View {
   private var source: some View {
     if let recipeSource = revision.source {
       LabeledContent {
-        if let url = recipeSource.canonicalURL {
-          Link(recipeSource.title ?? url.host() ?? "Open Source", destination: url)
+        if let url = RecipeSourceURLPolicy.validatedURL(recipeSource.canonicalURL),
+           let host = RecipeSourceURLPolicy.displayHost(for: url) {
+          Link(destination: url) {
+            VStack(alignment: .trailing, spacing: 2) {
+              Text(recipeSource.title ?? "Open Source")
+              // Imported titles are untrusted display text. Keeping the actual
+              // destination host visible prevents a title from disguising a
+              // cross-origin link and remains useful for ordinary attribution.
+              Text(host)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            }
+          }
         } else {
-          Text(recipeSource.title ?? recipeSource.kind.rawValue.capitalized)
-            .foregroundStyle(.primary)
+          VStack(alignment: .trailing, spacing: 2) {
+            Text(recipeSource.title ?? recipeSource.kind.rawValue.capitalized)
+              .foregroundStyle(.primary)
+            if recipeSource.canonicalURL != nil {
+              Text("Link unavailable")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            }
+          }
         }
       } label: {
         HStack(spacing: 8) {

@@ -32,6 +32,13 @@ macOS and iOS each have two distinct checks:
 2. `Core tests` runs after that platform's build succeeds. The macOS check also
    runs the KitchenMemoryDomain and sample-data package tests.
 
+Application and documentation build jobs explicitly compile the Release
+configuration. Core-test jobs retain Xcode's Debug configuration so test-only
+diagnostics and the deliberately Debug-only disposable UI-test store remain
+covered. This split makes CI exercise both configurations and, on macOS,
+verifies that App Sandbox and Hardened Runtime Release settings continue to
+compile without exceptions.
+
 The two platform pipelines are independent: macOS checks do not wait for iOS
 checks, and iOS checks do not wait for macOS checks. The repository's merge
 rules require both platform builds and both core-test checks directly, so there

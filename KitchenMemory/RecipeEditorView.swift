@@ -10,13 +10,28 @@ struct RecipeEditorView: View {
   enum Mode {
     case create
     case revise
+    case importReview
 
-    var title: String { self == .create ? "New Recipe" : "Edit Recipe" }
-    var saveLabel: String { self == .create ? "Create Recipe" : "Save Revision" }
+    var title: String {
+      switch self {
+      case .create: "New Recipe"
+      case .revise: "Edit Recipe"
+      case .importReview: "Review Import"
+      }
+    }
+
+    var saveLabel: String {
+      self == .revise ? "Save Revision" : "Create Recipe"
+    }
   }
 
   let mode: Mode
   let save: (RecipeDraft) -> Bool
+  let reviewConcerns: [RecipeImportConcern]
+  private let preservedSourceCapture: RecipeSourceCapture?
+  private let preservedCuisines: [String]
+  private let preservedCategories: [String]
+  private let preservedKeywords: [String]
 
   @Environment(\.dismiss) private var dismiss
   @State private var title: String
@@ -34,9 +49,19 @@ struct RecipeEditorView: View {
   @State private var ingredientSections: [IngredientSection]
   @State private var instructionSections: [InstructionSection]
 
-  init(mode: Mode, draft: RecipeDraft = RecipeDraft(), save: @escaping (RecipeDraft) -> Bool) {
+  init(
+    mode: Mode,
+    draft: RecipeDraft = RecipeDraft(),
+    reviewConcerns: [RecipeImportConcern] = [],
+    save: @escaping (RecipeDraft) -> Bool
+  ) {
     self.mode = mode
     self.save = save
+    self.reviewConcerns = reviewConcerns
+    preservedSourceCapture = draft.sourceCapture
+    preservedCuisines = draft.cuisines
+    preservedCategories = draft.categories
+    preservedKeywords = draft.keywords
     _title = State(initialValue: draft.title)
     _summary = State(initialValue: draft.summary ?? "")
     _authorName = State(initialValue: draft.authorName ?? "")
@@ -81,7 +106,10 @@ struct RecipeEditorView: View {
         ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
         ToolbarItem(placement: .confirmationAction) {
           Button(mode.saveLabel) { if save(draft) { dismiss() } }
-            .disabled(title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            .disabled(
+              title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
+                sourceURLValidationMessage != nil
+            )
             .accessibilityIdentifier("recipe-editor-save")
         }
       }
@@ -100,11 +128,41 @@ struct RecipeEditorView: View {
 
   @ViewBuilder
   private var editorSections: some View {
+    if mode == .importReview {
+      importReviewSection
+    }
     recipeSection
     timingSection
     sourceSection
     ingredientsSection
     instructionsSection
+  }
+
+  private var importReviewSection: some View {
+    Section {
+      if reviewConcerns.isEmpty {
+        Label("Import is ready for your review", systemImage: "eye")
+          .foregroundStyle(.secondary)
+      } else {
+        ForEach(Array(reviewConcerns.enumerated()), id: \.offset) { _, concern in
+          if concern.isInformational {
+            Label(concern.reviewMessage, systemImage: "info.circle")
+              .foregroundStyle(.secondary)
+          } else {
+            Label(concern.reviewMessage, systemImage: "exclamationmark.triangle")
+              .foregroundStyle(.orange)
+          }
+        }
+      }
+    } header: {
+      Text("Import Review")
+    } footer: {
+      Text(
+        "Check the imported wording and structure before saving. Review and save do not "
+          + "contact the source again. Saving keeps the final source URL and bounded JSON-LD "
+          + "metadata locally, including fields not shown here."
+      )
+    }
   }
 
   private var recipeSection: some View {
@@ -137,6 +195,11 @@ struct RecipeEditorView: View {
       EditorTextField("Source author", text: $sourceAuthor)
       EditorTextField("Publisher", text: $sourcePublisher)
       EditorTextField("Source URL", text: $sourceURL)
+      if let sourceURLValidationMessage {
+        Label(sourceURLValidationMessage, systemImage: "exclamationmark.triangle")
+          .foregroundStyle(.red)
+          .accessibilityIdentifier("recipe-editor-source-url-error")
+      }
     }
   }
 
@@ -181,26 +244,35 @@ struct RecipeEditorView: View {
   private var draft: RecipeDraft {
     RecipeDraft(
       title: title, summary: summary, authorName: authorName, source: source,
+      sourceCapture: preservedSourceCapture,
       recipeYield: text(yieldText).map { RecipeYield(originalText: $0) },
       prepDuration: duration(prepMinutes), cookDuration: duration(cookMinutes), totalDuration: duration(totalMinutes),
+      cuisines: preservedCuisines, categories: preservedCategories, keywords: preservedKeywords,
       ingredientSections: ingredientSections, instructionSections: instructionSections
     )
   }
 
   private var source: RecipeSource? {
-    guard (
+    let canonicalURL = RecipeSourceURLPolicy.validatedURL(from: sourceURL)
+    guard
       text(sourceTitle) != nil ||
         text(sourceAuthor) != nil ||
         text(sourcePublisher) != nil ||
-        URL(string: sourceURL) != nil
-    ) else { return nil }
+        canonicalURL != nil
+    else { return nil }
     return RecipeSource(
         kind: sourceKind,
         title: text(sourceTitle),
         authorName: text(sourceAuthor),
         publisherName: text(sourcePublisher),
-        canonicalURL: URL(string: sourceURL)
+        canonicalURL: canonicalURL
     )
+  }
+
+  private var sourceURLValidationMessage: String? {
+    guard text(sourceURL) != nil else { return nil }
+    guard RecipeSourceURLPolicy.validatedURL(from: sourceURL) == nil else { return nil }
+    return "Enter a complete http or https URL without embedded credentials."
   }
 
   private func moveIngredientSection(_ index: Int, by offset: Int) {
@@ -218,11 +290,50 @@ struct RecipeEditorView: View {
     return trimmed.isEmpty ? nil : trimmed
   }
   private func duration(_ minutes: String) -> RecipeDuration? {
-    guard let value = Int(minutes), value >= 0 else { return nil }
+    let maximumMinutes = ImportEditorLimits.maximumDurationSeconds / 60
+    guard let value = Int(minutes), value >= 0, value <= maximumMinutes else { return nil }
     return RecipeDuration(seconds: value * 60)
   }
   private static func minutes(_ duration: RecipeDuration?) -> String {
     duration.map { String($0.seconds / 60) } ?? ""
+  }
+}
+
+private enum ImportEditorLimits {
+  // Match the importer's generous one-year ceiling. Bounding before
+  // multiplication prevents pasted numeric text from trapping on overflow.
+  static let maximumDurationSeconds = 366 * 24 * 60 * 60
+}
+
+private extension RecipeImportConcern {
+  var reviewMessage: String {
+    switch self {
+    case .missingTitle: "Title needs attention"
+    case .missingIngredients: "No ingredients were found"
+    case .missingInstructions: "No instructions were found"
+    case .unparsedIngredients(let count):
+      "\(count) ingredient \(count == 1 ? "line is" : "lines are") preserved but unparsed"
+    case .provisionalIngredients(let count):
+      "\(count) ingredient \(count == 1 ? "interpretation needs" : "interpretations need") review"
+    case .ignoredSourceBlocks(let count):
+      "\(count) malformed or unsupported source \(count == 1 ? "block was" : "blocks were") ignored"
+    case .preservedTaxonomy(let cuisines, let categories, let keywords):
+      "Preserved metadata — \(taxonomySummary(cuisines: cuisines, categories: categories, keywords: keywords))"
+    case .referencedImages(let count):
+      "\(count) source \(count == 1 ? "image is" : "images are") referenced but not downloaded"
+    }
+  }
+
+  private func taxonomySummary(
+    cuisines: [String],
+    categories: [String],
+    keywords: [String]
+  ) -> String {
+    var groups: [String] = []
+    if !cuisines.isEmpty { groups.append("cuisine: \(cuisines.joined(separator: ", "))") }
+    if !categories.isEmpty { groups.append("categories: \(categories.joined(separator: ", "))") }
+    if !keywords.isEmpty { groups.append("keywords: \(keywords.joined(separator: ", "))") }
+    return groups.joined(separator: "; ")
   }
 }
 

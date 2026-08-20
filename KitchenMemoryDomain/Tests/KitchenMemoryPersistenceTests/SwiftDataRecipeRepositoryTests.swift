@@ -10,6 +10,43 @@ import XCTest
 
 @MainActor
 final class SwiftDataRecipeRepositoryTests: XCTestCase {
+  func testImportedSourceCaptureRoundTripsWithoutChangingTheV1Schema() throws {
+    let repository = SwiftDataRecipeRepository(
+      modelContainer: try KitchenMemorySchema.makeContainer(inMemory: true)
+    )
+    let kitchen = Kitchen(name: "Home")
+    try repository.save(kitchen)
+    let recipeID = Recipe.ID()
+    let capture = RecipeSourceCapture(
+      kind: .schemaOrgJSONLD,
+      sourceURL: URL(string: "https://example.com/soup")!,
+      capturedAt: Date(timeIntervalSince1970: 1_800_000_000),
+      mediaType: "application/ld+json",
+      payload: Data("{\"@type\":\"Recipe\"}".utf8),
+      blockIndex: 0,
+      objectIndex: 1
+    )
+    let revision = RecipeRevision(
+      recipeID: recipeID,
+      revisionNumber: 1,
+      title: "Soup",
+      source: RecipeSource(
+        kind: .webpage,
+        canonicalURL: URL(string: "https://example.com/soup")
+      ),
+      sourceCapture: capture
+    )
+    let recipe = Recipe(
+      id: recipeID,
+      kitchenID: kitchen.id,
+      currentRevisionID: revision.id
+    )
+
+    try repository.save(recipe: recipe, revision: revision)
+
+    XCTAssertEqual(try repository.recipe(id: recipeID)?.revision.sourceCapture, capture)
+    XCTAssertEqual(try repository.recipe(id: recipeID)?.revision.source, revision.source)
+  }
   func testContainerUsesTheInitialVersionedSchemaAndMigrationPlan() throws {
     let container = try KitchenMemorySchema.makeContainer(inMemory: true)
 

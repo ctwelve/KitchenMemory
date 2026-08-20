@@ -5,6 +5,7 @@
 import KitchenMemoryApplication
 import KitchenMemoryDomain
 import KitchenMemoryPersistence
+import Foundation
 import Observation
 
 @MainActor
@@ -13,16 +14,23 @@ final class RecipeLibraryModel {
   private let kitchenID: Kitchen.ID
   private let library: RecipeLibrary
   private let editor: RecipeEditor
+  private let importer: any RecipeImportServing
 
   private(set) var recipes: [StoredRecipe] = []
   var selectedRecipeID: Recipe.ID?
   private(set) var errorMessage: String?
   private(set) var hasLoaded = false
 
-  init(kitchenID: Kitchen.ID, library: RecipeLibrary, editor: RecipeEditor) {
+  init(
+    kitchenID: Kitchen.ID,
+    library: RecipeLibrary,
+    editor: RecipeEditor,
+    importer: any RecipeImportServing = RecipeImportService()
+  ) {
     self.kitchenID = kitchenID
     self.library = library
     self.editor = editor
+    self.importer = importer
   }
 
   var selectedRecipe: StoredRecipe? {
@@ -71,5 +79,9 @@ final class RecipeLibraryModel {
       errorMessage = "Kitchen Memory could not save this recipe."
       return false
     }
+  }
+
+  func importRecipe(from url: URL) async throws -> [RecipeImportOption] {
+    try await importer.importRecipe(from: url)
   }
 }

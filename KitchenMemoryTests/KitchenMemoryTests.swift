@@ -47,4 +47,43 @@ final class KitchenMemoryTests: XCTestCase {
       manifest.recipes.map(\.recipeID)
     )
   }
+
+  func testSourceURLPolicyAllowsOnlyBoundedCredentialFreeWebLinks() {
+    XCTAssertEqual(
+      RecipeSourceURLPolicy.validatedURL(from: "  https://recipes.example/soup  ")?
+        .absoluteString,
+      "https://recipes.example/soup"
+    )
+    XCTAssertNotNil(RecipeSourceURLPolicy.validatedURL(from: "http://recipes.example/soup"))
+    XCTAssertEqual(
+      RecipeSourceURLPolicy.displayHost(
+        for: URL(string: "https://recipes.example:8443/soup")!
+      ),
+      "recipes.example:8443"
+    )
+
+    let rejected = [
+      "recipes.example/soup",
+      "/soup",
+      "file:///tmp/soup",
+      "javascript:alert(1)",
+      "https://person:secret@recipes.example/soup",
+      "https:///soup",
+      "https://example.com/" + String(repeating: "a", count: 4_096),
+    ]
+    for value in rejected {
+      XCTAssertNil(RecipeSourceURLPolicy.validatedURL(from: value), value)
+    }
+  }
+
+#if DEBUG
+  func testUITestingUsesDisposableStorageOnlyWhenExplicitlyRequestedInDebug() {
+    XCTAssertTrue(AppRuntimeConfiguration.usesInMemoryStore(
+      arguments: ["KitchenMemory", "--ui-testing"]
+    ))
+    XCTAssertFalse(AppRuntimeConfiguration.usesInMemoryStore(
+      arguments: ["KitchenMemory"]
+    ))
+  }
+#endif
 }

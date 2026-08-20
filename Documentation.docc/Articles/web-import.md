@@ -39,21 +39,71 @@ URL
  → save recipe
 ```
 
-Network fetching should eventually live behind a small interface so the same
-pipeline can consume a Safari share extension, a saved HTML file, or test
+Network fetching lives behind a small interface so the same pipeline can later
+consume a Safari share extension or saved HTML file and already consumes test
 fixtures without knowing where the document came from.
+
+`URLSessionRecipeDocumentLoader` now provides that interface for person-entered
+URLs. It uses a fresh ephemeral session, accepts only HTTPS, carries no cookies,
+URL cache, or credential store, limits redirects and total resource time, and
+streams at most 2 MiB into memory. It accepts HTML content only and rejects
+credential-bearing URLs,
+literal IP addresses, local-looking names, and nonstandard ports. URLSession
+owns DNS, connection setup, redirects, response streaming, and cancellation
+under one resource deadline; no separate blocking resolver can outlive the
+import. The same structural URL policy is applied to every redirect. Loading
+cancels when the import surface closes. Each accepted redirect becomes a fresh,
+bodyless `GET` carrying only Kitchen Memory's `Accept` and `User-Agent` headers;
+Foundation-proposed methods, bodies, cookies, authorization, and arbitrary
+headers do not cross that boundary. Parsing then applies independent budgets for
+JSON-LD blocks, nesting,
+structural tokens, discovered objects, candidates, interpreted field lengths,
+ingredients, and instruction items. Structural and item ceilings are enforced
+while traversing. An aggregate UTF-8 ceiling bounds the candidate models retained
+for review, while the direct-input ceiling and item counts separately bound
+transient construction memory.
 
 ## Deterministic import boundary
 
 `KitchenMemoryImport` implements the pipeline from captured HTML or JSON-LD
 through reviewable candidates. `SchemaOrgRecipeImporter` has no networking or
-persistence dependency. Its result retains both the untouched containing JSON-LD
-block and the selected candidate object, so later parsing improvements can be
-applied without fetching the page again or relying on today's interpretation.
+persistence dependency. Its result retains a source-faithful UTF-8 transcription
+of the containing JSON-LD block plus the selected candidate coordinates, so
+later parsing improvements can be applied without fetching the page again or
+relying on today's interpretation.
 
 Missing titles and malformed sibling blocks are diagnostics rather than reasons
 to discard other meaningful recipe content. Candidate selection, URL fetching,
-person-facing review, and saving remain responsibilities of later layers.
+person-facing review, and saving remain responsibilities of the application
+layer rather than the deterministic parser.
+
+When a reviewed candidate is saved, the revision retains one bounded JSON-LD
+block and the selected candidate coordinates. It does not persist the full HTML
+document, download referenced images, or duplicate the normalized candidate
+payload. Existing stores use the same optional encoded source field, so this
+addition remains compatible with the released V1 SwiftData schema.
+
+The editable source link for a URL import is anchored to the final document URL
+that URLSession actually fetched after redirects. A publisher-declared
+`url` or `mainEntityOfPage` may describe a different origin, so it remains
+available in the captured JSON-LD rather than silently becoming the active
+attribution link.
+
+The transcription preserves the decoded JSON text's spelling, whitespace, key
+order, unknown properties, and Unicode scalar content. It does not preserve the
+HTTP response's original byte encoding, byte-order mark, byte offsets, or the
+surrounding HTML. Exact network-byte provenance would require retaining the
+bounded response plus encoding metadata; this release deliberately keeps only
+the smaller recipe metadata block. The payload remains untrusted opaque data:
+Kitchen Memory must not execute it or insert it into an HTML surface.
+
+Both the import sheet and review editor disclose this local retention before a
+recipe is saved. They also explain that redirects may be followed during the
+initial ephemeral fetch, while review and save do not contact the source again.
+
+`blockIndex` and `objectIndex` describe the traversal performed by the importer
+that created the capture. They are not permanent JSON Pointers, and a later
+importer may discover candidates differently as Schema.org support improves.
 
 ## Candidate discovery
 
@@ -77,7 +127,7 @@ user which recipe to save.
 | `name` | `Recipe.name` | Required for a clean import; user may supply if absent |
 | `description` | `Recipe.description` | Strip unsafe markup, preserve text |
 | `author` | `Recipe.authorName` | Accept person, organization, text, or arrays |
-| `url`, `mainEntityOfPage` | `RecipeSource.canonicalURL` | Resolve relative URLs |
+| `url`, `mainEntityOfPage` | `RecipeSource.canonicalURL` | Resolve relative URLs; retain only structurally public HTTP(S) metadata; revalidate before activation |
 | `datePublished` | Source metadata | Not a local creation date |
 | `image` | `Recipe.images` | Accept URL, object, or array |
 | `prepTime` | `Recipe.prepDuration` | ISO 8601 duration |
@@ -132,6 +182,9 @@ The review experience is a core product surface, not an error dialog.
 
 - Show the recipe as it will be saved.
 - Emphasize only low-confidence or incomplete fields.
+- Distinguish machine-parsed ingredients from person-reviewed ingredients.
+- Surface malformed sibling blocks, referenced-but-undownloaded images, and
+  taxonomy that is preserved even when the current editor cannot change it.
 - Allow bulk acceptance of high-confidence rows.
 - Let the user edit its structure, choose the original line, or supply an
   explicit custom presentation.
@@ -147,10 +200,36 @@ successful even if every ingredient remains unparsed.
 - Never execute page scripts.
 - Sanitize markup before display.
 - Apply response-size and redirect limits.
-- Restrict URL schemes and defend against requests to local/private services if
-  fetching occurs on a server.
+- Bound post-download expansion as well as transport bytes. JSON nesting,
+  collections, candidates, and interpreted strings need limits before model
+  allocation.
+- Restrict fetch URL schemes, ports, literal address syntax, and every redirect;
+  leave DNS and connection policy to URLSession's finite system task.
+- Revalidate editable and legacy source metadata immediately before activation.
+  Only bounded, credential-free HTTP(S) links become system-browser actions,
+  and the destination host remains visible beside any untrusted source title.
 - Avoid downloading all media during the initial parse.
 - Make external image loading visible and controllable for privacy.
+
+### Destination-validation boundary
+
+String inspection cannot prove that a hostname resolves only to public
+addresses. Kitchen Memory rejects literal and ambiguous numeric addresses, but
+deliberately leaves hostname resolution to URLSession. A separate `getaddrinfo`
+preflight cannot be cancelled reliably, and URLSession cannot pin its later TLS
+connection to the answer that preflight inspected. Such a check would therefore
+add a hang and time-of-check/time-of-use boundary without creating a dependable
+security boundary.
+
+Consequently, a dotted hostname can still resolve to a private address, and the
+system's configured proxy, VPN, trusted roots, and managed routing remain part of
+the device trust boundary. HTTPS certificate validation, no cookies or
+application credentials, a person-initiated `GET`, a small response limit, one
+finite URLSession-owned deadline, and no script execution independently limit
+the consequence. Server-trust challenges use normal system evaluation; Basic,
+Digest, NTLM, client-certificate, proxy, and other credential challenges are
+cancelled. That is a deliberate availability-oriented policy for a recipe
+importer, not a claim to provide a general SSRF sandbox.
 
 ## Test strategy
 

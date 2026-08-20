@@ -38,6 +38,7 @@ let package = Package(
             name: "KitchenMemoryApplication",
             dependencies: [
                 "KitchenMemoryDomain",
+                "KitchenMemoryImport",
                 "KitchenMemoryPersistence",
             ]
         ),
@@ -66,6 +67,7 @@ let package = Package(
             dependencies: [
                 "KitchenMemoryApplication",
                 "KitchenMemoryDomain",
+                "KitchenMemoryImport",
                 "KitchenMemoryPersistence",
             ]
         ),
