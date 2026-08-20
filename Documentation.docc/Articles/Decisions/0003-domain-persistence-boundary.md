@@ -20,7 +20,8 @@ introduces lifecycle and permission behavior beyond ordinary local storage.
 
 ## Decision
 
-Maintain one persistence-independent `KitchenMemoryDomain` Swift package.
+Maintain one persistence-independent `KitchenMemoryDomain` module as a native
+framework target inside the Xcode project.
 Represent Kitchen Memory concepts and stable identities there without SwiftData
 annotations, CloudKit record identifiers, or synchronization state.
 

@@ -2,9 +2,9 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: GPL-3.0-only
 
+@testable import KitchenMemory
 import KitchenMemoryDomain
 import KitchenMemoryPersistence
-import KitchenMemorySampleData
 import SwiftData
 import XCTest
 

@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 import KitchenMemoryDomain
-import KitchenMemorySampleData
 import SwiftUI
 
 struct RecipeImage: View {

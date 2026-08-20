@@ -2,10 +2,8 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: GPL-3.0-only
 
-import KitchenMemoryApplication
 import KitchenMemoryDomain
 import KitchenMemoryPersistence
-import KitchenMemorySampleData
 import SwiftData
 import SwiftUI
 
@@ -63,7 +61,8 @@ struct AppDependencies {
     libraryModel = RecipeLibraryModel(
       kitchenID: kitchen.id,
       library: RecipeLibrary(repository: repository),
-      editor: RecipeEditor(repository: repository)
+      editor: RecipeEditor(repository: repository),
+      importer: RecipeImportService()
     )
   }
 

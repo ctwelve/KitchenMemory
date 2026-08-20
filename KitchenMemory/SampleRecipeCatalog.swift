@@ -59,7 +59,7 @@ public enum SampleRecipeCatalogError: Error, Equatable {
     case unsupportedPlatform
 }
 
-/// Loads deterministic sample content from the package's asset catalog.
+/// Loads deterministic sample content from the application's asset catalog.
 public enum SampleRecipeCatalog {
     private static let resourceBundle = Bundle(for: SampleRecipeCatalogBundleToken.self)
 
@@ -79,7 +79,7 @@ public enum SampleRecipeCatalog {
     ///
     /// Production media storage will eventually supply recipe images. This
     /// bridge keeps deterministic sample media available to previews and the
-    /// first read-only recipe surface without exposing the package bundle.
+    /// first read-only recipe surface without exposing bundle lookup details.
     public static func imageResource(named name: String) -> ImageResource {
         ImageResource(name: name, bundle: resourceBundle)
     }
@@ -141,5 +141,5 @@ public enum SampleRecipeCatalog {
     }
 }
 
-/// Resolves resources from the native framework that owns the sample catalog.
+/// Resolves resources from the bundle containing the application-owned catalog.
 private final class SampleRecipeCatalogBundleToken: NSObject {}

@@ -2,6 +2,7 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: GPL-3.0-only
 
+import Foundation
 import KitchenMemoryDomain
 import KitchenMemoryPersistence
 
@@ -68,10 +69,14 @@ public struct RecipeDraft: Equatable, Sendable {
     self.init(
       title: title,
       summary: summary,
-      ingredientSections: ingredientLines.isEmpty ? [] : [IngredientSection(ingredients: ingredientLines.map {
-        RecipeIngredient(originalText: $0, presentationMode: .original, parseState: .edited)
-      })],
-      instructionSections: instructionLines.isEmpty ? [] : [InstructionSection(steps: instructionLines.map { InstructionStep(text: $0) })]
+      ingredientSections: ingredientLines.isEmpty
+        ? []
+        : [IngredientSection(ingredients: ingredientLines.map {
+          RecipeIngredient(originalText: $0, presentationMode: .original, parseState: .edited)
+        })],
+      instructionSections: instructionLines.isEmpty
+        ? []
+        : [InstructionSection(steps: instructionLines.map { InstructionStep(text: $0) })]
     )
   }
 

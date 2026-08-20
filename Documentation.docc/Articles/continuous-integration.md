@@ -30,8 +30,8 @@ macOS and iOS each have two distinct checks:
 1. `Build` compiles the application. The macOS build also builds the native
    DocC documentation.
 2. `Core tests` runs the consolidated Xcode unit and integration suite after
-   that platform's build succeeds. This includes the domain, import,
-   persistence, application, and sample-data module tests.
+   that platform's build succeeds. This includes app-level use-case and sample-
+   data tests plus the domain, import, and persistence framework tests.
 
 Application and documentation build jobs explicitly compile the Release
 configuration. Core-test jobs retain Xcode's Debug configuration so test-only

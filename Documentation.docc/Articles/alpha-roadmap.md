@@ -66,7 +66,7 @@ edits as immutable revisions that retain their structure after relaunching.
 
 ### Slice 5 — Import engine
 
-Added a pure `KitchenMemoryImport` package layer for deterministic Schema.org
+Added a pure `KitchenMemoryImport` module for deterministic Schema.org
 `Recipe` JSON-LD discovery and normalization. It accepts captured HTML or JSON-LD,
 collects candidates across blocks and `@graph`, retains source-faithful JSON-LD
 evidence,

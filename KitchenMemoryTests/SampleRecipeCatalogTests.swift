@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 import Foundation
+@testable import KitchenMemory
 import KitchenMemoryDomain
-import KitchenMemorySampleData
 import XCTest
 
 final class SampleRecipeCatalogTests: XCTestCase {

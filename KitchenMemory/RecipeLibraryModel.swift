@@ -2,7 +2,6 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: GPL-3.0-only
 
-import KitchenMemoryApplication
 import KitchenMemoryDomain
 import KitchenMemoryPersistence
 import Foundation
@@ -25,7 +24,7 @@ final class RecipeLibraryModel {
     kitchenID: Kitchen.ID,
     library: RecipeLibrary,
     editor: RecipeEditor,
-    importer: any RecipeImportServing = RecipeImportService()
+    importer: any RecipeImportServing
   ) {
     self.kitchenID = kitchenID
     self.library = library

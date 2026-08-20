@@ -139,18 +139,20 @@ provenance, and media needed to reconstruct the exported scope.
 Storage migrations and CloudKit schema changes therefore do not define the
 portable format.
 
-## Package organization
+## Module organization
 
-Use one `KitchenMemoryDomain` Swift package, organized by feature. Separate
-packages for recipes, kitchens, pantry, planning, and sessions would create
-dependencies among concepts that intentionally share identities and rules.
+Use one `KitchenMemoryDomain` module, organized by feature. Separate modules for
+recipes, kitchens, pantry, planning, and sessions would create dependencies among
+concepts that intentionally share identities and rules. The app's internal
+modules are native Xcode framework targets under `KitchenMemory/Modules`; they
+are not separately distributed packages.
 
-The implemented `KitchenMemoryDomain` package begins with the
-`Kitchen → Recipe → RecipeRevision` slice. Its sibling
-`KitchenMemorySampleData` target owns deterministic sample resources without
-introducing Apple resource APIs into the domain target.
+The implemented `KitchenMemoryDomain` module begins with the
+`Kitchen → Recipe → RecipeRevision` slice. The application target owns
+deterministic starter resources and their loader, keeping Apple resource APIs
+out of the domain module without creating a framework for app-specific data.
 
-The package also exposes `KitchenMemoryPersistence`, the first SwiftData adapter.
+`KitchenMemoryPersistence` is the first SwiftData adapter behind that boundary.
 It uses internal relational records with application-owned UUID foreign keys and
 explicit ordering columns. A domain-facing repository performs all mapping, so
 neither callers nor domain values depend on SwiftData model identity. The first
@@ -163,7 +165,8 @@ the shared-Kitchen prototype selects its CloudKit behavior. The database is not
 the export format. It is installed through an explicit V1 migration plan; later
 schema changes add immutable versions and deliberate migration stages.
 
-`KitchenMemoryApplication` now supplies the first such use case. `RecipeLibrary`
-provides Kitchen-scoped listing and stable-identifier lookup to SwiftUI without
-exposing SwiftData records. The app's first read-only recipe view exercises that
-path from the persistent current revision through ordered ingredients and steps.
+Application code in the main `KitchenMemory` target supplies the first such use
+case. `RecipeLibrary` provides Kitchen-scoped listing and stable-identifier
+lookup to SwiftUI without exposing SwiftData records. The app's first read-only
+recipe view exercises that path from the persistent current revision through
+ordered ingredients and steps.

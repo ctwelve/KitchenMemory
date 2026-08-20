@@ -35,8 +35,8 @@ Performance work should follow evidence from measurement or actual use.
 ## Consequences
 
 - Application and UI testing use the same XCTest concepts and Xcode tooling.
-- Domain packages remain free to adopt Swift Testing without forcing mixed
-  conventions inside one test target.
+- Independent domain or support test targets remain free to adopt Swift Testing
+  without forcing mixed conventions inside one test target.
 - Module boundaries remain intentional rather than multiplying with every type.
 - Straightforward code is preferred to speculative generality.
 - Non-obvious Apple-platform idioms should be explained where naming and

@@ -5,7 +5,6 @@
 @testable import KitchenMemory
 import KitchenMemoryDomain
 import KitchenMemoryPersistence
-import KitchenMemorySampleData
 import XCTest
 
 @MainActor

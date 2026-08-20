@@ -1,21 +1,49 @@
-# Kitchen Memory internal modules
+# Implementation architecture
 
-`Modules` contains the app's internal native framework targets. These modules
-enforce dependency direction inside the Xcode project; they are not separate
-packages or independently distributed products.
+<!--
+Kitchen Memory
+Copyright © 2026 the Kitchen Memory contributors.
+SPDX-License-Identifier: GPL-3.0-only
+-->
 
-The project builds five internal modules:
+Kitchen Memory uses native Xcode framework targets for boundaries that carry
+independent technical responsibilities. Product-specific composition, use
+cases, interface code, and bundled starter content compile directly into the
+application target.
 
-- `KitchenMemoryDomain` — persistence-independent domain values.
-- `KitchenMemorySampleData` — deterministic sample resources and their loader.
-- `KitchenMemoryPersistence` — SwiftData records and domain-facing repositories.
-- `KitchenMemoryApplication` — reusable use cases that coordinate domain-facing repositories.
+## Target organization
 
-## Application
+`KitchenMemory/Modules` contains three internal frameworks. They enforce
+dependency direction inside the Xcode project; they are not separately
+distributed products.
 
-`KitchenMemoryApplication` begins with `RecipeLibrary`, the read capability used
-to list recipes in a Kitchen and retrieve a recipe by stable identifier. SwiftUI
-and future automation call this boundary rather than reaching into SwiftData.
+- `KitchenMemoryDomain` owns persistence-independent domain values.
+- `KitchenMemoryImport` owns deterministic Schema.org recipe discovery and
+  normalization.
+- `KitchenMemoryPersistence` owns SwiftData records and domain-facing
+  repositories.
+
+The application target depends on all three frameworks. Import and persistence
+each depend on the domain, but do not depend on one another or on the
+application.
+
+```text
+KitchenMemory
+├── KitchenMemoryImport ───────┐
+├── KitchenMemoryPersistence ──┼── KitchenMemoryDomain
+└──────────────────────────────┘
+```
+
+This structure keeps reusable technical boundaries explicit without turning
+small, app-specific groups of files into framework products merely for source
+organization.
+
+## Import
+
+`KitchenMemoryImport` owns pure, fixture-testable discovery and normalization
+of Schema.org `Recipe` JSON-LD, plus the bounded webpage fetcher. It produces
+domain values and retained source evidence without saving recipes or presenting
+review UI. Application code coordinates those later steps.
 
 ## Persistence
 
@@ -50,20 +78,22 @@ after release.
 
 ## Sample resources
 
-Sample content belongs in
-`KitchenMemorySampleData/Resources/SampleRecipes.xcassets`. Keep the
-catalog separate from the application's visual assets.
+Deterministic starter content is application data, so its loader and resources
+live directly in the `KitchenMemory` target. The source asset catalog is
+`KitchenMemory/SampleRecipes.xcassets`, separate from the application's visual
+assets.
 
-Assets for one recipe may be collected in an organizational asset-catalog group.
-The sample loader supports nested data sets during command-line SwiftPM tests;
-ordinary Xcode builds continue to resolve the compiled catalog by logical name.
+Assets for one recipe may be collected in an organizational asset-catalog
+group. The sample loader resolves nested source data sets when Xcode copies the
+catalog for tests, while ordinary builds resolve the compiled catalog by logical
+name.
 
 `SampleManifest.dataset` is a versioned recipe-pack index. Its XML property list
 names each recipe data asset and optional hero image asset. Recipe data sets use
-Foundation property lists so Xcode can provide structured editing without adding
-a parser dependency. Recipe, revision, row, step, and media identities are
-pre-generated so importing the catalog into a fresh store is repeatable and can
-be made idempotent.
+Foundation property lists so Xcode can provide structured editing without
+adding a parser dependency. Recipe, revision, row, step, and media identities
+are pre-generated so importing the catalog into a fresh store is repeatable and
+can be made idempotent.
 
 The catalog does not contain a Kitchen identifier. A sample recipe retains its
 own stable recipe, revision, and media identities, while the importing use case
@@ -95,10 +125,13 @@ source formats. Prefer sRGB or Display P3, omit transparency, keep the subject
 away from crop-sensitive edges, and do not bake interface decoration or text
 into recipe photographs.
 
-The loader resolves the compiled catalog from the native
-`KitchenMemorySampleData` framework bundle.
+`SampleRecipeCatalog` resolves the compiled catalog from the bundle containing
+the application-owned loader.
 
 ## Tests
 
-All module, app, and UI tests belong to the shared `KitchenMemory` scheme and
-the committed `KitchenMemory.xctestplan`.
+Framework, application, integration, and UI tests belong to the shared
+`KitchenMemory` scheme and the committed `KitchenMemory.xctestplan`. Tests for
+application-owned use cases and starter content live directly in
+`KitchenMemoryTests`; framework tests remain grouped by their corresponding
+module.

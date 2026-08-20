@@ -43,6 +43,7 @@ presentation architecture.
 ### Apple platforms and engineering
 
 - <doc:apple-platform>
+- <doc:implementation-architecture>
 - <doc:accessibility-engineering>
 - <doc:continuous-integration>
 
