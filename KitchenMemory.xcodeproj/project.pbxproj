@@ -179,78 +179,101 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		A14783F23037A45200B16FC1 /* Exceptions for "Modules" folder in "KitchenMemoryDomain" target */ = {
+		A147845D3037AF5A00B16FC1 /* Exceptions for "KitchenMemory" folder in "KitchenMemory" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				KitchenMemoryDomain/Kitchen.swift,
-				KitchenMemoryDomain/Recipe.swift,
-				KitchenMemoryDomain/RecipeContent.swift,
-				KitchenMemoryDomain/RecipeRevision.swift,
-				KitchenMemoryDomain/RecipeSourceCapture.swift,
-				KitchenMemoryDomain/StableIdentifier.swift,
-				README.md,
+				Modules/KitchenMemoryApplication/RecipeEditor.swift,
+				Modules/KitchenMemoryApplication/RecipeImportService.swift,
+				Modules/KitchenMemoryApplication/RecipeLibrary.swift,
+				Modules/KitchenMemoryDomain/Kitchen.swift,
+				Modules/KitchenMemoryDomain/Recipe.swift,
+				Modules/KitchenMemoryDomain/RecipeContent.swift,
+				Modules/KitchenMemoryDomain/RecipeRevision.swift,
+				Modules/KitchenMemoryDomain/RecipeSourceCapture.swift,
+				Modules/KitchenMemoryDomain/StableIdentifier.swift,
+				Modules/KitchenMemoryImport/ImportedPlainTextNormalizer.swift,
+				Modules/KitchenMemoryImport/IngredientLineParser.swift,
+				Modules/KitchenMemoryImport/RecipeImportModels.swift,
+				Modules/KitchenMemoryImport/RecipeURLImporter.swift,
+				Modules/KitchenMemoryImport/SchemaOrgRecipeImporter.swift,
+				Modules/KitchenMemoryPersistence/KitchenMemoryMigrationPlan.swift,
+				Modules/KitchenMemoryPersistence/KitchenMemorySchema.swift,
+				Modules/KitchenMemoryPersistence/PersistenceRecords.swift,
+				Modules/KitchenMemoryPersistence/RecipeRepository.swift,
+				Modules/KitchenMemorySampleData/Resources/SampleRecipes.xcassets,
+				Modules/KitchenMemorySampleData/SampleRecipeCatalog.swift,
+				Modules/README.md,
+			);
+			target = A1C4E79D302A63B800E2C0DB /* KitchenMemory */;
+		};
+		A147845E3037AF5A00B16FC1 /* Exceptions for "KitchenMemory" folder in "KitchenMemoryDomain" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Modules/KitchenMemoryDomain/Kitchen.swift,
+				Modules/KitchenMemoryDomain/Recipe.swift,
+				Modules/KitchenMemoryDomain/RecipeContent.swift,
+				Modules/KitchenMemoryDomain/RecipeRevision.swift,
+				Modules/KitchenMemoryDomain/RecipeSourceCapture.swift,
+				Modules/KitchenMemoryDomain/StableIdentifier.swift,
+				Modules/README.md,
 			);
 			target = B20000000000000000000021 /* KitchenMemoryDomain */;
 		};
-		A14783F33037A45200B16FC1 /* Exceptions for "Modules" folder in "KitchenMemoryImport" target */ = {
+		A147845F3037AF5A00B16FC1 /* Exceptions for "KitchenMemory" folder in "KitchenMemoryImport" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				KitchenMemoryImport/ImportedPlainTextNormalizer.swift,
-				KitchenMemoryImport/IngredientLineParser.swift,
-				KitchenMemoryImport/RecipeImportModels.swift,
-				KitchenMemoryImport/RecipeURLImporter.swift,
-				KitchenMemoryImport/SchemaOrgRecipeImporter.swift,
-				README.md,
+				Modules/KitchenMemoryImport/ImportedPlainTextNormalizer.swift,
+				Modules/KitchenMemoryImport/IngredientLineParser.swift,
+				Modules/KitchenMemoryImport/RecipeImportModels.swift,
+				Modules/KitchenMemoryImport/RecipeURLImporter.swift,
+				Modules/KitchenMemoryImport/SchemaOrgRecipeImporter.swift,
+				Modules/README.md,
 			);
 			target = B20000000000000000000022 /* KitchenMemoryImport */;
 		};
-		A14783F43037A45200B16FC1 /* Exceptions for "Modules" folder in "KitchenMemoryPersistence" target */ = {
+		A14784603037AF5A00B16FC1 /* Exceptions for "KitchenMemory" folder in "KitchenMemoryPersistence" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				KitchenMemoryPersistence/KitchenMemoryMigrationPlan.swift,
-				KitchenMemoryPersistence/KitchenMemorySchema.swift,
-				KitchenMemoryPersistence/PersistenceRecords.swift,
-				KitchenMemoryPersistence/RecipeRepository.swift,
-				README.md,
+				Modules/KitchenMemoryPersistence/KitchenMemoryMigrationPlan.swift,
+				Modules/KitchenMemoryPersistence/KitchenMemorySchema.swift,
+				Modules/KitchenMemoryPersistence/PersistenceRecords.swift,
+				Modules/KitchenMemoryPersistence/RecipeRepository.swift,
+				Modules/README.md,
 			);
 			target = B20000000000000000000023 /* KitchenMemoryPersistence */;
 		};
-		A14783F53037A45200B16FC1 /* Exceptions for "Modules" folder in "KitchenMemoryApplication" target */ = {
+		A14784613037AF5A00B16FC1 /* Exceptions for "KitchenMemory" folder in "KitchenMemoryApplication" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				KitchenMemoryApplication/RecipeEditor.swift,
-				KitchenMemoryApplication/RecipeImportService.swift,
-				KitchenMemoryApplication/RecipeLibrary.swift,
-				README.md,
+				Modules/KitchenMemoryApplication/RecipeEditor.swift,
+				Modules/KitchenMemoryApplication/RecipeImportService.swift,
+				Modules/KitchenMemoryApplication/RecipeLibrary.swift,
+				Modules/README.md,
 			);
 			target = B20000000000000000000024 /* KitchenMemoryApplication */;
 		};
-		A14783F63037A45200B16FC1 /* Exceptions for "Modules" folder in "KitchenMemorySampleData" target */ = {
+		A14784623037AF5A00B16FC1 /* Exceptions for "KitchenMemory" folder in "KitchenMemorySampleData" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				KitchenMemorySampleData/Resources/SampleRecipes.xcassets,
-				KitchenMemorySampleData/SampleRecipeCatalog.swift,
-				README.md,
+				Modules/KitchenMemorySampleData/Resources/SampleRecipes.xcassets,
+				Modules/KitchenMemorySampleData/SampleRecipeCatalog.swift,
+				Modules/README.md,
 			);
 			target = B20000000000000000000025 /* KitchenMemorySampleData */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		A14783F13037A43600B16FC1 /* Modules */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				A14783F23037A45200B16FC1 /* Exceptions for "Modules" folder in "KitchenMemoryDomain" target */,
-				A14783F33037A45200B16FC1 /* Exceptions for "Modules" folder in "KitchenMemoryImport" target */,
-				A14783F43037A45200B16FC1 /* Exceptions for "Modules" folder in "KitchenMemoryPersistence" target */,
-				A14783F53037A45200B16FC1 /* Exceptions for "Modules" folder in "KitchenMemoryApplication" target */,
-				A14783F63037A45200B16FC1 /* Exceptions for "Modules" folder in "KitchenMemorySampleData" target */,
-			);
-			path = Modules;
-			sourceTree = "<group>";
-		};
 		A1C4E7A0302A63B800E2C0DB /* KitchenMemory */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				A147845D3037AF5A00B16FC1 /* Exceptions for "KitchenMemory" folder in "KitchenMemory" target */,
+				A147845E3037AF5A00B16FC1 /* Exceptions for "KitchenMemory" folder in "KitchenMemoryDomain" target */,
+				A147845F3037AF5A00B16FC1 /* Exceptions for "KitchenMemory" folder in "KitchenMemoryImport" target */,
+				A14784603037AF5A00B16FC1 /* Exceptions for "KitchenMemory" folder in "KitchenMemoryPersistence" target */,
+				A14784613037AF5A00B16FC1 /* Exceptions for "KitchenMemory" folder in "KitchenMemoryApplication" target */,
+				A14784623037AF5A00B16FC1 /* Exceptions for "KitchenMemory" folder in "KitchenMemorySampleData" target */,
+			);
 			path = KitchenMemory;
 			sourceTree = "<group>";
 		};
@@ -362,7 +385,6 @@
 			isa = PBXGroup;
 			children = (
 				A14784273037A60D00B16FC1 /* .github */,
-				A14783F13037A43600B16FC1 /* Modules */,
 				A1532352302C2FF100C8D534 /* Documentation.docc */,
 				A15962C5302BC01A00926925 /* KitchenMemory.xctestplan */,
 				A1C4E837302A6FCA00E2C0DB /* AI.md */,
