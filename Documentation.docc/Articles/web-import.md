@@ -97,6 +97,10 @@ bounded response plus encoding metadata; this release deliberately keeps only
 the smaller recipe metadata block. The payload remains untrusted opaque data:
 Kitchen Memory must not execute it or insert it into an HTML surface.
 
+Both the import sheet and review editor disclose this local retention before a
+recipe is saved. They also explain that redirects may be followed during the
+initial ephemeral fetch, while review and save do not contact the source again.
+
 `blockIndex` and `objectIndex` describe the traversal performed by the importer
 that created the capture. They are not permanent JSON Pointers, and a later
 importer may discover candidates differently as Schema.org support improves.

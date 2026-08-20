@@ -157,7 +157,11 @@ struct RecipeEditorView: View {
     } header: {
       Text("Import Review")
     } footer: {
-      Text("Check the imported wording and structure before saving. The source page is not contacted again.")
+      Text(
+        "Check the imported wording and structure before saving. Review and save do not "
+          + "contact the source again. Saving keeps the final source URL and bounded JSON-LD "
+          + "metadata locally, including fields not shown here."
+      )
     }
   }
 

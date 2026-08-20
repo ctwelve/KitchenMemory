@@ -130,8 +130,15 @@ struct RecipeURLImportView: View {
   private var privacySection: some View {
     Section("Privacy") {
       Text(
-        "Kitchen Memory fetches this page once without cookies, runs no page scripts, "
-          + "and downloads no images during review."
+        "Kitchen Memory follows redirects and downloads the resulting HTML with an "
+          + "ephemeral request that supplies no cookies or app credentials. It runs no "
+          + "page scripts and downloads no images during review."
+      )
+        .foregroundStyle(.secondary)
+      Text(
+        "If you save a recipe, Kitchen Memory keeps the final source URL and one bounded "
+          + "JSON-LD recipe-metadata block locally, including source fields not shown in "
+          + "the review editor."
       )
         .foregroundStyle(.secondary)
     }
