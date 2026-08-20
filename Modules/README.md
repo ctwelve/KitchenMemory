@@ -1,9 +1,10 @@
-# KitchenMemoryDomain
+# Kitchen Memory internal modules
 
-`KitchenMemoryDomain` contains Kitchen Memory concepts and rules without
-SwiftData, CloudKit, or user-interface dependencies.
+`Modules` contains the app's internal native framework targets. These modules
+enforce dependency direction inside the Xcode project; they are not separate
+packages or independently distributed products.
 
-The package currently exposes four library products:
+The project builds five internal modules:
 
 - `KitchenMemoryDomain` — persistence-independent domain values.
 - `KitchenMemorySampleData` — deterministic sample resources and their loader.
@@ -50,7 +51,7 @@ after release.
 ## Sample resources
 
 Sample content belongs in
-`Sources/KitchenMemorySampleData/Resources/SampleRecipes.xcassets`. Keep the
+`KitchenMemorySampleData/Resources/SampleRecipes.xcassets`. Keep the
 catalog separate from the application's visual assets.
 
 Assets for one recipe may be collected in an organizational asset-catalog group.
@@ -94,12 +95,10 @@ source formats. Prefer sRGB or Display P3, omit transparency, keep the subject
 away from crop-sensitive edges, and do not bake interface decoration or text
 into recipe photographs.
 
-The loader first uses `NSDataAsset` when Xcode compiles the catalog. It also
-supports SwiftPM's command-line behavior, which copies the catalog source into
-the package resource bundle during `swift test`.
+The loader resolves the compiled catalog from the native
+`KitchenMemorySampleData` framework bundle.
 
 ## Tests
 
-```sh
-swift test --package-path KitchenMemoryDomain
-```
+All module, app, and UI tests belong to the shared `KitchenMemory` scheme and
+the committed `KitchenMemory.xctestplan`.

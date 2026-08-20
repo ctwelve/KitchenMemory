@@ -80,7 +80,10 @@ import SwiftData
   var sortIndex: Int
   var role: String
   var assetName: String
-  var accessibilityLabel: String?
+  // Avoid the iOS accessibility runtime's property name while retaining the
+  // original on-disk field name for existing V1 stores.
+  @Attribute(originalName: "accessibilityLabel")
+  var mediaAccessibilityLabel: String?
 
   init(
     id: UUID, revisionID: UUID, sortIndex: Int, role: String, assetName: String,
@@ -91,7 +94,7 @@ import SwiftData
     self.sortIndex = sortIndex
     self.role = role
     self.assetName = assetName
-    self.accessibilityLabel = accessibilityLabel
+    self.mediaAccessibilityLabel = accessibilityLabel
   }
 }
 

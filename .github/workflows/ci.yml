@@ -66,9 +66,6 @@ jobs:
       - name: Report Xcode version
         run: xcodebuild -version
 
-      - name: Test domain package
-        run: swift test --package-path KitchenMemoryDomain
-
       - name: Test macOS core
         run: >-
           xcodebuild -skipPackagePluginValidation test

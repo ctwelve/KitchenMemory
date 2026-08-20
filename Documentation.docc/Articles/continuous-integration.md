@@ -29,8 +29,9 @@ macOS and iOS each have two distinct checks:
 
 1. `Build` compiles the application. The macOS build also builds the native
    DocC documentation.
-2. `Core tests` runs after that platform's build succeeds. The macOS check also
-   runs the KitchenMemoryDomain and sample-data package tests.
+2. `Core tests` runs the consolidated Xcode unit and integration suite after
+   that platform's build succeeds. This includes the domain, import,
+   persistence, application, and sample-data module tests.
 
 Application and documentation build jobs explicitly compile the Release
 configuration. Core-test jobs retain Xcode's Debug configuration so test-only
@@ -50,9 +51,8 @@ in the repository; restore the platform-specific jobs when the primary recipe
 workflows and accessibility tree are stable enough for their results to be
 durable CI signals.
 
-Application, integration, and UI targets use XCTest as their common test model.
-Independent domain and support packages may use Swift Testing when it improves
-their tests without mixing conventions inside one target.
+Application, integration, module, and UI targets use XCTest as their common
+test model and are all visible through the Xcode project and shared test plan.
 
 The commands disable code signing because these checks produce no distributable
 application and require no development certificate. Each job receives a clean

@@ -10,13 +10,107 @@
 		A1532353302C2FF100C8D534 /* Documentation.docc in Sources */ = {isa = PBXBuildFile; fileRef = A1532352302C2FF100C8D534 /* Documentation.docc */; };
 		A1532354302C2FF100C8D534 /* Documentation.docc in Sources */ = {isa = PBXBuildFile; fileRef = A1532352302C2FF100C8D534 /* Documentation.docc */; };
 		A1532355302C2FF100C8D534 /* Documentation.docc in Sources */ = {isa = PBXBuildFile; fileRef = A1532352302C2FF100C8D534 /* Documentation.docc */; };
-		A1C4E901302B100000E2C0DB /* KitchenMemoryDomain in Frameworks */ = {isa = PBXBuildFile; productRef = A1C4E903302B100000E2C0DB /* KitchenMemoryDomain */; };
-		A1C4EA01302B200000E2C0DB /* KitchenMemoryApplication in Frameworks */ = {isa = PBXBuildFile; productRef = A1C4EA04302B200000E2C0DB /* KitchenMemoryApplication */; };
-		A1C4EA02302B200000E2C0DB /* KitchenMemoryPersistence in Frameworks */ = {isa = PBXBuildFile; productRef = A1C4EA05302B200000E2C0DB /* KitchenMemoryPersistence */; };
-		A1C4EA03302B200000E2C0DB /* KitchenMemorySampleData in Frameworks */ = {isa = PBXBuildFile; productRef = A1C4EA06302B200000E2C0DB /* KitchenMemorySampleData */; };
+		B20000000000000000000101 /* KitchenMemoryDomain.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000011 /* KitchenMemoryDomain.framework */; };
+		B20000000000000000000102 /* KitchenMemoryImport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000012 /* KitchenMemoryImport.framework */; };
+		B20000000000000000000103 /* KitchenMemoryPersistence.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000013 /* KitchenMemoryPersistence.framework */; };
+		B20000000000000000000104 /* KitchenMemoryApplication.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000014 /* KitchenMemoryApplication.framework */; };
+		B20000000000000000000105 /* KitchenMemorySampleData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000015 /* KitchenMemorySampleData.framework */; };
+		B20000000000000000000106 /* KitchenMemoryDomain.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000011 /* KitchenMemoryDomain.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		B20000000000000000000107 /* KitchenMemoryImport.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000012 /* KitchenMemoryImport.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		B20000000000000000000108 /* KitchenMemoryPersistence.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000013 /* KitchenMemoryPersistence.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		B20000000000000000000109 /* KitchenMemoryApplication.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000014 /* KitchenMemoryApplication.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		B20000000000000000000110 /* KitchenMemorySampleData.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000015 /* KitchenMemorySampleData.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		B20000000000000000000111 /* KitchenMemoryDomain.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000011 /* KitchenMemoryDomain.framework */; };
+		B20000000000000000000112 /* KitchenMemoryDomain.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000011 /* KitchenMemoryDomain.framework */; };
+		B20000000000000000000113 /* KitchenMemoryDomain.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000011 /* KitchenMemoryDomain.framework */; };
+		B20000000000000000000114 /* KitchenMemoryImport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000012 /* KitchenMemoryImport.framework */; };
+		B20000000000000000000115 /* KitchenMemoryPersistence.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000013 /* KitchenMemoryPersistence.framework */; };
+		B20000000000000000000116 /* KitchenMemoryDomain.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000011 /* KitchenMemoryDomain.framework */; };
+		B20000000000000000000117 /* KitchenMemoryDomain.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000011 /* KitchenMemoryDomain.framework */; };
+		B20000000000000000000118 /* KitchenMemoryImport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000012 /* KitchenMemoryImport.framework */; };
+		B20000000000000000000119 /* KitchenMemoryPersistence.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000013 /* KitchenMemoryPersistence.framework */; };
+		B20000000000000000000120 /* KitchenMemoryApplication.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000014 /* KitchenMemoryApplication.framework */; };
+		B20000000000000000000121 /* KitchenMemorySampleData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000015 /* KitchenMemorySampleData.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		A14782DF3037A13600B16FC1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A1C4E796302A63B800E2C0DB /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B20000000000000000000021;
+			remoteInfo = KitchenMemoryDomain;
+		};
+		A14782E03037A13600B16FC1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A1C4E796302A63B800E2C0DB /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B20000000000000000000022;
+			remoteInfo = KitchenMemoryImport;
+		};
+		A14782E13037A13600B16FC1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A1C4E796302A63B800E2C0DB /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B20000000000000000000021;
+			remoteInfo = KitchenMemoryDomain;
+		};
+		A14782E23037A13600B16FC1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A1C4E796302A63B800E2C0DB /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B20000000000000000000023;
+			remoteInfo = KitchenMemoryPersistence;
+		};
+		A14782E33037A13600B16FC1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A1C4E796302A63B800E2C0DB /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B20000000000000000000021;
+			remoteInfo = KitchenMemoryDomain;
+		};
+		A14782E43037A13600B16FC1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A1C4E796302A63B800E2C0DB /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B20000000000000000000024;
+			remoteInfo = KitchenMemoryApplication;
+		};
+		A14782E53037A13600B16FC1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A1C4E796302A63B800E2C0DB /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B20000000000000000000021;
+			remoteInfo = KitchenMemoryDomain;
+		};
+		A14782E63037A13600B16FC1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A1C4E796302A63B800E2C0DB /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B20000000000000000000022;
+			remoteInfo = KitchenMemoryImport;
+		};
+		A14782E73037A13600B16FC1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A1C4E796302A63B800E2C0DB /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B20000000000000000000023;
+			remoteInfo = KitchenMemoryPersistence;
+		};
+		A14782E83037A13600B16FC1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A1C4E796302A63B800E2C0DB /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B20000000000000000000025;
+			remoteInfo = KitchenMemorySampleData;
+		};
+		A14782E93037A13600B16FC1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A1C4E796302A63B800E2C0DB /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B20000000000000000000021;
+			remoteInfo = KitchenMemoryDomain;
+		};
 		A1C4E7AE302A63B900E2C0DB /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = A1C4E796302A63B800E2C0DB /* Project object */;
@@ -33,7 +127,26 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		B20000000000000000000046 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				B20000000000000000000106 /* KitchenMemoryDomain.framework in Embed Frameworks */,
+				B20000000000000000000107 /* KitchenMemoryImport.framework in Embed Frameworks */,
+				B20000000000000000000108 /* KitchenMemoryPersistence.framework in Embed Frameworks */,
+				B20000000000000000000109 /* KitchenMemoryApplication.framework in Embed Frameworks */,
+				B20000000000000000000110 /* KitchenMemorySampleData.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		A14784253037A60D00B16FC1 /* ci.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = ci.yml; sourceTree = "<group>"; };
 		A1532352302C2FF100C8D534 /* Documentation.docc */ = {isa = PBXFileReference; lastKnownFileType = folder.documentationcatalog; path = Documentation.docc; sourceTree = "<group>"; };
 		A15962C5302BC01A00926925 /* KitchenMemory.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = KitchenMemory.xctestplan; sourceTree = "<group>"; };
 		A1C4E79E302A63B800E2C0DB /* KitchenMemory.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KitchenMemory.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -58,9 +171,84 @@
 		A1C4E838302A6FCA00E2C0DB /* COPYRIGHT */ = {isa = PBXFileReference; lastKnownFileType = text; path = COPYRIGHT; sourceTree = "<group>"; };
 		A1C4E839302A6FCA00E2C0DB /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		A1C4E83A302A6FCA00E2C0DB /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		B20000000000000000000011 /* KitchenMemoryDomain.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = KitchenMemoryDomain.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B20000000000000000000012 /* KitchenMemoryImport.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = KitchenMemoryImport.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B20000000000000000000013 /* KitchenMemoryPersistence.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = KitchenMemoryPersistence.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B20000000000000000000014 /* KitchenMemoryApplication.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = KitchenMemoryApplication.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B20000000000000000000015 /* KitchenMemorySampleData.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = KitchenMemorySampleData.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		A14783F23037A45200B16FC1 /* Exceptions for "Modules" folder in "KitchenMemoryDomain" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				KitchenMemoryDomain/Kitchen.swift,
+				KitchenMemoryDomain/Recipe.swift,
+				KitchenMemoryDomain/RecipeContent.swift,
+				KitchenMemoryDomain/RecipeRevision.swift,
+				KitchenMemoryDomain/RecipeSourceCapture.swift,
+				KitchenMemoryDomain/StableIdentifier.swift,
+				README.md,
+			);
+			target = B20000000000000000000021 /* KitchenMemoryDomain */;
+		};
+		A14783F33037A45200B16FC1 /* Exceptions for "Modules" folder in "KitchenMemoryImport" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				KitchenMemoryImport/ImportedPlainTextNormalizer.swift,
+				KitchenMemoryImport/IngredientLineParser.swift,
+				KitchenMemoryImport/RecipeImportModels.swift,
+				KitchenMemoryImport/RecipeURLImporter.swift,
+				KitchenMemoryImport/SchemaOrgRecipeImporter.swift,
+				README.md,
+			);
+			target = B20000000000000000000022 /* KitchenMemoryImport */;
+		};
+		A14783F43037A45200B16FC1 /* Exceptions for "Modules" folder in "KitchenMemoryPersistence" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				KitchenMemoryPersistence/KitchenMemoryMigrationPlan.swift,
+				KitchenMemoryPersistence/KitchenMemorySchema.swift,
+				KitchenMemoryPersistence/PersistenceRecords.swift,
+				KitchenMemoryPersistence/RecipeRepository.swift,
+				README.md,
+			);
+			target = B20000000000000000000023 /* KitchenMemoryPersistence */;
+		};
+		A14783F53037A45200B16FC1 /* Exceptions for "Modules" folder in "KitchenMemoryApplication" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				KitchenMemoryApplication/RecipeEditor.swift,
+				KitchenMemoryApplication/RecipeImportService.swift,
+				KitchenMemoryApplication/RecipeLibrary.swift,
+				README.md,
+			);
+			target = B20000000000000000000024 /* KitchenMemoryApplication */;
+		};
+		A14783F63037A45200B16FC1 /* Exceptions for "Modules" folder in "KitchenMemorySampleData" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				KitchenMemorySampleData/Resources/SampleRecipes.xcassets,
+				KitchenMemorySampleData/SampleRecipeCatalog.swift,
+				README.md,
+			);
+			target = B20000000000000000000025 /* KitchenMemorySampleData */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		A14783F13037A43600B16FC1 /* Modules */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				A14783F23037A45200B16FC1 /* Exceptions for "Modules" folder in "KitchenMemoryDomain" target */,
+				A14783F33037A45200B16FC1 /* Exceptions for "Modules" folder in "KitchenMemoryImport" target */,
+				A14783F43037A45200B16FC1 /* Exceptions for "Modules" folder in "KitchenMemoryPersistence" target */,
+				A14783F53037A45200B16FC1 /* Exceptions for "Modules" folder in "KitchenMemoryApplication" target */,
+				A14783F63037A45200B16FC1 /* Exceptions for "Modules" folder in "KitchenMemorySampleData" target */,
+			);
+			path = Modules;
+			sourceTree = "<group>";
+		};
 		A1C4E7A0302A63B800E2C0DB /* KitchenMemory */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = KitchenMemory;
@@ -83,10 +271,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A1C4EA01302B200000E2C0DB /* KitchenMemoryApplication in Frameworks */,
-				A1C4E901302B100000E2C0DB /* KitchenMemoryDomain in Frameworks */,
-				A1C4EA02302B200000E2C0DB /* KitchenMemoryPersistence in Frameworks */,
-				A1C4EA03302B200000E2C0DB /* KitchenMemorySampleData in Frameworks */,
+				B20000000000000000000101 /* KitchenMemoryDomain.framework in Frameworks */,
+				B20000000000000000000102 /* KitchenMemoryImport.framework in Frameworks */,
+				B20000000000000000000103 /* KitchenMemoryPersistence.framework in Frameworks */,
+				B20000000000000000000104 /* KitchenMemoryApplication.framework in Frameworks */,
+				B20000000000000000000105 /* KitchenMemorySampleData.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -94,6 +283,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B20000000000000000000117 /* KitchenMemoryDomain.framework in Frameworks */,
+				B20000000000000000000118 /* KitchenMemoryImport.framework in Frameworks */,
+				B20000000000000000000119 /* KitchenMemoryPersistence.framework in Frameworks */,
+				B20000000000000000000120 /* KitchenMemoryApplication.framework in Frameworks */,
+				B20000000000000000000121 /* KitchenMemorySampleData.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -104,12 +298,71 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		B20000000000000000000032 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B20000000000000000000035 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B20000000000000000000111 /* KitchenMemoryDomain.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B20000000000000000000038 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B20000000000000000000112 /* KitchenMemoryDomain.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B20000000000000000000041 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B20000000000000000000113 /* KitchenMemoryDomain.framework in Frameworks */,
+				B20000000000000000000114 /* KitchenMemoryImport.framework in Frameworks */,
+				B20000000000000000000115 /* KitchenMemoryPersistence.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B20000000000000000000044 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B20000000000000000000116 /* KitchenMemoryDomain.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		A14784263037A60D00B16FC1 /* workflows */ = {
+			isa = PBXGroup;
+			children = (
+				A14784253037A60D00B16FC1 /* ci.yml */,
+			);
+			path = workflows;
+			sourceTree = "<group>";
+		};
+		A14784273037A60D00B16FC1 /* .github */ = {
+			isa = PBXGroup;
+			children = (
+				A14784263037A60D00B16FC1 /* workflows */,
+			);
+			path = .github;
+			sourceTree = "<group>";
+		};
 		A1C4E795302A63B800E2C0DB = {
 			isa = PBXGroup;
 			children = (
+				A14784273037A60D00B16FC1 /* .github */,
+				A14783F13037A43600B16FC1 /* Modules */,
 				A1532352302C2FF100C8D534 /* Documentation.docc */,
 				A15962C5302BC01A00926925 /* KitchenMemory.xctestplan */,
 				A1C4E837302A6FCA00E2C0DB /* AI.md */,
@@ -130,6 +383,11 @@
 				A1C4E79E302A63B800E2C0DB /* KitchenMemory.app */,
 				A1C4E7AD302A63B900E2C0DB /* KitchenMemoryTests.xctest */,
 				A1C4E7B7302A63B900E2C0DB /* KitchenMemoryUITests.xctest */,
+				B20000000000000000000011 /* KitchenMemoryDomain.framework */,
+				B20000000000000000000012 /* KitchenMemoryImport.framework */,
+				B20000000000000000000013 /* KitchenMemoryPersistence.framework */,
+				B20000000000000000000014 /* KitchenMemoryApplication.framework */,
+				B20000000000000000000015 /* KitchenMemorySampleData.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -198,22 +456,24 @@
 				A1C4E850302A750000E2C0DB /* Generate App Icon */,
 				A1C4E79A302A63B800E2C0DB /* Sources */,
 				A1C4E79B302A63B800E2C0DB /* Frameworks */,
+				B20000000000000000000046 /* Embed Frameworks */,
 				A1C4E79C302A63B800E2C0DB /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 				A12691AA302E7F04004E6195 /* PBXTargetDependency */,
+				B20000000000000000000201 /* PBXTargetDependency */,
+				B20000000000000000000202 /* PBXTargetDependency */,
+				B20000000000000000000203 /* PBXTargetDependency */,
+				B20000000000000000000204 /* PBXTargetDependency */,
+				B20000000000000000000205 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				A1C4E7A0302A63B800E2C0DB /* KitchenMemory */,
 			);
 			name = KitchenMemory;
 			packageProductDependencies = (
-				A1C4EA04302B200000E2C0DB /* KitchenMemoryApplication */,
-				A1C4E903302B100000E2C0DB /* KitchenMemoryDomain */,
-				A1C4EA05302B200000E2C0DB /* KitchenMemoryPersistence */,
-				A1C4EA06302B200000E2C0DB /* KitchenMemorySampleData */,
 			);
 			productName = KitchenMemory;
 			productReference = A1C4E79E302A63B800E2C0DB /* KitchenMemory.app */;
@@ -265,6 +525,107 @@
 			productReference = A1C4E7B7302A63B900E2C0DB /* KitchenMemoryUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		B20000000000000000000021 /* KitchenMemoryDomain */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B20000000000000000000321 /* Build configuration list for PBXNativeTarget "KitchenMemoryDomain" */;
+			buildPhases = (
+				B20000000000000000000031 /* Sources */,
+				B20000000000000000000032 /* Frameworks */,
+				B20000000000000000000033 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = KitchenMemoryDomain;
+			packageProductDependencies = (
+			);
+			productName = KitchenMemoryDomain;
+			productReference = B20000000000000000000011 /* KitchenMemoryDomain.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		B20000000000000000000022 /* KitchenMemoryImport */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B20000000000000000000322 /* Build configuration list for PBXNativeTarget "KitchenMemoryImport" */;
+			buildPhases = (
+				B20000000000000000000034 /* Sources */,
+				B20000000000000000000035 /* Frameworks */,
+				B20000000000000000000036 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				B20000000000000000000206 /* PBXTargetDependency */,
+			);
+			name = KitchenMemoryImport;
+			packageProductDependencies = (
+			);
+			productName = KitchenMemoryImport;
+			productReference = B20000000000000000000012 /* KitchenMemoryImport.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		B20000000000000000000023 /* KitchenMemoryPersistence */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B20000000000000000000323 /* Build configuration list for PBXNativeTarget "KitchenMemoryPersistence" */;
+			buildPhases = (
+				B20000000000000000000037 /* Sources */,
+				B20000000000000000000038 /* Frameworks */,
+				B20000000000000000000039 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				B20000000000000000000207 /* PBXTargetDependency */,
+			);
+			name = KitchenMemoryPersistence;
+			packageProductDependencies = (
+			);
+			productName = KitchenMemoryPersistence;
+			productReference = B20000000000000000000013 /* KitchenMemoryPersistence.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		B20000000000000000000024 /* KitchenMemoryApplication */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B20000000000000000000324 /* Build configuration list for PBXNativeTarget "KitchenMemoryApplication" */;
+			buildPhases = (
+				B20000000000000000000040 /* Sources */,
+				B20000000000000000000041 /* Frameworks */,
+				B20000000000000000000042 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				B20000000000000000000208 /* PBXTargetDependency */,
+				B20000000000000000000209 /* PBXTargetDependency */,
+				B20000000000000000000210 /* PBXTargetDependency */,
+			);
+			name = KitchenMemoryApplication;
+			packageProductDependencies = (
+			);
+			productName = KitchenMemoryApplication;
+			productReference = B20000000000000000000014 /* KitchenMemoryApplication.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		B20000000000000000000025 /* KitchenMemorySampleData */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B20000000000000000000325 /* Build configuration list for PBXNativeTarget "KitchenMemorySampleData" */;
+			buildPhases = (
+				B20000000000000000000043 /* Sources */,
+				B20000000000000000000044 /* Frameworks */,
+				B20000000000000000000045 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				B20000000000000000000211 /* PBXTargetDependency */,
+			);
+			name = KitchenMemorySampleData;
+			packageProductDependencies = (
+			);
+			productName = KitchenMemorySampleData;
+			productReference = B20000000000000000000015 /* KitchenMemorySampleData.framework */;
+			productType = "com.apple.product-type.framework";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -286,6 +647,21 @@
 						CreatedOnToolsVersion = 26.6;
 						TestTargetID = A1C4E79D302A63B800E2C0DB;
 					};
+					B20000000000000000000021 = {
+						CreatedOnToolsVersion = 26.6;
+					};
+					B20000000000000000000022 = {
+						CreatedOnToolsVersion = 26.6;
+					};
+					B20000000000000000000023 = {
+						CreatedOnToolsVersion = 26.6;
+					};
+					B20000000000000000000024 = {
+						CreatedOnToolsVersion = 26.6;
+					};
+					B20000000000000000000025 = {
+						CreatedOnToolsVersion = 26.6;
+					};
 				};
 			};
 			buildConfigurationList = A1C4E799302A63B800E2C0DB /* Build configuration list for PBXProject "KitchenMemory" */;
@@ -298,7 +674,6 @@
 			mainGroup = A1C4E795302A63B800E2C0DB;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				A1C4E902302B100000E2C0DB /* XCLocalSwiftPackageReference "KitchenMemoryDomain" */,
 				A12691A8302E7ECF004E6195 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */,
 			);
 			preferredProjectObjectVersion = 77;
@@ -309,6 +684,11 @@
 				A1C4E79D302A63B800E2C0DB /* KitchenMemory */,
 				A1C4E7AC302A63B900E2C0DB /* KitchenMemoryTests */,
 				A1C4E7B6302A63B900E2C0DB /* KitchenMemoryUITests */,
+				B20000000000000000000021 /* KitchenMemoryDomain */,
+				B20000000000000000000022 /* KitchenMemoryImport */,
+				B20000000000000000000023 /* KitchenMemoryPersistence */,
+				B20000000000000000000024 /* KitchenMemoryApplication */,
+				B20000000000000000000025 /* KitchenMemorySampleData */,
 			);
 		};
 /* End PBXProject section */
@@ -329,6 +709,41 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		A1C4E7B5302A63B900E2C0DB /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B20000000000000000000033 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B20000000000000000000036 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B20000000000000000000039 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B20000000000000000000042 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B20000000000000000000045 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -409,6 +824,41 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		B20000000000000000000031 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B20000000000000000000034 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B20000000000000000000037 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B20000000000000000000040 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B20000000000000000000043 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -425,6 +875,61 @@
 			isa = PBXTargetDependency;
 			target = A1C4E79D302A63B800E2C0DB /* KitchenMemory */;
 			targetProxy = A1C4E7B8302A63B900E2C0DB /* PBXContainerItemProxy */;
+		};
+		B20000000000000000000201 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B20000000000000000000021 /* KitchenMemoryDomain */;
+			targetProxy = A14782DF3037A13600B16FC1 /* PBXContainerItemProxy */;
+		};
+		B20000000000000000000202 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B20000000000000000000022 /* KitchenMemoryImport */;
+			targetProxy = A14782E03037A13600B16FC1 /* PBXContainerItemProxy */;
+		};
+		B20000000000000000000203 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B20000000000000000000023 /* KitchenMemoryPersistence */;
+			targetProxy = A14782E23037A13600B16FC1 /* PBXContainerItemProxy */;
+		};
+		B20000000000000000000204 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B20000000000000000000024 /* KitchenMemoryApplication */;
+			targetProxy = A14782E43037A13600B16FC1 /* PBXContainerItemProxy */;
+		};
+		B20000000000000000000205 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B20000000000000000000025 /* KitchenMemorySampleData */;
+			targetProxy = A14782E83037A13600B16FC1 /* PBXContainerItemProxy */;
+		};
+		B20000000000000000000206 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B20000000000000000000021 /* KitchenMemoryDomain */;
+			targetProxy = A14782E13037A13600B16FC1 /* PBXContainerItemProxy */;
+		};
+		B20000000000000000000207 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B20000000000000000000021 /* KitchenMemoryDomain */;
+			targetProxy = A14782E33037A13600B16FC1 /* PBXContainerItemProxy */;
+		};
+		B20000000000000000000208 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B20000000000000000000021 /* KitchenMemoryDomain */;
+			targetProxy = A14782E53037A13600B16FC1 /* PBXContainerItemProxy */;
+		};
+		B20000000000000000000209 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B20000000000000000000022 /* KitchenMemoryImport */;
+			targetProxy = A14782E63037A13600B16FC1 /* PBXContainerItemProxy */;
+		};
+		B20000000000000000000210 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B20000000000000000000023 /* KitchenMemoryPersistence */;
+			targetProxy = A14782E73037A13600B16FC1 /* PBXContainerItemProxy */;
+		};
+		B20000000000000000000211 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B20000000000000000000021 /* KitchenMemoryDomain */;
+			targetProxy = A14782E93037A13600B16FC1 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -643,8 +1148,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = FT9KDL728H;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
 				MACOSX_DEPLOYMENT_TARGET = 26.5;
@@ -669,8 +1176,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = FT9KDL728H;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
 				MACOSX_DEPLOYMENT_TARGET = 26.5;
@@ -694,8 +1203,10 @@
 		A1C4E7C8302A63B900E2C0DB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = FT9KDL728H;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
 				MACOSX_DEPLOYMENT_TARGET = 26.5;
@@ -719,8 +1230,10 @@
 		A1C4E7C9302A63B900E2C0DB /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = FT9KDL728H;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
 				MACOSX_DEPLOYMENT_TARGET = 26.5;
@@ -737,6 +1250,256 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				TEST_TARGET_NAME = KitchenMemory;
+				XROS_DEPLOYMENT_TARGET = 26.5;
+			};
+			name = Release;
+		};
+		B20000000000000000000301 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = FT9KDL728H;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				MACOSX_DEPLOYMENT_TARGET = 26.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory.Domain;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+				XROS_DEPLOYMENT_TARGET = 26.5;
+			};
+			name = Debug;
+		};
+		B20000000000000000000302 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = FT9KDL728H;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				MACOSX_DEPLOYMENT_TARGET = 26.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory.Domain;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+				XROS_DEPLOYMENT_TARGET = 26.5;
+			};
+			name = Release;
+		};
+		B20000000000000000000303 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = FT9KDL728H;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				MACOSX_DEPLOYMENT_TARGET = 26.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory.Import;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+				XROS_DEPLOYMENT_TARGET = 26.5;
+			};
+			name = Debug;
+		};
+		B20000000000000000000304 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = FT9KDL728H;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				MACOSX_DEPLOYMENT_TARGET = 26.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory.Import;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+				XROS_DEPLOYMENT_TARGET = 26.5;
+			};
+			name = Release;
+		};
+		B20000000000000000000305 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = FT9KDL728H;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				MACOSX_DEPLOYMENT_TARGET = 26.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory.Persistence;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+				XROS_DEPLOYMENT_TARGET = 26.5;
+			};
+			name = Debug;
+		};
+		B20000000000000000000306 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = FT9KDL728H;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				MACOSX_DEPLOYMENT_TARGET = 26.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory.Persistence;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+				XROS_DEPLOYMENT_TARGET = 26.5;
+			};
+			name = Release;
+		};
+		B20000000000000000000307 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = FT9KDL728H;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				MACOSX_DEPLOYMENT_TARGET = 26.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory.Application;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+				XROS_DEPLOYMENT_TARGET = 26.5;
+			};
+			name = Debug;
+		};
+		B20000000000000000000308 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = FT9KDL728H;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				MACOSX_DEPLOYMENT_TARGET = 26.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory.Application;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+				XROS_DEPLOYMENT_TARGET = 26.5;
+			};
+			name = Release;
+		};
+		B20000000000000000000309 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = FT9KDL728H;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				MACOSX_DEPLOYMENT_TARGET = 26.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory.SampleData;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+				XROS_DEPLOYMENT_TARGET = 26.5;
+			};
+			name = Debug;
+		};
+		B20000000000000000000310 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = FT9KDL728H;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				MACOSX_DEPLOYMENT_TARGET = 26.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory.SampleData;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
 				XROS_DEPLOYMENT_TARGET = 26.5;
 			};
 			name = Release;
@@ -780,14 +1543,52 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-/* End XCConfigurationList section */
-
-/* Begin XCLocalSwiftPackageReference section */
-		A1C4E902302B100000E2C0DB /* XCLocalSwiftPackageReference "KitchenMemoryDomain" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = KitchenMemoryDomain;
+		B20000000000000000000321 /* Build configuration list for PBXNativeTarget "KitchenMemoryDomain" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B20000000000000000000301 /* Debug */,
+				B20000000000000000000302 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
-/* End XCLocalSwiftPackageReference section */
+		B20000000000000000000322 /* Build configuration list for PBXNativeTarget "KitchenMemoryImport" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B20000000000000000000303 /* Debug */,
+				B20000000000000000000304 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B20000000000000000000323 /* Build configuration list for PBXNativeTarget "KitchenMemoryPersistence" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B20000000000000000000305 /* Debug */,
+				B20000000000000000000306 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B20000000000000000000324 /* Build configuration list for PBXNativeTarget "KitchenMemoryApplication" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B20000000000000000000307 /* Debug */,
+				B20000000000000000000308 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B20000000000000000000325 /* Build configuration list for PBXNativeTarget "KitchenMemorySampleData" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B20000000000000000000309 /* Debug */,
+				B20000000000000000000310 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
 		A12691A8302E7ECF004E6195 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */ = {
@@ -805,22 +1606,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = A12691A8302E7ECF004E6195 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */;
 			productName = "plugin:SwiftLintBuildToolPlugin";
-		};
-		A1C4E903302B100000E2C0DB /* KitchenMemoryDomain */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = KitchenMemoryDomain;
-		};
-		A1C4EA04302B200000E2C0DB /* KitchenMemoryApplication */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = KitchenMemoryApplication;
-		};
-		A1C4EA05302B200000E2C0DB /* KitchenMemoryPersistence */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = KitchenMemoryPersistence;
-		};
-		A1C4EA06302B200000E2C0DB /* KitchenMemorySampleData */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = KitchenMemorySampleData;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
