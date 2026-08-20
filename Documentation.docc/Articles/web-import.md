@@ -45,12 +45,14 @@ fixtures without knowing where the document came from.
 
 `URLSessionRecipeDocumentLoader` now provides that interface for person-entered
 URLs. It uses a fresh ephemeral session, accepts only HTTPS, carries no
-cookies or URL cache, limits redirects and elapsed time, and streams at most 2
-MiB into memory. It accepts HTML content only, rejects credentials and
-nonstandard ports, resolves hostnames with the system resolver, and refuses a
-request if any returned IPv4 or IPv6 address is not globally routable. The same
-policy is applied to every redirect. Loading cancels when the import surface
-closes. Parsing then applies independent budgets for JSON-LD blocks, nesting,
+cookies or URL cache, limits redirects and total resource time, and streams at
+most 2 MiB into memory. It accepts HTML content only and rejects credentials,
+literal IP addresses, local-looking names, and nonstandard ports. URLSession
+owns DNS, connection setup, redirects, response streaming, and cancellation
+under one resource deadline; no separate blocking resolver can outlive the
+import. The same structural URL policy is applied to every redirect. Loading
+cancels when the import surface closes. Parsing then applies independent budgets
+for JSON-LD blocks, nesting,
 structural tokens, discovered objects, candidates, interpreted field lengths,
 ingredients, and instruction items. Structural and item ceilings are enforced
 while traversing. An aggregate UTF-8 ceiling bounds the candidate models retained
@@ -195,22 +197,21 @@ successful even if every ingredient remains unparsed.
 
 ### Destination-validation boundary
 
-String inspection alone cannot establish that a hostname is public. Alternate
-numeric spellings can disguise literal addresses, and an ordinary-looking domain
-can resolve to loopback, link-local, private, documentation, benchmarking,
-multicast, or reserved space. Kitchen Memory therefore parses literal addresses
-with system IP routines and resolves domain names before both the initial request
-and each redirect. If a name has multiple answers, every answer must be public.
+String inspection cannot prove that a hostname resolves only to public
+addresses. Kitchen Memory rejects literal and ambiguous numeric addresses, but
+deliberately leaves hostname resolution to URLSession. A separate `getaddrinfo`
+preflight cannot be cancelled reliably, and URLSession cannot pin its later TLS
+connection to the answer that preflight inspected. Such a check would therefore
+add a hang and time-of-check/time-of-use boundary without creating a dependable
+security boundary.
 
-There is still a time-of-check/time-of-use boundary between system DNS resolution
-and `URLSession` opening its connection. `URLSession` does not expose an API that
-pins its TLS connection to the exact validated DNS answer while retaining normal
-hostname verification. The checks materially reduce accidental and straightforward
-local-network access, but they are not described as perfect protection against a
-hostile authoritative DNS server performing a precisely timed rebinding attack.
-The importer remains a person-initiated, credential-free `GET` client with no
-cookies, a small response limit, and no script execution; those independent
-controls reduce the consequence of that residual boundary.
+Consequently, a dotted hostname can still resolve to a private address, and the
+system's configured proxy, VPN, trusted roots, and managed routing remain part of
+the device trust boundary. HTTPS certificate validation, no cookies, a
+person-initiated `GET`, a small response limit, one finite URLSession-owned
+deadline, and no script execution independently limit the consequence. That is
+a deliberate availability-oriented policy for a recipe importer, not a claim
+to provide a general SSRF sandbox.
 
 ## Test strategy
 

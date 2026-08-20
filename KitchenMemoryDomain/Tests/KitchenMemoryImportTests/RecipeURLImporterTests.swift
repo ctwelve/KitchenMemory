@@ -99,31 +99,20 @@ final class RecipeURLImporterTests: XCTestCase {
     XCTAssertFalse(URLSessionRecipeDocumentLoader.isStructurallyAllowedFetchURL(oversized))
   }
 
-  func testRejectsPublicHostnameWhenAnyResolvedAddressIsNotPublic() async {
-    let loader = URLSessionRecipeDocumentLoader(hostResolver: StubHostResolver(addresses: [
-      IPAddress("93.184.216.34")!,
-      IPAddress("192.168.1.20")!,
-    ]))
+  func testSessionConfigurationOwnsTheFiniteRequestLifetime() {
+    let timeout: TimeInterval = 7
+    let configuration = URLSessionRecipeDocumentLoader.configuredSession(
+      .default,
+      timeout: timeout
+    )
 
-    do {
-      _ = try await loader.load(URL(string: "https://recipes.example.com/toast")!)
-      XCTFail("Expected private DNS result to be rejected before fetching")
-    } catch {
-      XCTAssertEqual(error as? RecipeURLImportError, .disallowedURL)
-    }
-  }
-
-  func testIPAddressPolicyRejectsNonGlobalNetworks() {
-    let rejected = [
-      "0.0.0.0", "100.64.0.1", "169.254.169.254", "192.0.2.1",
-      "198.18.0.1", "198.51.100.1", "203.0.113.1", "224.0.0.1",
-      "::1", "::ffff:8.8.8.8", "2001:db8::1", "fc00::1", "fe80::1",
-    ]
-    for address in rejected {
-      XCTAssertFalse(IPAddress(address)!.isPublic, address)
-    }
-    XCTAssertTrue(IPAddress("93.184.216.34")!.isPublic)
-    XCTAssertTrue(IPAddress("2606:2800:220:1:248:1893:25c8:1946")!.isPublic)
+    XCTAssertEqual(configuration.timeoutIntervalForRequest, timeout)
+    XCTAssertEqual(configuration.timeoutIntervalForResource, timeout)
+    XCTAssertFalse(configuration.waitsForConnectivity)
+    XCTAssertEqual(configuration.requestCachePolicy, .reloadIgnoringLocalCacheData)
+    XCTAssertNil(configuration.urlCache)
+    XCTAssertNil(configuration.httpCookieStorage)
+    XCTAssertFalse(configuration.httpShouldSetCookies)
   }
 
   func testInvalidTextEncodingFailsWithoutAttemptingFallbackInterpretation() async {
@@ -159,14 +148,6 @@ final class RecipeURLImporterTests: XCTestCase {
     } catch {
       XCTAssertEqual(error as? RecipeURLImportError, .tooManyCandidates(maximum: 2))
     }
-  }
-}
-
-private struct StubHostResolver: RecipeHostResolving {
-  var addresses: [IPAddress]
-
-  func resolve(_ host: String) throws -> [IPAddress] {
-    addresses
   }
 }
 
