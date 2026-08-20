@@ -181,6 +181,7 @@ public struct URLSessionRecipeDocumentLoader: RecipeDocumentLoading, Sendable {
     configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
     configuration.urlCache = nil
     configuration.httpCookieStorage = nil
+    configuration.urlCredentialStorage = nil
     configuration.httpShouldSetCookies = false
     configuration.httpMaximumConnectionsPerHost = 2
     return configuration
@@ -367,6 +368,55 @@ final class RedirectController: NSObject, URLSessionTaskDelegate, @unchecked Sen
 
   var error: RecipeURLImportError? {
     lock.withLock { storedError }
+  }
+
+  /// Chooses the only two authentication outcomes recipe import permits.
+  ///
+  /// Server trust is not an application credential: default handling asks the
+  /// operating system to perform its normal certificate and hostname checks.
+  /// Every other challenge requests a password, client identity, proxy secret,
+  /// or mechanism-specific credential that a public recipe import neither owns
+  /// nor needs. Cancelling those challenges also prevents Foundation from
+  /// consulting ambient credentials on the app's behalf.
+  static func authenticationDisposition(
+    for authenticationMethod: String
+  ) -> URLSession.AuthChallengeDisposition {
+    authenticationMethod == NSURLAuthenticationMethodServerTrust
+      ? .performDefaultHandling
+      : .cancelAuthenticationChallenge
+  }
+
+  func urlSession(
+    _ session: URLSession,
+    didReceive challenge: URLAuthenticationChallenge,
+    completionHandler: @escaping (
+      URLSession.AuthChallengeDisposition,
+      URLCredential?
+    ) -> Void
+  ) {
+    completionHandler(
+      Self.authenticationDisposition(
+        for: challenge.protectionSpace.authenticationMethod
+      ),
+      nil
+    )
+  }
+
+  func urlSession(
+    _ session: URLSession,
+    task: URLSessionTask,
+    didReceive challenge: URLAuthenticationChallenge,
+    completionHandler: @escaping (
+      URLSession.AuthChallengeDisposition,
+      URLCredential?
+    ) -> Void
+  ) {
+    completionHandler(
+      Self.authenticationDisposition(
+        for: challenge.protectionSpace.authenticationMethod
+      ),
+      nil
+    )
   }
 
   func urlSession(

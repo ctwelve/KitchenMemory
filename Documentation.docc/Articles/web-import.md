@@ -44,9 +44,10 @@ consume a Safari share extension or saved HTML file and already consumes test
 fixtures without knowing where the document came from.
 
 `URLSessionRecipeDocumentLoader` now provides that interface for person-entered
-URLs. It uses a fresh ephemeral session, accepts only HTTPS, carries no
-cookies or URL cache, limits redirects and total resource time, and streams at
-most 2 MiB into memory. It accepts HTML content only and rejects credentials,
+URLs. It uses a fresh ephemeral session, accepts only HTTPS, carries no cookies,
+URL cache, or credential store, limits redirects and total resource time, and
+streams at most 2 MiB into memory. It accepts HTML content only and rejects
+credential-bearing URLs,
 literal IP addresses, local-looking names, and nonstandard ports. URLSession
 owns DNS, connection setup, redirects, response streaming, and cancellation
 under one resource deadline; no separate blocking resolver can outlive the
@@ -210,11 +211,13 @@ security boundary.
 
 Consequently, a dotted hostname can still resolve to a private address, and the
 system's configured proxy, VPN, trusted roots, and managed routing remain part of
-the device trust boundary. HTTPS certificate validation, no cookies, a
-person-initiated `GET`, a small response limit, one finite URLSession-owned
-deadline, and no script execution independently limit the consequence. That is
-a deliberate availability-oriented policy for a recipe importer, not a claim
-to provide a general SSRF sandbox.
+the device trust boundary. HTTPS certificate validation, no cookies or
+application credentials, a person-initiated `GET`, a small response limit, one
+finite URLSession-owned deadline, and no script execution independently limit
+the consequence. Server-trust challenges use normal system evaluation; Basic,
+Digest, NTLM, client-certificate, proxy, and other credential challenges are
+cancelled. That is a deliberate availability-oriented policy for a recipe
+importer, not a claim to provide a general SSRF sandbox.
 
 ## Test strategy
 

@@ -112,7 +112,33 @@ final class RecipeURLImporterTests: XCTestCase {
     XCTAssertEqual(configuration.requestCachePolicy, .reloadIgnoringLocalCacheData)
     XCTAssertNil(configuration.urlCache)
     XCTAssertNil(configuration.httpCookieStorage)
+    XCTAssertNil(configuration.urlCredentialStorage)
     XCTAssertFalse(configuration.httpShouldSetCookies)
+  }
+
+  func testAuthenticationPolicyUsesSystemTrustWithoutSupplyingCredentials() {
+    XCTAssertEqual(
+      RedirectController.authenticationDisposition(
+        for: NSURLAuthenticationMethodServerTrust
+      ),
+      .performDefaultHandling
+    )
+
+    let credentialMethods = [
+      NSURLAuthenticationMethodDefault,
+      NSURLAuthenticationMethodHTTPBasic,
+      NSURLAuthenticationMethodHTTPDigest,
+      NSURLAuthenticationMethodNTLM,
+      NSURLAuthenticationMethodNegotiate,
+      NSURLAuthenticationMethodClientCertificate,
+    ]
+    for method in credentialMethods {
+      XCTAssertEqual(
+        RedirectController.authenticationDisposition(for: method),
+        .cancelAuthenticationChallenge,
+        method
+      )
+    }
   }
 
   func testRedirectRebuildsAHostileProposalAsAMinimalGET() throws {
