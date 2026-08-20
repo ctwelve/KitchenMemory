@@ -115,6 +115,77 @@ final class RecipeURLImporterTests: XCTestCase {
     XCTAssertFalse(configuration.httpShouldSetCookies)
   }
 
+  func testRedirectRebuildsAHostileProposalAsAMinimalGET() throws {
+    let sourceURL = try XCTUnwrap(URL(string: "https://first.example/recipe"))
+    let destinationURL = try XCTUnwrap(URL(string: "https://second.example/recipe"))
+    let response = try XCTUnwrap(HTTPURLResponse(
+      url: sourceURL,
+      statusCode: 302,
+      httpVersion: "HTTP/1.1",
+      headerFields: ["Location": destinationURL.absoluteString]
+    ))
+    var proposed = URLRequest(url: destinationURL)
+    proposed.httpMethod = "POST"
+    proposed.httpBody = Data("secret body".utf8)
+    proposed.setValue("Bearer secret", forHTTPHeaderField: "Authorization")
+    proposed.setValue("session=secret", forHTTPHeaderField: "Cookie")
+    proposed.setValue(sourceURL.absoluteString, forHTTPHeaderField: "Referer")
+    proposed.setValue("untrusted", forHTTPHeaderField: "X-Publisher-Header")
+
+    let request = try XCTUnwrap(
+      RedirectController(maximumRedirects: 5, timeout: 7).redirectRequest(
+        response: response,
+        proposedRequest: proposed
+      )
+    )
+
+    XCTAssertEqual(request.url, destinationURL)
+    XCTAssertEqual(request.httpMethod, "GET")
+    XCTAssertNil(request.httpBody)
+    XCTAssertNil(request.httpBodyStream)
+    XCTAssertEqual(request.timeoutInterval, 7)
+    XCTAssertEqual(request.cachePolicy, .reloadIgnoringLocalCacheData)
+    XCTAssertFalse(request.httpShouldHandleCookies)
+    XCTAssertEqual(
+      request.value(forHTTPHeaderField: "Accept"),
+      "text/html, application/xhtml+xml;q=0.9"
+    )
+    XCTAssertEqual(request.value(forHTTPHeaderField: "User-Agent"), "KitchenMemory/1")
+    XCTAssertNil(request.value(forHTTPHeaderField: "Authorization"))
+    XCTAssertNil(request.value(forHTTPHeaderField: "Cookie"))
+    XCTAssertNil(request.value(forHTTPHeaderField: "Referer"))
+    XCTAssertNil(request.value(forHTTPHeaderField: "X-Publisher-Header"))
+  }
+
+  func testRedirectPolicyRejectsDisallowedTargetsAndStopsAtTheExactLimit() throws {
+    let sourceURL = try XCTUnwrap(URL(string: "https://first.example/recipe"))
+    let validTarget = try XCTUnwrap(URL(string: "https://second.example/recipe"))
+    let response = try XCTUnwrap(HTTPURLResponse(
+      url: sourceURL,
+      statusCode: 302,
+      httpVersion: nil,
+      headerFields: nil
+    ))
+
+    let blocked = RedirectController(maximumRedirects: 5, timeout: 7)
+    XCTAssertNil(blocked.redirectRequest(
+      response: response,
+      proposedRequest: URLRequest(url: URL(string: "http://second.example/recipe")!)
+    ))
+    XCTAssertEqual(blocked.error, .disallowedURL)
+
+    let limited = RedirectController(maximumRedirects: 1, timeout: 7)
+    XCTAssertNotNil(limited.redirectRequest(
+      response: response,
+      proposedRequest: URLRequest(url: validTarget)
+    ))
+    XCTAssertNil(limited.redirectRequest(
+      response: response,
+      proposedRequest: URLRequest(url: validTarget)
+    ))
+    XCTAssertEqual(limited.error, .tooManyRedirects)
+  }
+
   func testInvalidTextEncodingFailsWithoutAttemptingFallbackInterpretation() async {
     let loader = StubLoader(document: FetchedRecipeDocument(
       data: Data([0xFF, 0xFE, 0xFD]),

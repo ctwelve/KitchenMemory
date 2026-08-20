@@ -77,7 +77,8 @@ public struct URLSessionRecipeDocumentLoader: RecipeDocumentLoading, Sendable {
     }
 
     let redirectController = RedirectController(
-      maximumRedirects: maximumRedirects
+      maximumRedirects: maximumRedirects,
+      timeout: timeout
     )
     let configuration = Self.configuredSession(
       .ephemeral,
@@ -91,14 +92,7 @@ public struct URLSessionRecipeDocumentLoader: RecipeDocumentLoading, Sendable {
     )
     defer { session.invalidateAndCancel() }
 
-    var request = URLRequest(url: url)
-    request.httpMethod = "GET"
-    request.timeoutInterval = timeout
-    request.setValue(
-      "text/html, application/xhtml+xml;q=0.9",
-      forHTTPHeaderField: "Accept"
-    )
-    request.setValue("KitchenMemory/1", forHTTPHeaderField: "User-Agent")
+    let request = Self.recipeRequest(for: url, timeout: timeout)
 
     let bytes: URLSession.AsyncBytes
     let response: URLResponse
@@ -190,6 +184,28 @@ public struct URLSessionRecipeDocumentLoader: RecipeDocumentLoading, Sendable {
     configuration.httpShouldSetCookies = false
     configuration.httpMaximumConnectionsPerHost = 2
     return configuration
+  }
+
+  /// Builds the only request shape used for both initial loads and redirects.
+  ///
+  /// Redirect responses can cause Foundation to propose a request derived from
+  /// the previous one. Recipe import does not need to preserve arbitrary
+  /// headers, methods, or bodies across origins, so rebuilding from the target
+  /// URL gives that boundary a short allowlist instead of a growing denylist.
+  static func recipeRequest(for url: URL, timeout: TimeInterval) -> URLRequest {
+    var request = URLRequest(
+      url: url,
+      cachePolicy: .reloadIgnoringLocalCacheData,
+      timeoutInterval: timeout
+    )
+    request.httpMethod = "GET"
+    request.httpShouldHandleCookies = false
+    request.setValue(
+      "text/html, application/xhtml+xml;q=0.9",
+      forHTTPHeaderField: "Accept"
+    )
+    request.setValue("KitchenMemory/1", forHTTPHeaderField: "User-Agent")
+    return request
   }
 
   /// Performs the non-network portion of the recipe-fetch destination policy.
@@ -337,14 +353,16 @@ private extension URLSessionRecipeDocumentLoader {
   }
 }
 
-private final class RedirectController: NSObject, URLSessionTaskDelegate, @unchecked Sendable {
+final class RedirectController: NSObject, URLSessionTaskDelegate, @unchecked Sendable {
   private let maximumRedirects: Int
+  private let timeout: TimeInterval
   private let lock = NSLock()
   private var redirectCount = 0
   private var storedError: RecipeURLImportError?
 
-  init(maximumRedirects: Int) {
+  init(maximumRedirects: Int, timeout: TimeInterval) {
     self.maximumRedirects = maximumRedirects
+    self.timeout = timeout
   }
 
   var error: RecipeURLImportError? {
@@ -353,16 +371,30 @@ private final class RedirectController: NSObject, URLSessionTaskDelegate, @unche
 
   func urlSession(
     _ session: URLSession,
-    task: URLSessionTask,
+    task _: URLSessionTask,
     willPerformHTTPRedirection response: HTTPURLResponse,
     newRequest request: URLRequest,
     completionHandler: @escaping (URLRequest?) -> Void
   ) {
-    let shouldFollow = lock.withLock {
+    completionHandler(redirectRequest(response: response, proposedRequest: request))
+  }
+
+  /// Validates one redirect and returns a new minimal request when it is safe.
+  ///
+  /// This method is separate from the delegate callback so the trust boundary
+  /// can be exercised without starting a real network request. Both the source
+  /// response and proposed destination must remain within fetch policy; only
+  /// the destination URL survives into the returned request.
+  func redirectRequest(
+    response: HTTPURLResponse,
+    proposedRequest: URLRequest
+  ) -> URLRequest? {
+    lock.withLock {
+      guard storedError == nil else { return nil }
       redirectCount += 1
       guard redirectCount <= maximumRedirects else {
         storedError = .tooManyRedirects
-        return false
+        return nil
       }
       // A redirect is a new network destination, not merely part of the first
       // URL. Validate it before handing it back to URLSession; approving first
@@ -370,20 +402,15 @@ private final class RedirectController: NSObject, URLSessionTaskDelegate, @unche
       // to reach a private service. This delegate runs on URLSession's operation
       // queue, but the validation itself is deliberately pure string/URL work;
       // URLSession retains ownership of cancellable system DNS.
-      guard let url = request.url,
+      guard let sourceURL = response.url,
+            URLSessionRecipeDocumentLoader.isStructurallyAllowedFetchURL(sourceURL),
+            let url = proposedRequest.url,
             URLSessionRecipeDocumentLoader.isStructurallyAllowedFetchURL(url)
       else {
         storedError = .disallowedURL
-        return false
+        return nil
       }
-      if task.currentRequest?.url?.scheme?.lowercased() == "https",
-         url.scheme?.lowercased() != "https"
-      {
-        storedError = .disallowedURL
-        return false
-      }
-      return true
+      return URLSessionRecipeDocumentLoader.recipeRequest(for: url, timeout: timeout)
     }
-    completionHandler(shouldFollow ? request : nil)
   }
 }

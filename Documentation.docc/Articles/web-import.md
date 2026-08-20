@@ -51,8 +51,11 @@ literal IP addresses, local-looking names, and nonstandard ports. URLSession
 owns DNS, connection setup, redirects, response streaming, and cancellation
 under one resource deadline; no separate blocking resolver can outlive the
 import. The same structural URL policy is applied to every redirect. Loading
-cancels when the import surface closes. Parsing then applies independent budgets
-for JSON-LD blocks, nesting,
+cancels when the import surface closes. Each accepted redirect becomes a fresh,
+bodyless `GET` carrying only Kitchen Memory's `Accept` and `User-Agent` headers;
+Foundation-proposed methods, bodies, cookies, authorization, and arbitrary
+headers do not cross that boundary. Parsing then applies independent budgets for
+JSON-LD blocks, nesting,
 structural tokens, discovered objects, candidates, interpreted field lengths,
 ingredients, and instruction items. Structural and item ceilings are enforced
 while traversing. An aggregate UTF-8 ceiling bounds the candidate models retained
