@@ -8,6 +8,10 @@ import KitchenMemoryPersistence
 import SwiftData
 import XCTest
 
+// Repository tests keep related round-trip scenarios together and use complete
+// domain fixtures whose setup is intentionally visible beside each assertion.
+// swiftlint:disable file_length type_body_length
+
 @MainActor
 final class SwiftDataRecipeRepositoryTests: XCTestCase {
   func testImportedSourceCaptureRoundTripsWithoutChangingTheV1Schema() throws {
@@ -238,6 +242,7 @@ final class SwiftDataRecipeRepositoryTests: XCTestCase {
     )
   }
 
+  // swiftlint:disable:next function_body_length
   func testReplacingKitchenRecipesDeletesHistoryWithoutAffectingOtherKitchens() throws {
     let kitchen = Kitchen(name: "Home")
     let otherKitchen = Kitchen(name: "Cabin")
@@ -327,6 +332,7 @@ final class SwiftDataRecipeRepositoryTests: XCTestCase {
     XCTAssertEqual(try repository.kitchens(), [cabin, home])
   }
 
+  // swiftlint:disable:next function_body_length
   func testOrderedRecipeContentRoundTripsInUseOrder() throws {
     let kitchen = Kitchen(name: "Test Kitchen")
     let recipeID = Recipe.ID()
@@ -441,3 +447,5 @@ final class SwiftDataRecipeRepositoryTests: XCTestCase {
     }
   }
 }
+
+// swiftlint:enable file_length type_body_length

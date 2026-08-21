@@ -4,6 +4,10 @@
 
 import XCTest
 
+// The UI suite keeps its shared navigation and accessibility helpers beside
+// the end-to-end scenarios they support.
+// swiftlint:disable file_length type_body_length
+
 final class KitchenMemoryUITests: XCTestCase {
   override func setUpWithError() throws {
     continueAfterFailure = false
@@ -269,6 +273,9 @@ final class KitchenMemoryUITests: XCTestCase {
   }
 
   @MainActor
+  // The platform-specific audit workarounds are kept together so removing one
+  // when Xcode is fixed remains straightforward.
+  // swiftlint:disable:next function_body_length
   private func isKnownAccessibilityAuditFalsePositive(
     _ issue: XCUIAccessibilityAuditIssue,
     systemFullScreenButtonFrame: CGRect
@@ -290,8 +297,7 @@ final class KitchenMemoryUITests: XCTestCase {
       .matching(NSPredicate(format: "identifier BEGINSWITH %@", "recipe-metadata-"))
     if element.identifier.isEmpty,
       metadataDescendants.count == 1,
-      metadataDescendants.firstMatch.frame == element.frame
-    {
+      metadataDescendants.firstMatch.frame == element.frame {
       return true
     }
     return false
@@ -301,8 +307,7 @@ final class KitchenMemoryUITests: XCTestCase {
     if issue.auditType == .sufficientElementDescription,
       element.elementType == .touchBar,
       element.identifier.isEmpty,
-      element.label.isEmpty
-    {
+      element.label.isEmpty {
       // Xcode 26 injects an empty, system-owned TouchBar element into the
       // macOS application hierarchy and screenshots the menu bar when it
       // reports the issue. Kitchen Memory does not create Touch Bar content;
@@ -314,8 +319,7 @@ final class KitchenMemoryUITests: XCTestCase {
       element.elementType == .group,
       element.identifier.isEmpty,
       element.label.isEmpty,
-      systemFullScreenButtonFrame.contains(element.frame)
-    {
+      systemFullScreenButtonFrame.contains(element.frame) {
       // Xcode 26 audits the private Group inside AppKit's green full-screen
       // traffic-light button and reports its system-owned parent relationship
       // as invalid. Accept only an unlabeled Group physically contained by
@@ -325,8 +329,7 @@ final class KitchenMemoryUITests: XCTestCase {
 
     if element.elementType == .other,
       element.identifier.isEmpty,
-      element.label.isEmpty
-    {
+      element.label.isEmpty {
       let metadataDescendants = element.descendants(matching: .any)
         .matching(NSPredicate(format: "identifier BEGINSWITH %@", "recipe-metadata-"))
 
@@ -339,8 +342,7 @@ final class KitchenMemoryUITests: XCTestCase {
 
         if isMetadataGridCellWrapper,
           issue.auditType == .sufficientElementDescription
-            || issue.compactDescription == "Parent/Child mismatch"
-        {
+            || issue.compactDescription == "Parent/Child mismatch" {
           // LazyVGrid creates an extra macOS accessibility element around each
           // cell. It has the same frame as its single, fully labeled child but
           // cannot inherit that child's description. Xcode 26 reports the wrapper
@@ -355,8 +357,7 @@ final class KitchenMemoryUITests: XCTestCase {
     if issue.auditType == .sufficientElementDescription,
       element.elementType == .group,
       element.label.isEmpty,
-      !element.isHittable
-    {
+      !element.isHittable {
       // On macOS, SwiftUI exposes non-interactive layout groups to XCTest and
       // keeps their native Text nodes separate in the query tree. Xcode 26
       // then audits those structural groups as if each needed its own spoken
@@ -506,3 +507,5 @@ final class KitchenMemoryUITests: XCTestCase {
 #endif
   }
 }
+
+// swiftlint:enable file_length type_body_length

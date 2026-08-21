@@ -10,6 +10,10 @@
 		A1532353302C2FF100C8D534 /* Documentation.docc in Sources */ = {isa = PBXBuildFile; fileRef = A1532352302C2FF100C8D534 /* Documentation.docc */; };
 		A1532354302C2FF100C8D534 /* Documentation.docc in Sources */ = {isa = PBXBuildFile; fileRef = A1532352302C2FF100C8D534 /* Documentation.docc */; };
 		A1532355302C2FF100C8D534 /* Documentation.docc in Sources */ = {isa = PBXBuildFile; fileRef = A1532352302C2FF100C8D534 /* Documentation.docc */; };
+		A1C933B730381D9300DE2E1C /* COPYRIGHT in Resources */ = {isa = PBXBuildFile; fileRef = A1C4E838302A6FCA00E2C0DB /* COPYRIGHT */; };
+		A1C933B830381D9800DE2E1C /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = A1C4E839302A6FCA00E2C0DB /* LICENSE */; };
+		A1C933B930381D9E00DE2E1C /* AI.md in Resources */ = {isa = PBXBuildFile; fileRef = A1C4E837302A6FCA00E2C0DB /* AI.md */; };
+		A1C933BA30381DAB00DE2E1C /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = A1C4E83A302A6FCA00E2C0DB /* README.md */; };
 		B20000000000000000000101 /* KitchenMemoryDomain.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000011 /* KitchenMemoryDomain.framework */; };
 		B20000000000000000000102 /* KitchenMemoryImport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000012 /* KitchenMemoryImport.framework */; };
 		B20000000000000000000103 /* KitchenMemoryPersistence.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000013 /* KitchenMemoryPersistence.framework */; };
@@ -120,6 +124,7 @@
 				Modules/KitchenMemoryImport/IngredientLineParser.swift,
 				Modules/KitchenMemoryImport/RecipeImportModels.swift,
 				Modules/KitchenMemoryImport/RecipeURLImporter.swift,
+				Modules/KitchenMemoryImport/RecipeURLRedirectController.swift,
 				Modules/KitchenMemoryImport/SchemaOrgRecipeImporter.swift,
 				Modules/KitchenMemoryPersistence/KitchenMemoryMigrationPlan.swift,
 				Modules/KitchenMemoryPersistence/KitchenMemorySchema.swift,
@@ -147,6 +152,7 @@
 				Modules/KitchenMemoryImport/IngredientLineParser.swift,
 				Modules/KitchenMemoryImport/RecipeImportModels.swift,
 				Modules/KitchenMemoryImport/RecipeURLImporter.swift,
+				Modules/KitchenMemoryImport/RecipeURLRedirectController.swift,
 				Modules/KitchenMemoryImport/SchemaOrgRecipeImporter.swift,
 			);
 			target = B20000000000000000000022 /* KitchenMemoryImport */;
@@ -312,6 +318,7 @@
 			);
 			dependencies = (
 				A1C4E7AF302A63B900E2C0DB /* PBXTargetDependency */,
+				B20000000000000000000401 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				A1C4E7B0302A63B900E2C0DB /* KitchenMemoryTests */,
@@ -335,6 +342,7 @@
 			);
 			dependencies = (
 				A1C4E7B9302A63B900E2C0DB /* PBXTargetDependency */,
+				B20000000000000000000402 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				A1C4E7BA302A63B900E2C0DB /* KitchenMemoryUITests */,
@@ -357,6 +365,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				B20000000000000000000403 /* PBXTargetDependency */,
 			);
 			name = KitchenMemoryDomain;
 			packageProductDependencies = (
@@ -377,6 +386,7 @@
 			);
 			dependencies = (
 				B20000000000000000000206 /* PBXTargetDependency */,
+				B20000000000000000000404 /* PBXTargetDependency */,
 			);
 			name = KitchenMemoryImport;
 			packageProductDependencies = (
@@ -397,6 +407,7 @@
 			);
 			dependencies = (
 				B20000000000000000000207 /* PBXTargetDependency */,
+				B20000000000000000000405 /* PBXTargetDependency */,
 			);
 			name = KitchenMemoryPersistence;
 			packageProductDependencies = (
@@ -469,6 +480,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A1C933B830381D9800DE2E1C /* LICENSE in Resources */,
+				A1C933B930381D9E00DE2E1C /* AI.md in Resources */,
+				A1C933B730381D9300DE2E1C /* COPYRIGHT in Resources */,
+				A1C933BA30381DAB00DE2E1C /* README.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -596,6 +611,26 @@
 			isa = PBXTargetDependency;
 			target = B20000000000000000000021 /* KitchenMemoryDomain */;
 			targetProxy = A14782E33037A13600B16FC1 /* PBXContainerItemProxy */;
+		};
+		B20000000000000000000401 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = A12691A9302E7F04004E6195 /* SwiftLintBuildToolPlugin */;
+		};
+		B20000000000000000000402 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = A12691A9302E7F04004E6195 /* SwiftLintBuildToolPlugin */;
+		};
+		B20000000000000000000403 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = A12691A9302E7F04004E6195 /* SwiftLintBuildToolPlugin */;
+		};
+		B20000000000000000000404 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = A12691A9302E7F04004E6195 /* SwiftLintBuildToolPlugin */;
+		};
+		B20000000000000000000405 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = A12691A9302E7F04004E6195 /* SwiftLintBuildToolPlugin */;
 		};
 /* End PBXTargetDependency section */
 

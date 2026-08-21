@@ -71,9 +71,11 @@ public struct RecipeDraft: Equatable, Sendable {
       summary: summary,
       ingredientSections: ingredientLines.isEmpty
         ? []
-        : [IngredientSection(ingredients: ingredientLines.map {
-          RecipeIngredient(originalText: $0, presentationMode: .original, parseState: .edited)
-        })],
+        : [
+          IngredientSection(ingredients: ingredientLines.map {
+            RecipeIngredient(originalText: $0, presentationMode: .original, parseState: .edited)
+          }),
+        ],
       instructionSections: instructionLines.isEmpty
         ? []
         : [InstructionSection(steps: instructionLines.map { InstructionStep(text: $0) })]

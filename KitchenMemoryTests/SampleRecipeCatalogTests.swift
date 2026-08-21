@@ -82,7 +82,7 @@ final class SampleRecipeCatalogTests: XCTestCase {
             revision.ingredientSections[1].ingredients[4].quantity?.text,
             "to taste"
         )
-        XCTAssertTrue(revision.instructionSections[2].steps[0].name == "KILL THE HEAT")
+        XCTAssertEqual(revision.instructionSections[2].steps[0].name, "KILL THE HEAT")
         XCTAssertTrue(revision.instructionSections[2].steps[1].text.contains("snaps into focus"))
         XCTAssertTrue(revision.instructionSections[2].steps[3].text.contains("thermal flywheel"))
     }

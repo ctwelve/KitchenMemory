@@ -5,6 +5,10 @@
 import Foundation
 import KitchenMemoryDomain
 
+// The deterministic parser and its bounded scanners stay together so its
+// safety limits can be audited as one boundary.
+// swiftlint:disable file_length
+
 /// A deterministic importer for already-captured HTML and JSON-LD.
 ///
 /// This type deliberately has no network or persistence dependency. Callers
@@ -31,6 +35,7 @@ public struct SchemaOrgRecipeImporter: Sendable {
         importJSONLDBlocks([data], documentURL: documentURL)
     }
 
+    // swiftlint:disable:next cyclomatic_complexity function_body_length
     private func importJSONLDBlocks(_ blocks: [Data], documentURL: URL?) -> RecipeImportResult {
         var candidates: [RecipeImportCandidate] = []
         var diagnostics: [RecipeImportDiagnostic] = []
@@ -213,6 +218,7 @@ private extension SchemaOrgRecipeImporter {
         )
     }
 
+    // swiftlint:disable:next function_body_length
     static func makeDraft(
         from object: [String: Any],
         title: String,
@@ -696,6 +702,9 @@ private extension SchemaOrgRecipeImporter {
         return nil
     }
 
+    // The explicit arguments make every independently bounded collection clear
+    // at the call site.
+    // swiftlint:disable function_parameter_count
     /// Appends a joined field without first allocating an unbounded temporary.
     /// Both counters are maintained by the caller so repeated appends never
     /// recompute `String.count` over an ever-growing result.
@@ -729,6 +738,7 @@ private extension SchemaOrgRecipeImporter {
         charactersUsed += separatorCharacters + valueCharacters
         utf8BytesUsed += separatorBytes + valueBytes
     }
+    // swiftlint:enable function_parameter_count
 
     /// Multiplies a caller-selected model ceiling without letting an extreme
     /// (but otherwise valid) configuration trap before untrusted input is read.
@@ -964,6 +974,7 @@ private enum HTMLJSONLDBlockScanner {
         return nil
     }
 
+    // swiftlint:disable:next cyclomatic_complexity function_body_length
     private static func containsJSONLDType(
         in bytes: [UInt8],
         attributes: Range<Int>
@@ -971,16 +982,14 @@ private enum HTMLJSONLDBlockScanner {
         var cursor = attributes.lowerBound
         while cursor < attributes.upperBound {
             while cursor < attributes.upperBound,
-                  isASCIIWhitespace(bytes[cursor]) || bytes[cursor] == ascii("/")
-            {
+                  isASCIIWhitespace(bytes[cursor]) || bytes[cursor] == ascii("/") {
                 cursor += 1
             }
             let nameStart = cursor
             while cursor < attributes.upperBound,
                   !isASCIIWhitespace(bytes[cursor]),
                   bytes[cursor] != ascii("="),
-                  bytes[cursor] != ascii("/")
-            {
+                  bytes[cursor] != ascii("/") {
                 cursor += 1
             }
             guard nameStart < cursor else {
@@ -1011,8 +1020,7 @@ private enum HTMLJSONLDBlockScanner {
 
             let valueRange: Range<Int>
             if cursor < attributes.upperBound,
-               bytes[cursor] == ascii("\"") || bytes[cursor] == ascii("'")
-            {
+               bytes[cursor] == ascii("\"") || bytes[cursor] == ascii("'") {
                 let quote = bytes[cursor]
                 cursor += 1
                 let valueStart = cursor
@@ -1024,8 +1032,7 @@ private enum HTMLJSONLDBlockScanner {
             } else {
                 let valueStart = cursor
                 while cursor < attributes.upperBound,
-                      !isASCIIWhitespace(bytes[cursor])
-                {
+                      !isASCIIWhitespace(bytes[cursor]) {
                     cursor += 1
                 }
                 valueRange = valueStart..<cursor
@@ -1196,6 +1203,7 @@ private enum JSONTextNormalizer {
 }
 
 private enum JSONStructurePreflight {
+    // swiftlint:disable cyclomatic_complexity
     /// Scans raw JSON before `JSONSerialization` builds Foundation containers.
     ///
     /// A transport byte limit alone does not prevent a compact document from
@@ -1243,6 +1251,7 @@ private enum JSONStructurePreflight {
         }
         return true
     }
+    // swiftlint:enable cyclomatic_complexity
 }
 
 private enum ConsumedFieldPreflight {
@@ -1275,3 +1284,5 @@ private enum ConsumedFieldPreflight {
         return true
     }
 }
+
+// swiftlint:enable file_length

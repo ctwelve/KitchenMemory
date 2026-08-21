@@ -115,9 +115,15 @@ final class RecipeEditorTests: XCTestCase {
     let first = try editor.create(in: kitchen.id, from: RecipeDraft(title: "Tomato Soup"))
     let source = RecipeSource(kind: .webpage, title: "Tomato Notes")
     let media = RecipeMedia(role: .hero, assetName: "tomato-soup")
-    let originalSections = [IngredientSection(title: "Soup", ingredients: [
-      RecipeIngredient(originalText: "4 tomatoes", presentationMode: .original, parseState: .reviewed)
-    ])]
+    let originalSections = [
+      IngredientSection(title: "Soup", ingredients: [
+        RecipeIngredient(
+          originalText: "4 tomatoes",
+          presentationMode: .original,
+          parseState: .reviewed
+        ),
+      ]),
+    ]
     let importedRevision = RecipeRevision(
       id: first.revision.id,
       recipeID: first.recipe.id,
@@ -162,7 +168,11 @@ final class RecipeEditorTests: XCTestCase {
       recipeYield: RecipeYield(originalText: "Serves 4"),
       prepDuration: RecipeDuration(seconds: 900),
       ingredientSections: [IngredientSection(title: "Soup", ingredients: [ingredient])],
-      instructionSections: [InstructionSection(title: "Cook", steps: [InstructionStep(name: "Simmer", text: "Simmer for 20 minutes.")])]
+      instructionSections: [
+        InstructionSection(title: "Cook", steps: [
+          InstructionStep(name: "Simmer", text: "Simmer for 20 minutes."),
+        ]),
+      ]
     ))
 
     XCTAssertEqual(stored.revision.authorName, "Aunt Jo")
@@ -170,8 +180,14 @@ final class RecipeEditorTests: XCTestCase {
     XCTAssertEqual(stored.revision.recipeYield?.originalText, "Serves 4")
     XCTAssertEqual(stored.revision.prepDuration?.seconds, 900)
     XCTAssertEqual(stored.revision.ingredientSections.first?.title, "Soup")
-    XCTAssertEqual(stored.revision.ingredientSections.first?.ingredients.first?.originalText, "2 (14-ounce) cans whole tomatoes")
-    XCTAssertEqual(stored.revision.ingredientSections.first?.ingredients.first?.ingredientText, "whole tomatoes")
+    XCTAssertEqual(
+      stored.revision.ingredientSections.first?.ingredients.first?.originalText,
+      "2 (14-ounce) cans whole tomatoes"
+    )
+    XCTAssertEqual(
+      stored.revision.ingredientSections.first?.ingredients.first?.ingredientText,
+      "whole tomatoes"
+    )
     XCTAssertEqual(stored.revision.instructionSections.first?.steps.first?.name, "Simmer")
     XCTAssertEqual(try repository.recipe(id: stored.recipe.id), stored)
   }
@@ -226,6 +242,8 @@ final class RecipeEditorTests: XCTestCase {
     }
   }
 
+  // A tuple keeps the setup destructuring concise at each call site.
+  // swiftlint:disable:next large_tuple
   private func makeEditor() throws -> (Kitchen, SwiftDataRecipeRepository, RecipeEditor) {
     let kitchen = Kitchen(name: "Test Kitchen")
     let repository = SwiftDataRecipeRepository(

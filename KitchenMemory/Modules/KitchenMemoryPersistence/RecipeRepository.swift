@@ -6,6 +6,10 @@ import Foundation
 import KitchenMemoryDomain
 import SwiftData
 
+// Persistence reconstruction is deliberately kept beside its inverse mapping
+// so schema changes can be reviewed in both directions.
+// swiftlint:disable file_length type_body_length
+
 /// A recipe together with the revision selected as its current content.
 public struct StoredRecipe: Equatable, Identifiable, Sendable {
   public var id: Recipe.ID { recipe.id }
@@ -209,6 +213,7 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     }
   }
 
+  // swiftlint:disable:next function_body_length
   private func replace(_ revision: RecipeRevision) throws {
     let identifier = revision.id.rawValue
     try deleteRevisionRows(revisionID: identifier)
@@ -281,6 +286,7 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     }
   }
 
+  // swiftlint:disable:next function_body_length
   private func domainRevision(from record: RecipeRevisionRecord) throws -> RecipeRevision {
     let storedSource = try decodeSource(record.sourceData)
     let revisionID = record.id
@@ -387,16 +393,19 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
   }
 
   private func deleteRevisionRows(revisionID: UUID) throws {
-    for record in try context.fetch(
-      FetchDescriptor<RecipeMediaRecord>(predicate: #Predicate { $0.revisionID == revisionID }))
-    { context.delete(record) }
-    for record in try context.fetch(
-      FetchDescriptor<EquipmentRecord>(predicate: #Predicate { $0.revisionID == revisionID }))
-    { context.delete(record) }
+    for record in try context.fetch(FetchDescriptor<RecipeMediaRecord>(
+      predicate: #Predicate { $0.revisionID == revisionID }
+    )) {
+      context.delete(record)
+    }
+    for record in try context.fetch(FetchDescriptor<EquipmentRecord>(
+      predicate: #Predicate { $0.revisionID == revisionID }
+    )) {
+      context.delete(record)
+    }
     for section in try context.fetch(
       FetchDescriptor<IngredientSectionRecord>(
-        predicate: #Predicate { $0.revisionID == revisionID }))
-    {
+        predicate: #Predicate { $0.revisionID == revisionID })) {
       let sectionID = section.id
       for item in try context.fetch(
         FetchDescriptor<RecipeIngredientRecord>(predicate: #Predicate { $0.sectionID == sectionID })
@@ -405,12 +414,13 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     }
     for section in try context.fetch(
       FetchDescriptor<InstructionSectionRecord>(
-        predicate: #Predicate { $0.revisionID == revisionID }))
-    {
+        predicate: #Predicate { $0.revisionID == revisionID })) {
       let sectionID = section.id
-      for step in try context.fetch(
-        FetchDescriptor<InstructionStepRecord>(predicate: #Predicate { $0.sectionID == sectionID }))
-      { context.delete(step) }
+      for step in try context.fetch(FetchDescriptor<InstructionStepRecord>(
+        predicate: #Predicate { $0.sectionID == sectionID }
+      )) {
+        context.delete(step)
+      }
       context.delete(section)
     }
   }
@@ -441,17 +451,17 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
   }
 
   private func decode<Value: Decodable>(_ type: Value.Type, from data: Data, field: String) throws
-    -> Value
-  {
+    -> Value {
     do { return try decoder.decode(type, from: data) } catch {
       throw KitchenMemoryPersistenceError.invalidStoredValue(field: field)
     }
   }
 
   private func decodeOptional<Value: Decodable>(_ type: Value.Type, from data: Data?, field: String)
-    throws -> Value?
-  {
+    throws -> Value? {
     guard let data else { return nil }
     return try decode(type, from: data, field: field)
   }
 }
+
+// swiftlint:enable file_length type_body_length

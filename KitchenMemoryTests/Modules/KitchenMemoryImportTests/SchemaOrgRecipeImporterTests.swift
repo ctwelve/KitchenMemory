@@ -7,6 +7,10 @@ import KitchenMemoryDomain
 import KitchenMemoryImport
 import XCTest
 
+// These fixture-driven cases intentionally live beside the deterministic
+// importer boundary and exercise its complete input matrix.
+// swiftlint:disable file_length type_body_length
+
 final class SchemaOrgRecipeImporterTests: XCTestCase {
     private let importer = SchemaOrgRecipeImporter()
 
@@ -52,7 +56,10 @@ final class SchemaOrgRecipeImporterTests: XCTestCase {
             ["2 cups flour", "1½ cups sugar"]
         )
         XCTAssertEqual(candidate.draft.instructionSections.map(\.title), ["Cake", "Finish"])
-        XCTAssertEqual(candidate.draft.instructionSections[0].steps.map(\.text), ["Mix the batter.", "Bake until done."])
+        XCTAssertEqual(
+            candidate.draft.instructionSections[0].steps.map(\.text),
+            ["Mix the batter.", "Bake until done."]
+        )
         XCTAssertEqual(candidate.draft.instructionSections[1].steps.map(\.text), ["Cool completely."])
 
         let sourceDocument = try XCTUnwrap(
@@ -268,6 +275,7 @@ final class SchemaOrgRecipeImporterTests: XCTestCase {
 
     func testDirectJSONLDRejectsTrailingPartialUnicodeCodeUnits() throws {
         let json = #"{"@type":"Recipe","name":"Complete prefix"}"#
+        // swiftlint:disable:next large_tuple
         let variants: [(String.Encoding, [UInt8], ClosedRange<Int>)] = [
             (.utf16LittleEndian, [0xFF, 0xFE], 1...1),
             (.utf16BigEndian, [0xFE, 0xFF], 1...1),
@@ -294,6 +302,7 @@ final class SchemaOrgRecipeImporterTests: XCTestCase {
     func testDirectJSONLDDoesNotReplaceInvalidUnicodeScalars() throws {
         let prefix = #"{"@type":"Recipe","name":""#
         let suffix = #""}"#
+        // swiftlint:disable:next large_tuple
         let variants: [(String.Encoding, [UInt8], [UInt8])] = [
             (.utf16LittleEndian, [0xFF, 0xFE], [0x00, 0xD8]),
             (.utf16BigEndian, [0xFE, 0xFF], [0xD8, 0x00]),
@@ -537,20 +546,24 @@ final class SchemaOrgRecipeImporterTests: XCTestCase {
         let sectionData = try JSONSerialization.data(withJSONObject: [
             "@type": "Recipe",
             "name": "Nested steps",
-            "recipeInstructions": [[
-                "@type": "HowToSection",
-                "name": "Section",
-                "itemListElement": ["One", "Two", "Three"],
-            ]],
+            "recipeInstructions": [
+                [
+                    "@type": "HowToSection",
+                    "name": "Section",
+                    "itemListElement": ["One", "Two", "Three"],
+                ],
+            ],
         ])
         let exactSectionData = try JSONSerialization.data(withJSONObject: [
             "@type": "Recipe",
             "name": "Exact section",
-            "recipeInstructions": [[
-                "@type": "HowToSection",
-                "name": "Section",
-                "itemListElement": ["One", "Two"],
-            ]],
+            "recipeInstructions": [
+                [
+                    "@type": "HowToSection",
+                    "name": "Section",
+                    "itemListElement": ["One", "Two"],
+                ],
+            ],
         ])
 
         XCTAssertEqual(
@@ -758,3 +771,5 @@ final class SchemaOrgRecipeImporterTests: XCTestCase {
         return result
     }
 }
+
+// swiftlint:enable file_length type_body_length

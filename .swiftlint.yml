@@ -1,0 +1,26 @@
+check_for_updates: false
+reporter: xcode
+strict: true
+
+included:
+  - KitchenMemory
+  - KitchenMemoryTests
+  - KitchenMemoryUITests
+
+opt_in_rules:
+  - accessibility_label_for_image
+  - accessibility_trait_for_button
+  - contains_over_filter_count
+  - empty_count
+  - empty_string
+  - first_where
+  - sorted_first_last
+  - toggle_bool
+  - xct_specific_matcher
+
+type_name:
+  excluded:
+    - ID
+
+trailing_comma:
+  mandatory_comma: true

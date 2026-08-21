@@ -10,6 +10,9 @@ import XCTest
 
 @MainActor
 final class RecipeImportServiceTests: XCTestCase {
+  // This test intentionally keeps one complete imported candidate and all of
+  // its mapped evidence visible together.
+  // swiftlint:disable:next function_body_length
   func testMapsCandidateToEditableDraftWithBoundedSourceCaptureAndConcerns() throws {
     let requestedURL = URL(string: "https://short.example/soup")!
     let sourceURL = URL(string: "https://fetched.example/recipe")!
@@ -30,14 +33,16 @@ final class RecipeImportServiceTests: XCTestCase {
           URL(string: "https://example.com/soup.jpg")!,
           URL(string: "https://example.com/soup-2.jpg")!,
         ],
-        ingredientSections: [IngredientSection(ingredients: [
-          RecipeIngredient(originalText: "salt", presentationMode: .original),
-          RecipeIngredient(
-            originalText: "2 cups water",
-            presentationMode: .original,
-            parseState: .parsed
-          ),
-        ])]
+        ingredientSections: [
+          IngredientSection(ingredients: [
+            RecipeIngredient(originalText: "salt", presentationMode: .original),
+            RecipeIngredient(
+              originalText: "2 cups water",
+              presentationMode: .original,
+              parseState: .parsed
+            ),
+          ]),
+        ]
       ),
       snapshot: RecipeImportSourceSnapshot(
         documentURL: sourceURL,
@@ -66,7 +71,7 @@ final class RecipeImportServiceTests: XCTestCase {
       .preservedTaxonomy(cuisines: ["French"], categories: ["Dinner"], keywords: ["quick"]),
       .referencedImages(count: 2),
     ])
-    XCTAssertTrue(option.concerns.last?.isInformational == true)
+    XCTAssertEqual(option.concerns.last?.isInformational, true)
     XCTAssertEqual(option.draft.source?.canonicalURL, sourceURL)
     XCTAssertEqual(option.draft.sourceCapture?.sourceURL, sourceURL)
     XCTAssertEqual(option.draft.sourceCapture?.payload, payload)

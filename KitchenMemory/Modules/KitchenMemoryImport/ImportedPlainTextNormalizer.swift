@@ -37,7 +37,8 @@ enum ImportedPlainTextNormalizer {
     static func normalize(_ source: String) -> String {
         let decoded = decodeSupportedEntities(in: Array(source.utf8))
         let textBytes = removingMarkup(from: decoded)
-        return collapsingWhitespace(in: String(decoding: textBytes, as: UTF8.self))
+        guard let text = String(bytes: textBytes, encoding: .utf8) else { return "" }
+        return collapsingWhitespace(in: text)
     }
 
     /// Decodes one entity layer. In particular, `&amp;lt;` becomes `&lt;`, not
@@ -51,8 +52,7 @@ enum ImportedPlainTextNormalizer {
             if bytes[cursor] == ascii("&"),
                let entity = entities.first(where: {
                    matches($0.spelling, in: bytes, at: cursor, caseInsensitive: false)
-               })
-            {
+               }) {
                 output.append(contentsOf: entity.replacement)
                 cursor += entity.spelling.count
             } else {
