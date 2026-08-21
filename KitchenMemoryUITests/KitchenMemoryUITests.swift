@@ -107,6 +107,13 @@ final class KitchenMemoryUITests: XCTestCase {
       .firstMatch
     XCTAssertTrue(scroll(detail, untilVisible: scaledTuna))
 
+    let equipmentHelp = app.descendants(matching: .any)["equipment-scaling-help"]
+    XCTAssertTrue(scroll(detail, untilVisible: equipmentHelp))
+    let equipmentHelpText = [equipmentHelp.label, equipmentHelp.value as? String]
+      .compactMap { $0 }
+      .joined(separator: " ")
+    XCTAssertTrue(equipmentHelpText.contains("does not scale automatically"))
+
     let manualReview = app.descendants(matching: .any)
       .matching(NSPredicate(
         format: "label CONTAINS[c] %@",

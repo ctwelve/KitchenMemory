@@ -42,6 +42,12 @@ struct RecipeDetailView: View {
             accessibilityIdentifier: "equipment-section"
           ) {
             VStack(alignment: .leading, spacing: 10) {
+              Label(
+                "Equipment does not scale automatically. Check that it fits the working yield.",
+                systemImage: "info.circle")
+              .font(.caption)
+              .foregroundStyle(.secondary)
+              .accessibilityIdentifier("equipment-scaling-help")
               ForEach(revision.equipment) { item in
                 bullet(item.originalText)
               }
