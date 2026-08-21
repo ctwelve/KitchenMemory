@@ -7,6 +7,7 @@ import Foundation
 import KitchenMemoryDomain
 import XCTest
 
+@MainActor
 final class SampleRecipeCatalogTests: XCTestCase {
     func testManifestLoadsFromAssetCatalog() throws {
         let manifest = try SampleRecipeCatalog.loadManifest()

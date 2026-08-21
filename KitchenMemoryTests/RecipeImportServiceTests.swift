@@ -8,6 +8,7 @@ import KitchenMemoryDomain
 import KitchenMemoryImport
 import XCTest
 
+@MainActor
 final class RecipeImportServiceTests: XCTestCase {
   func testMapsCandidateToEditableDraftWithBoundedSourceCaptureAndConcerns() throws {
     let requestedURL = URL(string: "https://short.example/soup")!
