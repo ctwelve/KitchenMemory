@@ -8,25 +8,30 @@ import SwiftUI
 
 struct ContentView: View {
   @Bindable var model: RecipeLibraryModel
+  @Environment(\.horizontalSizeClass) private var horizontalSizeClass
   @State private var activeSheet: ActiveRecipeSheet?
+  @State private var columnVisibility: NavigationSplitViewVisibility = .automatic
   @State private var isShowingResetConfirmation = false
-#if os(iOS)
+#if !os(macOS)
   @State private var isShowingSettings = false
 #endif
 
   var body: some View {
-    NavigationSplitView {
+    NavigationSplitView(columnVisibility: $columnVisibility) {
       recipeList
         .navigationTitle("Recipes")
 #if os(macOS)
         .navigationSplitViewColumnWidth(min: 240, ideal: 300)
 #endif
+        // NavigationSplitView installs this item on its sidebar column, so
+        // removal must be scoped to the same view rather than the split root.
+        .toolbar(removing: usesCustomSidebarToggle ? .sidebarToggle : nil)
         .toolbar {
           ToolbarItem(placement: .primaryAction) {
             Button {
               activeSheet = .create
             } label: {
-              Label("New Recipe", systemImage: "plus")
+              ToolbarIconLabel("New Recipe", systemImage: "plus")
             }
             .accessibilityIdentifier("new-recipe")
           }
@@ -34,16 +39,27 @@ struct ContentView: View {
             Button {
               activeSheet = .importURL
             } label: {
-              Label("Import Recipe", systemImage: "square.and.arrow.down")
+              ToolbarIconLabel("Import Recipe", systemImage: "square.and.arrow.down")
             }
             .accessibilityIdentifier("import-recipe")
           }
-#if os(iOS)
+          if usesCustomSidebarToggle {
+            ToolbarItem(placement: sidebarTogglePlacement) {
+              Button {
+                toggleSidebar()
+              } label: {
+                ToolbarIconLabel(sidebarToggleTitle, systemImage: "sidebar.left")
+              }
+              .accessibilityIdentifier("toggle-sidebar")
+              .help(sidebarToggleTitle)
+            }
+          }
+#if !os(macOS)
           ToolbarItem(placement: .primaryAction) {
             Button {
               isShowingSettings = true
             } label: {
-              Label("Settings", systemImage: "gearshape")
+              ToolbarIconLabel("Settings", systemImage: "gearshape")
             }
             .accessibilityIdentifier("open-settings")
           }
@@ -58,13 +74,7 @@ struct ContentView: View {
     .sheet(item: $activeSheet) { sheet in
       sheetContent(sheet)
     }
-#if os(iOS)
-    .sheet(isPresented: $isShowingSettings) {
-      NavigationStack {
-        KitchenSettingsView(model: model)
-      }
-    }
-#else
+#if os(macOS)
     .focusedSceneValue(\.resetKitchenAction) {
       isShowingResetConfirmation = true
     }
@@ -72,8 +82,40 @@ struct ContentView: View {
       isPresented: $isShowingResetConfirmation,
       model: model
     )
+#else
+    .sheet(isPresented: $isShowingSettings) {
+      NavigationStack {
+        KitchenSettingsView(model: model)
+      }
+    }
 #endif
     .tint(Color("AccentColor"))
+  }
+
+  private var usesCustomSidebarToggle: Bool {
+#if os(iOS)
+    horizontalSizeClass == .regular
+#else
+    true
+#endif
+  }
+
+  private var sidebarToggleTitle: String {
+    columnVisibility == .detailOnly ? "Show Sidebar" : "Hide Sidebar"
+  }
+
+  private var sidebarTogglePlacement: ToolbarItemPlacement {
+#if os(macOS)
+    columnVisibility == .detailOnly ? .navigation : .primaryAction
+#else
+    .navigation
+#endif
+  }
+
+  private func toggleSidebar() {
+    withAnimation {
+      columnVisibility = columnVisibility == .detailOnly ? .all : .detailOnly
+    }
   }
 
   @ViewBuilder
@@ -164,6 +206,25 @@ struct ContentView: View {
         model.createRecipe(from: draft)
       }
     }
+  }
+}
+
+private struct ToolbarIconLabel: View {
+  let title: String
+  let systemImage: String
+
+  init(_ title: String, systemImage: String) {
+    self.title = title
+    self.systemImage = systemImage
+  }
+
+  var body: some View {
+    Label(title, systemImage: systemImage)
+      .labelStyle(.iconOnly)
+      // SF Symbols have different intrinsic heights. A shared box keeps their
+      // visible lower edges aligned without changing the toolbar button target.
+      .frame(width: 20, height: 20, alignment: .bottom)
+      .accessibilityLabel(title)
   }
 }
 

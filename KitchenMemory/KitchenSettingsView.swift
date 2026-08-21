@@ -42,7 +42,7 @@ struct KitchenCommands: Commands {
 struct KitchenSettingsView: View {
   @Bindable var model: RecipeLibraryModel
   @State private var isShowingResetConfirmation = false
-#if os(iOS)
+#if !os(macOS)
   @Environment(\.dismiss) private var dismiss
 #endif
 
