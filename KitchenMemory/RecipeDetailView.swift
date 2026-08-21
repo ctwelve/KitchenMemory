@@ -108,7 +108,9 @@ struct RecipeDetailView: View {
     .navigationBarTitleDisplayMode(.inline)
 #endif
   }
+}
 
+private extension RecipeDetailView {
   private var hero: some View {
     RecipeImage(
       media: revision.media.first { $0.role == .hero } ?? revision.media.first,
@@ -124,7 +126,6 @@ struct RecipeDetailView: View {
         .stroke(Color("SubtleBorder"), lineWidth: 1)
     }
   }
-
 
   private var header: some View {
     VStack(alignment: .leading, spacing: 10) {
@@ -157,7 +158,6 @@ struct RecipeDetailView: View {
     // SwiftUI from flattening the title, summary, and author into one element.
     .accessibilityElement(children: .contain)
   }
-
 
   @ViewBuilder
   private var metadata: some View {
