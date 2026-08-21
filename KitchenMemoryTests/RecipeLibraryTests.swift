@@ -76,4 +76,9 @@ private final class InMemoryRecipeRepository: RecipeRepository {
   func revisions(for recipeID: Recipe.ID) throws -> [RecipeRevision] {
     revisionsByRecipeID[recipeID, default: []]
   }
+
+  func replaceRecipes(in kitchenID: Kitchen.ID, with recipes: [StoredRecipe]) throws {
+    storedRecipes.removeAll { $0.recipe.kitchenID == kitchenID }
+    storedRecipes.append(contentsOf: recipes)
+  }
 }

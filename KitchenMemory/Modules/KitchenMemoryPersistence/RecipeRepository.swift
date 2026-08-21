@@ -32,6 +32,8 @@ public protocol RecipeRepository: AnyObject {
   func recipes(in kitchenID: Kitchen.ID) throws -> [StoredRecipe]
   /// Returns every saved revision for a recipe, newest revision first.
   func revisions(for recipeID: Recipe.ID) throws -> [RecipeRevision]
+  /// Atomically replaces every recipe and revision owned by one Kitchen.
+  func replaceRecipes(in kitchenID: Kitchen.ID, with recipes: [StoredRecipe]) throws
 }
 
 /// Failures detected while translating between domain values and stored rows.
@@ -149,6 +151,48 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
       sortBy: [SortDescriptor(\.revisionNumber, order: .reverse)]
     )
     return try context.fetch(descriptor).map(domainRevision)
+  }
+
+  public func replaceRecipes(in kitchenID: Kitchen.ID, with recipes: [StoredRecipe]) throws {
+    guard try kitchen(id: kitchenID) != nil else {
+      throw KitchenMemoryPersistenceError.missingKitchen
+    }
+    guard recipes.allSatisfy({ stored in
+      stored.recipe.kitchenID == kitchenID
+        && stored.revision.recipeID == stored.recipe.id
+        && stored.recipe.currentRevisionID == stored.revision.id
+    }) else {
+      throw KitchenMemoryPersistenceError.inconsistentRecipeIdentity
+    }
+
+    do {
+      let kitchenIdentifier = kitchenID.rawValue
+      let recipeRecords = try context.fetch(
+        FetchDescriptor<RecipeRecord>(
+          predicate: #Predicate { $0.kitchenID == kitchenIdentifier }
+        )
+      )
+      let recipeIdentifiers = Set(recipeRecords.map(\.id))
+      let revisionRecords = try context.fetch(FetchDescriptor<RecipeRevisionRecord>())
+        .filter { recipeIdentifiers.contains($0.recipeID) }
+
+      for revision in revisionRecords {
+        try deleteRevisionRows(revisionID: revision.id)
+        context.delete(revision)
+      }
+      for recipe in recipeRecords {
+        context.delete(recipe)
+      }
+
+      for stored in recipes {
+        try upsert(stored.recipe)
+        try replace(stored.revision)
+      }
+      try context.save()
+    } catch {
+      context.rollback()
+      throw error
+    }
   }
 
   private func upsert(_ recipe: Recipe) throws {

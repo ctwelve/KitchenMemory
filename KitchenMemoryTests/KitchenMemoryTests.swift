@@ -47,6 +47,27 @@ final class KitchenMemoryTests: XCTestCase {
     )
   }
 
+  func testResetKitchenRemovesUserRecipesAndRestoresCurrentSamples() throws {
+    let dependencies = try AppDependencies(inMemory: true)
+    dependencies.libraryModel.loadIfNeeded()
+    let manifest = try SampleRecipeCatalog.loadManifest()
+
+    XCTAssertTrue(
+      dependencies.libraryModel.createRecipe(from: RecipeDraft(title: "Temporary Recipe"))
+    )
+    let temporaryRecipeID = try XCTUnwrap(dependencies.libraryModel.selectedRecipeID)
+    XCTAssertEqual(dependencies.libraryModel.recipes.count, manifest.recipes.count + 1)
+
+    XCTAssertTrue(dependencies.libraryModel.resetKitchen())
+    XCTAssertEqual(
+      Set(dependencies.libraryModel.recipes.map(\.recipe.id)),
+      Set(manifest.recipes.map(\.recipeID))
+    )
+    XCTAssertFalse(
+      dependencies.libraryModel.recipes.contains { $0.recipe.id == temporaryRecipeID }
+    )
+  }
+
   func testSourceURLPolicyAllowsOnlyBoundedCredentialFreeWebLinks() {
     XCTAssertEqual(
       RecipeSourceURLPolicy.validatedURL(from: "  https://recipes.example/soup  ")?

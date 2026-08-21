@@ -14,6 +14,7 @@ final class RecipeLibraryModel {
   private let library: RecipeLibrary
   private let editor: RecipeEditor
   private let importer: any RecipeImportServing
+  private let resetService: KitchenResetService
 
   private(set) var recipes: [StoredRecipe] = []
   var selectedRecipeID: Recipe.ID?
@@ -24,12 +25,14 @@ final class RecipeLibraryModel {
     kitchenID: Kitchen.ID,
     library: RecipeLibrary,
     editor: RecipeEditor,
-    importer: any RecipeImportServing
+    importer: any RecipeImportServing,
+    resetService: KitchenResetService
   ) {
     self.kitchenID = kitchenID
     self.library = library
     self.editor = editor
     self.importer = importer
+    self.resetService = resetService
   }
 
   var selectedRecipe: StoredRecipe? {
@@ -82,5 +85,17 @@ final class RecipeLibraryModel {
 
   func importRecipe(from url: URL) async throws -> [RecipeImportOption] {
     try await importer.importRecipe(from: url)
+  }
+
+  @discardableResult
+  func resetKitchen() -> Bool {
+    do {
+      try resetService.reset(kitchenID: kitchenID)
+      reload()
+      return errorMessage == nil
+    } catch {
+      errorMessage = "Kitchen Memory could not reset this Kitchen. No reset was completed."
+      return false
+    }
   }
 }

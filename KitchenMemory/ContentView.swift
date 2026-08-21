@@ -9,6 +9,10 @@ import SwiftUI
 struct ContentView: View {
   @Bindable var model: RecipeLibraryModel
   @State private var activeSheet: ActiveRecipeSheet?
+  @State private var isShowingResetConfirmation = false
+#if os(iOS)
+  @State private var isShowingSettings = false
+#endif
 
   var body: some View {
     NavigationSplitView {
@@ -34,6 +38,16 @@ struct ContentView: View {
             }
             .accessibilityIdentifier("import-recipe")
           }
+#if os(iOS)
+          ToolbarItem(placement: .primaryAction) {
+            Button {
+              isShowingSettings = true
+            } label: {
+              Label("Settings", systemImage: "gearshape")
+            }
+            .accessibilityIdentifier("open-settings")
+          }
+#endif
         }
     } detail: {
       detail
@@ -44,6 +58,21 @@ struct ContentView: View {
     .sheet(item: $activeSheet) { sheet in
       sheetContent(sheet)
     }
+#if os(iOS)
+    .sheet(isPresented: $isShowingSettings) {
+      NavigationStack {
+        KitchenSettingsView(model: model)
+      }
+    }
+#else
+    .focusedSceneValue(\.resetKitchenAction) {
+      isShowingResetConfirmation = true
+    }
+    .kitchenResetConfirmation(
+      isPresented: $isShowingResetConfirmation,
+      model: model
+    )
+#endif
     .tint(Color("AccentColor"))
   }
 

@@ -24,9 +24,22 @@ struct KitchenMemoryApp: App {
   }
 
   var body: some Scene {
+#if os(macOS)
     WindowGroup {
       ContentView(model: dependencies.libraryModel)
     }
+    .commands {
+      KitchenCommands()
+    }
+
+    Settings {
+      KitchenSettingsView(model: dependencies.libraryModel)
+    }
+#else
+    WindowGroup {
+      ContentView(model: dependencies.libraryModel)
+    }
+#endif
   }
 }
 
@@ -62,7 +75,8 @@ struct AppDependencies {
       kitchenID: kitchen.id,
       library: RecipeLibrary(repository: repository),
       editor: RecipeEditor(repository: repository),
-      importer: RecipeImportService()
+      importer: RecipeImportService(),
+      resetService: KitchenResetService(repository: repository)
     )
   }
 

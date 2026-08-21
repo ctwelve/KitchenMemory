@@ -97,6 +97,38 @@ final class KitchenMemoryUITests: XCTestCase {
   }
 
   @MainActor
+  func testSettingsResetRequiresExplicitDestructiveConfirmation() throws {
+    let app = launchApp()
+#if os(macOS)
+    app.typeKey(",", modifierFlags: .command)
+#else
+    let openSettings = app.buttons["open-settings"]
+    XCTAssertTrue(openSettings.waitForExistence(timeout: 2))
+    activate(openSettings)
+#endif
+
+    let reset = app.buttons["settings-reset-kitchen"]
+    XCTAssertTrue(reset.waitForExistence(timeout: 5))
+    activate(reset)
+    assertResetWarning(in: app)
+  }
+
+#if os(macOS)
+  @MainActor
+  func testKitchenMenuResetRequiresExplicitDestructiveConfirmation() throws {
+    let app = launchApp()
+    let kitchenMenu = app.menuBars.menuBarItems["Kitchen"]
+    XCTAssertTrue(kitchenMenu.waitForExistence(timeout: 2))
+    activate(kitchenMenu)
+
+    let reset = app.menuItems["Reset Kitchen…"]
+    XCTAssertTrue(reset.waitForExistence(timeout: 2))
+    activate(reset)
+    assertResetWarning(in: app)
+  }
+#endif
+
+  @MainActor
   func testRecipeEditorCanScrollToItsLastSection() throws {
     let app = launchApp()
     let newRecipe = app.buttons["new-recipe"]
@@ -402,6 +434,46 @@ final class KitchenMemoryUITests: XCTestCase {
         )
       )
       .firstMatch
+  }
+
+  @MainActor
+  private func assertResetWarning(in app: XCUIApplication) {
+#if os(macOS)
+    // SwiftUI presents alerts as AppKit sheets. XCTest exposes the sheet's
+    // generic accessibility label, while the visible title remains a child.
+    let confirmation = app.sheets["alert"]
+#else
+    let confirmation = app.alerts["Reset Kitchen?"]
+#endif
+    XCTAssertTrue(confirmation.waitForExistence(timeout: 3))
+
+    let title = confirmation.descendants(matching: .any)
+      .matching(
+        NSPredicate(
+          format: "label == %@ OR value == %@",
+          "Reset Kitchen?",
+          "Reset Kitchen?"
+        )
+      )
+      .firstMatch
+    XCTAssertTrue(title.waitForExistence(timeout: 2))
+
+    let warning = confirmation.descendants(matching: .any)
+      .matching(
+        NSPredicate(
+          format: "label CONTAINS[c] %@ OR value CONTAINS[c] %@",
+          "permanently deleted",
+          "permanently deleted"
+        )
+      )
+      .firstMatch
+    XCTAssertTrue(warning.waitForExistence(timeout: 2))
+    XCTAssertTrue(confirmation.buttons["Reset Kitchen"].exists)
+
+    let cancel = confirmation.buttons["Cancel"]
+    XCTAssertTrue(cancel.exists)
+    activate(cancel)
+    XCTAssertTrue(confirmation.waitForNonExistence(timeout: 2))
   }
 
   @MainActor

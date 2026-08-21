@@ -238,6 +238,82 @@ final class SwiftDataRecipeRepositoryTests: XCTestCase {
     )
   }
 
+  func testReplacingKitchenRecipesDeletesHistoryWithoutAffectingOtherKitchens() throws {
+    let kitchen = Kitchen(name: "Home")
+    let otherKitchen = Kitchen(name: "Cabin")
+    let repository = SwiftDataRecipeRepository(
+      modelContainer: try KitchenMemorySchema.makeContainer(inMemory: true)
+    )
+    try repository.save(kitchen)
+    try repository.save(otherKitchen)
+
+    let oldRecipeID = Recipe.ID()
+    let firstRevision = RecipeRevision(
+      recipeID: oldRecipeID,
+      revisionNumber: 1,
+      title: "First Draft"
+    )
+    let secondRevision = RecipeRevision(
+      recipeID: oldRecipeID,
+      revisionNumber: 2,
+      title: "Family Draft"
+    )
+    try repository.save(
+      recipe: Recipe(
+        id: oldRecipeID,
+        kitchenID: kitchen.id,
+        currentRevisionID: firstRevision.id
+      ),
+      revision: firstRevision
+    )
+    try repository.save(
+      recipe: Recipe(
+        id: oldRecipeID,
+        kitchenID: kitchen.id,
+        currentRevisionID: secondRevision.id
+      ),
+      revision: secondRevision
+    )
+
+    let otherRecipeID = Recipe.ID()
+    let otherRevision = RecipeRevision(
+      recipeID: otherRecipeID,
+      revisionNumber: 1,
+      title: "Cabin Chili"
+    )
+    let otherRecipe = Recipe(
+      id: otherRecipeID,
+      kitchenID: otherKitchen.id,
+      currentRevisionID: otherRevision.id
+    )
+    try repository.save(recipe: otherRecipe, revision: otherRevision)
+
+    let replacementID = Recipe.ID()
+    let replacementRevision = RecipeRevision(
+      recipeID: replacementID,
+      revisionNumber: 1,
+      title: "Sample Soup"
+    )
+    let replacement = StoredRecipe(
+      recipe: Recipe(
+        id: replacementID,
+        kitchenID: kitchen.id,
+        currentRevisionID: replacementRevision.id
+      ),
+      revision: replacementRevision
+    )
+
+    try repository.replaceRecipes(in: kitchen.id, with: [replacement])
+
+    XCTAssertEqual(try repository.recipes(in: kitchen.id), [replacement])
+    XCTAssertNil(try repository.recipe(id: oldRecipeID))
+    XCTAssertEqual(try repository.revisions(for: oldRecipeID), [])
+    XCTAssertEqual(try repository.recipe(id: otherRecipeID), StoredRecipe(
+      recipe: otherRecipe,
+      revision: otherRevision
+    ))
+  }
+
   func testKitchenListLoadsAllSavedKitchensInNameOrder() throws {
     let repository = SwiftDataRecipeRepository(
       modelContainer: try KitchenMemorySchema.makeContainer(inMemory: true)
