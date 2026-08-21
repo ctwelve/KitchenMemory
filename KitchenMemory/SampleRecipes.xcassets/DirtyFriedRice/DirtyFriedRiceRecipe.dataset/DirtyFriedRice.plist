@@ -1,0 +1,369 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>formatVersion</key>
+	<integer>1</integer>
+	<key>recipeID</key>
+	<string>D1F10000-0000-4000-8000-000000000001</string>
+	<key>revision</key>
+	<dict>
+		<key>id</key>
+		<string>D1F20000-0000-4000-8000-000000000001</string>
+		<key>recipeID</key>
+		<string>D1F10000-0000-4000-8000-000000000001</string>
+		<key>revisionNumber</key>
+		<integer>1</integer>
+		<key>title</key>
+		<string>Dirty Fried Rice</string>
+		<key>summary</key>
+		<string>Not dirty rice. Not quite fried rice. A beefy, peppery, mildly spicy pantry raid with Hatch chiles, egg, vegetables, and a Bismarck, North Dakota passport. Allow approximately 20–30 minutes.</string>
+		<key>authorName</key>
+		<string>cTwelve</string>
+		<key>source</key>
+		<dict>
+			<key>kind</key>
+			<string>webpage</string>
+			<key>title</key>
+			<string>Dirty Fried Rice on X</string>
+			<key>authorName</key>
+			<string>cTwelve</string>
+			<key>publisherName</key>
+			<string>X</string>
+			<key>canonicalURL</key>
+			<dict>
+				<key>relative</key>
+				<string>https://x.com/theCTwelve/status/2089465462723682809</string>
+			</dict>
+		</dict>
+		<key>recipeYield</key>
+		<dict>
+			<key>originalText</key>
+			<string>Makes one enormous skillet</string>
+		</dict>
+		<key>cuisines</key>
+		<array>
+			<string>North Dakotan</string>
+		</array>
+		<key>categories</key>
+		<array>
+			<string>Dinner</string>
+			<string>Fried rice</string>
+			<string>Budget cooking</string>
+		</array>
+		<key>keywords</key>
+		<array>
+			<string>ground beef</string>
+			<string>rice</string>
+			<string>Hatch chiles</string>
+			<string>pantry raid</string>
+			<string>large batch</string>
+		</array>
+		<key>media</key>
+		<array>
+			<dict>
+				<key>id</key>
+				<string>D1F30000-0000-4000-8000-000000000001</string>
+				<key>role</key>
+				<string>hero</string>
+				<key>assetName</key>
+				<string>DirtyFriedRiceHero</string>
+				<key>accessibilityLabel</key>
+				<string>A bowl piled with beef fried rice, egg, corn, carrots, peas, and green beans, held in front of the enormous skillet it came from</string>
+			</dict>
+		</array>
+		<key>equipment</key>
+		<array>
+			<dict>
+				<key>id</key><string>D1F40001-0000-4000-8000-000000000001</string>
+				<key>originalText</key><string>One very large skillet, capable of high-temperature use</string>
+				<key>quantity</key><dict><key>kind</key><string>exact</string><key>lowerBound</key><dict><key>numerator</key><integer>1</integer><key>denominator</key><integer>1</integer></dict></dict>
+				<key>name</key><string>very large high-temperature skillet</string>
+				<key>isOptional</key><false/>
+			</dict>
+			<dict>
+				<key>id</key><string>D1F40002-0000-4000-8000-000000000002</string>
+				<key>originalText</key><string>One spatulator™ of sufficient power and might to handle Large Cookin'</string>
+				<key>quantity</key><dict><key>kind</key><string>exact</string><key>lowerBound</key><dict><key>numerator</key><integer>1</integer><key>denominator</key><integer>1</integer></dict></dict>
+				<key>name</key><string>sturdy spatula</string>
+				<key>isOptional</key><false/>
+			</dict>
+			<dict>
+				<key>id</key><string>D1F40003-0000-4000-8000-000000000003</string>
+				<key>originalText</key><string>Bowl and fork to scramble eggs</string>
+				<key>name</key><string>bowl and fork</string>
+				<key>isOptional</key><false/>
+			</dict>
+			<dict>
+				<key>id</key><string>D1F40004-0000-4000-8000-000000000004</string>
+				<key>originalText</key><string>Knife and cutting board to deal with the onion</string>
+				<key>name</key><string>knife and cutting board</string>
+				<key>isOptional</key><false/>
+			</dict>
+			<dict>
+				<key>id</key><string>D1F40005-0000-4000-8000-000000000005</string>
+				<key>originalText</key><string>Can opener to free your Ro-Tel from its metallic prison</string>
+				<key>name</key><string>can opener</string>
+				<key>isOptional</key><false/>
+			</dict>
+		</array>
+		<key>ingredientSections</key>
+		<array>
+			<dict>
+				<key>id</key><string>D1F50001-0000-4000-8000-000000000001</string>
+				<key>title</key><string>Main skillet</string>
+				<key>ingredients</key>
+				<array>
+					<dict>
+						<key>id</key><string>D1F60001-0000-4000-8000-000000000001</string>
+						<key>originalText</key><string>1.3 lb ground beef</string>
+						<key>presentationMode</key><string>original</string>
+						<key>quantity</key><dict><key>kind</key><string>exact</string><key>lowerBound</key><dict><key>numerator</key><integer>13</integer><key>denominator</key><integer>10</integer></dict></dict>
+						<key>unitText</key><string>pounds</string>
+						<key>ingredientText</key><string>ground beef</string>
+						<key>isOptional</key><false/>
+						<key>scalingBehavior</key><string>linear</string>
+						<key>parseState</key><string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key><string>D1F60002-0000-4000-8000-000000000002</string>
+						<key>originalText</key><string>1 tbsp vegetable oil, only if necessary for your ground beef</string>
+						<key>presentationMode</key><string>original</string>
+						<key>quantity</key><dict><key>kind</key><string>exact</string><key>lowerBound</key><dict><key>numerator</key><integer>1</integer><key>denominator</key><integer>1</integer></dict></dict>
+						<key>unitText</key><string>tablespoon</string>
+						<key>ingredientText</key><string>vegetable oil</string>
+						<key>note</key><string>Use another high-temperature oil if preferred; do not use olive oil.</string>
+						<key>isOptional</key><true/>
+						<key>scalingBehavior</key><string>linear</string>
+						<key>parseState</key><string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key><string>D1F60003-0000-4000-8000-000000000003</string>
+						<key>originalText</key><string>1 small-ish yellow onion, roughly chopped</string>
+						<key>presentationMode</key><string>original</string>
+						<key>quantity</key><dict><key>kind</key><string>exact</string><key>lowerBound</key><dict><key>numerator</key><integer>1</integer><key>denominator</key><integer>1</integer></dict></dict>
+						<key>unitText</key><string>small-ish</string>
+						<key>ingredientText</key><string>yellow onion</string>
+						<key>preparation</key><string>roughly chopped</string>
+						<key>note</key><string>More would not hurt.</string>
+						<key>isOptional</key><false/>
+						<key>scalingBehavior</key><string>linear</string>
+						<key>parseState</key><string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key><string>D1F60004-0000-4000-8000-000000000004</string>
+						<key>originalText</key><string>Plenty of freshly ground black pepper</string>
+						<key>presentationMode</key><string>original</string>
+						<key>quantity</key><dict><key>kind</key><string>text</string><key>text</key><string>plenty</string></dict>
+						<key>ingredientText</key><string>black pepper</string>
+						<key>preparation</key><string>freshly ground</string>
+						<key>isOptional</key><false/>
+						<key>scalingBehavior</key><string>manualReview</string>
+						<key>parseState</key><string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key><string>D1F60005-0000-4000-8000-000000000005</string>
+						<key>originalText</key><string>Montreal steak seasoning, to taste</string>
+						<key>presentationMode</key><string>original</string>
+						<key>quantity</key><dict><key>kind</key><string>text</string><key>text</key><string>to taste</string></dict>
+						<key>ingredientText</key><string>Montreal steak seasoning</string>
+						<key>note</key><string>If unavailable, season to taste from coarse salt, black pepper, cayenne, garlic, paprika, onion, coriander, dill, or similar spices.</string>
+						<key>isOptional</key><false/>
+						<key>scalingBehavior</key><string>manualReview</string>
+						<key>parseState</key><string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key><string>D1F60006-0000-4000-8000-000000000006</string>
+						<key>originalText</key><string>1 10-oz can Ro-Tel Hatch Diced Tomatoes &amp; Fire Roasted Hatch Chilies</string>
+						<key>presentationMode</key><string>original</string>
+						<key>quantity</key><dict><key>kind</key><string>exact</string><key>lowerBound</key><dict><key>numerator</key><integer>1</integer><key>denominator</key><integer>1</integer></dict></dict>
+						<key>unitText</key><string>can</string>
+						<key>package</key><dict><key>quantity</key><dict><key>kind</key><string>exact</string><key>lowerBound</key><dict><key>numerator</key><integer>10</integer><key>denominator</key><integer>1</integer></dict></dict><key>unitText</key><string>ounces</string></dict>
+						<key>ingredientText</key><string>Ro-Tel Hatch Diced Tomatoes &amp; Fire Roasted Hatch Chilies</string>
+						<key>isOptional</key><false/>
+						<key>scalingBehavior</key><string>linear</string>
+						<key>parseState</key><string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key><string>D1F60007-0000-4000-8000-000000000007</string>
+						<key>originalText</key><string>3 rice-cooker cups Japanese rice, cooked</string>
+						<key>presentationMode</key><string>original</string>
+						<key>quantity</key><dict><key>kind</key><string>exact</string><key>lowerBound</key><dict><key>numerator</key><integer>3</integer><key>denominator</key><integer>1</integer></dict></dict>
+						<key>unitText</key><string>rice-cooker cups</string>
+						<key>ingredientText</key><string>Japanese rice</string>
+						<key>preparation</key><string>cooked</string>
+						<key>note</key><string>One small Zojirushi batch, or one small-to-medium saucepan batch.</string>
+						<key>isOptional</key><false/>
+						<key>scalingBehavior</key><string>linear</string>
+						<key>parseState</key><string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key><string>D1F60008-0000-4000-8000-000000000008</string>
+						<key>originalText</key><string>3 large eggs, scrambled</string>
+						<key>presentationMode</key><string>original</string>
+						<key>quantity</key><dict><key>kind</key><string>exact</string><key>lowerBound</key><dict><key>numerator</key><integer>3</integer><key>denominator</key><integer>1</integer></dict></dict>
+						<key>unitText</key><string>large</string>
+						<key>ingredientText</key><string>eggs</string>
+						<key>preparation</key><string>scrambled</string>
+						<key>isOptional</key><false/>
+						<key>scalingBehavior</key><string>linear</string>
+						<key>parseState</key><string>reviewed</string>
+					</dict>
+				</array>
+			</dict>
+			<dict>
+				<key>id</key><string>D1F50002-0000-4000-8000-000000000002</string>
+				<key>title</key><string>Seasoning and finish</string>
+				<key>ingredients</key>
+				<array>
+					<dict>
+						<key>id</key><string>D1F60009-0000-4000-8000-000000000009</string>
+						<key>originalText</key><string>1 0.74-oz / 21-g packet Sun-Bird Fried Rice Seasoning Mix</string>
+						<key>presentationMode</key><string>original</string>
+						<key>quantity</key><dict><key>kind</key><string>exact</string><key>lowerBound</key><dict><key>numerator</key><integer>1</integer><key>denominator</key><integer>1</integer></dict></dict>
+						<key>unitText</key><string>packet</string>
+						<key>package</key><dict><key>quantity</key><dict><key>kind</key><string>exact</string><key>lowerBound</key><dict><key>numerator</key><integer>21</integer><key>denominator</key><integer>1</integer></dict></dict><key>unitText</key><string>grams</string></dict>
+						<key>ingredientText</key><string>Sun-Bird Fried Rice Seasoning Mix</string>
+						<key>note</key><string>0.74 ounces</string>
+						<key>isOptional</key><false/>
+						<key>scalingBehavior</key><string>linear</string>
+						<key>parseState</key><string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key><string>D1F6000A-0000-4000-8000-00000000000A</string>
+						<key>originalText</key><string>A splash of Worcestershire sauce</string>
+						<key>presentationMode</key><string>original</string>
+						<key>quantity</key><dict><key>kind</key><string>text</string><key>text</key><string>a splash</string></dict>
+						<key>ingredientText</key><string>Worcestershire sauce</string>
+						<key>isOptional</key><false/>
+						<key>scalingBehavior</key><string>manualReview</string>
+						<key>parseState</key><string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key><string>D1F6000B-0000-4000-8000-00000000000B</string>
+						<key>originalText</key><string>A generous shake of cayenne</string>
+						<key>presentationMode</key><string>original</string>
+						<key>quantity</key><dict><key>kind</key><string>text</string><key>text</key><string>a generous shake</string></dict>
+						<key>ingredientText</key><string>cayenne pepper</string>
+						<key>isOptional</key><false/>
+						<key>scalingBehavior</key><string>manualReview</string>
+						<key>parseState</key><string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key><string>D1F6000C-0000-4000-8000-00000000000C</string>
+						<key>originalText</key><string>1 10-oz bag frozen mixed vegetables</string>
+						<key>presentationMode</key><string>original</string>
+						<key>quantity</key><dict><key>kind</key><string>exact</string><key>lowerBound</key><dict><key>numerator</key><integer>1</integer><key>denominator</key><integer>1</integer></dict></dict>
+						<key>unitText</key><string>bag</string>
+						<key>package</key><dict><key>quantity</key><dict><key>kind</key><string>exact</string><key>lowerBound</key><dict><key>numerator</key><integer>10</integer><key>denominator</key><integer>1</integer></dict></dict><key>unitText</key><string>ounces</string></dict>
+						<key>ingredientText</key><string>frozen mixed vegetables</string>
+						<key>note</key><string>Corn, peas, carrots, and green beans—or use what you want; I'm not your mom.</string>
+						<key>isOptional</key><false/>
+						<key>scalingBehavior</key><string>linear</string>
+						<key>parseState</key><string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key><string>D1F6000D-0000-4000-8000-00000000000D</string>
+						<key>originalText</key><string>Soy sauce, to taste and probably more than you initially think</string>
+						<key>presentationMode</key><string>original</string>
+						<key>quantity</key><dict><key>kind</key><string>text</string><key>text</key><string>to taste</string></dict>
+						<key>ingredientText</key><string>soy sauce</string>
+						<key>isOptional</key><false/>
+						<key>scalingBehavior</key><string>manualReview</string>
+						<key>parseState</key><string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key><string>D1F6000E-0000-4000-8000-00000000000E</string>
+						<key>originalText</key><string>Toasted sesame oil, for finishing</string>
+						<key>presentationMode</key><string>original</string>
+						<key>ingredientText</key><string>toasted sesame oil</string>
+						<key>preparation</key><string>for finishing</string>
+						<key>isOptional</key><false/>
+						<key>scalingBehavior</key><string>manualReview</string>
+						<key>parseState</key><string>reviewed</string>
+					</dict>
+				</array>
+			</dict>
+		</array>
+		<key>instructionSections</key>
+		<array>
+			<dict>
+				<key>id</key><string>D1F70001-0000-4000-8000-000000000001</string>
+				<key>title</key><string>Brown the beef</string>
+				<key>steps</key>
+				<array>
+					<dict>
+						<key>id</key><string>D1F80001-0000-4000-8000-000000000001</string>
+						<key>name</key><string>Brown aggressively</string>
+						<key>text</key><string>Get the very large skillet ripping hot. Add the ground beef, using the vegetable oil only if necessary. Season with Montreal steak seasoning and plenty of freshly ground black pepper, then brown aggressively while keeping everything moving. Brown bits on the bottom of the pan are important.</string>
+					</dict>
+					<dict>
+						<key>id</key><string>D1F80002-0000-4000-8000-000000000002</string>
+						<key>name</key><string>Use the onion to deglaze</string>
+						<key>text</key><string>When the beef is delightfully brown, add the onion. Continue cooking until it softens a bit, using its moisture to lift the browned bits from the pan.</string>
+					</dict>
+					<dict>
+						<key>id</key><string>D1F80003-0000-4000-8000-000000000003</string>
+						<key>name</key><string>Cook off the tomato liquid</string>
+						<key>text</key><string>Dump in the whole can of Hatch Ro-Tel, liquid and all. Keep cooking until the beef is fully browned, the onion is softened to your liking, and most excess tomato liquid has cooked away. The high heat matters: we want browned hamburger, not boiled hamburger. Once it looks good, back the heat down somewhat.</string>
+					</dict>
+				</array>
+			</dict>
+			<dict>
+				<key>id</key><string>D1F70002-0000-4000-8000-000000000002</string>
+				<key>title</key><string>Fry the rice</string>
+				<key>steps</key>
+				<array>
+					<dict>
+						<key>id</key><string>D1F80004-0000-4000-8000-000000000004</string>
+						<key>name</key><string>Fold in the rice</string>
+						<key>text</key><string>Add the cooked Japanese rice and fold everything together, breaking up the rice as you go. Fresh rice is completely fine; no traditional ceremony of discovering leftover rice in the refrigerator is required. Give it a minute or two so the carryover heat can actually fry the rice.</string>
+					</dict>
+					<dict>
+						<key>id</key><string>D1F80005-0000-4000-8000-000000000005</string>
+						<key>name</key><string>Season</string>
+						<key>text</key><string>Add the Sun-Bird fried rice seasoning, a splash of Worcestershire sauce, and a generous hit of cayenne. Toss to combine, then turn the heat down again.</string>
+					</dict>
+					<dict>
+						<key>id</key><string>D1F80006-0000-4000-8000-000000000006</string>
+						<key>name</key><string>Work in the eggs</string>
+						<key>text</key><string>Add the 3 scrambled eggs. Work them through the hot rice and beef, continuing to turn and stir until the egg is cooked and distributed throughout the rice in little pieces.</string>
+					</dict>
+					<dict>
+						<key>id</key><string>D1F80007-0000-4000-8000-000000000007</string>
+						<key>name</key><string>Give it an actual fry</string>
+						<key>text</key><string>Keep working the mixture over reduced heat long enough for everything to combine and for some of the rice, beef, onion, and egg to get a little actual frying and browning.</string>
+					</dict>
+				</array>
+			</dict>
+			<dict>
+				<key>id</key><string>D1F70003-0000-4000-8000-000000000003</string>
+				<key>title</key><string>Finish and rest</string>
+				<key>steps</key>
+				<array>
+					<dict>
+						<key>id</key><string>D1F80008-0000-4000-8000-000000000008</string>
+						<key>name</key><string>KILL THE HEAT</string>
+						<key>text</key><string>Dump the entire bag of frozen vegetables directly into the pan—do not thaw or microwave them first. Stir thoroughly and let the enormous mass of screaming-hot beef and rice, plus the stored heat in the pan, cook the vegetables.</string>
+					</dict>
+					<dict>
+						<key>id</key><string>D1F80009-0000-4000-8000-000000000009</string>
+						<key>name</key><string>Taste and add soy</string>
+						<key>text</key><string>Taste. Add soy sauce until the flavor suddenly snaps into focus. If it needs help distributing, put the pan back over high heat for only about 15 seconds while stirring vigorously, just enough to work the soy through and cook off some water.</string>
+					</dict>
+					<dict>
+						<key>id</key><string>D1F8000A-0000-4000-8000-00000000000A</string>
+						<key>name</key><string>Heat off again</string>
+						<key>text</key><string>Turn the heat off again. Finish with a drizzle of toasted sesame oil and stir it through. The exact amount of soy is deliberately unspecified because the other seasonings and different soy sauces bring different amounts of salt. Likewise, cayenne is a matter between you and God.</string>
+					</dict>
+					<dict>
+						<key>id</key><string>D1F8000B-0000-4000-8000-00000000000B</string>
+						<key>name</key><string>The Giant Pan Maneuver</string>
+						<key>text</key><string>If the rice seems dry, do not immediately add liquid. Move the entire pan to a completely cold burner and cover it. The skillet and several pounds of food are a thermal flywheel: their stored energy finishes the vegetables while trapped steam redistributes moisture through the rice. Physically moving the pan matters on a radiant glass cooktop, where “OFF” and “COLD” are different concepts.</string>
+					</dict>
+				</array>
+			</dict>
+		</array>
+	</dict>
+</dict>
+</plist>

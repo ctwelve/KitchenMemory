@@ -18,6 +18,7 @@ final class KitchenMemoryUITests: XCTestCase {
 
     let recipeRow = app.descendants(matching: .any)
       .matching(NSPredicate(format: "identifier BEGINSWITH %@", "recipe-row-"))
+      .matching(NSPredicate(format: "label CONTAINS[c] %@", "Tuna Noodle Hotdish"))
       .firstMatch
     XCTAssertTrue(recipeRow.waitForExistence(timeout: 5))
     XCTAssertTrue(recipeRow.label.contains("Tuna Noodle Hotdish"))

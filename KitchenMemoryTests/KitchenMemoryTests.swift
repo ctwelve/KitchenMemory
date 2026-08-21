@@ -14,10 +14,10 @@ final class KitchenMemoryTests: XCTestCase {
 
     dependencies.libraryModel.loadIfNeeded()
 
-    XCTAssertEqual(dependencies.libraryModel.recipes.count, 1)
+    XCTAssertEqual(dependencies.libraryModel.recipes.count, 2)
     XCTAssertEqual(
       dependencies.libraryModel.selectedRecipe?.revision.title,
-      "Tuna Noodle Hotdish"
+      "Dirty Fried Rice"
     )
   }
 
@@ -27,7 +27,7 @@ final class KitchenMemoryTests: XCTestCase {
     dependencies.libraryModel.loadIfNeeded()
     dependencies.libraryModel.reload()
 
-    XCTAssertEqual(dependencies.libraryModel.recipes.count, 1)
+    XCTAssertEqual(dependencies.libraryModel.recipes.count, 2)
   }
 
   func testNewStoreCreatesOneKitchenAndImportsTheSampleCollectionOnce() throws {
@@ -42,8 +42,8 @@ final class KitchenMemoryTests: XCTestCase {
     XCTAssertEqual(firstKitchen, secondKitchen)
     XCTAssertEqual(try repository.kitchens(), [firstKitchen])
     XCTAssertEqual(
-      try repository.recipes(in: firstKitchen.id).map(\.recipe.id),
-      manifest.recipes.map(\.recipeID)
+      Set(try repository.recipes(in: firstKitchen.id).map(\.recipe.id)),
+      Set(manifest.recipes.map(\.recipeID))
     )
   }
 
