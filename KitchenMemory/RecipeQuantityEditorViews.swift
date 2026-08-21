@@ -62,7 +62,11 @@ struct IngredientQuantityEditor: View {
 
   private var preciseEntry: some View {
     VStack(alignment: .leading, spacing: 12) {
-      QuantityExpressionEditor(quantity: $quantity, allowsNone: true)
+      QuantityExpressionEditor(
+        quantity: $quantity,
+        availableKinds: [.none, .exact, .range, .approximate, .text],
+        accessibilityIdentifier: nil
+      )
 
       if package == nil {
         Button("Add package size", systemImage: "shippingbox") {
@@ -79,7 +83,8 @@ struct IngredientQuantityEditor: View {
           VStack(alignment: .leading, spacing: 10) {
             QuantityExpressionEditor(
               quantity: packageQuantityBinding,
-              allowsNone: false
+              availableKinds: [.exact, .range, .approximate, .text],
+              accessibilityIdentifier: nil
             )
             EditorTextField(
               "Package unit",
@@ -155,9 +160,10 @@ struct IngredientQuantityEditor: View {
   }
 }
 
-private struct QuantityExpressionEditor: View {
+struct QuantityExpressionEditor: View {
   @Binding var quantity: QuantityExpression?
-  let allowsNone: Bool
+  let availableKinds: [QuantityExpression.Kind]
+  let accessibilityIdentifier: String?
 
   var body: some View {
     Picker(selection: kindBinding) {
@@ -167,18 +173,35 @@ private struct QuantityExpressionEditor: View {
     } label: {
       EditorFieldLabel("Quantity type")
     }
+    .identified(accessibilityIdentifier.map { "\($0)-kind" })
 
     switch quantity?.kind ?? .none {
     case .none:
       Text("No quantity specified")
         .foregroundStyle(.secondary)
     case .exact:
-      RationalQuantityEditor("Quantity", quantity: lowerBoundBinding)
+      RationalQuantityEditor(
+        "Quantity",
+        quantity: lowerBoundBinding,
+        accessibilityIdentifier: accessibilityIdentifier.map { "\($0)-lower" }
+      )
     case .range:
-      RationalQuantityEditor("From", quantity: lowerBoundBinding)
-      RationalQuantityEditor("Through", quantity: upperBoundBinding)
+      RationalQuantityEditor(
+        "From",
+        quantity: lowerBoundBinding,
+        accessibilityIdentifier: accessibilityIdentifier.map { "\($0)-lower" }
+      )
+      RationalQuantityEditor(
+        "Through",
+        quantity: upperBoundBinding,
+        accessibilityIdentifier: accessibilityIdentifier.map { "\($0)-upper" }
+      )
     case .approximate:
-      RationalQuantityEditor("About", quantity: lowerBoundBinding)
+      RationalQuantityEditor(
+        "About",
+        quantity: lowerBoundBinding,
+        accessibilityIdentifier: accessibilityIdentifier.map { "\($0)-lower" }
+      )
     case .text:
       EditorTextField(
         "Amount",
@@ -188,12 +211,6 @@ private struct QuantityExpressionEditor: View {
     }
   }
 
-  private var availableKinds: [QuantityExpression.Kind] {
-    allowsNone
-      ? [.none, .exact, .range, .approximate, .text]
-      : [.exact, .range, .approximate, .text]
-  }
-
   private var kindBinding: Binding<QuantityExpression.Kind> {
     Binding(
       get: { quantity?.kind ?? .none },
@@ -201,7 +218,7 @@ private struct QuantityExpressionEditor: View {
         let previousText = quantity?.text
         switch newKind {
         case .none:
-          if allowsNone { quantity = nil }
+          if availableKinds.contains(.none) { quantity = nil }
         case .exact:
           quantity = QuantityExpression(
             kind: .exact,
@@ -256,24 +273,51 @@ private struct QuantityExpressionEditor: View {
 private struct RationalQuantityEditor: View {
   let label: String
   @Binding var quantity: RationalQuantity
+  let accessibilityIdentifier: String?
 
-  init(_ label: String, quantity: Binding<RationalQuantity>) {
+  init(
+    _ label: String,
+    quantity: Binding<RationalQuantity>,
+    accessibilityIdentifier: String?
+  ) {
     self.label = label
     _quantity = quantity
+    self.accessibilityIdentifier = accessibilityIdentifier
   }
 
   var body: some View {
     LabeledContent {
       HStack(spacing: 6) {
+        Button {
+          quantity.numerator = max(0, quantity.numerator - 1)
+        } label: {
+          Image(systemName: "minus")
+        }
+        .disabled(quantity.numerator == 0)
+        .accessibilityLabel("Decrease \(label.lowercased())")
+        .identified(accessibilityIdentifier.map { "\($0)-decrement" })
+
         TextField("Numerator", value: numeratorBinding, format: .number)
           .labelsHidden()
           .frame(maxWidth: 90)
+          .identified(accessibilityIdentifier.map { "\($0)-numerator" })
         Text("/")
           .foregroundStyle(.secondary)
           .accessibilityHidden(true)
         TextField("Denominator", value: denominatorBinding, format: .number)
           .labelsHidden()
           .frame(maxWidth: 90)
+          .identified(accessibilityIdentifier.map { "\($0)-denominator" })
+
+        Button {
+          let (numerator, overflow) = quantity.numerator.addingReportingOverflow(1)
+          if !overflow { quantity.numerator = numerator }
+        } label: {
+          Image(systemName: "plus")
+        }
+        .disabled(quantity.numerator == Int.max)
+        .accessibilityLabel("Increase \(label.lowercased())")
+        .identified(accessibilityIdentifier.map { "\($0)-increment" })
       }
       .accessibilityElement(children: .contain)
       .accessibilityLabel(label)
@@ -294,6 +338,17 @@ private struct RationalQuantityEditor: View {
       get: { quantity.denominator },
       set: { quantity.denominator = max(1, $0) }
     )
+  }
+}
+
+private extension View {
+  @ViewBuilder
+  func identified(_ identifier: String?) -> some View {
+    if let identifier {
+      accessibilityIdentifier(identifier)
+    } else {
+      self
+    }
   }
 }
 

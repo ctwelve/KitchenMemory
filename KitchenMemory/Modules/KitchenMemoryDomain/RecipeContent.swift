@@ -50,7 +50,7 @@ public struct RationalQuantity: Codable, Equatable, Sendable {
 
 public extension RationalQuantity {
     var renderedText: String {
-        denominator == 1 ? String(numerator) : "\(numerator)/\(denominator)"
+        scaledRenderedText
     }
 }
 

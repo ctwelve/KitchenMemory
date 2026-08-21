@@ -118,6 +118,7 @@
 				Modules/KitchenMemoryDomain/Recipe.swift,
 				Modules/KitchenMemoryDomain/RecipeContent.swift,
 				Modules/KitchenMemoryDomain/RecipeRevision.swift,
+				Modules/KitchenMemoryDomain/RecipeScaling.swift,
 				Modules/KitchenMemoryDomain/RecipeSourceCapture.swift,
 				Modules/KitchenMemoryDomain/StableIdentifier.swift,
 				Modules/KitchenMemoryImport/ImportedPlainTextNormalizer.swift,
@@ -140,6 +141,7 @@
 				Modules/KitchenMemoryDomain/Recipe.swift,
 				Modules/KitchenMemoryDomain/RecipeContent.swift,
 				Modules/KitchenMemoryDomain/RecipeRevision.swift,
+				Modules/KitchenMemoryDomain/RecipeScaling.swift,
 				Modules/KitchenMemoryDomain/RecipeSourceCapture.swift,
 				Modules/KitchenMemoryDomain/StableIdentifier.swift,
 			);

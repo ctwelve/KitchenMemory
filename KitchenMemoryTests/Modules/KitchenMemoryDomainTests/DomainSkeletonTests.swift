@@ -113,4 +113,138 @@ final class DomainSkeletonTests: XCTestCase {
             "4 (5-ounce) cans chunk light tuna"
         )
     }
+
+    func testRationalScalingReducesAndRendersMixedFractionsExactly() throws {
+        let scale = try XCTUnwrap(RecipeScale(
+            baseYield: RationalQuantity(numerator: 8),
+            workingYield: RationalQuantity(numerator: 6)
+        ))
+
+        XCTAssertEqual(scale.multiplier, RationalQuantity(numerator: 3, denominator: 4))
+        XCTAssertEqual(
+            RationalQuantity(numerator: 2).multiplied(by: scale.multiplier),
+            RationalQuantity(numerator: 3, denominator: 2)
+        )
+        XCTAssertEqual(RationalQuantity(numerator: 6, denominator: 4).renderedText, "1 1/2")
+    }
+
+    func testExactAndRangedLinearQuantitiesScaleWithoutChangingPackageSize() throws {
+        let scale = try XCTUnwrap(RecipeScale(
+            baseYield: RationalQuantity(numerator: 8),
+            workingYield: RationalQuantity(numerator: 4)
+        ))
+        let exact = RecipeIngredient(
+            quantity: QuantityExpression(
+                kind: .exact,
+                lowerBound: RationalQuantity(numerator: 4)
+            ),
+            unitText: "cans",
+            package: PackageDescription(
+                quantity: QuantityExpression(
+                    kind: .exact,
+                    lowerBound: RationalQuantity(numerator: 5)
+                ),
+                unitText: "ounces"
+            ),
+            ingredientText: "tuna"
+        ).scaled(using: scale)
+        let range = RecipeIngredient(
+            quantity: QuantityExpression(
+                kind: .range,
+                lowerBound: RationalQuantity(numerator: 2),
+                upperBound: RationalQuantity(numerator: 3)
+            ),
+            unitText: "cups",
+            ingredientText: "stock"
+        ).scaled(using: scale)
+
+        XCTAssertEqual(exact.status, .scaled)
+        XCTAssertEqual(exact.ingredient.effectiveDisplayText, "2 (5-ounce) cans tuna")
+        XCTAssertEqual(range.status, .scaled)
+        XCTAssertEqual(range.ingredient.effectiveDisplayText, "1–1 1/2 cups stock")
+    }
+
+    func testNonlinearAndTextIngredientsRemainIntactWithExplicitStatuses() throws {
+        let scale = try XCTUnwrap(RecipeScale(
+            baseYield: RationalQuantity(numerator: 4),
+            workingYield: RationalQuantity(numerator: 8)
+        ))
+        let fixed = RecipeIngredient(
+            originalText: "oil for the pan",
+            ingredientText: "oil for the pan",
+            scalingBehavior: .fixed
+        ).scaled(using: scale)
+        let manual = RecipeIngredient(
+            originalText: "salt to taste",
+            ingredientText: "salt",
+            scalingBehavior: .manualReview
+        ).scaled(using: scale)
+        let text = RecipeIngredient(
+            quantity: QuantityExpression(kind: .text, text: "a handful"),
+            ingredientText: "parsley"
+        ).scaled(using: scale)
+
+        XCTAssertEqual(fixed.status, .unchangedFixed)
+        XCTAssertEqual(fixed.ingredient.effectiveDisplayText, "oil for the pan")
+        XCTAssertEqual(manual.status, .unchangedManualReview)
+        XCTAssertEqual(manual.ingredient.effectiveDisplayText, "salt")
+        XCTAssertEqual(text.status, .unchangedText)
+        XCTAssertEqual(text.ingredient.effectiveDisplayText, "a handful parsley")
+    }
+
+    func testOriginalPresentationUsesStructuredAmountOnlyForScaledCopy() throws {
+        let scale = try XCTUnwrap(RecipeScale(
+            baseYield: RationalQuantity(numerator: 4),
+            workingYield: RationalQuantity(numerator: 8)
+        ))
+        let ingredient = RecipeIngredient(
+            originalText: "1.3 lb ground beef",
+            presentationMode: .original,
+            quantity: QuantityExpression(
+                kind: .exact,
+                lowerBound: RationalQuantity(numerator: 13, denominator: 10)
+            ),
+            unitText: "pounds",
+            ingredientText: "ground beef",
+            parseState: .reviewed
+        )
+
+        let scaled = ingredient.scaled(using: scale)
+
+        XCTAssertEqual(ingredient.effectiveDisplayText, "1.3 lb ground beef")
+        XCTAssertEqual(scaled.status, .scaled)
+        XCTAssertEqual(scaled.ingredient.effectiveDisplayText, "2 3/5 pounds ground beef")
+    }
+
+    func testRangedYieldExposesBothHonestScalingBases() {
+        let recipeYield = RecipeYield(
+            quantity: QuantityExpression(
+                kind: .range,
+                lowerBound: RationalQuantity(numerator: 4),
+                upperBound: RationalQuantity(numerator: 6)
+            ),
+            unitText: "servings",
+            originalText: "Serves 4 to 6"
+        )
+
+        XCTAssertEqual(
+            recipeYield.scalingBases,
+            [
+                RecipeYieldBasis(
+                    kind: .rangeLowerBound,
+                    quantity: RationalQuantity(numerator: 4)
+                ),
+                RecipeYieldBasis(
+                    kind: .rangeUpperBound,
+                    quantity: RationalQuantity(numerator: 6)
+                ),
+            ]
+        )
+        XCTAssertTrue(
+            RecipeYield(
+                quantity: QuantityExpression(kind: .text, text: "one large platter"),
+                originalText: "One large platter"
+            ).scalingBases.isEmpty
+        )
+    }
 }

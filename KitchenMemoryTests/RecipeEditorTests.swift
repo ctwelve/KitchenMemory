@@ -165,7 +165,14 @@ final class RecipeEditorTests: XCTestCase {
       title: "Tomato Soup",
       authorName: "Aunt Jo",
       source: RecipeSource(kind: .book, title: "Family Suppers", authorName: "Aunt Jo"),
-      recipeYield: RecipeYield(originalText: "Serves 4"),
+      recipeYield: RecipeYield(
+        quantity: QuantityExpression(
+          kind: .exact,
+          lowerBound: RationalQuantity(numerator: 4)
+        ),
+        unitText: "servings",
+        originalText: "Serves 4"
+      ),
       prepDuration: RecipeDuration(seconds: 900),
       ingredientSections: [IngredientSection(title: "Soup", ingredients: [ingredient])],
       instructionSections: [
@@ -178,6 +185,8 @@ final class RecipeEditorTests: XCTestCase {
     XCTAssertEqual(stored.revision.authorName, "Aunt Jo")
     XCTAssertEqual(stored.revision.source?.title, "Family Suppers")
     XCTAssertEqual(stored.revision.recipeYield?.originalText, "Serves 4")
+    XCTAssertEqual(stored.revision.recipeYield?.quantity?.lowerBound, RationalQuantity(numerator: 4))
+    XCTAssertEqual(stored.revision.recipeYield?.unitText, "servings")
     XCTAssertEqual(stored.revision.prepDuration?.seconds, 900)
     XCTAssertEqual(stored.revision.ingredientSections.first?.title, "Soup")
     XCTAssertEqual(
