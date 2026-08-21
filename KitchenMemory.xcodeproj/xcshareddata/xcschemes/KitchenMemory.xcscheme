@@ -57,28 +57,6 @@
                ReferencedContainer = "container:KitchenMemory.xcodeproj">
             </BuildableReference>
          </TestableReference>
-         <TestableReference
-            skipped = "NO"
-            parallelizable = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "A14784853037B11200B16FC1"
-               BuildableName = "Test2Tests.xctest"
-               BlueprintName = "Test2Tests"
-               ReferencedContainer = "container:KitchenMemory.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO"
-            parallelizable = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "A14784A73037B27F00B16FC1"
-               BuildableName = "Test3Tests.xctest"
-               BlueprintName = "Test3Tests"
-               ReferencedContainer = "container:KitchenMemory.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
