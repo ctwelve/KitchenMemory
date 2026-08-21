@@ -6,103 +6,117 @@ Copyright © 2026 the Kitchen Memory contributors.
 SPDX-License-Identifier: GPL-3.0-only
 -->
 
+Xcode Cloud is Kitchen Memory's continuous-integration system. The shared
+`KitchenMemory` scheme is the source of truth for local and cloud build, test,
+Analyze, and archive behavior; CI-only replacements for those actions should
+be avoided.
 
-GitHub Actions repeats the project's build and core-test verification on clean,
-GitHub-hosted Macs.
+## Workflow policy
 
-## When CI runs
+### Slice development
 
-The workflow runs:
+The slice workflow starts for meaningful project changes pushed to `slice/*`
+branches. It performs Build, Analyze, and Test actions using the shared
+`KitchenMemory` scheme, but does not archive a product.
 
-- for every pull request targeting `main`;
-- after a commit is pushed to `main`; and
-- when started manually from GitHub's Actions interface.
+Build and Analyze are required to pass. Test is advisory while the application
+UI is changing rapidly, allowing work on `slice/*` to continue through known UI
+test instability while still reporting the failures.
 
-Pull-request runs provide feedback before a change is merged. The subsequent
-`main` run verifies the resulting branch, including GitHub-created merge
-commits. If a newer commit makes an in-progress run obsolete, concurrency
-control cancels the older run.
+### Main production
 
-## What CI verifies
+The production workflow starts for meaningful project changes merged or pushed
+to `main`. It requires Test, Analyze, and Archive actions to pass. Archive is the
+production Release build, so a separate Build action would duplicate that work
+without producing a different artifact.
 
-macOS and iOS each have two distinct checks:
+Repeating the tests on `main` verifies the actual merge result, including its
+interaction with changes that landed after a slice branch began. The Analyze
+action remains a single macOS action: all application and internal-framework
+Swift sources are included by that scheme action, while platform compilation is
+covered by the other workflow actions.
 
-1. `Build` compiles the application. The macOS build also builds the native
-   DocC documentation.
-2. `Core tests` runs the consolidated Xcode unit and integration suite after
-   that platform's build succeeds. This includes app-level use-case and sample-
-   data tests plus the domain, import, and persistence framework tests.
+### Change filters
 
-Application and documentation build jobs explicitly compile the Release
-configuration. Core-test jobs retain Xcode's Debug configuration so test-only
-diagnostics and the deliberately Debug-only disposable UI-test store remain
-covered. This split makes CI exercise both configurations and, on macOS,
-verifies that App Sandbox and Hardened Runtime Release settings continue to
-compile without exceptions.
+Both workflows use file and folder conditions so source, project, dependency,
+test, asset, lint, and cloud-script changes run CI. Documentation-only and other
+non-product maintenance changes do not spend a full build allocation. Keep the
+filters conservative: configuration such as `.swiftlint.yml`, `Package.resolved`,
+the shared scheme and test plan, and `ci_scripts` can change build behavior even
+when no Swift source changed.
 
-The two platform pipelines are independent: macOS checks do not wait for iOS
-checks, and iOS checks do not wait for macOS checks. The repository's merge
-rules require both platform builds and both core-test checks directly, so there
-is no additional aggregator job or runner-startup delay.
+### Pull-request gate
 
-The accessibility UI-test jobs are temporarily disabled while the application
-UI is changing rapidly. The tests and their local-running documentation remain
-in the repository; restore the platform-specific jobs when the primary recipe
-workflows and accessibility tree are stable enough for their results to be
-durable CI signals.
+The pull-request workflow starts for meaningful project changes in pull requests
+from `slice/*` into `main`. Its Test action is required to pass, while tests in
+the slice-development workflow remain advisory during ordinary development.
 
-Application, integration, module, and UI targets use XCTest as their common
-test model and are all visible through the Xcode project and shared test plan.
+Xcode Cloud reports the pull-request result to GitHub. To make the gate prevent
+rather than merely warn about a failed merge candidate, configure the resulting
+Xcode Cloud build or Test action as a required GitHub status check for `main`.
+The production workflow repeats required tests after merge to verify the actual
+result on `main`.
 
-The commands disable code signing because these checks produce no distributable
-application and require no development certificate. Each job receives a clean
-runner and its own temporary Derived Data directory. GitHub jobs do not share
-build products automatically, so test jobs compile the test products they need
-after the preceding build has established that the application itself compiles.
-Sharing those products would require transferring large Derived Data artifacts;
-that optimization is deferred until measurements justify its complexity.
+The accessibility UI tests may remain advisory while their hierarchy is changing.
+Their audit model and accepted Xcode false positives are documented in
+<doc:accessibility-engineering>.
 
-The locally run UI suite treats accessibility semantics as part of the app's
-test contract. It verifies stable identifiers and reading order for the starter
-recipe, then runs semantic XCTest accessibility audits in light and dark
-appearances. The audits cover element detection, hit regions, descriptions,
-Dynamic Type, clipped text, traits, actions, and parent-child relationships.
+Xcode Cloud workflow metadata and start conditions live in Xcode Cloud rather
+than in this repository. Keep its actions, requirements, branch patterns, and
+change filters aligned with this policy. Add TestFlight or notarization as
+distribution post-actions when release automation is ready.
 
-The app-wide XCTest contrast audit is intentionally excluded. Xcode 26 samples
-wholly offscreen macOS `ScrollView` text against unrelated onscreen pixels,
-making that audit nondeterministic. The palette uses semantic text colors and
-defined light/dark asset variants; a deterministic contrast specimen is a
-finish-polish follow-up.
+## Static analysis
 
-SwiftUI and XCTest expose several platform-specific structural and system-owned
-elements. Every accepted false positive is matched by its audit type and exact
-element evidence rather than by broad error text. The full semantic model,
-exception boundaries, local runner-signing requirements, and result-bundle
-debugging workflow are documented in
-[Accessibility engineering](accessibility-engineering.md).
+The shared scheme marks the application as buildable for Analyze. Project build
+settings select Xcode's `deep` static-analyzer mode specifically for the Analyze
+action. The analyzer does not run during every ordinary build, avoiding a slower
+duplicate pass during day-to-day development.
 
-## Security and resource choices
+Run the same action locally with:
 
-The workflow grants its GitHub token read-only repository access. Checkout does
-not persist credentials because no step needs to write to the repository.
+```sh
+DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer \
+  xcodebuild -skipPackagePluginValidation analyze \
+  -project KitchenMemory.xcodeproj \
+  -scheme KitchenMemory \
+  -destination 'platform=macOS' \
+  -derivedDataPath /private/tmp/KitchenMemoryAnalyze \
+  CODE_SIGNING_ALLOWED=NO
+```
 
-`Build (macOS)`, `Core tests (macOS)`, `Build (iOS)`, and `Core tests (iOS)` are
-required status checks. Accessibility checks are not currently emitted by the
-workflow and must not be configured as required repository status checks.
+## SwiftLint
 
-Each job has a 20-minute timeout to prevent an unexpected hang from consuming
-runner time indefinitely. The repository is public. CI should nevertheless
-remain economical and avoid unnecessary duplicate work.
+SwiftLint is a pinned Swift package build-tool plugin attached to the application,
+internal frameworks, and test targets. Consequently, linting runs for the source
+files Xcode is already building, both locally and in Xcode Cloud. There is no
+separate cloud lint installation or script.
+
+The root `.swiftlint.yml` is strict: a violation fails the target. Its opt-in
+rules are deliberately limited to product safety and lifecycle mistakes,
+collection correctness and avoidable work, SwiftUI accessibility contracts, and
+test quality. Formatting preferences that would create broad mechanical churn
+are not CI policy.
+
+When adding an opt-in rule:
+
+1. audit it across the application, frameworks, and both test targets;
+2. confirm that its findings represent defects or an agreed maintenance cost;
+3. bring the current tree to zero violations before making it required; and
+4. avoid a baseline unless an incremental migration has been explicitly chosen.
+
+Xcode Cloud's noninteractive environment cannot approve package-plugin
+fingerprints. The executable `ci_scripts/ci_post_clone.sh` enables Xcode's
+package-plugin fingerprint bypass before each action. This is acceptable only
+because `Package.resolved` pins the SwiftLint plugin revision; dependency updates
+must be reviewed like source changes.
 
 ## Maintenance
 
-GitHub updates its hosted runner images and their default Xcode installations.
-The workflow records `xcodebuild -version` on every run so a toolchain change is
-visible in the log. Update the runner label or select a specific installed Xcode
-when the project needs a deliberate migration rather than accepting the hosted
-image's default.
+Xcode Cloud can update its Xcode and macOS environment. Treat a toolchain change
+as a deliberate migration: run the shared scheme locally with that Xcode version,
+review new analyzer and linter diagnostics, and then update the workflow.
 
-If CI becomes slow or expensive, useful later refinements include running
-portable domain tests on Linux, separating documentation into a less frequent
-job, or adding dependency caching. Those optimizations are intentionally deferred
-until measurements justify their complexity.
+Custom scripts in `ci_scripts` run for every cloud action. Keep them short,
+deterministic, and limited to environment preparation so build, test, Analyze,
+and archive behavior remains visible in the shared scheme.
