@@ -9,6 +9,8 @@ import SwiftUI
 struct RecipeDetailView: View {
   let storedRecipe: StoredRecipe
 
+  @State private var scalingSelection: RecipeScalingSelection
+
   // The metadata grid collapses before large text makes its cards cramped.
   // @ScaledMetric separately keeps the numbered instruction badge in step
   // with the text size instead of clipping a larger numeral in a fixed circle.
@@ -17,12 +19,20 @@ struct RecipeDetailView: View {
 
   private var revision: RecipeRevision { storedRecipe.revision }
 
+  init(storedRecipe: StoredRecipe) {
+    self.storedRecipe = storedRecipe
+    _scalingSelection = State(
+      initialValue: RecipeScalingSelection(recipeYield: storedRecipe.revision.recipeYield)
+    )
+  }
+
   var body: some View {
     ScrollView {
       VStack(alignment: .leading, spacing: 24) {
         hero
         header
         metadata
+        RecipeScalingControls(selection: $scalingSelection)
         source
 
         if !revision.equipment.isEmpty {
@@ -32,6 +42,12 @@ struct RecipeDetailView: View {
             accessibilityIdentifier: "equipment-section"
           ) {
             VStack(alignment: .leading, spacing: 10) {
+              Label(
+                "Equipment does not scale automatically. Check that it fits the working yield.",
+                systemImage: "info.circle")
+              .font(.caption)
+              .foregroundStyle(.secondary)
+              .accessibilityIdentifier("equipment-scaling-help")
               ForEach(revision.equipment) { item in
                 bullet(item.originalText)
               }
@@ -58,7 +74,7 @@ struct RecipeDetailView: View {
                     )
                 }
                 ForEach(section.ingredients) { ingredient in
-                  bullet(ingredient.effectiveDisplayText)
+                  ScaledIngredientRow(ingredient: ingredient, scale: scalingSelection.scale)
                 }
               }
               .accessibilityElement(children: .contain)
@@ -206,8 +222,10 @@ private extension RecipeDetailView {
 
   private var metadataValues: [MetadataValue] {
     var values: [MetadataValue] = []
-    if let recipeYield = revision.recipeYield {
-      values.append(.init(label: "Yield", value: recipeYield.originalText, systemImage: "person.2"))
+    if revision.recipeYield != nil {
+      values.append(
+        .init(label: "Yield", value: scalingSelection.displayedYield, systemImage: "person.2")
+      )
     }
     if let prepDuration = revision.prepDuration {
       values.append(.init(label: "Prep", value: duration(prepDuration), systemImage: "clock"))

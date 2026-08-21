@@ -36,7 +36,7 @@ struct RecipeEditorView: View {
   @State private var title: String
   @State private var summary: String
   @State private var authorName: String
-  @State private var yieldText: String
+  @State private var recipeYield: RecipeYield?
   @State private var prepMinutes: String
   @State private var cookMinutes: String
   @State private var totalMinutes: String
@@ -64,7 +64,7 @@ struct RecipeEditorView: View {
     _title = State(initialValue: draft.title)
     _summary = State(initialValue: draft.summary ?? "")
     _authorName = State(initialValue: draft.authorName ?? "")
-    _yieldText = State(initialValue: draft.recipeYield?.originalText ?? "")
+    _recipeYield = State(initialValue: draft.recipeYield)
     _prepMinutes = State(initialValue: Self.minutes(draft.prepDuration))
     _cookMinutes = State(initialValue: Self.minutes(draft.cookDuration))
     _totalMinutes = State(initialValue: Self.minutes(draft.totalDuration))
@@ -173,7 +173,7 @@ private extension RecipeEditorView {
       EditorTextField("Summary", text: $summary, multiline: true)
         .accessibilityIdentifier("recipe-editor-summary")
       EditorTextField("Recipe author", text: $authorName)
-      EditorTextField("Yield", text: $yieldText, prompt: "e.g. Serves 4")
+      RecipeYieldEditor(recipeYield: $recipeYield)
     }
   }
 
@@ -246,11 +246,27 @@ private extension RecipeEditorView {
     RecipeDraft(
       title: title, summary: summary, authorName: authorName, source: source,
       sourceCapture: preservedSourceCapture,
-      recipeYield: text(yieldText).map { RecipeYield(originalText: $0) },
+      recipeYield: cleanedRecipeYield,
       prepDuration: duration(prepMinutes), cookDuration: duration(cookMinutes), totalDuration: duration(totalMinutes),
       cuisines: preservedCuisines, categories: preservedCategories, keywords: preservedKeywords,
       ingredientSections: ingredientSections, instructionSections: instructionSections
     )
+  }
+
+  private var cleanedRecipeYield: RecipeYield? {
+    guard var recipeYield else { return nil }
+    recipeYield.unitText = recipeYield.unitText.flatMap(text)
+    let originalText = text(recipeYield.originalText)
+    if let originalText {
+      recipeYield.originalText = originalText
+    } else if let quantityText = recipeYield.quantity?.renderedText {
+      recipeYield.originalText = [quantityText, recipeYield.unitText]
+        .compactMap { $0 }
+        .joined(separator: " ")
+    } else {
+      return nil
+    }
+    return recipeYield
   }
 
   private var source: RecipeSource? {

@@ -82,6 +82,95 @@ final class KitchenMemoryUITests: XCTestCase {
   }
 
   @MainActor
+  func testStarterRecipeCanBeScaledForReading() throws {
+    let app = launchApp()
+    let recipeRow = app.descendants(matching: .any)
+      .matching(NSPredicate(format: "label CONTAINS[c] %@", "Tuna Noodle Hotdish"))
+      .firstMatch
+    XCTAssertTrue(recipeRow.waitForExistence(timeout: 5))
+    let detail = openRecipeDetail(in: app, from: recipeRow)
+
+    let scalingSection = app.descendants(matching: .any)["recipe-scaling-section"]
+    XCTAssertTrue(scroll(detail, untilVisible: scalingSection))
+    let workingYield = app.descendants(matching: .any)["recipe-working-yield"]
+    XCTAssertTrue(scroll(detail, untilVisible: workingYield))
+    let decrement = app.buttons["recipe-working-yield-decrement"]
+    XCTAssertTrue(decrement.waitForExistence(timeout: 2))
+    activate(decrement)
+    XCTAssertTrue(
+      NSPredicate(format: "value CONTAINS[c] %@", "7 servings")
+        .evaluate(with: workingYield)
+    )
+
+    let scaledTuna = app.descendants(matching: .any)
+      .matching(NSPredicate(format: "label CONTAINS[c] %@", "3 1/2 (5-ounce) cans"))
+      .firstMatch
+    XCTAssertTrue(scroll(detail, untilVisible: scaledTuna))
+
+    let equipmentHelp = app.descendants(matching: .any)["equipment-scaling-help"]
+    XCTAssertTrue(scroll(detail, untilVisible: equipmentHelp))
+    let equipmentHelpText = [equipmentHelp.label, equipmentHelp.value as? String]
+      .compactMap { $0 }
+      .joined(separator: " ")
+    XCTAssertTrue(equipmentHelpText.contains("does not scale automatically"))
+
+    let manualReview = app.descendants(matching: .any)
+      .matching(NSPredicate(
+        format: "label CONTAINS[c] %@",
+        "Check this amount manually"
+      ))
+      .firstMatch
+    XCTAssertTrue(scroll(detail, untilVisible: manualReview))
+  }
+
+  @MainActor
+  func testTextOnlyYieldCanBeMadeScalableAndRefreshesAfterSave() throws {
+    let app = launchApp()
+    let dirtyFriedRice = app.descendants(matching: .any)
+      .matching(NSPredicate(format: "label CONTAINS[c] %@", "Dirty Fried Rice"))
+      .firstMatch
+    XCTAssertTrue(dirtyFriedRice.waitForExistence(timeout: 5))
+    let detail = openRecipeDetail(in: app, from: dirtyFriedRice)
+
+    let edit = app.buttons["edit-recipe"]
+    XCTAssertTrue(edit.waitForExistence(timeout: 2))
+    activate(edit)
+
+    let editor = app.descendants(matching: .any)["recipe-editor-scroll"]
+    let scalingToggle = app.descendants(matching: .any)["recipe-editor-yield-scaling"]
+    XCTAssertTrue(scroll(editor, untilVisible: scalingToggle))
+    activate(scalingToggle)
+
+    let increment = app.buttons["recipe-editor-yield-quantity-lower-increment"]
+    XCTAssertTrue(increment.waitForExistence(timeout: 2))
+    for _ in 1..<8 { activate(increment) }
+
+    let save = app.buttons["recipe-editor-save"]
+    XCTAssertTrue(save.waitForExistence(timeout: 2))
+    activate(save)
+
+    let workingYield = app.descendants(matching: .any)["recipe-working-yield"]
+    XCTAssertTrue(scroll(detail, untilVisible: workingYield))
+    XCTAssertTrue(
+      NSPredicate(format: "value CONTAINS[c] %@", "8")
+        .evaluate(with: workingYield)
+    )
+
+    let decrement = app.buttons["recipe-working-yield-decrement"]
+    XCTAssertTrue(decrement.waitForExistence(timeout: 2))
+    activate(decrement)
+    XCTAssertTrue(
+      NSPredicate(format: "value CONTAINS[c] %@", "7")
+        .evaluate(with: workingYield)
+    )
+
+    let scaledEggs = app.descendants(matching: .any)
+      .matching(NSPredicate(format: "label CONTAINS[c] %@", "2 5/8 large eggs"))
+      .firstMatch
+    XCTAssertTrue(scroll(detail, untilVisible: scaledEggs))
+  }
+
+  @MainActor
   func testCanCreateARecipeFromTheEditor() throws {
     let app = launchApp()
     let newRecipe = app.buttons["new-recipe"]

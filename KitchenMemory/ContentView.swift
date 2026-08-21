@@ -161,7 +161,10 @@ struct ContentView: View {
   private var detail: some View {
     if let selectedRecipe = model.selectedRecipe {
       RecipeDetailView(storedRecipe: selectedRecipe)
-        .id(selectedRecipe.recipe.id)
+        // A revision is immutable, but this view owns reading-only state such
+        // as the selected scaling basis. Give each new revision fresh state so
+        // a just-saved yield is reflected immediately.
+        .id(selectedRecipe.revision.id)
         .toolbar {
           ToolbarItem(placement: .primaryAction) {
             Button { activeSheet = .edit(selectedRecipe) } label: {
