@@ -102,6 +102,7 @@
 		A1C4E838302A6FCA00E2C0DB /* COPYRIGHT */ = {isa = PBXFileReference; lastKnownFileType = text; path = COPYRIGHT; sourceTree = "<group>"; };
 		A1C4E839302A6FCA00E2C0DB /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		A1C4E83A302A6FCA00E2C0DB /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		A1FA94673037E162009138EF /* ci_post_clone.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = ci_post_clone.sh; sourceTree = "<group>"; };
 		B20000000000000000000011 /* KitchenMemoryDomain.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = KitchenMemoryDomain.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B20000000000000000000012 /* KitchenMemoryImport.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = KitchenMemoryImport.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B20000000000000000000013 /* KitchenMemoryPersistence.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = KitchenMemoryPersistence.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -261,6 +262,7 @@
 		A1C4E795302A63B800E2C0DB = {
 			isa = PBXGroup;
 			children = (
+				A1FA94663037E15C009138EF /* ci_scripts */,
 				A14784273037A60D00B16FC1 /* .github */,
 				A1532352302C2FF100C8D534 /* Documentation.docc */,
 				A15962C5302BC01A00926925 /* KitchenMemory.xctestplan */,
@@ -286,6 +288,14 @@
 				B20000000000000000000013 /* KitchenMemoryPersistence.framework */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		A1FA94663037E15C009138EF /* ci_scripts */ = {
+			isa = PBXGroup;
+			children = (
+				A1FA94673037E162009138EF /* ci_post_clone.sh */,
+			);
+			path = ci_scripts;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
