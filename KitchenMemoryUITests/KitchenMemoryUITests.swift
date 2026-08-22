@@ -250,7 +250,9 @@ final class KitchenMemoryUITests: XCTestCase {
     let app = launchApp()
     let recipeRow = app.descendants(matching: .any)
       .matching(NSPredicate(format: "identifier BEGINSWITH %@", "recipe-row-"))
+      .matching(NSPredicate(format: "label CONTAINS[c] %@", "Tuna Noodle Hotdish"))
       .firstMatch
+    XCTAssertTrue(recipeRow.waitForExistence(timeout: 5))
     let detail = openRecipeDetail(in: app, from: recipeRow)
     let edit = app.buttons["edit-recipe"]
     XCTAssertTrue(edit.waitForExistence(timeout: 2))
