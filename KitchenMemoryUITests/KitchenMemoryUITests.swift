@@ -139,10 +139,15 @@ final class KitchenMemoryUITests: XCTestCase {
     let editor = app.descendants(matching: .any)["recipe-editor-scroll"]
     let scalingToggle = app.descendants(matching: .any)["recipe-editor-yield-scaling"]
     XCTAssertTrue(scroll(editor, untilVisible: scalingToggle))
+#if os(macOS)
     activate(scalingToggle)
+#else
+    activate(scalingToggle.descendants(matching: .switch).firstMatch)
+#endif
 
     let increment = app.buttons["recipe-editor-yield-quantity-lower-increment"]
-    XCTAssertTrue(increment.waitForExistence(timeout: 2))
+    for _ in 0..<3 where !increment.isHittable { editor.swipeUp() }
+    XCTAssertTrue(increment.isHittable)
     for _ in 1..<8 { activate(increment) }
 
     let save = app.buttons["recipe-editor-save"]
@@ -151,17 +156,23 @@ final class KitchenMemoryUITests: XCTestCase {
 
     let workingYield = app.descendants(matching: .any)["recipe-working-yield"]
     XCTAssertTrue(scroll(detail, untilVisible: workingYield))
+    let savedYieldText = [workingYield.label, workingYield.value as? String]
+      .compactMap { $0 }
+      .joined(separator: " ")
     XCTAssertTrue(
-      NSPredicate(format: "value CONTAINS[c] %@", "8")
-        .evaluate(with: workingYield)
+      savedYieldText.contains("8"),
+      "Expected the saved working yield to contain 8; found: \(savedYieldText)"
     )
 
     let decrement = app.buttons["recipe-working-yield-decrement"]
     XCTAssertTrue(decrement.waitForExistence(timeout: 2))
     activate(decrement)
+    let decreasedYieldText = [workingYield.label, workingYield.value as? String]
+      .compactMap { $0 }
+      .joined(separator: " ")
     XCTAssertTrue(
-      NSPredicate(format: "value CONTAINS[c] %@", "7")
-        .evaluate(with: workingYield)
+      decreasedYieldText.contains("7"),
+      "Expected the decreased working yield to contain 7; found: \(decreasedYieldText)"
     )
 
     let scaledEggs = app.descendants(matching: .any)

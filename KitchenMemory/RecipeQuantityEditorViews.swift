@@ -294,6 +294,7 @@ private struct RationalQuantityEditor: View {
           Image(systemName: "minus")
         }
         .disabled(quantity.numerator == 0)
+        .buttonStyle(.borderless)
         .accessibilityLabel("Decrease \(label.lowercased())")
         .identified(accessibilityIdentifier.map { "\($0)-decrement" })
 
@@ -316,6 +317,7 @@ private struct RationalQuantityEditor: View {
           Image(systemName: "plus")
         }
         .disabled(quantity.numerator == Int.max)
+        .buttonStyle(.borderless)
         .accessibilityLabel("Increase \(label.lowercased())")
         .identified(accessibilityIdentifier.map { "\($0)-increment" })
       }
