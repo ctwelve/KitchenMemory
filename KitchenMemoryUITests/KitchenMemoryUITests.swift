@@ -163,17 +163,19 @@ final class KitchenMemoryUITests: XCTestCase {
 
     let workingYield = app.descendants(matching: .any)["recipe-working-yield"]
     XCTAssertTrue(scroll(detail, untilVisible: workingYield))
+    let savedYieldText = accessibilityText(of: workingYield)
     XCTAssertTrue(
-      NSPredicate(format: "value CONTAINS[c] %@", "8")
-        .evaluate(with: workingYield)
+      savedYieldText.contains("8"),
+      "Expected the saved working yield to contain 8; found: \(savedYieldText)"
     )
 
     let decrement = app.buttons["recipe-working-yield-decrement"]
     XCTAssertTrue(decrement.waitForExistence(timeout: 2))
     activate(decrement)
+    let decreasedYieldText = accessibilityText(of: workingYield)
     XCTAssertTrue(
-      NSPredicate(format: "value CONTAINS[c] %@", "7")
-        .evaluate(with: workingYield)
+      decreasedYieldText.contains("7"),
+      "Expected the decreased working yield to contain 7; found: \(decreasedYieldText)"
     )
 
     let scaledEggs = app.descendants(matching: .any)
@@ -258,6 +260,7 @@ final class KitchenMemoryUITests: XCTestCase {
         )
       )
       .firstMatch
+    XCTAssertTrue(recipeRow.waitForExistence(timeout: 5))
     let detail = openRecipeDetail(in: app, from: recipeRow)
     let edit = app.buttons["edit-recipe"]
     XCTAssertTrue(edit.waitForExistence(timeout: 2))
@@ -559,6 +562,13 @@ final class KitchenMemoryUITests: XCTestCase {
     app.staticTexts
       .matching(NSPredicate(format: "label == %@ OR value == %@", label, label))
       .firstMatch
+  }
+
+  @MainActor
+  private func accessibilityText(of element: XCUIElement) -> String {
+    [element.label, element.value as? String]
+      .compactMap { $0 }
+      .joined(separator: " ")
   }
 
   @MainActor

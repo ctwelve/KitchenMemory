@@ -86,21 +86,20 @@ The fetcher runs no page scripts, stores no cookies, downloads no images, limits
 redirects, response bytes, and candidate fan-out, and rejects obvious local or
 credential-bearing destinations.
 
-## Remaining slices
-
 ### Slice 7 — Scaling and recipe reading
 
-Make recipes adaptable to the intended yield while remaining honest about
-quantities that cannot be scaled automatically.
+Made recipes adaptable to a selected working yield without changing the saved
+recipe revision. Exact and ranged linear ingredient quantities now scale with
+rational arithmetic, while fixed, written, manually reviewed, and otherwise
+unsafe amounts remain intact with visible guidance. Recipes with approximate or
+ranged numeric yields expose honest scaling bases, and structured yield editing
+can make previously text-only yields scalable.
 
-- Select a working yield from a recipe's usable numeric yield.
-- Scale exact and ranged linear quantities with rational arithmetic.
-- Leave text, fixed, and manual-review quantities intact and visibly explain why.
-- Provide accessible, readable base and scaled recipe presentations.
+The reading presentation provides accessible working-yield controls, preserves
+the base yield for context, refreshes after an immutable revision is saved, and
+reminds cooks that equipment does not scale automatically.
 
-**Complete when:** representative recipes scale predictably without converting
-fractions to inaccurate floating-point text or silently changing ambiguous
-amounts.
+## Remaining slices
 
 ### Slice 8 — Cooking sessions
 
