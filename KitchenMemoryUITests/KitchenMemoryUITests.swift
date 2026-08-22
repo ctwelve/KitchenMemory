@@ -363,13 +363,19 @@ final class KitchenMemoryUITests: XCTestCase {
     let systemFullScreenButtonFrame = fullScreenButton.exists
       ? fullScreenButton.frame
       : CGRect.null
+    let recipeLibrary = app.descendants(matching: .any)["recipe-library"]
+    let recipeLibraryFrame = recipeLibrary.exists
+      ? recipeLibrary.frame
+      : CGRect.null
 #else
     let systemFullScreenButtonFrame = CGRect.null
+    let recipeLibraryFrame = CGRect.null
 #endif
     try app.performAccessibilityAudit(for: auditTypes) { issue in
       self.isKnownAccessibilityAuditFalsePositive(
         issue,
-        systemFullScreenButtonFrame: systemFullScreenButtonFrame
+        systemFullScreenButtonFrame: systemFullScreenButtonFrame,
+        recipeLibraryFrame: recipeLibraryFrame
       )
     }
   }
@@ -380,7 +386,8 @@ final class KitchenMemoryUITests: XCTestCase {
   // swiftlint:disable:next function_body_length
   private func isKnownAccessibilityAuditFalsePositive(
     _ issue: XCUIAccessibilityAuditIssue,
-    systemFullScreenButtonFrame: CGRect
+    systemFullScreenButtonFrame: CGRect,
+    recipeLibraryFrame: CGRect
   ) -> Bool {
 #if os(iOS)
     guard issue.auditType == .dynamicType, let element = issue.element else {
@@ -458,15 +465,28 @@ final class KitchenMemoryUITests: XCTestCase {
 
     if issue.auditType == .sufficientElementDescription,
       element.elementType == .group,
-      element.label.isEmpty,
-      !element.isHittable {
+      element.label.isEmpty {
+      let elementValue = element.value as? String ?? ""
+      let wrapperFrame = element.frame
+      let isRecipeLibraryWrapper = element.isHittable
+        && element.identifier.isEmpty
+        && elementValue.isEmpty
+        && !recipeLibraryFrame.isNull
+        && abs(wrapperFrame.midX - recipeLibraryFrame.midX) <= 2
+        && abs(wrapperFrame.width - recipeLibraryFrame.width) <= 2
+        && abs(wrapperFrame.maxY - recipeLibraryFrame.maxY) <= 2
+        && wrapperFrame.minY < recipeLibraryFrame.minY
+        && wrapperFrame.insetBy(dx: -2, dy: -2).contains(recipeLibraryFrame)
+
       // On macOS, SwiftUI exposes non-interactive layout groups to XCTest and
       // keeps their native Text nodes separate in the query tree. Xcode 26
       // then audits those structural groups as if each needed its own spoken
-      // label. Accept only an empty-labeled, non-hittable Group. A nonmatching
-      // sufficient-description finding falls through to the exact recipe-row
-      // exception below instead of being rejected prematurely.
-      return true
+      // label. NavigationSplitView also adds one hittable, unlabeled Group
+      // around the labeled recipe-library List and its toolbar, with AppKit's
+      // one-point border offsets. Accept only those non-interactive groups or
+      // that aligned wrapper around the app-owned List; every other hittable,
+      // unlabeled Group remains a failure.
+      return !element.isHittable || isRecipeLibraryWrapper
     }
 
     // A SwiftUI NavigationLink in the macOS sidebar is exposed to XCTest as a
