@@ -211,8 +211,27 @@ native text and layout.
 own spoken name, even though VoiceOver reaches the native child elements.
 
 **Guard:** the handler accepts only the sufficient-description audit type for
-an empty-labeled, non-hittable `Group`. Hittable groups and other audit types
+an empty-labeled, non-hittable `Group`. Hittable groups remain failures except
+for the separately bounded system sidebar wrapper below; other audit types
 remain failures.
+
+### macOS system sidebar wrapper
+
+**Finding:** “Element has no description.”
+
+**Element:** the private, empty-labeled `Group` that
+`NavigationSplitView` places around the sidebar toolbar and the fully labeled
+`recipe-library` outline on macOS 26.6.
+
+**Evidence:** the audit's element screenshot covers the complete sidebar, while
+the captured accessibility hierarchy contains exactly one descendant identified
+as `recipe-library` and labeled “Recipe library.” The wrapper is reported as
+hittable even though it has no action of its own.
+
+**Guard:** only a sufficient-description finding for an empty, unidentified
+`Group` is accepted. It must contain exactly one labeled `recipe-library`
+descendant, align with that outline's horizontal bounds within two points, and
+vertically contain it. Other hittable groups remain failures.
 
 ### macOS metadata grid-cell wrapper
 

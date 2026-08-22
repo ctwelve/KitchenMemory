@@ -238,7 +238,13 @@ final class KitchenMemoryUITests: XCTestCase {
   func testRecipeEditorKeepsIngredientAndInstructionSectionsDistinct() throws {
     let app = launchApp()
     let recipeRow = app.descendants(matching: .any)
-      .matching(NSPredicate(format: "identifier BEGINSWITH %@", "recipe-row-"))
+      .matching(
+        NSPredicate(
+          format: "identifier BEGINSWITH %@ AND label CONTAINS[c] %@",
+          "recipe-row-",
+          "Tuna Noodle Hotdish"
+        )
+      )
       .firstMatch
     let detail = openRecipeDetail(in: app, from: recipeRow)
     let edit = app.buttons["edit-recipe"]
@@ -249,7 +255,7 @@ final class KitchenMemoryUITests: XCTestCase {
     let ingredientSection = app.descendants(matching: .any)
       .matching(NSPredicate(format: "identifier BEGINSWITH %@", "ingredient-editor-section-"))
       .firstMatch
-    XCTAssertTrue(scroll(editor, untilVisible: ingredientSection))
+    XCTAssertTrue(scroll(editor, untilHittable: ingredientSection))
     activate(ingredientSection)
 
     let addIngredient = app.descendants(matching: .any)
@@ -266,7 +272,7 @@ final class KitchenMemoryUITests: XCTestCase {
     let instructionSection = app.descendants(matching: .any)
       .matching(NSPredicate(format: "identifier BEGINSWITH %@", "instruction-editor-section-"))
       .firstMatch
-    XCTAssertTrue(scroll(editor, untilVisible: instructionSection))
+    XCTAssertTrue(scroll(editor, untilHittable: instructionSection))
     XCTAssertEqual(instructionSection.value as? String, "Collapsed")
     _ = detail
   }
@@ -443,16 +449,7 @@ final class KitchenMemoryUITests: XCTestCase {
       }
     }
 
-    if issue.auditType == .sufficientElementDescription,
-      element.elementType == .group,
-      element.label.isEmpty,
-      !element.isHittable {
-      // On macOS, SwiftUI exposes non-interactive layout groups to XCTest and
-      // keeps their native Text nodes separate in the query tree. Xcode 26
-      // then audits those structural groups as if each needed its own spoken
-      // label. Accept only an empty-labeled, non-hittable Group. A nonmatching
-      // sufficient-description finding falls through to the exact recipe-row
-      // exception below instead of being rejected prematurely.
+    if isKnownMacOSLayoutGroup(issue, element: element) {
       return true
     }
 
@@ -468,6 +465,50 @@ final class KitchenMemoryUITests: XCTestCase {
       && element.identifier.hasPrefix("recipe-row-")
 #endif
   }
+
+#if os(macOS)
+  @MainActor
+  private func isKnownMacOSLayoutGroup(
+    _ issue: XCUIAccessibilityAuditIssue,
+    element: XCUIElement
+  ) -> Bool {
+    guard issue.auditType == .sufficientElementDescription,
+      element.elementType == .group,
+      element.identifier.isEmpty,
+      element.label.isEmpty
+    else { return false }
+
+    if !element.isHittable {
+      // SwiftUI exposes non-interactive layout groups separately from their
+      // native Text children, then Xcode 26 audits each structural wrapper as
+      // if it needed its own spoken label.
+      return true
+    }
+
+    let libraryDescendants = element.descendants(matching: .any)
+      .matching(NSPredicate(format: "identifier == %@", "recipe-library"))
+    guard libraryDescendants.count == 1 else { return false }
+
+    let library = libraryDescendants.firstMatch
+    guard library.exists, library.label == "Recipe library" else { return false }
+
+    let wrapperFrame = element.frame
+    let libraryFrame = library.frame
+    let tolerance: CGFloat = 2
+    let isSystemSidebarWrapper = [
+      abs(wrapperFrame.minX - libraryFrame.minX) <= tolerance,
+      abs(wrapperFrame.width - libraryFrame.width) <= tolerance,
+      wrapperFrame.minY <= libraryFrame.minY + tolerance,
+      wrapperFrame.maxY + tolerance >= libraryFrame.maxY,
+    ].allSatisfy { $0 }
+
+    // macOS 26.6 exposes the private NavigationSplitView sidebar wrapper as
+    // an empty, hittable Group even though its only content region is our
+    // labeled recipe-library outline. Accept only that width-aligned system
+    // wrapper around exactly one known, fully described outline.
+    return isSystemSidebarWrapper
+  }
+#endif
 
   @MainActor
   private func openRecipeDetail(
@@ -580,6 +621,31 @@ final class KitchenMemoryUITests: XCTestCase {
     for _ in 0..<attempts {
       container.swipeUp()
       if element.waitForExistence(timeout: 1) { return true }
+    }
+
+    return false
+  }
+
+  @MainActor
+  private func scroll(
+    _ container: XCUIElement,
+    untilHittable element: XCUIElement,
+    attempts: Int = 6
+  ) -> Bool {
+    // AppKit can expose an offscreen disclosure control as existing. Require
+    // it to be interactive before clicking so the test proves the section was
+    // actually expanded instead of silently sending a click outside the view.
+    if element.waitForExistence(timeout: 1), element.isHittable { return true }
+
+    for _ in 0..<attempts {
+#if os(macOS)
+      // A fixed wheel delta avoids the momentum of swipeUp(), which can jump
+      // past a nearby target in a macOS ScrollView.
+      container.scroll(byDeltaX: 0, deltaY: -400)
+#else
+      container.swipeUp()
+#endif
+      if element.waitForExistence(timeout: 1), element.isHittable { return true }
     }
 
     return false
