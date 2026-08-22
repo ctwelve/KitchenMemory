@@ -8,6 +8,7 @@ import SwiftUI
 
 struct RecipeDetailView: View {
   let storedRecipe: StoredRecipe
+
   @State private var scalingSelection: RecipeScalingSelection
 
   // The metadata grid collapses before large text makes its cards cramped.
@@ -33,7 +34,6 @@ struct RecipeDetailView: View {
         metadata
         RecipeScalingControls(selection: $scalingSelection)
         source
-
         if !revision.equipment.isEmpty {
           recipeSection(
             "Equipment",
@@ -41,13 +41,13 @@ struct RecipeDetailView: View {
             accessibilityIdentifier: "equipment-section"
           ) {
             VStack(alignment: .leading, spacing: 10) {
-              Label(
-                "Equipment does not scale automatically. Check that it fits the working yield.",
-                systemImage: "info.circle")
+              HStack(spacing: 6) {
+                Image(systemName: "info.circle").accessibilityHidden(true)
+                Text("Equipment does not scale automatically. Check that it fits the working yield.")
+                  .accessibilityIdentifier("equipment-scaling-help")
+              }
               .font(.caption)
               .foregroundStyle(.secondary)
-              .accessibilityElement(children: .combine)
-              .accessibilityIdentifier("equipment-scaling-help")
               ForEach(revision.equipment) { item in
                 bullet(item.originalText)
               }

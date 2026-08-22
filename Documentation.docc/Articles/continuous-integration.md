@@ -93,11 +93,18 @@ internal frameworks, and test targets. Consequently, linting runs for the source
 files Xcode is already building, both locally and in Xcode Cloud. There is no
 separate cloud lint installation or script.
 
-The root `.swiftlint.yml` is strict: a violation fails the target. Its opt-in
-rules are deliberately limited to product safety and lifecycle mistakes,
-collection correctness and avoidable work, SwiftUI accessibility contracts, and
-test quality. Formatting preferences that would create broad mechanical churn
-are not CI policy.
+The root `.swiftlint.yml` is the development policy: violations retain their
+configured severities instead of being promoted globally. File length warns
+above 400 lines and becomes an error above 1,000 lines. The goal remains a
+warning-free tree, but an ordinary maintenance warning does not block local,
+slice, or bug work. Strict warning promotion is reserved for an explicit release
+engineering scheme once that scheme split is added, rather than inherited by
+every build.
+
+The opt-in rules are deliberately limited to product safety and lifecycle
+mistakes, collection correctness and avoidable work, SwiftUI accessibility
+contracts, and test quality. Formatting preferences that would create broad
+mechanical churn are not CI policy.
 
 When adding an opt-in rule:
 

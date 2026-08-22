@@ -139,26 +139,31 @@ final class KitchenMemoryUITests: XCTestCase {
     let editor = app.descendants(matching: .any)["recipe-editor-scroll"]
     let scalingToggle = app.descendants(matching: .any)["recipe-editor-yield-scaling"]
     XCTAssertTrue(scroll(editor, untilVisible: scalingToggle))
-#if os(macOS)
+
+    #if os(iOS)
+    let switchControl = scalingToggle.descendants(matching: .switch).firstMatch
+    XCTAssertTrue(switchControl.waitForExistence(timeout: 2))
+    activate(switchControl)
+    XCTAssertEqual(switchControl.value as? String, "1")
+    #else
     activate(scalingToggle)
-#else
-    activate(scalingToggle.descendants(matching: .switch).firstMatch)
-#endif
+    #endif
 
     let increment = app.buttons["recipe-editor-yield-quantity-lower-increment"]
-    for _ in 0..<3 where !increment.isHittable { editor.swipeUp() }
-    XCTAssertTrue(increment.isHittable)
+    XCTAssertTrue(scroll(editor, untilHittable: increment))
+    let numerator = app.textFields["recipe-editor-yield-quantity-lower-numerator"]
+    XCTAssertTrue(numerator.waitForExistence(timeout: 2))
     for _ in 1..<8 { activate(increment) }
+    XCTAssertEqual(numerator.value as? String, "8")
 
     let save = app.buttons["recipe-editor-save"]
     XCTAssertTrue(save.waitForExistence(timeout: 2))
     activate(save)
+    XCTAssertTrue(save.waitForNonExistence(timeout: 5))
 
     let workingYield = app.descendants(matching: .any)["recipe-working-yield"]
     XCTAssertTrue(scroll(detail, untilVisible: workingYield))
-    let savedYieldText = [workingYield.label, workingYield.value as? String]
-      .compactMap { $0 }
-      .joined(separator: " ")
+    let savedYieldText = accessibilityText(of: workingYield)
     XCTAssertTrue(
       savedYieldText.contains("8"),
       "Expected the saved working yield to contain 8; found: \(savedYieldText)"
@@ -167,9 +172,7 @@ final class KitchenMemoryUITests: XCTestCase {
     let decrement = app.buttons["recipe-working-yield-decrement"]
     XCTAssertTrue(decrement.waitForExistence(timeout: 2))
     activate(decrement)
-    let decreasedYieldText = [workingYield.label, workingYield.value as? String]
-      .compactMap { $0 }
-      .joined(separator: " ")
+    let decreasedYieldText = accessibilityText(of: workingYield)
     XCTAssertTrue(
       decreasedYieldText.contains("7"),
       "Expected the decreased working yield to contain 7; found: \(decreasedYieldText)"
@@ -249,8 +252,13 @@ final class KitchenMemoryUITests: XCTestCase {
   func testRecipeEditorKeepsIngredientAndInstructionSectionsDistinct() throws {
     let app = launchApp()
     let recipeRow = app.descendants(matching: .any)
-      .matching(NSPredicate(format: "identifier BEGINSWITH %@", "recipe-row-"))
-      .matching(NSPredicate(format: "label CONTAINS[c] %@", "Tuna Noodle Hotdish"))
+      .matching(
+        NSPredicate(
+          format: "identifier BEGINSWITH %@ AND label CONTAINS[c] %@",
+          "recipe-row-",
+          "Tuna Noodle Hotdish"
+        )
+      )
       .firstMatch
     XCTAssertTrue(recipeRow.waitForExistence(timeout: 5))
     let detail = openRecipeDetail(in: app, from: recipeRow)
@@ -262,7 +270,7 @@ final class KitchenMemoryUITests: XCTestCase {
     let ingredientSection = app.descendants(matching: .any)
       .matching(NSPredicate(format: "identifier BEGINSWITH %@", "ingredient-editor-section-"))
       .firstMatch
-    XCTAssertTrue(scroll(editor, untilVisible: ingredientSection))
+    XCTAssertTrue(scroll(editor, untilHittable: ingredientSection))
     activate(ingredientSection)
 
     let addIngredient = app.descendants(matching: .any)
@@ -279,7 +287,7 @@ final class KitchenMemoryUITests: XCTestCase {
     let instructionSection = app.descendants(matching: .any)
       .matching(NSPredicate(format: "identifier BEGINSWITH %@", "instruction-editor-section-"))
       .firstMatch
-    XCTAssertTrue(scroll(editor, untilVisible: instructionSection))
+    XCTAssertTrue(scroll(editor, untilHittable: instructionSection))
     XCTAssertEqual(instructionSection.value as? String, "Collapsed")
     _ = detail
   }
@@ -363,19 +371,13 @@ final class KitchenMemoryUITests: XCTestCase {
     let systemFullScreenButtonFrame = fullScreenButton.exists
       ? fullScreenButton.frame
       : CGRect.null
-    let recipeLibrary = app.descendants(matching: .any)["recipe-library"]
-    let recipeLibraryFrame = recipeLibrary.exists
-      ? recipeLibrary.frame
-      : CGRect.null
 #else
     let systemFullScreenButtonFrame = CGRect.null
-    let recipeLibraryFrame = CGRect.null
 #endif
     try app.performAccessibilityAudit(for: auditTypes) { issue in
       self.isKnownAccessibilityAuditFalsePositive(
         issue,
-        systemFullScreenButtonFrame: systemFullScreenButtonFrame,
-        recipeLibraryFrame: recipeLibraryFrame
+        systemFullScreenButtonFrame: systemFullScreenButtonFrame
       )
     }
   }
@@ -386,8 +388,7 @@ final class KitchenMemoryUITests: XCTestCase {
   // swiftlint:disable:next function_body_length
   private func isKnownAccessibilityAuditFalsePositive(
     _ issue: XCUIAccessibilityAuditIssue,
-    systemFullScreenButtonFrame: CGRect,
-    recipeLibraryFrame: CGRect
+    systemFullScreenButtonFrame: CGRect
   ) -> Bool {
 #if os(iOS)
     guard issue.auditType == .dynamicType, let element = issue.element else {
@@ -463,30 +464,8 @@ final class KitchenMemoryUITests: XCTestCase {
       }
     }
 
-    if issue.auditType == .sufficientElementDescription,
-      element.elementType == .group,
-      element.label.isEmpty {
-      let elementValue = element.value as? String ?? ""
-      let wrapperFrame = element.frame
-      let isRecipeLibraryWrapper = element.isHittable
-        && element.identifier.isEmpty
-        && elementValue.isEmpty
-        && !recipeLibraryFrame.isNull
-        && abs(wrapperFrame.midX - recipeLibraryFrame.midX) <= 2
-        && abs(wrapperFrame.width - recipeLibraryFrame.width) <= 2
-        && abs(wrapperFrame.maxY - recipeLibraryFrame.maxY) <= 2
-        && wrapperFrame.minY < recipeLibraryFrame.minY
-        && wrapperFrame.insetBy(dx: -2, dy: -2).contains(recipeLibraryFrame)
-
-      // On macOS, SwiftUI exposes non-interactive layout groups to XCTest and
-      // keeps their native Text nodes separate in the query tree. Xcode 26
-      // then audits those structural groups as if each needed its own spoken
-      // label. NavigationSplitView also adds one hittable, unlabeled Group
-      // around the labeled recipe-library List and its toolbar, with AppKit's
-      // one-point border offsets. Accept only those non-interactive groups or
-      // that aligned wrapper around the app-owned List; every other hittable,
-      // unlabeled Group remains a failure.
-      return !element.isHittable || isRecipeLibraryWrapper
+    if isKnownMacOSLayoutGroup(issue, element: element) {
+      return true
     }
 
     // A SwiftUI NavigationLink in the macOS sidebar is exposed to XCTest as a
@@ -501,6 +480,50 @@ final class KitchenMemoryUITests: XCTestCase {
       && element.identifier.hasPrefix("recipe-row-")
 #endif
   }
+
+#if os(macOS)
+  @MainActor
+  private func isKnownMacOSLayoutGroup(
+    _ issue: XCUIAccessibilityAuditIssue,
+    element: XCUIElement
+  ) -> Bool {
+    guard issue.auditType == .sufficientElementDescription,
+      element.elementType == .group,
+      element.identifier.isEmpty,
+      element.label.isEmpty
+    else { return false }
+
+    if !element.isHittable {
+      // SwiftUI exposes non-interactive layout groups separately from their
+      // native Text children, then Xcode 26 audits each structural wrapper as
+      // if it needed its own spoken label.
+      return true
+    }
+
+    let libraryDescendants = element.descendants(matching: .any)
+      .matching(NSPredicate(format: "identifier == %@", "recipe-library"))
+    guard libraryDescendants.count == 1 else { return false }
+
+    let library = libraryDescendants.firstMatch
+    guard library.exists, library.label == "Recipe library" else { return false }
+
+    let wrapperFrame = element.frame
+    let libraryFrame = library.frame
+    let tolerance: CGFloat = 2
+    let isSystemSidebarWrapper = [
+      abs(wrapperFrame.minX - libraryFrame.minX) <= tolerance,
+      abs(wrapperFrame.width - libraryFrame.width) <= tolerance,
+      wrapperFrame.minY <= libraryFrame.minY + tolerance,
+      wrapperFrame.maxY + tolerance >= libraryFrame.maxY,
+    ].allSatisfy { $0 }
+
+    // macOS 26.6 exposes the private NavigationSplitView sidebar wrapper as
+    // an empty, hittable Group even though its only content region is our
+    // labeled recipe-library outline. Accept only that width-aligned system
+    // wrapper around exactly one known, fully described outline.
+    return isSystemSidebarWrapper
+  }
+#endif
 
   @MainActor
   private func openRecipeDetail(
@@ -539,6 +562,13 @@ final class KitchenMemoryUITests: XCTestCase {
     app.staticTexts
       .matching(NSPredicate(format: "label == %@ OR value == %@", label, label))
       .firstMatch
+  }
+
+  @MainActor
+  private func accessibilityText(of element: XCUIElement) -> String {
+    [element.label, element.value as? String]
+      .compactMap { $0 }
+      .joined(separator: " ")
   }
 
   @MainActor
@@ -613,6 +643,31 @@ final class KitchenMemoryUITests: XCTestCase {
     for _ in 0..<attempts {
       container.swipeUp()
       if element.waitForExistence(timeout: 1) { return true }
+    }
+
+    return false
+  }
+
+  @MainActor
+  private func scroll(
+    _ container: XCUIElement,
+    untilHittable element: XCUIElement,
+    attempts: Int = 6
+  ) -> Bool {
+    // AppKit can expose an offscreen disclosure control as existing. Require
+    // it to be interactive before clicking so the test proves the section was
+    // actually expanded instead of silently sending a click outside the view.
+    if element.waitForExistence(timeout: 1), element.isHittable { return true }
+
+    for _ in 0..<attempts {
+#if os(macOS)
+      // A fixed wheel delta avoids the momentum of swipeUp(), which can jump
+      // past a nearby target in a macOS ScrollView.
+      container.scroll(byDeltaX: 0, deltaY: -400)
+#else
+      container.swipeUp()
+#endif
+      if element.waitForExistence(timeout: 1), element.isHittable { return true }
     }
 
     return false

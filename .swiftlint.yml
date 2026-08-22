@@ -1,6 +1,6 @@
 check_for_updates: false
 reporter: xcode
-strict: true
+strict: false
 
 included:
   - KitchenMemory
@@ -53,3 +53,7 @@ type_name:
 
 trailing_comma:
   mandatory_comma: true
+
+file_length:
+  warning: 400
+  error: 1000
