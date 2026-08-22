@@ -29,6 +29,43 @@ final class SwiftDataRecipeRepositoryBoundaryTests: XCTestCase {
     XCTAssertEqual(try repository.kitchens(), [kitchen])
   }
 
+  func testAtomicCreateRefusesToReplaceAnExistingKitchen() throws {
+    let repository = SwiftDataRecipeRepository(
+      modelContainer: try KitchenMemorySchema.makeContainer(inMemory: true)
+    )
+    let kitchen = Kitchen(name: "Home")
+    try repository.create(kitchen, with: [])
+
+    XCTAssertThrowsError(try repository.create(kitchen, with: [])) { error in
+      XCTAssertEqual(
+        error as? KitchenMemoryPersistenceError,
+        .kitchenAlreadyExists(kitchenID: kitchen.id)
+      )
+    }
+    XCTAssertEqual(try repository.kitchens(), [kitchen])
+  }
+
+  func testAtomicCreateRollsBackKitchenWhenRecipeIdentityIsInvalid() throws {
+    let repository = SwiftDataRecipeRepository(
+      modelContainer: try KitchenMemorySchema.makeContainer(inMemory: true)
+    )
+    let kitchen = Kitchen(name: "Home")
+    let revision = RecipeRevision(recipeID: Recipe.ID(), revisionNumber: 1, title: "Invalid")
+    let stored = StoredRecipe(
+      recipe: Recipe(
+        id: Recipe.ID(),
+        kitchenID: kitchen.id,
+        currentRevisionID: revision.id
+      ),
+      revision: revision
+    )
+
+    XCTAssertThrowsError(try repository.create(kitchen, with: [stored])) { error in
+      XCTAssertEqual(error as? KitchenMemoryPersistenceError, .inconsistentRecipeIdentity)
+    }
+    XCTAssertTrue(try repository.kitchens().isEmpty)
+  }
+
   func testDurationFieldsRoundTripFromStoredSeconds() throws {
     let repository = SwiftDataRecipeRepository(
       modelContainer: try KitchenMemorySchema.makeContainer(inMemory: true)

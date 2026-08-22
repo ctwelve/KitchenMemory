@@ -88,7 +88,8 @@ Tools/check-core-framework-coverage.sh /path/to/Tests.xcresult
 ```
 
 The script reads Xcode's integer covered and executable line counts rather than
-its rounded percentage. It prints evidence for every required framework and
+its rounded percentage. It prints evidence for the domain, import, logic, and
+persistence frameworks and
 fails when a target or current framework source is missing, when even one
 executable line is uncovered, or when source, tests, the test plan, or project
 membership, scheme behavior, or resolved dependencies changed after the bundle's

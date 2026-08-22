@@ -380,6 +380,8 @@ public struct RecipeURLImporter<Loader: RecipeDocumentLoading>: Sendable {
   }
 }
 
+extension RecipeURLImporter: RecipeURLImporting {}
+
 private extension URLSessionRecipeDocumentLoader {
   static func isIPAddressLiteral(_ source: String) -> Bool {
     let host = source.trimmingCharacters(in: CharacterSet(charactersIn: "[]"))

@@ -28,6 +28,10 @@
     {
       "name": "import.url.public-hosts",
       "hexadecimal": "0x55524C504F4C4943"
+    },
+    {
+      "name": "logic.scaling.adjustments",
+      "hexadecimal": "0x5CA1EAD0A57A7E5"
     }
   ]
 }

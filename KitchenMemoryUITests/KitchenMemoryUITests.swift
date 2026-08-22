@@ -6,7 +6,7 @@ import XCTest
 
 /// Smoke tests for the durable application shell.
 ///
-/// Product behavior belongs in the domain, application, import, and persistence
+/// Product behavior belongs in the domain, logic, import, and persistence
 /// suites. Keep this suite small and independent of provisional editor layout,
 /// visible copy, and accessibility-tree details while the interface evolves.
 final class KitchenMemoryUITests: XCTestCase {

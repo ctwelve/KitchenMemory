@@ -29,6 +29,8 @@ public struct StoredRecipe: Equatable, Identifiable, Sendable {
 @MainActor
 public protocol RecipeRepository: AnyObject {
   func save(_ kitchen: Kitchen) throws
+  /// Atomically creates one Kitchen together with its initial recipes.
+  func create(_ kitchen: Kitchen, with recipes: [StoredRecipe]) throws
   func save(recipe: Recipe, revision: RecipeRevision) throws
   func kitchens() throws -> [Kitchen]
   func kitchen(id: Kitchen.ID) throws -> Kitchen?
@@ -47,6 +49,9 @@ public enum KitchenMemoryPersistenceError: Error, Equatable {
 
   /// A recipe cannot be saved before its owning Kitchen exists.
   case missingKitchen
+
+  /// Bootstrap cannot replace an already-created Kitchen implicitly.
+  case kitchenAlreadyExists(kitchenID: Kitchen.ID)
 
   /// A recipe row refers to a revision that is absent from the store.
   case missingCurrentRevision
@@ -103,6 +108,17 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
   public func save(_ kitchen: Kitchen) throws {
     try performIsolatedWrite { writer in
       try writer.upsert(kitchen)
+    }
+  }
+
+  public func create(_ kitchen: Kitchen, with recipes: [StoredRecipe]) throws {
+    try performIsolatedWrite { writer in
+      guard try writer.kitchen(id: kitchen.id) == nil else {
+        throw KitchenMemoryPersistenceError.kitchenAlreadyExists(kitchenID: kitchen.id)
+      }
+      try writer.validate(recipes, in: kitchen.id, requiresExistingKitchen: false)
+      try writer.upsert(kitchen)
+      try writer.replaceValidatedRecipes(in: kitchen.id, with: recipes)
     }
   }
 
@@ -200,7 +216,8 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
 
   private func validate(
     _ recipes: [StoredRecipe],
-    in kitchenID: Kitchen.ID
+    in kitchenID: Kitchen.ID,
+    requiresExistingKitchen: Bool = true
   ) throws {
     guard recipes.allSatisfy({ stored in
       stored.recipe.kitchenID == kitchenID
@@ -209,7 +226,7 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     }) else {
       throw KitchenMemoryPersistenceError.inconsistentRecipeIdentity
     }
-    guard try kitchen(id: kitchenID) != nil else {
+    if requiresExistingKitchen, try kitchen(id: kitchenID) == nil {
       throw KitchenMemoryPersistenceError.missingKitchen
     }
 

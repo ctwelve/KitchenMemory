@@ -3,13 +3,14 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 import KitchenMemoryDomain
+import KitchenMemoryLogic
 import KitchenMemoryPersistence
 import SwiftUI
 
 struct RecipeDetailView: View {
   let storedRecipe: StoredRecipe
 
-  @State private var scalingSelection: RecipeScalingSelection
+  @State private var scalingSelection: RecipeScalingState
 
   // The metadata grid collapses before large text makes its cards cramped.
   // @ScaledMetric separately keeps the numbered instruction badge in step
@@ -22,7 +23,7 @@ struct RecipeDetailView: View {
   init(storedRecipe: StoredRecipe) {
     self.storedRecipe = storedRecipe
     _scalingSelection = State(
-      initialValue: RecipeScalingSelection(recipeYield: storedRecipe.revision.recipeYield)
+      initialValue: RecipeScalingState(recipeYield: storedRecipe.revision.recipeYield)
     )
   }
 
@@ -389,12 +390,4 @@ private extension RecipeDetailView {
     }
     return text
   }
-}
-
-private struct MetadataValue: Identifiable {
-  let label: String
-  let value: String
-  let systemImage: String
-
-  var id: String { label }
 }

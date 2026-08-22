@@ -3,30 +3,10 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 import KitchenMemoryDomain
+import KitchenMemoryLogic
 import SwiftUI
 
-struct RecipeScalingSelection: Equatable {
-  let recipeYield: RecipeYield?
-  var selectedBasisIndex = 0
-  var workingYield: RationalQuantity?
-
-  init(recipeYield: RecipeYield?) {
-    self.recipeYield = recipeYield
-    workingYield = recipeYield?.scalingBases.first?.quantity
-  }
-
-  var bases: [RecipeYieldBasis] { recipeYield?.scalingBases ?? [] }
-
-  var selectedBasis: RecipeYieldBasis? {
-    guard bases.indices.contains(selectedBasisIndex) else { return nil }
-    return bases[selectedBasisIndex]
-  }
-
-  var scale: RecipeScale? {
-    guard let baseYield = selectedBasis?.quantity, let workingYield else { return nil }
-    return RecipeScale(baseYield: baseYield, workingYield: workingYield)
-  }
-
+extension RecipeScalingState {
   var displayedYield: String {
     guard let recipeYield else { return "" }
     guard let scale, scale.multiplier != RationalQuantity(numerator: 1) else {
@@ -38,41 +18,6 @@ struct RecipeScalingSelection: Equatable {
   var workingYieldLabel: String {
     guard let recipeYield, let workingYield else { return recipeYield?.originalText ?? "" }
     return joinedYield(quantity: workingYield, unitText: recipeYield.unitText)
-  }
-
-  var canDecreaseWorkingYield: Bool {
-    guard let current = workingYield?.normalized else { return false }
-    return current.numerator > current.denominator
-  }
-
-  var canIncreaseWorkingYield: Bool {
-    guard let current = workingYield?.normalized else { return false }
-    let (maximumNumerator, overflow) = current.denominator.multipliedReportingOverflow(by: 999)
-    return !overflow && current.numerator <= maximumNumerator - current.denominator
-  }
-
-  mutating func selectBasis(_ index: Int) {
-    guard bases.indices.contains(index) else { return }
-    selectedBasisIndex = index
-    workingYield = bases[index].quantity
-  }
-
-  mutating func adjustWorkingYield(by wholeNumber: Int) {
-    guard let current = workingYield?.normalized else { return }
-    let (delta, deltaOverflow) = current.denominator.multipliedReportingOverflow(
-      by: wholeNumber
-    )
-    let (numerator, additionOverflow) = current.numerator.addingReportingOverflow(delta)
-    guard !deltaOverflow, !additionOverflow, numerator > 0 else { return }
-
-    let (maximumNumerator, maximumOverflow) = current.denominator.multipliedReportingOverflow(
-      by: 999
-    )
-    guard !maximumOverflow, numerator <= maximumNumerator else { return }
-    workingYield = RationalQuantity(
-      numerator: numerator,
-      denominator: current.denominator
-    ).normalized
   }
 
   func basisLabel(_ basis: RecipeYieldBasis) -> String {
@@ -90,18 +35,14 @@ struct RecipeScalingSelection: Equatable {
   }
 
   private func joinedYield(quantity: RationalQuantity, unitText: String?) -> String {
-    let unit: String?
-    if quantity == RationalQuantity(numerator: 1), let unitText, unitText.hasSuffix("s") {
-      unit = String(unitText.dropLast())
-    } else {
-      unit = unitText
-    }
-    return [quantity.renderedText, unit].compactMap { $0 }.joined(separator: " ")
+    // Preserve authored unit wording until locale-aware plural rules own this
+    // decision. Guessing from a trailing "s" corrupts words such as "glass".
+    [quantity.renderedText, unitText].compactMap { $0 }.joined(separator: " ")
   }
 }
 
 struct RecipeScalingControls: View {
-  @Binding var selection: RecipeScalingSelection
+  @Binding var selection: RecipeScalingState
 
   @ViewBuilder
   var body: some View {
@@ -187,7 +128,7 @@ struct RecipeScalingControls: View {
       Spacer(minLength: 12)
       if selection.workingYield != selection.selectedBasis?.quantity {
         Button("Reset") {
-          selection.workingYield = selection.selectedBasis?.quantity
+          selection.resetWorkingYield()
         }
         .accessibilityLabel("Reset to base yield")
         .accessibilityIdentifier("recipe-scaling-reset")

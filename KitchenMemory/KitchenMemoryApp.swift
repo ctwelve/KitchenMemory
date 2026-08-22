@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 import KitchenMemoryDomain
+import KitchenMemoryLogic
 import KitchenMemoryPersistence
 import SwiftData
 import SwiftUI
@@ -68,7 +69,11 @@ struct AppDependencies {
   init(inMemory: Bool = false) throws {
     let modelContainer = try KitchenMemorySchema.makeContainer(inMemory: inMemory)
     let repository = SwiftDataRecipeRepository(modelContainer: modelContainer)
-    let kitchen = try Self.prepareInitialKitchen(repository: repository)
+    let samples = BundledSampleRecipeProvider()
+    let kitchen = try KitchenBootstrapService(
+      repository: repository,
+      samples: samples
+    ).prepareInitialKitchen()
 
     self.modelContainer = modelContainer
     libraryModel = RecipeLibraryModel(
@@ -76,7 +81,7 @@ struct AppDependencies {
       library: RecipeLibrary(repository: repository),
       editor: RecipeEditor(repository: repository),
       importer: RecipeImportService(),
-      resetService: KitchenResetService(repository: repository)
+      resetService: KitchenResetService(repository: repository, samples: samples)
     )
   }
 
@@ -89,19 +94,9 @@ struct AppDependencies {
   }
 
   static func prepareInitialKitchen(repository: any RecipeRepository) throws -> Kitchen {
-    if let existingKitchen = try repository.kitchens().first {
-      return existingKitchen
-    }
-
-    let kitchen = Kitchen(name: "Home Kitchen")
-    try repository.save(kitchen)
-
-    let manifest = try SampleRecipeCatalog.loadManifest()
-    for reference in manifest.recipes {
-      let document = try SampleRecipeCatalog.loadRecipe(reference)
-      let materialized = try document.materialize(in: kitchen.id)
-      try repository.save(recipe: materialized.recipe, revision: materialized.revision)
-    }
-    return kitchen
+    try KitchenBootstrapService(
+      repository: repository,
+      samples: BundledSampleRecipeProvider()
+    ).prepareInitialKitchen()
   }
 }

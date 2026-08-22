@@ -16,6 +16,7 @@ SCRIPT_DIRECTORY=$(CDPATH= cd "$(dirname "$0")" && pwd)
 PROJECT_ROOT=$(dirname "$SCRIPT_DIRECTORY")
 DOMAIN_DIRECTORY="$PROJECT_ROOT/KitchenMemory/Modules/KitchenMemoryDomain"
 IMPORT_DIRECTORY="$PROJECT_ROOT/KitchenMemory/Modules/KitchenMemoryImport"
+LOGIC_DIRECTORY="$PROJECT_ROOT/KitchenMemory/Modules/KitchenMemoryLogic"
 PERSISTENCE_DIRECTORY="$PROJECT_ROOT/KitchenMemory/Modules/KitchenMemoryPersistence"
 
 if [ ! -r "$RESULT_BUNDLE" ]; then
@@ -45,6 +46,7 @@ fi
 if ! INPUT_TIMESTAMPS=$(find \
   "$DOMAIN_DIRECTORY" \
   "$IMPORT_DIRECTORY" \
+  "$LOGIC_DIRECTORY" \
   "$PERSISTENCE_DIRECTORY" \
   "$PROJECT_ROOT/KitchenMemoryTests" \
   "$PROJECT_ROOT/KitchenMemory.xcodeproj/project.pbxproj" \
@@ -125,6 +127,7 @@ EOF
 done <<EOF
 KitchenMemoryDomain.framework|$DOMAIN_DIRECTORY
 KitchenMemoryImport.framework|$IMPORT_DIRECTORY
+KitchenMemoryLogic.framework|$LOGIC_DIRECTORY
 KitchenMemoryPersistence.framework|$PERSISTENCE_DIRECTORY
 EOF
 
@@ -132,8 +135,9 @@ printf '%s\n' "$COVERAGE_REPORT" | awk '
   BEGIN {
     order[1] = "KitchenMemoryDomain.framework"
     order[2] = "KitchenMemoryImport.framework"
-    order[3] = "KitchenMemoryPersistence.framework"
-    for (position = 1; position <= 3; position++) {
+    order[3] = "KitchenMemoryLogic.framework"
+    order[4] = "KitchenMemoryPersistence.framework"
+    for (position = 1; position <= 4; position++) {
       wanted[order[position]] = 1
     }
   }
@@ -156,7 +160,7 @@ printf '%s\n' "$COVERAGE_REPORT" | awk '
 
   END {
     failed = 0
-    for (position = 1; position <= 3; position++) {
+    for (position = 1; position <= 4; position++) {
       target = order[position]
       if (found[target] == 0) {
         print "Coverage gate error: missing target " target > "/dev/stderr"

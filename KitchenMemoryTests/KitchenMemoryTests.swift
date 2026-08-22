@@ -4,6 +4,7 @@
 
 @testable import KitchenMemory
 import KitchenMemoryDomain
+import KitchenMemoryLogic
 import KitchenMemoryPersistence
 import XCTest
 

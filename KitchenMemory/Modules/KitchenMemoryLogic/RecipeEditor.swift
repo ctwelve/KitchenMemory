@@ -2,6 +2,9 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: GPL-3.0-only
 
+// UI-independent recipe editing belongs to KitchenMemoryLogic so every
+// presentation and automation surface creates the same immutable revisions.
+
 import Foundation
 import KitchenMemoryDomain
 import KitchenMemoryPersistence
@@ -174,16 +177,16 @@ public struct RecipeEditor {
     return StoredRecipe(recipe: recipe, revision: revision)
   }
 
-    public func revise(recipeID: Recipe.ID, from draft: RecipeDraft) throws -> StoredRecipe {
+  public func revise(recipeID: Recipe.ID, from draft: RecipeDraft) throws -> StoredRecipe {
     guard let stored = try repository.recipe(id: recipeID) else {
       throw RecipeEditorError.missingRecipe
     }
-        let revision = try revision(
-          recipeID: recipeID,
-          number: stored.revision.revisionNumber + 1,
-          from: draft,
-          preserving: stored.revision
-        )
+    let revision = try revision(
+      recipeID: recipeID,
+      number: stored.revision.revisionNumber + 1,
+      from: draft,
+      preserving: stored.revision
+    )
     var recipe = stored.recipe
     recipe.currentRevisionID = revision.id
     try repository.save(recipe: recipe, revision: revision)

@@ -12,6 +12,7 @@ enum PropertyTestSeedName: String, CaseIterable {
     case importIngredientMixedFractions = "import.ingredient.mixed-fractions"
     case importNormalizerMarkup = "import.normalizer.markup"
     case importURLPublicHosts = "import.url.public-hosts"
+    case logicScalingAdjustments = "logic.scaling.adjustments"
 }
 
 struct PropertyTestSeed: Equatable {
