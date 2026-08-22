@@ -8,7 +8,6 @@ import SwiftUI
 
 struct RecipeDetailView: View {
   let storedRecipe: StoredRecipe
-
   @State private var scalingSelection: RecipeScalingSelection
 
   // The metadata grid collapses before large text makes its cards cramped.
@@ -47,6 +46,7 @@ struct RecipeDetailView: View {
                 systemImage: "info.circle")
               .font(.caption)
               .foregroundStyle(.secondary)
+              .accessibilityElement(children: .combine)
               .accessibilityIdentifier("equipment-scaling-help")
               ForEach(revision.equipment) { item in
                 bullet(item.originalText)
