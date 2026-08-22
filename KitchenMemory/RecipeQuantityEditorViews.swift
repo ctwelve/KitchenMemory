@@ -319,6 +319,9 @@ private struct RationalQuantityEditor: View {
         .accessibilityLabel("Increase \(label.lowercased())")
         .identified(accessibilityIdentifier.map { "\($0)-increment" })
       }
+      // Form promotes automatic-style buttons to a shared row action on iOS.
+      // Keep decrement and increment independent instead of firing them together.
+      .buttonStyle(.borderless)
       .accessibilityElement(children: .contain)
       .accessibilityLabel(label)
     } label: {
