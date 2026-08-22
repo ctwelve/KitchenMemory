@@ -101,7 +101,35 @@ reminds cooks that equipment does not scale automatically.
 
 ## Remaining slices
 
-### Slice 8 — Cooking sessions
+### Slice 8 — Cleanup and refactor pass
+
+Make the completed foundation cheaper to change before adding another major
+workflow.
+
+- Collect coverage for the shared test plan and establish the durable
+  business-logic source boundary.
+- Reach complete coverage of meaningful executable business logic and document
+  any narrow exclusions that cannot represent product behavior.
+- Move any business rules that remain embedded in SwiftUI views into testable
+  domain or application operations.
+- Keep UI automation to smoke tests for launch, sidebar navigation, Settings,
+  and destructive-reset confirmation.
+- Remove obsolete UI and accessibility audit machinery tied to replaceable
+  editor and reading presentations.
+- Reconcile engineering documentation and CI guidance with the new testing
+  boundary.
+
+This slice does not redesign the editor or treat the current English interface
+as final. In-page editing, String Catalog adoption, localization proofing, and
+comprehensive accessibility validation follow once the relevant interface work
+is stable.
+
+**Complete when:** every meaningful business-logic branch is covered or has a
+narrow documented exclusion, the coverage report can distinguish durable logic
+from presentation code, and the UI suite contains only the agreed shell smoke
+tests.
+
+### Slice 9 — Cooking sessions
 
 Support real cooking without silently changing the maintained recipe.
 
@@ -115,13 +143,18 @@ Support real cooking without silently changing the maintained recipe.
 **Complete when:** a cook can prepare a recipe entirely from the app, return
 later to a session, and see what happened without altering the canonical recipe.
 
-### Slice 9 — Alpha hardening
+### Slice 10 — Alpha hardening
 
 Prove that the completed loop is dependable enough for household use.
 
-- Add migration, error, and recovery coverage for persisted local data.
-- Expand importer fixtures and domain/application/UI regression tests.
-- Audit the finished workflows for accessibility on supported Apple platforms.
+- Reach complete business-logic coverage, including migration, error, recovery,
+  and source-preservation behavior.
+- Expand importer fixtures and domain/application regression tests while keeping
+  UI automation to application-shell smoke tests.
+- Establish String Catalogs and complete the internationalization pass after the
+  relevant interface and product language stabilize.
+- Audit the stable, finished workflows for accessibility on supported Apple
+  platforms.
 - Validate macOS and iOS builds and document local backup/export expectations.
 - Run an alpha acceptance set of roughly twenty varied real recipes.
 
@@ -136,8 +169,9 @@ Structured editing
   → Import engine
     → URL import and review
       → Scaling and reading
-        → Cooking sessions
-          → Alpha hardening
+        → Cleanup and refactor
+          → Cooking sessions
+            → Alpha hardening
 ```
 
 Pantry holdings, shopping lists, planned cooks, meal planning, synchronization,

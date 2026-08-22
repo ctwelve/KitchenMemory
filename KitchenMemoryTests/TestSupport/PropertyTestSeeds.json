@@ -1,0 +1,37 @@
+{
+  "formatVersion": 1,
+  "seeds": [
+    {
+      "name": "domain.codable.ingredients",
+      "hexadecimal": "0xC0DAB1E5F00D2026"
+    },
+    {
+      "name": "domain.rational.inverse-scaling",
+      "hexadecimal": "0x1A7E5CA1E202600D"
+    },
+    {
+      "name": "domain.rational.multiplication",
+      "hexadecimal": "0xA11CE55ED15C1A1D"
+    },
+    {
+      "name": "domain.rational.normalization",
+      "hexadecimal": "0x5CA1E202600DCAFE"
+    },
+    {
+      "name": "import.ingredient.mixed-fractions",
+      "hexadecimal": "0x4B49544348454E"
+    },
+    {
+      "name": "import.normalizer.markup",
+      "hexadecimal": "0x4E4F524D414C495A"
+    },
+    {
+      "name": "import.url.public-hosts",
+      "hexadecimal": "0x55524C504F4C4943"
+    },
+    {
+      "name": "logic.scaling.adjustments",
+      "hexadecimal": "0x5CA1EAD0A57A7E5"
+    }
+  ]
+}

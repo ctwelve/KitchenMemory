@@ -25,6 +25,12 @@
 		B20000000000000000000117 /* KitchenMemoryDomain.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000011 /* KitchenMemoryDomain.framework */; };
 		B20000000000000000000118 /* KitchenMemoryImport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000012 /* KitchenMemoryImport.framework */; };
 		B20000000000000000000119 /* KitchenMemoryPersistence.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000013 /* KitchenMemoryPersistence.framework */; };
+		B30000000000000000000101 /* KitchenMemoryLogic.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B30000000000000000000011 /* KitchenMemoryLogic.framework */; };
+		B30000000000000000000102 /* KitchenMemoryLogic.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B30000000000000000000011 /* KitchenMemoryLogic.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		B30000000000000000000103 /* KitchenMemoryLogic.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B30000000000000000000011 /* KitchenMemoryLogic.framework */; };
+		B30000000000000000000111 /* KitchenMemoryDomain.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000011 /* KitchenMemoryDomain.framework */; };
+		B30000000000000000000112 /* KitchenMemoryImport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000012 /* KitchenMemoryImport.framework */; };
+		B30000000000000000000113 /* KitchenMemoryPersistence.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000013 /* KitchenMemoryPersistence.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -77,6 +83,41 @@
 			remoteGlobalIDString = A1C4E79D302A63B800E2C0DB;
 			remoteInfo = KitchenMemory;
 		};
+		B30000000000000000000201 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A1C4E796302A63B800E2C0DB /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B30000000000000000000021;
+			remoteInfo = KitchenMemoryLogic;
+		};
+		B30000000000000000000202 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A1C4E796302A63B800E2C0DB /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B20000000000000000000021;
+			remoteInfo = KitchenMemoryDomain;
+		};
+		B30000000000000000000203 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A1C4E796302A63B800E2C0DB /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B20000000000000000000022;
+			remoteInfo = KitchenMemoryImport;
+		};
+		B30000000000000000000204 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A1C4E796302A63B800E2C0DB /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B20000000000000000000023;
+			remoteInfo = KitchenMemoryPersistence;
+		};
+		B30000000000000000000205 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A1C4E796302A63B800E2C0DB /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B30000000000000000000021;
+			remoteInfo = KitchenMemoryLogic;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -89,6 +130,7 @@
 				B20000000000000000000106 /* KitchenMemoryDomain.framework in Embed Frameworks */,
 				B20000000000000000000107 /* KitchenMemoryImport.framework in Embed Frameworks */,
 				B20000000000000000000108 /* KitchenMemoryPersistence.framework in Embed Frameworks */,
+				B30000000000000000000102 /* KitchenMemoryLogic.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -98,7 +140,7 @@
 /* Begin PBXFileReference section */
 		A1532352302C2FF100C8D534 /* Documentation.docc */ = {isa = PBXFileReference; lastKnownFileType = folder.documentationcatalog; path = Documentation.docc; sourceTree = "<group>"; };
 		A15962C5302BC01A00926925 /* KitchenMemory.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = KitchenMemory.xctestplan; sourceTree = "<group>"; };
-		A15E8F4030391280009B0A22 /* ci_post_clone.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; name = ci_post_clone.sh; path = ci_scripts/ci_post_clone.sh; sourceTree = "<group>"; };
+		A15E8F4030391280009B0A22 /* ci_post_clone.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; name = ci_post_clone.sh; path = ci_scripts/ci_post_clone.sh; sourceTree = SOURCE_ROOT; };
 		A15E8F41303912A6009B0A22 /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 		A1C4E79E302A63B800E2C0DB /* KitchenMemory.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KitchenMemory.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1C4E7AD302A63B900E2C0DB /* KitchenMemoryTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KitchenMemoryTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -110,6 +152,7 @@
 		B20000000000000000000011 /* KitchenMemoryDomain.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = KitchenMemoryDomain.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B20000000000000000000012 /* KitchenMemoryImport.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = KitchenMemoryImport.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B20000000000000000000013 /* KitchenMemoryPersistence.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = KitchenMemoryPersistence.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B30000000000000000000011 /* KitchenMemoryLogic.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = KitchenMemoryLogic.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -128,8 +171,17 @@
 				Modules/KitchenMemoryImport/IngredientLineParser.swift,
 				Modules/KitchenMemoryImport/RecipeImportModels.swift,
 				Modules/KitchenMemoryImport/RecipeURLImporter.swift,
+				Modules/KitchenMemoryImport/RecipeURLImporting.swift,
 				Modules/KitchenMemoryImport/RecipeURLRedirectController.swift,
 				Modules/KitchenMemoryImport/SchemaOrgRecipeImporter.swift,
+				Modules/KitchenMemoryLogic/KitchenServices.swift,
+				Modules/KitchenMemoryLogic/RecipeEditor.swift,
+				Modules/KitchenMemoryLogic/RecipeEditSession.swift,
+				Modules/KitchenMemoryLogic/RecipeImportService.swift,
+				Modules/KitchenMemoryLogic/RecipeImportSession.swift,
+				Modules/KitchenMemoryLogic/RecipeLibrary.swift,
+				Modules/KitchenMemoryLogic/RecipeScalingState.swift,
+				Modules/KitchenMemoryLogic/RecipeSourceURLPolicy.swift,
 				Modules/KitchenMemoryPersistence/KitchenMemoryMigrationPlan.swift,
 				Modules/KitchenMemoryPersistence/KitchenMemorySchema.swift,
 				Modules/KitchenMemoryPersistence/PersistenceRecords.swift,
@@ -157,6 +209,7 @@
 				Modules/KitchenMemoryImport/IngredientLineParser.swift,
 				Modules/KitchenMemoryImport/RecipeImportModels.swift,
 				Modules/KitchenMemoryImport/RecipeURLImporter.swift,
+				Modules/KitchenMemoryImport/RecipeURLImporting.swift,
 				Modules/KitchenMemoryImport/RecipeURLRedirectController.swift,
 				Modules/KitchenMemoryImport/SchemaOrgRecipeImporter.swift,
 			);
@@ -172,6 +225,20 @@
 			);
 			target = B20000000000000000000023 /* KitchenMemoryPersistence */;
 		};
+		B30000000000000000000501 /* Exceptions for "KitchenMemory" folder in "KitchenMemoryLogic" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Modules/KitchenMemoryLogic/KitchenServices.swift,
+				Modules/KitchenMemoryLogic/RecipeEditor.swift,
+				Modules/KitchenMemoryLogic/RecipeEditSession.swift,
+				Modules/KitchenMemoryLogic/RecipeImportService.swift,
+				Modules/KitchenMemoryLogic/RecipeImportSession.swift,
+				Modules/KitchenMemoryLogic/RecipeLibrary.swift,
+				Modules/KitchenMemoryLogic/RecipeScalingState.swift,
+				Modules/KitchenMemoryLogic/RecipeSourceURLPolicy.swift,
+			);
+			target = B30000000000000000000021 /* KitchenMemoryLogic */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -182,6 +249,7 @@
 				A147845E3037AF5A00B16FC1 /* Exceptions for "KitchenMemory" folder in "KitchenMemoryDomain" target */,
 				A147845F3037AF5A00B16FC1 /* Exceptions for "KitchenMemory" folder in "KitchenMemoryImport" target */,
 				A14784603037AF5A00B16FC1 /* Exceptions for "KitchenMemory" folder in "KitchenMemoryPersistence" target */,
+				B30000000000000000000501 /* Exceptions for "KitchenMemory" folder in "KitchenMemoryLogic" target */,
 			);
 			path = KitchenMemory;
 			sourceTree = "<group>";
@@ -206,6 +274,7 @@
 				B20000000000000000000101 /* KitchenMemoryDomain.framework in Frameworks */,
 				B20000000000000000000102 /* KitchenMemoryImport.framework in Frameworks */,
 				B20000000000000000000103 /* KitchenMemoryPersistence.framework in Frameworks */,
+				B30000000000000000000101 /* KitchenMemoryLogic.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -216,6 +285,7 @@
 				B20000000000000000000117 /* KitchenMemoryDomain.framework in Frameworks */,
 				B20000000000000000000118 /* KitchenMemoryImport.framework in Frameworks */,
 				B20000000000000000000119 /* KitchenMemoryPersistence.framework in Frameworks */,
+				B30000000000000000000103 /* KitchenMemoryLogic.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -249,6 +319,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		B30000000000000000000032 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B30000000000000000000111 /* KitchenMemoryDomain.framework in Frameworks */,
+				B30000000000000000000112 /* KitchenMemoryImport.framework in Frameworks */,
+				B30000000000000000000113 /* KitchenMemoryPersistence.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -279,6 +359,7 @@
 				B20000000000000000000011 /* KitchenMemoryDomain.framework */,
 				B20000000000000000000012 /* KitchenMemoryImport.framework */,
 				B20000000000000000000013 /* KitchenMemoryPersistence.framework */,
+				B30000000000000000000011 /* KitchenMemoryLogic.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -302,6 +383,7 @@
 				B20000000000000000000201 /* PBXTargetDependency */,
 				B20000000000000000000202 /* PBXTargetDependency */,
 				B20000000000000000000203 /* PBXTargetDependency */,
+				B30000000000000000000401 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				A1C4E7A0302A63B800E2C0DB /* KitchenMemory */,
@@ -326,6 +408,7 @@
 			dependencies = (
 				A1C4E7AF302A63B900E2C0DB /* PBXTargetDependency */,
 				B20000000000000000000401 /* PBXTargetDependency */,
+				B30000000000000000000406 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				A1C4E7B0302A63B900E2C0DB /* KitchenMemoryTests */,
@@ -423,6 +506,29 @@
 			productReference = B20000000000000000000013 /* KitchenMemoryPersistence.framework */;
 			productType = "com.apple.product-type.framework";
 		};
+		B30000000000000000000021 /* KitchenMemoryLogic */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B30000000000000000000321 /* Build configuration list for PBXNativeTarget "KitchenMemoryLogic" */;
+			buildPhases = (
+				B30000000000000000000031 /* Sources */,
+				B30000000000000000000032 /* Frameworks */,
+				B30000000000000000000033 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				B30000000000000000000402 /* PBXTargetDependency */,
+				B30000000000000000000403 /* PBXTargetDependency */,
+				B30000000000000000000404 /* PBXTargetDependency */,
+				B30000000000000000000405 /* PBXTargetDependency */,
+			);
+			name = KitchenMemoryLogic;
+			packageProductDependencies = (
+			);
+			productName = KitchenMemoryLogic;
+			productReference = B30000000000000000000011 /* KitchenMemoryLogic.framework */;
+			productType = "com.apple.product-type.framework";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -453,6 +559,9 @@
 					B20000000000000000000023 = {
 						CreatedOnToolsVersion = 26.6;
 					};
+					B30000000000000000000021 = {
+						CreatedOnToolsVersion = 26.6;
+					};
 				};
 			};
 			buildConfigurationList = A1C4E799302A63B800E2C0DB /* Build configuration list for PBXProject "KitchenMemory" */;
@@ -478,6 +587,7 @@
 				B20000000000000000000021 /* KitchenMemoryDomain */,
 				B20000000000000000000022 /* KitchenMemoryImport */,
 				B20000000000000000000023 /* KitchenMemoryPersistence */,
+				B30000000000000000000021 /* KitchenMemoryLogic */,
 			);
 		};
 /* End PBXProject section */
@@ -529,6 +639,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		B30000000000000000000033 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -571,6 +688,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		B20000000000000000000037 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B30000000000000000000031 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -638,6 +762,35 @@
 		B20000000000000000000405 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			productRef = A12691A9302E7F04004E6195 /* SwiftLintBuildToolPlugin */;
+		};
+		B30000000000000000000401 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B30000000000000000000021 /* KitchenMemoryLogic */;
+			targetProxy = B30000000000000000000201 /* PBXContainerItemProxy */;
+		};
+		B30000000000000000000402 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B20000000000000000000021 /* KitchenMemoryDomain */;
+			targetProxy = B30000000000000000000202 /* PBXContainerItemProxy */;
+		};
+		B30000000000000000000403 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B20000000000000000000022 /* KitchenMemoryImport */;
+			targetProxy = B30000000000000000000203 /* PBXContainerItemProxy */;
+		};
+		B30000000000000000000404 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B20000000000000000000023 /* KitchenMemoryPersistence */;
+			targetProxy = B30000000000000000000204 /* PBXContainerItemProxy */;
+		};
+		B30000000000000000000405 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = A12691A9302E7F04004E6195 /* SwiftLintBuildToolPlugin */;
+		};
+		B30000000000000000000406 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B30000000000000000000021 /* KitchenMemoryLogic */;
+			targetProxy = B30000000000000000000205 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1152,6 +1305,56 @@
 			};
 			name = Release;
 		};
+		B30000000000000000000301 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = FT9KDL728H;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				MACOSX_DEPLOYMENT_TARGET = 26.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory.Logic;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SWIFT_ENABLE_EXPLICIT_MODULES = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		B30000000000000000000302 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = FT9KDL728H;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				MACOSX_DEPLOYMENT_TARGET = 26.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory.Logic;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SWIFT_ENABLE_EXPLICIT_MODULES = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1214,6 +1417,15 @@
 			buildConfigurations = (
 				B20000000000000000000305 /* Debug */,
 				B20000000000000000000306 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B30000000000000000000321 /* Build configuration list for PBXNativeTarget "KitchenMemoryLogic" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B30000000000000000000301 /* Debug */,
+				B30000000000000000000302 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

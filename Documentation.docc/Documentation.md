@@ -55,3 +55,4 @@ presentation architecture.
 - <doc:0004-apple-persistence-and-portability>
 - <doc:0005-testing-and-comprehension>
 - <doc:0006-shared-ui-for-foundation-slices>
+- <doc:0007-business-logic-coverage-and-ui-smoke-tests>

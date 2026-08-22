@@ -57,6 +57,7 @@ Pantry inventory, meal planning, and shopping follow after this slice is useful.
 - [Implementation architecture](Documentation.docc/Articles/implementation-architecture.md)
 - [Continuous integration](Documentation.docc/Articles/continuous-integration.md)
 - [Accessibility engineering](Documentation.docc/Articles/accessibility-engineering.md)
+- [Testing strategy](Documentation.docc/Articles/Decisions/0007-business-logic-coverage-and-ui-smoke-tests.md)
 - [Open questions](Documentation.docc/Articles/open-questions.md)
 - [Architecture decisions](Documentation.docc/Documentation.md#Architecture-decisions)
 - [Artificial intelligence use](AI.md)
@@ -72,9 +73,9 @@ recipe library. The Kitchen gets an installation-specific identity; bundled
 recipes retain their hand-assigned identities so linked Kitchens can recognize
 the same samples instead of accumulating duplicates.
 
-The app's internal domain, import, and persistence modules live under
-`KitchenMemory/Modules` as native Xcode framework targets. Application use
-cases and bundled starter content compile directly into `KitchenMemory`. All
+The app's internal domain, import, persistence, and product-logic modules live
+under `KitchenMemory/Modules` as native Xcode framework targets. Bundled starter
+content and presentation adapters compile directly into `KitchenMemory`. All
 tests run in the shared `KitchenMemory` scheme and committed test plan:
 
 ```sh

@@ -60,8 +60,8 @@ struct KitchenSettingsView: View {
         }
         .accessibilityIdentifier("settings-reset-kitchen")
 
-        if let errorMessage = model.errorMessage {
-          Label(errorMessage, systemImage: "exclamationmark.triangle")
+        if let issue = model.issue {
+          Label(issue.message, systemImage: "exclamationmark.triangle")
             .foregroundStyle(.red)
         }
       }

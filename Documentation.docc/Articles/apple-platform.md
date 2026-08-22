@@ -97,7 +97,7 @@ Repository interfaces and mapping expressed in domain terms. The first
 implementation uses SwiftData, but callers do not receive storage-framework
 model objects. CloudKit integration remains behind the application boundary.
 
-### RecipeApplication
+### KitchenMemoryLogic
 
 Use cases that coordinate the domain, importer, and store. Candidate operations:
 
@@ -228,7 +228,7 @@ feature ships, even if scanning itself comes much later.
 
 Automator remains a useful integration point for existing Mac workflows, but a
 Shortcuts action and scriptable app are the more durable product surfaces. The
-shared `RecipeApplication` use cases allow all three to coexist:
+shared `KitchenMemoryLogic` use cases allow all three to coexist:
 
 - AppleScript for rich Mac automation and querying.
 - Shortcuts/App Intents for approachable cross-device actions.

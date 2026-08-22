@@ -165,8 +165,9 @@ the shared-Kitchen prototype selects its CloudKit behavior. The database is not
 the export format. It is installed through an explicit V1 migration plan; later
 schema changes add immutable versions and deliberate migration stages.
 
-Application code in the main `KitchenMemory` target supplies the first such use
-case. `RecipeLibrary` provides Kitchen-scoped listing and stable-identifier
-lookup to SwiftUI without exposing SwiftData records. The app's first read-only
-recipe view exercises that path from the persistent current revision through
-ordered ingredients and steps.
+`KitchenMemoryLogic` supplies the product use cases. `RecipeLibrary` provides
+Kitchen-scoped listing and stable-identifier lookup to SwiftUI without exposing
+SwiftData records; editing, import interpretation, scaling state, bootstrap, and
+reset behavior share the same UI-independent boundary. The app's recipe view
+exercises that path from the persistent current revision through ordered
+ingredients and steps.

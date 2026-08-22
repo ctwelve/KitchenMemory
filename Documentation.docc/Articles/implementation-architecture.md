@@ -7,13 +7,12 @@ SPDX-License-Identifier: GPL-3.0-only
 -->
 
 Kitchen Memory uses native Xcode framework targets for boundaries that carry
-independent technical responsibilities. Product-specific composition, use
-cases, interface code, and bundled starter content compile directly into the
-application target.
+independent technical responsibilities. Interface code, platform composition,
+and bundled starter content compile directly into the application target.
 
 ## Target organization
 
-`KitchenMemory/Modules` contains three internal frameworks. They enforce
+`KitchenMemory/Modules` contains four internal frameworks. They enforce
 dependency direction inside the Xcode project; they are not separately
 distributed products.
 
@@ -22,16 +21,19 @@ distributed products.
   normalization.
 - `KitchenMemoryPersistence` owns SwiftData records and domain-facing
   repositories.
+- `KitchenMemoryLogic` owns product operations and presentation-independent
+  workflow state.
 
-The application target depends on all three frameworks. Import and persistence
-each depend on the domain, but do not depend on one another or on the
-application.
+The application target composes all four frameworks. Import and persistence
+each depend on the domain but not on one another. Logic coordinates their public
+boundaries without depending on the application or SwiftUI.
 
 ```text
 KitchenMemory
-├── KitchenMemoryImport ───────┐
-├── KitchenMemoryPersistence ──┼── KitchenMemoryDomain
-└──────────────────────────────┘
+└── KitchenMemoryLogic
+    ├── KitchenMemoryImport ───────┐
+    ├── KitchenMemoryPersistence ──┼── KitchenMemoryDomain
+    └──────────────────────────────┘
 ```
 
 This structure keeps reusable technical boundaries explicit without turning
@@ -43,7 +45,63 @@ organization.
 `KitchenMemoryImport` owns pure, fixture-testable discovery and normalization
 of Schema.org `Recipe` JSON-LD, plus the bounded webpage fetcher. It produces
 domain values and retained source evidence without saving recipes or presenting
-review UI. Application code coordinates those later steps.
+review UI. Product logic coordinates those later steps.
+
+## Product logic
+
+`KitchenMemoryLogic` owns recipe editing and library operations, import-result
+interpretation, scaling selection, Kitchen bootstrap/reset operations, and pure
+edit/import workflow state. SwiftUI views bind to those values and translate
+typed failures into presentation strings. This boundary keeps current sheets
+replaceable by future in-page editing without rewriting validation or losing
+input, and lets complete product behavior run in fast framework tests.
+
+### Application composition and stitching points
+
+The application target contains a deliberately small set of stitching points.
+They connect platform facilities and replaceable SwiftUI presentation to the
+stable framework boundaries without moving business rules back into the app.
+
+```text
+KitchenMemoryApp
+└── AppDependencies
+    ├── SwiftDataRecipeRepository
+    ├── BundledSampleRecipeProvider
+    ├── KitchenBootstrapService
+    └── RecipeLibraryModel
+        ├── RecipeLibrary
+        ├── RecipeEditor
+        ├── RecipeImportService
+        └── KitchenResetService
+```
+
+`AppDependencies` is the composition root. It creates the concrete SwiftData
+repository and asset-backed sample provider, asks the bootstrap service for the
+initial Kitchen, and injects the resulting collaborators into
+`RecipeLibraryModel`. Concrete construction stays here so neither the views nor
+the reusable frameworks need to locate their own dependencies.
+
+`RecipeLibraryModel` is the principal application glue. It owns the UI-facing
+state for one Kitchen: the loaded recipe list, current selection, load state,
+and typed presentation issue. Every library-wide read or mutation passes
+through it. The model delegates validation and durable operations to
+`KitchenMemoryLogic`, then applies the small amount of presentation coordination
+that follows a successful operation, such as reloading the list while preserving
+or changing the selection. Its main-actor isolation and observation belong to
+the app boundary; recipe rules do not.
+
+`BundledSampleRecipeProvider` adapts the application asset catalog to
+`SampleRecipeProviding`. This lets bootstrap and reset logic consume recipes
+without knowing about bundles, compiled asset catalogs, or sample-document
+formats. A future sample source can replace the adapter without changing those
+operations.
+
+Views own transient presentation and bind directly to pure workflow values such
+as `RecipeEditSession`, `RecipeImportSession`, and `RecipeScalingState`. They ask
+`RecipeLibraryModel` to cross the library boundary rather than constructing
+repositories or use cases themselves. `RecipeLibraryIssue` is the final
+presentation seam: it converts typed failure categories into current user-facing
+copy, ready to move into string catalogs without changing the underlying logic.
 
 ## Persistence
 
@@ -132,6 +190,9 @@ the application-owned loader.
 
 Framework, application, integration, and UI tests belong to the shared
 `KitchenMemory` scheme and the committed `KitchenMemory.xctestplan`. Tests for
-application-owned use cases and starter content live directly in
-`KitchenMemoryTests`; framework tests remain grouped by their corresponding
-module.
+starter content and app composition live directly in `KitchenMemoryTests`;
+framework tests remain grouped by their corresponding module, including
+`KitchenMemoryLogicTests`. The non-UI suites pursue complete coverage of
+durable business logic; the UI target contains only application-shell smoke
+tests. See
+<doc:0007-business-logic-coverage-and-ui-smoke-tests>.

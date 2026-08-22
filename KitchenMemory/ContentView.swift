@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 import KitchenMemoryDomain
+import KitchenMemoryLogic
 import KitchenMemoryPersistence
 import SwiftUI
 
@@ -120,11 +121,11 @@ struct ContentView: View {
 
   @ViewBuilder
   private var recipeList: some View {
-    if let errorMessage = model.errorMessage {
+    if let issue = model.issue {
       ContentUnavailableView {
         Label("Recipes Unavailable", systemImage: "exclamationmark.triangle")
       } description: {
-        Text(errorMessage)
+        Text(issue.message)
       } actions: {
         Button("Try Again") { model.reload() }
       }

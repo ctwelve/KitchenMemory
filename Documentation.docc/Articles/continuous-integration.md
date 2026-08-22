@@ -19,17 +19,17 @@ The slice workflow starts for meaningful project changes pushed to `slice/*`
 branches. It performs Build, Analyze, and Test actions using the shared
 `KitchenMemory` scheme, but does not archive a product.
 
-Build and Analyze are required to pass. Test is advisory while the application
-UI is changing rapidly, allowing work on `slice/*` to continue through known UI
-test instability while still reporting the failures.
+Build and Analyze are required to pass. Test is advisory on `slice/*` while the
+project establishes complete business-logic coverage and keeps UI automation to
+the durable application-shell smoke tests. A failing logic test is still a
+product defect even when that cloud action is not yet a branch gate.
 
 ### Main production
 
 The production workflow starts for meaningful project changes merged or pushed
-to `main`. It requires Test on iOS and macOS, Analyze on iOS, macOS, and visionOS,
-and Archive on iOS, macOS, and visionOS to pass. Each Archive action is the
-production Release build for that platform, so separate Build actions would
-duplicate that work without producing different artifacts.
+to `main`. It requires Test, Analyze, and Archive on iOS and macOS to pass. Each
+Archive action is the production Release build for that platform, so separate
+Build actions would duplicate that work without producing different artifacts.
 
 Repeating the tests on `main` verifies the actual merge result, including its
 interaction with changes that landed after a slice branch began. Running Analyze
@@ -58,9 +58,51 @@ Xcode Cloud build or Test action as a required GitHub status check for `main`.
 The production workflow repeats required tests after merge to verify the actual
 result on `main`.
 
-The accessibility UI tests may remain advisory while their hierarchy is changing.
-Their audit model and accepted Xcode false positives are documented in
+The UI target contains smoke tests only. Comprehensive accessibility audits,
+localized-copy checks, and interaction-specific UI suites are deferred until the
+relevant interface is stable. See
+<doc:0007-business-logic-coverage-and-ui-smoke-tests> and
 <doc:accessibility-engineering>.
+
+The committed test plan collects code coverage. Evaluate the durable domain,
+import, persistence, and application-operation sources separately from SwiftUI
+views and test bundles; an app-wide percentage is not the business-logic metric.
+Use uncovered executable lines to find missing behavior and boundary tests, not
+to justify exercising provisional views through UI automation.
+
+### Core framework coverage gate
+
+Generate a fresh coverage bundle from the complete non-UI test target and apply
+the gate in the same run:
+
+```sh
+Tools/run-core-framework-coverage.sh
+```
+
+The runner creates a unique evidence directory under `/private/tmp`, prints its
+location, runs the tests, and invokes the checker only after Xcode succeeds. To
+check an existing result bundle directly, pass it to:
+
+```sh
+Tools/check-core-framework-coverage.sh /path/to/Tests.xcresult
+```
+
+The script reads Xcode's integer covered and executable line counts rather than
+its rounded percentage. It prints evidence for the domain, import, logic, and
+persistence frameworks and
+fails when a target or current framework source is missing, when even one
+executable line is uncovered, or when source, tests, the test plan, or project
+membership, scheme behavior, or resolved dependencies changed after the bundle's
+recorded build start.
+
+### Deterministic property-test corpora
+
+Property tests load named entropy seeds from
+`KitchenMemoryTests/TestSupport/PropertyTestSeeds.json`. Failure messages record
+the seed and case number so a generated input can be replayed exactly. The test
+harness verifies catalog integrity, proves that changed seeds produce different
+raw and derived corpora, and pins a known-answer vector so an accidental generator
+rewrite cannot silently change the meaning of an existing seed/case pair.
 
 Xcode Cloud workflow metadata and start conditions live in Xcode Cloud rather
 than in this repository. Keep its actions, requirements, branch patterns, and

@@ -12,10 +12,10 @@ import Foundation
 /// boundary Kitchen Memory only needs to prevent relative paths, custom schemes,
 /// embedded credentials, and implausibly large pasted values from becoming
 /// actions. DNS, TLS, and browser navigation remain system responsibilities.
-enum RecipeSourceURLPolicy {
-  static let maximumUTF8Bytes = 4_096
+public enum RecipeSourceURLPolicy {
+  public static let maximumUTF8Bytes = 4_096
 
-  static func validatedURL(from enteredValue: String) -> URL? {
+  public static func validatedURL(from enteredValue: String) -> URL? {
     let value = enteredValue.trimmingCharacters(in: .whitespacesAndNewlines)
     guard !value.isEmpty,
           value.utf8.count <= maximumUTF8Bytes,
@@ -30,12 +30,12 @@ enum RecipeSourceURLPolicy {
     return url
   }
 
-  static func validatedURL(_ url: URL?) -> URL? {
+  public static func validatedURL(_ url: URL?) -> URL? {
     guard let url else { return nil }
     return validatedURL(from: url.absoluteString)
   }
 
-  static func displayHost(for url: URL) -> String? {
+  public static func displayHost(for url: URL) -> String? {
     guard let url = validatedURL(url), let host = url.host else { return nil }
     let hostWithUnambiguousIPv6Brackets = host.contains(":") ? "[\(host)]" : host
     return url.port.map { "\(hostWithUnambiguousIPv6Brackets):\($0)" }
