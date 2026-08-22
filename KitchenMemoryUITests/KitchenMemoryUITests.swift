@@ -139,15 +139,27 @@ final class KitchenMemoryUITests: XCTestCase {
     let editor = app.descendants(matching: .any)["recipe-editor-scroll"]
     let scalingToggle = app.descendants(matching: .any)["recipe-editor-yield-scaling"]
     XCTAssertTrue(scroll(editor, untilVisible: scalingToggle))
+
+    #if os(iOS)
+    let switchControl = scalingToggle.descendants(matching: .switch).firstMatch
+    XCTAssertTrue(switchControl.waitForExistence(timeout: 2))
+    activate(switchControl)
+    XCTAssertEqual(switchControl.value as? String, "1")
+    #else
     activate(scalingToggle)
+    #endif
 
     let increment = app.buttons["recipe-editor-yield-quantity-lower-increment"]
-    XCTAssertTrue(increment.waitForExistence(timeout: 2))
+    XCTAssertTrue(scroll(editor, untilHittable: increment))
+    let numerator = app.textFields["recipe-editor-yield-quantity-lower-numerator"]
+    XCTAssertTrue(numerator.waitForExistence(timeout: 2))
     for _ in 1..<8 { activate(increment) }
+    XCTAssertEqual(numerator.value as? String, "8")
 
     let save = app.buttons["recipe-editor-save"]
     XCTAssertTrue(save.waitForExistence(timeout: 2))
     activate(save)
+    XCTAssertTrue(save.waitForNonExistence(timeout: 5))
 
     let workingYield = app.descendants(matching: .any)["recipe-working-yield"]
     XCTAssertTrue(scroll(detail, untilVisible: workingYield))
