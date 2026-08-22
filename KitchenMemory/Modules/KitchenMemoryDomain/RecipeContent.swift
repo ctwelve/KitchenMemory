@@ -279,10 +279,8 @@ public struct RecipeIngredient: Codable, Equatable, Identifiable, Sendable {
         if let package,
            let packageQuantity = package.quantity.renderedText,
            let packageUnitText = nonempty(package.unitText) {
-            let packageUnit = packageUnitText.hasSuffix("s")
-                ? String(packageUnitText.dropLast())
-                : packageUnitText
-            components.append("(\(packageQuantity)-\(packageUnit))")
+            // Preserve authored wording until localized package-phrase templates exist.
+            components.append("(\(packageQuantity) \(packageUnitText))")
         }
         if let unit = nonempty(unitText) { components.append(unit) }
         components.append(ingredientName)

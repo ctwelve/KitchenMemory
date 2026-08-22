@@ -110,7 +110,7 @@ final class DomainSkeletonTests: XCTestCase {
 
         XCTAssertEqual(
             ingredient.effectiveDisplayText,
-            "4 (5-ounce) cans chunk light tuna"
+            "4 (5 ounces) cans chunk light tuna"
         )
     }
 
@@ -159,7 +159,7 @@ final class DomainSkeletonTests: XCTestCase {
         ).scaled(using: scale)
 
         XCTAssertEqual(exact.status, .scaled)
-        XCTAssertEqual(exact.ingredient.effectiveDisplayText, "2 (5-ounce) cans tuna")
+        XCTAssertEqual(exact.ingredient.effectiveDisplayText, "2 (5 ounces) cans tuna")
         XCTAssertEqual(range.status, .scaled)
         XCTAssertEqual(range.ingredient.effectiveDisplayText, "1–1 1/2 cups stock")
     }

@@ -56,11 +56,28 @@ public struct URLSessionRecipeDocumentLoader: RecipeDocumentLoading, Sendable {
   public var maximumBytes: Int
   public var maximumRedirects: Int
   public var timeout: TimeInterval
+  private let configurationProvider: @Sendable () -> URLSessionConfiguration
 
   public init(
     maximumBytes: Int = Self.defaultMaximumBytes,
     maximumRedirects: Int = 5,
     timeout: TimeInterval = 20
+  ) {
+    self.init(
+      maximumBytes: maximumBytes,
+      maximumRedirects: maximumRedirects,
+      timeout: timeout,
+      configurationProvider: Self.ephemeralConfiguration
+    )
+  }
+
+  /// Internal seam for deterministic transport tests. Production callers use
+  /// the public initializer, which always creates a fresh ephemeral session.
+  init(
+    maximumBytes: Int,
+    maximumRedirects: Int = 5,
+    timeout: TimeInterval = 20,
+    configurationProvider: @escaping @Sendable () -> URLSessionConfiguration
   ) {
     precondition(maximumBytes > 0)
     precondition(maximumRedirects >= 0)
@@ -68,11 +85,12 @@ public struct URLSessionRecipeDocumentLoader: RecipeDocumentLoading, Sendable {
     self.maximumBytes = maximumBytes
     self.maximumRedirects = maximumRedirects
     self.timeout = timeout
+    self.configurationProvider = configurationProvider
   }
 
   // The transport policy is intentionally visible as one linear sequence from
   // URL validation through bounded response consumption.
-  // swiftlint:disable:next cyclomatic_complexity function_body_length
+  // swiftlint:disable:next function_body_length
   public func load(_ url: URL) async throws -> FetchedRecipeDocument {
     try Task.checkCancellation()
     guard Self.isStructurallyAllowedFetchURL(url) else {
@@ -83,10 +101,7 @@ public struct URLSessionRecipeDocumentLoader: RecipeDocumentLoading, Sendable {
       maximumRedirects: maximumRedirects,
       timeout: timeout
     )
-    let configuration = Self.configuredSession(
-      .ephemeral,
-      timeout: timeout
-    )
+    let configuration = makeSessionConfiguration()
 
     let session = URLSession(
       configuration: configuration,
@@ -126,29 +141,12 @@ public struct URLSessionRecipeDocumentLoader: RecipeDocumentLoading, Sendable {
     let dataTask = bytes.task
     let buffer: [UInt8]
     do {
-      buffer = try await withTaskCancellationHandler {
-        var buffer: [UInt8] = []
-        if response.expectedContentLength > 0 {
-          buffer.reserveCapacity(min(Int(response.expectedContentLength), maximumBytes))
-        }
-        for try await byte in bytes {
-          // This periodic check stops promptly while consuming bytes already
-          // buffered in memory without paying for a cancellation check on
-          // every byte.
-          if buffer.count.isMultiple(of: 4_096) { try Task.checkCancellation() }
-          guard buffer.count < maximumBytes else {
-            throw RecipeURLImportError.responseTooLarge(maximumBytes: maximumBytes)
-          }
-          buffer.append(byte)
-        }
-        try Task.checkCancellation()
-        return buffer
-      } onCancel: {
-        // `bytes(for:)` has already returned once headers arrive. Explicitly
-        // cancel its underlying task so closing the import sheet also stops a
-        // slow or stalled response body rather than merely abandoning iteration.
-        dataTask.cancel()
-      }
+      buffer = try await Self.consumeResponseBody(
+        bytes,
+        expectedContentLength: response.expectedContentLength,
+        maximumBytes: maximumBytes,
+        onCancel: dataTask.cancel
+      )
     } catch {
       // Foundation may surface cancellation as `URLError.cancelled`. Preserve
       // Swift task cancellation as `CancellationError` so application code can
@@ -163,6 +161,51 @@ public struct URLSessionRecipeDocumentLoader: RecipeDocumentLoading, Sendable {
       mediaType: response.mimeType,
       textEncodingName: response.textEncodingName
     )
+  }
+
+  /// Constructs a fresh, fully hardened configuration for each transport.
+  /// Keeping construction separate makes the public initializer's ephemeral
+  /// default independently verifiable without making a real network request.
+  func makeSessionConfiguration() -> URLSessionConfiguration {
+    Self.configuredSession(configurationProvider(), timeout: timeout)
+  }
+
+  /// Consumes an asynchronous byte stream without letting buffering bypass the
+  /// response limit. The injected cancellation action lets tests exercise the
+  /// transport-cleanup guarantee with a deterministic in-memory stream.
+  static func consumeResponseBody<Bytes>(
+    _ bytes: Bytes,
+    expectedContentLength: Int64,
+    maximumBytes: Int,
+    onCancel: @escaping @Sendable () -> Void
+  ) async throws -> [UInt8]
+  where Bytes: AsyncSequence & Sendable, Bytes.Element == UInt8 {
+    try await withTaskCancellationHandler {
+      var buffer: [UInt8] = []
+      if expectedContentLength > 0 {
+        buffer.reserveCapacity(min(Int(expectedContentLength), maximumBytes))
+      }
+      for try await byte in bytes {
+        // This periodic check stops promptly while consuming bytes already
+        // buffered in memory without paying for a cancellation check on
+        // every byte.
+        if buffer.count.isMultiple(of: 4_096) { try Task.checkCancellation() }
+        guard buffer.count < maximumBytes else {
+          throw RecipeURLImportError.responseTooLarge(maximumBytes: maximumBytes)
+        }
+        buffer.append(byte)
+      }
+      try Task.checkCancellation()
+      return buffer
+    } onCancel: {
+      // The response headers may already have arrived. Explicitly stop the
+      // underlying task instead of merely abandoning byte iteration.
+      onCancel()
+    }
+  }
+
+  private static func ephemeralConfiguration() -> URLSessionConfiguration {
+    .ephemeral
   }
 
   /// Applies the complete transport-lifetime policy to a session configuration.
@@ -321,9 +364,6 @@ public struct RecipeURLImporter<Loader: RecipeDocumentLoading>: Sendable {
       return false
     }) {
       throw RecipeURLImportError.processingLimitExceeded
-    }
-    guard result.candidates.count <= maximumCandidates else {
-      throw RecipeURLImportError.tooManyCandidates(maximum: maximumCandidates)
     }
     return result
   }

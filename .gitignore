@@ -6,6 +6,7 @@ xcuserdata/
 DerivedData/
 .build/
 .swiftpm/
+*.profraw
 
 # macOS
 .DS_Store
