@@ -26,15 +26,16 @@ test instability while still reporting the failures.
 ### Main production
 
 The production workflow starts for meaningful project changes merged or pushed
-to `main`. It requires Test, Analyze, and Archive actions to pass. Archive is the
-production Release build, so a separate Build action would duplicate that work
-without producing a different artifact.
+to `main`. It requires Test on iOS and macOS, Analyze on iOS, macOS, and visionOS,
+and Archive on iOS, macOS, and visionOS to pass. Each Archive action is the
+production Release build for that platform, so separate Build actions would
+duplicate that work without producing different artifacts.
 
 Repeating the tests on `main` verifies the actual merge result, including its
-interaction with changes that landed after a slice branch began. The Analyze
-action remains a single macOS action: all application and internal-framework
-Swift sources are included by that scheme action, while platform compilation is
-covered by the other workflow actions.
+interaction with changes that landed after a slice branch began. Running Analyze
+and Archive across every supported platform deliberately pays the full production
+confidence cost on `main`; the slice workflow remains the lighter development
+feedback loop.
 
 ### Change filters
 
