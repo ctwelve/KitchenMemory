@@ -19,9 +19,10 @@ The slice workflow starts for meaningful project changes pushed to `slice/*`
 branches. It performs Build, Analyze, and Test actions using the shared
 `KitchenMemory` scheme, but does not archive a product.
 
-Build and Analyze are required to pass. Test is advisory while the application
-UI is changing rapidly, allowing work on `slice/*` to continue through known UI
-test instability while still reporting the failures.
+Build and Analyze are required to pass. Test is advisory on `slice/*` while the
+project establishes complete business-logic coverage and keeps UI automation to
+the durable application-shell smoke tests. A failing logic test is still a
+product defect even when that cloud action is not yet a branch gate.
 
 ### Main production
 
@@ -58,9 +59,17 @@ Xcode Cloud build or Test action as a required GitHub status check for `main`.
 The production workflow repeats required tests after merge to verify the actual
 result on `main`.
 
-The accessibility UI tests may remain advisory while their hierarchy is changing.
-Their audit model and accepted Xcode false positives are documented in
+The UI target contains smoke tests only. Comprehensive accessibility audits,
+localized-copy checks, and interaction-specific UI suites are deferred until the
+relevant interface is stable. See
+<doc:0007-business-logic-coverage-and-ui-smoke-tests> and
 <doc:accessibility-engineering>.
+
+The committed test plan collects code coverage. Evaluate the durable domain,
+import, persistence, and application-operation sources separately from SwiftUI
+views and test bundles; an app-wide percentage is not the business-logic metric.
+Use uncovered executable lines to find missing behavior and boundary tests, not
+to justify exercising provisional views through UI automation.
 
 Xcode Cloud workflow metadata and start conditions live in Xcode Cloud rather
 than in this repository. Keep its actions, requirements, branch patterns, and

@@ -134,4 +134,6 @@ Framework, application, integration, and UI tests belong to the shared
 `KitchenMemory` scheme and the committed `KitchenMemory.xctestplan`. Tests for
 application-owned use cases and starter content live directly in
 `KitchenMemoryTests`; framework tests remain grouped by their corresponding
-module.
+module. The non-UI suites pursue complete coverage of durable business logic;
+the UI target contains only application-shell smoke tests. See
+<doc:0007-business-logic-coverage-and-ui-smoke-tests>.
