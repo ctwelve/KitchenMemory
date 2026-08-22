@@ -47,23 +47,28 @@ app.
 
 ## Architectural aim
 
-Every way of adding a recipe should call the same application capability:
+The current SwiftUI application crosses durable product boundaries through
+`RecipeLibraryModel`, which delegates to the same `KitchenMemoryLogic` operations
+that future automation and platform-specific interfaces will use:
 
 ```text
-SwiftUI editor ───────────────┐
-Safari share extension ──────┤
-File importer ───────────────┼─→ ImportRecipe use case → Recipe library
-AppleScript command ─────────┤
-Shortcuts action ────────────┤
-Folder/CLI batch importer ───┘
+SwiftUI views
+   ↓
+RecipeLibraryModel
+   ├── RecipeLibrary ────────┐
+   ├── RecipeEditor ────────├──→ RecipeRepository
+   ├── KitchenResetService ──┘
+   └── RecipeImportService ───→ KitchenMemoryImport
 ```
 
-Automation must not manipulate persistence objects or UI elements directly.
-It invokes stable use cases using transferable values and receives structured
-results. This keeps AppleScript, Shortcuts, tests, and future tools from becoming
-coupled to SwiftData, CloudKit, or a particular window layout.
+`RecipeLibraryModel` is application glue, not the only permitted client. A
+Safari share extension, file importer, AppleScript command, Shortcut, or batch
+tool should call the relevant Logic operation directly and exchange domain
+values or structured results. Automation must not manipulate persistence
+objects or UI elements. This keeps every client independent of SwiftData,
+CloudKit, and a particular window layout.
 
-## Proposed module boundaries
+## Current module boundaries
 
 ### KitchenMemoryDomain
 
@@ -78,16 +83,17 @@ Plain Swift domain values and rules:
 The domain should be usable from the app, extensions, tests, and a potential
 command-line companion.
 
-### RecipeImport
+### KitchenMemoryImport
 
-An asynchronous import pipeline:
+The deterministic and bounded web import pipeline:
 
-- Input discovery and type detection.
-- Schema.org JSON-LD decoding.
-- Later: OCR, image cleanup, PDF handling, and ingredient interpretation.
-- An `ImportDraft` result containing warnings, confidence, and source evidence.
+- Discovers and decodes Schema.org `Recipe` JSON-LD.
+- Normalizes recipe candidates and preserves bounded source evidence.
+- Conservatively interprets ingredient lines without discarding original text.
+- Fetches person-entered URLs through a bounded, ephemeral URLSession adapter.
+- Produces reviewable candidates without saving them.
 
-Import produces a draft. Saving that draft is a separate application decision.
+Import produces a draft. Saving that draft is a separate product-logic decision.
 This distinction is essential for unattended batch processing: ambiguous cards
 can land in an inbox rather than being silently turned into bad recipes.
 
@@ -99,28 +105,32 @@ model objects. CloudKit integration remains behind the application boundary.
 
 ### KitchenMemoryLogic
 
-Use cases that coordinate the domain, importer, and store. Candidate operations:
+Product operations and presentation-independent workflow state that coordinate
+the domain, importer, and store. The implemented boundary includes:
 
 ```text
-createRecipe
-updateRecipe
-importRecipe
-importFiles
-listRecipes
-findRecipes
-exportRecipes
+RecipeLibrary          Kitchen-scoped reads and revision history
+RecipeEditor           create and revise immutable recipes
+RecipeImportService    interpret URL-import results for review
+KitchenBootstrapService / KitchenResetService
+RecipeEditSession      transient structured edit state
+RecipeImportSession    transient import and candidate-selection state
+RecipeScalingState     transient working-yield selection
 ```
 
-These operations form the conceptual automation API even before AppleScript is
-implemented.
+File import, search, export, batch work, and cooking sessions will extend this
+same boundary when their slices arrive.
 
-### RecipesApp
+### KitchenMemory application target
 
-The SwiftUI interface and Apple-platform integrations. Platform-specific scenes
-and commands belong here; reusable recipe behavior does not.
+The SwiftUI interface, `RecipeLibraryModel` composition glue, bundled sample
+resources, localization catalogs, and Apple-platform integrations. Platform-
+specific scenes, commands, and presentation strings belong here; reusable recipe
+behavior does not. See <doc:implementation-architecture> and
+<doc:localization-architecture>.
 
 An eventual tvOS target should consume `KitchenMemoryDomain` and the read/cook-oriented
-application use cases while supplying its own focused presentation layer. Its
+Logic operations while supplying its own focused presentation layer. Its
 future existence must not force television interaction constraints into the
 Mac, iPhone, or iPad interface.
 
@@ -161,7 +171,7 @@ every database field.
 An eventual vocabulary might read naturally:
 
 ```applescript
-tell application "Recipes"
+tell application "Kitchen Memory"
     set importedRecipes to import recipes from folder scansFolder
     repeat with importedRecipe in importedRecipes
         if review status of importedRecipe is needs review then
@@ -235,12 +245,16 @@ shared `KitchenMemoryLogic` use cases allow all three to coexist:
 - Automator via Run AppleScript, Shortcuts, Services, or a future command-line
   companion.
 
-## Near-term implications
+## Current foundation and next implications
 
-The first implementation does not need AppleScript support. It does need:
+The implemented foundation already provides UI-independent domain values,
+reviewable import drafts, stable recipe/source identities, SwiftData behind a
+repository, and shared Logic operations. The next platform work should preserve
+those boundaries while it:
 
-1. A domain module independent of UI and persistence frameworks.
-2. An importer that returns drafts instead of saving directly.
-3. Stable UUIDs for recipes, source captures, and import jobs.
-4. Batch-capable import interfaces, even if the first UI imports one URL.
-5. Fixtures that can later include scans as well as webpages.
+1. establishes String Catalogs and localized asset-backed recipe packs;
+2. replaces provisional modal editing with interaction models suited to Mac and
+   mobile;
+3. adds cooking sessions without mutating maintained recipe revisions;
+4. introduces batch-capable import interfaces before adding scan/OCR inputs; and
+5. keeps fixtures extensible to files and scans as well as webpages.

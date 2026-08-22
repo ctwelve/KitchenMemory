@@ -24,16 +24,19 @@ distributed products.
 - `KitchenMemoryLogic` owns product operations and presentation-independent
   workflow state.
 
-The application target composes all four frameworks. Import and persistence
-each depend on the domain but not on one another. Logic coordinates their public
-boundaries without depending on the application or SwiftUI.
+The application target links all four frameworks because composition adapters
+exchange domain values, construct persistence and import implementations, and
+inject Logic operations. Import and persistence each depend on the domain but
+not on one another. Logic coordinates all three public boundaries without
+depending on the application or SwiftUI.
 
 ```text
-KitchenMemory
-└── KitchenMemoryLogic
-    ├── KitchenMemoryImport ───────┐
-    ├── KitchenMemoryPersistence ──┼── KitchenMemoryDomain
-    └──────────────────────────────┘
+KitchenMemory application ──→ all four internal frameworks
+
+KitchenMemoryLogic
+├── KitchenMemoryImport ───────┐
+├── KitchenMemoryPersistence ──┼──→ KitchenMemoryDomain
+└──────────────────────────────┘
 ```
 
 This structure keeps reusable technical boundaries explicit without turning
@@ -100,8 +103,9 @@ Views own transient presentation and bind directly to pure workflow values such
 as `RecipeEditSession`, `RecipeImportSession`, and `RecipeScalingState`. They ask
 `RecipeLibraryModel` to cross the library boundary rather than constructing
 repositories or use cases themselves. `RecipeLibraryIssue` is the final
-presentation seam: it converts typed failure categories into current user-facing
-copy, ready to move into string catalogs without changing the underlying logic.
+presentation seam: it converts typed failure categories into user-facing copy.
+The internationalization slice moves that copy into String Catalogs without
+changing the underlying logic.
 
 ## Persistence
 
@@ -134,6 +138,21 @@ The store begins at `KitchenMemorySchemaV1` under
 version and an explicit migration stage; V1's models are never edited in place
 after release.
 
+## Localization resources
+
+String Catalogs, locale-aware presentation formatters, and localized bundled
+content belong to the application target. The internationalization slice moves
+the remaining English-oriented domain display helpers behind that boundary so
+the frameworks return semantic domain values and typed failures rather than
+choosing interface language. This keeps formatting and pluralization replaceable
+without making locale a hidden input to business rules.
+
+Interface copy and authored recipe content use separate resources. String
+Catalogs hold labels, actions, errors, and pluralized messages. Complete sample
+recipe documents remain data assets so a translation preserves coherent
+instructions, ingredients, attribution, and accessibility descriptions. See
+<doc:localization-architecture>.
+
 ## Sample resources
 
 Deterministic starter content is application data, so its loader and resources
@@ -152,6 +171,14 @@ Foundation property lists so Xcode can provide structured editing without
 adding a parser dependency. Recipe, revision, row, step, and media identities
 are pre-generated so importing the catalog into a fresh store is repeatable and
 can be made idempotent.
+
+The internationalization slice extends that index with explicit locale-tagged
+recipe variants. A manifest-level sample-family identifier relates the variants,
+while each authored translation has its own stable recipe, revision, and child
+identities. Reusing one durable recipe identity for different translated
+payloads would create a synchronization conflict. The application adapter
+selects an exact regional match, a supported language fallback, or the English
+development asset before Logic performs the atomic bootstrap/reset operation.
 
 The catalog does not contain a Kitchen identifier. A sample recipe retains its
 own stable recipe, revision, and media identities, while the importing use case
@@ -192,7 +219,7 @@ Framework, application, integration, and UI tests belong to the shared
 `KitchenMemory` scheme and the committed `KitchenMemory.xctestplan`. Tests for
 starter content and app composition live directly in `KitchenMemoryTests`;
 framework tests remain grouped by their corresponding module, including
-`KitchenMemoryLogicTests`. The non-UI suites pursue complete coverage of
-durable business logic; the UI target contains only application-shell smoke
-tests. See
+`KitchenMemoryLogicTests`. The exact coverage gate currently requires every
+executable line in the four internal frameworks to be covered by the non-UI
+suite. The UI target contains only application-shell smoke tests. See
 <doc:0007-business-logic-coverage-and-ui-smoke-tests>.

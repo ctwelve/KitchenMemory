@@ -36,8 +36,8 @@ differences are necessary, but do not treat maximum view reuse or final visual
 design as goals during this phase. Avoid elaborate interactions that would
 prematurely commit the product to a presentation architecture.
 
-Continue to keep the domain, import pipeline, persistence interfaces, and
-application use cases outside the view layer. The shared core is the durable
+Continue to keep the domain, import pipeline, persistence interfaces, and Logic
+operations outside the view layer. The shared core is the durable
 product investment; the current shared UI is replaceable scaffolding.
 
 Before serious visual-editor work begins, evaluate separate Mac and mobile

@@ -30,9 +30,9 @@ distance. It will share the domain and relevant application services, but it is
 not expected to match the editing, import, pantry, or automation capabilities of
 the Mac application.
 
-Keep the recipe domain, import pipeline, application use cases, and persistence
-interfaces outside the SwiftUI view layer. Automation will call application use
-cases rather than drive the UI or access persistence objects.
+Keep the recipe domain, import pipeline, Logic operations, and persistence
+interfaces outside the SwiftUI view layer. Automation will call Logic operations
+rather than drive the UI or access persistence objects.
 
 SwiftData, CloudKit, and the domain boundary were selected subsequently in ADRs
 0003 and 0004.

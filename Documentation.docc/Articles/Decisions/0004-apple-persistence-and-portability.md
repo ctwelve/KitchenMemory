@@ -22,7 +22,7 @@ without treating the application's private database as a public file format.
 Use SwiftData as the first local persistence implementation and CloudKit as the
 synchronization and household-collaboration platform.
 
-Do not commit the domain or application use cases to SwiftData managed CloudKit
+Do not commit the domain or Logic operations to SwiftData managed CloudKit
 sync as the only integration mechanism. Select the final combination of managed
 sync, Core Data CloudKit integration, and direct CloudKit behavior after a
 shared-Kitchen collaboration prototype.

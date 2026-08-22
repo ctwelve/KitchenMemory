@@ -28,9 +28,9 @@ precise stock counts. A useful household tool needs a middle path:
 - make sharing with a family feel like sharing a kitchen, not administering a
   database.
 
-## Current scope
+## Current alpha scope
 
-The first product slice is:
+The implemented recipe foundation and remaining alpha loop are:
 
 1. Create and edit a recipe.
 2. Import a recipe from a webpage using Schema.org JSON-LD.
@@ -55,6 +55,7 @@ Pantry inventory, meal planning, and shopping follow after this slice is useful.
 - [Product workflows](Documentation.docc/Articles/workflows.md)
 - [Apple platform and automation architecture](Documentation.docc/Articles/apple-platform.md)
 - [Implementation architecture](Documentation.docc/Articles/implementation-architecture.md)
+- [Localization and recipe resources](Documentation.docc/Articles/localization-architecture.md)
 - [Continuous integration](Documentation.docc/Articles/continuous-integration.md)
 - [Accessibility engineering](Documentation.docc/Articles/accessibility-engineering.md)
 - [Testing strategy](Documentation.docc/Articles/Decisions/0007-business-logic-coverage-and-ui-smoke-tests.md)
@@ -67,11 +68,12 @@ Pantry inventory, meal planning, and shopping follow after this slice is useful.
 Open `KitchenMemory.xcodeproj` in Xcode and run the **KitchenMemory** scheme on
 My Mac or an iOS Simulator. The application is based on Xcode's standard
 multiplatform SwiftUI structure and uses SwiftData as its first local persistence
-implementation. On first launch, it installs the bundled Tuna Noodle Hotdish as
-starter content into a newly created local Kitchen and opens the read-only
-recipe library. The Kitchen gets an installation-specific identity; bundled
-recipes retain their hand-assigned identities so linked Kitchens can recognize
-the same samples instead of accumulating duplicates.
+implementation. On first launch, it installs the bundled sample recipe pack into
+a newly created local Kitchen and opens the recipe library. The Kitchen gets an
+installation-specific identity; bundled recipes retain their hand-assigned
+identities so seeding and reset behavior are deterministic. Localized authored
+variants will be related by the sample manifest rather than pretending that two
+different recipe payloads are one durable recipe revision.
 
 The app's internal domain, import, persistence, and product-logic modules live
 under `KitchenMemory/Modules` as native Xcode framework targets. Bundled starter

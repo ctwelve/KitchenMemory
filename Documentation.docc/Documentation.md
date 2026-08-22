@@ -44,6 +44,7 @@ presentation architecture.
 
 - <doc:apple-platform>
 - <doc:implementation-architecture>
+- <doc:localization-architecture>
 - <doc:accessibility-engineering>
 - <doc:continuous-integration>
 
