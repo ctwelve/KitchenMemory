@@ -28,9 +28,9 @@ precise stock counts. A useful household tool needs a middle path:
 - make sharing with a family feel like sharing a kitchen, not administering a
   database.
 
-## Current alpha scope
+## Current 0.1 scope
 
-The implemented recipe foundation and remaining alpha loop are:
+The 0.1 feature baseline is implemented:
 
 1. Create and edit a recipe.
 2. Import a recipe from a webpage using Schema.org JSON-LD.
@@ -38,14 +38,16 @@ The implemented recipe foundation and remaining alpha loop are:
 4. Scale and read a recipe from clear, sectioned instructions.
 5. Keep the local-first recipe library synchronized across one person's devices.
 
-Cooking sessions, pantry inventory, meal planning, shopping, and household
-sharing follow after this slice is useful.
+The next pass is release engineering: harden, package, distribute, and prove
+this existing loop without adding another product feature. Cooking sessions,
+pantry inventory, meal planning, shopping, and household sharing follow later.
 
 ## Documentation
 
 - [Documentation library](Documentation.docc/Documentation.md) — complete guide
 - [Product doctrine](Documentation.docc/Articles/product-doctrine.md) — consolidated product direction
-- [Alpha roadmap](Documentation.docc/Articles/alpha-roadmap.md) — remaining slices to a working alpha
+- [0.1 roadmap](Documentation.docc/Articles/alpha-roadmap.md) — completed feature slices and release boundary
+- [0.1 release engineering](Documentation.docc/Articles/release-engineering.md) — hardening and release gates
 - [Naming and voice](Documentation.docc/Articles/naming.md)
 - [Product brief](Documentation.docc/Articles/product-brief.md)
 - [Recipe domain model](Documentation.docc/Articles/recipe-domain-model.md)

@@ -247,16 +247,21 @@ shared `KitchenMemoryLogic` use cases allow all three to coexist:
 
 ## Current foundation and next implications
 
-The implemented foundation already provides UI-independent domain values,
-reviewable import drafts, stable recipe/source identities, SwiftData behind a
-repository, and shared Logic operations. The next platform work should preserve
+The implemented 0.1 feature baseline already provides UI-independent domain
+values, reviewable import drafts, stable recipe/source identities, SwiftData and
+personal iCloud synchronization behind the persistence boundary, localized
+sample content, and shared Logic operations. Release engineering should preserve
 those boundaries while it:
 
-1. proves private, local-first iCloud synchronization behind the repository
-   boundary;
-2. extends the established String Catalogs and localized asset-backed recipe packs;
-3. replaces provisional modal editing with interaction models suited to Mac and
-   mobile;
-4. adds cooking sessions in 0.2 without mutating maintained recipe revisions;
-5. introduces batch-capable import interfaces before adding scan/OCR inputs; and
-6. keeps fixtures extensible to files and scans as well as webpages.
+1. proves the existing private, local-first iCloud path on real devices and
+   rehearses production schema promotion;
+2. verifies the established String Catalogs and localized asset-backed recipe
+   packs under release conditions;
+3. produces signed, installable, diagnosable iOS and macOS candidates; and
+4. records a repeatable release procedure before 0.2 feature development.
+
+After that baseline is established, platform feature work can replace
+provisional modal editing with interaction models suited to Mac and mobile, add
+cooking sessions without mutating maintained recipe revisions, introduce
+batch-capable import interfaces before scan/OCR inputs, and keep fixtures
+extensible to files and scans as well as webpages.

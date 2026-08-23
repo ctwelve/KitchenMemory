@@ -14,19 +14,20 @@ archives. CI-only replacements for those actions should be avoided.
 
 ## Workflow policy
 
-### Slice development
+### Integration and hardening development
 
-The slice workflow starts for meaningful project changes pushed to `slice/*`
-branches. It performs Build, Analyze, and Test actions using the shared
+The development workflow starts for meaningful project changes pushed to
+`slice/*` integration branches and `bugs/*` hardening branches. It performs
+Build, Analyze, and Test actions using the shared
 `KitchenMemory Testing` scheme, but does not archive a product. Its actions use
 `Testing` and do not include UI automation. Local developer runs use
 `KitchenMemory Debugging`, whose Run and Analyze actions use `Develop`.
 
-The current integration branch is `slice/completion`. Focused working branches
-merge into it through review; the resulting push runs the slice workflow. When
-the collected slice is ready, its pull request to `main` is subject to the
-pull-request gate below. A working branch therefore need not duplicate cloud
-work before its reviewed result reaches `slice/completion`.
+The completed feature baseline was collected on `slice/completion` before its
+merge to `main`. Release engineering begins from that `main` baseline and uses
+focused reviewed fixes rather than extending the integration branch as an
+indefinite parallel trunk. A future batch of feature slices may establish a new
+temporary `slice/*` integration branch.
 
 Build, Analyze, and the non-UI Test action are required to pass. The core
 framework coverage gate has reached exact complete line coverage; a failing
@@ -47,6 +48,18 @@ and Archive across every supported platform deliberately pays the full productio
 confidence cost on `main`; the slice workflow remains the lighter development
 feedback loop.
 
+### Release tags and notarization
+
+The notarization workflow is attached to `main` and starts when a tag name begins
+with `release-`. A release tag must point to a reviewed commit already present on
+`main` whose required production actions have passed. Creating the tag is a
+release operation, not an exploratory build shortcut.
+
+Treat release tags as immutable evidence: never move, reuse, or recreate one for
+a different commit. Confirm that the version and build metadata match the tag,
+then install and launch the notarized Mac artifact outside Xcode. A successful
+workflow without an installation check is incomplete release evidence.
+
 ### Change filters
 
 Both workflows use file and folder conditions so source, project, dependency,
@@ -59,8 +72,8 @@ when no Swift source changed.
 ### Pull-request gate
 
 The pull-request workflow starts for meaningful project changes in pull requests
-from `slice/*` into `main`. Its Test action is required to pass, while tests in
-the slice-development workflow remain advisory during ordinary development.
+from `slice/*` or `bugs/*` into `main`. Its Test action is required to pass,
+while tests in the development workflow remain advisory during ordinary work.
 
 Xcode Cloud reports the pull-request result to GitHub. To make the gate prevent
 rather than merely warn about a failed merge candidate, configure the resulting
@@ -120,9 +133,14 @@ raw and derived corpora, and pins a known-answer vector so an accidental generat
 rewrite cannot silently change the meaning of an existing seed/case pair.
 
 Xcode Cloud workflow metadata and start conditions live in Xcode Cloud rather
-than in this repository. Keep its actions, requirements, branch patterns, and
-change filters aligned with this policy. Add TestFlight or notarization as
-distribution post-actions when release automation is ready.
+than in this repository. Keep its actions, requirements, branch patterns, tag
+prefixes, and change filters aligned with this policy. Add TestFlight as a
+distribution post-action when that beta path is ready; notarization is already
+driven by the `release-` tag prefix.
+
+The first release-engineering pass uses the production workflow as release
+evidence rather than as a ceremonial final build. Its acceptance and
+distribution gates are defined in <doc:release-engineering>.
 
 ### Current iOS UI-runner diagnostic
 

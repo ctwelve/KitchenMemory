@@ -1,4 +1,4 @@
-# Alpha roadmap
+# 0.1 roadmap and release boundary
 
 <!--
 Kitchen Memory
@@ -7,17 +7,17 @@ SPDX-License-Identifier: GPL-3.0-only
 -->
 
 
-- Status: Accepted direction
-- Date: 2026-08-11
+- Status: Feature baseline complete; release engineering next
+- Date: 2026-08-23
 
-This roadmap divides the remaining work between the completed local-persistence
-foundation and a full working alpha. It is intentionally outcome-oriented: each
-slice should leave the app more useful on its own and have clear acceptance
-criteria.
+This roadmap records the feature slices that produced the 0.1 baseline and the
+boundary between feature development and release engineering. Slices 1 through
+10 are complete. The next pass is not Slice 11: it hardens the integrated
+product without introducing another product capability.
 
 ## Alpha definition
 
-Kitchen Memory reaches alpha when one person can save or import recipes
+Kitchen Memory's 0.1 feature baseline lets one person save or import recipes
 faithfully, correct them without re-entry, scale usable quantities, read them
 without returning to the source webpage, and find the same library on their
 supported Apple devices.
@@ -120,8 +120,6 @@ The pass deliberately did not redesign the editor or treat the current English
 interface as final. It made those later changes cheaper by separating durable
 behavior from replaceable presentation.
 
-## Remaining slices
-
 ### Slice 9 — Internationalization foundation (implemented 2026-08-22)
 
 Make application language and bundled starter content correct for the initial
@@ -158,7 +156,7 @@ pack migration without turning an onboarding response into permanent authority.
 Because V1 has no external users, the schema was updated in place and development
 stores were reset instead of manufacturing a migration.
 
-### Slice 10 — iCloud synchronization foundation
+### Slice 10 — iCloud synchronization foundation (implemented 2026-08-23)
 
 Make the existing recipe library available across one person's devices without
 leaking CloudKit concepts into the domain or Logic layers.
@@ -186,31 +184,23 @@ not belong to this foundation. The repository and synchronization boundaries
 must leave room for them without pretending private cross-device sync proves
 their behavior.
 
-**Complete when:** a recipe created or revised on one supported device appears
-intact on another device signed into the same iCloud account; offline changes
-remain locally usable and converge after reconnection; failures are observable
-and recoverable; and the production schema can be promoted from a documented,
-repeatable process.
+The slice established the V1 personal CloudKit configuration, stable identity
+and convergence rules, observable account and transfer status, remote-store
+refresh, development schema administration, and recovery documentation. Local
+and cloud persistence now live together behind `KitchenMemoryPersistence`,
+while Domain and Logic remain independent of Apple storage mechanics.
 
-### Slice 11 — Alpha hardening
+## 0.1 release engineering — Hardening
 
-Prove that the completed loop is dependable enough for personal use.
+The feature loop now moves into its first release-engineering pass. This work is
+deliberately not numbered as Slice 11: its unit of progress is release evidence,
+not another feature increment.
 
-- Maintain complete business-logic coverage, including local migration, sync
-  error and recovery, conflict, and source-preservation behavior.
-- Expand importer fixtures and framework regression tests while keeping
-  UI automation to application-shell smoke tests.
-- Verify localization completeness and representative longer-text layouts for
-  every release locale.
-- Audit the stable, finished workflows for accessibility on supported Apple
-  platforms.
-- Validate macOS and iOS builds and document iCloud, local backup, and export
-  expectations.
-- Run an alpha acceptance set of roughly twenty varied real recipes.
-
-**Complete when:** all acceptance recipes import or enter successfully, retain
-their meaningful content after relaunch, scale safely where supported, and
-survive the documented cross-device, offline, conflict, and recovery exercises.
+The pass covers production builds and archives, real-device and cross-device
+acceptance, V1 schema promotion, synchronization recovery, localization and
+accessibility review, privacy-conscious diagnostics, beta distribution, and a
+repeatable release procedure. Its full gates and exit criteria live in
+<doc:release-engineering>.
 
 ## 0.2 feature release — Cooking sessions
 
@@ -236,7 +226,7 @@ Structured editing
         → Cleanup and refactor
           → Internationalization foundation
             → iCloud synchronization foundation
-              → Alpha hardening
+              → 0.1 release engineering
                 → 0.2 cooking sessions
 ```
 

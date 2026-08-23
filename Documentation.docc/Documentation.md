@@ -28,6 +28,7 @@ presentation architecture.
 - <doc:product-brief>
 - <doc:naming>
 - <doc:alpha-roadmap>
+- <doc:release-engineering>
 - <doc:open-questions>
 
 ### Domain and workflows
