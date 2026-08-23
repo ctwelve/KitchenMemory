@@ -99,6 +99,8 @@ fix, test, diagnostic, or documentation change; it should not expand this loop.
 
 - Ensure operational failures produce actionable, privacy-conscious diagnostics
   without logging recipe contents or unnecessary account identifiers.
+- Verify the shipped privacy manifest against the release binary and the
+  diagnostic boundary in <doc:privacy>.
 - Document what iCloud synchronization does and does not replace, how local data
   behaves offline, and which reset or recovery actions are destructive.
 - Maintain a release-blocker list and known-issues record. A workaround must be

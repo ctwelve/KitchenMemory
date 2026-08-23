@@ -47,18 +47,25 @@ final class KitchenMemoryUITests: XCTestCase {
   @MainActor
   func testSettingsPresentsDestructiveResetConfirmation() {
     let app = launchApp()
-#if os(macOS)
-    app.typeKey(",", modifierFlags: .command)
-#else
-    let openSettings = app.buttons["open-settings"]
-    XCTAssertTrue(openSettings.waitForExistence(timeout: 2))
-    activate(openSettings)
-#endif
+    openSettings(in: app)
 
     let reset = app.buttons["settings-reset-kitchen"]
     XCTAssertTrue(reset.waitForExistence(timeout: 5))
     activate(reset)
     XCTAssertTrue(app.buttons["confirm-reset-kitchen"].waitForExistence(timeout: 3))
+  }
+
+  @MainActor
+  func testSettingsPresentsPrivacyDisplay() {
+    let app = launchApp()
+    openSettings(in: app)
+
+    let privacy = app.descendants(matching: .any)["settings-privacy"]
+    XCTAssertTrue(privacy.waitForExistence(timeout: 5))
+    activate(privacy)
+    XCTAssertTrue(
+      app.descendants(matching: .any)["privacy-display"].waitForExistence(timeout: 3)
+    )
   }
 
   @MainActor
@@ -102,6 +109,17 @@ final class KitchenMemoryUITests: XCTestCase {
     element.click()
 #else
     element.tap()
+#endif
+  }
+
+  @MainActor
+  private func openSettings(in app: XCUIApplication) {
+#if os(macOS)
+    app.typeKey(",", modifierFlags: .command)
+#else
+    let openSettings = app.buttons["open-settings"]
+    XCTAssertTrue(openSettings.waitForExistence(timeout: 2))
+    activate(openSettings)
 #endif
   }
 }

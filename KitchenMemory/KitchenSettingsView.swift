@@ -101,6 +101,25 @@ struct KitchenSettingsView: View {
             .foregroundStyle(.red)
         }
       }
+
+      Section {
+        NavigationLink {
+          PrivacyDisplayView()
+        } label: {
+          Label {
+            VStack(alignment: .leading, spacing: 2) {
+              Text("Privacy")
+              Text("No tracking or data collection.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            }
+          } icon: {
+            Image(systemName: "hand.raised.fill")
+              .foregroundStyle(.tint)
+          }
+        }
+        .accessibilityIdentifier("settings-privacy")
+      }
     }
     .navigationTitle("Settings")
 #if os(macOS)

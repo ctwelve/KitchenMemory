@@ -3982,6 +3982,270 @@
           }
         }
       }
+    },
+    "Data Not Collected" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Data Not Collected"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se recopilan datos"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune donnée recueillie"
+          }
+        }
+      }
+    },
+    "Debugging and Support" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Debugging and Support"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Depuración y soporte"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Débogage et assistance"
+          }
+        }
+      }
+    },
+    "Kitchen Memory does not collect data from this app." : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kitchen Memory does not collect data from this app."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kitchen Memory no recopila datos de esta app."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kitchen Memory ne recueille aucune donnée provenant de cette app."
+          }
+        }
+      }
+    },
+    "No Advertising" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "No Advertising"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin publicidad"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune publicité"
+          }
+        }
+      }
+    },
+    "No Analytics" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "No Analytics"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin análisis de uso"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune analyse d’utilisation"
+          }
+        }
+      }
+    },
+    "No tracking or data collection." : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "No tracking or data collection."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin rastreo ni recopilación de datos."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun suivi ni aucune collecte de données."
+          }
+        }
+      }
+    },
+    "No Tracking" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "No Tracking"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin rastreo"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun suivi"
+          }
+        }
+      }
+    },
+    "Private debugging material is deleted when the immediate need ends. It is never published or retained as test data." : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Private debugging material is deleted when the immediate need ends. It is never published or retained as test data."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El material privado de depuración se elimina cuando termina la necesidad inmediata. Nunca se publica ni se conserva como datos de prueba."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le matériel privé de débogage est supprimé dès que le besoin immédiat prend fin. Il n’est jamais publié ni conservé comme données de test."
+          }
+        }
+      }
+    },
+    "Recipes stay on this device and, when iCloud sync is available, in your private iCloud database." : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Recipes stay on this device and, when iCloud sync is available, in your private iCloud database."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las recetas permanecen en este dispositivo y, cuando la sincronización con iCloud está disponible, en tu base de datos privada de iCloud."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les recettes restent sur cet appareil et, lorsque la synchronisation iCloud est disponible, dans votre base de données iCloud privée."
+          }
+        }
+      }
+    },
+    "This display reflects the privacy manifest included with this version of Kitchen Memory." : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "This display reflects the privacy manifest included with this version of Kitchen Memory."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta pantalla refleja el manifiesto de privacidad incluido con esta versión de Kitchen Memory."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cet écran reflète le manifeste de confidentialité inclus avec cette version de Kitchen Memory."
+          }
+        }
+      }
+    },
+    "We inspect private information only when you deliberately provide it to diagnose a problem." : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "We inspect private information only when you deliberately provide it to diagnose a problem."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solo examinamos información privada cuando la proporcionas deliberadamente para diagnosticar un problema."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nous examinons des renseignements privés uniquement lorsque vous les fournissez délibérément pour diagnostiquer un problème."
+          }
+        }
+      }
+    },
+    "Your Recipes" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Your Recipes"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tus recetas"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vos recettes"
+          }
+        }
+      }
     }
   },
   "version" : "1.1"

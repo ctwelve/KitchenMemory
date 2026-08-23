@@ -44,7 +44,9 @@ struct KitchenMemoryApp: App {
     }
 
     Settings {
-      KitchenSettingsView(model: dependencies.libraryModel)
+      NavigationStack {
+        KitchenSettingsView(model: dependencies.libraryModel)
+      }
     }
 #else
     WindowGroup {
