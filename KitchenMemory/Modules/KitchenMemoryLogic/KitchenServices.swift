@@ -2,6 +2,7 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: GPL-3.0-only
 
+import Foundation
 import KitchenMemoryDomain
 import KitchenMemoryPersistence
 
@@ -31,6 +32,14 @@ public enum SampleRecipePresence: Equatable, Sendable {
 /// Creates the first empty Kitchen without treating absence of recipes as permission.
 @MainActor
 public struct KitchenBootstrapService {
+  /// The stable identity used for a person's default Kitchen across installations.
+  ///
+  /// Reusing this identity lets independently launched installations converge.
+  /// Account isolation and transport remain persistence-adapter responsibilities.
+  public static let personalKitchenID = Kitchen.ID(
+    rawValue: UUID(uuidString: "5D4167A0-7027-4A3D-A170-0B73E86DCE8D")!
+  )
+
   private let repository: any RecipeRepository
 
   public init(repository: any RecipeRepository) {
@@ -38,8 +47,14 @@ public struct KitchenBootstrapService {
   }
 
   public func prepareInitialKitchen(named name: String = "Home Kitchen") throws -> Kitchen {
-    if let existingKitchen = try repository.kitchens().first { return existingKitchen }
-    let kitchen = Kitchen(name: name)
+    if let personalKitchen = try repository.kitchen(id: Self.personalKitchenID) {
+      return personalKitchen
+    }
+    // Preserve a pre-sync development Kitchen rather than orphaning its recipes.
+    // Development data is reset before release, so fresh 1.0 installations all
+    // use the deterministic personal identity above.
+    if let legacyKitchen = try repository.kitchens().first { return legacyKitchen }
+    let kitchen = Kitchen(id: Self.personalKitchenID, name: name)
     try repository.create(kitchen, with: [])
     return kitchen
   }

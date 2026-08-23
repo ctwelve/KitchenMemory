@@ -2,7 +2,7 @@
   "configurations" : [
     {
       "id" : "B0CA75C0-62A1-48AF-839E-38567D54F494",
-      "name" : "Configuration 1",
+      "name" : "Core and Application Tests",
       "options" : {
 
       }
@@ -18,14 +18,6 @@
         "containerPath" : "container:KitchenMemory.xcodeproj",
         "identifier" : "A1C4E7AC302A63B900E2C0DB",
         "name" : "KitchenMemoryTests"
-      }
-    },
-    {
-      "parallelizable" : true,
-      "target" : {
-        "containerPath" : "container:KitchenMemory.xcodeproj",
-        "identifier" : "A1C4E7B6302A63B900E2C0DB",
-        "name" : "KitchenMemoryUITests"
       }
     }
   ],

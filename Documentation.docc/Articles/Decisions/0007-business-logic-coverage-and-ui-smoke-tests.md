@@ -33,7 +33,7 @@ suites can exercise it deterministically without launching the application UI.
 
 Use UI automation only for smoke coverage of the durable application shell:
 
-- the application launches into its recipe library;
+- the application launches into its durable recipe shell and can reach its sidebar;
 - the sidebar presents recipes and opens a recipe;
 - the sidebar's basic visibility control works where present; and
 - Settings opens and guards destructive reset behind confirmation.
@@ -41,6 +41,12 @@ Use UI automation only for smoke coverage of the durable application shell:
 Do not add UI tests for provisional editor layout, scrolling, disclosure state,
 exact visible strings, or detailed accessibility-tree behavior. A feature whose
 behavior can be verified below the view layer must be tested there.
+
+Keep the `KitchenMemory Testing` scheme and `Testing` configuration non-UI.
+Run the UI target only from `KitchenMemory Production`, using the
+release-optimized but non-distributable `ProductionTesting` host. The actual
+`Production` application must not contain the disposable UI-test storage
+switch.
 
 Continue to use native controls, semantic structure, and sensible accessibility
 labels during prototyping. Defer exhaustive accessibility audits, localized-copy
@@ -52,6 +58,13 @@ Coverage percentage is evidence, not a substitute for test quality. Generated
 code, declarations without executable behavior, and unreachable defensive paths
 must not motivate artificial tests. Any exclusion from the business-logic
 coverage target should be narrow and documented.
+
+The direct Apple-runtime bridge in `PersonalCloudStatusMonitor.swift` is one
+such exclusion. It performs a real `CKContainer` account query and receives a
+Core Data CloudKit event object that Apple does not expose a public initializer
+for. Its deterministic status reducer is isolated in `PersonalCloudStatus.swift`
+and remains subject to the exact coverage gate; focused adapter tests still
+exercise notification delivery, concurrency hops, and stale-result rejection.
 
 ## Consequences
 

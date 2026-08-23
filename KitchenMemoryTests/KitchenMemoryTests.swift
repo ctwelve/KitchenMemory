@@ -96,14 +96,70 @@ final class KitchenMemoryTests: XCTestCase {
     }
   }
 
-#if DEBUG
-  func testUITestingUsesDisposableStorageOnlyWhenExplicitlyRequestedInDebug() {
+  func testBuildEnvironmentPolicyKeepsCloudAndTestHarnessesSeparate() {
+    XCTAssertFalse(AppBuildEnvironment.debug.synchronizesWithPersonalCloud)
+    XCTAssertTrue(AppBuildEnvironment.develop.synchronizesWithPersonalCloud)
+    XCTAssertFalse(AppBuildEnvironment.testing.synchronizesWithPersonalCloud)
+    XCTAssertTrue(AppBuildEnvironment.production.synchronizesWithPersonalCloud)
+    XCTAssertFalse(AppBuildEnvironment.productionTesting.synchronizesWithPersonalCloud)
+
+    XCTAssertFalse(AppBuildEnvironment.debug.permitsUITestHarness)
+    XCTAssertFalse(AppBuildEnvironment.develop.permitsUITestHarness)
+    XCTAssertTrue(AppBuildEnvironment.testing.permitsUITestHarness)
+    XCTAssertFalse(AppBuildEnvironment.production.permitsUITestHarness)
+    XCTAssertTrue(AppBuildEnvironment.productionTesting.permitsUITestHarness)
+
+    XCTAssertFalse(AppBuildEnvironment.debug.permitsCloudKitSchemaAdministration)
+    XCTAssertTrue(AppBuildEnvironment.develop.permitsCloudKitSchemaAdministration)
+    XCTAssertFalse(AppBuildEnvironment.testing.permitsCloudKitSchemaAdministration)
+    XCTAssertFalse(AppBuildEnvironment.production.permitsCloudKitSchemaAdministration)
+    XCTAssertFalse(AppBuildEnvironment.productionTesting.permitsCloudKitSchemaAdministration)
+  }
+
+  func testCurrentBuildEnvironmentMatchesCompilationConditions() {
+#if TESTING && PRODUCTION
+    XCTAssertEqual(AppBuildEnvironment.current, .productionTesting)
+#elseif TESTING
+    XCTAssertEqual(AppBuildEnvironment.current, .testing)
+#elseif DEVELOP
+    XCTAssertEqual(AppBuildEnvironment.current, .develop)
+#elseif PRODUCTION
+    XCTAssertEqual(AppBuildEnvironment.current, .production)
+#else
+    XCTAssertEqual(AppBuildEnvironment.current, .debug)
+#endif
+  }
+
+  func testUITestingUsesDisposableStorageOnlyInTestingBuilds() {
     XCTAssertTrue(AppRuntimeConfiguration.usesInMemoryStore(
-      arguments: ["KitchenMemory", "--ui-testing"]
+      arguments: ["KitchenMemory", "--ui-testing"],
+      buildEnvironment: .productionTesting
     ))
     XCTAssertFalse(AppRuntimeConfiguration.usesInMemoryStore(
-      arguments: ["KitchenMemory"]
+      arguments: ["KitchenMemory", "--ui-testing"],
+      buildEnvironment: .production
     ))
   }
-#endif
+
+  func testHostedUnitTestsDisablePersonalCloudInCloudEnabledBuilds() {
+    XCTAssertFalse(AppRuntimeConfiguration.synchronizesWithPersonalCloud(
+      environment: ["XCTestConfigurationFilePath": "/tmp/KitchenMemory.xctestconfiguration"],
+      buildEnvironment: .develop
+    ))
+    XCTAssertTrue(AppRuntimeConfiguration.synchronizesWithPersonalCloud(
+      environment: [:],
+      buildEnvironment: .production
+    ))
+  }
+
+  func testCloudKitSchemaInitializationRequiresDevelopAndTheExplicitArgument() {
+    XCTAssertTrue(AppRuntimeConfiguration.initializesCloudKitSchema(
+      arguments: ["KitchenMemory", "--initialize-cloudkit-schema"],
+      buildEnvironment: .develop
+    ))
+    XCTAssertFalse(AppRuntimeConfiguration.initializesCloudKitSchema(
+      arguments: ["KitchenMemory", "--initialize-cloudkit-schema"],
+      buildEnvironment: .production
+    ))
+  }
 }

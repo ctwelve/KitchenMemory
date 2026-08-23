@@ -19,8 +19,9 @@ distributed products.
 - `KitchenMemoryDomain` owns persistence-independent domain values.
 - `KitchenMemoryImport` owns deterministic Schema.org recipe discovery and
   normalization.
-- `KitchenMemoryPersistence` owns SwiftData records and domain-facing
-  repositories.
+- `KitchenMemoryPersistence` owns SwiftData records, domain-facing
+  repositories, local/personal-cloud store configuration, and persistence
+  runtime signals.
 - `KitchenMemoryLogic` owns product operations and presentation-independent
   workflow state.
 
@@ -42,6 +43,30 @@ KitchenMemoryLogic
 This structure keeps reusable technical boundaries explicit without turning
 small, app-specific groups of files into framework products merely for source
 organization.
+
+## Build environments
+
+Project-level `.xcconfig` files define operational policy independently of
+target implementation details:
+
+| Configuration | Intended action | Personal CloudKit | Optimization |
+| --- | --- | --- | --- |
+| `Debug` | local diagnostics and previews | off | debug |
+| `Develop` | ordinary developer runs and schema exercises | development | debug |
+| `Testing` | deterministic business-logic and integration tests | off | debug |
+| `Production` | profile, archive, and distribution | production | release |
+| `ProductionTesting` | production UI smoke-test host only | off | release |
+
+`ProductionTesting` is deliberately non-distributable. It retains production
+compiler behavior while admitting the disposable UI-test store switch that is
+compiled out of the actual `Production` application. `KitchenMemory Debugging`
+runs `Develop`, `KitchenMemory Testing` runs the non-UI plan with `Testing`, and
+`KitchenMemory Production` archives `Production` while running its UI target
+through `ProductionTesting`.
+
+Production retains automatic signing but does not pin an Apple Development
+identity. Xcode therefore remains responsible for selecting the appropriate
+distribution credentials during archive export.
 
 ## Import
 
@@ -73,6 +98,8 @@ KitchenMemoryApp
     ├── KitchenBootstrapService
     ├── SampleRecipeInstallService
     ├── SampleRecipeOnboardingStoring
+    ├── PersistentStoreChangeObserver
+    ├── PersonalCloudStatusMonitor
     └── RecipeLibraryModel
         ├── RecipeLibrary
         ├── RecipeEditor
@@ -83,9 +110,10 @@ KitchenMemoryApp
 `AppDependencies` is the composition root. It creates the concrete SwiftData
 repository and asset-backed sample provider, asks the bootstrap service for the
 initial empty Kitchen, selects the durable or disposable onboarding store, and
-injects the resulting collaborators into
-`RecipeLibraryModel`. Concrete construction stays here so neither the views nor
-the reusable frameworks need to locate their own dependencies.
+injects the resulting collaborators into `RecipeLibraryModel`. For a managed
+personal-cloud store it also connects the persistence framework's remote-change
+and status adapters to that model. Concrete construction stays here so neither
+the views nor the reusable frameworks need to locate their own dependencies.
 
 `RecipeLibraryModel` is the principal application glue. It owns the UI-facing
 state for one Kitchen: the loaded recipe list, current selection, load state,
@@ -122,10 +150,12 @@ That copy now comes from String Catalogs without changing the underlying logic.
 
 ## Persistence
 
-`KitchenMemoryPersistence` is the first adapter behind the domain boundary. Its
-record types are intentionally internal: application and interface code exchange
-`Kitchen`, `Recipe`, and `RecipeRevision` values through `RecipeRepository` and
-never retain SwiftData models.
+`KitchenMemoryPersistence` is the app's persistence implementation behind the
+domain boundary. It deliberately includes both the local SwiftData store and
+the managed personal-CloudKit behavior of that same store. Its record types are
+intentionally internal: application and interface code exchange `Kitchen`,
+`Recipe`, and `RecipeRevision` values through `RecipeRepository` and never
+retain SwiftData models.
 
 The initial schema stores kitchens, recipes, revisions, media, equipment,
 sections, ingredients, and instruction steps as separate rows connected by
@@ -140,17 +170,31 @@ rather than moving SwiftData records between actors. The repository enforces the
 Kitchen ownership boundary when saving and exposes Kitchen-scoped recipe lists
 already reconstructed as domain values.
 
-`KitchenMemorySchema.makeContainer()` uses SwiftData's standard permanent local
-store location, deliberately configured without CloudKit. Synchronization will
-be added behind this boundary after the collaboration prototype. In-memory
-containers remain available for previews and tests, and callers may provide an
-explicit URL for isolated tests or migration work.
+`KitchenMemorySchema.makeContainer()` selects either SwiftData's standard
+permanent store with a named private CloudKit database or an explicit local-only
+configuration. The application uses private synchronization for ordinary
+launches. In-memory containers, hosted unit tests, and callers that provide an
+explicit test URL remain local-only; they never require an iCloud entitlement or
+account. Persistence-owned adapters translate Core Data and CloudKit callbacks
+into plain status and refresh signals before the application connects them to
+`RecipeLibraryModel`. Domain, Logic, and the repository protocol remain unaware
+of the transport. See <doc:personal-icloud-synchronization>.
+
+SwiftData continues to own synchronization. The framework imports Core Data
+only for public managed-store notifications and development schema
+initialization, and imports CloudKit for account availability. Those adapters
+remain Swift: Objective-C would neither change their queue-delivery rules nor
+add sharing capability. A distinct store framework should wait until a future
+implementation has a genuinely different lifecycle, such as a versioned
+document package or direct shared-Kitchen repository.
 
 The store begins at `KitchenMemorySchemaV1` under
 `KitchenMemoryMigrationPlan`. V1 remains intentionally mutable before the first
 release, with development stores deleted after incompatible changes. At first
-release V1 becomes immutable; every later schema change must add a new version
-and an explicit migration stage.
+release V1 becomes immutable; every later local schema change must add a new
+version and an explicit migration stage. The production CloudKit schema follows
+the corresponding additive rule: later features may introduce record types and
+fields but must not remove or redefine published elements.
 
 ## Localization resources
 
@@ -197,8 +241,9 @@ reset operation.
 
 The catalog does not contain a Kitchen identifier. A sample recipe retains its
 own stable recipe, revision, and media identities, while the importing use case
-attaches it to the destination Kitchen created for that installation or sharing
-context.
+attaches it to the destination Kitchen. Fresh personal-sync stores converge on a
+deterministic personal Kitchen identity; future sharing supplies a different
+Kitchen context without changing the sample pack.
 
 Recipe media refers to logical asset names and semantic roles such as `hero`,
 `thumbnail`, and `gallery`. File encoding and pixel dimensions remain asset-
@@ -230,11 +275,17 @@ the application-owned loader.
 
 ## Tests
 
-Framework, application, integration, and UI tests belong to the shared
-`KitchenMemory` scheme and the committed `KitchenMemory.xctestplan`. Tests for
-starter content and app composition live directly in `KitchenMemoryTests`;
-framework tests remain grouped by their corresponding module, including
-`KitchenMemoryLogicTests`. The exact coverage gate currently requires every
-executable line in the four internal frameworks to be covered by the non-UI
-suite. The UI target contains only application-shell smoke tests. See
+Framework, application, and integration tests belong to the shared
+`KitchenMemory Testing` scheme and `KitchenMemoryTesting.xctestplan`. Tests for starter content
+and app composition live directly in `KitchenMemoryTests`; framework tests
+remain grouped by their corresponding module, including
+`KitchenMemoryLogicTests` and the cloud-specific
+`KitchenMemoryPersistenceTests/Cloud` group. The exact coverage gate currently
+requires every executable line in the four internal frameworks to be covered by
+this non-UI suite.
+
+The `KitchenMemory Production` scheme is the only scheme that references
+`KitchenMemoryProduction.xctestplan` and the UI target. Its application-shell
+smoke tests compile under `ProductionTesting`, never under ordinary Debug,
+Develop, Testing, or distributable Production actions. See
 <doc:0007-business-logic-coverage-and-ui-smoke-tests>.

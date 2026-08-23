@@ -7,10 +7,22 @@ SPDX-License-Identifier: GPL-3.0-only
 -->
 
 
-- Status: Exploration
+- Status: Deferred 0.2 exploration
 
 The accepted simplifications distilled from this exploration are recorded in
 `product-doctrine.md`; unresolved detail remains here for future design work.
+
+Cooking sessions are deliberately outside the 0.1 persistence and production
+CloudKit schema. The current application has neither session domain types nor
+session persistence records. The 0.2 feature slice must first settle the
+unresolved ownership, historical-reference, progress, and deviation boundaries
+described below, then introduce a new immutable SwiftData schema version and
+additive CloudKit record types and fields.
+
+This is expected schema evolution, not a rewrite of recipe data. CloudKit's
+production schema may grow but published types and fields cannot be removed or
+repurposed, so the 0.1 synchronization foundation must establish an additive
+schema policy without guessing at a premature session representation.
 
 A saved recipe describes an intended preparation. Cooking it creates a temporary
 working session: ingredients and steps can be checked off, and the cook can note

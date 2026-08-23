@@ -35,9 +35,11 @@ The implemented recipe foundation and remaining alpha loop are:
 1. Create and edit a recipe.
 2. Import a recipe from a webpage using Schema.org JSON-LD.
 3. Review the imported ingredient structure without losing the source text.
-4. Scale a recipe and cook from clear, sectioned instructions.
+4. Scale and read a recipe from clear, sectioned instructions.
+5. Keep the local-first recipe library synchronized across one person's devices.
 
-Pantry inventory, meal planning, and shopping follow after this slice is useful.
+Cooking sessions, pantry inventory, meal planning, shopping, and household
+sharing follow after this slice is useful.
 
 ## Documentation
 
@@ -55,6 +57,7 @@ Pantry inventory, meal planning, and shopping follow after this slice is useful.
 - [Product workflows](Documentation.docc/Articles/workflows.md)
 - [Apple platform and automation architecture](Documentation.docc/Articles/apple-platform.md)
 - [Implementation architecture](Documentation.docc/Articles/implementation-architecture.md)
+- [Personal iCloud synchronization](Documentation.docc/Articles/personal-icloud-synchronization.md)
 - [Localization and recipe resources](Documentation.docc/Articles/localization-architecture.md)
 - [Continuous integration](Documentation.docc/Articles/continuous-integration.md)
 - [Accessibility engineering](Documentation.docc/Articles/accessibility-engineering.md)
@@ -65,8 +68,8 @@ Pantry inventory, meal planning, and shopping follow after this slice is useful.
 
 ## Development
 
-Open `KitchenMemory.xcodeproj` in Xcode and run the **KitchenMemory** scheme on
-My Mac or an iOS Simulator. The application is based on Xcode's standard
+Open `KitchenMemory.xcodeproj` in Xcode and run the **KitchenMemory Debugging**
+scheme on My Mac or an iOS Simulator. The application is based on Xcode's standard
 multiplatform SwiftUI structure and uses SwiftData as its first local persistence
 implementation. On first launch, it creates an empty local Kitchen and asks
 whether the person wants to install the bundled sample recipe pack. The answer
@@ -81,18 +84,25 @@ that two different recipe payloads are one durable recipe revision.
 
 The app's internal domain, import, persistence, and product-logic modules live
 under `KitchenMemory/Modules` as native Xcode framework targets. Bundled starter
-content and presentation adapters compile directly into `KitchenMemory`. All
-tests run in the shared `KitchenMemory` scheme and committed test plan:
+content and presentation adapters compile directly into `KitchenMemory`.
+Business-logic, application, and persistence tests run in the shared
+`KitchenMemory Testing` scheme and committed non-UI test plan:
 
 ```sh
 xcodebuild test \
   -project KitchenMemory.xcodeproj \
-  -scheme KitchenMemory \
+  -scheme 'KitchenMemory Testing' \
   -destination 'platform=macOS'
 ```
 
-CloudKit is the selected synchronization and collaboration platform; the
-precise shared-Kitchen integration will be selected after a focused
+The small UI smoke suite runs only through the `KitchenMemory Production`
+scheme. See the architecture and continuous-integration documentation for the
+Debug, Develop, Testing, Production, and non-distributable ProductionTesting
+configuration policy.
+
+CloudKit is the selected synchronization and collaboration platform. The first
+private cross-device integration lives behind the persistence adapter; the
+precise shared-Kitchen integration remains subject to a later post-1.0
 collaboration prototype.
 
 ## License

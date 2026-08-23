@@ -93,7 +93,8 @@ inventory maintenance.
 - URL import from Schema.org `Recipe` JSON-LD.
 - Import review that highlights uncertain interpretations.
 - Serving/yield scaling where quantities permit it.
-- Step-by-step and full-recipe cooking views.
+- Clear full-recipe reading views.
+- Private iCloud synchronization across one person's devices.
 - Source attribution and a link back to the webpage.
 
 ### Explicitly deferred
@@ -105,6 +106,8 @@ inventory maintenance.
 - OCR and image-based import.
 - AI-generated recipes.
 - Public recipe discovery or social feeds.
+- Cooking-session progress, deviations, and history.
+- Multi-person Kitchen sharing and live collaboration.
 - True peer-to-peer synchronization.
 
 ## Success signals
@@ -116,6 +119,8 @@ The first release succeeds when a household can:
 3. Enter a family recipe that has imprecise ingredients.
 4. Reliably scale the ingredients that are mathematically scalable.
 5. Cook from the app without returning to the source webpage.
+6. Find the intact recipe library on another device using the same iCloud
+   account.
 
 ## Product risks
 

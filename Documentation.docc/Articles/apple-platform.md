@@ -252,9 +252,11 @@ reviewable import drafts, stable recipe/source identities, SwiftData behind a
 repository, and shared Logic operations. The next platform work should preserve
 those boundaries while it:
 
-1. extends the established String Catalogs and localized asset-backed recipe packs;
-2. replaces provisional modal editing with interaction models suited to Mac and
+1. proves private, local-first iCloud synchronization behind the repository
+   boundary;
+2. extends the established String Catalogs and localized asset-backed recipe packs;
+3. replaces provisional modal editing with interaction models suited to Mac and
    mobile;
-3. adds cooking sessions without mutating maintained recipe revisions;
-4. introduces batch-capable import interfaces before adding scan/OCR inputs; and
-5. keeps fixtures extensible to files and scans as well as webpages.
+4. adds cooking sessions in 0.2 without mutating maintained recipe revisions;
+5. introduces batch-capable import interfaces before adding scan/OCR inputs; and
+6. keeps fixtures extensible to files and scans as well as webpages.

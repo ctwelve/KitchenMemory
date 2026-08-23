@@ -6,10 +6,11 @@ Copyright © 2026 the Kitchen Memory contributors.
 SPDX-License-Identifier: GPL-3.0-only
 -->
 
-Xcode Cloud is Kitchen Memory's continuous-integration system. The shared
-`KitchenMemory` scheme is the source of truth for local and cloud build, test,
-Analyze, and archive behavior; CI-only replacements for those actions should
-be avoided.
+Xcode Cloud is Kitchen Memory's continuous-integration system. Three shared
+schemes make the workflow boundary explicit: `KitchenMemory Debugging` owns
+ordinary developer runs, `KitchenMemory Testing` owns deterministic non-UI
+validation, and `KitchenMemory Production` owns production UI smoke tests and
+archives. CI-only replacements for those actions should be avoided.
 
 ## Workflow policy
 
@@ -17,7 +18,9 @@ be avoided.
 
 The slice workflow starts for meaningful project changes pushed to `slice/*`
 branches. It performs Build, Analyze, and Test actions using the shared
-`KitchenMemory` scheme, but does not archive a product.
+`KitchenMemory Testing` scheme, but does not archive a product. Its actions use
+`Testing` and do not include UI automation. Local developer runs use
+`KitchenMemory Debugging`, whose Run and Analyze actions use `Develop`.
 
 The current integration branch is `slice/completion`. Focused working branches
 merge into it through review; the resulting push runs the slice workflow. When
@@ -25,18 +28,18 @@ the collected slice is ready, its pull request to `main` is subject to the
 pull-request gate below. A working branch therefore need not duplicate cloud
 work before its reviewed result reaches `slice/completion`.
 
-Build and Analyze are required to pass. Test is advisory on `slice/*` while the
-shared test plan still includes provisional UI automation and its Apple tooling
-dependencies. The core framework coverage gate has reached exact complete line
-coverage; a failing logic test or coverage check is a product defect even when
-the aggregate cloud Test action is not yet a branch gate.
+Build, Analyze, and the non-UI Test action are required to pass. The core
+framework coverage gate has reached exact complete line coverage; a failing
+logic test or coverage check is a product defect.
 
 ### Main production
 
 The production workflow starts for meaningful project changes merged or pushed
-to `main`. It requires Test, Analyze, and Archive on iOS and macOS to pass. Each
-Archive action is the production Release build for that platform, so separate
-Build actions would duplicate that work without producing different artifacts.
+to `main`. It uses `KitchenMemory Production` and requires UI-smoke Test,
+Analyze, and Archive on iOS and macOS to pass. The Test action uses the
+release-optimized, non-distributable `ProductionTesting` configuration; Analyze
+and Archive use `Production`. Each Archive action therefore already builds the
+distribution product, so a separate Build action would duplicate that work.
 
 Repeating the tests on `main` verifies the actual merge result, including its
 interaction with changes that landed after a slice branch began. Running Analyze
@@ -73,7 +76,7 @@ relevant interface is stable. See
 <doc:accessibility-engineering>. Localization ownership and its non-UI testing
 boundary are described in <doc:localization-architecture>.
 
-The committed test plan collects code coverage. Evaluate the durable domain,
+The committed non-UI test plan collects code coverage. Evaluate the durable domain,
 import, persistence, and product-logic sources separately from SwiftUI
 views and test bundles; an app-wide percentage is not the business-logic metric.
 Use uncovered executable lines to find missing behavior and boundary tests, not
@@ -89,8 +92,11 @@ Tools/run-core-framework-coverage.sh
 ```
 
 The runner creates a unique evidence directory under `/private/tmp`, prints its
-location, runs the tests, and invokes the checker only after Xcode succeeds. To
-check an existing result bundle directly, pass it to:
+location, runs the committed non-UI test plan, and invokes the checker only
+after Xcode succeeds. The Testing scheme and plan exclude the UI target; the
+Production scheme and plan include it.
+
+To check an existing result bundle directly, pass it to:
 
 ```sh
 Tools/check-core-framework-coverage.sh /path/to/Tests.xcresult
@@ -118,25 +124,17 @@ than in this repository. Keep its actions, requirements, branch patterns, and
 change filters aligned with this policy. Add TestFlight or notarization as
 distribution post-actions when release automation is ready.
 
-### Current iOS UI-runner limitation
+### Current iOS UI-runner diagnostic
 
-With Xcode 26.6 and the iOS 26.5 simulator, the two applicable iOS XCUI smoke
-tests can fail before their test bodies execute. Xcode reports an internal
-`DebuggerVersionStore` / `no debugger version` error and denies the
-`.xctrunner` launch. The same destination runs the complete non-UI XCTest bundle,
-and the generated, signed UI runner installs and launches manually. A clean
-DerivedData rebuild and normal signing do not change the result.
-
-Treat this observed failure as an Apple UI-test orchestration limitation, not a
-reason to weaken signing or change product behavior. Keep the smoke tests in the
-shared plan, retain macOS smoke evidence, and record the Xcode/runtime versions
-with any affected validation. Re-evaluate the exception whenever Xcode or the
-simulator runtime changes; it is not a permanent waiver for a test that reaches
-its body and finds a product failure.
+With Xcode 26.6 and the iOS 26.5 simulator, Xcode may report internal
+`DebuggerVersionStore` / `no debugger version` messages while launching XCUI
+tests. Its fallback launcher currently proceeds and the smoke tests execute.
+Treat the messages as Apple tooling diagnostics, but treat any assertion reached
+inside a test body as an ordinary test failure requiring investigation.
 
 ## Static analysis
 
-The shared scheme marks the application as buildable for Analyze. Project build
+The Debugging and Testing schemes mark the application as buildable for Analyze. Project build
 settings select Xcode's `deep` static-analyzer mode specifically for the Analyze
 action. The analyzer does not run during every ordinary build, avoiding a slower
 duplicate pass during day-to-day development.
@@ -147,7 +145,7 @@ Run the same action locally with:
 DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer \
   xcodebuild -skipPackagePluginValidation analyze \
   -project KitchenMemory.xcodeproj \
-  -scheme KitchenMemory \
+  -scheme 'KitchenMemory Debugging' \
   -destination 'platform=macOS' \
   -derivedDataPath /private/tmp/KitchenMemoryAnalyze \
   CODE_SIGNING_ALLOWED=NO
@@ -164,9 +162,8 @@ The root `.swiftlint.yml` is the development policy: violations retain their
 configured severities instead of being promoted globally. File length warns
 above 400 lines and becomes an error above 1,000 lines. The goal remains a
 warning-free tree, but an ordinary maintenance warning does not block local,
-slice, or bug work. Strict warning promotion is reserved for an explicit release
-engineering scheme once that scheme split is added, rather than inherited by
-every build.
+slice, or bug work. Strict warning promotion may later be attached explicitly
+to the production scheme rather than inherited by every build.
 
 The opt-in rules are deliberately limited to product safety and lifecycle
 mistakes, collection correctness and avoidable work, SwiftUI accessibility
@@ -189,9 +186,10 @@ must be reviewed like source changes.
 ## Maintenance
 
 Xcode Cloud can update its Xcode and macOS environment. Treat a toolchain change
-as a deliberate migration: run the shared scheme locally with that Xcode version,
-review new analyzer and linter diagnostics, and then update the workflow.
+as a deliberate migration: run the Testing and Production schemes locally with
+that Xcode version, review new analyzer and linter diagnostics, and then update
+the workflow.
 
 Custom scripts in `ci_scripts` run for every cloud action. Keep them short,
 deterministic, and limited to environment preparation so build, test, Analyze,
-and archive behavior remains visible in the shared scheme.
+and archive behavior remains visible in the shared schemes.

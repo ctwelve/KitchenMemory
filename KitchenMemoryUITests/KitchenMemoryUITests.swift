@@ -74,7 +74,16 @@ final class KitchenMemoryUITests: XCTestCase {
     app.launch()
 
     let recipeLibrary = app.descendants(matching: .any)["recipe-library"]
-#if os(macOS)
+#if os(iOS)
+    if !recipeLibrary.waitForExistence(timeout: 2) {
+      // A compact split view may present the selected recipe first. Return to
+      // the durable sidebar before exercising either application-shell smoke.
+      let backButton = app.buttons["BackButton"]
+      if backButton.waitForExistence(timeout: 3) {
+        activate(backButton)
+      }
+    }
+#else
     if !recipeLibrary.waitForExistence(timeout: 2) {
       // macOS may restore a previous split-view selection between launches.
       let toggle = app.buttons["toggle-sidebar"]

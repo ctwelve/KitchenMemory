@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 import KitchenMemoryLogic
+import KitchenMemoryPersistence
 import SwiftUI
 
 private enum KitchenResetCopy {
@@ -59,6 +60,12 @@ struct KitchenSettingsView: View {
 
   var body: some View {
     Form {
+      if model.personalCloudStatus != .notConfigured {
+        Section("iCloud Sync") {
+          personalCloudStatusLabel
+        }
+      }
+
       Section("Sample Recipes") {
         samplePresenceLabel
 
@@ -114,6 +121,35 @@ struct KitchenSettingsView: View {
       model: model,
       locale: locale
     )
+  }
+
+  @ViewBuilder
+  private var personalCloudStatusLabel: some View {
+    switch model.personalCloudStatus {
+    case .notConfigured:
+      EmptyView()
+    case .checking:
+      Label("Checking iCloud status…", systemImage: "icloud")
+        .foregroundStyle(.secondary)
+    case .available:
+      Label("iCloud sync is available.", systemImage: "checkmark.icloud.fill")
+        .foregroundStyle(.green)
+    case .syncing:
+      Label("Kitchen Memory is syncing with iCloud.", systemImage: "arrow.triangle.2.circlepath.icloud")
+        .foregroundStyle(.secondary)
+    case .noAccount:
+      Label("Sign in to iCloud to sync your recipes.", systemImage: "person.crop.circle.badge.exclamationmark")
+        .foregroundStyle(.secondary)
+    case .restricted:
+      Label("iCloud access is restricted on this device.", systemImage: "lock.icloud")
+        .foregroundStyle(.secondary)
+    case .temporarilyUnavailable:
+      Label("iCloud sync is temporarily unavailable.", systemImage: "exclamationmark.icloud")
+        .foregroundStyle(.yellow)
+    case .failed:
+      Label("iCloud sync needs attention.", systemImage: "exclamationmark.icloud.fill")
+        .foregroundStyle(.red)
+    }
   }
 
   @ViewBuilder

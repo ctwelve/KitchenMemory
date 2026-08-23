@@ -32,6 +32,7 @@ final class RecipeLibraryModel {
   private(set) var startupState: StartupState = .loading
   private(set) var sampleOnboardingResponse: SampleRecipeOnboardingResponse
   private(set) var samplePresence: SampleRecipePresence = .unavailable
+  private(set) var personalCloudStatus: PersonalCloudStatus = .notConfigured
 
   init(
     kitchenID: Kitchen.ID,
@@ -64,6 +65,20 @@ final class RecipeLibraryModel {
 
   func reload() {
     _ = reload(selecting: selectedRecipeID)
+  }
+
+  /// Refreshes visible state after persistence imports changes from elsewhere.
+  ///
+  /// A remote notification may arrive while the launch screen is still up. In
+  /// that case `loadIfNeeded()` must remain responsible for advancing the
+  /// sample-choice state machine, so an early import is deliberately ignored.
+  func reloadAfterExternalStoreChange() {
+    guard hasLoaded else { return }
+    reload()
+  }
+
+  func updatePersonalCloudStatus(_ status: PersonalCloudStatus) {
+    personalCloudStatus = status
   }
 
   func acceptSampleRecipes() {
