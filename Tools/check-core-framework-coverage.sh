@@ -18,6 +18,7 @@ DOMAIN_DIRECTORY="$PROJECT_ROOT/KitchenMemory/Modules/KitchenMemoryDomain"
 IMPORT_DIRECTORY="$PROJECT_ROOT/KitchenMemory/Modules/KitchenMemoryImport"
 LOGIC_DIRECTORY="$PROJECT_ROOT/KitchenMemory/Modules/KitchenMemoryLogic"
 PERSISTENCE_DIRECTORY="$PROJECT_ROOT/KitchenMemory/Modules/KitchenMemoryPersistence"
+PERSISTENCE_RUNTIME_ADAPTER="$PERSISTENCE_DIRECTORY/Cloud/PersonalCloudStatusMonitor.swift"
 
 if [ ! -r "$RESULT_BUNDLE" ]; then
   echo "Coverage gate error: result bundle is not readable: $RESULT_BUNDLE" >&2
@@ -49,10 +50,11 @@ if ! INPUT_TIMESTAMPS=$(find \
   "$LOGIC_DIRECTORY" \
   "$PERSISTENCE_DIRECTORY" \
   "$PROJECT_ROOT/KitchenMemoryTests" \
+  "$PROJECT_ROOT/Configurations" \
   "$PROJECT_ROOT/KitchenMemory.xcodeproj/project.pbxproj" \
-  "$PROJECT_ROOT/KitchenMemory.xcodeproj/xcshareddata/xcschemes/KitchenMemory.xcscheme" \
+  "$PROJECT_ROOT/KitchenMemory.xcodeproj/xcshareddata/xcschemes/KitchenMemory Testing.xcscheme" \
   "$PROJECT_ROOT/KitchenMemory.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved" \
-  "$PROJECT_ROOT/KitchenMemory.xctestplan" \
+  "$PROJECT_ROOT/KitchenMemoryTesting.xctestplan" \
   -type f -exec stat -f '%Fm %N' {} +); then
   echo "Coverage gate error: could not inventory coverage inputs" >&2
   exit 2
@@ -69,11 +71,6 @@ if [ -n "$NEWER_INPUTS" ]; then
   exit 2
 fi
 
-if ! COVERAGE_REPORT=$(xcrun xccov view --report --only-targets "$RESULT_BUNDLE"); then
-  echo "Coverage gate error: xccov could not read: $RESULT_BUNDLE" >&2
-  exit 2
-fi
-
 # Exact aggregate counts cannot reveal a source file accidentally omitted from
 # its framework target. The build log proves membership for declaration-only
 # files, which xccov legitimately omits, while the per-target reports place each
@@ -84,6 +81,7 @@ if ! BUILD_LOG=$(
   echo "Coverage gate error: xcresulttool could not read the build log" >&2
   exit 2
 fi
+COVERAGE_FAILED=0
 while IFS='|' read -r TARGET MODULE_DIRECTORY; do
   BUILD_TARGET=${TARGET%.framework}
   TARGET_MARKER="(in target '$BUILD_TARGET' from project 'KitchenMemory')"
@@ -92,6 +90,63 @@ while IFS='|' read -r TARGET MODULE_DIRECTORY; do
   ); then
     echo "Coverage gate error: xccov could not inspect target $TARGET" >&2
     exit 2
+  fi
+
+  EXCLUDED_SOURCE=
+  if [ "$TARGET" = "KitchenMemoryPersistence.framework" ]; then
+    # This file is the narrow Apple-runtime bridge: it calls CKContainer and
+    # translates ObjC notifications whose event type has no public initializer.
+    # Its deterministic status reducer lives in PersonalCloudStatus.swift and
+    # remains inside the exact business-logic gate.
+    EXCLUDED_SOURCE=$PERSISTENCE_RUNTIME_ADAPTER
+  fi
+
+  if TARGET_COVERAGE=$(printf '%s\n' "$TARGET_REPORT" | awk \
+    -v target="$TARGET" -v excluded="$EXCLUDED_SOURCE" '
+      /^[[:space:]]*[0-9]+[[:space:]]+/ {
+        count = $NF
+        gsub(/^\(/, "", count)
+        gsub(/\)$/, "", count)
+        partCount = split(count, parts, "/")
+        if (partCount != 2 || parts[1] !~ /^[0-9]+$/ || parts[2] !~ /^[0-9]+$/) {
+          malformed = $NF
+          next
+        }
+        if (excluded != "" && index($0, excluded)) {
+          excludedLines += parts[2]
+          next
+        }
+        fileCount++
+        covered += parts[1]
+        executable += parts[2]
+      }
+
+      END {
+        if (fileCount == 0 || malformed != "" || executable == 0 || covered > executable) {
+          printf "Coverage gate error: invalid line counts for %s: %s\n", \
+            target, malformed > "/dev/stderr"
+          exit 1
+        }
+
+        printf "%s: %d/%d business-logic executable lines covered", \
+          target, covered, executable
+        if (excludedLines > 0) {
+          printf " (%d runtime-adapter lines excluded)", excludedLines
+        }
+        printf "\n"
+
+        if (covered != executable) {
+          printf "Coverage gate error: %s has %d uncovered business-logic line(s)\n", \
+            target, executable - covered > "/dev/stderr"
+          exit 1
+        }
+      }
+    ')
+  then
+    printf '%s\n' "$TARGET_COVERAGE"
+  else
+    printf '%s\n' "$TARGET_COVERAGE"
+    COVERAGE_FAILED=1
   fi
 
   if ! MODULE_SOURCES=$(find "$MODULE_DIRECTORY" -type f -name '*.swift' -print); then
@@ -131,66 +186,7 @@ KitchenMemoryLogic.framework|$LOGIC_DIRECTORY
 KitchenMemoryPersistence.framework|$PERSISTENCE_DIRECTORY
 EOF
 
-printf '%s\n' "$COVERAGE_REPORT" | awk '
-  BEGIN {
-    order[1] = "KitchenMemoryDomain.framework"
-    order[2] = "KitchenMemoryImport.framework"
-    order[3] = "KitchenMemoryLogic.framework"
-    order[4] = "KitchenMemoryPersistence.framework"
-    for (position = 1; position <= 4; position++) {
-      wanted[order[position]] = 1
-    }
-  }
-
-  $2 in wanted {
-    target = $2
-    count = $NF
-    gsub(/^\(/, "", count)
-    gsub(/\)$/, "", count)
-    partCount = split(count, parts, "/")
-
-    found[target]++
-    if (partCount != 2 || parts[1] !~ /^[0-9]+$/ || parts[2] !~ /^[0-9]+$/) {
-      malformed[target] = $NF
-      next
-    }
-    covered[target] = parts[1] + 0
-    executable[target] = parts[2] + 0
-  }
-
-  END {
-    failed = 0
-    for (position = 1; position <= 4; position++) {
-      target = order[position]
-      if (found[target] == 0) {
-        print "Coverage gate error: missing target " target > "/dev/stderr"
-        failed = 1
-        continue
-      }
-      if (found[target] != 1) {
-        print "Coverage gate error: duplicate target " target > "/dev/stderr"
-        failed = 1
-        continue
-      }
-      if (target in malformed || executable[target] == 0 || covered[target] > executable[target]) {
-        print "Coverage gate error: invalid line counts for " target ": " malformed[target] \
-          > "/dev/stderr"
-        failed = 1
-        continue
-      }
-
-      printf "%s: %d/%d executable lines covered\n", \
-        target, covered[target], executable[target]
-      if (covered[target] != executable[target]) {
-        printf "Coverage gate error: %s has %d uncovered executable line(s)\n", \
-          target, executable[target] - covered[target] > "/dev/stderr"
-        failed = 1
-      }
-    }
-
-    if (failed == 0) {
-      print "Core framework coverage gate passed."
-    }
-    exit failed
-  }
-'
+if [ "$COVERAGE_FAILED" -ne 0 ]; then
+  exit 1
+fi
+echo "Core framework business-logic coverage gate passed."

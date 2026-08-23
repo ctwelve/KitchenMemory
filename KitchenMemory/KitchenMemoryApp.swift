@@ -14,7 +14,7 @@ struct KitchenMemoryApp: App {
 
   init() {
     do {
-#if DEBUG
+#if DEVELOP
       if AppRuntimeConfiguration.initializesCloudKitSchema(
         arguments: ProcessInfo.processInfo.arguments
       ) {
@@ -54,41 +54,73 @@ struct KitchenMemoryApp: App {
   }
 }
 
+enum AppBuildEnvironment: CaseIterable {
+  case debug
+  case develop
+  case testing
+  case production
+  case productionTesting
+
+  static var current: Self {
+#if TESTING && PRODUCTION
+    .productionTesting
+#elseif TESTING
+    .testing
+#elseif DEVELOP
+    .develop
+#elseif PRODUCTION
+    .production
+#else
+    .debug
+#endif
+  }
+
+  var synchronizesWithPersonalCloud: Bool {
+    self == .develop || self == .production
+  }
+
+  var permitsUITestHarness: Bool {
+    self == .testing || self == .productionTesting
+  }
+
+  var permitsCloudKitSchemaAdministration: Bool {
+    self == .develop
+  }
+}
+
 enum AppRuntimeConfiguration {
   /// Whether this process may replace durable storage with an in-memory store.
   ///
   /// UI automation needs deterministic disposable state, but launch arguments
-  /// are also ordinary process input on macOS. A production app must never let
-  /// an argument make entered or imported recipes appear to save and then
-  /// vanish at process exit. Compile the switch out of Release rather than
-  /// relying on callers to avoid an undocumented flag.
-  static func usesInMemoryStore(arguments: [String]) -> Bool {
-#if DEBUG
-    arguments.contains("--ui-testing")
-#else
-    false
-#endif
+  /// are also ordinary process input on macOS. The switch exists only in the
+  /// Testing and non-distributable ProductionTesting configurations.
+  static func usesInMemoryStore(
+    arguments: [String],
+    buildEnvironment: AppBuildEnvironment = .current
+  ) -> Bool {
+    buildEnvironment.permitsUITestHarness && arguments.contains("--ui-testing")
   }
 
   /// Whether the host process should attach its durable store to CloudKit.
   ///
-  /// Hosted unit tests execute the app's `init` before XCTest connects. They
-  /// deliberately use the local store because unsigned CI and coverage runs do
-  /// not carry the application's iCloud entitlement. Normal Debug and Release
-  /// launches still select personal sync.
-  static func synchronizesWithPersonalCloud(environment: [String: String]) -> Bool {
-#if DEBUG
-    environment["XCTestConfigurationFilePath"] == nil
-#else
-    true
-#endif
+  /// Develop and Production attach ordinary launches to personal CloudKit.
+  /// Debug, Testing, and ProductionTesting remain local so diagnostics and test
+  /// evidence never depend on an iCloud account.
+  static func synchronizesWithPersonalCloud(
+    environment: [String: String],
+    buildEnvironment: AppBuildEnvironment = .current
+  ) -> Bool {
+    buildEnvironment.synchronizesWithPersonalCloud
+      && environment["XCTestConfigurationFilePath"] == nil
   }
 
-#if DEBUG
-  static func initializesCloudKitSchema(arguments: [String]) -> Bool {
-    arguments.contains("--initialize-cloudkit-schema")
+  static func initializesCloudKitSchema(
+    arguments: [String],
+    buildEnvironment: AppBuildEnvironment = .current
+  ) -> Bool {
+    buildEnvironment.permitsCloudKitSchemaAdministration
+      && arguments.contains("--initialize-cloudkit-schema")
   }
-#endif
 }
 
 @MainActor

@@ -2,10 +2,24 @@
   "sourceLanguage" : "en-US",
   "strings" : {
     "/" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "/"
+          }
+        }
+      },
       "shouldTranslate" : false
     },
     "%@ (base: %@)" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ (base: %@)"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -22,6 +36,12 @@
     },
     "%@ recipe" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ recipe"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -38,6 +58,12 @@
     },
     "%@, %@" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@, %@"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -54,6 +80,12 @@
     },
     "%@, optional" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@, optional"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -70,6 +102,12 @@
     },
     "%lld hr" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%lld hr"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -86,6 +124,12 @@
     },
     "%lld hr %lld min" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%lld hr %lld min"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -102,6 +146,12 @@
     },
     "%lld ingredient interpretation needs review" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%lld ingredient interpretation needs review"
+          }
+        },
         "es-MX" : {
           "variations" : {
             "plural" : {
@@ -142,6 +192,12 @@
     },
     "%lld ingredient line is preserved but unparsed" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%lld ingredient line is preserved but unparsed"
+          }
+        },
         "es-MX" : {
           "variations" : {
             "plural" : {
@@ -182,6 +238,12 @@
     },
     "%lld malformed or unsupported source block was ignored" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%lld malformed or unsupported source block was ignored"
+          }
+        },
         "es-MX" : {
           "variations" : {
             "plural" : {
@@ -222,6 +284,12 @@
     },
     "%lld min" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%lld min"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -238,6 +306,12 @@
     },
     "%lld review note" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%lld review note"
+          }
+        },
         "es-MX" : {
           "variations" : {
             "plural" : {
@@ -278,6 +352,12 @@
     },
     "%lld source image is referenced but not downloaded" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%lld source image is referenced but not downloaded"
+          }
+        },
         "es-MX" : {
           "variations" : {
             "plural" : {
@@ -318,6 +398,12 @@
     },
     "about %@" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "about %@"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -334,6 +420,12 @@
     },
     "About %@" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "About %@"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -350,6 +442,12 @@
     },
     "Add Ingredient" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Add Ingredient"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -366,6 +464,12 @@
     },
     "Add Ingredient Section" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Add Ingredient Section"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -382,6 +486,12 @@
     },
     "Add Instruction Section" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Add Instruction Section"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -398,6 +508,12 @@
     },
     "Add package size" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Add package size"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -414,6 +530,12 @@
     },
     "Add Sample Recipes" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Add Sample Recipes"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -430,6 +552,12 @@
     },
     "Add Sample Recipes?" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Add Sample Recipes?"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -446,6 +574,12 @@
     },
     "Add Step" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Add Step"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -462,6 +596,12 @@
     },
     "All recipes, edits, revision history, imported source captures, and recipe metadata in this Kitchen will be permanently deleted. Kitchen Memory will restore only the sample recipes included with this version. This cannot be undone." : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "All recipes, edits, revision history, imported source captures, and recipe metadata in this Kitchen will be permanently deleted. Kitchen Memory will restore only the sample recipes included with this version. This cannot be undone."
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -478,6 +618,12 @@
     },
     "All sample recipes are installed." : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "All sample recipes are installed."
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -494,6 +640,12 @@
     },
     "Approximate" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Approximate"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -510,6 +662,12 @@
     },
     "Base yield" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Base yield"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -526,6 +684,12 @@
     },
     "Book" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Book"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -542,6 +706,12 @@
     },
     "By %@" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "By %@"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -558,6 +728,12 @@
     },
     "Cancel" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Cancel"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -572,24 +748,14 @@
         }
       }
     },
-    "Checking iCloud status…" : {
-      "localizations" : {
-        "es-MX" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Comprobando el estado de iCloud…"
-          }
-        },
-        "fr-CA" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vérification de l’état d’iCloud…"
-          }
-        }
-      }
-    },
     "Categories: %@" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Categories: %@"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -606,6 +772,12 @@
     },
     "Check the imported wording and structure before saving. Review and save do not contact the source again. Saving keeps the final source URL and bounded JSON-LD metadata locally, including fields not shown here." : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Check the imported wording and structure before saving. Review and save do not contact the source again. Saving keeps the final source URL and bounded JSON-LD metadata locally, including fields not shown here."
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -622,6 +794,12 @@
     },
     "Check this amount manually when changing the yield." : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Check this amount manually when changing the yield."
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -636,8 +814,36 @@
         }
       }
     },
+    "Checking iCloud status…" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Checking iCloud status…"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comprobando el estado de iCloud…"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vérification de l’état d’iCloud…"
+          }
+        }
+      }
+    },
     "Choose a recipe to read its ingredients and instructions." : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Choose a recipe to read its ingredients and instructions."
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -654,6 +860,12 @@
     },
     "Choose Recipe" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Choose Recipe"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -670,6 +882,12 @@
     },
     "Collapse" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Collapse"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -686,6 +904,12 @@
     },
     "Collapsed" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Collapsed"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -702,6 +926,12 @@
     },
     "Cook" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Cook"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -718,6 +948,12 @@
     },
     "Could not scale this amount safely; left unchanged." : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Could not scale this amount safely; left unchanged."
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -734,6 +970,12 @@
     },
     "Create Recipe" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Create Recipe"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -750,6 +992,12 @@
     },
     "Cuisine: %@" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Cuisine: %@"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -766,6 +1014,12 @@
     },
     "Custom" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Custom"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -782,6 +1036,12 @@
     },
     "Decrease %@" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Decrease %@"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -798,6 +1058,12 @@
     },
     "Decrease working yield" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Decrease working yield"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -814,6 +1080,12 @@
     },
     "Delete" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Delete"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -830,6 +1102,12 @@
     },
     "Delete Section" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Delete Section"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -846,6 +1124,12 @@
     },
     "Denominator" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Denominator"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -862,6 +1146,12 @@
     },
     "Display wording could not be scaled safely; left unchanged." : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Display wording could not be scaled safely; left unchanged."
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -878,6 +1168,12 @@
     },
     "Done with quantity details" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Done with quantity details"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -894,6 +1190,12 @@
     },
     "Duration %@." : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Duration %@."
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -910,6 +1212,12 @@
     },
     "Edit" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Edit"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -926,6 +1234,12 @@
     },
     "Edit precise quantity…" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Edit precise quantity…"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -942,6 +1256,12 @@
     },
     "Edit Recipe" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Edit Recipe"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -958,6 +1278,12 @@
     },
     "Enable recipe scaling" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Enable recipe scaling"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -974,6 +1300,12 @@
     },
     "Enter a complete http or https URL without embedded credentials." : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Enter a complete http or https URL without embedded credentials."
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -990,6 +1322,12 @@
     },
     "Enter whole minutes from 0 through 527040." : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Enter whole minutes from 0 through 527040."
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1006,6 +1344,12 @@
     },
     "Equipment does not scale automatically. Check that it fits the working yield." : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Equipment does not scale automatically. Check that it fits the working yield."
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1022,6 +1366,12 @@
     },
     "Exact" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Exact"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1038,6 +1388,12 @@
     },
     "Expand" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Expand"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1054,6 +1410,12 @@
     },
     "Expanded" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Expanded"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1070,6 +1432,12 @@
     },
     "Fetch recipe" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Fetch recipe"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1086,6 +1454,12 @@
     },
     "Fetch Recipe" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Fetch Recipe"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1102,6 +1476,12 @@
     },
     "Fetching recipe" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Fetching recipe"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1118,6 +1498,12 @@
     },
     "Fetching Recipe" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Fetching Recipe"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1134,6 +1520,12 @@
     },
     "Fixed" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Fixed"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1150,6 +1542,12 @@
     },
     "Fixed amount; left unchanged." : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Fixed amount; left unchanged."
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1166,6 +1564,12 @@
     },
     "For safety, Kitchen Memory cannot fetch this address or redirect." : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "For safety, Kitchen Memory cannot fetch this address or redirect."
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1182,6 +1586,12 @@
     },
     "Hide Sidebar" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Hide Sidebar"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1197,90 +1607,24 @@
       }
     },
     "https://example.com/recipe" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "https://example.com/recipe"
+          }
+        }
+      },
       "shouldTranslate" : false
-    },
-    "If you save a recipe, Kitchen Memory keeps the final source URL and one bounded JSON-LD recipe-metadata block locally, including source fields not shown in the review editor." : {
-      "localizations" : {
-        "es-MX" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Si guardas una receta, Kitchen Memory conserva localmente la URL final de origen y un bloque limitado de metadatos JSON-LD de la receta, incluso los campos de origen que no se muestran en el editor de revisión."
-          }
-        },
-        "fr-CA" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Si vous enregistrez une recette, Kitchen Memory conserve localement l’URL source finale et un bloc limité de métadonnées JSON-LD de la recette, y compris les champs sources non affichés dans l’éditeur de révision."
-          }
-        }
-      }
-    },
-    "Import is ready for your review" : {
-      "localizations" : {
-        "es-MX" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La importación está lista para revisarse"
-          }
-        },
-        "fr-CA" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "L’importation est prête à être révisée"
-          }
-        }
-      }
-    },
-    "Import Recipe" : {
-      "localizations" : {
-        "es-MX" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Importar receta"
-          }
-        },
-        "fr-CA" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Importer une recette"
-          }
-        }
-      }
-    },
-    "Import Review" : {
-      "localizations" : {
-        "es-MX" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Revisión de importación"
-          }
-        },
-        "fr-CA" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Révision de l’importation"
-          }
-        }
-      }
-    },
-    "Imported" : {
-      "localizations" : {
-        "es-MX" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Importado"
-          }
-        },
-        "fr-CA" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Importé"
-          }
-        }
-      }
     },
     "iCloud access is restricted on this device." : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "iCloud access is restricted on this device."
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1297,6 +1641,12 @@
     },
     "iCloud Sync" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "iCloud Sync"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1313,6 +1663,12 @@
     },
     "iCloud sync is available." : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "iCloud sync is available."
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1329,6 +1685,12 @@
     },
     "iCloud sync is temporarily unavailable." : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "iCloud sync is temporarily unavailable."
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1345,6 +1707,12 @@
     },
     "iCloud sync needs attention." : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "iCloud sync needs attention."
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1359,8 +1727,124 @@
         }
       }
     },
+    "If you save a recipe, Kitchen Memory keeps the final source URL and one bounded JSON-LD recipe-metadata block locally, including source fields not shown in the review editor." : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "If you save a recipe, Kitchen Memory keeps the final source URL and one bounded JSON-LD recipe-metadata block locally, including source fields not shown in the review editor."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si guardas una receta, Kitchen Memory conserva localmente la URL final de origen y un bloque limitado de metadatos JSON-LD de la receta, incluso los campos de origen que no se muestran en el editor de revisión."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si vous enregistrez une recette, Kitchen Memory conserve localement l’URL source finale et un bloc limité de métadonnées JSON-LD de la recette, y compris les champs sources non affichés dans l’éditeur de révision."
+          }
+        }
+      }
+    },
+    "Import is ready for your review" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Import is ready for your review"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La importación está lista para revisarse"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L’importation est prête à être révisée"
+          }
+        }
+      }
+    },
+    "Import Recipe" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Import Recipe"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importar receta"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importer une recette"
+          }
+        }
+      }
+    },
+    "Import Review" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Import Review"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Revisión de importación"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Révision de l’importation"
+          }
+        }
+      }
+    },
+    "Imported" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Imported"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importado"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importé"
+          }
+        }
+      }
+    },
     "Increase %@" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Increase %@"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1377,6 +1861,12 @@
     },
     "Increase working yield" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Increase working yield"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1393,6 +1883,12 @@
     },
     "Ingredient" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ingredient"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1409,6 +1905,12 @@
     },
     "Ingredient amounts update for reading only. The saved recipe stays unchanged." : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ingredient amounts update for reading only. The saved recipe stays unchanged."
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1425,6 +1927,12 @@
     },
     "Ingredients" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ingredients"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1441,6 +1949,12 @@
     },
     "Install Missing Sample Recipes" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Install Missing Sample Recipes"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1457,10 +1971,24 @@
     },
     "Install Sample Recipes" : {
       "comment" : "A button to install sample recipes.",
-      "isCommentAutoGenerated" : true
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Install Sample Recipes"
+          }
+        }
+      }
     },
     "Installation checks stable recipe identities and adds only missing samples." : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Installation checks stable recipe identities and adds only missing samples."
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1477,6 +2005,12 @@
     },
     "Instructions" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Instructions"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1493,6 +2027,12 @@
     },
     "Keywords: %@" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Keywords: %@"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1509,6 +2049,12 @@
     },
     "Kitchen" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kitchen"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1525,6 +2071,12 @@
     },
     "Kitchen Data" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kitchen Data"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1541,6 +2093,12 @@
     },
     "Kitchen Memory could not add the sample recipes. Your existing recipes were not changed." : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kitchen Memory could not add the sample recipes. Your existing recipes were not changed."
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1557,6 +2115,12 @@
     },
     "Kitchen Memory could not import this webpage. Check the URL and try again." : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kitchen Memory could not import this webpage. Check the URL and try again."
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1573,6 +2137,12 @@
     },
     "Kitchen Memory could not read this recipe library." : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kitchen Memory could not read this recipe library."
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1589,6 +2159,12 @@
     },
     "Kitchen Memory could not reset this Kitchen. No reset was completed." : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kitchen Memory could not reset this Kitchen. No reset was completed."
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1605,6 +2181,12 @@
     },
     "Kitchen Memory could not save this recipe." : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kitchen Memory could not save this recipe."
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1621,6 +2203,12 @@
     },
     "Kitchen Memory follows redirects and downloads the resulting HTML with an ephemeral request that supplies no cookies or app credentials. It runs no page scripts and downloads no images during review." : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kitchen Memory follows redirects and downloads the resulting HTML with an ephemeral request that supplies no cookies or app credentials. It runs no page scripts and downloads no images during review."
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1637,6 +2225,12 @@
     },
     "Kitchen Memory includes a small collection of sample recipes. Add them to your recipe library?" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kitchen Memory includes a small collection of sample recipes. Add them to your recipe library?"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1653,6 +2247,12 @@
     },
     "Kitchen Memory is syncing with iCloud." : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kitchen Memory is syncing with iCloud."
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1669,6 +2269,12 @@
     },
     "Linear" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Linear"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1685,6 +2291,12 @@
     },
     "Link unavailable" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Link unavailable"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1701,6 +2313,12 @@
     },
     "Loading Recipes" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Loading Recipes"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1717,6 +2335,12 @@
     },
     "Lower estimate: %@" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Lower estimate: %@"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1733,6 +2357,12 @@
     },
     "Manual review" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Manual review"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1749,6 +2379,12 @@
     },
     "Move Down" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Move Down"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1765,6 +2401,12 @@
     },
     "Move Up" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Move Up"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1781,6 +2423,12 @@
     },
     "New Recipe" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "New Recipe"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1797,6 +2445,12 @@
     },
     "No ingredients were found" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "No ingredients were found"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1813,6 +2467,12 @@
     },
     "No instructions were found" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "No instructions were found"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1829,6 +2489,12 @@
     },
     "No quantity specified" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "No quantity specified"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1845,6 +2511,12 @@
     },
     "No Recipes" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "No Recipes"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1861,6 +2533,12 @@
     },
     "No sample recipes are installed." : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "No sample recipes are installed."
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1877,6 +2555,12 @@
     },
     "No Schema.org recipe was found on this page." : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "No Schema.org recipe was found on this page."
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1893,6 +2577,12 @@
     },
     "None" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "None"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1909,6 +2599,12 @@
     },
     "Not Now" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Not Now"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1925,6 +2621,12 @@
     },
     "Not specified" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Not specified"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1941,6 +2643,12 @@
     },
     "Numerator" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Numerator"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1957,6 +2665,12 @@
     },
     "Open Source" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Open Source"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1973,6 +2687,12 @@
     },
     "Original" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Original"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1989,6 +2709,12 @@
     },
     "Original wording is retained separately from the structured interpretation." : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Original wording is retained separately from the structured interpretation."
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2005,6 +2731,12 @@
     },
     "Package size (optional)" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Package size (optional)"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2021,6 +2753,12 @@
     },
     "Package: %@" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Package: %@"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2037,6 +2775,12 @@
     },
     "Person" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Person"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2053,6 +2797,12 @@
     },
     "Prep" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Prep"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2069,6 +2819,12 @@
     },
     "Preparing Your Kitchen…" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Preparing Your Kitchen…"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2085,6 +2841,12 @@
     },
     "Preserved metadata — %@" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Preserved metadata — %@"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2101,6 +2863,12 @@
     },
     "Privacy" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Privacy"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2117,6 +2885,12 @@
     },
     "Range" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Range"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2133,6 +2907,12 @@
     },
     "Recipe" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Recipe"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2149,6 +2929,12 @@
     },
     "Recipe image" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Recipe image"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2165,6 +2951,12 @@
     },
     "Recipe library" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Recipe library"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2181,6 +2973,12 @@
     },
     "Recipe webpage" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Recipe webpage"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2197,6 +2995,12 @@
     },
     "Recipe webpage URL" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Recipe webpage URL"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2213,6 +3017,12 @@
     },
     "Recipes" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Recipes"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2229,6 +3039,12 @@
     },
     "Recipes saved to this Kitchen will appear here." : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Recipes saved to this Kitchen will appear here."
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2245,6 +3061,12 @@
     },
     "Recipes Unavailable" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Recipes Unavailable"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2261,6 +3083,12 @@
     },
     "Remove package size" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Remove package size"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2277,6 +3105,12 @@
     },
     "Reset" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Reset"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2293,6 +3127,12 @@
     },
     "Reset Kitchen" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Reset Kitchen"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2309,6 +3149,12 @@
     },
     "Reset Kitchen?" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Reset Kitchen?"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2325,6 +3171,12 @@
     },
     "Reset Kitchen…" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Reset Kitchen…"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2341,6 +3193,12 @@
     },
     "Reset to base yield" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Reset to base yield"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2357,6 +3215,12 @@
     },
     "Restore this Kitchen to the sample recipes included with the current version of Kitchen Memory." : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Restore this Kitchen to the sample recipes included with the current version of Kitchen Memory."
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2373,6 +3237,12 @@
     },
     "Review Import" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Review Import"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2389,6 +3259,12 @@
     },
     "Review this recipe before saving" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Review this recipe before saving"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2405,6 +3281,12 @@
     },
     "Sample recipe status is unavailable." : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Sample recipe status is unavailable."
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2421,6 +3303,12 @@
     },
     "Sample Recipes" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Sample Recipes"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2437,6 +3325,12 @@
     },
     "Sample Recipes Installed" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Sample Recipes Installed"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2453,6 +3347,12 @@
     },
     "Save Revision" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Save Revision"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2469,6 +3369,12 @@
     },
     "Scale recipe" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Scale recipe"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2485,6 +3391,12 @@
     },
     "Select a Recipe" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Select a Recipe"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2501,6 +3413,12 @@
     },
     "Settings" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Settings"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2515,24 +3433,14 @@
         }
       }
     },
-    "Sign in to iCloud to sync your recipes." : {
-      "localizations" : {
-        "es-MX" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Inicia sesión en iCloud para sincronizar tus recetas."
-          }
-        },
-        "fr-CA" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Connectez-vous à iCloud pour synchroniser vos recettes."
-          }
-        }
-      }
-    },
     "Show Sidebar" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Show Sidebar"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2547,8 +3455,36 @@
         }
       }
     },
+    "Sign in to iCloud to sync your recipes." : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Sign in to iCloud to sync your recipes."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inicia sesión en iCloud para sincronizar tus recetas."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connectez-vous à iCloud pour synchroniser vos recettes."
+          }
+        }
+      }
+    },
     "Some sample recipes are missing." : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Some sample recipes are missing."
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2565,6 +3501,12 @@
     },
     "Source" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Source"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2581,6 +3523,12 @@
     },
     "Step %lld." : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Step %lld."
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2597,6 +3545,12 @@
     },
     "Structured" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Structured"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2613,6 +3567,12 @@
     },
     "The numeric yield is the basis used to scale ingredient amounts." : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "The numeric yield is the basis used to scale ingredient amounts."
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2629,6 +3589,12 @@
     },
     "The webpage could not be downloaded. Check your connection and try again." : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "The webpage could not be downloaded. Check your connection and try again."
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2645,6 +3611,12 @@
     },
     "This address did not return a supported HTML recipe page." : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "This address did not return a supported HTML recipe page."
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2661,6 +3633,12 @@
     },
     "This page contains multiple recipes" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "This page contains multiple recipes"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2677,6 +3655,12 @@
     },
     "This page contains too much data to import safely." : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "This page contains too much data to import safely."
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2693,6 +3677,12 @@
     },
     "Times" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Times"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2709,6 +3699,12 @@
     },
     "Title needs attention" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Title needs attention"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2725,6 +3721,12 @@
     },
     "Total" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Total"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2741,6 +3743,12 @@
     },
     "Try Again" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Try Again"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2757,6 +3765,12 @@
     },
     "Untitled recipe" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Untitled recipe"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2773,6 +3787,12 @@
     },
     "Upper estimate: %@" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Upper estimate: %@"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2789,6 +3809,12 @@
     },
     "Use a Different URL" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Use a Different URL"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2805,6 +3831,12 @@
     },
     "Use precise quantity…" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Use precise quantity…"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2821,6 +3853,12 @@
     },
     "Webpage" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Webpage"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2837,6 +3875,12 @@
     },
     "Words" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Words"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2853,6 +3897,12 @@
     },
     "Working yield" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Working yield"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2869,6 +3919,12 @@
     },
     "Written amount; left unchanged." : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Written amount; left unchanged."
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2885,6 +3941,12 @@
     },
     "Yield" : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Yield"
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2901,6 +3963,12 @@
     },
     "You can add them later from Settings." : {
       "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "You can add them later from Settings."
+          }
+        },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",

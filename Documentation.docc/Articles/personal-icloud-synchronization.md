@@ -53,17 +53,19 @@ does not need to be rewritten merely because the transport scope changes.
 
 ## Runtime configuration
 
-Production and ordinary development launches use the private database in
-`iCloud.net.ctwelve.KitchenMemory`. The application target enables iCloud,
-push notifications, and the remote-notification background mode. SwiftData
-tests, previews, and UI smoke tests use explicit local or in-memory stores and
-never require an iCloud account.
+`Develop` and `Production` launches use the private database in
+`iCloud.net.ctwelve.KitchenMemory`, selecting the development and production
+CloudKit environments respectively. The application target enables iCloud,
+push notifications, and the remote-notification background mode. `Debug`,
+`Testing`, and the non-distributable `ProductionTesting` UI-smoke host use
+explicit local or in-memory stores and never require an iCloud account.
 
 Managed CloudKit imports post a persistent-store remote-change notification.
-The application adapter converts that notification into a
-`RecipeLibraryModel` refresh after the model has completed its initial load.
-This keeps notification mechanics out of the reusable frameworks and avoids an
-early notification bypassing sample-onboarding state.
+`KitchenMemoryPersistence` converts that callback into a concurrency-safe
+refresh signal; the application composition root connects it to
+`RecipeLibraryModel` after the model has completed its initial load. This keeps
+Core Data and CloudKit callback mechanics out of Domain and Logic while avoiding
+an early notification bypassing sample-onboarding state.
 
 Settings reports the current iCloud account availability and the public managed
 CloudKit setup, import, and export event state. It never equates “account
@@ -112,7 +114,7 @@ Cooking sessions therefore become a new aggregate and new additive records in
 Schema administration is an explicit development operation, not application
 startup behavior.
 
-1. Build and sign a Debug application with the development iCloud container.
+1. Build and sign a `Develop` application with the development iCloud container.
 2. Launch it once with `--initialize-cloudkit-schema`.
 3. Inspect record types, indexes, and security roles in CloudKit Console.
 4. Exercise create, edit, delete, offline, reconnect, and concurrent-edit paths
@@ -121,10 +123,12 @@ startup behavior.
    correction is intentional.
 6. Deploy the schema to production only as a deliberate release operation.
 
-The Debug argument temporarily hands the default store to
+The Develop-only argument temporarily hands the default store to
 `NSPersistentCloudKitContainer`, asks it to initialize the development schema,
 unloads that store, and then lets the ordinary SwiftData container open it.
-Release builds do not contain this switch.
+The initializer lives with the rest of the store implementation in
+`KitchenMemoryPersistence/Cloud`. Debug, Testing, ProductionTesting, and
+Production builds do not contain this switch.
 
 Production schema deployment is one-way in practical terms. It must never be a
 routine build step, CI action, or automatic launch task.

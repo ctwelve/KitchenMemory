@@ -2,9 +2,8 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: GPL-3.0-only
 
-#if DEBUG
+#if DEVELOP
 import CoreData
-import KitchenMemoryPersistence
 import SwiftData
 
 /// Creates or additively updates the development CloudKit schema on demand.
@@ -13,13 +12,13 @@ import SwiftData
 /// store long enough to initialize its generated CloudKit schema, unloads it,
 /// and only then lets the app create its ordinary SwiftData container. Normal
 /// launches never perform schema administration.
-enum CloudKitDevelopmentSchemaInitializer {
+public enum CloudKitDevelopmentSchemaInitializer {
   enum InitializationError: Error {
     case managedObjectModelUnavailable
     case persistentStoreUnavailable
   }
 
-  static func initialize() throws {
+  public static func initialize() throws {
     try autoreleasepool {
       let schema = Schema(versionedSchema: KitchenMemorySchemaV1.self)
       let configuration = ModelConfiguration(

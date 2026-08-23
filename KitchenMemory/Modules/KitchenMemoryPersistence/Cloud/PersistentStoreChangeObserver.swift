@@ -5,18 +5,18 @@
 import CoreData
 import Foundation
 
-/// Bridges persistence notifications into application-facing refresh work.
+/// Bridges managed-store notifications into application-facing refresh work.
 ///
 /// CloudKit remains a persistence detail: this adapter observes Core Data's
 /// generic remote-store notification and tells the composition root that its
 /// read model is stale. Neither the domain nor product-logic frameworks need
 /// to know which transport produced the change.
 @MainActor
-final class PersistentStoreChangeObserver: NSObject {
+public final class PersistentStoreChangeObserver: NSObject {
   private let notificationCenter: NotificationCenter
   private let onChange: @MainActor () -> Void
 
-  init(
+  public init(
     notificationCenter: NotificationCenter = .default,
     onChange: @escaping @MainActor () -> Void
   ) {
@@ -35,7 +35,11 @@ final class PersistentStoreChangeObserver: NSObject {
     notificationCenter.removeObserver(self)
   }
 
-  @objc private func storeDidChange() {
-    onChange()
+  // Core Data posts remote-store changes on a private queue. The Objective-C
+  // selector must accept that delivery context before crossing to UI state.
+  @objc nonisolated private func storeDidChange() {
+    Task { @MainActor [weak self] in
+      self?.onChange()
+    }
   }
 }

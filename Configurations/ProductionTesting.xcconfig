@@ -1,0 +1,10 @@
+// Kitchen Memory
+// Copyright © 2026 the Kitchen Memory contributors.
+// SPDX-License-Identifier: GPL-3.0-only
+
+#include "Base.xcconfig"
+
+// Release-equivalent code with the disposable UI-test harness compiled in.
+// This configuration is never archived or distributed.
+ENABLE_TESTABILITY = YES
+SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited) PRODUCTION TESTING

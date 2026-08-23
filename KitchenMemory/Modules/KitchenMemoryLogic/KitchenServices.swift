@@ -32,12 +32,10 @@ public enum SampleRecipePresence: Equatable, Sendable {
 /// Creates the first empty Kitchen without treating absence of recipes as permission.
 @MainActor
 public struct KitchenBootstrapService {
-  /// The logical Kitchen shared by every installation in one private iCloud database.
+  /// The stable identity used for a person's default Kitchen across installations.
   ///
-  /// Reusing this identity lets independently launched devices converge even if
-  /// each creates its local placeholder before the first CloudKit import. The
-  /// database is private, so using the same value for another person's account
-  /// does not combine their data.
+  /// Reusing this identity lets independently launched installations converge.
+  /// Account isolation and transport remain persistence-adapter responsibilities.
   public static let personalKitchenID = Kitchen.ID(
     rawValue: UUID(uuidString: "5D4167A0-7027-4A3D-A170-0B73E86DCE8D")!
   )

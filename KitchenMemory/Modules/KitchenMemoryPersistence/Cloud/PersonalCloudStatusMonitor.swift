@@ -6,65 +6,20 @@ import CloudKit
 import CoreData
 import Foundation
 
-enum PersonalCloudStatus: Equatable {
-  case notConfigured
-  case checking
-  case available
-  case syncing
-  case noAccount
-  case restricted
-  case temporarilyUnavailable
-  case failed
-}
-
-struct PersonalCloudStatusState {
-  var accountStatus: PersonalCloudStatus = .checking
-  private var activeEventIDs = Set<UUID>()
-  private var failedEventTypes = Set<Int>()
-
-  init(accountStatus: PersonalCloudStatus = .checking) {
-    self.accountStatus = accountStatus
-  }
-
-  var status: PersonalCloudStatus {
-    guard accountStatus == .available else { return accountStatus }
-    if !activeEventIDs.isEmpty { return .syncing }
-    return failedEventTypes.isEmpty ? .available : .failed
-  }
-
-  mutating func recordEvent(
-    id: UUID,
-    type: Int,
-    ended: Bool,
-    succeeded: Bool
-  ) {
-    if ended {
-      activeEventIDs.remove(id)
-      if succeeded {
-        failedEventTypes.remove(type)
-      } else {
-        failedEventTypes.insert(type)
-      }
-    } else {
-      activeEventIDs.insert(id)
-    }
-  }
-}
-
 @MainActor
-protocol PersonalCloudAccountChecking {
+public protocol PersonalCloudAccountChecking {
   func status() async -> PersonalCloudStatus
 }
 
 @MainActor
-struct CloudKitAccountChecker: PersonalCloudAccountChecking {
+public struct CloudKitAccountChecker: PersonalCloudAccountChecking {
   private let container: CKContainer
 
-  init(containerIdentifier: String) {
+  public init(containerIdentifier: String) {
     container = CKContainer(identifier: containerIdentifier)
   }
 
-  func status() async -> PersonalCloudStatus {
+  public func status() async -> PersonalCloudStatus {
     do {
       return Self.status(for: try await container.accountStatus())
     } catch {
@@ -90,14 +45,14 @@ struct CloudKitAccountChecker: PersonalCloudAccountChecking {
 /// CloudKit/Core Data signals so Settings can report honest availability and
 /// operation failures without introducing CloudKit into reusable frameworks.
 @MainActor
-final class PersonalCloudStatusMonitor: NSObject {
+public final class PersonalCloudStatusMonitor: NSObject {
   private let notificationCenter: NotificationCenter
   private let accountChecker: any PersonalCloudAccountChecking
   private let onStatusChange: @MainActor (PersonalCloudStatus) -> Void
   private var state = PersonalCloudStatusState()
   private var accountCheckGeneration = 0
 
-  init(
+  public init(
     notificationCenter: NotificationCenter = .default,
     accountChecker: any PersonalCloudAccountChecking,
     onStatusChange: @escaping @MainActor (PersonalCloudStatus) -> Void
@@ -124,22 +79,41 @@ final class PersonalCloudStatusMonitor: NSObject {
     notificationCenter.removeObserver(self)
   }
 
-  func start() {
+  public func start() {
     refreshAccountStatus()
   }
 
-  @objc private func accountChanged() {
-    refreshAccountStatus()
+  @objc nonisolated private func accountChanged() {
+    Task { @MainActor [weak self] in
+      self?.refreshAccountStatus()
+    }
   }
 
-  @objc private func cloudEventChanged(_ notification: Notification) {
+  @objc nonisolated private func cloudEventChanged(_ notification: Notification) {
     guard let event = notification.userInfo?[
       NSPersistentCloudKitContainer.eventNotificationUserInfoKey
     ] as? NSPersistentCloudKitContainer.Event else { return }
+    receiveCloudEvent(
+      PersonalCloudEventSnapshot(
+        id: event.identifier,
+        type: event.type.rawValue,
+        ended: event.endDate != nil,
+        succeeded: event.succeeded
+      )
+    )
+  }
+
+  nonisolated func receiveCloudEvent(_ event: PersonalCloudEventSnapshot) {
+    Task { @MainActor [weak self] in
+      self?.recordCloudEvent(event)
+    }
+  }
+
+  private func recordCloudEvent(_ event: PersonalCloudEventSnapshot) {
     state.recordEvent(
-      id: event.identifier,
-      type: event.type.rawValue,
-      ended: event.endDate != nil,
+      id: event.id,
+      type: event.type,
+      ended: event.ended,
       succeeded: event.succeeded
     )
     publishStatus()

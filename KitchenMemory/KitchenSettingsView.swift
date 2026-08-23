@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 import KitchenMemoryLogic
+import KitchenMemoryPersistence
 import SwiftUI
 
 private enum KitchenResetCopy {
