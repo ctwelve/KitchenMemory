@@ -66,14 +66,16 @@ struct AppDependencies {
   let modelContainer: ModelContainer
   let libraryModel: RecipeLibraryModel
 
-  init(inMemory: Bool = false) throws {
+  init(
+    inMemory: Bool = false,
+    sampleConsentStore: (any SampleRecipeConsentStoring)? = nil,
+    sampleProvider: (any SampleRecipeProviding)? = nil
+  ) throws {
     let modelContainer = try KitchenMemorySchema.makeContainer(inMemory: inMemory)
     let repository = SwiftDataRecipeRepository(modelContainer: modelContainer)
-    let samples = BundledSampleRecipeProvider()
-    let kitchen = try KitchenBootstrapService(
-      repository: repository,
-      samples: samples
-    ).prepareInitialKitchen()
+    let samples = sampleProvider ?? BundledSampleRecipeProvider()
+    let kitchen = try KitchenBootstrapService(repository: repository).prepareInitialKitchen()
+    let consentStore = sampleConsentStore ?? Self.defaultConsentStore(inMemory: inMemory)
 
     self.modelContainer = modelContainer
     libraryModel = RecipeLibraryModel(
@@ -81,7 +83,9 @@ struct AppDependencies {
       library: RecipeLibrary(repository: repository),
       editor: RecipeEditor(repository: repository),
       importer: RecipeImportService(),
-      resetService: KitchenResetService(repository: repository, samples: samples)
+      resetService: KitchenResetService(repository: repository, samples: samples),
+      sampleInstaller: SampleRecipeInstallService(repository: repository, samples: samples),
+      sampleConsentStore: consentStore
     )
   }
 
@@ -94,9 +98,14 @@ struct AppDependencies {
   }
 
   static func prepareInitialKitchen(repository: any RecipeRepository) throws -> Kitchen {
-    try KitchenBootstrapService(
-      repository: repository,
-      samples: BundledSampleRecipeProvider()
-    ).prepareInitialKitchen()
+    try KitchenBootstrapService(repository: repository).prepareInitialKitchen()
+  }
+
+  private static func defaultConsentStore(
+    inMemory: Bool
+  ) -> any SampleRecipeConsentStoring {
+    inMemory
+      ? VolatileSampleRecipeConsentStore(consent: .accepted)
+      : UserDefaultsSampleRecipeConsentStore()
   }
 }

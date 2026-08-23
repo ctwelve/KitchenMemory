@@ -74,6 +74,11 @@ private final class InMemoryRecipeRepository: RecipeRepository {
     storedRecipes.filter { $0.recipe.kitchenID == kitchenID }
   }
 
+  func addRecipes(_ recipes: [StoredRecipe], to kitchenID: Kitchen.ID) throws {
+    let existingIDs = Set(storedRecipes.map(\.id))
+    storedRecipes.append(contentsOf: recipes.filter { !existingIDs.contains($0.id) })
+  }
+
   func revisions(for recipeID: Recipe.ID) throws -> [RecipeRevision] {
     revisionsByRecipeID[recipeID, default: []]
   }

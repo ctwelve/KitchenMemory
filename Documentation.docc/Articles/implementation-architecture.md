@@ -71,6 +71,8 @@ KitchenMemoryApp
     ├── SwiftDataRecipeRepository
     ├── BundledSampleRecipeProvider
     ├── KitchenBootstrapService
+    ├── SampleRecipeInstallService
+    ├── SampleRecipeConsentStoring
     └── RecipeLibraryModel
         ├── RecipeLibrary
         ├── RecipeEditor
@@ -80,24 +82,33 @@ KitchenMemoryApp
 
 `AppDependencies` is the composition root. It creates the concrete SwiftData
 repository and asset-backed sample provider, asks the bootstrap service for the
-initial Kitchen, and injects the resulting collaborators into
+initial empty Kitchen, selects the durable or disposable consent store, and
+injects the resulting collaborators into
 `RecipeLibraryModel`. Concrete construction stays here so neither the views nor
 the reusable frameworks need to locate their own dependencies.
 
 `RecipeLibraryModel` is the principal application glue. It owns the UI-facing
 state for one Kitchen: the loaded recipe list, current selection, load state,
-and typed presentation issue. Every library-wide read or mutation passes
-through it. The model delegates validation and durable operations to
+sample-consent state, startup phase, and typed presentation issue. Every
+library-wide read or mutation passes through it. The model delegates validation
+and durable operations to
 `KitchenMemoryLogic`, then applies the small amount of presentation coordination
 that follows a successful operation, such as reloading the list while preserving
 or changing the selection. Its main-actor isolation and observation belong to
 the app boundary; recipe rules do not.
 
 `BundledSampleRecipeProvider` adapts the application asset catalog to
-`SampleRecipeProviding`. This lets bootstrap and reset logic consume recipes
-without knowing about bundles, compiled asset catalogs, or sample-document
-formats. A future sample source can replace the adapter without changing those
-operations.
+`SampleRecipeProviding`. `SampleRecipeInstallService` adds only recipe UUIDs
+that are not already present, while `KitchenResetService` deliberately replaces
+the Kitchen after explicit destructive confirmation. Bootstrap itself creates
+an empty Kitchen and never interprets emptiness as consent. A future background-
+asset provider can replace the bundled adapter without changing these use cases.
+
+`SampleRecipeConsentStoring` persists `undecided`, `accepted`, or `declined`
+outside recipe storage. This decision survives independently of sample-pack
+format and availability. The in-app startup gate moves through loading, sample
+choice, and library states; the operating-system launch screen remains static
+and does not perform product work.
 
 Views own transient presentation and bind directly to pure workflow values such
 as `RecipeEditSession`, `RecipeImportSession`, and `RecipeScalingState`. They ask
@@ -178,7 +189,8 @@ while each authored translation has its own stable recipe, revision, and child
 identities. Reusing one durable recipe identity for different translated
 payloads would create a synchronization conflict. The application adapter
 selects an exact regional match, a supported language fallback, or the English
-development asset before Logic performs the atomic bootstrap/reset operation.
+development asset before Logic performs an idempotent installation or atomic
+reset operation.
 
 The catalog does not contain a Kitchen identifier. A sample recipe retains its
 own stable recipe, revision, and media identities, while the importing use case

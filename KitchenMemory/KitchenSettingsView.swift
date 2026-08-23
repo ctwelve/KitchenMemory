@@ -2,6 +2,7 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: GPL-3.0-only
 
+import KitchenMemoryLogic
 import SwiftUI
 
 private enum KitchenResetCopy {
@@ -58,6 +59,21 @@ struct KitchenSettingsView: View {
 
   var body: some View {
     Form {
+      Section("Sample Recipes") {
+        if model.sampleConsent == .accepted, model.issue != .samples {
+          Label("Sample recipes are enabled.", systemImage: "checkmark.circle")
+            .foregroundStyle(.secondary)
+        } else {
+          Text("Add the sample recipes included with this version of Kitchen Memory.")
+            .foregroundStyle(.secondary)
+
+          Button(model.issue == .samples ? "Try Again" : "Add Sample Recipes") {
+            model.acceptSampleRecipes()
+          }
+          .accessibilityIdentifier("add-sample-recipes")
+        }
+      }
+
       Section("Kitchen Data") {
         Text("Restore this Kitchen to the sample recipes included with the current version of Kitchen Memory.")
         .foregroundStyle(.secondary)
@@ -76,7 +92,7 @@ struct KitchenSettingsView: View {
     .navigationTitle("Settings")
 #if os(macOS)
     .formStyle(.grouped)
-    .frame(width: 480, height: 260)
+    .frame(width: 480, height: 360)
     .focusedSceneValue(\.resetKitchenAction) {
       isShowingResetConfirmation = true
     }

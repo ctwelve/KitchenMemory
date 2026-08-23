@@ -2410,6 +2410,166 @@
         }
       }
     },
+    "Add Sample Recipes" : {
+      "localizations" : {
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agregar recetas de ejemplo"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter les recettes d’exemple"
+          }
+        }
+      }
+    },
+    "Add Sample Recipes?" : {
+      "localizations" : {
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Agregar recetas de ejemplo?"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter des recettes d’exemple?"
+          }
+        }
+      }
+    },
+    "Add the sample recipes included with this version of Kitchen Memory." : {
+      "localizations" : {
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agrega las recetas de ejemplo incluidas con esta versión de Kitchen Memory."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajoutez les recettes d’exemple incluses avec cette version de Kitchen Memory."
+          }
+        }
+      }
+    },
+    "Kitchen Memory could not add the sample recipes. Your existing recipes were not changed." : {
+      "localizations" : {
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kitchen Memory no pudo agregar las recetas de ejemplo. Tus recetas existentes no se modificaron."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kitchen Memory n’a pas pu ajouter les recettes d’exemple. Vos recettes existantes n’ont pas été modifiées."
+          }
+        }
+      }
+    },
+    "Kitchen Memory includes a small collection of sample recipes. Add them to your recipe library?" : {
+      "localizations" : {
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kitchen Memory incluye una pequeña colección de recetas de ejemplo. ¿Quieres agregarlas a tu recetario?"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kitchen Memory comprend une petite collection de recettes d’exemple. Voulez-vous les ajouter à votre bibliothèque de recettes?"
+          }
+        }
+      }
+    },
+    "Not Now" : {
+      "localizations" : {
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ahora no"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pas maintenant"
+          }
+        }
+      }
+    },
+    "Preparing Your Kitchen…" : {
+      "localizations" : {
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preparando tu cocina…"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Préparation de votre cuisine…"
+          }
+        }
+      }
+    },
+    "Sample recipes are enabled." : {
+      "localizations" : {
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las recetas de ejemplo están activadas."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les recettes d’exemple sont activées."
+          }
+        }
+      }
+    },
+    "Sample Recipes" : {
+      "localizations" : {
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recetas de ejemplo"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recettes d’exemple"
+          }
+        }
+      }
+    },
+    "You can add them later from Settings." : {
+      "localizations" : {
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puedes agregarlas más tarde desde Configuración."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous pourrez les ajouter plus tard dans Réglages."
+          }
+        }
+      }
+    },
     "https://example.com/recipe" : {
       "shouldTranslate" : false
     }

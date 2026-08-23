@@ -19,6 +19,26 @@ struct ContentView: View {
 #endif
 
   var body: some View {
+    Group {
+      switch model.startupState {
+      case .loading:
+        KitchenLoadingView()
+      case .choosingSamples:
+        SampleRecipeDecisionView(
+          accept: model.acceptSampleRecipes,
+          decline: model.declineSampleRecipes
+        )
+      case .ready:
+        recipeLibrary
+      }
+    }
+    .task {
+      model.loadIfNeeded()
+    }
+    .tint(Color("AccentColor"))
+  }
+
+  private var recipeLibrary: some View {
     NavigationSplitView(columnVisibility: $columnVisibility) {
       recipeList
         .navigationTitle("Recipes")
@@ -70,9 +90,6 @@ struct ContentView: View {
     } detail: {
       detail
     }
-    .task {
-      model.loadIfNeeded()
-    }
     .sheet(item: $activeSheet) { sheet in
       sheetContent(sheet)
     }
@@ -92,7 +109,6 @@ struct ContentView: View {
       }
     }
 #endif
-    .tint(Color("AccentColor"))
   }
 
   private var usesCustomSidebarToggle: Bool {
@@ -131,7 +147,7 @@ struct ContentView: View {
       } description: {
         Text(issue.message(locale: locale))
       } actions: {
-        Button("Try Again") { model.reload() }
+        Button("Try Again") { model.retryCurrentIssue() }
       }
     } else if model.hasLoaded && model.recipes.isEmpty {
       ContentUnavailableView(

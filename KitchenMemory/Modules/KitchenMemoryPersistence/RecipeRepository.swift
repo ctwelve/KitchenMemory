@@ -36,6 +36,8 @@ public protocol RecipeRepository: AnyObject {
   func kitchen(id: Kitchen.ID) throws -> Kitchen?
   func recipe(id: Recipe.ID) throws -> StoredRecipe?
   func recipes(in kitchenID: Kitchen.ID) throws -> [StoredRecipe]
+  /// Atomically adds recipes whose stable identities are not already present.
+  func addRecipes(_ recipes: [StoredRecipe], to kitchenID: Kitchen.ID) throws
   /// Returns every saved revision for a recipe, newest revision first.
   func revisions(for recipeID: Recipe.ID) throws -> [RecipeRevision]
   /// Atomically replaces every recipe and revision owned by one Kitchen.
@@ -184,6 +186,17 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
       .sorted {
         $0.revision.title.localizedStandardCompare($1.revision.title) == .orderedAscending
       }
+  }
+
+  public func addRecipes(_ recipes: [StoredRecipe], to kitchenID: Kitchen.ID) throws {
+    try performIsolatedWrite { writer in
+      try writer.validate(recipes, in: kitchenID)
+      for stored in recipes {
+        guard try writer.recipe(id: stored.id) == nil else { continue }
+        try writer.upsert(stored.recipe)
+        try writer.replace(stored.revision)
+      }
+    }
   }
 
   public func revisions(for recipeID: Recipe.ID) throws -> [RecipeRevision] {

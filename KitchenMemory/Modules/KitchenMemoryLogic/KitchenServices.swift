@@ -10,9 +10,33 @@ public protocol SampleRecipeProviding {
   func recipes(in kitchenID: Kitchen.ID) throws -> [StoredRecipe]
 }
 
-/// Creates the first Kitchen and its samples as one durable transaction.
+/// The durable answer to whether bundled or downloaded samples may be installed.
+public enum SampleRecipeConsent: String, Equatable, Sendable {
+  case undecided
+  case accepted
+  case declined
+}
+
+/// Creates the first empty Kitchen without treating absence of recipes as consent.
 @MainActor
 public struct KitchenBootstrapService {
+  private let repository: any RecipeRepository
+
+  public init(repository: any RecipeRepository) {
+    self.repository = repository
+  }
+
+  public func prepareInitialKitchen(named name: String = "Home Kitchen") throws -> Kitchen {
+    if let existingKitchen = try repository.kitchens().first { return existingKitchen }
+    let kitchen = Kitchen(name: name)
+    try repository.create(kitchen, with: [])
+    return kitchen
+  }
+}
+
+/// Installs a sample collection without replacing user recipes or matching UUIDs.
+@MainActor
+public struct SampleRecipeInstallService {
   private let repository: any RecipeRepository
   private let samples: any SampleRecipeProviding
 
@@ -21,12 +45,9 @@ public struct KitchenBootstrapService {
     self.samples = samples
   }
 
-  public func prepareInitialKitchen(named name: String = "Home Kitchen") throws -> Kitchen {
-    if let existingKitchen = try repository.kitchens().first { return existingKitchen }
-    let kitchen = Kitchen(name: name)
-    let sampleRecipes = try samples.recipes(in: kitchen.id)
-    try repository.create(kitchen, with: sampleRecipes)
-    return kitchen
+  public func install(in kitchenID: Kitchen.ID) throws {
+    let sampleRecipes = try samples.recipes(in: kitchenID)
+    try repository.addRecipes(sampleRecipes, to: kitchenID)
   }
 }
 

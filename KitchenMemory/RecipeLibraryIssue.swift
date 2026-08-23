@@ -8,6 +8,7 @@ enum RecipeLibraryIssue: Equatable {
   case read
   case save
   case reset
+  case samples
 
   func message(locale: Locale = .current) -> String {
     switch self {
@@ -18,6 +19,11 @@ enum RecipeLibraryIssue: Equatable {
     case .reset:
       String(
         localized: "Kitchen Memory could not reset this Kitchen. No reset was completed.",
+        locale: locale
+      )
+    case .samples:
+      String(
+        localized: "Kitchen Memory could not add the sample recipes. Your existing recipes were not changed.",
         locale: locale
       )
     }

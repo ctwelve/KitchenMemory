@@ -118,10 +118,26 @@ canonical BCP 47 tag and carries it through drafts, sample documents, Schema.org
 single-user development toy, this pre-release change updates V1 directly and
 requires deleting development stores; no fictional migration path is retained.
 
+## Sample consent and future delivery
+
+The current release ships the localized sample pack inside the application, but
+first startup does not install it implicitly. A separate durable preference
+records `undecided`, `accepted`, or `declined`; only acceptance invokes the
+idempotent installer. Stable recipe UUIDs let repeated installation skip
+existing samples and let later pack delivery reconcile without duplicating
+recipes or deleting user content.
+
+The in-app loading and decision states are deliberately independent of the
+static operating-system launch screen. When the deployment floor reaches xOS
+27, the bundled provider may be replaced by localized Managed Background Asset
+packs. The stored consent remains authoritative, so declining transfers no pack
+and accepting can begin download without asking the same product question again.
+
 ## Persistence behavior
 
-Bootstrap chooses a localized sample variant before the Kitchen and its recipes
-are created atomically. Once stored, that recipe is ordinary local content. A
+Bootstrap creates an empty Kitchen. After acceptance, installation chooses a
+localized sample variant and atomically adds only stable recipe identities that
+are not already present. Once stored, that recipe is ordinary local content. A
 later system-language change must not silently replace it, discard edits, or
 rewrite immutable revision history.
 

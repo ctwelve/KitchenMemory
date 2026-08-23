@@ -31,24 +31,17 @@ final class KitchenMemoryTests: XCTestCase {
     XCTAssertEqual(dependencies.libraryModel.recipes.count, 2)
   }
 
-  func testNewStoreCreatesOneKitchenAndImportsTheSampleCollectionOnce() throws {
+  func testNewStoreCreatesOneEmptyKitchenWithoutAssumingSampleConsent() throws {
     let repository = SwiftDataRecipeRepository(
       modelContainer: try KitchenMemorySchema.makeContainer(inMemory: true)
     )
 
     let firstKitchen = try AppDependencies.prepareInitialKitchen(repository: repository)
     let secondKitchen = try AppDependencies.prepareInitialKitchen(repository: repository)
-    let manifest = try SampleRecipeCatalog.loadManifest()
 
     XCTAssertEqual(firstKitchen, secondKitchen)
     XCTAssertEqual(try repository.kitchens(), [firstKitchen])
-    XCTAssertEqual(
-      Set(try repository.recipes(in: firstKitchen.id).map(\.recipe.id)),
-      Set(try SampleRecipeCatalog.localizedRecipes(
-        in: manifest,
-        preferredLanguages: Locale.preferredLanguages
-      ).map(\.recipeID))
-    )
+    XCTAssertTrue(try repository.recipes(in: firstKitchen.id).isEmpty)
   }
 
   func testResetKitchenRemovesUserRecipesAndRestoresCurrentSamples() throws {
