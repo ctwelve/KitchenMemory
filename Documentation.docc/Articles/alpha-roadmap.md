@@ -242,6 +242,7 @@ Structured editing
 
 Pantry holdings, shopping lists, planned cooks, cooking sessions, meal planning,
 household sharing, OCR, and social features are intentionally outside the alpha.
-The domain seams for them remain important, but they should not delay validation
+Household sharing is also explicitly deferred until after 1.0. The domain seams
+for these capabilities remain important, but they should not delay validation
 of the complete recipe import, correction, scaling, reading, and private
 cross-device synchronization loop.

@@ -57,6 +57,7 @@ sharing follow after this slice is useful.
 - [Product workflows](Documentation.docc/Articles/workflows.md)
 - [Apple platform and automation architecture](Documentation.docc/Articles/apple-platform.md)
 - [Implementation architecture](Documentation.docc/Articles/implementation-architecture.md)
+- [Personal iCloud synchronization](Documentation.docc/Articles/personal-icloud-synchronization.md)
 - [Localization and recipe resources](Documentation.docc/Articles/localization-architecture.md)
 - [Continuous integration](Documentation.docc/Articles/continuous-integration.md)
 - [Accessibility engineering](Documentation.docc/Articles/accessibility-engineering.md)

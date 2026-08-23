@@ -281,11 +281,12 @@ Information moves between contexts intentionally:
 The platforms share the domain and relevant application capabilities. They do not
 share one compromised interface.
 
-SwiftData is the first local persistence implementation. CloudKit is the
-Apple-native synchronization and household-collaboration platform. The domain
-remains independent of both, and versioned import and export provide content
-portability. The exact shared-Kitchen CloudKit integration follows a focused
-collaboration prototype; see ADRs 0003 and 0004.
+SwiftData is the first local persistence implementation. Managed private
+CloudKit synchronization carries one person's library across their devices for
+1.0. The domain remains independent of both, and versioned import and export
+provide content portability. Multi-person Kitchen sharing is a separate
+post-1.0 collaboration slice whose direct or managed CloudKit integration
+follows a focused prototype; see ADRs 0003 and 0004.
 
 ## Capability horizons
 

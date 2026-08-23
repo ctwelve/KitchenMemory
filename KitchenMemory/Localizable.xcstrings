@@ -572,6 +572,22 @@
         }
       }
     },
+    "Checking iCloud status…" : {
+      "localizations" : {
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comprobando el estado de iCloud…"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vérification de l’état d’iCloud…"
+          }
+        }
+      }
+    },
     "Categories: %@" : {
       "localizations" : {
         "es-MX" : {
@@ -1263,6 +1279,86 @@
         }
       }
     },
+    "iCloud access is restricted on this device." : {
+      "localizations" : {
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El acceso a iCloud está restringido en este dispositivo."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L’accès à iCloud est restreint sur cet appareil."
+          }
+        }
+      }
+    },
+    "iCloud Sync" : {
+      "localizations" : {
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincronización con iCloud"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisation iCloud"
+          }
+        }
+      }
+    },
+    "iCloud sync is available." : {
+      "localizations" : {
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La sincronización con iCloud está disponible."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La synchronisation iCloud est disponible."
+          }
+        }
+      }
+    },
+    "iCloud sync is temporarily unavailable." : {
+      "localizations" : {
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La sincronización con iCloud no está disponible temporalmente."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La synchronisation iCloud est temporairement indisponible."
+          }
+        }
+      }
+    },
+    "iCloud sync needs attention." : {
+      "localizations" : {
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La sincronización con iCloud requiere atención."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La synchronisation iCloud nécessite votre attention."
+          }
+        }
+      }
+    },
     "Increase %@" : {
       "localizations" : {
         "es-MX" : {
@@ -1551,6 +1647,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Kitchen Memory comprend une petite collection de recettes d’exemple. Voulez-vous les ajouter à votre bibliothèque de recettes?"
+          }
+        }
+      }
+    },
+    "Kitchen Memory is syncing with iCloud." : {
+      "localizations" : {
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kitchen Memory se está sincronizando con iCloud."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kitchen Memory se synchronise avec iCloud."
           }
         }
       }
@@ -2399,6 +2511,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Réglages"
+          }
+        }
+      }
+    },
+    "Sign in to iCloud to sync your recipes." : {
+      "localizations" : {
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inicia sesión en iCloud para sincronizar tus recetas."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connectez-vous à iCloud pour synchroniser vos recettes."
           }
         }
       }

@@ -145,7 +145,8 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
 
   public func kitchens() throws -> [Kitchen] {
     let descriptor = FetchDescriptor<KitchenRecord>(sortBy: [SortDescriptor(\.name)])
-    return try context.fetch(descriptor).map {
+    var seenIDs = Set<UUID>()
+    return try context.fetch(descriptor).filter { seenIDs.insert($0.id).inserted }.map {
       Kitchen(id: .init(rawValue: $0.id), name: $0.name)
     }
   }
@@ -154,19 +155,23 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     let identifier = id.rawValue
     let recipeDescriptor = FetchDescriptor<RecipeRecord>(
       predicate: #Predicate { $0.id == identifier })
-    guard let recipeRecord = try context.fetch(recipeDescriptor).first else { return nil }
-    let revisionID = recipeRecord.currentRevisionID
-    let revisionDescriptor = FetchDescriptor<RecipeRevisionRecord>(
-      predicate: #Predicate { $0.id == revisionID })
-    guard let revisionRecord = try context.fetch(revisionDescriptor).first else {
-      throw KitchenMemoryPersistenceError.missingCurrentRevision
-    }
-    guard revisionRecord.recipeID == recipeRecord.id else {
+    let recipeRecords = try context.fetch(recipeDescriptor)
+    guard !recipeRecords.isEmpty else { return nil }
+    let currentRevisionIDs = Set(recipeRecords.map(\.currentRevisionID))
+    let currentRevisionRecords = try context.fetch(FetchDescriptor<RecipeRevisionRecord>())
+      .filter { currentRevisionIDs.contains($0.id) }
+    let revisionRecords = currentRevisionRecords.filter { $0.recipeID == identifier }
+    if revisionRecords.isEmpty, let mismatched = currentRevisionRecords.first {
       throw KitchenMemoryPersistenceError.inconsistentStoredRecipeIdentity(
-        recipeID: .init(rawValue: recipeRecord.id),
-        revisionID: .init(rawValue: revisionRecord.id)
+        recipeID: id,
+        revisionID: .init(rawValue: mismatched.id)
       )
     }
+    guard let revisionRecord = revisionRecords.max(by: Self.precedesForCurrentRevision) else {
+      throw KitchenMemoryPersistenceError.missingCurrentRevision
+    }
+    let recipeRecord = recipeRecords.first { $0.currentRevisionID == revisionRecord.id }
+    guard let recipeRecord else { throw KitchenMemoryPersistenceError.missingCurrentRevision }
 
     let recipe = Recipe(
       id: .init(rawValue: recipeRecord.id),
@@ -181,7 +186,9 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     let descriptor = FetchDescriptor<RecipeRecord>(
       predicate: #Predicate { $0.kitchenID == identifier }
     )
+    var seenIDs = Set<UUID>()
     return try context.fetch(descriptor)
+      .filter { seenIDs.insert($0.id).inserted }
       .compactMap { try recipe(id: .init(rawValue: $0.id)) }
       .sorted {
         $0.revision.title.localizedStandardCompare($1.revision.title) == .orderedAscending
@@ -205,7 +212,20 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
       predicate: #Predicate { $0.recipeID == identifier },
       sortBy: [SortDescriptor(\.revisionNumber, order: .reverse)]
     )
-    return try context.fetch(descriptor).map(domainRevision)
+    var seenIDs = Set<UUID>()
+    return try context.fetch(descriptor)
+      .filter { seenIDs.insert($0.id).inserted }
+      .map(domainRevision)
+  }
+
+  private static func precedesForCurrentRevision(
+    _ lhs: RecipeRevisionRecord,
+    _ rhs: RecipeRevisionRecord
+  ) -> Bool {
+    if lhs.revisionNumber != rhs.revisionNumber {
+      return lhs.revisionNumber < rhs.revisionNumber
+    }
+    return lhs.id.uuidString < rhs.id.uuidString
   }
 
   public func replaceRecipes(in kitchenID: Kitchen.ID, with recipes: [StoredRecipe]) throws {
@@ -409,11 +429,12 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
   private func domainRevision(from record: RecipeRevisionRecord) throws -> RecipeRevision {
     let storedSource = try decodeSource(record.sourceData)
     let revisionID = record.id
+    var seenMediaIDs = Set<UUID>()
     let media = try context.fetch(
       FetchDescriptor<RecipeMediaRecord>(
         predicate: #Predicate { $0.revisionID == revisionID }, sortBy: [SortDescriptor(\.sortIndex)]
       )
-    ).map { item in
+    ).filter { seenMediaIDs.insert($0.id).inserted }.map { item in
       guard let role = RecipeMedia.Role(rawValue: item.role) else {
         throw KitchenMemoryPersistenceError.invalidStoredValue(field: "media.role")
       }
@@ -421,11 +442,12 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
         id: .init(rawValue: item.id), role: role, assetName: item.assetName,
         accessibilityLabel: item.mediaAccessibilityLabel)
     }
+    var seenEquipmentIDs = Set<UUID>()
     let equipment = try context.fetch(
       FetchDescriptor<EquipmentRecord>(
         predicate: #Predicate { $0.revisionID == revisionID }, sortBy: [SortDescriptor(\.sortIndex)]
       )
-    ).map { item in
+    ).filter { seenEquipmentIDs.insert($0.id).inserted }.map { item in
       EquipmentItem(
         id: .init(rawValue: item.id), originalText: item.originalText,
         quantity: try decodeOptional(
@@ -433,10 +455,12 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
         name: item.name, isOptional: item.isOptional)
     }
 
+    var seenIngredientSectionIDs = Set<UUID>()
     let ingredientSectionRecords = try context.fetch(
       FetchDescriptor<IngredientSectionRecord>(
         predicate: #Predicate { $0.revisionID == revisionID }, sortBy: [SortDescriptor(\.sortIndex)]
-      ))
+      )
+    ).filter { seenIngredientSectionIDs.insert($0.id).inserted }
     let ingredientSections = try ingredientSectionRecords.map { section in
       let sectionID = section.id
       let storedItems = try context.fetch(
@@ -474,10 +498,12 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
         id: .init(rawValue: section.id), title: section.title, ingredients: items)
     }
 
+    var seenInstructionSectionIDs = Set<UUID>()
     let instructionSectionRecords = try context.fetch(
       FetchDescriptor<InstructionSectionRecord>(
         predicate: #Predicate { $0.revisionID == revisionID }, sortBy: [SortDescriptor(\.sortIndex)]
-      ))
+      )
+    ).filter { seenInstructionSectionIDs.insert($0.id).inserted }
     let instructionSections = try instructionSectionRecords.map { section in
       let sectionID = section.id
       let storedSteps = try context.fetch(

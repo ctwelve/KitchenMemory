@@ -14,9 +14,19 @@ struct KitchenMemoryApp: App {
 
   init() {
     do {
+#if DEBUG
+      if AppRuntimeConfiguration.initializesCloudKitSchema(
+        arguments: ProcessInfo.processInfo.arguments
+      ) {
+        try CloudKitDevelopmentSchemaInitializer.initialize()
+      }
+#endif
       dependencies = try AppDependencies(
         inMemory: AppRuntimeConfiguration.usesInMemoryStore(
           arguments: ProcessInfo.processInfo.arguments
+        ),
+        synchronizesWithPersonalCloud: AppRuntimeConfiguration.synchronizesWithPersonalCloud(
+          environment: ProcessInfo.processInfo.environment
         )
       )
     } catch {
@@ -59,19 +69,48 @@ enum AppRuntimeConfiguration {
     false
 #endif
   }
+
+  /// Whether the host process should attach its durable store to CloudKit.
+  ///
+  /// Hosted unit tests execute the app's `init` before XCTest connects. They
+  /// deliberately use the local store because unsigned CI and coverage runs do
+  /// not carry the application's iCloud entitlement. Normal Debug and Release
+  /// launches still select personal sync.
+  static func synchronizesWithPersonalCloud(environment: [String: String]) -> Bool {
+#if DEBUG
+    environment["XCTestConfigurationFilePath"] == nil
+#else
+    true
+#endif
+  }
+
+#if DEBUG
+  static func initializesCloudKitSchema(arguments: [String]) -> Bool {
+    arguments.contains("--initialize-cloudkit-schema")
+  }
+#endif
 }
 
 @MainActor
 struct AppDependencies {
   let modelContainer: ModelContainer
   let libraryModel: RecipeLibraryModel
+  let persistentStoreChangeObserver: PersistentStoreChangeObserver?
+  let personalCloudStatusMonitor: PersonalCloudStatusMonitor?
 
   init(
     inMemory: Bool = false,
+    synchronizesWithPersonalCloud: Bool = false,
     sampleOnboardingStore: (any SampleRecipeOnboardingStoring)? = nil,
     sampleProvider: (any SampleRecipeProviding)? = nil
   ) throws {
-    let modelContainer = try KitchenMemorySchema.makeContainer(inMemory: inMemory)
+    let synchronization: KitchenMemoryStoreSynchronization = synchronizesWithPersonalCloud
+      ? .personalCloud(containerIdentifier: KitchenMemorySchema.personalCloudContainerIdentifier)
+      : .localOnly
+    let modelContainer = try KitchenMemorySchema.makeContainer(
+      inMemory: inMemory,
+      synchronization: synchronization
+    )
     let repository = SwiftDataRecipeRepository(modelContainer: modelContainer)
     let samples = sampleProvider ?? BundledSampleRecipeProvider()
     let kitchen = try KitchenBootstrapService(repository: repository).prepareInitialKitchen()
@@ -84,8 +123,7 @@ struct AppDependencies {
       try sampleInstaller.install(in: kitchen.id)
     }
 
-    self.modelContainer = modelContainer
-    libraryModel = RecipeLibraryModel(
+    let libraryModel = RecipeLibraryModel(
       kitchenID: kitchen.id,
       library: RecipeLibrary(repository: repository),
       editor: RecipeEditor(repository: repository),
@@ -94,6 +132,24 @@ struct AppDependencies {
       sampleInstaller: sampleInstaller,
       sampleOnboardingStore: onboardingStore
     )
+    self.modelContainer = modelContainer
+    self.libraryModel = libraryModel
+    persistentStoreChangeObserver = synchronizesWithPersonalCloud
+      ? PersistentStoreChangeObserver {
+        libraryModel.reloadAfterExternalStoreChange()
+      }
+      : nil
+    let personalCloudStatusMonitor = synchronizesWithPersonalCloud
+      ? PersonalCloudStatusMonitor(
+        accountChecker: CloudKitAccountChecker(
+          containerIdentifier: KitchenMemorySchema.personalCloudContainerIdentifier
+        )
+      ) { status in
+        libraryModel.updatePersonalCloudStatus(status)
+      }
+      : nil
+    self.personalCloudStatusMonitor = personalCloudStatusMonitor
+    personalCloudStatusMonitor?.start()
   }
 
   static var preview: AppDependencies {

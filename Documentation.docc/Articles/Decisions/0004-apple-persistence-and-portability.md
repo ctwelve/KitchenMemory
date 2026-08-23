@@ -23,11 +23,12 @@ Use SwiftData as the first local persistence implementation and CloudKit as the
 synchronization and household-collaboration platform.
 
 Do not commit the domain or Logic operations to SwiftData managed CloudKit sync
-as the only integration mechanism. The first synchronization slice targets the
-private database for one person's devices and selects its integration after a
-focused prototype. Select or supplement that mechanism for multi-person Kitchen
-sharing only after a later collaboration prototype exercises participants,
-permissions, private and shared database scopes, and conflict behavior.
+as the only integration mechanism. The first synchronization slice uses managed
+SwiftData synchronization with the private database for one person's devices.
+That choice remains inside the persistence adapter. Select or supplement the
+mechanism for multi-person Kitchen sharing only after a post-1.0 collaboration
+prototype exercises participants, permissions, private and shared database
+scopes, and conflict behavior.
 
 Before promoting the first production CloudKit schema, make the persistence
 model compatible with the selected integration and validate its generated
@@ -51,6 +52,7 @@ exported scope.
   types without rewriting existing recipe content, but it still requires a new
   local schema version and tested migration stage.
 - Multi-person sharing remains an explicit product and sync responsibility.
+- The personal-sync adapter does not determine the later sharing transport.
 - Export formats require versioning and migration independently of SwiftData.
 - Replacing or supplementing persistence technology does not require changing
   the domain model.

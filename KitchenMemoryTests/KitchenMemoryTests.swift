@@ -105,5 +105,21 @@ final class KitchenMemoryTests: XCTestCase {
       arguments: ["KitchenMemory"]
     ))
   }
+
+  func testHostedUnitTestsDisablePersonalCloudWithoutChangingNormalLaunches() {
+    XCTAssertFalse(AppRuntimeConfiguration.synchronizesWithPersonalCloud(
+      environment: ["XCTestConfigurationFilePath": "/tmp/KitchenMemory.xctestconfiguration"]
+    ))
+    XCTAssertTrue(AppRuntimeConfiguration.synchronizesWithPersonalCloud(environment: [:]))
+  }
+
+  func testCloudKitSchemaInitializationRequiresTheExplicitDebugArgument() {
+    XCTAssertTrue(AppRuntimeConfiguration.initializesCloudKitSchema(
+      arguments: ["KitchenMemory", "--initialize-cloudkit-schema"]
+    ))
+    XCTAssertFalse(AppRuntimeConfiguration.initializesCloudKitSchema(
+      arguments: ["KitchenMemory"]
+    ))
+  }
 #endif
 }

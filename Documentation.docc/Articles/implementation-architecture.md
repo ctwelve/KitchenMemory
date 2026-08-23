@@ -140,13 +140,14 @@ rather than moving SwiftData records between actors. The repository enforces the
 Kitchen ownership boundary when saving and exposes Kitchen-scoped recipe lists
 already reconstructed as domain values.
 
-`KitchenMemorySchema.makeContainer()` currently uses SwiftData's standard
-permanent local store location and is deliberately configured without CloudKit.
-Slice 10 will replace that local-only production configuration with the selected
-private cross-device integration after a focused prototype, while keeping the
-choice behind this boundary. In-memory containers remain available for previews
-and tests, and callers may provide an explicit URL for isolated tests or
-migration work.
+`KitchenMemorySchema.makeContainer()` selects either SwiftData's standard
+permanent store with a named private CloudKit database or an explicit local-only
+configuration. The application uses private synchronization for ordinary
+launches. In-memory containers, hosted unit tests, and callers that provide an
+explicit test URL remain local-only; they never require an iCloud entitlement or
+account. Imported remote-store changes cross one application adapter and refresh
+`RecipeLibraryModel` without exposing CloudKit to Domain, Logic, or the
+repository protocol. See <doc:personal-icloud-synchronization>.
 
 The store begins at `KitchenMemorySchemaV1` under
 `KitchenMemoryMigrationPlan`. V1 remains intentionally mutable before the first
@@ -201,8 +202,9 @@ reset operation.
 
 The catalog does not contain a Kitchen identifier. A sample recipe retains its
 own stable recipe, revision, and media identities, while the importing use case
-attaches it to the destination Kitchen created for that installation or sharing
-context.
+attaches it to the destination Kitchen. Fresh personal-sync stores converge on a
+deterministic personal Kitchen identity; future sharing supplies a different
+Kitchen context without changing the sample pack.
 
 Recipe media refers to logical asset names and semantic roles such as `hero`,
 `thumbnail`, and `gallery`. File encoding and pixel dimensions remain asset-

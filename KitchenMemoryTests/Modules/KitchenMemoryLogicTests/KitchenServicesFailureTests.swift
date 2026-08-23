@@ -9,6 +9,27 @@ import XCTest
 
 @MainActor
 final class KitchenServicesFailureTests: XCTestCase {
+  func testBootstrapUsesOneDeterministicPersonalKitchenIdentity() throws {
+    let repository = try makeRepository()
+    let service = KitchenBootstrapService(repository: repository)
+
+    let kitchen = try service.prepareInitialKitchen()
+
+    XCTAssertEqual(kitchen.id, KitchenBootstrapService.personalKitchenID)
+    XCTAssertEqual(try service.prepareInitialKitchen(), kitchen)
+  }
+
+  func testBootstrapPreservesALegacyKitchenUntilDevelopmentDataIsReset() throws {
+    let repository = try makeRepository()
+    let legacyKitchen = Kitchen(name: "Legacy Kitchen")
+    try repository.save(legacyKitchen)
+
+    XCTAssertEqual(
+      try KitchenBootstrapService(repository: repository).prepareInitialKitchen(),
+      legacyKitchen
+    )
+  }
+
   func testSampleFailureCannotPartiallyInstallIntoAKitchen() throws {
     let repository = try makeRepository()
     let kitchen = Kitchen(name: "Home")

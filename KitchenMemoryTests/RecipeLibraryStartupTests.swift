@@ -39,6 +39,22 @@ final class RecipeLibraryStartupTests: XCTestCase {
     XCTAssertEqual(preferences.response, .undecided)
   }
 
+  func testExternalChangeBeforeInitialLoadLeavesStartupOwnedByLoad() throws {
+    let preferences = VolatileSampleRecipeOnboardingStore()
+    let dependencies = try AppDependencies(
+      inMemory: true,
+      sampleOnboardingStore: preferences
+    )
+
+    dependencies.libraryModel.reloadAfterExternalStoreChange()
+
+    XCTAssertFalse(dependencies.libraryModel.hasLoaded)
+    XCTAssertEqual(dependencies.libraryModel.startupState, .loading)
+
+    dependencies.libraryModel.loadIfNeeded()
+    XCTAssertEqual(dependencies.libraryModel.startupState, .choosingSamples)
+  }
+
   func testDecliningPersistsTheChoiceAndRevealsTheEmptyLibrary() throws {
     let preferences = VolatileSampleRecipeOnboardingStore()
     let dependencies = try AppDependencies(

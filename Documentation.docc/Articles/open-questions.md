@@ -12,7 +12,7 @@ settle abstractly.
 
 ## Product
 
-- Which post-alpha release should introduce multi-person Kitchen sharing?
+- Which post-1.0 release should introduce multi-person Kitchen sharing?
 - Should an imported recipe be a private snapshot, a linked copy, or explicitly
   selectable between the two?
 - How prominent should source updates be after a user has edited an import?
