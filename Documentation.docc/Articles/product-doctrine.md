@@ -297,13 +297,15 @@ Horizons communicate dependency and focus, not dates or promises.
 - Recipe sections, ingredients, instructions, yield, and core metadata.
 - Lossless Schema.org JSON-LD URL import into reviewable drafts.
 - Local recipe library with folders and tags.
-- Recipe reading and basic cooking sessions with progress and notes.
-- A basic planned cook that retains recipe revision and desired yield.
+- Recipe reading and safe quantity scaling.
+- Private iCloud synchronization across one person's devices.
 - Domain, import, storage, and UI boundaries suitable for multiple Apple targets.
 
 ### Expansion
 
-- Kitchen sharing and synchronization.
+- Kitchen sharing and multi-person synchronization.
+- Basic cooking sessions with progress and notes.
+- A basic planned cook that retains recipe revision and desired yield.
 - Pantry items with multiple exact, fuzzy, presence, and uncertain holdings.
 - Ingredient readiness decisions, combined shopping, and weekly collections of
   planned cooks.

@@ -35,9 +35,11 @@ The implemented recipe foundation and remaining alpha loop are:
 1. Create and edit a recipe.
 2. Import a recipe from a webpage using Schema.org JSON-LD.
 3. Review the imported ingredient structure without losing the source text.
-4. Scale a recipe and cook from clear, sectioned instructions.
+4. Scale and read a recipe from clear, sectioned instructions.
+5. Keep the local-first recipe library synchronized across one person's devices.
 
-Pantry inventory, meal planning, and shopping follow after this slice is useful.
+Cooking sessions, pantry inventory, meal planning, shopping, and household
+sharing follow after this slice is useful.
 
 ## Documentation
 
@@ -91,9 +93,9 @@ xcodebuild test \
   -destination 'platform=macOS'
 ```
 
-CloudKit is the selected synchronization and collaboration platform; the
-precise shared-Kitchen integration will be selected after a focused
-collaboration prototype.
+CloudKit is the selected synchronization and collaboration platform. Slice 10
+will select and prove the initial private cross-device integration; the precise
+shared-Kitchen integration remains subject to a later collaboration prototype.
 
 ## License
 

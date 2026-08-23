@@ -140,17 +140,21 @@ rather than moving SwiftData records between actors. The repository enforces the
 Kitchen ownership boundary when saving and exposes Kitchen-scoped recipe lists
 already reconstructed as domain values.
 
-`KitchenMemorySchema.makeContainer()` uses SwiftData's standard permanent local
-store location, deliberately configured without CloudKit. Synchronization will
-be added behind this boundary after the collaboration prototype. In-memory
-containers remain available for previews and tests, and callers may provide an
-explicit URL for isolated tests or migration work.
+`KitchenMemorySchema.makeContainer()` currently uses SwiftData's standard
+permanent local store location and is deliberately configured without CloudKit.
+Slice 10 will replace that local-only production configuration with the selected
+private cross-device integration after a focused prototype, while keeping the
+choice behind this boundary. In-memory containers remain available for previews
+and tests, and callers may provide an explicit URL for isolated tests or
+migration work.
 
 The store begins at `KitchenMemorySchemaV1` under
 `KitchenMemoryMigrationPlan`. V1 remains intentionally mutable before the first
 release, with development stores deleted after incompatible changes. At first
-release V1 becomes immutable; every later schema change must add a new version
-and an explicit migration stage.
+release V1 becomes immutable; every later local schema change must add a new
+version and an explicit migration stage. The production CloudKit schema follows
+the corresponding additive rule: later features may introduce record types and
+fields but must not remove or redefine published elements.
 
 ## Localization resources
 

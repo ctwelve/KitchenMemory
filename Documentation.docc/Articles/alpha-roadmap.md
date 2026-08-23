@@ -17,9 +17,10 @@ criteria.
 
 ## Alpha definition
 
-Kitchen Memory reaches alpha when one household can locally save or import
-recipes faithfully, correct them without re-entry, scale usable quantities, and
-cook from the application without returning to the source webpage.
+Kitchen Memory reaches alpha when one person can save or import recipes
+faithfully, correct them without re-entry, scale usable quantities, read them
+without returning to the source webpage, and find the same library on their
+supported Apple devices.
 
 The alpha validates the recipe loop:
 
@@ -30,13 +31,16 @@ Manual entry or webpage URL
             ↓
        Saved recipe revision
             ↓
-         Scale and cook
+        Scale and read
             ↓
-  Cooking-session record of reality
+ Private iCloud synchronization
 ```
 
-The app remains local first throughout this work. Each slice preserves original
-source text and keeps canonical recipe editing distinct from a cooking session.
+The app remains local first throughout this work: the local store remains usable
+without a network connection, and iCloud moves durable changes between devices
+rather than becoming the only copy. Each slice preserves original source text.
+Cooking-session state remains distinct from canonical recipe editing, but that
+workflow is deferred to the 0.2 feature release.
 
 ## Completed slices
 
@@ -154,38 +158,73 @@ pack migration without turning an onboarding response into permanent authority.
 Because V1 has no external users, the schema was updated in place and development
 stores were reset instead of manufacturing a migration.
 
-### Slice 10 — Cooking sessions
+### Slice 10 — iCloud synchronization foundation
 
-Support real cooking without silently changing the maintained recipe.
+Make the existing recipe library available across one person's devices without
+leaking CloudKit concepts into the domain or Logic layers.
 
-- Start and resume a session for a specific recipe revision and working scale.
-- Provide full-recipe and step-by-step cooking presentations.
-- Persist ingredient and step checkoffs.
-- Record quick notes, skips, substitutions, and other deviations.
-- Finish or abandon a session while retaining its history and recipe-revision
-  reference.
+- Choose and document the initial private-database integration after a focused
+  prototype of SwiftData-managed synchronization and its recovery behavior.
+- Make the current persistence records compatible with the chosen CloudKit
+  integration before promoting any production schema.
+- Preserve application-owned Kitchen, recipe, revision, child-row, and media
+  identifiers across devices.
+- Synchronize the complete recipe graph, including immutable revision history,
+  source evidence, authored-language metadata, and sample-recipe identities.
+- Keep local reads and writes useful while offline, and surface account, setup,
+  import, and export failures without presenting speculative success.
+- Define deterministic convergence for concurrent edits, deletion, sample-pack
+  installation, and recovery after interrupted synchronization.
+- Exercise the development schema on multiple devices and document the explicit
+  production-promotion checklist.
+- Establish the post-release rule that SwiftData schemas are versioned and the
+  production CloudKit schema evolves additively. Published record types and
+  fields are never repurposed to mean something else.
 
-**Complete when:** a cook can prepare a recipe entirely from the app, return
-later to a session, and see what happened without altering the canonical recipe.
+Household invitations, shared-database permissions, and live collaboration do
+not belong to this foundation. The repository and synchronization boundaries
+must leave room for them without pretending private cross-device sync proves
+their behavior.
+
+**Complete when:** a recipe created or revised on one supported device appears
+intact on another device signed into the same iCloud account; offline changes
+remain locally usable and converge after reconnection; failures are observable
+and recoverable; and the production schema can be promoted from a documented,
+repeatable process.
 
 ### Slice 11 — Alpha hardening
 
-Prove that the completed loop is dependable enough for household use.
+Prove that the completed loop is dependable enough for personal use.
 
-- Reach complete business-logic coverage, including migration, error, recovery,
-  and source-preservation behavior.
+- Maintain complete business-logic coverage, including local migration, sync
+  error and recovery, conflict, and source-preservation behavior.
 - Expand importer fixtures and framework regression tests while keeping
   UI automation to application-shell smoke tests.
 - Verify localization completeness and representative longer-text layouts for
   every release locale.
 - Audit the stable, finished workflows for accessibility on supported Apple
   platforms.
-- Validate macOS and iOS builds and document local backup/export expectations.
+- Validate macOS and iOS builds and document iCloud, local backup, and export
+  expectations.
 - Run an alpha acceptance set of roughly twenty varied real recipes.
 
 **Complete when:** all acceptance recipes import or enter successfully, retain
-their meaningful content after relaunch, scale safely where supported, and can be
-cooked through in the application.
+their meaningful content after relaunch, scale safely where supported, and
+survive the documented cross-device, offline, conflict, and recovery exercises.
+
+## 0.2 feature release — Cooking sessions
+
+Cooking sessions become the first post-alpha feature slice. This release will
+support starting and resuming a session for a specific recipe revision and
+working scale, lightweight ingredient and step progress, notes and deviations,
+and an explicit finish or abandon action without mutating the maintained recipe.
+
+The current domain and persistence model do not implement this aggregate. Before
+0.2 persistence work begins, resolve the session's revision-reference or
+snapshot policy, ownership and sharing behavior, progress granularity, and
+deviation targets. Then add an immutable SwiftData schema version and additive
+CloudKit record types and fields. Because sessions are a new aggregate, existing
+recipe records should not require a content rewrite merely to accommodate them.
 
 ## Sequence and boundaries
 
@@ -196,11 +235,13 @@ Structured editing
       → Scaling and reading
         → Cleanup and refactor
           → Internationalization foundation
-            → Cooking sessions
+            → iCloud synchronization foundation
               → Alpha hardening
+                → 0.2 cooking sessions
 ```
 
-Pantry holdings, shopping lists, planned cooks, meal planning, synchronization,
-OCR, and social features are intentionally outside the alpha. The domain seams
-for them remain important, but they should not delay validation of the complete
-recipe import, correction, scaling, and cooking loop.
+Pantry holdings, shopping lists, planned cooks, cooking sessions, meal planning,
+household sharing, OCR, and social features are intentionally outside the alpha.
+The domain seams for them remain important, but they should not delay validation
+of the complete recipe import, correction, scaling, reading, and private
+cross-device synchronization loop.
