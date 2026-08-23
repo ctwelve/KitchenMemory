@@ -9,11 +9,12 @@ SPDX-License-Identifier: GPL-3.0-only
 - Status: Implemented foundation
 - Date: 2026-08-22
 
-Kitchen Memory's first localization set is English, Canadian French
-(`fr-CA`), and Mexican Spanish (`es-MX`). English is the development language;
-the regional identifiers are intentional because recipe vocabulary, measurements,
-and ordinary kitchen language vary by market. German, Italian, and additional
-locales may follow without changing the architectural boundary.
+Kitchen Memory's first localization set is American English (`en-US`), Canadian
+French (`fr-CA`), and Mexican Spanish (`es-MX`). American English is the
+development language and universal fallback. The regional identifiers are
+intentional because recipe vocabulary, measurements, and ordinary kitchen
+language vary by market. German, Italian, and additional locales may follow
+without changing the architectural boundary.
 
 Internationalization has two distinct resource problems:
 
@@ -27,10 +28,34 @@ table of sentence fragments.
 
 Application-shell labels, actions, settings, validation messages, and formatted
 counts belong in String Catalogs owned by the `KitchenMemory` application target.
-The catalogs carry translator comments and the plural variants required by each
-supported locale. Views and presentation adapters request localized values;
-`KitchenMemoryDomain`, `KitchenMemoryImport`, `KitchenMemoryPersistence`, and
-`KitchenMemoryLogic` do not look up interface strings.
+The catalogs carry the plural variants required by each supported locale. As
+interface copy stabilizes, ambiguous terms, placeholders, tone, and screen
+context receive translator comments at their extraction sites. Views and
+presentation adapters request localized values; `KitchenMemoryDomain`,
+`KitchenMemoryImport`, `KitchenMemoryPersistence`, and `KitchenMemoryLogic` do
+not look up interface strings.
+
+### Localization-key lifecycle
+
+Readable `en-US` source strings are the current development key and fallback.
+That is a deliberate velocity tradeoff: it is acceptable during development and
+acceptable to ship to production while the interface is still changing. It is
+not the intended permanent representation of stable interface copy.
+
+Once an interface area is considered stable, its catalog entries graduate to
+semantic localization identifiers such as `recipe.editor.save-revision`. The
+catalog then provides an explicit `en-US` value alongside every other supported
+localization, and the English sentence is no longer embedded in application code
+or used as the durable key. Each graduated entry carries enough translator
+context to explain its screen, purpose, tone, placeholders, plural operands, and
+accessibility role where those details are not already obvious.
+
+This graduation happens area by area rather than as a flag-day rewrite. A stable
+area is complete when its user-visible literals have semantic keys, explicit
+`en-US` values, translator context, and locale-specific plural or formatting
+tests where applicable. Sentence fragments are not introduced merely to reuse a
+key, and source-authored recipe wording remains outside this interface-copy
+abstraction.
 
 This boundary is now enforced. The former English-oriented `renderedText`,
 `structuredDisplayText`, and `effectiveDisplayText` domain helpers are gone.
@@ -51,6 +76,11 @@ Numbers, dates, durations, temperatures, and measurements are formatted for
 an explicit locale at the presentation boundary. A formatted value is never
 parsed back into a domain value, and changing locale never changes stored
 rational quantities or source-faithful ingredient text.
+
+The standard macOS About panel is the intentional resource-level exception.
+AppKit reads `Credits.rtf` as formatted bundle content, so the complete document
+has `en-US`, `fr-CA`, and `es-MX` resource variants rather than flattening its
+formatting and links into String Catalog entries.
 
 ## Bundled recipe packs
 

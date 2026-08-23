@@ -15,7 +15,7 @@ final class SampleRecipeCatalogTests: XCTestCase {
         XCTAssertEqual(manifest.name, "Kitchen Memory Samples")
         XCTAssertEqual(manifest.formatVersion, 2)
         XCTAssertEqual(
-            manifest.recipes.compactMap { $0.variant(preferredLanguages: ["en"])?.dataAssetName },
+            manifest.recipes.compactMap { $0.variant(preferredLanguages: ["en-US"])?.dataAssetName },
             ["TunaNoodleHotdishRecipe", "DirtyFriedRiceRecipe"]
         )
     }
@@ -60,7 +60,7 @@ final class SampleRecipeCatalogTests: XCTestCase {
             }
         )
         let document = try SampleRecipeCatalog.loadRecipe(
-            try XCTUnwrap(reference.variant(preferredLanguages: ["en"]))
+            try XCTUnwrap(reference.variant(preferredLanguages: ["en-US"]))
         )
         let destinationKitchenID = Kitchen.ID()
         let materialization = try document.materialize(in: destinationKitchenID)
@@ -102,14 +102,14 @@ final class SampleRecipeCatalogTests: XCTestCase {
             "A same-language variant should win before a later exact preference."
         )
         XCTAssertEqual(reference.variant(preferredLanguages: ["es-MX"])?.localeIdentifier, "es-MX")
-        XCTAssertEqual(reference.variant(preferredLanguages: ["de-DE"])?.localeIdentifier, "en")
-        XCTAssertEqual(reference.variant(preferredLanguages: [])?.localeIdentifier, "en")
+        XCTAssertEqual(reference.variant(preferredLanguages: ["de-DE"])?.localeIdentifier, "en-US")
+        XCTAssertEqual(reference.variant(preferredLanguages: [])?.localeIdentifier, "en-US")
     }
 
     func testLocalizedSamplesCarryMatchingAuthoredLanguageAndDistinctIdentity() throws {
         let manifest = try SampleRecipeCatalog.loadManifest()
 
-        for localeIdentifier in ["en", "fr-CA", "es-MX"] {
+        for localeIdentifier in ["en-US", "fr-CA", "es-MX"] {
             let references = try SampleRecipeCatalog.localizedRecipes(
                 in: manifest,
                 preferredLanguages: [localeIdentifier]
