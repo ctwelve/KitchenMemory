@@ -68,14 +68,21 @@ struct AppDependencies {
 
   init(
     inMemory: Bool = false,
-    sampleConsentStore: (any SampleRecipeConsentStoring)? = nil,
+    sampleOnboardingStore: (any SampleRecipeOnboardingStoring)? = nil,
     sampleProvider: (any SampleRecipeProviding)? = nil
   ) throws {
     let modelContainer = try KitchenMemorySchema.makeContainer(inMemory: inMemory)
     let repository = SwiftDataRecipeRepository(modelContainer: modelContainer)
     let samples = sampleProvider ?? BundledSampleRecipeProvider()
     let kitchen = try KitchenBootstrapService(repository: repository).prepareInitialKitchen()
-    let consentStore = sampleConsentStore ?? Self.defaultConsentStore(inMemory: inMemory)
+    let onboardingStore = sampleOnboardingStore ?? Self.defaultOnboardingStore(inMemory: inMemory)
+    let sampleInstaller = SampleRecipeInstallService(repository: repository, samples: samples)
+
+    // Disposable previews and UI smoke tests request a ready-made fixture.
+    // Durable launches never infer installation permission from this path.
+    if inMemory, sampleOnboardingStore == nil {
+      try sampleInstaller.install(in: kitchen.id)
+    }
 
     self.modelContainer = modelContainer
     libraryModel = RecipeLibraryModel(
@@ -84,8 +91,8 @@ struct AppDependencies {
       editor: RecipeEditor(repository: repository),
       importer: RecipeImportService(),
       resetService: KitchenResetService(repository: repository, samples: samples),
-      sampleInstaller: SampleRecipeInstallService(repository: repository, samples: samples),
-      sampleConsentStore: consentStore
+      sampleInstaller: sampleInstaller,
+      sampleOnboardingStore: onboardingStore
     )
   }
 
@@ -101,11 +108,11 @@ struct AppDependencies {
     try KitchenBootstrapService(repository: repository).prepareInitialKitchen()
   }
 
-  private static func defaultConsentStore(
+  private static func defaultOnboardingStore(
     inMemory: Bool
-  ) -> any SampleRecipeConsentStoring {
+  ) -> any SampleRecipeOnboardingStoring {
     inMemory
-      ? VolatileSampleRecipeConsentStore(consent: .accepted)
-      : UserDefaultsSampleRecipeConsentStore()
+      ? VolatileSampleRecipeOnboardingStore(response: .accepted)
+      : UserDefaultsSampleRecipeOnboardingStore()
   }
 }

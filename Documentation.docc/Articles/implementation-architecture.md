@@ -72,7 +72,7 @@ KitchenMemoryApp
     ├── BundledSampleRecipeProvider
     ├── KitchenBootstrapService
     ├── SampleRecipeInstallService
-    ├── SampleRecipeConsentStoring
+    ├── SampleRecipeOnboardingStoring
     └── RecipeLibraryModel
         ├── RecipeLibrary
         ├── RecipeEditor
@@ -82,16 +82,16 @@ KitchenMemoryApp
 
 `AppDependencies` is the composition root. It creates the concrete SwiftData
 repository and asset-backed sample provider, asks the bootstrap service for the
-initial empty Kitchen, selects the durable or disposable consent store, and
+initial empty Kitchen, selects the durable or disposable onboarding store, and
 injects the resulting collaborators into
 `RecipeLibraryModel`. Concrete construction stays here so neither the views nor
 the reusable frameworks need to locate their own dependencies.
 
 `RecipeLibraryModel` is the principal application glue. It owns the UI-facing
 state for one Kitchen: the loaded recipe list, current selection, load state,
-sample-consent state, startup phase, and typed presentation issue. Every
-library-wide read or mutation passes through it. The model delegates validation
-and durable operations to
+sample-onboarding and live pack-presence states, startup phase, and typed
+presentation issue. Every library-wide read or mutation passes through it. The
+model delegates validation and durable operations to
 `KitchenMemoryLogic`, then applies the small amount of presentation coordination
 that follows a successful operation, such as reloading the list while preserving
 or changing the selection. Its main-actor isolation and observation belong to
@@ -99,16 +99,19 @@ the app boundary; recipe rules do not.
 
 `BundledSampleRecipeProvider` adapts the application asset catalog to
 `SampleRecipeProviding`. `SampleRecipeInstallService` adds only recipe UUIDs
-that are not already present, while `KitchenResetService` deliberately replaces
-the Kitchen after explicit destructive confirmation. Bootstrap itself creates
-an empty Kitchen and never interprets emptiness as consent. A future background-
-asset provider can replace the bundled adapter without changing these use cases.
+that are not already present and derives none/partial/complete presence from
+the current localized pack's stable identities. `KitchenResetService`
+deliberately replaces the Kitchen after explicit destructive confirmation.
+Bootstrap itself creates an empty Kitchen and never interprets emptiness as
+permission. A future background-asset provider can replace the bundled adapter
+without changing these use cases.
 
-`SampleRecipeConsentStoring` persists `undecided`, `accepted`, or `declined`
-outside recipe storage. This decision survives independently of sample-pack
-format and availability. The in-app startup gate moves through loading, sample
-choice, and library states; the operating-system launch screen remains static
-and does not perform product work.
+`SampleRecipeOnboardingStoring` persists `undecided`, `accepted`, or `declined`
+outside recipe storage to prevent repeating the onboarding question. It is not
+standing authority to reinsert a deleted recipe: current presence comes from
+the repository, and repair requires an explicit Settings action. The in-app
+startup gate moves through loading, sample choice, and library states; the
+operating-system launch screen remains static and does not perform product work.
 
 Views own transient presentation and bind directly to pure workflow values such
 as `RecipeEditSession`, `RecipeImportSession`, and `RecipeScalingState`. They ask

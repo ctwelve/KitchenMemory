@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "en-US",
   "strings" : {
+    "/" : {
+      "shouldTranslate" : false
+    },
     "%@ (base: %@)" : {
       "localizations" : {
         "es-MX" : {
@@ -313,8 +316,21 @@
         }
       }
     },
-    "/" : {
-      "shouldTranslate" : false
+    "about %@" : {
+      "localizations" : {
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "aproximadamente %@"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "environ %@"
+          }
+        }
+      }
     },
     "About %@" : {
       "localizations" : {
@@ -380,6 +396,54 @@
         }
       }
     },
+    "Add package size" : {
+      "localizations" : {
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agregar tamaño del paquete"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter le format de l’emballage"
+          }
+        }
+      }
+    },
+    "Add Sample Recipes" : {
+      "localizations" : {
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agregar recetas de ejemplo"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter les recettes d’exemple"
+          }
+        }
+      }
+    },
+    "Add Sample Recipes?" : {
+      "localizations" : {
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Agregar recetas de ejemplo?"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter des recettes d’exemple?"
+          }
+        }
+      }
+    },
     "Add Step" : {
       "localizations" : {
         "es-MX" : {
@@ -396,18 +460,34 @@
         }
       }
     },
-    "Add package size" : {
+    "All recipes, edits, revision history, imported source captures, and recipe metadata in this Kitchen will be permanently deleted. Kitchen Memory will restore only the sample recipes included with this version. This cannot be undone." : {
       "localizations" : {
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Agregar tamaño del paquete"
+            "value" : "Se eliminarán permanentemente todas las recetas, ediciones, historiales de revisión, capturas de origen importadas y metadatos de recetas de esta cocina. Kitchen Memory restaurará únicamente las recetas de muestra incluidas en esta versión. Esta acción no se puede deshacer."
           }
         },
         "fr-CA" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ajouter le format de l’emballage"
+            "value" : "Toutes les recettes, modifications, historiques de révision, captures de sources importées et métadonnées de recettes de cette cuisine seront supprimés définitivement. Kitchen Memory restaurera uniquement les exemples de recettes inclus dans cette version. Cette action est irréversible."
+          }
+        }
+      }
+    },
+    "All sample recipes are installed." : {
+      "localizations" : {
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todas las recetas de ejemplo están instaladas."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toutes les recettes d’exemple sont installées."
           }
         }
       }
@@ -510,8 +590,18 @@
     },
     "Check the imported wording and structure before saving. Review and save do not contact the source again. Saving keeps the final source URL and bounded JSON-LD metadata locally, including fields not shown here." : {
       "localizations" : {
-        "es-MX" : {"stringUnit":{"state":"translated","value":"Revisa el texto y la estructura importados antes de guardar. La revisión y el guardado no vuelven a contactar el origen. Al guardar se conservan localmente la URL final y los metadatos JSON-LD limitados, incluso los campos que no se muestran aquí."}},
-        "fr-CA" : {"stringUnit":{"state":"translated","value":"Vérifiez le libellé et la structure importés avant d’enregistrer. La révision et l’enregistrement ne contactent pas de nouveau la source. L’enregistrement conserve localement l’URL finale et les métadonnées JSON-LD limitées, y compris les champs non affichés ici."}}
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Revisa el texto y la estructura importados antes de guardar. La revisión y el guardado no vuelven a contactar el origen. Al guardar se conservan localmente la URL final y los metadatos JSON-LD limitados, incluso los campos que no se muestran aquí."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vérifiez le libellé et la structure importés avant d’enregistrer. La révision et l’enregistrement ne contactent pas de nouveau la source. L’enregistrement conserve localement l’URL finale et les métadonnées JSON-LD limitées, y compris les champs non affichés ici."
+          }
+        }
       }
     },
     "Check this amount manually when changing the yield." : {
@@ -530,22 +620,6 @@
         }
       }
     },
-    "Choose Recipe" : {
-      "localizations" : {
-        "es-MX" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Elegir receta"
-          }
-        },
-        "fr-CA" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Choisir une recette"
-          }
-        }
-      }
-    },
     "Choose a recipe to read its ingredients and instructions." : {
       "localizations" : {
         "es-MX" : {
@@ -558,6 +632,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Choisissez une recette pour lire ses ingrédients et ses instructions."
+          }
+        }
+      }
+    },
+    "Choose Recipe" : {
+      "localizations" : {
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elegir receta"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisir une recette"
           }
         }
       }
@@ -596,8 +686,18 @@
     },
     "Cook" : {
       "localizations" : {
-        "es-MX" : {"stringUnit":{"state":"translated","value":"Cocción"}},
-        "fr-CA" : {"stringUnit":{"state":"translated","value":"Cuisson"}}
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cocción"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuisson"
+          }
+        }
       }
     },
     "Could not scale this amount safely; left unchanged." : {
@@ -778,8 +878,18 @@
     },
     "Duration %@." : {
       "localizations" : {
-        "es-MX" : {"stringUnit":{"state":"translated","value":"Duración: %@."}},
-        "fr-CA" : {"stringUnit":{"state":"translated","value":"Durée : %@."}}
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duración: %@."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Durée : %@."
+          }
+        }
       }
     },
     "Edit" : {
@@ -798,22 +908,6 @@
         }
       }
     },
-    "Edit Recipe" : {
-      "localizations" : {
-        "es-MX" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Editar receta"
-          }
-        },
-        "fr-CA" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Modifier la recette"
-          }
-        }
-      }
-    },
     "Edit precise quantity…" : {
       "localizations" : {
         "es-MX" : {
@@ -826,6 +920,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Modifier la quantité précise…"
+          }
+        }
+      }
+    },
+    "Edit Recipe" : {
+      "localizations" : {
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editar receta"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier la recette"
           }
         }
       }
@@ -942,22 +1052,6 @@
         }
       }
     },
-    "Fetch Recipe" : {
-      "localizations" : {
-        "es-MX" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Obtener receta"
-          }
-        },
-        "fr-CA" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Télécharger la recette"
-          }
-        }
-      }
-    },
     "Fetch recipe" : {
       "localizations" : {
         "es-MX" : {
@@ -974,7 +1068,23 @@
         }
       }
     },
-    "Fetching Recipe" : {
+    "Fetch Recipe" : {
+      "localizations" : {
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obtener receta"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Télécharger la recette"
+          }
+        }
+      }
+    },
+    "Fetching recipe" : {
       "localizations" : {
         "es-MX" : {
           "stringUnit" : {
@@ -990,7 +1100,7 @@
         }
       }
     },
-    "Fetching recipe" : {
+    "Fetching Recipe" : {
       "localizations" : {
         "es-MX" : {
           "stringUnit" : {
@@ -1070,10 +1180,39 @@
         }
       }
     },
+    "https://example.com/recipe" : {
+      "shouldTranslate" : false
+    },
     "If you save a recipe, Kitchen Memory keeps the final source URL and one bounded JSON-LD recipe-metadata block locally, including source fields not shown in the review editor." : {
       "localizations" : {
-        "es-MX" : {"stringUnit":{"state":"translated","value":"Si guardas una receta, Kitchen Memory conserva localmente la URL final de origen y un bloque limitado de metadatos JSON-LD de la receta, incluso los campos de origen que no se muestran en el editor de revisión."}},
-        "fr-CA" : {"stringUnit":{"state":"translated","value":"Si vous enregistrez une recette, Kitchen Memory conserve localement l’URL source finale et un bloc limité de métadonnées JSON-LD de la recette, y compris les champs sources non affichés dans l’éditeur de révision."}}
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si guardas una receta, Kitchen Memory conserva localmente la URL final de origen y un bloque limitado de metadatos JSON-LD de la receta, incluso los campos de origen que no se muestran en el editor de revisión."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si vous enregistrez une recette, Kitchen Memory conserve localement l’URL source finale et un bloc limité de métadonnées JSON-LD de la recette, y compris les champs sources non affichés dans l’éditeur de révision."
+          }
+        }
+      }
+    },
+    "Import is ready for your review" : {
+      "localizations" : {
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La importación está lista para revisarse"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L’importation est prête à être révisée"
+          }
+        }
       }
     },
     "Import Recipe" : {
@@ -1104,22 +1243,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Révision de l’importation"
-          }
-        }
-      }
-    },
-    "Import is ready for your review" : {
-      "localizations" : {
-        "es-MX" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La importación está lista para revisarse"
-          }
-        },
-        "fr-CA" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "L’importation est prête à être révisée"
           }
         }
       }
@@ -1220,6 +1343,42 @@
         }
       }
     },
+    "Install Missing Sample Recipes" : {
+      "localizations" : {
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Instalar las recetas de ejemplo que faltan"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Installer les recettes d’exemple manquantes"
+          }
+        }
+      }
+    },
+    "Install Sample Recipes" : {
+      "comment" : "A button to install sample recipes.",
+      "isCommentAutoGenerated" : true
+    },
+    "Installation checks stable recipe identities and adds only missing samples." : {
+      "localizations" : {
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La instalación comprueba las identidades estables de las recetas y agrega únicamente los ejemplos que faltan."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L’installation vérifie les identifiants stables des recettes et ajoute seulement les exemples manquants."
+          }
+        }
+      }
+    },
     "Instructions" : {
       "localizations" : {
         "es-MX" : {
@@ -1280,6 +1439,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Données de la cuisine"
+          }
+        }
+      }
+    },
+    "Kitchen Memory could not add the sample recipes. Your existing recipes were not changed." : {
+      "localizations" : {
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kitchen Memory no pudo agregar las recetas de ejemplo. Tus recetas existentes no se modificaron."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kitchen Memory n’a pas pu ajouter les recettes d’exemple. Vos recettes existantes n’ont pas été modifiées."
           }
         }
       }
@@ -1350,8 +1525,34 @@
     },
     "Kitchen Memory follows redirects and downloads the resulting HTML with an ephemeral request that supplies no cookies or app credentials. It runs no page scripts and downloads no images during review." : {
       "localizations" : {
-        "es-MX" : {"stringUnit":{"state":"translated","value":"Kitchen Memory sigue las redirecciones y descarga el HTML resultante mediante una solicitud efímera que no proporciona cookies ni credenciales de la app. No ejecuta scripts de la página ni descarga imágenes durante la revisión."}},
-        "fr-CA" : {"stringUnit":{"state":"translated","value":"Kitchen Memory suit les redirections et télécharge le HTML résultant au moyen d’une requête éphémère qui ne fournit aucun témoin ni identifiant de l’app. Aucun script de page n’est exécuté et aucune image n’est téléchargée pendant la révision."}}
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kitchen Memory sigue las redirecciones y descarga el HTML resultante mediante una solicitud efímera que no proporciona cookies ni credenciales de la app. No ejecuta scripts de la página ni descarga imágenes durante la revisión."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kitchen Memory suit les redirections et télécharge le HTML résultant au moyen d’une requête éphémère qui ne fournit aucun témoin ni identifiant de l’app. Aucun script de page n’est exécuté et aucune image n’est téléchargée pendant la révision."
+          }
+        }
+      }
+    },
+    "Kitchen Memory includes a small collection of sample recipes. Add them to your recipe library?" : {
+      "localizations" : {
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kitchen Memory incluye una pequeña colección de recetas de ejemplo. ¿Quieres agregarlas a tu recetario?"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kitchen Memory comprend une petite collection de recettes d’exemple. Voulez-vous les ajouter à votre bibliothèque de recettes?"
+          }
+        }
       }
     },
     "Linear" : {
@@ -1482,38 +1683,6 @@
         }
       }
     },
-    "No Recipes" : {
-      "localizations" : {
-        "es-MX" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No hay recetas"
-          }
-        },
-        "fr-CA" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aucune recette"
-          }
-        }
-      }
-    },
-    "No Schema.org recipe was found on this page." : {
-      "localizations" : {
-        "es-MX" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No se encontró una receta de Schema.org en esta página."
-          }
-        },
-        "fr-CA" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aucune recette Schema.org n’a été trouvée sur cette page."
-          }
-        }
-      }
-    },
     "No ingredients were found" : {
       "localizations" : {
         "es-MX" : {
@@ -1562,6 +1731,54 @@
         }
       }
     },
+    "No Recipes" : {
+      "localizations" : {
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay recetas"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune recette"
+          }
+        }
+      }
+    },
+    "No sample recipes are installed." : {
+      "localizations" : {
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay recetas de ejemplo instaladas."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune recette d’exemple n’est installée."
+          }
+        }
+      }
+    },
+    "No Schema.org recipe was found on this page." : {
+      "localizations" : {
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se encontró una receta de Schema.org en esta página."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune recette Schema.org n’a été trouvée sur cette page."
+          }
+        }
+      }
+    },
     "None" : {
       "localizations" : {
         "es-MX" : {
@@ -1574,6 +1791,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aucune"
+          }
+        }
+      }
+    },
+    "Not Now" : {
+      "localizations" : {
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ahora no"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pas maintenant"
           }
         }
       }
@@ -1612,8 +1845,18 @@
     },
     "Open Source" : {
       "localizations" : {
-        "es-MX" : {"stringUnit":{"state":"translated","value":"Abrir origen"}},
-        "fr-CA" : {"stringUnit":{"state":"translated","value":"Ouvrir la source"}}
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir origen"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir la source"
+          }
+        }
       }
     },
     "Original" : {
@@ -1698,8 +1941,34 @@
     },
     "Prep" : {
       "localizations" : {
-        "es-MX" : {"stringUnit":{"state":"translated","value":"Preparación"}},
-        "fr-CA" : {"stringUnit":{"state":"translated","value":"Préparation"}}
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preparación"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Préparation"
+          }
+        }
+      }
+    },
+    "Preparing Your Kitchen…" : {
+      "localizations" : {
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preparando tu cocina…"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Préparation de votre cuisine…"
+          }
+        }
       }
     },
     "Preserved metadata — %@" : {
@@ -1768,8 +2037,18 @@
     },
     "Recipe image" : {
       "localizations" : {
-        "es-MX" : {"stringUnit":{"state":"translated","value":"Imagen de la receta"}},
-        "fr-CA" : {"stringUnit":{"state":"translated","value":"Image de la recette"}}
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imagen de la receta"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Image de la recette"
+          }
+        }
       }
     },
     "Recipe library" : {
@@ -1836,22 +2115,6 @@
         }
       }
     },
-    "Recipes Unavailable" : {
-      "localizations" : {
-        "es-MX" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Recetas no disponibles"
-          }
-        },
-        "fr-CA" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Recettes indisponibles"
-          }
-        }
-      }
-    },
     "Recipes saved to this Kitchen will appear here." : {
       "localizations" : {
         "es-MX" : {
@@ -1864,6 +2127,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Les recettes enregistrées dans cette cuisine apparaîtront ici."
+          }
+        }
+      }
+    },
+    "Recipes Unavailable" : {
+      "localizations" : {
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recetas no disponibles"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recettes indisponibles"
           }
         }
       }
@@ -1898,12 +2177,6 @@
             "value" : "Réinitialiser"
           }
         }
-      }
-    },
-    "All recipes, edits, revision history, imported source captures, and recipe metadata in this Kitchen will be permanently deleted. Kitchen Memory will restore only the sample recipes included with this version. This cannot be undone." : {
-      "localizations" : {
-        "es-MX" : {"stringUnit":{"state":"translated","value":"Se eliminarán permanentemente todas las recetas, ediciones, historiales de revisión, capturas de origen importadas y metadatos de recetas de esta cocina. Kitchen Memory restaurará únicamente las recetas de muestra incluidas en esta versión. Esta acción no se puede deshacer."}},
-        "fr-CA" : {"stringUnit":{"state":"translated","value":"Toutes les recettes, modifications, historiques de révision, captures de sources importées et métadonnées de recettes de cette cuisine seront supprimés définitivement. Kitchen Memory restaurera uniquement les exemples de recettes inclus dans cette version. Cette action est irréversible."}}
       }
     },
     "Reset Kitchen" : {
@@ -1972,8 +2245,18 @@
     },
     "Restore this Kitchen to the sample recipes included with the current version of Kitchen Memory." : {
       "localizations" : {
-        "es-MX" : {"stringUnit":{"state":"translated","value":"Restaura esta cocina con las recetas de muestra incluidas en la versión actual de Kitchen Memory."}},
-        "fr-CA" : {"stringUnit":{"state":"translated","value":"Restaurez cette cuisine avec les exemples de recettes inclus dans la version actuelle de Kitchen Memory."}}
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restaura esta cocina con las recetas de muestra incluidas en la versión actual de Kitchen Memory."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restaurez cette cuisine avec les exemples de recettes inclus dans la version actuelle de Kitchen Memory."
+          }
+        }
       }
     },
     "Review Import" : {
@@ -2004,6 +2287,54 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Révisez cette recette avant de l’enregistrer"
+          }
+        }
+      }
+    },
+    "Sample recipe status is unavailable." : {
+      "localizations" : {
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El estado de las recetas de ejemplo no está disponible."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L’état des recettes d’exemple n’est pas disponible."
+          }
+        }
+      }
+    },
+    "Sample Recipes" : {
+      "localizations" : {
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recetas de ejemplo"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recettes d’exemple"
+          }
+        }
+      }
+    },
+    "Sample Recipes Installed" : {
+      "localizations" : {
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recetas de ejemplo instaladas"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recettes d’exemple installées"
           }
         }
       }
@@ -2088,6 +2419,22 @@
         }
       }
     },
+    "Some sample recipes are missing." : {
+      "localizations" : {
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Faltan algunas recetas de ejemplo."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Certaines recettes d’exemple sont manquantes."
+          }
+        }
+      }
+    },
     "Source" : {
       "localizations" : {
         "es-MX" : {
@@ -2106,8 +2453,18 @@
     },
     "Step %lld." : {
       "localizations" : {
-        "es-MX" : {"stringUnit":{"state":"translated","value":"Paso %lld."}},
-        "fr-CA" : {"stringUnit":{"state":"translated","value":"Étape %lld."}}
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paso %lld."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Étape %lld."
+          }
+        }
       }
     },
     "Structured" : {
@@ -2240,8 +2597,18 @@
     },
     "Total" : {
       "localizations" : {
-        "es-MX" : {"stringUnit":{"state":"translated","value":"Total"}},
-        "fr-CA" : {"stringUnit":{"state":"translated","value":"Total"}}
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total"
+          }
+        }
       }
     },
     "Try Again" : {
@@ -2262,8 +2629,18 @@
     },
     "Untitled recipe" : {
       "localizations" : {
-        "es-MX" : {"stringUnit":{"state":"translated","value":"Receta sin título"}},
-        "fr-CA" : {"stringUnit":{"state":"translated","value":"Recette sans titre"}}
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Receta sin título"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recette sans titre"
+          }
+        }
       }
     },
     "Upper estimate: %@" : {
@@ -2394,166 +2771,6 @@
         }
       }
     },
-    "about %@" : {
-      "localizations" : {
-        "es-MX" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "aproximadamente %@"
-          }
-        },
-        "fr-CA" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "environ %@"
-          }
-        }
-      }
-    },
-    "Add Sample Recipes" : {
-      "localizations" : {
-        "es-MX" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Agregar recetas de ejemplo"
-          }
-        },
-        "fr-CA" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ajouter les recettes d’exemple"
-          }
-        }
-      }
-    },
-    "Add Sample Recipes?" : {
-      "localizations" : {
-        "es-MX" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "¿Agregar recetas de ejemplo?"
-          }
-        },
-        "fr-CA" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ajouter des recettes d’exemple?"
-          }
-        }
-      }
-    },
-    "Add the sample recipes included with this version of Kitchen Memory." : {
-      "localizations" : {
-        "es-MX" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Agrega las recetas de ejemplo incluidas con esta versión de Kitchen Memory."
-          }
-        },
-        "fr-CA" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ajoutez les recettes d’exemple incluses avec cette version de Kitchen Memory."
-          }
-        }
-      }
-    },
-    "Kitchen Memory could not add the sample recipes. Your existing recipes were not changed." : {
-      "localizations" : {
-        "es-MX" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kitchen Memory no pudo agregar las recetas de ejemplo. Tus recetas existentes no se modificaron."
-          }
-        },
-        "fr-CA" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kitchen Memory n’a pas pu ajouter les recettes d’exemple. Vos recettes existantes n’ont pas été modifiées."
-          }
-        }
-      }
-    },
-    "Kitchen Memory includes a small collection of sample recipes. Add them to your recipe library?" : {
-      "localizations" : {
-        "es-MX" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kitchen Memory incluye una pequeña colección de recetas de ejemplo. ¿Quieres agregarlas a tu recetario?"
-          }
-        },
-        "fr-CA" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kitchen Memory comprend une petite collection de recettes d’exemple. Voulez-vous les ajouter à votre bibliothèque de recettes?"
-          }
-        }
-      }
-    },
-    "Not Now" : {
-      "localizations" : {
-        "es-MX" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ahora no"
-          }
-        },
-        "fr-CA" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pas maintenant"
-          }
-        }
-      }
-    },
-    "Preparing Your Kitchen…" : {
-      "localizations" : {
-        "es-MX" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Preparando tu cocina…"
-          }
-        },
-        "fr-CA" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Préparation de votre cuisine…"
-          }
-        }
-      }
-    },
-    "Sample recipes are enabled." : {
-      "localizations" : {
-        "es-MX" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Las recetas de ejemplo están activadas."
-          }
-        },
-        "fr-CA" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Les recettes d’exemple sont activées."
-          }
-        }
-      }
-    },
-    "Sample Recipes" : {
-      "localizations" : {
-        "es-MX" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Recetas de ejemplo"
-          }
-        },
-        "fr-CA" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Recettes d’exemple"
-          }
-        }
-      }
-    },
     "You can add them later from Settings." : {
       "localizations" : {
         "es-MX" : {
@@ -2569,9 +2786,6 @@
           }
         }
       }
-    },
-    "https://example.com/recipe" : {
-      "shouldTranslate" : false
     }
   },
   "version" : "1.1"

@@ -60,18 +60,24 @@ struct KitchenSettingsView: View {
   var body: some View {
     Form {
       Section("Sample Recipes") {
-        if model.sampleConsent == .accepted, model.issue != .samples {
-          Label("Sample recipes are enabled.", systemImage: "checkmark.circle")
-            .foregroundStyle(.secondary)
-        } else {
-          Text("Add the sample recipes included with this version of Kitchen Memory.")
-            .foregroundStyle(.secondary)
+        samplePresenceLabel
 
-          Button(model.issue == .samples ? "Try Again" : "Add Sample Recipes") {
-            model.acceptSampleRecipes()
+        Text("Installation checks stable recipe identities and adds only missing samples.")
+          .foregroundStyle(.secondary)
+
+        Button(action: model.acceptSampleRecipes) {
+          if model.issue == .samples {
+            Text("Try Again")
+          } else if model.samplePresence == .partial {
+            Text("Install Missing Sample Recipes")
+          } else if model.samplePresence == .complete {
+            Text("Sample Recipes Installed")
+          } else {
+            Text("Install Sample Recipes")
           }
-          .accessibilityIdentifier("add-sample-recipes")
         }
+        .disabled(model.samplePresence == .complete && model.issue != .samples)
+        .accessibilityIdentifier("add-sample-recipes")
       }
 
       Section("Kitchen Data") {
@@ -108,6 +114,24 @@ struct KitchenSettingsView: View {
       model: model,
       locale: locale
     )
+  }
+
+  @ViewBuilder
+  private var samplePresenceLabel: some View {
+    switch model.samplePresence {
+    case .complete:
+      Label("All sample recipes are installed.", systemImage: "checkmark.circle.fill")
+        .foregroundStyle(.green)
+    case .partial:
+      Label("Some sample recipes are missing.", systemImage: "exclamationmark.triangle.fill")
+        .foregroundStyle(.yellow)
+    case .none:
+      Label("No sample recipes are installed.", systemImage: "xmark.circle")
+        .foregroundStyle(.secondary)
+    case .unavailable:
+      Label("Sample recipe status is unavailable.", systemImage: "questionmark.circle")
+        .foregroundStyle(.secondary)
+    }
   }
 }
 

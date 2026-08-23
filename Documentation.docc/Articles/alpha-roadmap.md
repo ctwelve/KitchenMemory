@@ -147,10 +147,12 @@ release-level accessibility audits still wait for stable platform interfaces.
 The foundation now includes the three-locale String Catalog, application-owned
 formatters, plural rules, authored-language persistence and import, localized
 sample families, deterministic fallback, explicit-locale tests, and an opt-in
-sample installation flow. Sample consent is stored outside recipe data for a
-future downloadable-pack migration, while stable UUIDs make bundled installation
-idempotent. Because V1 has no external users, the schema was updated in place
-and development stores were reset instead of manufacturing a migration.
+sample installation flow. The onboarding answer is stored outside recipe data,
+but sample presence is derived from stable UUIDs and missing content is never
+reinserted without an explicit request. This supports a future downloadable-
+pack migration without turning an onboarding response into permanent authority.
+Because V1 has no external users, the schema was updated in place and development
+stores were reset instead of manufacturing a migration.
 
 ### Slice 10 — Cooking sessions
 

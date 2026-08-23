@@ -31,7 +31,7 @@ final class KitchenMemoryTests: XCTestCase {
     XCTAssertEqual(dependencies.libraryModel.recipes.count, 2)
   }
 
-  func testNewStoreCreatesOneEmptyKitchenWithoutAssumingSampleConsent() throws {
+  func testNewStoreCreatesOneEmptyKitchenWithoutAssumingSamplePermission() throws {
     let repository = SwiftDataRecipeRepository(
       modelContainer: try KitchenMemorySchema.makeContainer(inMemory: true)
     )

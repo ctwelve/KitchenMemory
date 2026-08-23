@@ -70,13 +70,14 @@ My Mac or an iOS Simulator. The application is based on Xcode's standard
 multiplatform SwiftUI structure and uses SwiftData as its first local persistence
 implementation. On first launch, it creates an empty local Kitchen and asks
 whether the person wants to install the bundled sample recipe pack. The answer
-is stored independently of recipe data so a future
-downloadable pack can honor it before transferring assets. The Kitchen gets an
-installation-specific identity; bundled recipes retain their hand-assigned
-identities so installation, future merging, and reset behavior are
-deterministic. Localized authored variants are related by the sample manifest
-rather than pretending that two different recipe payloads are one durable
-recipe revision.
+is stored independently of recipe data only to avoid repeating onboarding; it
+is not standing permission to restore deleted content. Settings derives
+none/partial/complete installation state from stable sample UUIDs and adds only
+missing identities when explicitly asked. The Kitchen gets an installation-
+specific identity; bundled recipes retain their hand-assigned identities so
+installation, future merging, and reset behavior are deterministic. Localized
+authored variants are related by the sample manifest rather than pretending
+that two different recipe payloads are one durable recipe revision.
 
 The app's internal domain, import, persistence, and product-logic modules live
 under `KitchenMemory/Modules` as native Xcode framework targets. Bundled starter
