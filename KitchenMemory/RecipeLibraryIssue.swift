@@ -2,19 +2,24 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: GPL-3.0-only
 
+import Foundation
+
 enum RecipeLibraryIssue: Equatable {
   case read
   case save
   case reset
 
-  var message: String {
+  func message(locale: Locale = .current) -> String {
     switch self {
     case .read:
-      "Kitchen Memory could not read this recipe library."
+      String(localized: "Kitchen Memory could not read this recipe library.", locale: locale)
     case .save:
-      "Kitchen Memory could not save this recipe."
+      String(localized: "Kitchen Memory could not save this recipe.", locale: locale)
     case .reset:
-      "Kitchen Memory could not reset this Kitchen. No reset was completed."
+      String(
+        localized: "Kitchen Memory could not reset this Kitchen. No reset was completed.",
+        locale: locale
+      )
     }
   }
 }

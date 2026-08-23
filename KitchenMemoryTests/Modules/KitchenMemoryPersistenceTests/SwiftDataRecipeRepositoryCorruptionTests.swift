@@ -54,6 +54,16 @@ final class SwiftDataRecipeRepositoryCorruptionTests: XCTestCase {
     assertReading(fixture, throwsFor: "media.role")
   }
 
+  func testMalformedContentLanguageReportsItsExactField() throws {
+    let fixture = try makeFixture()
+    let context = ModelContext(fixture.container)
+    let revision = try XCTUnwrap(context.fetch(FetchDescriptor<RecipeRevisionRecord>()).first)
+    revision.contentLanguage = "@@@"
+    try context.save()
+
+    assertReading(fixture, throwsFor: "revision.contentLanguage")
+  }
+
   func testUnknownIngredientEnumsReportTheirExactFields() throws {
     let corruptions: [(field: String, mutate: (RecipeIngredientRecord) -> Void)] = [
       ("ingredient.presentationMode", { $0.presentationMode = "future-mode" }),

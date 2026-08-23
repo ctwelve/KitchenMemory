@@ -569,6 +569,8 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				"fr-CA",
+				"es-MX",
 				Base,
 			);
 			mainGroup = A1C4E795302A63B800E2C0DB;

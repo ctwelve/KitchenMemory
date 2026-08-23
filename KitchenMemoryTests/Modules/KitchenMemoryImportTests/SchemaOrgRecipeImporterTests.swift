@@ -46,6 +46,26 @@ final class SchemaOrgRecipeImporterTests: XCTestCase {
         )
     }
 
+    func testAuthoredLanguageAcceptsTextOrStructuredSchemaOrgValues() throws {
+        let direct = importer.importJSONLD(Data(
+            #"{"@type":"Recipe","name":"Soupe","inLanguage":"fr_ca"}"#.utf8
+        ))
+        let structured = importer.importJSONLD(Data(
+            #"{"@type":"Recipe","name":"Sopa","inLanguage":{"@id":"es-MX"}}"#.utf8
+        ))
+        let named = importer.importJSONLD(Data(
+            #"{"@type":"Recipe","name":"Sopa","inLanguage":{"name":"es_MX"}}"#.utf8
+        ))
+        let invalid = importer.importJSONLD(Data(
+            #"{"@type":"Recipe","name":"Soup","inLanguage":"@@@"}"#.utf8
+        ))
+
+        XCTAssertEqual(direct.unambiguousCandidate?.draft.contentLanguage?.rawValue, "fr-CA")
+        XCTAssertEqual(structured.unambiguousCandidate?.draft.contentLanguage?.rawValue, "es-MX")
+        XCTAssertEqual(named.unambiguousCandidate?.draft.contentLanguage?.rawValue, "es-MX")
+        XCTAssertNil(invalid.unambiguousCandidate?.draft.contentLanguage)
+    }
+
     func testGraphAndStructuredValuesNormalizeWithoutLosingUnknownFields() throws {
         let result = importer.importHTML(try fixture("graph-sections"))
         let candidate = try XCTUnwrap(result.unambiguousCandidate)

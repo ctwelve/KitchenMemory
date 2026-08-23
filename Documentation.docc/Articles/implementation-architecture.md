@@ -104,8 +104,7 @@ as `RecipeEditSession`, `RecipeImportSession`, and `RecipeScalingState`. They as
 `RecipeLibraryModel` to cross the library boundary rather than constructing
 repositories or use cases themselves. `RecipeLibraryIssue` is the final
 presentation seam: it converts typed failure categories into user-facing copy.
-The internationalization slice moves that copy into String Catalogs without
-changing the underlying logic.
+That copy now comes from String Catalogs without changing the underlying logic.
 
 ## Persistence
 
@@ -134,18 +133,19 @@ containers remain available for previews and tests, and callers may provide an
 explicit URL for isolated tests or migration work.
 
 The store begins at `KitchenMemorySchemaV1` under
-`KitchenMemoryMigrationPlan`. Every later schema change must add a new immutable
-version and an explicit migration stage; V1's models are never edited in place
-after release.
+`KitchenMemoryMigrationPlan`. V1 remains intentionally mutable before the first
+release, with development stores deleted after incompatible changes. At first
+release V1 becomes immutable; every later schema change must add a new version
+and an explicit migration stage.
 
 ## Localization resources
 
 String Catalogs, locale-aware presentation formatters, and localized bundled
-content belong to the application target. The internationalization slice moves
-the remaining English-oriented domain display helpers behind that boundary so
-the frameworks return semantic domain values and typed failures rather than
-choosing interface language. This keeps formatting and pluralization replaceable
-without making locale a hidden input to business rules.
+content belong to the application target. English-oriented display helpers have
+been removed from the domain; the frameworks return semantic domain values and
+typed failures rather than choosing interface language. This keeps formatting
+and pluralization replaceable without making locale a hidden input to business
+rules.
 
 Interface copy and authored recipe content use separate resources. String
 Catalogs hold labels, actions, errors, and pluralized messages. Complete sample
@@ -172,7 +172,7 @@ adding a parser dependency. Recipe, revision, row, step, and media identities
 are pre-generated so importing the catalog into a fresh store is repeatable and
 can be made idempotent.
 
-The internationalization slice extends that index with explicit locale-tagged
+The manifest contains explicit locale-tagged
 recipe variants. A manifest-level sample-family identifier relates the variants,
 while each authored translation has its own stable recipe, revision, and child
 identities. Reusing one durable recipe identity for different translated

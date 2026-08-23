@@ -12,16 +12,18 @@ struct RecipeEditorView: View {
     case revise
     case importReview
 
-    var title: String {
+    func title(locale: Locale) -> String {
       switch self {
-      case .create: "New Recipe"
-      case .revise: "Edit Recipe"
-      case .importReview: "Review Import"
+      case .create: String(localized: "New Recipe", locale: locale)
+      case .revise: String(localized: "Edit Recipe", locale: locale)
+      case .importReview: String(localized: "Review Import", locale: locale)
       }
     }
 
-    var saveLabel: String {
-      self == .revise ? "Save Revision" : "Create Recipe"
+    func saveLabel(locale: Locale) -> String {
+      self == .revise
+        ? String(localized: "Save Revision", locale: locale)
+        : String(localized: "Create Recipe", locale: locale)
     }
   }
 
@@ -30,6 +32,7 @@ struct RecipeEditorView: View {
   let reviewConcerns: [RecipeImportConcern]
 
   @Environment(\.dismiss) private var dismiss
+  @Environment(\.locale) private var locale
   @State private var session: RecipeEditSession
 
   init(
@@ -64,14 +67,14 @@ struct RecipeEditorView: View {
         .accessibilityIdentifier("recipe-editor-scroll")
 #endif
       }
-      .navigationTitle(mode.title)
+      .navigationTitle(mode.title(locale: locale))
 #if os(iOS)
       .navigationBarTitleDisplayMode(.inline)
 #endif
       .toolbar {
         ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
         ToolbarItem(placement: .confirmationAction) {
-          Button(mode.saveLabel) {
+          Button(mode.saveLabel(locale: locale)) {
             if let draft = try? session.validatedDraft(), save(draft) { dismiss() }
           }
             .disabled(!session.canSave)
@@ -113,10 +116,10 @@ private extension RecipeEditorView {
       } else {
         ForEach(Array(reviewConcerns.enumerated()), id: \.offset) { _, concern in
           if concern.isInformational {
-            Label(concern.reviewMessage, systemImage: "info.circle")
+            Label(concern.reviewMessage(locale: locale), systemImage: "info.circle")
               .foregroundStyle(.secondary)
           } else {
-            Label(concern.reviewMessage, systemImage: "exclamationmark.triangle")
+            Label(concern.reviewMessage(locale: locale), systemImage: "exclamationmark.triangle")
               .foregroundStyle(.orange)
           }
         }
@@ -124,11 +127,8 @@ private extension RecipeEditorView {
     } header: {
       Text("Import Review")
     } footer: {
-      Text(
-        "Check the imported wording and structure before saving. Review and save do not "
-          + "contact the source again. Saving keeps the final source URL and bounded JSON-LD "
-          + "metadata locally, including fields not shown here."
-      )
+      // swiftlint:disable:next line_length
+      Text("Check the imported wording and structure before saving. Review and save do not contact the source again. Saving keeps the final source URL and bounded JSON-LD metadata locally, including fields not shown here.")
     }
   }
 
@@ -226,39 +226,79 @@ private extension RecipeEditorView {
   }
 }
 
-private extension RecipeImportConcern {
-  var reviewMessage: String {
+extension RecipeImportConcern {
+  func reviewMessage(locale: Locale = .current) -> String {
     switch self {
-    case .missingTitle: "Title needs attention"
-    case .missingIngredients: "No ingredients were found"
-    case .missingInstructions: "No instructions were found"
+    case .missingTitle:
+      return localized("Title needs attention", locale: locale)
+    case .missingIngredients:
+      return localized("No ingredients were found", locale: locale)
+    case .missingInstructions:
+      return localized("No instructions were found", locale: locale)
     case .unparsedIngredients(let count):
-      "\(count) ingredient \(count == 1 ? "line is" : "lines are") preserved but unparsed"
+      return localized("\(count) ingredient line is preserved but unparsed", locale: locale)
     case .provisionalIngredients(let count):
-      "\(count) ingredient \(count == 1 ? "interpretation needs" : "interpretations need") review"
+      return localized("\(count) ingredient interpretation needs review", locale: locale)
     case .ignoredSourceBlocks(let count):
-      "\(count) malformed or unsupported source \(count == 1 ? "block was" : "blocks were") ignored"
+      return localized("\(count) malformed or unsupported source block was ignored", locale: locale)
     case .preservedTaxonomy(let cuisines, let categories, let keywords):
-      "Preserved metadata — \(taxonomySummary(cuisines: cuisines, categories: categories, keywords: keywords))"
+      let summary = taxonomySummary(
+        cuisines: cuisines,
+        categories: categories,
+        keywords: keywords,
+        locale: locale
+      )
+      return localized("Preserved metadata — \(summary)", locale: locale)
     case .referencedImages(let count):
-      "\(count) source \(count == 1 ? "image is" : "images are") referenced but not downloaded"
+      return localized("\(count) source image is referenced but not downloaded", locale: locale)
     }
   }
 
   private func taxonomySummary(
     cuisines: [String],
     categories: [String],
-    keywords: [String]
+    keywords: [String],
+    locale: Locale
   ) -> String {
     var groups: [String] = []
-    if !cuisines.isEmpty { groups.append("cuisine: \(cuisines.joined(separator: ", "))") }
-    if !categories.isEmpty { groups.append("categories: \(categories.joined(separator: ", "))") }
-    if !keywords.isEmpty { groups.append("keywords: \(keywords.joined(separator: ", "))") }
+    if !cuisines.isEmpty {
+      groups.append(String(
+        localized: "Cuisine: \(cuisines.joined(separator: ", "))",
+        bundle: .kitchenMemory(for: locale),
+        locale: locale
+      ))
+    }
+    if !categories.isEmpty {
+      groups.append(String(
+        localized: "Categories: \(categories.joined(separator: ", "))",
+        bundle: .kitchenMemory(for: locale),
+        locale: locale
+      ))
+    }
+    if !keywords.isEmpty {
+      groups.append(String(
+        localized: "Keywords: \(keywords.joined(separator: ", "))",
+        bundle: .kitchenMemory(for: locale),
+        locale: locale
+      ))
+    }
     return groups.joined(separator: "; ")
+  }
+
+  private func localized(_ value: String.LocalizationValue, locale: Locale) -> String {
+    String(localized: value, bundle: .kitchenMemory(for: locale), locale: locale)
   }
 }
 
 private extension RecipeSource.Kind {
   static var allCases: [Self] { [.original, .webpage, .book, .person, .imported] }
-  var label: String { rawValue.capitalized }
+  var label: String {
+    switch self {
+    case .original: String(localized: "Original")
+    case .webpage: String(localized: "Webpage")
+    case .book: String(localized: "Book")
+    case .person: String(localized: "Person")
+    case .imported: String(localized: "Imported")
+    }
+  }
 }

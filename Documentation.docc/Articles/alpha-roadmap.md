@@ -118,7 +118,7 @@ behavior from replaceable presentation.
 
 ## Remaining slices
 
-### Slice 9 — Internationalization foundation
+### Slice 9 — Internationalization foundation (implemented 2026-08-22)
 
 Make application language and bundled starter content correct for the initial
 North American release.
@@ -134,7 +134,7 @@ North American release.
 - Extend the asset-backed sample-recipe pack with coherent localized recipe
   documents, deterministic locale fallback, and stable identity rules.
 - Add optional authored-content language metadata to recipe revisions and carry
-  it through drafts, imports, sample assets, and a versioned store migration.
+  it through drafts, imports, sample assets, and the pre-release V1 store.
 - Preserve imported and person-authored recipe language instead of translating
   stored content as a side effect of changing the app locale.
 - Document translator context, recipe-resource ownership, and the boundary
@@ -144,10 +144,11 @@ This slice internationalizes the existing experience without declaring its
 editor layout final. Detailed localized UI automation, screenshot proofing, and
 release-level accessibility audits still wait for stable platform interfaces.
 
-**Complete when:** all durable user-facing copy is catalog-backed, count and
-formatting behavior is verified for all three initial locales, every localized
-sample asset passes structural and identity validation, and changing locale
-cannot mutate existing recipe history.
+The foundation now includes the three-locale String Catalog, application-owned
+formatters, plural rules, authored-language persistence and import, localized
+sample families, deterministic fallback, and explicit-locale tests. Because V1
+has no external users, the schema was updated in place and development stores
+were reset instead of manufacturing a migration.
 
 ### Slice 10 — Cooking sessions
 

@@ -252,7 +252,7 @@ reviewable import drafts, stable recipe/source identities, SwiftData behind a
 repository, and shared Logic operations. The next platform work should preserve
 those boundaries while it:
 
-1. establishes String Catalogs and localized asset-backed recipe packs;
+1. extends the established String Catalogs and localized asset-backed recipe packs;
 2. replaces provisional modal editing with interaction models suited to Mac and
    mobile;
 3. adds cooking sessions without mutating maintained recipe revisions;

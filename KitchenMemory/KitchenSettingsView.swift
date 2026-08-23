@@ -5,12 +5,21 @@
 import SwiftUI
 
 private enum KitchenResetCopy {
-  static let title = "Reset Kitchen?"
-  static let message = """
-    All recipes, edits, revision history, imported source captures, and recipe metadata in this \
-    Kitchen will be permanently deleted. Kitchen Memory will restore only the sample recipes \
-    included with this version. This cannot be undone.
-    """
+  static func title(locale: Locale) -> String {
+    String(localized: "Reset Kitchen?", locale: locale)
+  }
+
+  static func message(locale: Locale) -> String {
+    let source = """
+      All recipes, edits, revision history, imported source captures, and recipe metadata in this \
+      Kitchen will be permanently deleted. Kitchen Memory will restore only the sample recipes \
+      included with this version. This cannot be undone.
+      """
+    return String(
+      localized: String.LocalizationValue(source),
+      locale: locale
+    )
+  }
 }
 
 struct ResetKitchenActionKey: FocusedValueKey {
@@ -42,6 +51,7 @@ struct KitchenCommands: Commands {
 struct KitchenSettingsView: View {
   @Bindable var model: RecipeLibraryModel
   @State private var isShowingResetConfirmation = false
+  @Environment(\.locale) private var locale
 #if !os(macOS)
   @Environment(\.dismiss) private var dismiss
 #endif
@@ -49,10 +59,7 @@ struct KitchenSettingsView: View {
   var body: some View {
     Form {
       Section("Kitchen Data") {
-        Text(
-          "Restore this Kitchen to the sample recipes included with the current version of "
-            + "Kitchen Memory."
-        )
+        Text("Restore this Kitchen to the sample recipes included with the current version of Kitchen Memory.")
         .foregroundStyle(.secondary)
 
         Button("Reset Kitchen…", role: .destructive) {
@@ -61,7 +68,7 @@ struct KitchenSettingsView: View {
         .accessibilityIdentifier("settings-reset-kitchen")
 
         if let issue = model.issue {
-          Label(issue.message, systemImage: "exclamationmark.triangle")
+          Label(issue.message(locale: locale), systemImage: "exclamationmark.triangle")
             .foregroundStyle(.red)
         }
       }
@@ -82,7 +89,8 @@ struct KitchenSettingsView: View {
 #endif
     .kitchenResetConfirmation(
       isPresented: $isShowingResetConfirmation,
-      model: model
+      model: model,
+      locale: locale
     )
   }
 }
@@ -90,16 +98,17 @@ struct KitchenSettingsView: View {
 extension View {
   func kitchenResetConfirmation(
     isPresented: Binding<Bool>,
-    model: RecipeLibraryModel
+    model: RecipeLibraryModel,
+    locale: Locale
   ) -> some View {
-    alert(KitchenResetCopy.title, isPresented: isPresented) {
+    alert(KitchenResetCopy.title(locale: locale), isPresented: isPresented) {
       Button("Cancel", role: .cancel) {}
       Button("Reset Kitchen", role: .destructive) {
         model.resetKitchen()
       }
       .accessibilityIdentifier("confirm-reset-kitchen")
     } message: {
-      Text(KitchenResetCopy.message)
+      Text(KitchenResetCopy.message(locale: locale))
     }
   }
 }

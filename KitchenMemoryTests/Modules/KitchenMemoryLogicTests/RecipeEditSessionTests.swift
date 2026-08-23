@@ -22,6 +22,7 @@ final class RecipeEditSessionTests: XCTestCase {
       title: "Soup",
       summary: "Summary",
       authorName: "Cook",
+      contentLanguage: RecipeContentLanguage(rawValue: "fr-CA"),
       source: RecipeSource(
         kind: .book,
         title: "Book",
@@ -51,14 +52,13 @@ final class RecipeEditSessionTests: XCTestCase {
     let result = try RecipeEditSession(draft: draft).validatedDraft()
 
     XCTAssertEqual(result.sourceCapture, capture)
+    XCTAssertEqual(result.contentLanguage?.rawValue, "fr-CA")
     XCTAssertEqual(result.recipeYield?.unitText, "servings")
     XCTAssertEqual(result.recipeYield?.originalText, "Serves four")
     XCTAssertEqual(result.prepDuration?.seconds, 600)
     XCTAssertEqual(result.cookDuration?.seconds, 1_200)
     XCTAssertEqual(result.totalDuration?.seconds, 1_800)
-    XCTAssertEqual(result.cuisines, ["French"])
-    XCTAssertEqual(result.categories, ["Dinner"])
-    XCTAssertEqual(result.keywords, ["warm"])
+    XCTAssertEqual([result.cuisines, result.categories, result.keywords], [["French"], ["Dinner"], ["warm"]])
     XCTAssertEqual(result.source?.publisherName, "Press")
   }
 
@@ -113,7 +113,8 @@ final class RecipeEditSessionTests: XCTestCase {
     XCTAssertEqual(session.ingredientSections.map(\.title), ["Second", "First"])
     XCTAssertEqual(session.instructionSections.map(\.title), ["Second", "First"])
     XCTAssertEqual(result.title, " Soup ")
-    XCTAssertEqual(result.recipeYield?.originalText, "3 bowls")
+    XCTAssertEqual(result.recipeYield?.originalText, "")
+    XCTAssertEqual(result.recipeYield?.unitText, "bowls")
     XCTAssertNil(result.source)
     XCTAssertNil(result.prepDuration)
   }

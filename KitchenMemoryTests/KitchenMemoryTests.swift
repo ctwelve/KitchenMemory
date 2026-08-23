@@ -44,7 +44,10 @@ final class KitchenMemoryTests: XCTestCase {
     XCTAssertEqual(try repository.kitchens(), [firstKitchen])
     XCTAssertEqual(
       Set(try repository.recipes(in: firstKitchen.id).map(\.recipe.id)),
-      Set(manifest.recipes.map(\.recipeID))
+      Set(try SampleRecipeCatalog.localizedRecipes(
+        in: manifest,
+        preferredLanguages: Locale.preferredLanguages
+      ).map(\.recipeID))
     )
   }
 
@@ -62,7 +65,10 @@ final class KitchenMemoryTests: XCTestCase {
     XCTAssertTrue(dependencies.libraryModel.resetKitchen())
     XCTAssertEqual(
       Set(dependencies.libraryModel.recipes.map(\.recipe.id)),
-      Set(manifest.recipes.map(\.recipeID))
+      Set(try SampleRecipeCatalog.localizedRecipes(
+        in: manifest,
+        preferredLanguages: Locale.preferredLanguages
+      ).map(\.recipeID))
     )
     XCTAssertFalse(
       dependencies.libraryModel.recipes.contains { $0.recipe.id == temporaryRecipeID }

@@ -9,6 +9,7 @@ struct IngredientQuantityEditor: View {
   @Binding var quantity: QuantityExpression?
   @Binding var package: PackageDescription?
   @State private var showsPreciseEntry: Bool
+  @Environment(\.locale) private var locale
 
   init(
     quantity: Binding<QuantityExpression?>,
@@ -110,22 +111,25 @@ struct IngredientQuantityEditor: View {
   }
 
   private var summary: String {
+    let formatter = RecipePresentationFormatter(locale: locale)
     var parts: [String] = []
-    if let quantityText = quantity?.renderedText {
+    if let quantityText = formatter.quantity(quantity) {
       parts.append(quantityText)
     }
     if let package {
-      let packageText = [package.quantity.renderedText, package.unitText]
+      let packageText = [formatter.quantity(package.quantity), package.unitText]
         .compactMap { value in
           guard let value, !value.isEmpty else { return nil }
           return value
         }
         .joined(separator: " ")
       if !packageText.isEmpty {
-        parts.append("package: \(packageText)")
+        parts.append(String(localized: "Package: \(packageText)", locale: locale))
       }
     }
-    return parts.isEmpty ? "Not specified" : parts.joined(separator: ", ")
+    return parts.isEmpty
+      ? String(localized: "Not specified", locale: locale)
+      : parts.joined(separator: ", ")
   }
 
   private var simpleAmountBinding: Binding<String> {
@@ -358,11 +362,11 @@ private extension View {
 private extension QuantityExpression.Kind {
   var label: String {
     switch self {
-    case .none: "None"
-    case .exact: "Exact"
-    case .range: "Range"
-    case .approximate: "Approximate"
-    case .text: "Words"
+    case .none: String(localized: "None")
+    case .exact: String(localized: "Exact")
+    case .range: String(localized: "Range")
+    case .approximate: String(localized: "Approximate")
+    case .text: String(localized: "Words")
     }
   }
 }

@@ -43,6 +43,7 @@ import SwiftData
   var title: String
   var summary: String?
   var authorName: String?
+  var contentLanguage: String?
   var sourceData: Data?
   var yieldData: Data?
   var prepSeconds: Int?
@@ -54,7 +55,8 @@ import SwiftData
 
   init(
     id: UUID, recipeID: UUID, revisionNumber: Int, title: String, summary: String?,
-    authorName: String?, sourceData: Data?, yieldData: Data?, prepSeconds: Int?, cookSeconds: Int?,
+    authorName: String?, contentLanguage: String?, sourceData: Data?, yieldData: Data?,
+    prepSeconds: Int?, cookSeconds: Int?,
     totalSeconds: Int?, cuisinesData: Data, categoriesData: Data, keywordsData: Data
   ) {
     self.id = id
@@ -63,6 +65,7 @@ import SwiftData
     self.title = title
     self.summary = summary
     self.authorName = authorName
+    self.contentLanguage = contentLanguage
     self.sourceData = sourceData
     self.yieldData = yieldData
     self.prepSeconds = prepSeconds

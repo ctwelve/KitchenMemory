@@ -61,7 +61,9 @@ final class SwiftDataRecipeRepositoryTests: XCTestCase {
   func testTunaNoodleHotdishRoundTripsThroughSwiftData() throws {
     let kitchen = Kitchen(name: "Test Kitchen")
     let manifest = try SampleRecipeCatalog.loadManifest()
-    let document = try SampleRecipeCatalog.loadRecipe(try XCTUnwrap(manifest.recipes.first))
+    let family = try XCTUnwrap(manifest.recipes.first)
+    let reference = try XCTUnwrap(family.variant(preferredLanguages: ["en"]))
+    let document = try SampleRecipeCatalog.loadRecipe(reference)
     let sample = try document.materialize(in: kitchen.id)
     let repository = SwiftDataRecipeRepository(
       modelContainer: try KitchenMemorySchema.makeContainer(inMemory: true)
@@ -79,7 +81,9 @@ final class SwiftDataRecipeRepositoryTests: XCTestCase {
   func testSavingTheSameRecipeUpdatesInsteadOfDuplicatingItsChildren() throws {
     let kitchen = Kitchen(name: "Test Kitchen")
     let manifest = try SampleRecipeCatalog.loadManifest()
-    let document = try SampleRecipeCatalog.loadRecipe(try XCTUnwrap(manifest.recipes.first))
+    let family = try XCTUnwrap(manifest.recipes.first)
+    let reference = try XCTUnwrap(family.variant(preferredLanguages: ["en"]))
+    let document = try SampleRecipeCatalog.loadRecipe(reference)
     let sample = try document.materialize(in: kitchen.id)
     var editedRevision = sample.revision
     editedRevision.title = "Leftover Tuna Noodle Hotdish"

@@ -6,8 +6,10 @@ import SwiftData
 
 /// The first persisted Kitchen Memory schema.
 ///
-/// Keep this version immutable after it has been released. Future versions add
-/// their own schema type and a migration stage to ``KitchenMemoryMigrationPlan``.
+/// This pre-release schema intentionally remains mutable while Kitchen Memory
+/// has no external users. A change to V1 requires deleting development stores.
+/// After the first release, this type becomes immutable and later changes add
+/// a new schema plus a migration stage.
 public enum KitchenMemorySchemaV1: VersionedSchema {
   public static let versionIdentifier = Schema.Version(1, 0, 0)
 
@@ -26,9 +28,8 @@ public enum KitchenMemorySchemaV1: VersionedSchema {
 
 /// The ordered migration path for Kitchen Memory's private local store.
 ///
-/// V1 is the only released schema in this source tree, so no migration stage
-/// exists yet. The plan is installed now to make the next schema change a
-/// deliberate compatibility decision rather than an implicit store rewrite.
+/// V1 is the only schema in this source tree. There is deliberately no
+/// migration stage while development stores are disposable.
 public enum KitchenMemoryMigrationPlan: SchemaMigrationPlan {
   public static let schemas: [any VersionedSchema.Type] = [
     KitchenMemorySchemaV1.self

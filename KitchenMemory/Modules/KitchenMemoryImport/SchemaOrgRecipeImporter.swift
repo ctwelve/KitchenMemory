@@ -193,7 +193,7 @@ private extension SchemaOrgRecipeImporter {
     ) -> Bool {
         let ordinaryFields = [
             "name", "description", "author", "publisher", "url", "mainEntityOfPage",
-            "recipeYield", "prepTime", "cookTime", "totalTime", "recipeCuisine",
+            "recipeYield", "prepTime", "cookTime", "totalTime", "inLanguage", "recipeCuisine",
             "recipeCategory", "keywords", "image",
         ]
         for key in ordinaryFields {
@@ -256,6 +256,7 @@ private extension SchemaOrgRecipeImporter {
             title: cleanText(title),
             summary: text(object["description"]).map(cleanText),
             authorName: author,
+            contentLanguage: contentLanguage(object["inLanguage"]),
             source: RecipeSource(
                 kind: .webpage,
                 title: cleanText(title),
@@ -288,6 +289,15 @@ private extension SchemaOrgRecipeImporter {
         )
         try normalizedOutputBudget.validate(draft)
         return draft
+    }
+
+    static func contentLanguage(_ value: Any?) -> RecipeContentLanguage? {
+        if let identifier = text(value) {
+            return RecipeContentLanguage(rawValue: identifier)
+        }
+        guard let object = value as? [String: Any] else { return nil }
+        return text(object["@id"]).flatMap(RecipeContentLanguage.init(rawValue:))
+            ?? text(object["name"]).flatMap(RecipeContentLanguage.init(rawValue:))
     }
 
     static func resolvedMainEntityURL(_ value: Any?, relativeTo baseURL: URL?) -> URL? {

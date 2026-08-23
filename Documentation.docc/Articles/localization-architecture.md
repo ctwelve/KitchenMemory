@@ -6,7 +6,7 @@ Copyright © 2026 the Kitchen Memory contributors.
 SPDX-License-Identifier: GPL-3.0-only
 -->
 
-- Status: Accepted direction
+- Status: Implemented foundation
 - Date: 2026-08-22
 
 Kitchen Memory's first localization set is English, Canadian French
@@ -32,14 +32,13 @@ supported locale. Views and presentation adapters request localized values;
 `KitchenMemoryDomain`, `KitchenMemoryImport`, `KitchenMemoryPersistence`, and
 `KitchenMemoryLogic` do not look up interface strings.
 
-This is the destination boundary, with one known foundation-era exception. The
-domain currently exposes English-oriented `renderedText`,
-`structuredDisplayText`, and `effectiveDisplayText` helpers, including the words
-“about,” “optional,” and the fallback “Ingredient.” `RecipeEditor` also uses that
-fallback wording as an empty-row signal. The internationalization slice replaces
-the sentinel with semantic validation and moves locale-sensitive composition
-behind an application-owned formatter. Authored source wording remains in the
-domain; generated interface wording does not.
+This boundary is now enforced. The former English-oriented `renderedText`,
+`structuredDisplayText`, and `effectiveDisplayText` domain helpers are gone.
+Semantic predicates identify meaningful and structured ingredient content;
+`RecipePresentationFormatter` owns locale-sensitive composition such as
+“about,” “optional,” durations, quantities, and the fallback “Ingredient.”
+Authored source wording remains in the domain; generated interface wording does
+not.
 
 The reusable frameworks continue to return semantic values such as quantities,
 counts, workflow states, and typed failures. For example,
@@ -48,7 +47,7 @@ the application decides how that concern is phrased and pluralized. This keeps
 business-logic tests independent of a development language while allowing
 focused presentation tests to exercise locale-specific output.
 
-Numbers, dates, durations, temperatures, and measurements will be formatted for
+Numbers, dates, durations, temperatures, and measurements are formatted for
 an explicit locale at the presentation boundary. A formatted value is never
 parsed back into a domain value, and changing locale never changes stored
 rational quantities or source-faithful ingredient text.
@@ -62,7 +61,7 @@ coherent document. Those fields remain versioned `SampleRecipeDocument` data
 assets in `SampleRecipes.xcassets` rather than thousands of disconnected String
 Catalog entries.
 
-The locale-aware sample manifest will map one logical sample recipe to explicit
+The locale-aware sample manifest maps one logical sample recipe to explicit
 localized data-asset names. Each authored translation has stable recipe,
 revision, and child identifiers. The manifest also carries a logical sample-
 family identifier used to select among translations. Distinct translated
@@ -83,11 +82,11 @@ remain shared; localized accessibility descriptions travel with the recipe
 document.
 
 Authored content language is durable recipe metadata, not an inference from the
-current application locale. The current `RecipeRevision` has no such field, so
-the internationalization slice must add an optional canonical BCP 47 language
-tag and carry it through `RecipeDraft`, sample documents, import mapping, and a
-new immutable persistence-schema version. Existing revisions migrate as unknown
-rather than being mislabeled from the device's current settings.
+current application locale. `RecipeRevision.contentLanguage` stores an optional
+canonical BCP 47 tag and carries it through drafts, sample documents, Schema.org
+`inLanguage` import mapping, and persistence. Because the app is still a
+single-user development toy, this pre-release change updates V1 directly and
+requires deleting development stores; no fictional migration path is retained.
 
 ## Persistence behavior
 
@@ -109,7 +108,7 @@ changing the application locale.
 
 ## Testing boundary
 
-Localization tests should remain fast and deterministic:
+Localization tests remain fast and deterministic:
 
 - select `en`, `fr-CA`, and `es-MX` explicitly rather than inheriting the host;
 - exercise every pluralized formatter with representative values for each
