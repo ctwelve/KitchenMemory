@@ -114,6 +114,7 @@ public struct RecipeImportDraft: Equatable, Sendable {
     public var title: String
     public var summary: String?
     public var authorName: String?
+    public var contentLanguage: RecipeContentLanguage?
     public var source: RecipeSource
     public var recipeYield: RecipeYield?
     public var prepDuration: RecipeDuration?
@@ -130,6 +131,7 @@ public struct RecipeImportDraft: Equatable, Sendable {
         title: String,
         summary: String? = nil,
         authorName: String? = nil,
+        contentLanguage: RecipeContentLanguage? = nil,
         source: RecipeSource,
         recipeYield: RecipeYield? = nil,
         prepDuration: RecipeDuration? = nil,
@@ -145,6 +147,7 @@ public struct RecipeImportDraft: Equatable, Sendable {
         self.title = title
         self.summary = summary
         self.authorName = authorName
+        self.contentLanguage = contentLanguage
         self.source = source
         self.recipeYield = recipeYield
         self.prepDuration = prepDuration

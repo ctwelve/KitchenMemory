@@ -74,8 +74,9 @@ relying on today's interpretation.
 
 Missing titles and malformed sibling blocks are diagnostics rather than reasons
 to discard other meaningful recipe content. Candidate selection, URL fetching,
-person-facing review, and saving remain responsibilities of the application
-layer rather than the deterministic parser.
+and concern classification are coordinated by `KitchenMemoryLogic` rather than
+the deterministic parser. SwiftUI presents the resulting import session and
+routes an accepted draft through the same `RecipeEditor` used by manual entry.
 
 When a reviewed candidate is saved, the revision retains one bounded JSON-LD
 block and the selected candidate coordinates. It does not persist the full HTML
@@ -124,19 +125,19 @@ user which recipe to save.
 
 | Schema.org | Internal concept | Notes |
 | --- | --- | --- |
-| `name` | `Recipe.name` | Required for a clean import; user may supply if absent |
-| `description` | `Recipe.description` | Strip unsafe markup, preserve text |
-| `author` | `Recipe.authorName` | Accept person, organization, text, or arrays |
+| `name` | `RecipeRevision.title` | Required for a clean import; user may supply if absent |
+| `description` | `RecipeRevision.summary` | Strip unsafe markup, preserve text |
+| `author` | `RecipeRevision.authorName` | Accept person, organization, text, or arrays |
 | `url`, `mainEntityOfPage` | `RecipeSource.canonicalURL` | Resolve relative URLs; retain only structurally public HTTP(S) metadata; revalidate before activation |
 | `datePublished` | Source metadata | Not a local creation date |
-| `image` | `Recipe.images` | Accept URL, object, or array |
-| `prepTime` | `Recipe.prepDuration` | ISO 8601 duration |
-| `cookTime` | `Recipe.cookDuration` | ISO 8601 duration |
-| `totalTime` | `Recipe.totalDuration` | Preserve independently |
-| `recipeYield` | `Recipe.yield` | Text, number, or quantitative value |
-| `recipeCuisine` | `Recipe.cuisines` | Text or array |
-| `recipeCategory` | `Recipe.categories` | Text or array |
-| `keywords` | `Recipe.keywords` | Comma-separated text or array |
+| `image` | `RecipeRevision.media` | Accept URL, object, or array |
+| `prepTime` | `RecipeRevision.prepDuration` | ISO 8601 duration |
+| `cookTime` | `RecipeRevision.cookDuration` | ISO 8601 duration |
+| `totalTime` | `RecipeRevision.totalDuration` | Preserve independently |
+| `recipeYield` | `RecipeRevision.recipeYield` | Text, number, or quantitative value |
+| `recipeCuisine` | `RecipeRevision.cuisines` | Text or array |
+| `recipeCategory` | `RecipeRevision.categories` | Text or array |
+| `keywords` | `RecipeRevision.keywords` | Comma-separated text or array |
 | `recipeIngredient` | ingredient rows | Always retain each original value |
 | `recipeInstructions` | sections and steps | Normalize all legal shapes |
 | `nutrition` | deferred source metadata | Preserve raw; do not calculate yet |

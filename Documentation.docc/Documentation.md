@@ -28,6 +28,7 @@ presentation architecture.
 - <doc:product-brief>
 - <doc:naming>
 - <doc:alpha-roadmap>
+- <doc:release-engineering>
 - <doc:open-questions>
 
 ### Domain and workflows
@@ -44,6 +45,8 @@ presentation architecture.
 
 - <doc:apple-platform>
 - <doc:implementation-architecture>
+- <doc:personal-icloud-synchronization>
+- <doc:localization-architecture>
 - <doc:accessibility-engineering>
 - <doc:continuous-integration>
 
@@ -55,3 +58,4 @@ presentation architecture.
 - <doc:0004-apple-persistence-and-portability>
 - <doc:0005-testing-and-comprehension>
 - <doc:0006-shared-ui-for-foundation-slices>
+- <doc:0007-business-logic-coverage-and-ui-smoke-tests>

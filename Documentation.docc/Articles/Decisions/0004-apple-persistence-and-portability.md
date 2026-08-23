@@ -22,10 +22,20 @@ without treating the application's private database as a public file format.
 Use SwiftData as the first local persistence implementation and CloudKit as the
 synchronization and household-collaboration platform.
 
-Do not commit the domain or application use cases to SwiftData managed CloudKit
-sync as the only integration mechanism. Select the final combination of managed
-sync, Core Data CloudKit integration, and direct CloudKit behavior after a
-shared-Kitchen collaboration prototype.
+Do not commit the domain or Logic operations to SwiftData managed CloudKit sync
+as the only integration mechanism. The first synchronization slice uses managed
+SwiftData synchronization with the private database for one person's devices.
+That choice remains inside the persistence adapter. Select or supplement the
+mechanism for multi-person Kitchen sharing only after a post-1.0 collaboration
+prototype exercises participants, permissions, private and shared database
+scopes, and conflict behavior.
+
+Before promoting the first production CloudKit schema, make the persistence
+model compatible with the selected integration and validate its generated
+schema. After promotion, evolve CloudKit additively: new product aggregates may
+add record types and fields, but published elements are neither removed nor
+repurposed. Corresponding local persistence changes use new immutable SwiftData
+schema versions and deliberate migration stages.
 
 Provide documented, versioned import and export formats as the content-
 sovereignty mechanism. Portable data is expressed in domain terms and includes
@@ -38,7 +48,11 @@ exported scope.
   capabilities.
 - CloudKit schema constraints must influence persistence records before a
   production schema is promoted.
+- A later aggregate such as `CookingSession` can add storage and CloudKit record
+  types without rewriting existing recipe content, but it still requires a new
+  local schema version and tested migration stage.
 - Multi-person sharing remains an explicit product and sync responsibility.
+- The personal-sync adapter does not determine the later sharing transport.
 - Export formats require versioning and migration independently of SwiftData.
 - Replacing or supplementing persistence technology does not require changing
   the domain model.

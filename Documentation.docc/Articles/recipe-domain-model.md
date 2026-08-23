@@ -7,9 +7,10 @@ SPDX-License-Identifier: GPL-3.0-only
 -->
 
 
-This is a conceptual model, not yet a persistence schema. Names should be judged
-by whether they describe the cooking domain clearly; storage-framework concerns
-come later.
+This is the conceptual domain model, not a persistence schema. The implemented
+recipe foundation follows these names and ownership boundaries; future pantry,
+planning, and cooking-session types remain design direction until their slices
+land.
 
 ## Design goals
 
@@ -25,16 +26,17 @@ come later.
 ```text
 Kitchen
 └── Recipe
-    ├── RecipeSource
-    ├── Yield
-    ├── Media[]
-    ├── IngredientSection[]
-    │   └── RecipeIngredient[]
-    │       ├── QuantityExpression?
-    │       ├── UnitReference?
-    │       └── IngredientReference?
-    └── InstructionSection[]
-        └── InstructionStep[]
+    └── RecipeRevision[]
+        ├── RecipeSource?
+        ├── RecipeSourceCapture?
+        ├── RecipeYield?
+        ├── RecipeMedia[]
+        ├── EquipmentItem[]
+        ├── IngredientSection[]
+        │   └── RecipeIngredient[]
+        │       └── QuantityExpression?
+        └── InstructionSection[]
+            └── InstructionStep[]
 ```
 
 ## Entities and values
@@ -50,21 +52,36 @@ model.
 | Field | Meaning |
 | --- | --- |
 | `id` | Stable application identity |
-| `name` | Display title |
-| `description` | Optional summary |
+| `kitchenID` | Owning Kitchen identity |
+| `currentRevisionID` | Revision currently presented as maintained content |
+
+### RecipeRevision
+
+An immutable authored version of one recipe. Editing appends a new revision and
+makes it current; it does not overwrite the previous value.
+
+| Field | Meaning |
+| --- | --- |
+| `id` | Stable revision identity |
+| `recipeID` | Owning Recipe identity |
+| `revisionNumber` | Person-visible sequence within the Recipe |
+| `title` | Display title |
+| `summary` | Optional summary |
 | `authorName` | Human-readable attribution |
 | `source` | Provenance for imported or transcribed material |
-| `yield` | What the base recipe produces |
+| `sourceCapture` | Bounded immutable evidence retained from import |
+| `contentLanguage` | Planned optional BCP 47 authored-language tag; existing content may be unknown |
+| `recipeYield` | What the base recipe produces |
 | `prepDuration` | Active preparation time, when known |
 | `cookDuration` | Cooking time, when known |
 | `totalDuration` | Published total, which need not equal prep + cook |
 | `cuisines` | Publisher/user classifications |
 | `categories` | Course or recipe type |
 | `keywords` | Other descriptive tags |
+| `media` | Locally managed or remote media references |
+| `equipment` | Ordered tools named by the authored recipe |
 | `ingredientSections` | Ordered ingredient groups |
 | `instructionSections` | Ordered instruction groups |
-| `images` | Locally managed or remote media references |
-| `createdAt`, `updatedAt` | Local bookkeeping |
 
 Durations should be stored as semantic durations rather than formatted strings.
 The imported spelling may additionally remain in the source snapshot.
@@ -72,17 +89,18 @@ The imported spelling may additionally remain in the source snapshot.
 ### RecipeSource
 
 ```text
-kind: original | webpage | book | person | import
-canonicalURL?
+kind: original | webpage | book | person | imported
+title?
+authorName?
 publisherName?
-sourceTitle?
-retrievedAt?
-rawPayload?       // original JSON-LD or imported document
-contentDigest?    // supports change detection and duplicate detection
+canonicalURL?
 ```
 
-`rawPayload` is not the live recipe. It is evidence of what was imported and
-allows future importers to reinterpret old captures.
+Imported revisions may additionally retain a `RecipeSourceCapture`. The current
+capture records one bounded JSON-LD block, its final source URL, capture time,
+media type, and the selected candidate coordinates. Its opaque payload is not
+the live recipe; it is evidence that lets a future importer reinterpret the
+source without refetching the webpage.
 
 ### Yield
 
@@ -113,14 +131,14 @@ This is the ingredient **as used by this recipe**, not the canonical food.
 | `presentationMode` | Whether to show structured, original, or custom text |
 | `customDisplayText` | Optional explicit presentation override |
 | `quantity` | Parsed quantity expression, if any |
-| `unit` | Parsed or selected recipe unit, if any |
-| `ingredient` | Link to a normalized ingredient concept, if resolved |
+| `unitText` | Parsed or selected recipe-unit wording, if any |
+| `package` | Optional structured package quantity and unit wording |
 | `ingredientText` | Parsed name before/without resolution |
 | `preparation` | “finely chopped,” “divided,” “at room temperature” |
-| `optional` | Whether the line describes an optional ingredient |
+| `note` | Other authored guidance retained with the row |
+| `isOptional` | Whether the line describes an optional ingredient |
 | `scalingBehavior` | linear, fixed, or manual-review |
 | `parseState` | unparsed, parsed, reviewed, or edited |
-| `parseConfidence` | Optional signal used by the review interface |
 
 Both `originalText` and structured fields are necessary. For example:
 
@@ -141,10 +159,12 @@ The package size is meaningful but does not fit cleanly into a single quantity
 and unit. `PackageDescription` represents it without blocking
 the first implementation.
 
-### Ingredient
+### Future Ingredient seam
 
-A kitchen-scoped normalized concept such as “whole tomatoes” or “unsalted
-butter.” It is deliberately not a commercial product and not a pantry record.
+A later pantry slice may add a kitchen-scoped normalized concept such as “whole
+tomatoes” or “unsalted butter.” It is deliberately not a commercial product and
+not a pantry record. The implemented recipe row currently retains
+`ingredientText`; it does not yet carry this reference.
 
 ```text
 id
@@ -170,10 +190,12 @@ text("one generous handful")
 Exact numeric values should use rational or decimal arithmetic. Fractions must
 round-trip cleanly; `1/3` must not become `0.333333` in the editor.
 
-### Unit
+### Future Unit seam
 
-A recipe unit has a stable identity, preferred label, aliases, and a dimension
-where known.
+A later normalization slice may give a recipe unit stable identity, a preferred
+label, aliases, and a dimension where known. The implemented recipe row stores
+authored `unitText`, which remains lossless without claiming that normalization
+has occurred.
 
 ```text
 id
@@ -199,9 +221,8 @@ InstructionSection
 InstructionStep
   name?
   text
-  image?
-  sourceURL?
   duration?
+  temperature?
 ```
 
 Steps do not initially require explicit links to ingredients. That feature can

@@ -3,105 +3,51 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 import KitchenMemoryDomain
+import KitchenMemoryLogic
 import SwiftUI
 
-struct RecipeScalingSelection: Equatable {
-  let recipeYield: RecipeYield?
-  var selectedBasisIndex = 0
-  var workingYield: RationalQuantity?
-
-  init(recipeYield: RecipeYield?) {
-    self.recipeYield = recipeYield
-    workingYield = recipeYield?.scalingBases.first?.quantity
-  }
-
-  var bases: [RecipeYieldBasis] { recipeYield?.scalingBases ?? [] }
-
-  var selectedBasis: RecipeYieldBasis? {
-    guard bases.indices.contains(selectedBasisIndex) else { return nil }
-    return bases[selectedBasisIndex]
-  }
-
-  var scale: RecipeScale? {
-    guard let baseYield = selectedBasis?.quantity, let workingYield else { return nil }
-    return RecipeScale(baseYield: baseYield, workingYield: workingYield)
-  }
-
-  var displayedYield: String {
+extension RecipeScalingState {
+  func displayedYield(locale: Locale) -> String {
     guard let recipeYield else { return "" }
+    let formatter = RecipePresentationFormatter(locale: locale)
+    let base = recipeYield.originalText.isEmpty
+      ? recipeYield.quantity.flatMap { formatter.quantity($0) } ?? recipeYield.unitText ?? ""
+      : recipeYield.originalText
     guard let scale, scale.multiplier != RationalQuantity(numerator: 1) else {
-      return recipeYield.originalText
+      return base
     }
-    return "\(workingYieldLabel) (base: \(recipeYield.originalText))"
+    return String(localized: "\(workingYieldLabel(locale: locale)) (base: \(base))", locale: locale)
   }
 
-  var workingYieldLabel: String {
+  func workingYieldLabel(locale: Locale) -> String {
     guard let recipeYield, let workingYield else { return recipeYield?.originalText ?? "" }
-    return joinedYield(quantity: workingYield, unitText: recipeYield.unitText)
-  }
-
-  var canDecreaseWorkingYield: Bool {
-    guard let current = workingYield?.normalized else { return false }
-    return current.numerator > current.denominator
-  }
-
-  var canIncreaseWorkingYield: Bool {
-    guard let current = workingYield?.normalized else { return false }
-    let (maximumNumerator, overflow) = current.denominator.multipliedReportingOverflow(by: 999)
-    return !overflow && current.numerator <= maximumNumerator - current.denominator
-  }
-
-  mutating func selectBasis(_ index: Int) {
-    guard bases.indices.contains(index) else { return }
-    selectedBasisIndex = index
-    workingYield = bases[index].quantity
-  }
-
-  mutating func adjustWorkingYield(by wholeNumber: Int) {
-    guard let current = workingYield?.normalized else { return }
-    let (delta, deltaOverflow) = current.denominator.multipliedReportingOverflow(
-      by: wholeNumber
+    return RecipePresentationFormatter(locale: locale).yield(
+      quantity: workingYield,
+      unitText: recipeYield.unitText
     )
-    let (numerator, additionOverflow) = current.numerator.addingReportingOverflow(delta)
-    guard !deltaOverflow, !additionOverflow, numerator > 0 else { return }
-
-    let (maximumNumerator, maximumOverflow) = current.denominator.multipliedReportingOverflow(
-      by: 999
-    )
-    guard !maximumOverflow, numerator <= maximumNumerator else { return }
-    workingYield = RationalQuantity(
-      numerator: numerator,
-      denominator: current.denominator
-    ).normalized
   }
 
-  func basisLabel(_ basis: RecipeYieldBasis) -> String {
-    let value = joinedYield(quantity: basis.quantity, unitText: recipeYield?.unitText)
+  func basisLabel(_ basis: RecipeYieldBasis, locale: Locale) -> String {
+    let value = RecipePresentationFormatter(locale: locale).yield(
+      quantity: basis.quantity,
+      unitText: recipeYield?.unitText
+    )
     switch basis.kind {
     case .exact:
       return value
     case .approximate:
-      return "About \(value)"
+      return String(localized: "About \(value)", locale: locale)
     case .rangeLowerBound:
-      return "Lower estimate: \(value)"
+      return String(localized: "Lower estimate: \(value)", locale: locale)
     case .rangeUpperBound:
-      return "Upper estimate: \(value)"
+      return String(localized: "Upper estimate: \(value)", locale: locale)
     }
-  }
-
-  private func joinedYield(quantity: RationalQuantity, unitText: String?) -> String {
-    let unit: String?
-    if quantity == RationalQuantity(numerator: 1), let unitText, unitText.hasSuffix("s") {
-      unit = String(unitText.dropLast())
-    } else {
-      unit = unitText
-    }
-    return [quantity.renderedText, unit].compactMap { $0 }.joined(separator: " ")
   }
 }
 
 struct RecipeScalingControls: View {
-  @Binding var selection: RecipeScalingSelection
+  @Binding var selection: RecipeScalingState
+  @Environment(\.locale) private var locale
 
   @ViewBuilder
   var body: some View {
@@ -112,7 +58,7 @@ struct RecipeScalingControls: View {
           if selection.bases.count > 1 {
             Picker("Base yield", selection: basisBinding) {
               ForEach(selection.bases.indices, id: \.self) { index in
-                Text(selection.basisLabel(selection.bases[index])).tag(index)
+                Text(selection.basisLabel(selection.bases[index], locale: locale)).tag(index)
               }
             }
             .accessibilityIdentifier("recipe-scaling-basis")
@@ -149,14 +95,14 @@ struct RecipeScalingControls: View {
       VStack(alignment: .leading, spacing: 3) {
         Text("Working yield")
           .font(.headline)
-        Text(selection.workingYieldLabel)
+        Text(selection.workingYieldLabel(locale: locale))
           .font(.title3.monospacedDigit())
           .foregroundStyle(Color("IconMark"))
       }
       .frame(maxWidth: .infinity, alignment: .leading)
       .accessibilityElement(children: .combine)
       .accessibilityLabel("Working yield")
-      .accessibilityValue(selection.workingYieldLabel)
+      .accessibilityValue(selection.workingYieldLabel(locale: locale))
       .accessibilityIdentifier("recipe-working-yield")
 
       Button {
@@ -187,7 +133,7 @@ struct RecipeScalingControls: View {
       Spacer(minLength: 12)
       if selection.workingYield != selection.selectedBasis?.quantity {
         Button("Reset") {
-          selection.workingYield = selection.selectedBasis?.quantity
+          selection.resetWorkingYield()
         }
         .accessibilityLabel("Reset to base yield")
         .accessibilityIdentifier("recipe-scaling-reset")
@@ -206,6 +152,7 @@ struct RecipeScalingControls: View {
 struct ScaledIngredientRow: View {
   let ingredient: RecipeIngredient
   let scale: RecipeScale?
+  @Environment(\.locale) private var locale
 
   private var scaled: ScaledRecipeIngredient? {
     scale.map { ingredient.scaled(using: $0) }
@@ -218,7 +165,7 @@ struct ScaledIngredientRow: View {
         .foregroundStyle(Color("AccentColor"))
         .accessibilityHidden(true)
       VStack(alignment: .leading, spacing: 4) {
-        Text(scaled?.ingredient.effectiveDisplayText ?? ingredient.effectiveDisplayText)
+        Text(RecipePresentationFormatter(locale: locale).ingredient(scaled?.ingredient ?? ingredient))
           .textSelection(.enabled)
         if let explanation {
           Label(explanation, systemImage: "exclamationmark.triangle")
@@ -237,15 +184,17 @@ struct ScaledIngredientRow: View {
     case .scaled, .unchangedWithoutQuantity:
       return nil
     case .unchangedManualReview:
-      return "Check this amount manually when changing the yield."
+      return String(localized: "Check this amount manually when changing the yield.")
     case .unchangedFixed:
-      return isBaseScale ? nil : "Fixed amount; left unchanged."
+      return isBaseScale ? nil : String(localized: "Fixed amount; left unchanged.")
     case .unchangedText:
-      return isBaseScale ? nil : "Written amount; left unchanged."
+      return isBaseScale ? nil : String(localized: "Written amount; left unchanged.")
     case .unchangedPresentationOverride:
-      return isBaseScale ? nil : "Display wording could not be scaled safely; left unchanged."
+      return isBaseScale
+        ? nil
+        : String(localized: "Display wording could not be scaled safely; left unchanged.")
     case .unchangedArithmeticFailure:
-      return "Could not scale this amount safely; left unchanged."
+      return String(localized: "Could not scale this amount safely; left unchanged.")
     }
   }
 

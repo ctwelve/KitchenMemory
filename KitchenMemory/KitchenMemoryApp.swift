@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 import KitchenMemoryDomain
+import KitchenMemoryLogic
 import KitchenMemoryPersistence
 import SwiftData
 import SwiftUI
@@ -13,9 +14,19 @@ struct KitchenMemoryApp: App {
 
   init() {
     do {
+#if DEVELOP
+      if AppRuntimeConfiguration.initializesCloudKitSchema(
+        arguments: ProcessInfo.processInfo.arguments
+      ) {
+        try CloudKitDevelopmentSchemaInitializer.initialize()
+      }
+#endif
       dependencies = try AppDependencies(
         inMemory: AppRuntimeConfiguration.usesInMemoryStore(
           arguments: ProcessInfo.processInfo.arguments
+        ),
+        synchronizesWithPersonalCloud: AppRuntimeConfiguration.synchronizesWithPersonalCloud(
+          environment: ProcessInfo.processInfo.environment
         )
       )
     } catch {
@@ -43,20 +54,72 @@ struct KitchenMemoryApp: App {
   }
 }
 
+enum AppBuildEnvironment: CaseIterable {
+  case debug
+  case develop
+  case testing
+  case production
+  case productionTesting
+
+  static var current: Self {
+#if TESTING && PRODUCTION
+    .productionTesting
+#elseif TESTING
+    .testing
+#elseif DEVELOP
+    .develop
+#elseif PRODUCTION
+    .production
+#else
+    .debug
+#endif
+  }
+
+  var synchronizesWithPersonalCloud: Bool {
+    self == .develop || self == .production
+  }
+
+  var permitsUITestHarness: Bool {
+    self == .testing || self == .productionTesting
+  }
+
+  var permitsCloudKitSchemaAdministration: Bool {
+    self == .develop
+  }
+}
+
 enum AppRuntimeConfiguration {
   /// Whether this process may replace durable storage with an in-memory store.
   ///
   /// UI automation needs deterministic disposable state, but launch arguments
-  /// are also ordinary process input on macOS. A production app must never let
-  /// an argument make entered or imported recipes appear to save and then
-  /// vanish at process exit. Compile the switch out of Release rather than
-  /// relying on callers to avoid an undocumented flag.
-  static func usesInMemoryStore(arguments: [String]) -> Bool {
-#if DEBUG
-    arguments.contains("--ui-testing")
-#else
-    false
-#endif
+  /// are also ordinary process input on macOS. The switch exists only in the
+  /// Testing and non-distributable ProductionTesting configurations.
+  static func usesInMemoryStore(
+    arguments: [String],
+    buildEnvironment: AppBuildEnvironment = .current
+  ) -> Bool {
+    buildEnvironment.permitsUITestHarness && arguments.contains("--ui-testing")
+  }
+
+  /// Whether the host process should attach its durable store to CloudKit.
+  ///
+  /// Develop and Production attach ordinary launches to personal CloudKit.
+  /// Debug, Testing, and ProductionTesting remain local so diagnostics and test
+  /// evidence never depend on an iCloud account.
+  static func synchronizesWithPersonalCloud(
+    environment: [String: String],
+    buildEnvironment: AppBuildEnvironment = .current
+  ) -> Bool {
+    buildEnvironment.synchronizesWithPersonalCloud
+      && environment["XCTestConfigurationFilePath"] == nil
+  }
+
+  static func initializesCloudKitSchema(
+    arguments: [String],
+    buildEnvironment: AppBuildEnvironment = .current
+  ) -> Bool {
+    buildEnvironment.permitsCloudKitSchemaAdministration
+      && arguments.contains("--initialize-cloudkit-schema")
   }
 }
 
@@ -64,20 +127,61 @@ enum AppRuntimeConfiguration {
 struct AppDependencies {
   let modelContainer: ModelContainer
   let libraryModel: RecipeLibraryModel
+  let persistentStoreChangeObserver: PersistentStoreChangeObserver?
+  let personalCloudStatusMonitor: PersonalCloudStatusMonitor?
 
-  init(inMemory: Bool = false) throws {
-    let modelContainer = try KitchenMemorySchema.makeContainer(inMemory: inMemory)
+  init(
+    inMemory: Bool = false,
+    synchronizesWithPersonalCloud: Bool = false,
+    sampleOnboardingStore: (any SampleRecipeOnboardingStoring)? = nil,
+    sampleProvider: (any SampleRecipeProviding)? = nil
+  ) throws {
+    let synchronization: KitchenMemoryStoreSynchronization = synchronizesWithPersonalCloud
+      ? .personalCloud(containerIdentifier: KitchenMemorySchema.personalCloudContainerIdentifier)
+      : .localOnly
+    let modelContainer = try KitchenMemorySchema.makeContainer(
+      inMemory: inMemory,
+      synchronization: synchronization
+    )
     let repository = SwiftDataRecipeRepository(modelContainer: modelContainer)
-    let kitchen = try Self.prepareInitialKitchen(repository: repository)
+    let samples = sampleProvider ?? BundledSampleRecipeProvider()
+    let kitchen = try KitchenBootstrapService(repository: repository).prepareInitialKitchen()
+    let onboardingStore = sampleOnboardingStore ?? Self.defaultOnboardingStore(inMemory: inMemory)
+    let sampleInstaller = SampleRecipeInstallService(repository: repository, samples: samples)
 
-    self.modelContainer = modelContainer
-    libraryModel = RecipeLibraryModel(
+    // Disposable previews and UI smoke tests request a ready-made fixture.
+    // Durable launches never infer installation permission from this path.
+    if inMemory, sampleOnboardingStore == nil {
+      try sampleInstaller.install(in: kitchen.id)
+    }
+
+    let libraryModel = RecipeLibraryModel(
       kitchenID: kitchen.id,
       library: RecipeLibrary(repository: repository),
       editor: RecipeEditor(repository: repository),
       importer: RecipeImportService(),
-      resetService: KitchenResetService(repository: repository)
+      resetService: KitchenResetService(repository: repository, samples: samples),
+      sampleInstaller: sampleInstaller,
+      sampleOnboardingStore: onboardingStore
     )
+    self.modelContainer = modelContainer
+    self.libraryModel = libraryModel
+    persistentStoreChangeObserver = synchronizesWithPersonalCloud
+      ? PersistentStoreChangeObserver {
+        libraryModel.reloadAfterExternalStoreChange()
+      }
+      : nil
+    let personalCloudStatusMonitor = synchronizesWithPersonalCloud
+      ? PersonalCloudStatusMonitor(
+        accountChecker: CloudKitAccountChecker(
+          containerIdentifier: KitchenMemorySchema.personalCloudContainerIdentifier
+        )
+      ) { status in
+        libraryModel.updatePersonalCloudStatus(status)
+      }
+      : nil
+    self.personalCloudStatusMonitor = personalCloudStatusMonitor
+    personalCloudStatusMonitor?.start()
   }
 
   static var preview: AppDependencies {
@@ -89,19 +193,14 @@ struct AppDependencies {
   }
 
   static func prepareInitialKitchen(repository: any RecipeRepository) throws -> Kitchen {
-    if let existingKitchen = try repository.kitchens().first {
-      return existingKitchen
-    }
+    try KitchenBootstrapService(repository: repository).prepareInitialKitchen()
+  }
 
-    let kitchen = Kitchen(name: "Home Kitchen")
-    try repository.save(kitchen)
-
-    let manifest = try SampleRecipeCatalog.loadManifest()
-    for reference in manifest.recipes {
-      let document = try SampleRecipeCatalog.loadRecipe(reference)
-      let materialized = try document.materialize(in: kitchen.id)
-      try repository.save(recipe: materialized.recipe, revision: materialized.revision)
-    }
-    return kitchen
+  private static func defaultOnboardingStore(
+    inMemory: Bool
+  ) -> any SampleRecipeOnboardingStoring {
+    inMemory
+      ? VolatileSampleRecipeOnboardingStore(response: .accepted)
+      : UserDefaultsSampleRecipeOnboardingStore()
   }
 }

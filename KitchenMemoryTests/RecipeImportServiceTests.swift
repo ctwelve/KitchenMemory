@@ -2,7 +2,7 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: GPL-3.0-only
 
-@testable import KitchenMemory
+@testable import KitchenMemoryLogic
 import Foundation
 import KitchenMemoryDomain
 import KitchenMemoryImport
@@ -25,6 +25,7 @@ final class RecipeImportServiceTests: XCTestCase {
       id: .init(blockIndex: 2, objectIndex: 4),
       draft: RecipeImportDraft(
         title: "Soup",
+        contentLanguage: RecipeContentLanguage(rawValue: "fr-CA"),
         source: RecipeSource(kind: .webpage, canonicalURL: publisherCanonicalURL),
         cuisines: ["French"],
         categories: ["Dinner"],
@@ -61,6 +62,7 @@ final class RecipeImportServiceTests: XCTestCase {
     let option = try XCTUnwrap(options.first)
 
     XCTAssertEqual(option.draft.cuisines, ["French"])
+    XCTAssertEqual(option.draft.contentLanguage?.rawValue, "fr-CA")
     XCTAssertEqual(option.draft.categories, ["Dinner"])
     XCTAssertEqual(option.draft.keywords, ["quick"])
     XCTAssertEqual(option.concerns, [

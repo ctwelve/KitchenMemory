@@ -20,7 +20,7 @@ devices and people.
 ```text
 KitchenMemoryDomain
         ↓
-Application use cases and repository interfaces
+KitchenMemoryLogic and domain-facing repository interfaces
         ↓
 SwiftData persistence records and mapping
         ↓
@@ -63,6 +63,10 @@ Kitchen
 └── Tag[]
 ```
 
+Only the Kitchen, Recipe, and RecipeRevision portion is implemented today. The
+remaining branches are accepted ownership direction for later product slices,
+not claims about current source types or persistence tables.
+
 `KitchenMember` represents product-level attribution and household behavior.
 CloudKit share participation and permission remain authoritative in the sync
 layer; the domain must not copy framework participants indiscriminately.
@@ -92,6 +96,13 @@ holding, may be owned and mutated through that aggregate.
 `RecipeRevision` contains the maintained content at a point in time. Planned
 cooks and cooking sessions retain the specific revision they used so that
 history remains intelligible after later edits.
+
+The authored language of that content belongs to the revision, not to the
+application's current locale. `RecipeRevision.contentLanguage` is an optional
+canonical BCP 47 language tag so existing content may remain explicitly unknown,
+imports can preserve source language when available, and localized bundled
+recipes do not lose their language after persistence. Display-language selection
+and localized interface strings remain outside the domain.
 
 Creating a revision is an intentional domain action. SwiftData save history and
 CloudKit conflict metadata are implementation details and do not substitute for
@@ -159,14 +170,20 @@ neither callers nor domain values depend on SwiftData model identity. The first
 repository supports saving and loading a kitchen, a recipe's current revision,
 and its saved revision history (newest first).
 
-The initial local store uses SwiftData's standard location and is explicitly
-local-only: synchronization remains behind the same repository boundary until
-the shared-Kitchen prototype selects its CloudKit behavior. The database is not
-the export format. It is installed through an explicit V1 migration plan; later
-schema changes add immutable versions and deliberate migration stages.
+The initial store uses SwiftData's standard location. Slice 10 adds private
+cross-device synchronization behind the same repository boundary after a
+focused prototype selects the CloudKit integration and proves recovery behavior.
+Shared-Kitchen collaboration remains a separate problem involving participants,
+permissions, and shared database scope. The database is not the export format.
+It is installed through an explicit V1 migration plan. Before first release V1
+may change with a development-store reset; after release, later schema changes
+add immutable versions and deliberate migration stages. Production CloudKit
+evolution is additive: new feature aggregates may add types and fields, while
+published schema elements keep their original meaning.
 
-Application code in the main `KitchenMemory` target supplies the first such use
-case. `RecipeLibrary` provides Kitchen-scoped listing and stable-identifier
-lookup to SwiftUI without exposing SwiftData records. The app's first read-only
-recipe view exercises that path from the persistent current revision through
-ordered ingredients and steps.
+`KitchenMemoryLogic` supplies the product use cases. `RecipeLibrary` provides
+Kitchen-scoped listing and stable-identifier lookup to SwiftUI without exposing
+SwiftData records; editing, import interpretation, scaling state, bootstrap, and
+reset behavior share the same UI-independent boundary. The app's recipe view
+exercises that path from the persistent current revision through ordered
+ingredients and steps.

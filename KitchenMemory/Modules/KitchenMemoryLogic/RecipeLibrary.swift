@@ -2,6 +2,8 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: GPL-3.0-only
 
+// Shared read operations live in KitchenMemoryLogic rather than any one UI.
+
 import KitchenMemoryDomain
 import KitchenMemoryPersistence
 

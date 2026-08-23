@@ -193,7 +193,7 @@ private extension SchemaOrgRecipeImporter {
     ) -> Bool {
         let ordinaryFields = [
             "name", "description", "author", "publisher", "url", "mainEntityOfPage",
-            "recipeYield", "prepTime", "cookTime", "totalTime", "recipeCuisine",
+            "recipeYield", "prepTime", "cookTime", "totalTime", "inLanguage", "recipeCuisine",
             "recipeCategory", "keywords", "image",
         ]
         for key in ordinaryFields {
@@ -227,7 +227,10 @@ private extension SchemaOrgRecipeImporter {
         normalizedOutputBudget: inout NormalizedOutputBudget
     ) throws(NormalizedOutputLimitExceeded) -> RecipeImportDraft {
         let canonicalURL = resolvedWebURL(
-            from: object["url"] ?? mainEntityURL(object["mainEntityOfPage"]),
+            from: object["url"],
+            relativeTo: documentURL
+        ) ?? resolvedMainEntityURL(
+            object["mainEntityOfPage"],
             relativeTo: documentURL
         ) ?? documentURL
         let author = try authorName(
@@ -253,6 +256,7 @@ private extension SchemaOrgRecipeImporter {
             title: cleanText(title),
             summary: text(object["description"]).map(cleanText),
             authorName: author,
+            contentLanguage: contentLanguage(object["inLanguage"]),
             source: RecipeSource(
                 kind: .webpage,
                 title: cleanText(title),
@@ -287,9 +291,21 @@ private extension SchemaOrgRecipeImporter {
         return draft
     }
 
-    static func mainEntityURL(_ value: Any?) -> Any? {
-        guard let object = value as? [String: Any] else { return value }
-        return object["@id"] ?? object["url"]
+    static func contentLanguage(_ value: Any?) -> RecipeContentLanguage? {
+        if let identifier = text(value) {
+            return RecipeContentLanguage(rawValue: identifier)
+        }
+        guard let object = value as? [String: Any] else { return nil }
+        return text(object["@id"]).flatMap(RecipeContentLanguage.init(rawValue:))
+            ?? text(object["name"]).flatMap(RecipeContentLanguage.init(rawValue:))
+    }
+
+    static func resolvedMainEntityURL(_ value: Any?, relativeTo baseURL: URL?) -> URL? {
+        guard let object = value as? [String: Any] else {
+            return resolvedWebURL(from: value, relativeTo: baseURL)
+        }
+        return resolvedWebURL(from: object["@id"], relativeTo: baseURL)
+            ?? resolvedWebURL(from: object["url"], relativeTo: baseURL)
     }
 
     static func authorName(
@@ -331,16 +347,21 @@ private extension SchemaOrgRecipeImporter {
     }
 
     static func yield(_ value: Any?) -> RecipeYield? {
-        if let original = text(value) {
-            return RecipeYield(originalText: cleanText(original))
+        if let values = value as? [Any] {
+            guard let first = values.compactMap(cleanedNonemptyText).first else { return nil }
+            return RecipeYield(originalText: first)
         }
-        if let first = (value as? [Any])?.compactMap(text).first {
-            return RecipeYield(originalText: cleanText(first))
+        if let object = value as? [String: Any] {
+            guard let original = cleanedNonemptyText(object["value"])
+                ?? cleanedNonemptyText(object["name"])
+            else { return nil }
+            return RecipeYield(
+                unitText: cleanedNonemptyText(object["unitText"]),
+                originalText: original
+            )
         }
-        guard let object = value as? [String: Any] else { return nil }
-        let original = text(object["value"]) ?? text(object["name"])
-        guard let original else { return nil }
-        return RecipeYield(unitText: text(object["unitText"]), originalText: cleanText(original))
+        guard let original = cleanedNonemptyText(value) else { return nil }
+        return RecipeYield(originalText: original)
     }
 
     static func duration(_ value: Any?) -> RecipeDuration? {
@@ -475,7 +496,9 @@ private extension SchemaOrgRecipeImporter {
     /// The untouched value remains in the captured JSON-LD if future correction
     /// or parser improvements need it.
     static func resolvedWebURL(from value: Any?, relativeTo baseURL: URL?) -> URL? {
-        guard let string = text(value) else { return nil }
+        guard let string = text(value)?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !string.isEmpty
+        else { return nil }
         guard let url = URL(string: string, relativeTo: baseURL)?.absoluteURL,
               URLSessionRecipeDocumentLoader.isStructurallyAllowedSourceURL(url)
         else { return nil }
@@ -497,7 +520,7 @@ private extension SchemaOrgRecipeImporter {
                 value,
                 maximumFieldCharacters: maximumFieldCharacters,
                 maximumUTF8Bytes: maximumUTF8Bytes
-            ) else { continue }
+            ), !text.isEmpty else { continue }
             guard ingredients.count < maximum else { throw NormalizedOutputLimitExceeded() }
             ingredients.append(IngredientLineParser.parse(text))
         }
@@ -509,33 +532,35 @@ private extension SchemaOrgRecipeImporter {
         maximumFieldCharacters: Int,
         maximumUTF8Bytes: Int
     ) throws(NormalizedOutputLimitExceeded) -> String? {
-        if let string = scalarText(value) { return string }
+        if scalarText(value) != nil { return cleanedNonemptyText(value) }
         guard let object = value as? [String: Any] else { return nil }
-        if let value = text(object["value"]), let unit = text(object["unitText"]) {
-            var result = ""
-            var charactersUsed = 0
-            var utf8BytesUsed = 0
-            try appendBounded(
-                value,
-                to: &result,
-                separator: "",
-                charactersUsed: &charactersUsed,
-                utf8BytesUsed: &utf8BytesUsed,
-                maximumCharacters: maximumFieldCharacters,
-                maximumUTF8Bytes: maximumUTF8Bytes
-            )
-            try appendBounded(
-                unit,
-                to: &result,
-                separator: " ",
-                charactersUsed: &charactersUsed,
-                utf8BytesUsed: &utf8BytesUsed,
-                maximumCharacters: maximumFieldCharacters,
-                maximumUTF8Bytes: maximumUTF8Bytes
-            )
-            return result
+        guard let structuredValue = cleanedNonemptyText(object["value"]) else {
+            return cleanedNonemptyText(object["name"])
         }
-        return text(object["value"]) ?? text(object["name"])
+        guard let unit = cleanedNonemptyText(object["unitText"]) else { return structuredValue }
+
+        var result = ""
+        var charactersUsed = 0
+        var utf8BytesUsed = 0
+        try appendBounded(
+            structuredValue,
+            to: &result,
+            separator: "",
+            charactersUsed: &charactersUsed,
+            utf8BytesUsed: &utf8BytesUsed,
+            maximumCharacters: maximumFieldCharacters,
+            maximumUTF8Bytes: maximumUTF8Bytes
+        )
+        try appendBounded(
+            unit,
+            to: &result,
+            separator: " ",
+            charactersUsed: &charactersUsed,
+            utf8BytesUsed: &utf8BytesUsed,
+            maximumCharacters: maximumFieldCharacters,
+            maximumUTF8Bytes: maximumUTF8Bytes
+        )
+        return result
     }
 
     static func instructionSections(
@@ -749,6 +774,12 @@ private extension SchemaOrgRecipeImporter {
 
     static func cleanText(_ value: String) -> String {
         ImportedPlainTextNormalizer.normalize(value)
+    }
+
+    static func cleanedNonemptyText(_ value: Any?) -> String? {
+        guard let raw = text(value) else { return nil }
+        let cleaned = cleanText(raw)
+        return cleaned.isEmpty ? nil : cleaned
     }
 }
 

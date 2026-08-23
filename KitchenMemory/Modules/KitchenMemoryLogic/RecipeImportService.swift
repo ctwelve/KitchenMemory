@@ -2,6 +2,9 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: GPL-3.0-only
 
+// Import interpretation is product logic; networking and JSON-LD discovery
+// remain behind KitchenMemoryImport.
+
 import Foundation
 import KitchenMemoryDomain
 import KitchenMemoryImport
@@ -59,10 +62,19 @@ public enum RecipeImportServiceError: Error, Equatable, Sendable {
 }
 
 public struct RecipeImportService: RecipeImportServing, Sendable {
-  private let importer: RecipeURLImporter<URLSessionRecipeDocumentLoader>
+  private let importer: any RecipeURLImporting
+  private let now: @Sendable () -> Date
 
   public init(loader: URLSessionRecipeDocumentLoader = .init()) {
-    importer = RecipeURLImporter(loader: loader)
+    self.init(importer: RecipeURLImporter(loader: loader))
+  }
+
+  public init(
+    importer: any RecipeURLImporting,
+    now: @escaping @Sendable () -> Date = { Date() }
+  ) {
+    self.importer = importer
+    self.now = now
   }
 
   public func importRecipe(from url: URL) async throws -> [RecipeImportOption] {
@@ -83,7 +95,7 @@ public struct RecipeImportService: RecipeImportServing, Sendable {
     } catch {
       throw RecipeImportServiceError.networkFailure
     }
-    return try Self.options(from: result, requestedURL: url, capturedAt: Date())
+    return try Self.options(from: result, requestedURL: url, capturedAt: now())
   }
 
   static func options(
@@ -172,6 +184,7 @@ public struct RecipeImportService: RecipeImportServing, Sendable {
         title: draft.title,
         summary: draft.summary,
         authorName: draft.authorName,
+        contentLanguage: draft.contentLanguage,
         source: attributedSource,
         sourceCapture: RecipeSourceCapture(
           kind: .schemaOrgJSONLD,

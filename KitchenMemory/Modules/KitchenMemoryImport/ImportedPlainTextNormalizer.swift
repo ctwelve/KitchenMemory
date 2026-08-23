@@ -170,7 +170,7 @@ enum ImportedPlainTextNormalizer {
     }
 
     private static func isSuppressedRawTextElement(_ name: [UInt8]) -> Bool {
-        equals(script, name, caseInsensitive: true) || equals(style, name, caseInsensitive: true)
+        equalsIgnoringASCIICase(script, name) || equalsIgnoringASCIICase(style, name)
     }
 
     private static func collapsingWhitespace(in source: String) -> String {
@@ -227,18 +227,10 @@ enum ImportedPlainTextNormalizer {
         return true
     }
 
-    private static func equals(
-        _ left: [UInt8],
-        _ right: [UInt8],
-        caseInsensitive: Bool
-    ) -> Bool {
+    private static func equalsIgnoringASCIICase(_ left: [UInt8], _ right: [UInt8]) -> Bool {
         guard left.count == right.count else { return false }
         for index in left.indices {
-            if caseInsensitive {
-                guard lowercaseASCII(left[index]) == lowercaseASCII(right[index]) else { return false }
-            } else if left[index] != right[index] {
-                return false
-            }
+            guard lowercaseASCII(left[index]) == lowercaseASCII(right[index]) else { return false }
         }
         return true
     }

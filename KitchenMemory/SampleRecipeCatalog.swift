@@ -27,9 +27,42 @@ public struct SampleRecipePackManifest: Codable, Equatable, Identifiable, Sendab
 }
 
 public struct SampleRecipeReference: Codable, Equatable, Sendable {
+    public let familyID: UUID
+    public let variants: [LocalizedSampleRecipeReference]
+}
+
+public struct LocalizedSampleRecipeReference: Codable, Equatable, Sendable {
+    public let localeIdentifier: String
     public let recipeID: Recipe.ID
     public let dataAssetName: String
     public let heroImageAssetName: String?
+}
+
+public extension SampleRecipeReference {
+    func variant(preferredLanguages: [String]) -> LocalizedSampleRecipeReference? {
+        let preferences = preferredLanguages.map(Self.canonicalLocale)
+        for preference in preferences {
+            if let exact = variants.first(where: {
+                Self.canonicalLocale($0.localeIdentifier) == preference
+            }) {
+                return exact
+            }
+            if let language = variants.first(where: {
+                Self.language(of: $0.localeIdentifier) == Self.language(of: preference)
+            }) {
+                return language
+            }
+        }
+        return variants.first { Self.language(of: $0.localeIdentifier) == "en" }
+    }
+
+    private static func canonicalLocale(_ identifier: String) -> String {
+        Locale(identifier: identifier).identifier(.bcp47).lowercased()
+    }
+
+    private static func language(of identifier: String) -> String {
+        canonicalLocale(identifier).split(separator: "-").first.map(String.init) ?? ""
+    }
 }
 
 public struct SampleRecipeDocument: Codable, Equatable, Sendable {
@@ -67,12 +100,26 @@ public enum SampleRecipeCatalog {
         try decodeAsset(named: "SampleManifest", as: SampleRecipePackManifest.self)
     }
 
-    public static func loadRecipe(_ reference: SampleRecipeReference) throws -> SampleRecipeDocument {
+    public static func loadRecipe(
+        _ reference: LocalizedSampleRecipeReference
+    ) throws -> SampleRecipeDocument {
         let document = try decodeAsset(named: reference.dataAssetName, as: SampleRecipeDocument.self)
         guard document.recipeID == reference.recipeID else {
             throw SampleRecipeCatalogError.inconsistentRecipeIdentity
         }
         return document
+    }
+
+    public static func localizedRecipes(
+        in manifest: SampleRecipePackManifest,
+        preferredLanguages: [String]
+    ) throws -> [LocalizedSampleRecipeReference] {
+        try manifest.recipes.map { reference in
+            guard let variant = reference.variant(preferredLanguages: preferredLanguages) else {
+                throw SampleRecipeCatalogError.missingAsset(reference.familyID.uuidString)
+            }
+            return variant
+        }
     }
 
     /// Locates an image in the bundled sample pack.

@@ -2,7 +2,7 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: GPL-3.0-only
 
-@testable import KitchenMemory
+@testable import KitchenMemoryLogic
 import KitchenMemoryDomain
 import KitchenMemoryPersistence
 import XCTest
@@ -61,6 +61,7 @@ private final class InMemoryRecipeRepository: RecipeRepository {
   var revisionsByRecipeID: [Recipe.ID: [RecipeRevision]] = [:]
 
   func save(_ kitchen: Kitchen) throws {}
+  func create(_ kitchen: Kitchen, with recipes: [StoredRecipe]) throws {}
   func save(recipe: Recipe, revision: RecipeRevision) throws {}
   func kitchens() throws -> [Kitchen] { [] }
   func kitchen(id: Kitchen.ID) throws -> Kitchen? { nil }
@@ -71,6 +72,11 @@ private final class InMemoryRecipeRepository: RecipeRepository {
 
   func recipes(in kitchenID: Kitchen.ID) throws -> [StoredRecipe] {
     storedRecipes.filter { $0.recipe.kitchenID == kitchenID }
+  }
+
+  func addRecipes(_ recipes: [StoredRecipe], to kitchenID: Kitchen.ID) throws {
+    let existingIDs = Set(storedRecipes.map(\.id))
+    storedRecipes.append(contentsOf: recipes.filter { !existingIDs.contains($0.id) })
   }
 
   func revisions(for recipeID: Recipe.ID) throws -> [RecipeRevision] {

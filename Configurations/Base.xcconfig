@@ -1,0 +1,7 @@
+// Kitchen Memory
+// Copyright © 2026 the Kitchen Memory contributors.
+// SPDX-License-Identifier: GPL-3.0-only
+
+KITCHEN_MEMORY_CLOUDKIT_CONTAINER = iCloud.net.ctwelve.KitchenMemory
+KITCHEN_MEMORY_CLOUDKIT_ENVIRONMENT = Development
+KITCHEN_MEMORY_APS_ENVIRONMENT = development

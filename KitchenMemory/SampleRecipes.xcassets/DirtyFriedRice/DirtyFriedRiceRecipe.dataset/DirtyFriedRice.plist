@@ -20,6 +20,8 @@
 		<string>Not dirty rice. Not quite fried rice. A beefy, peppery, mildly spicy pantry raid with Hatch chiles, egg, vegetables, and a Bismarck, North Dakota passport. Allow approximately 20–30 minutes.</string>
 		<key>authorName</key>
 		<string>cTwelve</string>
+		<key>contentLanguage</key>
+		<string>en-US</string>
 		<key>source</key>
 		<dict>
 			<key>kind</key>

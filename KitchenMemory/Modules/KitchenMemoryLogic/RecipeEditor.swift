@@ -2,6 +2,9 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: GPL-3.0-only
 
+// UI-independent recipe editing belongs to KitchenMemoryLogic so every
+// presentation and automation surface creates the same immutable revisions.
+
 import Foundation
 import KitchenMemoryDomain
 import KitchenMemoryPersistence
@@ -15,6 +18,7 @@ public struct RecipeDraft: Equatable, Sendable {
   public var title: String
   public var summary: String?
   public var authorName: String?
+  public var contentLanguage: RecipeContentLanguage?
   public var source: RecipeSource?
   public var sourceCapture: RecipeSourceCapture?
   public var recipeYield: RecipeYield?
@@ -31,6 +35,7 @@ public struct RecipeDraft: Equatable, Sendable {
     title: String = "",
     summary: String? = nil,
     authorName: String? = nil,
+    contentLanguage: RecipeContentLanguage? = nil,
     source: RecipeSource? = nil,
     sourceCapture: RecipeSourceCapture? = nil,
     recipeYield: RecipeYield? = nil,
@@ -46,6 +51,7 @@ public struct RecipeDraft: Equatable, Sendable {
     self.title = title
     self.summary = summary
     self.authorName = authorName
+    self.contentLanguage = contentLanguage
     self.source = source
     self.sourceCapture = sourceCapture
     self.recipeYield = recipeYield
@@ -63,12 +69,14 @@ public struct RecipeDraft: Equatable, Sendable {
   public init(
     title: String = "",
     summary: String? = nil,
+    contentLanguage: RecipeContentLanguage? = nil,
     ingredientLines: [String],
     instructionLines: [String] = []
   ) {
     self.init(
       title: title,
       summary: summary,
+      contentLanguage: contentLanguage,
       ingredientSections: ingredientLines.isEmpty
         ? []
         : [
@@ -87,6 +95,7 @@ public struct RecipeDraft: Equatable, Sendable {
       title: revision.title,
       summary: revision.summary,
       authorName: revision.authorName,
+      contentLanguage: revision.contentLanguage,
       source: revision.source,
       sourceCapture: revision.sourceCapture,
       recipeYield: revision.recipeYield,
@@ -174,16 +183,16 @@ public struct RecipeEditor {
     return StoredRecipe(recipe: recipe, revision: revision)
   }
 
-    public func revise(recipeID: Recipe.ID, from draft: RecipeDraft) throws -> StoredRecipe {
+  public func revise(recipeID: Recipe.ID, from draft: RecipeDraft) throws -> StoredRecipe {
     guard let stored = try repository.recipe(id: recipeID) else {
       throw RecipeEditorError.missingRecipe
     }
-        let revision = try revision(
-          recipeID: recipeID,
-          number: stored.revision.revisionNumber + 1,
-          from: draft,
-          preserving: stored.revision
-        )
+    let revision = try revision(
+      recipeID: recipeID,
+      number: stored.revision.revisionNumber + 1,
+      from: draft,
+      preserving: stored.revision
+    )
     var recipe = stored.recipe
     recipe.currentRevisionID = revision.id
     try repository.save(recipe: recipe, revision: revision)
@@ -207,6 +216,7 @@ public struct RecipeEditor {
       title: title,
       summary: summary?.isEmpty == true ? nil : summary,
       authorName: optional(draft.authorName),
+      contentLanguage: draft.contentLanguage,
       source: draft.source,
       sourceCapture: draft.sourceCapture ?? existing?.sourceCapture,
       recipeYield: draft.recipeYield,
@@ -249,7 +259,7 @@ public struct RecipeEditor {
         ingredient.package = cleaned(ingredient.package)
         ingredient.preparation = optional(ingredient.preparation)
         ingredient.note = optional(ingredient.note)
-        guard ingredient.effectiveDisplayText != "Ingredient" else { return nil }
+        guard ingredient.hasMeaningfulDisplayContent else { return nil }
         return ingredient
       }
       return section.ingredients.isEmpty && section.title == nil ? nil : section

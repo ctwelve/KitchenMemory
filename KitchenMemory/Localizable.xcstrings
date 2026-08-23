@@ -1,0 +1,3988 @@
+{
+  "sourceLanguage" : "en-US",
+  "strings" : {
+    "/" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "/"
+          }
+        }
+      },
+      "shouldTranslate" : false
+    },
+    "%@ (base: %@)" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ (base: %@)"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ (base: %2$@)"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ (base : %2$@)"
+          }
+        }
+      }
+    },
+    "%@ recipe" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ recipe"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Receta %@"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recette %@"
+          }
+        }
+      }
+    },
+    "%@, %@" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@, %@"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@, %2$@"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@, %2$@"
+          }
+        }
+      }
+    },
+    "%@, optional" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@, optional"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@, opcional"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@, facultatif"
+          }
+        }
+      }
+    },
+    "%lld hr" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%lld hr"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld h"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld h"
+          }
+        }
+      }
+    },
+    "%lld hr %lld min" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%lld hr %lld min"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld h %2$lld min"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld h %2$lld min"
+          }
+        }
+      }
+    },
+    "%lld ingredient interpretation needs review" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%lld ingredient interpretation needs review"
+          }
+        },
+        "es-MX" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Se debe revisar la interpretación de %lld ingrediente"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Se deben revisar las interpretaciones de %lld ingredientes"
+                }
+              }
+            }
+          }
+        },
+        "fr-CA" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "L’interprétation de %lld ingrédient doit être révisée"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Les interprétations de %lld ingrédients doivent être révisées"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld ingredient line is preserved but unparsed" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%lld ingredient line is preserved but unparsed"
+          }
+        },
+        "es-MX" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Se conservó %lld línea de ingrediente sin analizar"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Se conservaron %lld líneas de ingredientes sin analizar"
+                }
+              }
+            }
+          }
+        },
+        "fr-CA" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld ligne d’ingrédient est conservée sans être analysée"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld lignes d’ingrédients sont conservées sans être analysées"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld malformed or unsupported source block was ignored" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%lld malformed or unsupported source block was ignored"
+          }
+        },
+        "es-MX" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Se ignoró %lld bloque de origen dañado o no compatible"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Se ignoraron %lld bloques de origen dañados o no compatibles"
+                }
+              }
+            }
+          }
+        },
+        "fr-CA" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld bloc source mal formé ou non pris en charge a été ignoré"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld blocs sources mal formés ou non pris en charge ont été ignorés"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld min" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%lld min"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld min"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld min"
+          }
+        }
+      }
+    },
+    "%lld review note" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%lld review note"
+          }
+        },
+        "es-MX" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld nota para revisar"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld notas para revisar"
+                }
+              }
+            }
+          }
+        },
+        "fr-CA" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld note à réviser"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld notes à réviser"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld source image is referenced but not downloaded" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%lld source image is referenced but not downloaded"
+          }
+        },
+        "es-MX" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Se hace referencia a %lld imagen de origen, pero no se descargó"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Se hace referencia a %lld imágenes de origen, pero no se descargaron"
+                }
+              }
+            }
+          }
+        },
+        "fr-CA" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld image source est référencée sans être téléchargée"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld images sources sont référencées sans être téléchargées"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "about %@" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "about %@"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "aproximadamente %@"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "environ %@"
+          }
+        }
+      }
+    },
+    "About %@" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "About %@"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aproximadamente %@"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Environ %@"
+          }
+        }
+      }
+    },
+    "Add Ingredient" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Add Ingredient"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agregar ingrediente"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter un ingrédient"
+          }
+        }
+      }
+    },
+    "Add Ingredient Section" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Add Ingredient Section"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agregar sección de ingredientes"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter une section d’ingrédients"
+          }
+        }
+      }
+    },
+    "Add Instruction Section" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Add Instruction Section"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agregar sección de instrucciones"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter une section d’instructions"
+          }
+        }
+      }
+    },
+    "Add package size" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Add package size"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agregar tamaño del paquete"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter le format de l’emballage"
+          }
+        }
+      }
+    },
+    "Add Sample Recipes" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Add Sample Recipes"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agregar recetas de ejemplo"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter les recettes d’exemple"
+          }
+        }
+      }
+    },
+    "Add Sample Recipes?" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Add Sample Recipes?"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Agregar recetas de ejemplo?"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter des recettes d’exemple?"
+          }
+        }
+      }
+    },
+    "Add Step" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Add Step"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agregar paso"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter une étape"
+          }
+        }
+      }
+    },
+    "All recipes, edits, revision history, imported source captures, and recipe metadata in this Kitchen will be permanently deleted. Kitchen Memory will restore only the sample recipes included with this version. This cannot be undone." : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "All recipes, edits, revision history, imported source captures, and recipe metadata in this Kitchen will be permanently deleted. Kitchen Memory will restore only the sample recipes included with this version. This cannot be undone."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se eliminarán permanentemente todas las recetas, ediciones, historiales de revisión, capturas de origen importadas y metadatos de recetas de esta cocina. Kitchen Memory restaurará únicamente las recetas de muestra incluidas en esta versión. Esta acción no se puede deshacer."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toutes les recettes, modifications, historiques de révision, captures de sources importées et métadonnées de recettes de cette cuisine seront supprimés définitivement. Kitchen Memory restaurera uniquement les exemples de recettes inclus dans cette version. Cette action est irréversible."
+          }
+        }
+      }
+    },
+    "All sample recipes are installed." : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "All sample recipes are installed."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todas las recetas de ejemplo están instaladas."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toutes les recettes d’exemple sont installées."
+          }
+        }
+      }
+    },
+    "Approximate" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Approximate"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aproximada"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Approximatif"
+          }
+        }
+      }
+    },
+    "Base yield" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Base yield"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rendimiento base"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rendement de base"
+          }
+        }
+      }
+    },
+    "Book" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Book"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Libro"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Livre"
+          }
+        }
+      }
+    },
+    "By %@" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "By %@"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Por %@"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Par %@"
+          }
+        }
+      }
+    },
+    "Cancel" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Cancel"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancelar"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Annuler"
+          }
+        }
+      }
+    },
+    "Categories: %@" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Categories: %@"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Categorías: %@"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Catégories : %@"
+          }
+        }
+      }
+    },
+    "Check the imported wording and structure before saving. Review and save do not contact the source again. Saving keeps the final source URL and bounded JSON-LD metadata locally, including fields not shown here." : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Check the imported wording and structure before saving. Review and save do not contact the source again. Saving keeps the final source URL and bounded JSON-LD metadata locally, including fields not shown here."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Revisa el texto y la estructura importados antes de guardar. La revisión y el guardado no vuelven a contactar el origen. Al guardar se conservan localmente la URL final y los metadatos JSON-LD limitados, incluso los campos que no se muestran aquí."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vérifiez le libellé et la structure importés avant d’enregistrer. La révision et l’enregistrement ne contactent pas de nouveau la source. L’enregistrement conserve localement l’URL finale et les métadonnées JSON-LD limitées, y compris les champs non affichés ici."
+          }
+        }
+      }
+    },
+    "Check this amount manually when changing the yield." : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Check this amount manually when changing the yield."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Revisa esta cantidad manualmente al cambiar el rendimiento."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vérifiez cette quantité manuellement lorsque vous modifiez le rendement."
+          }
+        }
+      }
+    },
+    "Checking iCloud status…" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Checking iCloud status…"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comprobando el estado de iCloud…"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vérification de l’état d’iCloud…"
+          }
+        }
+      }
+    },
+    "Choose a recipe to read its ingredients and instructions." : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Choose a recipe to read its ingredients and instructions."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elige una receta para leer sus ingredientes e instrucciones."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisissez une recette pour lire ses ingrédients et ses instructions."
+          }
+        }
+      }
+    },
+    "Choose Recipe" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Choose Recipe"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elegir receta"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisir une recette"
+          }
+        }
+      }
+    },
+    "Collapse" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Collapse"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contraer"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réduire"
+          }
+        }
+      }
+    },
+    "Collapsed" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Collapsed"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contraído"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réduit"
+          }
+        }
+      }
+    },
+    "Cook" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Cook"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cocción"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuisson"
+          }
+        }
+      }
+    },
+    "Could not scale this amount safely; left unchanged." : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Could not scale this amount safely; left unchanged."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No fue posible ajustar esta cantidad de forma segura; se dejó sin cambios."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible de redimensionner cette quantité de façon sûre; elle reste inchangée."
+          }
+        }
+      }
+    },
+    "Create Recipe" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Create Recipe"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crear receta"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Créer la recette"
+          }
+        }
+      }
+    },
+    "Cuisine: %@" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Cuisine: %@"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cocina: %@"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuisine : %@"
+          }
+        }
+      }
+    },
+    "Custom" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Custom"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Personalizado"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Personnalisé"
+          }
+        }
+      }
+    },
+    "Decrease %@" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Decrease %@"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disminuir %@"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diminuer %@"
+          }
+        }
+      }
+    },
+    "Decrease working yield" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Decrease working yield"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disminuir el rendimiento de trabajo"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diminuer le rendement de travail"
+          }
+        }
+      }
+    },
+    "Delete" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Delete"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer"
+          }
+        }
+      }
+    },
+    "Delete Section" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Delete Section"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar sección"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer la section"
+          }
+        }
+      }
+    },
+    "Denominator" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Denominator"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Denominador"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dénominateur"
+          }
+        }
+      }
+    },
+    "Display wording could not be scaled safely; left unchanged." : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Display wording could not be scaled safely; left unchanged."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El texto mostrado no se pudo ajustar de forma segura; se dejó sin cambios."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le libellé d’affichage ne pouvait pas être redimensionné de façon sûre; il reste inchangé."
+          }
+        }
+      }
+    },
+    "Done with quantity details" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Done with quantity details"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terminar detalles de cantidad"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terminer les détails de quantité"
+          }
+        }
+      }
+    },
+    "Duration %@." : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Duration %@."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duración: %@."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Durée : %@."
+          }
+        }
+      }
+    },
+    "Edit" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Edit"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editar"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier"
+          }
+        }
+      }
+    },
+    "Edit precise quantity…" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Edit precise quantity…"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editar cantidad precisa…"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier la quantité précise…"
+          }
+        }
+      }
+    },
+    "Edit Recipe" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Edit Recipe"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editar receta"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier la recette"
+          }
+        }
+      }
+    },
+    "Enable recipe scaling" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Enable recipe scaling"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activar ajuste de la receta"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activer le redimensionnement de la recette"
+          }
+        }
+      }
+    },
+    "Enter a complete http or https URL without embedded credentials." : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Enter a complete http or https URL without embedded credentials."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ingresa una URL http o https completa sin credenciales integradas."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entrez une URL http ou https complète sans identifiants intégrés."
+          }
+        }
+      }
+    },
+    "Enter whole minutes from 0 through 527040." : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Enter whole minutes from 0 through 527040."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ingresa minutos enteros de 0 a 527040."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entrez un nombre entier de minutes de 0 à 527040."
+          }
+        }
+      }
+    },
+    "Equipment does not scale automatically. Check that it fits the working yield." : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Equipment does not scale automatically. Check that it fits the working yield."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El equipo no se ajusta automáticamente. Verifica que sea adecuado para el rendimiento de trabajo."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L’équipement ne se redimensionne pas automatiquement. Vérifiez qu’il convient au rendement de travail."
+          }
+        }
+      }
+    },
+    "Exact" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Exact"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exacta"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exacte"
+          }
+        }
+      }
+    },
+    "Expand" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Expand"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expandir"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Développer"
+          }
+        }
+      }
+    },
+    "Expanded" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Expanded"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expandido"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Développé"
+          }
+        }
+      }
+    },
+    "Fetch recipe" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Fetch recipe"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obtener receta"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Télécharger la recette"
+          }
+        }
+      }
+    },
+    "Fetch Recipe" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Fetch Recipe"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obtener receta"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Télécharger la recette"
+          }
+        }
+      }
+    },
+    "Fetching recipe" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Fetching recipe"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obteniendo receta"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Téléchargement de la recette"
+          }
+        }
+      }
+    },
+    "Fetching Recipe" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Fetching Recipe"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obteniendo receta"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Téléchargement de la recette"
+          }
+        }
+      }
+    },
+    "Fixed" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Fixed"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fija"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixe"
+          }
+        }
+      }
+    },
+    "Fixed amount; left unchanged." : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Fixed amount; left unchanged."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cantidad fija; se dejó sin cambios."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quantité fixe; elle reste inchangée."
+          }
+        }
+      }
+    },
+    "For safety, Kitchen Memory cannot fetch this address or redirect." : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "For safety, Kitchen Memory cannot fetch this address or redirect."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Por seguridad, Kitchen Memory no puede acceder a esta dirección ni redirección."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Par mesure de sécurité, Kitchen Memory ne peut pas accéder à cette adresse ni à cette redirection."
+          }
+        }
+      }
+    },
+    "Hide Sidebar" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Hide Sidebar"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ocultar barra lateral"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Masquer la barre latérale"
+          }
+        }
+      }
+    },
+    "https://example.com/recipe" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "https://example.com/recipe"
+          }
+        }
+      },
+      "shouldTranslate" : false
+    },
+    "iCloud access is restricted on this device." : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "iCloud access is restricted on this device."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El acceso a iCloud está restringido en este dispositivo."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L’accès à iCloud est restreint sur cet appareil."
+          }
+        }
+      }
+    },
+    "iCloud Sync" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "iCloud Sync"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincronización con iCloud"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisation iCloud"
+          }
+        }
+      }
+    },
+    "iCloud sync is available." : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "iCloud sync is available."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La sincronización con iCloud está disponible."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La synchronisation iCloud est disponible."
+          }
+        }
+      }
+    },
+    "iCloud sync is temporarily unavailable." : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "iCloud sync is temporarily unavailable."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La sincronización con iCloud no está disponible temporalmente."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La synchronisation iCloud est temporairement indisponible."
+          }
+        }
+      }
+    },
+    "iCloud sync needs attention." : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "iCloud sync needs attention."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La sincronización con iCloud requiere atención."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La synchronisation iCloud nécessite votre attention."
+          }
+        }
+      }
+    },
+    "If you save a recipe, Kitchen Memory keeps the final source URL and one bounded JSON-LD recipe-metadata block locally, including source fields not shown in the review editor." : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "If you save a recipe, Kitchen Memory keeps the final source URL and one bounded JSON-LD recipe-metadata block locally, including source fields not shown in the review editor."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si guardas una receta, Kitchen Memory conserva localmente la URL final de origen y un bloque limitado de metadatos JSON-LD de la receta, incluso los campos de origen que no se muestran en el editor de revisión."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si vous enregistrez une recette, Kitchen Memory conserve localement l’URL source finale et un bloc limité de métadonnées JSON-LD de la recette, y compris les champs sources non affichés dans l’éditeur de révision."
+          }
+        }
+      }
+    },
+    "Import is ready for your review" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Import is ready for your review"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La importación está lista para revisarse"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L’importation est prête à être révisée"
+          }
+        }
+      }
+    },
+    "Import Recipe" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Import Recipe"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importar receta"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importer une recette"
+          }
+        }
+      }
+    },
+    "Import Review" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Import Review"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Revisión de importación"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Révision de l’importation"
+          }
+        }
+      }
+    },
+    "Imported" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Imported"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importado"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importé"
+          }
+        }
+      }
+    },
+    "Increase %@" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Increase %@"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aumentar %@"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Augmenter %@"
+          }
+        }
+      }
+    },
+    "Increase working yield" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Increase working yield"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aumentar el rendimiento de trabajo"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Augmenter le rendement de travail"
+          }
+        }
+      }
+    },
+    "Ingredient" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ingredient"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ingrediente"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ingrédient"
+          }
+        }
+      }
+    },
+    "Ingredient amounts update for reading only. The saved recipe stays unchanged." : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ingredient amounts update for reading only. The saved recipe stays unchanged."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las cantidades se actualizan solo para lectura. La receta guardada permanece sin cambios."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les quantités d’ingrédients sont modifiées pour la lecture seulement. La recette enregistrée reste inchangée."
+          }
+        }
+      }
+    },
+    "Ingredients" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ingredients"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ingredientes"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ingrédients"
+          }
+        }
+      }
+    },
+    "Install Missing Sample Recipes" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Install Missing Sample Recipes"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Instalar las recetas de ejemplo que faltan"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Installer les recettes d’exemple manquantes"
+          }
+        }
+      }
+    },
+    "Install Sample Recipes" : {
+      "comment" : "A button to install sample recipes.",
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Install Sample Recipes"
+          }
+        }
+      }
+    },
+    "Installation checks stable recipe identities and adds only missing samples." : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Installation checks stable recipe identities and adds only missing samples."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La instalación comprueba las identidades estables de las recetas y agrega únicamente los ejemplos que faltan."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L’installation vérifie les identifiants stables des recettes et ajoute seulement les exemples manquants."
+          }
+        }
+      }
+    },
+    "Instructions" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Instructions"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Instrucciones"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Instructions"
+          }
+        }
+      }
+    },
+    "Keywords: %@" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Keywords: %@"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Palabras clave: %@"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mots-clés : %@"
+          }
+        }
+      }
+    },
+    "Kitchen" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kitchen"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cocina"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuisine"
+          }
+        }
+      }
+    },
+    "Kitchen Data" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kitchen Data"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datos de la cocina"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Données de la cuisine"
+          }
+        }
+      }
+    },
+    "Kitchen Memory could not add the sample recipes. Your existing recipes were not changed." : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kitchen Memory could not add the sample recipes. Your existing recipes were not changed."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kitchen Memory no pudo agregar las recetas de ejemplo. Tus recetas existentes no se modificaron."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kitchen Memory n’a pas pu ajouter les recettes d’exemple. Vos recettes existantes n’ont pas été modifiées."
+          }
+        }
+      }
+    },
+    "Kitchen Memory could not import this webpage. Check the URL and try again." : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kitchen Memory could not import this webpage. Check the URL and try again."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kitchen Memory no pudo importar esta página web. Revisa la URL e inténtalo de nuevo."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kitchen Memory n’a pas pu importer cette page Web. Vérifiez l’URL et réessayez."
+          }
+        }
+      }
+    },
+    "Kitchen Memory could not read this recipe library." : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kitchen Memory could not read this recipe library."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kitchen Memory no pudo leer esta biblioteca de recetas."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kitchen Memory n’a pas pu lire cette bibliothèque de recettes."
+          }
+        }
+      }
+    },
+    "Kitchen Memory could not reset this Kitchen. No reset was completed." : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kitchen Memory could not reset this Kitchen. No reset was completed."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kitchen Memory no pudo restablecer esta cocina. No se realizó ningún cambio."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kitchen Memory n’a pas pu réinitialiser cette cuisine. Aucune réinitialisation n’a été effectuée."
+          }
+        }
+      }
+    },
+    "Kitchen Memory could not save this recipe." : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kitchen Memory could not save this recipe."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kitchen Memory no pudo guardar esta receta."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kitchen Memory n’a pas pu enregistrer cette recette."
+          }
+        }
+      }
+    },
+    "Kitchen Memory follows redirects and downloads the resulting HTML with an ephemeral request that supplies no cookies or app credentials. It runs no page scripts and downloads no images during review." : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kitchen Memory follows redirects and downloads the resulting HTML with an ephemeral request that supplies no cookies or app credentials. It runs no page scripts and downloads no images during review."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kitchen Memory sigue las redirecciones y descarga el HTML resultante mediante una solicitud efímera que no proporciona cookies ni credenciales de la app. No ejecuta scripts de la página ni descarga imágenes durante la revisión."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kitchen Memory suit les redirections et télécharge le HTML résultant au moyen d’une requête éphémère qui ne fournit aucun témoin ni identifiant de l’app. Aucun script de page n’est exécuté et aucune image n’est téléchargée pendant la révision."
+          }
+        }
+      }
+    },
+    "Kitchen Memory includes a small collection of sample recipes. Add them to your recipe library?" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kitchen Memory includes a small collection of sample recipes. Add them to your recipe library?"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kitchen Memory incluye una pequeña colección de recetas de ejemplo. ¿Quieres agregarlas a tu recetario?"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kitchen Memory comprend une petite collection de recettes d’exemple. Voulez-vous les ajouter à votre bibliothèque de recettes?"
+          }
+        }
+      }
+    },
+    "Kitchen Memory is syncing with iCloud." : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kitchen Memory is syncing with iCloud."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kitchen Memory se está sincronizando con iCloud."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kitchen Memory se synchronise avec iCloud."
+          }
+        }
+      }
+    },
+    "Linear" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Linear"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lineal"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Linéaire"
+          }
+        }
+      }
+    },
+    "Link unavailable" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Link unavailable"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enlace no disponible"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lien indisponible"
+          }
+        }
+      }
+    },
+    "Loading Recipes" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Loading Recipes"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cargando recetas"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chargement des recettes"
+          }
+        }
+      }
+    },
+    "Lower estimate: %@" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Lower estimate: %@"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estimación inferior: %@"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estimation basse : %@"
+          }
+        }
+      }
+    },
+    "Manual review" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Manual review"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Revisión manual"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Révision manuelle"
+          }
+        }
+      }
+    },
+    "Move Down" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Move Down"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mover abajo"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déplacer vers le bas"
+          }
+        }
+      }
+    },
+    "Move Up" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Move Up"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mover arriba"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déplacer vers le haut"
+          }
+        }
+      }
+    },
+    "New Recipe" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "New Recipe"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nueva receta"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nouvelle recette"
+          }
+        }
+      }
+    },
+    "No ingredients were found" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "No ingredients were found"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se encontraron ingredientes"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun ingrédient trouvé"
+          }
+        }
+      }
+    },
+    "No instructions were found" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "No instructions were found"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se encontraron instrucciones"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune instruction trouvée"
+          }
+        }
+      }
+    },
+    "No quantity specified" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "No quantity specified"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se especificó cantidad"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune quantité indiquée"
+          }
+        }
+      }
+    },
+    "No Recipes" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "No Recipes"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay recetas"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune recette"
+          }
+        }
+      }
+    },
+    "No sample recipes are installed." : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "No sample recipes are installed."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay recetas de ejemplo instaladas."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune recette d’exemple n’est installée."
+          }
+        }
+      }
+    },
+    "No Schema.org recipe was found on this page." : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "No Schema.org recipe was found on this page."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se encontró una receta de Schema.org en esta página."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune recette Schema.org n’a été trouvée sur cette page."
+          }
+        }
+      }
+    },
+    "None" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "None"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ninguna"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune"
+          }
+        }
+      }
+    },
+    "Not Now" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Not Now"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ahora no"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pas maintenant"
+          }
+        }
+      }
+    },
+    "Not specified" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Not specified"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin especificar"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non indiqué"
+          }
+        }
+      }
+    },
+    "Numerator" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Numerator"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Numerador"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Numérateur"
+          }
+        }
+      }
+    },
+    "Open Source" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Open Source"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir origen"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir la source"
+          }
+        }
+      }
+    },
+    "Original" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Original"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Original"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Original"
+          }
+        }
+      }
+    },
+    "Original wording is retained separately from the structured interpretation." : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Original wording is retained separately from the structured interpretation."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El texto original se conserva por separado de la interpretación estructurada."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le libellé original est conservé séparément de l’interprétation structurée."
+          }
+        }
+      }
+    },
+    "Package size (optional)" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Package size (optional)"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tamaño del paquete (opcional)"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Format de l’emballage (facultatif)"
+          }
+        }
+      }
+    },
+    "Package: %@" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Package: %@"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paquete: %@"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Emballage : %@"
+          }
+        }
+      }
+    },
+    "Person" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Person"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Persona"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Personne"
+          }
+        }
+      }
+    },
+    "Prep" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Prep"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preparación"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Préparation"
+          }
+        }
+      }
+    },
+    "Preparing Your Kitchen…" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Preparing Your Kitchen…"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preparando tu cocina…"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Préparation de votre cuisine…"
+          }
+        }
+      }
+    },
+    "Preserved metadata — %@" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Preserved metadata — %@"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Metadatos conservados — %@"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Métadonnées conservées — %@"
+          }
+        }
+      }
+    },
+    "Privacy" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Privacy"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacidad"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confidentialité"
+          }
+        }
+      }
+    },
+    "Range" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Range"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rango"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plage"
+          }
+        }
+      }
+    },
+    "Recipe" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Recipe"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Receta"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recette"
+          }
+        }
+      }
+    },
+    "Recipe image" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Recipe image"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imagen de la receta"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Image de la recette"
+          }
+        }
+      }
+    },
+    "Recipe library" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Recipe library"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Biblioteca de recetas"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bibliothèque de recettes"
+          }
+        }
+      }
+    },
+    "Recipe webpage" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Recipe webpage"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Página web de la receta"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Page Web de la recette"
+          }
+        }
+      }
+    },
+    "Recipe webpage URL" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Recipe webpage URL"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URL de la página web de la receta"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URL de la page Web de la recette"
+          }
+        }
+      }
+    },
+    "Recipes" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Recipes"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recetas"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recettes"
+          }
+        }
+      }
+    },
+    "Recipes saved to this Kitchen will appear here." : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Recipes saved to this Kitchen will appear here."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las recetas guardadas en esta cocina aparecerán aquí."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les recettes enregistrées dans cette cuisine apparaîtront ici."
+          }
+        }
+      }
+    },
+    "Recipes Unavailable" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Recipes Unavailable"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recetas no disponibles"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recettes indisponibles"
+          }
+        }
+      }
+    },
+    "Remove package size" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Remove package size"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quitar tamaño del paquete"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer le format de l’emballage"
+          }
+        }
+      }
+    },
+    "Reset" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Reset"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restablecer"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réinitialiser"
+          }
+        }
+      }
+    },
+    "Reset Kitchen" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Reset Kitchen"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restablecer cocina"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réinitialiser la cuisine"
+          }
+        }
+      }
+    },
+    "Reset Kitchen?" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Reset Kitchen?"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Restablecer la cocina?"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réinitialiser la cuisine?"
+          }
+        }
+      }
+    },
+    "Reset Kitchen…" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Reset Kitchen…"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restablecer cocina…"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réinitialiser la cuisine…"
+          }
+        }
+      }
+    },
+    "Reset to base yield" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Reset to base yield"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restablecer rendimiento base"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Revenir au rendement de base"
+          }
+        }
+      }
+    },
+    "Restore this Kitchen to the sample recipes included with the current version of Kitchen Memory." : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Restore this Kitchen to the sample recipes included with the current version of Kitchen Memory."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restaura esta cocina con las recetas de muestra incluidas en la versión actual de Kitchen Memory."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restaurez cette cuisine avec les exemples de recettes inclus dans la version actuelle de Kitchen Memory."
+          }
+        }
+      }
+    },
+    "Review Import" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Review Import"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Revisar importación"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réviser l’importation"
+          }
+        }
+      }
+    },
+    "Review this recipe before saving" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Review this recipe before saving"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Revisa esta receta antes de guardarla"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Révisez cette recette avant de l’enregistrer"
+          }
+        }
+      }
+    },
+    "Sample recipe status is unavailable." : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Sample recipe status is unavailable."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El estado de las recetas de ejemplo no está disponible."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L’état des recettes d’exemple n’est pas disponible."
+          }
+        }
+      }
+    },
+    "Sample Recipes" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Sample Recipes"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recetas de ejemplo"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recettes d’exemple"
+          }
+        }
+      }
+    },
+    "Sample Recipes Installed" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Sample Recipes Installed"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recetas de ejemplo instaladas"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recettes d’exemple installées"
+          }
+        }
+      }
+    },
+    "Save Revision" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Save Revision"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guardar revisión"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistrer la révision"
+          }
+        }
+      }
+    },
+    "Scale recipe" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Scale recipe"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajustar receta"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Redimensionner la recette"
+          }
+        }
+      }
+    },
+    "Select a Recipe" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Select a Recipe"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selecciona una receta"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sélectionnez une recette"
+          }
+        }
+      }
+    },
+    "Settings" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Settings"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configuración"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réglages"
+          }
+        }
+      }
+    },
+    "Show Sidebar" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Show Sidebar"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar barra lateral"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher la barre latérale"
+          }
+        }
+      }
+    },
+    "Sign in to iCloud to sync your recipes." : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Sign in to iCloud to sync your recipes."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inicia sesión en iCloud para sincronizar tus recetas."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connectez-vous à iCloud pour synchroniser vos recettes."
+          }
+        }
+      }
+    },
+    "Some sample recipes are missing." : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Some sample recipes are missing."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Faltan algunas recetas de ejemplo."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Certaines recettes d’exemple sont manquantes."
+          }
+        }
+      }
+    },
+    "Source" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Source"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Origen"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Source"
+          }
+        }
+      }
+    },
+    "Step %lld." : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Step %lld."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paso %lld."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Étape %lld."
+          }
+        }
+      }
+    },
+    "Structured" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Structured"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estructurado"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Structuré"
+          }
+        }
+      }
+    },
+    "The numeric yield is the basis used to scale ingredient amounts." : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "The numeric yield is the basis used to scale ingredient amounts."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El rendimiento numérico es la base para ajustar las cantidades de ingredientes."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le rendement numérique sert de base au redimensionnement des quantités d’ingrédients."
+          }
+        }
+      }
+    },
+    "The webpage could not be downloaded. Check your connection and try again." : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "The webpage could not be downloaded. Check your connection and try again."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo descargar la página web. Revisa tu conexión e inténtalo de nuevo."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La page Web n’a pas pu être téléchargée. Vérifiez votre connexion et réessayez."
+          }
+        }
+      }
+    },
+    "This address did not return a supported HTML recipe page." : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "This address did not return a supported HTML recipe page."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta dirección no devolvió una página HTML de receta compatible."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette adresse n’a pas retourné une page HTML de recette prise en charge."
+          }
+        }
+      }
+    },
+    "This page contains multiple recipes" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "This page contains multiple recipes"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta página contiene varias recetas"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette page contient plusieurs recettes"
+          }
+        }
+      }
+    },
+    "This page contains too much data to import safely." : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "This page contains too much data to import safely."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta página contiene demasiados datos para importarlos de forma segura."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette page contient trop de données pour être importée de façon sûre."
+          }
+        }
+      }
+    },
+    "Times" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Times"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tiempos"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Durées"
+          }
+        }
+      }
+    },
+    "Title needs attention" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Title needs attention"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El título requiere atención"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le titre doit être vérifié"
+          }
+        }
+      }
+    },
+    "Total" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Total"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total"
+          }
+        }
+      }
+    },
+    "Try Again" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Try Again"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Intentar de nuevo"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réessayer"
+          }
+        }
+      }
+    },
+    "Untitled recipe" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Untitled recipe"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Receta sin título"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recette sans titre"
+          }
+        }
+      }
+    },
+    "Upper estimate: %@" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Upper estimate: %@"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estimación superior: %@"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estimation haute : %@"
+          }
+        }
+      }
+    },
+    "Use a Different URL" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Use a Different URL"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usar otra URL"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utiliser une autre URL"
+          }
+        }
+      }
+    },
+    "Use precise quantity…" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Use precise quantity…"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usar cantidad precisa…"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utiliser une quantité précise…"
+          }
+        }
+      }
+    },
+    "Webpage" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Webpage"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Página web"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Page Web"
+          }
+        }
+      }
+    },
+    "Words" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Words"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Palabras"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mots"
+          }
+        }
+      }
+    },
+    "Working yield" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Working yield"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rendimiento de trabajo"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rendement de travail"
+          }
+        }
+      }
+    },
+    "Written amount; left unchanged." : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Written amount; left unchanged."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cantidad escrita; se dejó sin cambios."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quantité écrite; elle reste inchangée."
+          }
+        }
+      }
+    },
+    "Yield" : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Yield"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rendimiento"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rendement"
+          }
+        }
+      }
+    },
+    "You can add them later from Settings." : {
+      "localizations" : {
+        "base" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "You can add them later from Settings."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puedes agregarlas más tarde desde Configuración."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous pourrez les ajouter plus tard dans Réglages."
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.1"
+}

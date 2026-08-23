@@ -29,11 +29,15 @@ public struct StoredRecipe: Equatable, Identifiable, Sendable {
 @MainActor
 public protocol RecipeRepository: AnyObject {
   func save(_ kitchen: Kitchen) throws
+  /// Atomically creates one Kitchen together with its initial recipes.
+  func create(_ kitchen: Kitchen, with recipes: [StoredRecipe]) throws
   func save(recipe: Recipe, revision: RecipeRevision) throws
   func kitchens() throws -> [Kitchen]
   func kitchen(id: Kitchen.ID) throws -> Kitchen?
   func recipe(id: Recipe.ID) throws -> StoredRecipe?
   func recipes(in kitchenID: Kitchen.ID) throws -> [StoredRecipe]
+  /// Atomically adds recipes whose stable identities are not already present.
+  func addRecipes(_ recipes: [StoredRecipe], to kitchenID: Kitchen.ID) throws
   /// Returns every saved revision for a recipe, newest revision first.
   func revisions(for recipeID: Recipe.ID) throws -> [RecipeRevision]
   /// Atomically replaces every recipe and revision owned by one Kitchen.
@@ -48,8 +52,29 @@ public enum KitchenMemoryPersistenceError: Error, Equatable {
   /// A recipe cannot be saved before its owning Kitchen exists.
   case missingKitchen
 
+  /// Bootstrap cannot replace an already-created Kitchen implicitly.
+  case kitchenAlreadyExists(kitchenID: Kitchen.ID)
+
   /// A recipe row refers to a revision that is absent from the store.
   case missingCurrentRevision
+
+  /// A stable recipe identity cannot move between Kitchens through an upsert.
+  case recipeAlreadyOwnedByAnotherKitchen(recipeID: Recipe.ID)
+
+  /// A stable revision identity cannot move between recipes through an upsert.
+  case revisionAlreadyOwnedByAnotherRecipe(revisionID: RecipeRevision.ID)
+
+  /// A bulk replacement must describe each durable recipe identity once.
+  case duplicateRecipeID(recipeID: Recipe.ID)
+
+  /// A bulk replacement must describe each durable revision identity once.
+  case duplicateRevisionID(revisionID: RecipeRevision.ID)
+
+  /// A stored current revision points back to a different recipe identity.
+  case inconsistentStoredRecipeIdentity(
+    recipeID: Recipe.ID,
+    revisionID: RecipeRevision.ID
+  )
 
   /// Persisted encoded data or an enum raw value cannot be decoded safely.
   case invalidStoredValue(field: String)
@@ -75,30 +100,39 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
   }
 
   public init(modelContainer: ModelContainer) {
-    context = ModelContext(modelContainer)
+    self.context = ModelContext(modelContainer)
+  }
+
+  private init(context: ModelContext) {
+    self.context = context
   }
 
   public func save(_ kitchen: Kitchen) throws {
-    let identifier = kitchen.id.rawValue
-    let descriptor = FetchDescriptor<KitchenRecord>(predicate: #Predicate { $0.id == identifier })
-    if let record = try context.fetch(descriptor).first {
-      record.name = kitchen.name
-    } else {
-      context.insert(KitchenRecord(id: identifier, name: kitchen.name))
+    try performIsolatedWrite { writer in
+      try writer.upsert(kitchen)
     }
-    try context.save()
+  }
+
+  public func create(_ kitchen: Kitchen, with recipes: [StoredRecipe]) throws {
+    try performIsolatedWrite { writer in
+      guard try writer.kitchen(id: kitchen.id) == nil else {
+        throw KitchenMemoryPersistenceError.kitchenAlreadyExists(kitchenID: kitchen.id)
+      }
+      try writer.validate(recipes, in: kitchen.id, requiresExistingKitchen: false)
+      try writer.upsert(kitchen)
+      try writer.replaceValidatedRecipes(in: kitchen.id, with: recipes)
+    }
   }
 
   public func save(recipe: Recipe, revision: RecipeRevision) throws {
-    guard revision.recipeID == recipe.id, recipe.currentRevisionID == revision.id else {
-      throw KitchenMemoryPersistenceError.inconsistentRecipeIdentity
+    try performIsolatedWrite { writer in
+      try writer.validate(
+        [StoredRecipe(recipe: recipe, revision: revision)],
+        in: recipe.kitchenID
+      )
+      try writer.upsert(recipe)
+      try writer.replace(revision)
     }
-    guard try kitchen(id: recipe.kitchenID) != nil else {
-      throw KitchenMemoryPersistenceError.missingKitchen
-    }
-    try upsert(recipe)
-    try replace(revision)
-    try context.save()
   }
 
   public func kitchen(id: Kitchen.ID) throws -> Kitchen? {
@@ -111,7 +145,8 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
 
   public func kitchens() throws -> [Kitchen] {
     let descriptor = FetchDescriptor<KitchenRecord>(sortBy: [SortDescriptor(\.name)])
-    return try context.fetch(descriptor).map {
+    var seenIDs = Set<UUID>()
+    return try context.fetch(descriptor).filter { seenIDs.insert($0.id).inserted }.map {
       Kitchen(id: .init(rawValue: $0.id), name: $0.name)
     }
   }
@@ -120,13 +155,23 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     let identifier = id.rawValue
     let recipeDescriptor = FetchDescriptor<RecipeRecord>(
       predicate: #Predicate { $0.id == identifier })
-    guard let recipeRecord = try context.fetch(recipeDescriptor).first else { return nil }
-    let revisionID = recipeRecord.currentRevisionID
-    let revisionDescriptor = FetchDescriptor<RecipeRevisionRecord>(
-      predicate: #Predicate { $0.id == revisionID })
-    guard let revisionRecord = try context.fetch(revisionDescriptor).first else {
+    let recipeRecords = try context.fetch(recipeDescriptor)
+    guard !recipeRecords.isEmpty else { return nil }
+    let currentRevisionIDs = Set(recipeRecords.map(\.currentRevisionID))
+    let currentRevisionRecords = try context.fetch(FetchDescriptor<RecipeRevisionRecord>())
+      .filter { currentRevisionIDs.contains($0.id) }
+    let revisionRecords = currentRevisionRecords.filter { $0.recipeID == identifier }
+    if revisionRecords.isEmpty, let mismatched = currentRevisionRecords.first {
+      throw KitchenMemoryPersistenceError.inconsistentStoredRecipeIdentity(
+        recipeID: id,
+        revisionID: .init(rawValue: mismatched.id)
+      )
+    }
+    guard let revisionRecord = revisionRecords.max(by: Self.precedesForCurrentRevision) else {
       throw KitchenMemoryPersistenceError.missingCurrentRevision
     }
+    let recipeRecord = recipeRecords.first { $0.currentRevisionID == revisionRecord.id }
+    guard let recipeRecord else { throw KitchenMemoryPersistenceError.missingCurrentRevision }
 
     let recipe = Recipe(
       id: .init(rawValue: recipeRecord.id),
@@ -141,11 +186,24 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     let descriptor = FetchDescriptor<RecipeRecord>(
       predicate: #Predicate { $0.kitchenID == identifier }
     )
+    var seenIDs = Set<UUID>()
     return try context.fetch(descriptor)
+      .filter { seenIDs.insert($0.id).inserted }
       .compactMap { try recipe(id: .init(rawValue: $0.id)) }
       .sorted {
         $0.revision.title.localizedStandardCompare($1.revision.title) == .orderedAscending
       }
+  }
+
+  public func addRecipes(_ recipes: [StoredRecipe], to kitchenID: Kitchen.ID) throws {
+    try performIsolatedWrite { writer in
+      try writer.validate(recipes, in: kitchenID)
+      for stored in recipes {
+        guard try writer.recipe(id: stored.id) == nil else { continue }
+        try writer.upsert(stored.recipe)
+        try writer.replace(stored.revision)
+      }
+    }
   }
 
   public func revisions(for recipeID: Recipe.ID) throws -> [RecipeRevision] {
@@ -154,13 +212,46 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
       predicate: #Predicate { $0.recipeID == identifier },
       sortBy: [SortDescriptor(\.revisionNumber, order: .reverse)]
     )
-    return try context.fetch(descriptor).map(domainRevision)
+    var seenIDs = Set<UUID>()
+    return try context.fetch(descriptor)
+      .filter { seenIDs.insert($0.id).inserted }
+      .map(domainRevision)
+  }
+
+  private static func precedesForCurrentRevision(
+    _ lhs: RecipeRevisionRecord,
+    _ rhs: RecipeRevisionRecord
+  ) -> Bool {
+    if lhs.revisionNumber != rhs.revisionNumber {
+      return lhs.revisionNumber < rhs.revisionNumber
+    }
+    return lhs.id.uuidString < rhs.id.uuidString
   }
 
   public func replaceRecipes(in kitchenID: Kitchen.ID, with recipes: [StoredRecipe]) throws {
-    guard try kitchen(id: kitchenID) != nil else {
-      throw KitchenMemoryPersistenceError.missingKitchen
+    try performIsolatedWrite { writer in
+      try writer.validate(recipes, in: kitchenID)
+      try writer.replaceValidatedRecipes(in: kitchenID, with: recipes)
     }
+  }
+
+  private func performIsolatedWrite(
+    _ operation: (SwiftDataRecipeRepository) throws -> Void
+  ) throws {
+    // A failed SwiftData save leaves its ModelContext's pending graph changed.
+    // Isolating every repository write keeps the long-lived read context
+    // immediately usable while `transaction` owns the durable commit/rollback.
+    let writer = SwiftDataRecipeRepository(context: ModelContext(context.container))
+    try writer.context.transaction {
+      try operation(writer)
+    }
+  }
+
+  private func validate(
+    _ recipes: [StoredRecipe],
+    in kitchenID: Kitchen.ID,
+    requiresExistingKitchen: Bool = true
+  ) throws {
     guard recipes.allSatisfy({ stored in
       stored.recipe.kitchenID == kitchenID
         && stored.revision.recipeID == stored.recipe.id
@@ -168,34 +259,81 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     }) else {
       throw KitchenMemoryPersistenceError.inconsistentRecipeIdentity
     }
+    if requiresExistingKitchen, try kitchen(id: kitchenID) == nil {
+      throw KitchenMemoryPersistenceError.missingKitchen
+    }
 
-    do {
-      let kitchenIdentifier = kitchenID.rawValue
-      let recipeRecords = try context.fetch(
-        FetchDescriptor<RecipeRecord>(
-          predicate: #Predicate { $0.kitchenID == kitchenIdentifier }
-        )
+    var recipeIDs = Set<Recipe.ID>()
+    var revisionIDs = Set<RecipeRevision.ID>()
+    for stored in recipes {
+      guard recipeIDs.insert(stored.recipe.id).inserted else {
+        throw KitchenMemoryPersistenceError.duplicateRecipeID(recipeID: stored.recipe.id)
+      }
+      guard revisionIDs.insert(stored.revision.id).inserted else {
+        throw KitchenMemoryPersistenceError.duplicateRevisionID(revisionID: stored.revision.id)
+      }
+    }
+    for stored in recipes {
+      try validateOwnership(of: stored.recipe)
+      try validateOwnership(of: stored.revision)
+    }
+  }
+
+  private func replaceValidatedRecipes(
+    in kitchenID: Kitchen.ID,
+    with recipes: [StoredRecipe]
+  ) throws {
+    let kitchenIdentifier = kitchenID.rawValue
+    let recipeRecords = try context.fetch(
+      FetchDescriptor<RecipeRecord>(
+        predicate: #Predicate { $0.kitchenID == kitchenIdentifier }
       )
-      let recipeIdentifiers = Set(recipeRecords.map(\.id))
-      let revisionRecords = try context.fetch(FetchDescriptor<RecipeRevisionRecord>())
-        .filter { recipeIdentifiers.contains($0.recipeID) }
+    )
+    let recipeIdentifiers = Set(recipeRecords.map(\.id))
+    let revisionRecords = try context.fetch(FetchDescriptor<RecipeRevisionRecord>())
+      .filter { recipeIdentifiers.contains($0.recipeID) }
 
-      for revision in revisionRecords {
-        try deleteRevisionRows(revisionID: revision.id)
-        context.delete(revision)
-      }
-      for recipe in recipeRecords {
-        context.delete(recipe)
-      }
+    for revision in revisionRecords {
+      try deleteRevisionRows(revisionID: revision.id)
+      context.delete(revision)
+    }
+    for recipe in recipeRecords {
+      context.delete(recipe)
+    }
 
-      for stored in recipes {
-        try upsert(stored.recipe)
-        try replace(stored.revision)
-      }
-      try context.save()
-    } catch {
-      context.rollback()
-      throw error
+    for stored in recipes {
+      try upsert(stored.recipe)
+      try replace(stored.revision)
+    }
+  }
+
+  private func validateOwnership(of recipe: Recipe) throws {
+    let identifier = recipe.id.rawValue
+    let descriptor = FetchDescriptor<RecipeRecord>(predicate: #Predicate { $0.id == identifier })
+    if let existing = try context.fetch(descriptor).first,
+      existing.kitchenID != recipe.kitchenID.rawValue {
+      throw KitchenMemoryPersistenceError.recipeAlreadyOwnedByAnotherKitchen(recipeID: recipe.id)
+    }
+  }
+
+  private func validateOwnership(of revision: RecipeRevision) throws {
+    let identifier = revision.id.rawValue
+    let descriptor = FetchDescriptor<RecipeRevisionRecord>(
+      predicate: #Predicate { $0.id == identifier })
+    if let existing = try context.fetch(descriptor).first,
+      existing.recipeID != revision.recipeID.rawValue {
+      throw KitchenMemoryPersistenceError.revisionAlreadyOwnedByAnotherRecipe(
+        revisionID: revision.id)
+    }
+  }
+
+  private func upsert(_ kitchen: Kitchen) throws {
+    let identifier = kitchen.id.rawValue
+    let descriptor = FetchDescriptor<KitchenRecord>(predicate: #Predicate { $0.id == identifier })
+    if let record = try context.fetch(descriptor).first {
+      record.name = kitchen.name
+    } else {
+      context.insert(KitchenRecord(id: identifier, name: kitchen.name))
     }
   }
 
@@ -229,6 +367,7 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
         title: revision.title,
         summary: revision.summary,
         authorName: revision.authorName,
+        contentLanguage: revision.contentLanguage?.rawValue,
         sourceData: try encodeSource(revision.source, capture: revision.sourceCapture),
         yieldData: try encodeOptional(revision.recipeYield),
         prepSeconds: revision.prepDuration?.seconds,
@@ -290,11 +429,12 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
   private func domainRevision(from record: RecipeRevisionRecord) throws -> RecipeRevision {
     let storedSource = try decodeSource(record.sourceData)
     let revisionID = record.id
+    var seenMediaIDs = Set<UUID>()
     let media = try context.fetch(
       FetchDescriptor<RecipeMediaRecord>(
         predicate: #Predicate { $0.revisionID == revisionID }, sortBy: [SortDescriptor(\.sortIndex)]
       )
-    ).map { item in
+    ).filter { seenMediaIDs.insert($0.id).inserted }.map { item in
       guard let role = RecipeMedia.Role(rawValue: item.role) else {
         throw KitchenMemoryPersistenceError.invalidStoredValue(field: "media.role")
       }
@@ -302,11 +442,12 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
         id: .init(rawValue: item.id), role: role, assetName: item.assetName,
         accessibilityLabel: item.mediaAccessibilityLabel)
     }
+    var seenEquipmentIDs = Set<UUID>()
     let equipment = try context.fetch(
       FetchDescriptor<EquipmentRecord>(
         predicate: #Predicate { $0.revisionID == revisionID }, sortBy: [SortDescriptor(\.sortIndex)]
       )
-    ).map { item in
+    ).filter { seenEquipmentIDs.insert($0.id).inserted }.map { item in
       EquipmentItem(
         id: .init(rawValue: item.id), originalText: item.originalText,
         quantity: try decodeOptional(
@@ -314,10 +455,12 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
         name: item.name, isOptional: item.isOptional)
     }
 
+    var seenIngredientSectionIDs = Set<UUID>()
     let ingredientSectionRecords = try context.fetch(
       FetchDescriptor<IngredientSectionRecord>(
         predicate: #Predicate { $0.revisionID == revisionID }, sortBy: [SortDescriptor(\.sortIndex)]
-      ))
+      )
+    ).filter { seenIngredientSectionIDs.insert($0.id).inserted }
     let ingredientSections = try ingredientSectionRecords.map { section in
       let sectionID = section.id
       let storedItems = try context.fetch(
@@ -327,11 +470,16 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
       )
       var seenItemIDs = Set<UUID>()
       let items = try storedItems.filter { seenItemIDs.insert($0.id).inserted }.map { item in
-        guard let presentationMode = RecipeIngredient.PresentationMode(rawValue: item.presentationMode),
-          let scaling = RecipeIngredient.ScalingBehavior(rawValue: item.scalingBehavior),
-          let parseState = RecipeIngredient.ParseState(rawValue: item.parseState)
+        guard let presentationMode = RecipeIngredient.PresentationMode(rawValue: item.presentationMode)
         else {
-          throw KitchenMemoryPersistenceError.invalidStoredValue(field: "ingredient enum")
+          throw KitchenMemoryPersistenceError.invalidStoredValue(
+            field: "ingredient.presentationMode")
+        }
+        guard let scaling = RecipeIngredient.ScalingBehavior(rawValue: item.scalingBehavior) else {
+          throw KitchenMemoryPersistenceError.invalidStoredValue(field: "ingredient.scalingBehavior")
+        }
+        guard let parseState = RecipeIngredient.ParseState(rawValue: item.parseState) else {
+          throw KitchenMemoryPersistenceError.invalidStoredValue(field: "ingredient.parseState")
         }
         return RecipeIngredient(
           id: .init(rawValue: item.id), originalText: item.originalText,
@@ -350,10 +498,12 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
         id: .init(rawValue: section.id), title: section.title, ingredients: items)
     }
 
+    var seenInstructionSectionIDs = Set<UUID>()
     let instructionSectionRecords = try context.fetch(
       FetchDescriptor<InstructionSectionRecord>(
         predicate: #Predicate { $0.revisionID == revisionID }, sortBy: [SortDescriptor(\.sortIndex)]
-      ))
+      )
+    ).filter { seenInstructionSectionIDs.insert($0.id).inserted }
     let instructionSections = try instructionSectionRecords.map { section in
       let sectionID = section.id
       let storedSteps = try context.fetch(
@@ -372,10 +522,23 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
       return InstructionSection(id: .init(rawValue: section.id), title: section.title, steps: steps)
     }
 
+    let contentLanguage: RecipeContentLanguage?
+    if let storedLanguage = record.contentLanguage {
+      guard let language = RecipeContentLanguage(rawValue: storedLanguage) else {
+        throw KitchenMemoryPersistenceError.invalidStoredValue(
+          field: "revision.contentLanguage"
+        )
+      }
+      contentLanguage = language
+    } else {
+      contentLanguage = nil
+    }
+
     return RecipeRevision(
       id: .init(rawValue: record.id), recipeID: .init(rawValue: record.recipeID),
       revisionNumber: record.revisionNumber,
       title: record.title, summary: record.summary, authorName: record.authorName,
+      contentLanguage: contentLanguage,
       source: storedSource.source,
       sourceCapture: storedSource.capture,
       recipeYield: try decodeOptional(

@@ -8,15 +8,18 @@ import SwiftData
 // These records are storage representations, not objects used to create new
 // domain entities. Their initializers therefore copy already-validated values
 // and preserve UUIDs supplied by the domain, an import, or synchronization; they
-// must not generate replacement identities or invent defaults. Construction and
-// validation belong to domain/application workflows, while the repository is
-// the only code that maps those values into these deliberately boring setters.
-// SwiftData still gives every record an internal identity, but that
+// must not generate replacement identities. Construction and validation belong
+// to domain/application workflows, while the repository is the only code that
+// maps those values into these deliberately boring setters. The property-level
+// values below are CloudKit schema defaults, required for every nonoptional
+// attribute. App construction always replaces them through these initializers;
+// they are not domain defaults or permission to invent missing synchronized
+// data. SwiftData still gives every record an internal identity, but that
 // implementation detail never crosses into KitchenMemoryDomain.
 
 @Model final class KitchenRecord {
-  var id: UUID
-  var name: String
+  var id: UUID = UUID()
+  var name: String = ""
 
   init(id: UUID, name: String) {
     self.id = id
@@ -25,9 +28,9 @@ import SwiftData
 }
 
 @Model final class RecipeRecord {
-  var id: UUID
-  var kitchenID: UUID
-  var currentRevisionID: UUID
+  var id: UUID = UUID()
+  var kitchenID: UUID = UUID()
+  var currentRevisionID: UUID = UUID()
 
   init(id: UUID, kitchenID: UUID, currentRevisionID: UUID) {
     self.id = id
@@ -37,24 +40,26 @@ import SwiftData
 }
 
 @Model final class RecipeRevisionRecord {
-  var id: UUID
-  var recipeID: UUID
-  var revisionNumber: Int
-  var title: String
+  var id: UUID = UUID()
+  var recipeID: UUID = UUID()
+  var revisionNumber: Int = 0
+  var title: String = ""
   var summary: String?
   var authorName: String?
+  var contentLanguage: String?
   var sourceData: Data?
   var yieldData: Data?
   var prepSeconds: Int?
   var cookSeconds: Int?
   var totalSeconds: Int?
-  var cuisinesData: Data
-  var categoriesData: Data
-  var keywordsData: Data
+  var cuisinesData: Data = Data()
+  var categoriesData: Data = Data()
+  var keywordsData: Data = Data()
 
   init(
     id: UUID, recipeID: UUID, revisionNumber: Int, title: String, summary: String?,
-    authorName: String?, sourceData: Data?, yieldData: Data?, prepSeconds: Int?, cookSeconds: Int?,
+    authorName: String?, contentLanguage: String?, sourceData: Data?, yieldData: Data?,
+    prepSeconds: Int?, cookSeconds: Int?,
     totalSeconds: Int?, cuisinesData: Data, categoriesData: Data, keywordsData: Data
   ) {
     self.id = id
@@ -63,6 +68,7 @@ import SwiftData
     self.title = title
     self.summary = summary
     self.authorName = authorName
+    self.contentLanguage = contentLanguage
     self.sourceData = sourceData
     self.yieldData = yieldData
     self.prepSeconds = prepSeconds
@@ -75,11 +81,11 @@ import SwiftData
 }
 
 @Model final class RecipeMediaRecord {
-  var id: UUID
-  var revisionID: UUID
-  var sortIndex: Int
-  var role: String
-  var assetName: String
+  var id: UUID = UUID()
+  var revisionID: UUID = UUID()
+  var sortIndex: Int = 0
+  var role: String = ""
+  var assetName: String = ""
   // Avoid the iOS accessibility runtime's property name while retaining the
   // original on-disk field name for existing V1 stores.
   @Attribute(originalName: "accessibilityLabel")
@@ -99,13 +105,13 @@ import SwiftData
 }
 
 @Model final class EquipmentRecord {
-  var id: UUID
-  var revisionID: UUID
-  var sortIndex: Int
-  var originalText: String
+  var id: UUID = UUID()
+  var revisionID: UUID = UUID()
+  var sortIndex: Int = 0
+  var originalText: String = ""
   var quantityData: Data?
-  var name: String
-  var isOptional: Bool
+  var name: String = ""
+  var isOptional: Bool = false
 
   init(
     id: UUID, revisionID: UUID, sortIndex: Int, originalText: String, quantityData: Data?,
@@ -122,9 +128,9 @@ import SwiftData
 }
 
 @Model final class IngredientSectionRecord {
-  var id: UUID
-  var revisionID: UUID
-  var sortIndex: Int
+  var id: UUID = UUID()
+  var revisionID: UUID = UUID()
+  var sortIndex: Int = 0
   var title: String?
 
   init(id: UUID, revisionID: UUID, sortIndex: Int, title: String?) {
@@ -136,11 +142,11 @@ import SwiftData
 }
 
 @Model final class RecipeIngredientRecord {
-  var id: UUID
-  var sectionID: UUID
-  var sortIndex: Int
-  var originalText: String
-  var presentationMode: String
+  var id: UUID = UUID()
+  var sectionID: UUID = UUID()
+  var sortIndex: Int = 0
+  var originalText: String = ""
+  var presentationMode: String = ""
   var customDisplayText: String?
   var quantityData: Data?
   var unitText: String?
@@ -148,9 +154,9 @@ import SwiftData
   var ingredientText: String?
   var preparation: String?
   var note: String?
-  var isOptional: Bool
-  var scalingBehavior: String
-  var parseState: String
+  var isOptional: Bool = false
+  var scalingBehavior: String = ""
+  var parseState: String = ""
 
   init(
     id: UUID, sectionID: UUID, sortIndex: Int, originalText: String,
@@ -178,9 +184,9 @@ import SwiftData
 }
 
 @Model final class InstructionSectionRecord {
-  var id: UUID
-  var revisionID: UUID
-  var sortIndex: Int
+  var id: UUID = UUID()
+  var revisionID: UUID = UUID()
+  var sortIndex: Int = 0
   var title: String?
 
   init(id: UUID, revisionID: UUID, sortIndex: Int, title: String?) {
@@ -192,11 +198,11 @@ import SwiftData
 }
 
 @Model final class InstructionStepRecord {
-  var id: UUID
-  var sectionID: UUID
-  var sortIndex: Int
+  var id: UUID = UUID()
+  var sectionID: UUID = UUID()
+  var sortIndex: Int = 0
   var name: String?
-  var text: String
+  var text: String = ""
   var durationSeconds: Int?
   var temperatureData: Data?
 

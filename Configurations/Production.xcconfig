@@ -1,0 +1,9 @@
+// Kitchen Memory
+// Copyright © 2026 the Kitchen Memory contributors.
+// SPDX-License-Identifier: GPL-3.0-only
+
+#include "Base.xcconfig"
+
+KITCHEN_MEMORY_APS_ENVIRONMENT = production
+KITCHEN_MEMORY_CLOUDKIT_ENVIRONMENT = Production
+SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited) PRODUCTION

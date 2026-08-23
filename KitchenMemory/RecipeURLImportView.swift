@@ -3,6 +3,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 import Accessibility
+import Foundation
+import KitchenMemoryLogic
 import SwiftUI
 
 struct RecipeURLImportView: View {
@@ -10,10 +12,8 @@ struct RecipeURLImportView: View {
   let select: (RecipeImportOption) -> Void
 
   @Environment(\.dismiss) private var dismiss
-  @State private var enteredURL = ""
-  @State private var candidates: [RecipeImportOption] = []
-  @State private var isLoading = false
-  @State private var errorMessage: String?
+  @Environment(\.locale) private var locale
+  @State private var session = RecipeImportSession()
   @State private var importTask: Task<Void, Never>?
 
   var body: some View {
@@ -31,7 +31,7 @@ struct RecipeURLImportView: View {
 #endif
       }
       .accessibilityIdentifier("recipe-url-import-scroll")
-      .navigationTitle(candidates.isEmpty ? "Import Recipe" : "Choose Recipe")
+      .navigationTitle(session.candidates.isEmpty ? "Import Recipe" : "Choose Recipe")
 #if os(iOS)
       .navigationBarTitleDisplayMode(.inline)
 #endif
@@ -40,7 +40,10 @@ struct RecipeURLImportView: View {
           Button("Cancel") { dismiss() }
         }
       }
-      .onDisappear { importTask?.cancel() }
+      .onDisappear {
+        importTask?.cancel()
+        session.cancel()
+      }
 #if os(macOS)
       .frame(minWidth: 520, idealWidth: 600, minHeight: 360, idealHeight: 460)
 #endif
@@ -49,7 +52,7 @@ struct RecipeURLImportView: View {
 
   @ViewBuilder
   private var importSections: some View {
-    if candidates.isEmpty {
+    if session.candidates.isEmpty {
       urlSection
       privacySection
     } else {
@@ -61,8 +64,8 @@ struct RecipeURLImportView: View {
     Section {
       urlField
 
-      if let errorMessage {
-        Label(errorMessage, systemImage: "exclamationmark.triangle")
+      if let failure = session.failure {
+        Label(Self.message(for: failure, locale: locale), systemImage: "exclamationmark.triangle")
           .foregroundStyle(.red)
           .accessibilityIdentifier("recipe-import-error")
       }
@@ -71,9 +74,9 @@ struct RecipeURLImportView: View {
         beginImport()
       } label: {
         Label {
-          Text(isLoading ? "Fetching Recipe" : "Fetch Recipe")
+          Text(session.isLoading ? "Fetching Recipe" : "Fetch Recipe")
         } icon: {
-          if isLoading {
+          if session.isLoading {
             ProgressView()
               .controlSize(.small)
               // The button's changing text communicates progress. Exposing the
@@ -84,8 +87,8 @@ struct RecipeURLImportView: View {
           }
         }
       }
-      .disabled(isLoading || normalizedURL == nil)
-      .accessibilityLabel(isLoading ? "Fetching recipe" : "Fetch recipe")
+      .disabled(session.isLoading || session.normalizedURL == nil)
+      .accessibilityLabel(session.isLoading ? "Fetching recipe" : "Fetch recipe")
       .accessibilityIdentifier("recipe-import-fetch")
     }
   }
@@ -112,7 +115,7 @@ struct RecipeURLImportView: View {
   private var urlTextField: some View {
     TextField(
       "Recipe webpage",
-      text: $enteredURL,
+      text: $session.enteredURL,
       prompt: Text("https://example.com/recipe").foregroundStyle(.secondary)
     )
     .foregroundStyle(.primary)
@@ -128,29 +131,27 @@ struct RecipeURLImportView: View {
 
   private var privacySection: some View {
     Section("Privacy") {
-      Text(
-        "Kitchen Memory follows redirects and downloads the resulting HTML with an "
-          + "ephemeral request that supplies no cookies or app credentials. It runs no "
-          + "page scripts and downloads no images during review."
-      )
+      // swiftlint:disable:next line_length
+      Text("Kitchen Memory follows redirects and downloads the resulting HTML with an ephemeral request that supplies no cookies or app credentials. It runs no page scripts and downloads no images during review.")
         .foregroundStyle(.secondary)
-      Text(
-        "If you save a recipe, Kitchen Memory keeps the final source URL and one bounded "
-          + "JSON-LD recipe-metadata block locally, including source fields not shown in "
-          + "the review editor."
-      )
+      // swiftlint:disable:next line_length
+      Text("If you save a recipe, Kitchen Memory keeps the final source URL and one bounded JSON-LD recipe-metadata block locally, including source fields not shown in the review editor.")
         .foregroundStyle(.secondary)
     }
   }
 
   private var candidateSection: some View {
     Section {
-      ForEach(candidates) { candidate in
+      ForEach(session.candidates) { candidate in
         Button {
           select(candidate)
         } label: {
           VStack(alignment: .leading, spacing: 4) {
-            Text(candidate.draft.title.isEmpty ? "Untitled recipe" : candidate.draft.title)
+            Text(
+              candidate.draft.title.isEmpty
+                ? String(localized: "Untitled recipe", locale: locale)
+                : candidate.draft.title
+            )
               .font(.headline)
             if let summary = candidate.draft.summary, !summary.isEmpty {
               Text(summary)
@@ -159,7 +160,7 @@ struct RecipeURLImportView: View {
                 .lineLimit(3)
             }
             if !candidate.concerns.isEmpty {
-              Text("\(candidate.concerns.count) review note\(candidate.concerns.count == 1 ? "" : "s")")
+              Text(reviewNoteCount(candidate.concerns.count))
                 .font(.caption)
                 .foregroundStyle(.orange)
             }
@@ -173,33 +174,13 @@ struct RecipeURLImportView: View {
       Text("This page contains multiple recipes")
     } footer: {
       Button("Use a Different URL") {
-        candidates = []
-        errorMessage = nil
+        session.useDifferentURL()
       }
     }
   }
 
-  private var normalizedURL: URL? {
-    let trimmed = enteredURL.trimmingCharacters(in: .whitespacesAndNewlines)
-    // URL text is person-controlled and can be pasted from another process.
-    // A modest ceiling prevents the UI and Foundation parser from doing
-    // disproportionate work on a value that cannot be a practical recipe URL.
-    guard !trimmed.isEmpty, trimmed.utf8.count <= 4_096 else { return nil }
-
-    let parsed = URL(string: trimmed)
-    let url = parsed?.scheme == nil ? URL(string: "https://\(trimmed)") : parsed
-    guard let url,
-          let scheme = url.scheme?.lowercased(),
-          scheme == "https",
-          url.host != nil
-    else { return nil }
-    return url
-  }
-
   private func beginImport() {
-    guard let url = normalizedURL, !isLoading else { return }
-    isLoading = true
-    errorMessage = nil
+    guard let url = session.beginImport() else { return }
     // Changing a button label is visible feedback, but assistive technology
     // does not necessarily revisit that button when an asynchronous operation
     // begins. Announce the state transition without moving keyboard or
@@ -210,20 +191,20 @@ struct RecipeURLImportView: View {
       do {
         let loaded = try await load(url)
         guard !Task.isCancelled else { return }
-        isLoading = false
-        if loaded.count == 1, let candidate = loaded.first {
+        switch session.receive(loaded) {
+        case .review(let candidate):
           select(candidate)
-        } else {
-          candidates = loaded
+        case .choose:
           AccessibilityNotification.Announcement(
             "\(loaded.count) recipes found. Choose a recipe to review."
           ).post()
+        case nil:
+          break
         }
       } catch {
-        guard !Task.isCancelled else { return }
-        isLoading = false
-        let message = Self.message(for: error)
-        errorMessage = message
+        session.receive(error: error)
+        guard !Task.isCancelled, let failure = session.failure else { return }
+        let message = Self.message(for: failure, locale: locale)
         // The identifier on the visible error supports automation only; it
         // does not make newly inserted text a live region. A native
         // announcement ensures the failure is heard while preserving the
@@ -233,20 +214,33 @@ struct RecipeURLImportView: View {
     }
   }
 
-  private static func message(for error: Error) -> String {
-    switch error {
-    case RecipeImportServiceError.noRecipeCandidates:
-      "No Schema.org recipe was found on this page."
-    case RecipeImportServiceError.disallowedAddress:
-      "For safety, Kitchen Memory cannot fetch this address or redirect."
-    case RecipeImportServiceError.pageTooLarge:
-      "This page contains too much data to import safely."
-    case RecipeImportServiceError.unsupportedPage:
-      "This address did not return a supported HTML recipe page."
-    case RecipeImportServiceError.networkFailure:
-      "The webpage could not be downloaded. Check your connection and try again."
-    default:
-      "Kitchen Memory could not import this webpage. Check the URL and try again."
+  private func reviewNoteCount(_ count: Int) -> String {
+    String(localized: "\(count) review note", locale: locale)
+  }
+
+  private static func message(
+    for failure: RecipeImportSessionFailure,
+    locale: Locale = .current
+  ) -> String {
+    switch failure {
+    case .noRecipeCandidates:
+      String(localized: "No Schema.org recipe was found on this page.", locale: locale)
+    case .disallowedAddress:
+      String(localized: "For safety, Kitchen Memory cannot fetch this address or redirect.", locale: locale)
+    case .pageTooLarge:
+      String(localized: "This page contains too much data to import safely.", locale: locale)
+    case .unsupportedPage:
+      String(localized: "This address did not return a supported HTML recipe page.", locale: locale)
+    case .networkFailure:
+      String(
+        localized: "The webpage could not be downloaded. Check your connection and try again.",
+        locale: locale
+      )
+    case .unknown:
+      String(
+        localized: "Kitchen Memory could not import this webpage. Check the URL and try again.",
+        locale: locale
+      )
     }
   }
 }

@@ -61,7 +61,9 @@ final class SwiftDataRecipeRepositoryTests: XCTestCase {
   func testTunaNoodleHotdishRoundTripsThroughSwiftData() throws {
     let kitchen = Kitchen(name: "Test Kitchen")
     let manifest = try SampleRecipeCatalog.loadManifest()
-    let document = try SampleRecipeCatalog.loadRecipe(try XCTUnwrap(manifest.recipes.first))
+    let family = try XCTUnwrap(manifest.recipes.first)
+    let reference = try XCTUnwrap(family.variant(preferredLanguages: ["en"]))
+    let document = try SampleRecipeCatalog.loadRecipe(reference)
     let sample = try document.materialize(in: kitchen.id)
     let repository = SwiftDataRecipeRepository(
       modelContainer: try KitchenMemorySchema.makeContainer(inMemory: true)
@@ -79,7 +81,9 @@ final class SwiftDataRecipeRepositoryTests: XCTestCase {
   func testSavingTheSameRecipeUpdatesInsteadOfDuplicatingItsChildren() throws {
     let kitchen = Kitchen(name: "Test Kitchen")
     let manifest = try SampleRecipeCatalog.loadManifest()
-    let document = try SampleRecipeCatalog.loadRecipe(try XCTUnwrap(manifest.recipes.first))
+    let family = try XCTUnwrap(manifest.recipes.first)
+    let reference = try XCTUnwrap(family.variant(preferredLanguages: ["en"]))
+    let document = try SampleRecipeCatalog.loadRecipe(reference)
     let sample = try document.materialize(in: kitchen.id)
     var editedRevision = sample.revision
     editedRevision.title = "Leftover Tuna Noodle Hotdish"
@@ -89,6 +93,10 @@ final class SwiftDataRecipeRepositoryTests: XCTestCase {
 
     try repository.save(kitchen)
     try repository.save(recipe: sample.recipe, revision: sample.revision)
+    XCTAssertEqual(
+      try repository.recipe(id: sample.recipe.id),
+      StoredRecipe(recipe: sample.recipe, revision: sample.revision)
+    )
     try repository.save(recipe: sample.recipe, revision: editedRevision)
 
     let stored = try XCTUnwrap(repository.recipe(id: sample.recipe.id))
@@ -123,6 +131,10 @@ final class SwiftDataRecipeRepositoryTests: XCTestCase {
 
     try repository.save(kitchen)
     try repository.save(recipe: recipe, revision: firstRevision)
+    XCTAssertEqual(
+      try repository.recipe(id: recipeID),
+      StoredRecipe(recipe: recipe, revision: firstRevision)
+    )
     recipe.currentRevisionID = secondRevision.id
     try repository.save(recipe: recipe, revision: secondRevision)
 
@@ -271,13 +283,15 @@ final class SwiftDataRecipeRepositoryTests: XCTestCase {
       ),
       revision: firstRevision
     )
-    try repository.save(
-      recipe: Recipe(
-        id: oldRecipeID,
-        kitchenID: kitchen.id,
-        currentRevisionID: secondRevision.id
-      ),
-      revision: secondRevision
+    let currentOldRecipe = Recipe(
+      id: oldRecipeID,
+      kitchenID: kitchen.id,
+      currentRevisionID: secondRevision.id
+    )
+    try repository.save(recipe: currentOldRecipe, revision: secondRevision)
+    XCTAssertEqual(
+      try repository.recipe(id: oldRecipeID),
+      StoredRecipe(recipe: currentOldRecipe, revision: secondRevision)
     )
 
     let otherRecipeID = Recipe.ID()

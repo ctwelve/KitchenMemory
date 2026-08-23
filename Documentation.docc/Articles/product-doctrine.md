@@ -281,11 +281,12 @@ Information moves between contexts intentionally:
 The platforms share the domain and relevant application capabilities. They do not
 share one compromised interface.
 
-SwiftData is the first local persistence implementation. CloudKit is the
-Apple-native synchronization and household-collaboration platform. The domain
-remains independent of both, and versioned import and export provide content
-portability. The exact shared-Kitchen CloudKit integration follows a focused
-collaboration prototype; see ADRs 0003 and 0004.
+SwiftData is the first local persistence implementation. Managed private
+CloudKit synchronization carries one person's library across their devices for
+1.0. The domain remains independent of both, and versioned import and export
+provide content portability. Multi-person Kitchen sharing is a separate
+post-1.0 collaboration slice whose direct or managed CloudKit integration
+follows a focused prototype; see ADRs 0003 and 0004.
 
 ## Capability horizons
 
@@ -297,13 +298,15 @@ Horizons communicate dependency and focus, not dates or promises.
 - Recipe sections, ingredients, instructions, yield, and core metadata.
 - Lossless Schema.org JSON-LD URL import into reviewable drafts.
 - Local recipe library with folders and tags.
-- Recipe reading and basic cooking sessions with progress and notes.
-- A basic planned cook that retains recipe revision and desired yield.
+- Recipe reading and safe quantity scaling.
+- Private iCloud synchronization across one person's devices.
 - Domain, import, storage, and UI boundaries suitable for multiple Apple targets.
 
 ### Expansion
 
-- Kitchen sharing and synchronization.
+- Kitchen sharing and multi-person synchronization.
+- Basic cooking sessions with progress and notes.
+- A basic planned cook that retains recipe revision and desired yield.
 - Pantry items with multiple exact, fuzzy, presence, and uncertain holdings.
 - Ingredient readiness decisions, combined shopping, and weekly collections of
   planned cooks.
