@@ -9,15 +9,18 @@ import XCTest
 
 @MainActor
 final class KitchenServicesFailureTests: XCTestCase {
-  func testSampleFailureCannotPartiallyBootstrapAKitchen() throws {
+  func testSampleFailureCannotPartiallyInstallIntoAKitchen() throws {
     let repository = try makeRepository()
-    let service = KitchenBootstrapService(
+    let kitchen = Kitchen(name: "Home")
+    try repository.save(kitchen)
+    let service = SampleRecipeInstallService(
       repository: repository,
       samples: FailingSampleProvider()
     )
 
-    XCTAssertThrowsError(try service.prepareInitialKitchen())
-    XCTAssertTrue(try repository.kitchens().isEmpty)
+    XCTAssertThrowsError(try service.install(in: kitchen.id))
+    XCTAssertEqual(try repository.kitchens(), [kitchen])
+    XCTAssertTrue(try repository.recipes(in: kitchen.id).isEmpty)
   }
 
   func testSampleFailureCannotClearExistingRecipesDuringReset() throws {

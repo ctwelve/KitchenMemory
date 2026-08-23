@@ -19,10 +19,17 @@ The slice workflow starts for meaningful project changes pushed to `slice/*`
 branches. It performs Build, Analyze, and Test actions using the shared
 `KitchenMemory` scheme, but does not archive a product.
 
+The current integration branch is `slice/completion`. Focused working branches
+merge into it through review; the resulting push runs the slice workflow. When
+the collected slice is ready, its pull request to `main` is subject to the
+pull-request gate below. A working branch therefore need not duplicate cloud
+work before its reviewed result reaches `slice/completion`.
+
 Build and Analyze are required to pass. Test is advisory on `slice/*` while the
-project establishes complete business-logic coverage and keeps UI automation to
-the durable application-shell smoke tests. A failing logic test is still a
-product defect even when that cloud action is not yet a branch gate.
+shared test plan still includes provisional UI automation and its Apple tooling
+dependencies. The core framework coverage gate has reached exact complete line
+coverage; a failing logic test or coverage check is a product defect even when
+the aggregate cloud Test action is not yet a branch gate.
 
 ### Main production
 
@@ -58,14 +65,16 @@ Xcode Cloud build or Test action as a required GitHub status check for `main`.
 The production workflow repeats required tests after merge to verify the actual
 result on `main`.
 
-The UI target contains smoke tests only. Comprehensive accessibility audits,
-localized-copy checks, and interaction-specific UI suites are deferred until the
+The UI target contains smoke tests only. Localization of durable copy and
+formatting proceeds independently, but comprehensive localized-layout assertions,
+accessibility audits, and interaction-specific UI suites are deferred until the
 relevant interface is stable. See
 <doc:0007-business-logic-coverage-and-ui-smoke-tests> and
-<doc:accessibility-engineering>.
+<doc:accessibility-engineering>. Localization ownership and its non-UI testing
+boundary are described in <doc:localization-architecture>.
 
 The committed test plan collects code coverage. Evaluate the durable domain,
-import, persistence, and application-operation sources separately from SwiftUI
+import, persistence, and product-logic sources separately from SwiftUI
 views and test bundles; an app-wide percentage is not the business-logic metric.
 Use uncovered executable lines to find missing behavior and boundary tests, not
 to justify exercising provisional views through UI automation.
@@ -108,6 +117,22 @@ Xcode Cloud workflow metadata and start conditions live in Xcode Cloud rather
 than in this repository. Keep its actions, requirements, branch patterns, and
 change filters aligned with this policy. Add TestFlight or notarization as
 distribution post-actions when release automation is ready.
+
+### Current iOS UI-runner limitation
+
+With Xcode 26.6 and the iOS 26.5 simulator, the two applicable iOS XCUI smoke
+tests can fail before their test bodies execute. Xcode reports an internal
+`DebuggerVersionStore` / `no debugger version` error and denies the
+`.xctrunner` launch. The same destination runs the complete non-UI XCTest bundle,
+and the generated, signed UI runner installs and launches manually. A clean
+DerivedData rebuild and normal signing do not change the result.
+
+Treat this observed failure as an Apple UI-test orchestration limitation, not a
+reason to weaken signing or change product behavior. Keep the smoke tests in the
+shared plan, retain macOS smoke evidence, and record the Xcode/runtime versions
+with any affected validation. Re-evaluate the exception whenever Xcode or the
+simulator runtime changes; it is not a permanent waiver for a test that reaches
+its body and finds a product failure.
 
 ## Static analysis
 

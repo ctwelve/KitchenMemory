@@ -13,16 +13,18 @@ final class SampleRecipeCatalogTests: XCTestCase {
         let manifest = try SampleRecipeCatalog.loadManifest()
 
         XCTAssertEqual(manifest.name, "Kitchen Memory Samples")
-        XCTAssertEqual(manifest.formatVersion, 1)
+        XCTAssertEqual(manifest.formatVersion, 2)
         XCTAssertEqual(
-            manifest.recipes.map(\.dataAssetName),
+            manifest.recipes.compactMap { $0.variant(preferredLanguages: ["en-US"])?.dataAssetName },
             ["TunaNoodleHotdishRecipe", "DirtyFriedRiceRecipe"]
         )
     }
 
     func testTunaNoodleHotdishUsesFullRecipeContentAndDestinationKitchen() throws {
         let reference = try XCTUnwrap(SampleRecipeCatalog.loadManifest().recipes.first)
-        let document = try SampleRecipeCatalog.loadRecipe(reference)
+        let document = try SampleRecipeCatalog.loadRecipe(
+            try XCTUnwrap(reference.variant(preferredLanguages: ["en-US"]))
+        )
         let destinationKitchenID = Kitchen.ID()
         let materialization = try document.materialize(in: destinationKitchenID)
 
@@ -53,9 +55,13 @@ final class SampleRecipeCatalogTests: XCTestCase {
     func testDirtyFriedRicePreservesFuzzyAmountsSourceAndThermalTechnique() throws {
         let manifest = try SampleRecipeCatalog.loadManifest()
         let reference = try XCTUnwrap(
-            manifest.recipes.first { $0.dataAssetName == "DirtyFriedRiceRecipe" }
+            manifest.recipes.first {
+                $0.variants.contains { $0.dataAssetName == "DirtyFriedRiceRecipe" }
+            }
         )
-        let document = try SampleRecipeCatalog.loadRecipe(reference)
+        let document = try SampleRecipeCatalog.loadRecipe(
+            try XCTUnwrap(reference.variant(preferredLanguages: ["en-US"]))
+        )
         let destinationKitchenID = Kitchen.ID()
         let materialization = try document.materialize(in: destinationKitchenID)
         let revision = materialization.revision
@@ -85,5 +91,37 @@ final class SampleRecipeCatalogTests: XCTestCase {
         XCTAssertEqual(revision.instructionSections[2].steps[0].name, "KILL THE HEAT")
         XCTAssertTrue(revision.instructionSections[2].steps[1].text.contains("snaps into focus"))
         XCTAssertTrue(revision.instructionSections[2].steps[3].text.contains("thermal flywheel"))
+    }
+
+    func testLocaleSelectionHonorsPreferenceOrderAndFallbacks() throws {
+        let reference = try XCTUnwrap(SampleRecipeCatalog.loadManifest().recipes.first)
+
+        XCTAssertEqual(
+            reference.variant(preferredLanguages: ["fr-FR", "es-MX"])?.localeIdentifier,
+            "fr-CA",
+            "A same-language variant should win before a later exact preference."
+        )
+        XCTAssertEqual(reference.variant(preferredLanguages: ["es-MX"])?.localeIdentifier, "es-MX")
+        XCTAssertEqual(reference.variant(preferredLanguages: ["de-DE"])?.localeIdentifier, "en-US")
+        XCTAssertEqual(reference.variant(preferredLanguages: [])?.localeIdentifier, "en-US")
+    }
+
+    func testLocalizedSamplesCarryMatchingAuthoredLanguageAndDistinctIdentity() throws {
+        let manifest = try SampleRecipeCatalog.loadManifest()
+
+        for localeIdentifier in ["en-US", "fr-CA", "es-MX"] {
+            let references = try SampleRecipeCatalog.localizedRecipes(
+                in: manifest,
+                preferredLanguages: [localeIdentifier]
+            )
+            XCTAssertEqual(references.count, 2)
+            XCTAssertEqual(Set(references.map(\.recipeID)).count, 2)
+
+            for reference in references {
+                let document = try SampleRecipeCatalog.loadRecipe(reference)
+                XCTAssertEqual(document.revision.contentLanguage?.rawValue, localeIdentifier)
+                XCTAssertEqual(document.recipeID, reference.recipeID)
+            }
+        }
     }
 }

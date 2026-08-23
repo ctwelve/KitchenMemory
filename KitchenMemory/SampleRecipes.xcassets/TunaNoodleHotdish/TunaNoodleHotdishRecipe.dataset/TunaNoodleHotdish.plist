@@ -12,6 +12,7 @@
 		<key>title</key><string>Tuna Noodle Hotdish</string>
 		<key>summary</key><string>A deeply savory Midwestern tuna noodle hotdish with peas and a buttery crouton-and-cracker topping.</string>
 		<key>authorName</key><string>Kitchen Memory contributors</string>
+		<key>contentLanguage</key><string>en-US</string>
 		<key>source</key><dict><key>kind</key><string>original</string><key>title</key><string>Made for dinner on August 10, 2026</string></dict>
 		<key>recipeYield</key>
 		<dict>

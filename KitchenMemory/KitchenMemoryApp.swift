@@ -66,14 +66,23 @@ struct AppDependencies {
   let modelContainer: ModelContainer
   let libraryModel: RecipeLibraryModel
 
-  init(inMemory: Bool = false) throws {
+  init(
+    inMemory: Bool = false,
+    sampleOnboardingStore: (any SampleRecipeOnboardingStoring)? = nil,
+    sampleProvider: (any SampleRecipeProviding)? = nil
+  ) throws {
     let modelContainer = try KitchenMemorySchema.makeContainer(inMemory: inMemory)
     let repository = SwiftDataRecipeRepository(modelContainer: modelContainer)
-    let samples = BundledSampleRecipeProvider()
-    let kitchen = try KitchenBootstrapService(
-      repository: repository,
-      samples: samples
-    ).prepareInitialKitchen()
+    let samples = sampleProvider ?? BundledSampleRecipeProvider()
+    let kitchen = try KitchenBootstrapService(repository: repository).prepareInitialKitchen()
+    let onboardingStore = sampleOnboardingStore ?? Self.defaultOnboardingStore(inMemory: inMemory)
+    let sampleInstaller = SampleRecipeInstallService(repository: repository, samples: samples)
+
+    // Disposable previews and UI smoke tests request a ready-made fixture.
+    // Durable launches never infer installation permission from this path.
+    if inMemory, sampleOnboardingStore == nil {
+      try sampleInstaller.install(in: kitchen.id)
+    }
 
     self.modelContainer = modelContainer
     libraryModel = RecipeLibraryModel(
@@ -81,7 +90,9 @@ struct AppDependencies {
       library: RecipeLibrary(repository: repository),
       editor: RecipeEditor(repository: repository),
       importer: RecipeImportService(),
-      resetService: KitchenResetService(repository: repository, samples: samples)
+      resetService: KitchenResetService(repository: repository, samples: samples),
+      sampleInstaller: sampleInstaller,
+      sampleOnboardingStore: onboardingStore
     )
   }
 
@@ -94,9 +105,14 @@ struct AppDependencies {
   }
 
   static func prepareInitialKitchen(repository: any RecipeRepository) throws -> Kitchen {
-    try KitchenBootstrapService(
-      repository: repository,
-      samples: BundledSampleRecipeProvider()
-    ).prepareInitialKitchen()
+    try KitchenBootstrapService(repository: repository).prepareInitialKitchen()
+  }
+
+  private static func defaultOnboardingStore(
+    inMemory: Bool
+  ) -> any SampleRecipeOnboardingStoring {
+    inMemory
+      ? VolatileSampleRecipeOnboardingStore(response: .accepted)
+      : UserDefaultsSampleRecipeOnboardingStore()
   }
 }

@@ -44,6 +44,7 @@ public struct RecipeEditSession: Equatable, Sendable {
   public var instructionSections: [InstructionSection]
 
   private let preservedSourceCapture: RecipeSourceCapture?
+  private let preservedContentLanguage: RecipeContentLanguage?
   private let preservedCuisines: [String]
   private let preservedCategories: [String]
   private let preservedKeywords: [String]
@@ -64,6 +65,7 @@ public struct RecipeEditSession: Equatable, Sendable {
     ingredientSections = draft.ingredientSections
     instructionSections = draft.instructionSections
     preservedSourceCapture = draft.sourceCapture
+    preservedContentLanguage = draft.contentLanguage
     preservedCuisines = draft.cuisines
     preservedCategories = draft.categories
     preservedKeywords = draft.keywords
@@ -90,6 +92,7 @@ public struct RecipeEditSession: Equatable, Sendable {
       title: title,
       summary: summary,
       authorName: authorName,
+      contentLanguage: preservedContentLanguage,
       source: source,
       sourceCapture: preservedSourceCapture,
       recipeYield: cleanedRecipeYield,
@@ -117,10 +120,8 @@ public struct RecipeEditSession: Equatable, Sendable {
     recipeYield.unitText = recipeYield.unitText.flatMap(text)
     if let originalText = text(recipeYield.originalText) {
       recipeYield.originalText = originalText
-    } else if let quantityText = recipeYield.quantity?.renderedText {
-      recipeYield.originalText = [quantityText, recipeYield.unitText]
-        .compactMap { $0 }
-        .joined(separator: " ")
+    } else if recipeYield.quantity != nil {
+      recipeYield.originalText = ""
     } else {
       return nil
     }

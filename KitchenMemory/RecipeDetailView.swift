@@ -16,6 +16,7 @@ struct RecipeDetailView: View {
   // @ScaledMetric separately keeps the numbered instruction badge in step
   // with the text size instead of clipping a larger numeral in a fixed circle.
   @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+  @Environment(\.locale) private var locale
   @ScaledMetric(relativeTo: .headline) private var stepNumberSize = 30
 
   private var revision: RecipeRevision { storedRecipe.revision }
@@ -225,17 +226,39 @@ private extension RecipeDetailView {
     var values: [MetadataValue] = []
     if revision.recipeYield != nil {
       values.append(
-        .init(label: "Yield", value: scalingSelection.displayedYield, systemImage: "person.2")
+        .init(
+          label: String(localized: "Yield", locale: locale),
+          value: scalingSelection.displayedYield(locale: locale),
+          systemImage: "person.2"
+        )
       )
     }
     if let prepDuration = revision.prepDuration {
-      values.append(.init(label: "Prep", value: duration(prepDuration), systemImage: "clock"))
+      values.append(
+        .init(
+          label: String(localized: "Prep", locale: locale),
+          value: duration(prepDuration),
+          systemImage: "clock"
+        )
+      )
     }
     if let cookDuration = revision.cookDuration {
-      values.append(.init(label: "Cook", value: duration(cookDuration), systemImage: "flame"))
+      values.append(
+        .init(
+          label: String(localized: "Cook", locale: locale),
+          value: duration(cookDuration),
+          systemImage: "flame"
+        )
+      )
     }
     if let totalDuration = revision.totalDuration {
-      values.append(.init(label: "Total", value: duration(totalDuration), systemImage: "timer"))
+      values.append(
+        .init(
+          label: String(localized: "Total", locale: locale),
+          value: duration(totalDuration),
+          systemImage: "timer"
+        )
+      )
     }
     return values
   }
@@ -248,7 +271,10 @@ private extension RecipeDetailView {
            let host = RecipeSourceURLPolicy.displayHost(for: url) {
           Link(destination: url) {
             VStack(alignment: .trailing, spacing: 2) {
-              Text(recipeSource.title ?? "Open Source")
+              Text(
+                recipeSource.title
+                  ?? String(localized: "Open Source", locale: locale)
+              )
               // Imported titles are untrusted display text. Keeping the actual
               // destination host visible prevents a title from disguising a
               // cross-origin link and remains useful for ordinary attribution.
@@ -286,11 +312,7 @@ private extension RecipeDetailView {
   }
 
   private func duration(_ duration: RecipeDuration) -> String {
-    let hours = duration.seconds / 3_600
-    let minutes = (duration.seconds % 3_600) / 60
-    if hours > 0, minutes > 0 { return "\(hours) hr \(minutes) min" }
-    if hours > 0 { return "\(hours) hr" }
-    return "\(minutes) min"
+    RecipePresentationFormatter(locale: locale).duration(duration)
   }
 
   private func recipeSection<Content: View>(
@@ -367,27 +389,8 @@ private extension RecipeDetailView {
     // views. Supply an explicit sentence so VoiceOver reads the step number,
     // optional name, instruction, and duration in the intended order.
     .accessibilityElement(children: .combine)
-    .accessibilityLabel(instructionAccessibilityLabel(number, step: step))
-  }
-
-  private func instructionAccessibilityLabel(_ number: Int, step: InstructionStep) -> String {
-    var parts = ["Step \(number)."]
-    if let name = step.name {
-      parts.append(accessibilitySentence(name))
-    }
-    parts.append(accessibilitySentence(step.text))
-    if let duration = step.duration {
-      parts.append("Duration \(self.duration(duration)).")
-    }
-    return parts.joined(separator: " ")
-  }
-
-  private func accessibilitySentence(_ text: String) -> String {
-    // Separators alone do not reliably create a pause in synthesized speech.
-    // Preserve authored punctuation and add a period only when one is absent.
-    guard let lastCharacter = text.last, ".!?".contains(lastCharacter) else {
-      return "\(text)."
-    }
-    return text
+    .accessibilityLabel(
+      RecipeInstructionAccessibilityFormatter(locale: locale).label(number: number, step: step)
+    )
   }
 }

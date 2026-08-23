@@ -52,14 +52,15 @@ struct IngredientSectionEditor: View {
 
 private struct IngredientEditor: View {
   @Binding var ingredient: RecipeIngredient
+  @Environment(\.locale) private var locale
   let moveUp: () -> Void
   let moveDown: () -> Void
   let delete: () -> Void
   var body: some View {
     EditorDisclosureGroup(
-      title: ingredient.effectiveDisplayText == "Ingredient"
+      title: !ingredient.hasMeaningfulDisplayContent
         ? "New ingredient"
-        : ingredient.effectiveDisplayText,
+        : RecipePresentationFormatter(locale: locale).ingredient(ingredient),
       accessibilityIdentifier: "ingredient-editor-row-\(ingredient.id.rawValue.uuidString)"
     ) {
       LabeledContent {
@@ -114,8 +115,20 @@ private struct IngredientEditor: View {
 
 private extension RecipeIngredient.ScalingBehavior {
   static var allCases: [Self] { [.linear, .fixed, .manualReview] }
-  var label: String { self == .manualReview ? "Manual review" : rawValue.capitalized }
+  var label: String {
+    switch self {
+    case .linear: String(localized: "Linear")
+    case .fixed: String(localized: "Fixed")
+    case .manualReview: String(localized: "Manual review")
+    }
+  }
 }
 private extension RecipeIngredient.PresentationMode {
-  var label: String { rawValue.capitalized }
+  var label: String {
+    switch self {
+    case .structured: String(localized: "Structured")
+    case .original: String(localized: "Original")
+    case .custom: String(localized: "Custom")
+    }
+  }
 }

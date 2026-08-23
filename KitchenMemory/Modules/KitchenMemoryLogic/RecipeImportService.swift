@@ -184,6 +184,7 @@ public struct RecipeImportService: RecipeImportServing, Sendable {
         title: draft.title,
         summary: draft.summary,
         authorName: draft.authorName,
+        contentLanguage: draft.contentLanguage,
         source: attributedSource,
         sourceCapture: RecipeSourceCapture(
           kind: .schemaOrgJSONLD,

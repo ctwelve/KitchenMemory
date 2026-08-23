@@ -28,7 +28,7 @@ struct RecipeImage: View {
     // the recipe. The detail hero remains exposed, so its imported alt text is
     // useful; the generic fallback still gives the otherwise visual placeholder
     // a meaningful description.
-    .accessibilityLabel(media?.accessibilityLabel ?? "Recipe image")
+    .accessibilityLabel(media?.accessibilityLabel ?? String(localized: "Recipe image"))
   }
 
 }

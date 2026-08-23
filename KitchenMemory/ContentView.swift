@@ -10,6 +10,7 @@ import SwiftUI
 struct ContentView: View {
   @Bindable var model: RecipeLibraryModel
   @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+  @Environment(\.locale) private var locale
   @State private var activeSheet: ActiveRecipeSheet?
   @State private var columnVisibility: NavigationSplitViewVisibility = .automatic
   @State private var isShowingResetConfirmation = false
@@ -18,6 +19,26 @@ struct ContentView: View {
 #endif
 
   var body: some View {
+    Group {
+      switch model.startupState {
+      case .loading:
+        KitchenLoadingView()
+      case .choosingSamples:
+        SampleRecipeDecisionView(
+          accept: model.acceptSampleRecipes,
+          decline: model.declineSampleRecipes
+        )
+      case .ready:
+        recipeLibrary
+      }
+    }
+    .task {
+      model.loadIfNeeded()
+    }
+    .tint(Color("AccentColor"))
+  }
+
+  private var recipeLibrary: some View {
     NavigationSplitView(columnVisibility: $columnVisibility) {
       recipeList
         .navigationTitle("Recipes")
@@ -69,9 +90,6 @@ struct ContentView: View {
     } detail: {
       detail
     }
-    .task {
-      model.loadIfNeeded()
-    }
     .sheet(item: $activeSheet) { sheet in
       sheetContent(sheet)
     }
@@ -81,7 +99,8 @@ struct ContentView: View {
     }
     .kitchenResetConfirmation(
       isPresented: $isShowingResetConfirmation,
-      model: model
+      model: model,
+      locale: locale
     )
 #else
     .sheet(isPresented: $isShowingSettings) {
@@ -90,7 +109,6 @@ struct ContentView: View {
       }
     }
 #endif
-    .tint(Color("AccentColor"))
   }
 
   private var usesCustomSidebarToggle: Bool {
@@ -102,7 +120,9 @@ struct ContentView: View {
   }
 
   private var sidebarToggleTitle: String {
-    columnVisibility == .detailOnly ? "Show Sidebar" : "Hide Sidebar"
+    columnVisibility == .detailOnly
+      ? String(localized: "Show Sidebar", locale: locale)
+      : String(localized: "Hide Sidebar", locale: locale)
   }
 
   private var sidebarTogglePlacement: ToolbarItemPlacement {
@@ -125,9 +145,9 @@ struct ContentView: View {
       ContentUnavailableView {
         Label("Recipes Unavailable", systemImage: "exclamationmark.triangle")
       } description: {
-        Text(issue.message)
+        Text(issue.message(locale: locale))
       } actions: {
-        Button("Try Again") { model.reload() }
+        Button("Try Again") { model.retryCurrentIssue() }
       }
     } else if model.hasLoaded && model.recipes.isEmpty {
       ContentUnavailableView(

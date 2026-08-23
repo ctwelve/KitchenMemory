@@ -41,5 +41,5 @@ aggregates independently with a stable `kitchenID`.
   other application behavior.
 - Import and export can use a stable domain format instead of a store dump.
 - Mapping and repository code are deliberate application infrastructure.
-- Cross-aggregate updates require explicit application use cases rather than
+- Cross-aggregate updates require explicit Logic operations rather than
   mutation of one giant Kitchen object graph.

@@ -17,6 +17,7 @@ final class RecipeEditorTests: XCTestCase {
       from: RecipeDraft(
         title: "  Tomato Soup  ",
         summary: "  A weekday favorite.  ",
+        contentLanguage: RecipeContentLanguage(rawValue: "es-MX"),
         ingredientLines: ["2 tomatoes", "", "1 onion"],
         instructionLines: ["Chop the vegetables.", "", "Simmer until soft."]
       )
@@ -26,6 +27,7 @@ final class RecipeEditorTests: XCTestCase {
     XCTAssertEqual(stored.revision.revisionNumber, 1)
     XCTAssertEqual(stored.revision.title, "Tomato Soup")
     XCTAssertEqual(stored.revision.summary, "A weekday favorite.")
+    XCTAssertEqual(stored.revision.contentLanguage?.rawValue, "es-MX")
     XCTAssertEqual(
       stored.revision.ingredientSections.flatMap(\.ingredients).map(\.originalText),
       ["2 tomatoes", "1 onion"]

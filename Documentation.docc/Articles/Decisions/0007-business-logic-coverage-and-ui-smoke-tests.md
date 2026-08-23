@@ -12,7 +12,7 @@ Accepted.
 
 ## Context
 
-Kitchen Memory's domain rules, application operations, import behavior, and
+Kitchen Memory's domain rules, product operations, import behavior, and
 persistence contracts are durable product investments. The current shared
 SwiftUI interface is deliberately replaceable scaffolding. Its modal editing
 flows, detailed layout, visible copy, and accessibility hierarchy are expected
@@ -28,7 +28,7 @@ mostly prove implementation that the project already intends to replace.
 
 Target complete automated coverage of executable business logic, including its
 meaningful branches, boundary cases, failure behavior, and preservation rules.
-Keep that logic outside views so the domain, application, import, and persistence
+Keep that logic outside views so the domain, Logic, import, and persistence
 suites can exercise it deterministically without launching the application UI.
 
 Use UI automation only for smoke coverage of the durable application shell:

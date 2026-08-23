@@ -36,6 +36,8 @@ public protocol RecipeRepository: AnyObject {
   func kitchen(id: Kitchen.ID) throws -> Kitchen?
   func recipe(id: Recipe.ID) throws -> StoredRecipe?
   func recipes(in kitchenID: Kitchen.ID) throws -> [StoredRecipe]
+  /// Atomically adds recipes whose stable identities are not already present.
+  func addRecipes(_ recipes: [StoredRecipe], to kitchenID: Kitchen.ID) throws
   /// Returns every saved revision for a recipe, newest revision first.
   func revisions(for recipeID: Recipe.ID) throws -> [RecipeRevision]
   /// Atomically replaces every recipe and revision owned by one Kitchen.
@@ -186,6 +188,17 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
       }
   }
 
+  public func addRecipes(_ recipes: [StoredRecipe], to kitchenID: Kitchen.ID) throws {
+    try performIsolatedWrite { writer in
+      try writer.validate(recipes, in: kitchenID)
+      for stored in recipes {
+        guard try writer.recipe(id: stored.id) == nil else { continue }
+        try writer.upsert(stored.recipe)
+        try writer.replace(stored.revision)
+      }
+    }
+  }
+
   public func revisions(for recipeID: Recipe.ID) throws -> [RecipeRevision] {
     let identifier = recipeID.rawValue
     let descriptor = FetchDescriptor<RecipeRevisionRecord>(
@@ -334,6 +347,7 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
         title: revision.title,
         summary: revision.summary,
         authorName: revision.authorName,
+        contentLanguage: revision.contentLanguage?.rawValue,
         sourceData: try encodeSource(revision.source, capture: revision.sourceCapture),
         yieldData: try encodeOptional(revision.recipeYield),
         prepSeconds: revision.prepDuration?.seconds,
@@ -482,10 +496,23 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
       return InstructionSection(id: .init(rawValue: section.id), title: section.title, steps: steps)
     }
 
+    let contentLanguage: RecipeContentLanguage?
+    if let storedLanguage = record.contentLanguage {
+      guard let language = RecipeContentLanguage(rawValue: storedLanguage) else {
+        throw KitchenMemoryPersistenceError.invalidStoredValue(
+          field: "revision.contentLanguage"
+        )
+      }
+      contentLanguage = language
+    } else {
+      contentLanguage = nil
+    }
+
     return RecipeRevision(
       id: .init(rawValue: record.id), recipeID: .init(rawValue: record.recipeID),
       revisionNumber: record.revisionNumber,
       title: record.title, summary: record.summary, authorName: record.authorName,
+      contentLanguage: contentLanguage,
       source: storedSource.source,
       sourceCapture: storedSource.capture,
       recipeYield: try decodeOptional(

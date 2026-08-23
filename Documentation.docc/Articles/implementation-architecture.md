@@ -24,16 +24,19 @@ distributed products.
 - `KitchenMemoryLogic` owns product operations and presentation-independent
   workflow state.
 
-The application target composes all four frameworks. Import and persistence
-each depend on the domain but not on one another. Logic coordinates their public
-boundaries without depending on the application or SwiftUI.
+The application target links all four frameworks because composition adapters
+exchange domain values, construct persistence and import implementations, and
+inject Logic operations. Import and persistence each depend on the domain but
+not on one another. Logic coordinates all three public boundaries without
+depending on the application or SwiftUI.
 
 ```text
-KitchenMemory
-└── KitchenMemoryLogic
-    ├── KitchenMemoryImport ───────┐
-    ├── KitchenMemoryPersistence ──┼── KitchenMemoryDomain
-    └──────────────────────────────┘
+KitchenMemory application ──→ all four internal frameworks
+
+KitchenMemoryLogic
+├── KitchenMemoryImport ───────┐
+├── KitchenMemoryPersistence ──┼──→ KitchenMemoryDomain
+└──────────────────────────────┘
 ```
 
 This structure keeps reusable technical boundaries explicit without turning
@@ -68,6 +71,8 @@ KitchenMemoryApp
     ├── SwiftDataRecipeRepository
     ├── BundledSampleRecipeProvider
     ├── KitchenBootstrapService
+    ├── SampleRecipeInstallService
+    ├── SampleRecipeOnboardingStoring
     └── RecipeLibraryModel
         ├── RecipeLibrary
         ├── RecipeEditor
@@ -77,31 +82,43 @@ KitchenMemoryApp
 
 `AppDependencies` is the composition root. It creates the concrete SwiftData
 repository and asset-backed sample provider, asks the bootstrap service for the
-initial Kitchen, and injects the resulting collaborators into
+initial empty Kitchen, selects the durable or disposable onboarding store, and
+injects the resulting collaborators into
 `RecipeLibraryModel`. Concrete construction stays here so neither the views nor
 the reusable frameworks need to locate their own dependencies.
 
 `RecipeLibraryModel` is the principal application glue. It owns the UI-facing
 state for one Kitchen: the loaded recipe list, current selection, load state,
-and typed presentation issue. Every library-wide read or mutation passes
-through it. The model delegates validation and durable operations to
+sample-onboarding and live pack-presence states, startup phase, and typed
+presentation issue. Every library-wide read or mutation passes through it. The
+model delegates validation and durable operations to
 `KitchenMemoryLogic`, then applies the small amount of presentation coordination
 that follows a successful operation, such as reloading the list while preserving
 or changing the selection. Its main-actor isolation and observation belong to
 the app boundary; recipe rules do not.
 
 `BundledSampleRecipeProvider` adapts the application asset catalog to
-`SampleRecipeProviding`. This lets bootstrap and reset logic consume recipes
-without knowing about bundles, compiled asset catalogs, or sample-document
-formats. A future sample source can replace the adapter without changing those
-operations.
+`SampleRecipeProviding`. `SampleRecipeInstallService` adds only recipe UUIDs
+that are not already present and derives none/partial/complete presence from
+the current localized pack's stable identities. `KitchenResetService`
+deliberately replaces the Kitchen after explicit destructive confirmation.
+Bootstrap itself creates an empty Kitchen and never interprets emptiness as
+permission. A future background-asset provider can replace the bundled adapter
+without changing these use cases.
+
+`SampleRecipeOnboardingStoring` persists `undecided`, `accepted`, or `declined`
+outside recipe storage to prevent repeating the onboarding question. It is not
+standing authority to reinsert a deleted recipe: current presence comes from
+the repository, and repair requires an explicit Settings action. The in-app
+startup gate moves through loading, sample choice, and library states; the
+operating-system launch screen remains static and does not perform product work.
 
 Views own transient presentation and bind directly to pure workflow values such
 as `RecipeEditSession`, `RecipeImportSession`, and `RecipeScalingState`. They ask
 `RecipeLibraryModel` to cross the library boundary rather than constructing
 repositories or use cases themselves. `RecipeLibraryIssue` is the final
-presentation seam: it converts typed failure categories into current user-facing
-copy, ready to move into string catalogs without changing the underlying logic.
+presentation seam: it converts typed failure categories into user-facing copy.
+That copy now comes from String Catalogs without changing the underlying logic.
 
 ## Persistence
 
@@ -130,9 +147,25 @@ containers remain available for previews and tests, and callers may provide an
 explicit URL for isolated tests or migration work.
 
 The store begins at `KitchenMemorySchemaV1` under
-`KitchenMemoryMigrationPlan`. Every later schema change must add a new immutable
-version and an explicit migration stage; V1's models are never edited in place
-after release.
+`KitchenMemoryMigrationPlan`. V1 remains intentionally mutable before the first
+release, with development stores deleted after incompatible changes. At first
+release V1 becomes immutable; every later schema change must add a new version
+and an explicit migration stage.
+
+## Localization resources
+
+String Catalogs, locale-aware presentation formatters, and localized bundled
+content belong to the application target. English-oriented display helpers have
+been removed from the domain; the frameworks return semantic domain values and
+typed failures rather than choosing interface language. This keeps formatting
+and pluralization replaceable without making locale a hidden input to business
+rules.
+
+Interface copy and authored recipe content use separate resources. String
+Catalogs hold labels, actions, errors, and pluralized messages. Complete sample
+recipe documents remain data assets so a translation preserves coherent
+instructions, ingredients, attribution, and accessibility descriptions. See
+<doc:localization-architecture>.
 
 ## Sample resources
 
@@ -152,6 +185,15 @@ Foundation property lists so Xcode can provide structured editing without
 adding a parser dependency. Recipe, revision, row, step, and media identities
 are pre-generated so importing the catalog into a fresh store is repeatable and
 can be made idempotent.
+
+The manifest contains explicit locale-tagged
+recipe variants. A manifest-level sample-family identifier relates the variants,
+while each authored translation has its own stable recipe, revision, and child
+identities. Reusing one durable recipe identity for different translated
+payloads would create a synchronization conflict. The application adapter
+selects an exact regional match, a supported language fallback, or the English
+development asset before Logic performs an idempotent installation or atomic
+reset operation.
 
 The catalog does not contain a Kitchen identifier. A sample recipe retains its
 own stable recipe, revision, and media identities, while the importing use case
@@ -192,7 +234,7 @@ Framework, application, integration, and UI tests belong to the shared
 `KitchenMemory` scheme and the committed `KitchenMemory.xctestplan`. Tests for
 starter content and app composition live directly in `KitchenMemoryTests`;
 framework tests remain grouped by their corresponding module, including
-`KitchenMemoryLogicTests`. The non-UI suites pursue complete coverage of
-durable business logic; the UI target contains only application-shell smoke
-tests. See
+`KitchenMemoryLogicTests`. The exact coverage gate currently requires every
+executable line in the four internal frameworks to be covered by the non-UI
+suite. The UI target contains only application-shell smoke tests. See
 <doc:0007-business-logic-coverage-and-ui-smoke-tests>.

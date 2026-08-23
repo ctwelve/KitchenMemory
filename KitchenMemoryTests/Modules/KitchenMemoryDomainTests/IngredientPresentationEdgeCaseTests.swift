@@ -41,6 +41,9 @@ final class IngredientPresentationEdgeCaseTests: XCTestCase {
         XCTAssertEqual(structuredFallback.effectiveDisplayText, "chickpeas")
         XCTAssertEqual(originalFallback.effectiveDisplayText, "one handful of herbs")
         XCTAssertEqual(placeholderFallback.effectiveDisplayText, "Ingredient")
+        XCTAssertTrue(structuredFallback.hasMeaningfulDisplayContent)
+        XCTAssertTrue(originalFallback.hasMeaningfulDisplayContent)
+        XCTAssertFalse(placeholderFallback.hasMeaningfulDisplayContent)
     }
 
     func testStructuredPresentationUsesPlaceholderWhenEveryFieldIsEmpty() {

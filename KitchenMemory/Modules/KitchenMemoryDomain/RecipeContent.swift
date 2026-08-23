@@ -48,12 +48,6 @@ public struct RationalQuantity: Codable, Equatable, Sendable {
     }
 }
 
-public extension RationalQuantity {
-    var renderedText: String {
-        scaledRenderedText
-    }
-}
-
 public struct QuantityExpression: Codable, Equatable, Sendable {
     public enum Kind: String, Codable, Sendable {
         case none, exact, range, approximate, text
@@ -255,64 +249,27 @@ public struct RecipeIngredient: Codable, Equatable, Identifiable, Sendable {
         try container.encode(parseState, forKey: .parseState)
     }
 
-    /// The text readers and cooking surfaces should present.
-    ///
-    /// Structured presentation is the default, but incomplete structure falls
-    /// back to preserved source evidence. A custom override is explicit rather
-    /// than a second stored value that can silently drift from its components.
-    public var effectiveDisplayText: String {
+    /// Whether this row contains authored or structured content worth saving.
+    public var hasMeaningfulDisplayContent: Bool {
         switch presentationMode {
         case .original:
-            return nonempty(originalText) ?? structuredDisplayText ?? "Ingredient"
+            return nonempty(originalText) != nil || hasStructuredDisplayContent
         case .custom:
-            return nonempty(customDisplayText) ?? structuredDisplayText
-                ?? nonempty(originalText) ?? "Ingredient"
+            return nonempty(customDisplayText) != nil || hasStructuredDisplayContent
+                || nonempty(originalText) != nil
         case .structured:
-            return structuredDisplayText ?? nonempty(originalText) ?? "Ingredient"
+            return hasStructuredDisplayContent || nonempty(originalText) != nil
         }
     }
 
-    public var structuredDisplayText: String? {
-        guard let ingredientName = nonempty(ingredientText) else { return nil }
-        var components: [String] = []
-        if let quantityText = quantity?.renderedText { components.append(quantityText) }
-        if let package,
-           let packageQuantity = package.quantity.renderedText,
-           let packageUnitText = nonempty(package.unitText) {
-            // Preserve authored wording until localized package-phrase templates exist.
-            components.append("(\(packageQuantity) \(packageUnitText))")
-        }
-        if let unit = nonempty(unitText) { components.append(unit) }
-        components.append(ingredientName)
-
-        var result = components.joined(separator: " ")
-        if let preparation = nonempty(preparation) { result += ", \(preparation)" }
-        if let note = nonempty(note) { result += ", \(note)" }
-        if isOptional { result += ", optional" }
-        return result
+    /// Whether locale-aware presentation can compose this row from structure.
+    public var hasStructuredDisplayContent: Bool {
+        nonempty(ingredientText) != nil
     }
 
     private func nonempty(_ text: String?) -> String? {
         let trimmed = text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         return trimmed.isEmpty ? nil : trimmed
-    }
-}
-
-public extension QuantityExpression {
-    var renderedText: String? {
-        switch kind {
-        case .none:
-            return nil
-        case .exact:
-            return lowerBound?.renderedText
-        case .range:
-            guard let lowerBound, let upperBound else { return text }
-            return "\(lowerBound.renderedText)–\(upperBound.renderedText)"
-        case .approximate:
-            return lowerBound.map { "about \($0.renderedText)" } ?? text
-        case .text:
-            return text
-        }
     }
 }
 

@@ -12,19 +12,6 @@ public extension RationalQuantity {
         )
     }
 
-    var scaledRenderedText: String {
-        guard let normalized else {
-            return denominator == 1 ? String(numerator) : "\(numerator)/\(denominator)"
-        }
-        guard normalized.denominator != 1 else { return String(normalized.numerator) }
-
-        let whole = normalized.numerator / normalized.denominator
-        let remainder = normalized.numerator % normalized.denominator
-        return whole == 0
-            ? "\(remainder)/\(normalized.denominator)"
-            : "\(whole) \(remainder)/\(normalized.denominator)"
-    }
-
     func multiplied(by multiplier: RationalQuantity) -> RationalQuantity? {
         guard let value = normalized, let multiplier = multiplier.normalized else { return nil }
 
@@ -192,7 +179,7 @@ public extension RecipeIngredient {
         var scaled = self
         scaled.quantity = scaledQuantity
         if presentationMode == .original, scale.multiplier != RationalQuantity(numerator: 1) {
-            guard scaled.structuredDisplayText != nil else {
+            guard scaled.hasStructuredDisplayContent else {
                 return ScaledRecipeIngredient(
                     ingredient: self,
                     status: .unchangedPresentationOverride

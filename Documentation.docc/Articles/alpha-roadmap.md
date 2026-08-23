@@ -47,7 +47,7 @@ experience were viable.
 
 ### Slice 2 — Skeleton
 
-Created the SwiftUI application, domain/application boundaries, sample content,
+Created the SwiftUI application, initial domain and use-case boundaries, sample content,
 accessibility foundation, tests, and continuous integration.
 
 ### Slice 3 — Local persistence
@@ -99,37 +99,62 @@ The reading presentation provides accessible working-yield controls, preserves
 the base yield for context, refreshes after an immutable revision is saved, and
 reminds cooks that equipment does not scale automatically.
 
-## Remaining slices
-
 ### Slice 8 — Cleanup and refactor pass
 
-Make the completed foundation cheaper to change before adding another major
+Made the completed foundation cheaper to change before adding another major
 workflow.
 
-- Collect coverage for the shared test plan and establish the durable
-  business-logic source boundary.
-- Reach complete coverage of meaningful executable business logic and document
-  any narrow exclusions that cannot represent product behavior.
-- Move any business rules that remain embedded in SwiftUI views into testable
-  domain or application operations.
-- Keep UI automation to smoke tests for launch, sidebar navigation, Settings,
-  and destructive-reset confirmation.
-- Remove obsolete UI and accessibility audit machinery tied to replaceable
-  editor and reading presentations.
-- Reconcile engineering documentation and CI guidance with the new testing
-  boundary.
+The pass established exact line-coverage gates for `KitchenMemoryDomain`,
+`KitchenMemoryImport`, `KitchenMemoryLogic`, and `KitchenMemoryPersistence`;
+externalized deterministic property-test seeds; and reduced UI automation to
+durable application-shell smoke tests. Product operations and pure edit, import,
+and scaling workflow state now live in `KitchenMemoryLogic`. The application
+composes those operations through `RecipeLibraryModel` and small platform
+adapters instead of embedding business rules in SwiftUI.
 
-This slice does not redesign the editor or treat the current English interface
-as final. In-page editing, String Catalog adoption, localization proofing, and
-comprehensive accessibility validation follow once the relevant interface work
-is stable.
+The pass deliberately did not redesign the editor or treat the current English
+interface as final. It made those later changes cheaper by separating durable
+behavior from replaceable presentation.
 
-**Complete when:** every meaningful business-logic branch is covered or has a
-narrow documented exclusion, the coverage report can distinguish durable logic
-from presentation code, and the UI suite contains only the agreed shell smoke
-tests.
+## Remaining slices
 
-### Slice 9 — Cooking sessions
+### Slice 9 — Internationalization foundation (implemented 2026-08-22)
+
+Make application language and bundled starter content correct for the initial
+North American release.
+
+- Establish String Catalogs for English, Canadian French (`fr-CA`), and Mexican
+  Spanish (`es-MX`).
+- Keep localization lookup and locale-aware formatting at the presentation
+  boundary while logic returns semantic values and typed failures.
+- Replace the domain's English display helpers and `"Ingredient"` sentinel with
+  semantic validation plus application-owned localized formatters.
+- Supply plural variants for count-bearing messages and test them with explicit
+  locales rather than host settings.
+- Extend the asset-backed sample-recipe pack with coherent localized recipe
+  documents, deterministic locale fallback, and stable identity rules.
+- Add optional authored-content language metadata to recipe revisions and carry
+  it through drafts, imports, sample assets, and the pre-release V1 store.
+- Preserve imported and person-authored recipe language instead of translating
+  stored content as a side effect of changing the app locale.
+- Document translator context, recipe-resource ownership, and the boundary
+  between authored content and interface copy.
+
+This slice internationalizes the existing experience without declaring its
+editor layout final. Detailed localized UI automation, screenshot proofing, and
+release-level accessibility audits still wait for stable platform interfaces.
+
+The foundation now includes the three-locale String Catalog, application-owned
+formatters, plural rules, authored-language persistence and import, localized
+sample families, deterministic fallback, explicit-locale tests, and an opt-in
+sample installation flow. The onboarding answer is stored outside recipe data,
+but sample presence is derived from stable UUIDs and missing content is never
+reinserted without an explicit request. This supports a future downloadable-
+pack migration without turning an onboarding response into permanent authority.
+Because V1 has no external users, the schema was updated in place and development
+stores were reset instead of manufacturing a migration.
+
+### Slice 10 — Cooking sessions
 
 Support real cooking without silently changing the maintained recipe.
 
@@ -143,16 +168,16 @@ Support real cooking without silently changing the maintained recipe.
 **Complete when:** a cook can prepare a recipe entirely from the app, return
 later to a session, and see what happened without altering the canonical recipe.
 
-### Slice 10 — Alpha hardening
+### Slice 11 — Alpha hardening
 
 Prove that the completed loop is dependable enough for household use.
 
 - Reach complete business-logic coverage, including migration, error, recovery,
   and source-preservation behavior.
-- Expand importer fixtures and domain/application regression tests while keeping
+- Expand importer fixtures and framework regression tests while keeping
   UI automation to application-shell smoke tests.
-- Establish String Catalogs and complete the internationalization pass after the
-  relevant interface and product language stabilize.
+- Verify localization completeness and representative longer-text layouts for
+  every release locale.
 - Audit the stable, finished workflows for accessibility on supported Apple
   platforms.
 - Validate macOS and iOS builds and document local backup/export expectations.
@@ -170,8 +195,9 @@ Structured editing
     → URL import and review
       → Scaling and reading
         → Cleanup and refactor
-          → Cooking sessions
-            → Alpha hardening
+          → Internationalization foundation
+            → Cooking sessions
+              → Alpha hardening
 ```
 
 Pantry holdings, shopping lists, planned cooks, meal planning, synchronization,

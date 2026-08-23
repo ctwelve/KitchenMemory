@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 import Accessibility
+import Foundation
 import KitchenMemoryLogic
 import SwiftUI
 
@@ -11,6 +12,7 @@ struct RecipeURLImportView: View {
   let select: (RecipeImportOption) -> Void
 
   @Environment(\.dismiss) private var dismiss
+  @Environment(\.locale) private var locale
   @State private var session = RecipeImportSession()
   @State private var importTask: Task<Void, Never>?
 
@@ -63,7 +65,7 @@ struct RecipeURLImportView: View {
       urlField
 
       if let failure = session.failure {
-        Label(Self.message(for: failure), systemImage: "exclamationmark.triangle")
+        Label(Self.message(for: failure, locale: locale), systemImage: "exclamationmark.triangle")
           .foregroundStyle(.red)
           .accessibilityIdentifier("recipe-import-error")
       }
@@ -129,17 +131,11 @@ struct RecipeURLImportView: View {
 
   private var privacySection: some View {
     Section("Privacy") {
-      Text(
-        "Kitchen Memory follows redirects and downloads the resulting HTML with an "
-          + "ephemeral request that supplies no cookies or app credentials. It runs no "
-          + "page scripts and downloads no images during review."
-      )
+      // swiftlint:disable:next line_length
+      Text("Kitchen Memory follows redirects and downloads the resulting HTML with an ephemeral request that supplies no cookies or app credentials. It runs no page scripts and downloads no images during review.")
         .foregroundStyle(.secondary)
-      Text(
-        "If you save a recipe, Kitchen Memory keeps the final source URL and one bounded "
-          + "JSON-LD recipe-metadata block locally, including source fields not shown in "
-          + "the review editor."
-      )
+      // swiftlint:disable:next line_length
+      Text("If you save a recipe, Kitchen Memory keeps the final source URL and one bounded JSON-LD recipe-metadata block locally, including source fields not shown in the review editor.")
         .foregroundStyle(.secondary)
     }
   }
@@ -151,7 +147,11 @@ struct RecipeURLImportView: View {
           select(candidate)
         } label: {
           VStack(alignment: .leading, spacing: 4) {
-            Text(candidate.draft.title.isEmpty ? "Untitled recipe" : candidate.draft.title)
+            Text(
+              candidate.draft.title.isEmpty
+                ? String(localized: "Untitled recipe", locale: locale)
+                : candidate.draft.title
+            )
               .font(.headline)
             if let summary = candidate.draft.summary, !summary.isEmpty {
               Text(summary)
@@ -160,7 +160,7 @@ struct RecipeURLImportView: View {
                 .lineLimit(3)
             }
             if !candidate.concerns.isEmpty {
-              Text("\(candidate.concerns.count) review note\(candidate.concerns.count == 1 ? "" : "s")")
+              Text(reviewNoteCount(candidate.concerns.count))
                 .font(.caption)
                 .foregroundStyle(.orange)
             }
@@ -204,7 +204,7 @@ struct RecipeURLImportView: View {
       } catch {
         session.receive(error: error)
         guard !Task.isCancelled, let failure = session.failure else { return }
-        let message = Self.message(for: failure)
+        let message = Self.message(for: failure, locale: locale)
         // The identifier on the visible error supports automation only; it
         // does not make newly inserted text a live region. A native
         // announcement ensures the failure is heard while preserving the
@@ -214,20 +214,33 @@ struct RecipeURLImportView: View {
     }
   }
 
-  private static func message(for failure: RecipeImportSessionFailure) -> String {
+  private func reviewNoteCount(_ count: Int) -> String {
+    String(localized: "\(count) review note", locale: locale)
+  }
+
+  private static func message(
+    for failure: RecipeImportSessionFailure,
+    locale: Locale = .current
+  ) -> String {
     switch failure {
     case .noRecipeCandidates:
-      "No Schema.org recipe was found on this page."
+      String(localized: "No Schema.org recipe was found on this page.", locale: locale)
     case .disallowedAddress:
-      "For safety, Kitchen Memory cannot fetch this address or redirect."
+      String(localized: "For safety, Kitchen Memory cannot fetch this address or redirect.", locale: locale)
     case .pageTooLarge:
-      "This page contains too much data to import safely."
+      String(localized: "This page contains too much data to import safely.", locale: locale)
     case .unsupportedPage:
-      "This address did not return a supported HTML recipe page."
+      String(localized: "This address did not return a supported HTML recipe page.", locale: locale)
     case .networkFailure:
-      "The webpage could not be downloaded. Check your connection and try again."
+      String(
+        localized: "The webpage could not be downloaded. Check your connection and try again.",
+        locale: locale
+      )
     case .unknown:
-      "Kitchen Memory could not import this webpage. Check the URL and try again."
+      String(
+        localized: "Kitchen Memory could not import this webpage. Check the URL and try again.",
+        locale: locale
+      )
     }
   }
 }
