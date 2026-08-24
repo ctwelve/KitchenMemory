@@ -53,12 +53,23 @@ does not need to be rewritten merely because the transport scope changes.
 
 ## Runtime configuration
 
-`Develop` and `Production` launches use the private database in
-`iCloud.net.ctwelve.KitchenMemory`, selecting the development and production
+`Develop` launches use the private database in
+`iCloud.net.ctwelve.dev.KitchenMemory`; `Production` uses
+`iCloud.net.ctwelve.KitchenMemory`. They select the Development and Production
 CloudKit environments respectively. The application target enables iCloud,
 push notifications, and the remote-notification background mode. `Debug`,
 `Testing`, and the non-distributable `ProductionTesting` UI-smoke host use
 explicit local or in-memory stores and never require an iCloud account.
+
+The sample-recipe onboarding answer is a small cross-device preference, not
+recipe content. Cloud-enabled builds mirror it in `UserDefaults` for offline
+startup and synchronize it through `NSUbiquitousKeyValueStore`. Incoming iCloud
+changes update the visible startup state, but the app never assumes that the
+preference arrives immediately. A Kitchen already present before local
+bootstrap, or recipe content arriving through CloudKit, independently proves
+that the Kitchen is established and suppresses an inapplicable first-run prompt.
+The answer remains authorization for one requested sample installation; it is
+not authority to restore or download samples automatically on another device.
 
 Managed CloudKit imports post a persistent-store remote-change notification.
 `KitchenMemoryPersistence` converts that callback into a concurrency-safe

@@ -246,22 +246,25 @@ struct AppDependencies {
     inMemory: Bool = false,
     personalCloudContainerIdentifier: String? = nil,
     sampleOnboardingStore: (any SampleRecipeOnboardingStoring)? = nil,
-    sampleProvider: (any SampleRecipeProviding)? = nil
+    sampleProvider: (any SampleRecipeProviding)? = nil,
+    initialKitchenWasCreatedOverride: Bool? = nil
   ) throws {
-    let synchronization: KitchenMemoryStoreSynchronization
-    if let personalCloudContainerIdentifier {
-      synchronization = .personalCloud(containerIdentifier: personalCloudContainerIdentifier)
-    } else {
-      synchronization = .localOnly
-    }
+    let synchronization = Self.storeSynchronization(
+      personalCloudContainerIdentifier: personalCloudContainerIdentifier
+    )
     let modelContainer = try KitchenMemorySchema.makeContainer(
       inMemory: inMemory,
       synchronization: synchronization
     )
     let repository = SwiftDataRecipeRepository(modelContainer: modelContainer)
     let samples = sampleProvider ?? BundledSampleRecipeProvider()
-    let kitchen = try KitchenBootstrapService(repository: repository).prepareInitialKitchen()
-    let onboardingStore = sampleOnboardingStore ?? Self.defaultOnboardingStore(inMemory: inMemory)
+    let preparedKitchen = try KitchenBootstrapService(repository: repository)
+      .prepareInitialKitchenWithStatus()
+    let kitchen = preparedKitchen.kitchen
+    let onboardingStore = sampleOnboardingStore ?? Self.defaultOnboardingStore(
+      inMemory: inMemory,
+      synchronizesWithPersonalCloud: personalCloudContainerIdentifier != nil
+    )
     let sampleInstaller = SampleRecipeInstallService(repository: repository, samples: samples)
 
     // Disposable previews and UI smoke tests request a ready-made fixture.
@@ -277,7 +280,8 @@ struct AppDependencies {
       importer: RecipeImportService(),
       resetService: KitchenResetService(repository: repository, samples: samples),
       sampleInstaller: sampleInstaller,
-      sampleOnboardingStore: onboardingStore
+      sampleOnboardingStore: onboardingStore,
+      kitchenWasCreated: initialKitchenWasCreatedOverride ?? preparedKitchen.wasCreated
     )
     self.modelContainer = modelContainer
     self.libraryModel = libraryModel
@@ -311,11 +315,20 @@ struct AppDependencies {
     try KitchenBootstrapService(repository: repository).prepareInitialKitchen()
   }
 
+  private static func storeSynchronization(
+    personalCloudContainerIdentifier: String?
+  ) -> KitchenMemoryStoreSynchronization {
+    guard let personalCloudContainerIdentifier else { return .localOnly }
+    return .personalCloud(containerIdentifier: personalCloudContainerIdentifier)
+  }
+
   private static func defaultOnboardingStore(
-    inMemory: Bool
+    inMemory: Bool,
+    synchronizesWithPersonalCloud: Bool
   ) -> any SampleRecipeOnboardingStoring {
-    inMemory
-      ? VolatileSampleRecipeOnboardingStore(response: .accepted)
+    if inMemory { return VolatileSampleRecipeOnboardingStore(response: .accepted) }
+    return synchronizesWithPersonalCloud
+      ? UbiquitousSampleRecipeOnboardingStore()
       : UserDefaultsSampleRecipeOnboardingStore()
   }
 }

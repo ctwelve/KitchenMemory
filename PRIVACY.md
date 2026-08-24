@@ -17,10 +17,12 @@ crash-reporting service. It declares no tracking and no collected data in its
 Apple privacy manifest.
 
 Kitchen Memory uses `UserDefaults` for one app-local preference: remembering
-your answer to the sample-recipe onboarding question. It privately synchronizes
-your recipe library through your iCloud account when that capability is
-available. Private iCloud synchronization is a feature you direct, not a way
-for this project to observe you, and it will never be repurposed for analytics.
+your answer to the sample-recipe onboarding question. When private iCloud sync
+is available, Apple's iCloud key-value store carries that same small preference
+between your devices. The app also privately synchronizes your recipe library
+through your iCloud account. Private iCloud synchronization is a feature you
+direct, not a way for this project to observe you, and it will never be
+repurposed for analytics.
 
 ## Debugging and support
 
