@@ -86,10 +86,11 @@ fix, test, diagnostic, or documentation change; it should not expand this loop.
   workflow; release tags are immutable evidence and must never be moved to a
   different commit or reused. Keep the source build number at `1`; Xcode Cloud
   owns the distributed build sequence.
-- Before public distribution, configure GitHub rulesets to require the selected
-  Xcode Cloud merge checks on `main` and to restrict creation, update, and
-  deletion of `release/*` tags. Xcode Cloud validates a release after it starts;
-  GitHub must enforce which commit may be tagged and keep that tag immutable.
+- GitHub requires the aggregate Xcode Cloud pull-request result before merging
+  to `main`. Active `release/*` rulesets restrict creation to the release
+  operator, require a successful Xcode Cloud `Merge to main` result on the
+  target commit, and prohibit tag updates or deletion with no bypass available.
+  Xcode Cloud validates the version after the protected tag starts the release.
 - Verify the notarized Mac artifact installs and launches outside Xcode before
   treating the workflow result as release evidence.
 - Record the production-schema promotion, archive, and submission steps so they

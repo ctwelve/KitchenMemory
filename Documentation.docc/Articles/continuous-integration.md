@@ -104,29 +104,36 @@ from `slice/*` or `bugs/*` into `main`. Its Test action is required to pass,
 while tests in the development workflow remain advisory during ordinary work.
 
 Xcode Cloud reports the pull-request result to GitHub. To make the gate prevent
-rather than merely warn about a failed merge candidate, configure the resulting
-Xcode Cloud build or Test action as a required GitHub status check for `main`.
-The production workflow then verifies that the actual merge result still builds
-for both supported platforms.
+rather than merely warn about a failed merge candidate, `main` requires the
+aggregate `KitchenMemory | Slice-dev and bug PRs to main` result from the Xcode
+Cloud GitHub App. The production workflow then verifies that the actual merge
+result still builds for both supported platforms.
 
 ### GitHub enforcement boundary
 
 Xcode Cloud supplies build and action results but does not provide all of the
-repository controls required by the release policy. GitHub rulesets own that
-boundary. Before public distribution, configure them to:
+repository controls required by the release policy. GitHub owns that boundary.
 
-- require the selected Xcode Cloud Test and Analyze checks before merging to
-  `main`;
-- prevent force-pushes and deletion of `main`;
-- target tags matching `release/*`, restrict creation to the release operator,
-  and prevent tag updates and deletion; and
-- require the applicable successful Xcode Cloud status on the target commit
-  before a release tag can be created, once the stable check names are visible
-  in GitHub.
+Classic branch protection on `main` requires a pull request, the strict aggregate
+Xcode Cloud pull-request result, and resolution of review conversations. It
+applies to administrators, blocks force-pushes and deletion, and deliberately
+allows merge commits. Zero approving reviews are required while the project has
+one release operator; the pull request remains the reviewable unit even when a
+second human approval is unavailable.
 
-Keep bypass access narrow and intentional. The Ruby release contract validates
-the tag and committed version inside Xcode Cloud; GitHub provides the missing
-controls over which commit may be tagged and whether the tag can later move.
+Three active tag rulesets target `release/*`:
+
+- `Release tag creation` allows only the repository owner to create a matching
+  tag.
+- `Release tag readiness` has no bypass and requires a successful
+  `KitchenMemory | Merge to main` status from the Xcode Cloud GitHub App on the
+  target commit.
+- `Release tag immutability` has no bypass and prevents every update or deletion
+  after creation.
+
+The separate rulesets are intentional: authority to create a release does not
+grant authority to move or erase its evidence. The Ruby release contract then
+validates the tag and committed version inside Xcode Cloud.
 
 The UI target contains smoke tests only. Localization of durable copy and
 formatting proceeds independently, but comprehensive localized-layout assertions,
