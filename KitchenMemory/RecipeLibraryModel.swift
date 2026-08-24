@@ -53,11 +53,6 @@ final class RecipeLibraryModel {
     sampleOnboardingResponse = sampleOnboardingStore.response
   }
 
-  // Swift 6.2 runtimes through OS 26.2 can double-free task-local state while
-  // running an actor-isolated deinitializer. Keep this explicit nonisolated
-  // deinitializer until affected deployment versions retire.
-  nonisolated deinit {}
-
   var selectedRecipe: StoredRecipe? {
     recipes.first { $0.recipe.id == selectedRecipeID }
   }

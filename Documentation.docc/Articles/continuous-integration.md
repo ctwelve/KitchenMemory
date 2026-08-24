@@ -152,13 +152,8 @@ the testing exception does not alter a shipped application.
 
 Application-hosted XCTest processes also select an in-memory store in those two
 testing configurations through the committed test plans' `--unit-testing`
-launch argument. `RecipeLibraryModel` also declares an explicit empty,
-nonisolated deinitializer to avoid a Swift 6.2 runtime defect that can
-double-free task-local state while destroying an actor-isolated class on macOS
-26.2. Swift tracks the matching XCTest defect as
-[swiftlang/swift#87316](https://github.com/swiftlang/swift/issues/87316); the
-workaround can retire after affected OS versions are no longer supported.
-Ordinary development and production launches continue to use durable storage.
+launch argument. Ordinary development and production launches continue to use
+durable storage.
 
 The localization contract test reads an exact JSON copy of the raw String
 Catalog from its test bundle. A declared test-target build phase embeds that
@@ -280,9 +275,15 @@ must be reviewed like source changes.
 
 ## Maintenance
 
-The workflows use a shared macOS alias mapped to macOS 26.2, the oldest current
-Tahoe release supported by the project. This provides a stable deployment
-environment while keeping the selected version centralized in Xcode Cloud.
+The workflows use a shared macOS alias mapped to the latest available macOS
+release. During early alpha, the project prefers the current Xcode Cloud test
+host over carrying application workarounds for a Swift 6.2 XCTest runtime defect
+on macOS 26.2, tracked as
+[swiftlang/swift#87316](https://github.com/swiftlang/swift/issues/87316). This is
+a CI test-environment choice and does not change the application's deployment
+target. Reconsider an additional oldest-supported compatibility lane before an
+external beta when failures can inform supported-user risk rather than block
+early development on a fixed platform defect.
 
 Treat every environment or alias change as a deliberate migration: run the
 Testing and Production schemes locally with that Xcode version, review new
