@@ -652,23 +652,19 @@
 /* Begin PBXShellScriptBuildPhase section */
 		C20000000000000000000001 /* Embed Localization Catalog Contract */ = {
 			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
 			inputPaths = (
 				"$(SRCROOT)/KitchenMemory/Localizable.xcstrings",
 			);
 			name = "Embed Localization Catalog Contract";
-			outputFileListPaths = (
-			);
 			outputPaths = (
 				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/LocalizationCatalog.json",
 			);
-			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -eu\n/bin/cp \"$SCRIPT_INPUT_FILE_0\" \"$SCRIPT_OUTPUT_FILE_0\"\n";
+			shellScript = (
+				"set -eu",
+				"/bin/cp \"$SCRIPT_INPUT_FILE_0\" \"$SCRIPT_OUTPUT_FILE_0\"",
+				"",
+			);
 		};
 /* End PBXShellScriptBuildPhase section */
 
