@@ -12,18 +12,18 @@ struct RecipeEditorView: View {
     case revise
     case importReview
 
-    func title(locale: Locale) -> String {
+    var title: LocalizedStringResource {
       switch self {
-      case .create: String(localized: "New Recipe", locale: locale)
-      case .revise: String(localized: "Edit Recipe", locale: locale)
-      case .importReview: String(localized: "Review Import", locale: locale)
+      case .create: .recipeEditorCreateTitle
+      case .revise: .recipeEditorReviseTitle
+      case .importReview: .recipeEditorImportReviewTitle
       }
     }
 
-    func saveLabel(locale: Locale) -> String {
+    var saveLabel: LocalizedStringResource {
       self == .revise
-        ? String(localized: "Save Revision", locale: locale)
-        : String(localized: "Create Recipe", locale: locale)
+        ? .recipeEditorReviseActionSave
+        : .recipeEditorCreateActionSave
     }
   }
 
@@ -67,14 +67,14 @@ struct RecipeEditorView: View {
         .accessibilityIdentifier("recipe-editor-scroll")
 #endif
       }
-      .navigationTitle(mode.title(locale: locale))
+      .navigationTitle(mode.title)
 #if os(iOS)
       .navigationBarTitleDisplayMode(.inline)
 #endif
       .toolbar {
-        ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
+        ToolbarItem(placement: .cancellationAction) { Button(.actionCancel) { dismiss() } }
         ToolbarItem(placement: .confirmationAction) {
-          Button(mode.saveLabel(locale: locale)) {
+          Button(mode.saveLabel) {
             if let draft = try? session.validatedDraft(), save(draft) { dismiss() }
           }
             .disabled(!session.canSave)
@@ -111,7 +111,7 @@ private extension RecipeEditorView {
   private var importReviewSection: some View {
     Section {
       if reviewConcerns.isEmpty {
-        Label("Import is ready for your review", systemImage: "eye")
+        Label(.recipeEditorImportReviewReady, systemImage: "eye")
           .foregroundStyle(.secondary)
       } else {
         ForEach(Array(reviewConcerns.enumerated()), id: \.offset) { _, concern in
@@ -125,46 +125,45 @@ private extension RecipeEditorView {
         }
       }
     } header: {
-      Text("Import Review")
+      Text(.recipeEditorImportReviewSection)
     } footer: {
-      // swiftlint:disable:next line_length
-      Text("Check the imported wording and structure before saving. Review and save do not contact the source again. Saving keeps the final source URL and bounded JSON-LD metadata locally, including fields not shown here.")
+      Text(.recipeEditorImportReviewFooter)
     }
   }
 
   private var recipeSection: some View {
-    Section("Recipe") {
-      EditorTextField("Title", text: $session.title)
+    Section(.recipeEditorRecipeSection) {
+      EditorTextField(.recipeEditorTitleField, text: $session.title)
         .accessibilityIdentifier("recipe-editor-title")
-      EditorTextField("Summary", text: $session.summary, multiline: true)
+      EditorTextField(.recipeEditorSummaryField, text: $session.summary, multiline: true)
         .accessibilityIdentifier("recipe-editor-summary")
-      EditorTextField("Recipe author", text: $session.authorName)
+      EditorTextField(.recipeEditorAuthorField, text: $session.authorName)
       RecipeYieldEditor(recipeYield: $session.recipeYield)
     }
   }
 
   private var timingSection: some View {
-    Section("Times") {
-      durationField("Prep minutes", text: $session.prepMinutes, field: .preparation)
-      durationField("Cook minutes", text: $session.cookMinutes, field: .cooking)
-      durationField("Total minutes", text: $session.totalMinutes, field: .total)
+    Section(.recipeEditorTimesSection) {
+      durationField(.recipeEditorTimePreparationField, text: $session.prepMinutes, field: .preparation)
+      durationField(.recipeEditorTimeCookingField, text: $session.cookMinutes, field: .cooking)
+      durationField(.recipeEditorTimeTotalField, text: $session.totalMinutes, field: .total)
     }
   }
 
   private var sourceSection: some View {
-    Section("Source") {
+    Section(.recipeEditorSourceSection) {
       Picker(selection: $session.sourceKind) {
         ForEach(RecipeSource.Kind.allCases, id: \.self) { Text($0.label).tag($0) }
       } label: {
-        EditorFieldLabel("Source type")
+        EditorFieldLabel(.recipeEditorSourceKindField)
       }
-      EditorTextField("Source title", text: $session.sourceTitle)
-      EditorTextField("Source author", text: $session.sourceAuthor)
-      EditorTextField("Publisher", text: $session.sourcePublisher)
-      EditorTextField("Source URL", text: $session.sourceURL)
+      EditorTextField(.recipeEditorSourceTitleField, text: $session.sourceTitle)
+      EditorTextField(.recipeEditorSourceAuthorField, text: $session.sourceAuthor)
+      EditorTextField(.recipeEditorSourcePublisherField, text: $session.sourcePublisher)
+      EditorTextField(.recipeEditorSourceUrlField, text: $session.sourceURL)
       if session.validationIssues.contains(.invalidSourceURL) {
         Label(
-          "Enter a complete http or https URL without embedded credentials.",
+          .recipeEditorSourceUrlValidation,
           systemImage: "exclamationmark.triangle"
         )
           .foregroundStyle(.red)
@@ -184,12 +183,12 @@ private extension RecipeEditorView {
         )
         .id("ingredient-section-\(session.ingredientSections[sectionIndex].id.rawValue.uuidString)")
       }
-      Button("Add Ingredient Section", systemImage: "plus") {
+      Button(.recipeEditorIngredientsActionAddSection, systemImage: "plus") {
         session.ingredientSections.append(IngredientSection(title: nil, ingredients: []))
       }
       .accessibilityIdentifier("add-ingredient-section")
-    } header: { Text("Ingredients") } footer: {
-      Text("Original wording is retained separately from the structured interpretation.")
+    } header: { Text(.recipeEditorIngredientsSection) } footer: {
+      Text(.recipeEditorIngredientsOriginalWordingNote)
     }
   }
 
@@ -204,22 +203,22 @@ private extension RecipeEditorView {
         )
         .id("instruction-section-\(session.instructionSections[sectionIndex].id.rawValue.uuidString)")
       }
-      Button("Add Instruction Section", systemImage: "plus") {
+      Button(.recipeEditorInstructionsActionAddSection, systemImage: "plus") {
         session.instructionSections.append(InstructionSection(title: nil, steps: []))
       }
       .accessibilityIdentifier("add-instruction-section")
-    } header: { Text("Instructions") }
+    } header: { Text(.recipeEditorInstructionsSection) }
   }
 
   private func durationField(
-    _ title: String,
+    _ title: LocalizedStringResource,
     text: Binding<String>,
     field: RecipeEditDurationField
   ) -> some View {
     Group {
       EditorTextField(title, text: text)
       if session.validationIssues.contains(.invalidDuration(field)) {
-        Label("Enter whole minutes from 0 through 527040.", systemImage: "exclamationmark.triangle")
+        Label(.recipeEditorTimeValidation, systemImage: "exclamationmark.triangle")
           .foregroundStyle(.red)
       }
     }
@@ -230,17 +229,20 @@ extension RecipeImportConcern {
   func reviewMessage(locale: Locale = .current) -> String {
     switch self {
     case .missingTitle:
-      return localized("Title needs attention", locale: locale)
+      return LocalizedStringResource.recipeImportConcernMissingTitle.localized(for: locale)
     case .missingIngredients:
-      return localized("No ingredients were found", locale: locale)
+      return LocalizedStringResource.recipeImportConcernMissingIngredients.localized(for: locale)
     case .missingInstructions:
-      return localized("No instructions were found", locale: locale)
+      return LocalizedStringResource.recipeImportConcernMissingInstructions.localized(for: locale)
     case .unparsedIngredients(let count):
-      return localized("\(count) ingredient line is preserved but unparsed", locale: locale)
+      return LocalizedStringResource.recipeImportConcernUnparsedIngredientCount(count: count)
+        .localized(for: locale)
     case .provisionalIngredients(let count):
-      return localized("\(count) ingredient interpretation needs review", locale: locale)
+      return LocalizedStringResource.recipeImportConcernProvisionalIngredientCount(count: count)
+        .localized(for: locale)
     case .ignoredSourceBlocks(let count):
-      return localized("\(count) malformed or unsupported source block was ignored", locale: locale)
+      return LocalizedStringResource.recipeImportConcernIgnoredSourceBlockCount(count: count)
+        .localized(for: locale)
     case .preservedTaxonomy(let cuisines, let categories, let keywords):
       let summary = taxonomySummary(
         cuisines: cuisines,
@@ -248,9 +250,11 @@ extension RecipeImportConcern {
         keywords: keywords,
         locale: locale
       )
-      return localized("Preserved metadata — \(summary)", locale: locale)
+      return LocalizedStringResource.recipeImportConcernPreservedMetadata(summary: summary)
+        .localized(for: locale)
     case .referencedImages(let count):
-      return localized("\(count) source image is referenced but not downloaded", locale: locale)
+      return LocalizedStringResource.recipeImportConcernReferencedImageCount(count: count)
+        .localized(for: locale)
     }
   }
 
@@ -262,43 +266,39 @@ extension RecipeImportConcern {
   ) -> String {
     var groups: [String] = []
     if !cuisines.isEmpty {
-      groups.append(String(
-        localized: "Cuisine: \(cuisines.joined(separator: ", "))",
-        bundle: .kitchenMemory(for: locale),
-        locale: locale
-      ))
+      groups.append(
+        LocalizedStringResource.recipeImportTaxonomyCuisine(
+          values: cuisines.joined(separator: ", ")
+        ).localized(for: locale)
+      )
     }
     if !categories.isEmpty {
-      groups.append(String(
-        localized: "Categories: \(categories.joined(separator: ", "))",
-        bundle: .kitchenMemory(for: locale),
-        locale: locale
-      ))
+      groups.append(
+        LocalizedStringResource.recipeImportTaxonomyCategories(
+          values: categories.joined(separator: ", ")
+        ).localized(for: locale)
+      )
     }
     if !keywords.isEmpty {
-      groups.append(String(
-        localized: "Keywords: \(keywords.joined(separator: ", "))",
-        bundle: .kitchenMemory(for: locale),
-        locale: locale
-      ))
+      groups.append(
+        LocalizedStringResource.recipeImportTaxonomyKeywords(
+          values: keywords.joined(separator: ", ")
+        ).localized(for: locale)
+      )
     }
     return groups.joined(separator: "; ")
-  }
-
-  private func localized(_ value: String.LocalizationValue, locale: Locale) -> String {
-    String(localized: value, bundle: .kitchenMemory(for: locale), locale: locale)
   }
 }
 
 private extension RecipeSource.Kind {
   static var allCases: [Self] { [.original, .webpage, .book, .person, .imported] }
-  var label: String {
+  var label: LocalizedStringResource {
     switch self {
-    case .original: String(localized: "Original")
-    case .webpage: String(localized: "Webpage")
-    case .book: String(localized: "Book")
-    case .person: String(localized: "Person")
-    case .imported: String(localized: "Imported")
+    case .original: .recipeSourceKindOriginal
+    case .webpage: .recipeSourceKindWebpage
+    case .book: .recipeSourceKindBook
+    case .person: .recipeSourceKindPerson
+    case .imported: .recipeSourceKindImported
     }
   }
 }

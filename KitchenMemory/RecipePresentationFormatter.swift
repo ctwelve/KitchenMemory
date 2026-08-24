@@ -45,7 +45,8 @@ nonisolated struct RecipePresentationFormatter {
       guard let value = quantity.lowerBound.map(rational) else {
         return nonempty(quantity.text)
       }
-      return String(localized: "about \(value)", bundle: .kitchenMemory(for: locale), locale: locale)
+      return LocalizedStringResource.recipePresentationQuantityApproximate(value: value)
+        .localized(for: locale)
     case .text:
       return nonempty(quantity.text)
     }
@@ -68,28 +69,21 @@ nonisolated struct RecipePresentationFormatter {
     let hours = duration.seconds / 3_600
     let minutes = (duration.seconds % 3_600) / 60
     if hours > 0, minutes > 0 {
-      return String(
-        localized: "\(hours) hr \(minutes) min",
-        bundle: .kitchenMemory(for: locale),
-        locale: locale
-      )
+      return LocalizedStringResource.recipePresentationDurationHoursMinutes(
+        hours: hours,
+        minutes: minutes
+      ).localized(for: locale)
     }
     if hours > 0 {
-      return String(
-        localized: "\(hours) hr",
-        bundle: .kitchenMemory(for: locale),
-        locale: locale
-      )
+      return LocalizedStringResource.recipePresentationDurationHours(hours: hours)
+        .localized(for: locale)
     }
-    return String(
-      localized: "\(minutes) min",
-      bundle: .kitchenMemory(for: locale),
-      locale: locale
-    )
+    return LocalizedStringResource.recipePresentationDurationMinutes(minutes: minutes)
+      .localized(for: locale)
   }
 
   private var ingredientFallback: String {
-    String(localized: "Ingredient", bundle: .kitchenMemory(for: locale), locale: locale)
+    LocalizedStringResource.recipeIngredientFallbackName.localized(for: locale)
   }
 
   private func structuredIngredient(_ ingredient: RecipeIngredient) -> String? {
@@ -108,11 +102,8 @@ nonisolated struct RecipePresentationFormatter {
     if let preparation = nonempty(ingredient.preparation) { result += ", \(preparation)" }
     if let note = nonempty(ingredient.note) { result += ", \(note)" }
     if ingredient.isOptional {
-      result = String(
-        localized: "\(result), optional",
-        bundle: .kitchenMemory(for: locale),
-        locale: locale
-      )
+      result = LocalizedStringResource.recipePresentationIngredientOptional(ingredient: result)
+        .localized(for: locale)
     }
     return result
   }

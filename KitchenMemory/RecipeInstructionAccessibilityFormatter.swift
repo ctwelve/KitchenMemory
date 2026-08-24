@@ -10,14 +10,18 @@ nonisolated struct RecipeInstructionAccessibilityFormatter {
   let locale: Locale
 
   func label(number: Int, step: InstructionStep) -> String {
-    var parts = [String(localized: "Step \(number).", locale: locale)]
+    var parts = [
+      LocalizedStringResource.recipeInstructionStep(number: number).localized(for: locale)
+    ]
     if let name = step.name {
       parts.append(sentence(name))
     }
     parts.append(sentence(step.text))
     if let duration = step.duration {
       let formatted = RecipePresentationFormatter(locale: locale).duration(duration)
-      parts.append(String(localized: "Duration \(formatted).", locale: locale))
+      parts.append(
+        LocalizedStringResource.recipeInstructionDuration(duration: formatted).localized(for: locale)
+      )
     }
     return parts.joined(separator: " ")
   }

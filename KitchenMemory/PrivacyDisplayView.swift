@@ -20,7 +20,7 @@ struct PrivacyDisplayView: View {
       recipeStorage
       debugging
     }
-    .navigationTitle("Privacy")
+    .navigationTitle(.privacyTitle)
     .accessibilityIdentifier("privacy-display")
 #if os(macOS)
     .listStyle(.inset)
@@ -38,11 +38,11 @@ struct PrivacyDisplayView: View {
           .foregroundStyle(.tint)
           .accessibilityHidden(true)
 
-        Text("Data Not Collected")
+        Text(.privacySummaryTitle)
           .font(.title2.bold())
           .accessibilityAddTraits(.isHeader)
 
-        Text("Kitchen Memory does not collect data from this app.")
+        Text(.privacySummaryMessage)
           .foregroundStyle(.secondary)
       }
       .multilineTextAlignment(.center)
@@ -55,20 +55,18 @@ struct PrivacyDisplayView: View {
 
   private var currentPractices: some View {
     Section {
-      privacyPractice("No Tracking")
-      privacyPractice("No Analytics")
-      privacyPractice("No Advertising")
+      privacyPractice(.privacyPracticeNoTracking)
+      privacyPractice(.privacyPracticeNoAnalytics)
+      privacyPractice(.privacyPracticeNoAdvertising)
     } footer: {
-      Text("This display reflects the privacy manifest included with this version of Kitchen Memory.")
+      Text(.privacyManifestNote)
     }
   }
 
   private var recipeStorage: some View {
-    Section("Your Recipes") {
+    Section(.privacyRecipesSection) {
       Label {
-        Text(
-          "Recipes stay on this device and, when iCloud sync is available, in your private iCloud database."
-        )
+        Text(.privacyRecipesMessage)
       } icon: {
         Image(systemName: "lock.icloud.fill")
           .foregroundStyle(.tint)
@@ -77,21 +75,13 @@ struct PrivacyDisplayView: View {
   }
 
   private var debugging: some View {
-    Section("Debugging and Support") {
-      Text(
-        "We inspect private information only when you deliberately provide it to diagnose a problem."
-      )
-      // Preserve one stable localization key for this complete policy sentence.
-      Text(
-        """
-        Private debugging material is deleted when the immediate need ends. It is never published or retained as test \
-        data.
-        """
-      )
+    Section(.privacyDebuggingSection) {
+      Text(.privacyDebuggingInspection)
+      Text(.privacyDebuggingRetention)
     }
   }
 
-  private func privacyPractice(_ title: LocalizedStringKey) -> some View {
+  private func privacyPractice(_ title: LocalizedStringResource) -> some View {
     Label(title, systemImage: "checkmark.circle.fill")
       .foregroundStyle(.primary, .green)
   }

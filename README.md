@@ -66,6 +66,7 @@ pantry inventory, meal planning, shopping, and household sharing follow later.
 - [Continuous integration](Documentation.docc/Articles/continuous-integration.md)
 - [Accessibility engineering](Documentation.docc/Articles/accessibility-engineering.md)
 - [Testing strategy](Documentation.docc/Articles/Decisions/0007-business-logic-coverage-and-ui-smoke-tests.md)
+- [0.1 localization contract](Documentation.docc/Articles/Decisions/0008-freeze-the-0-1-localization-contract.md)
 - [Open questions](Documentation.docc/Articles/open-questions.md)
 - [Architecture decisions](Documentation.docc/Documentation.md#Architecture-decisions)
 - [Artificial intelligence use](AI.md)

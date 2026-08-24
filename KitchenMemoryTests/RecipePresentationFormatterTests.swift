@@ -39,6 +39,16 @@ final class RecipePresentationFormatterTests: XCTestCase {
   func testCountMessagesUseLocalePluralRules() {
     XCTAssertEqual(
       RecipeImportConcern.unparsedIngredients(count: 1)
+        .reviewMessage(locale: Locale(identifier: "en-US")),
+      "1 ingredient line is preserved but unparsed"
+    )
+    XCTAssertEqual(
+      RecipeImportConcern.unparsedIngredients(count: 2)
+        .reviewMessage(locale: Locale(identifier: "en-US")),
+      "2 ingredient lines are preserved but unparsed"
+    )
+    XCTAssertEqual(
+      RecipeImportConcern.unparsedIngredients(count: 1)
         .reviewMessage(locale: Locale(identifier: "fr-CA")),
       "1 ligne d’ingrédient est conservée sans être analysée"
     )

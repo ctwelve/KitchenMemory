@@ -10,13 +10,13 @@ struct RecipeYieldEditor: View {
 
   var body: some View {
     EditorTextField(
-      "Display wording",
+      .recipeEditorYieldWordingField,
       text: originalTextBinding,
-      prompt: "e.g. Serves 4 or Makes one skillet"
+      prompt: .recipeEditorYieldWordingPrompt
     )
     .accessibilityIdentifier("recipe-editor-yield-wording")
 
-    Toggle("Enable recipe scaling", isOn: scalingEnabledBinding)
+    Toggle(LocalizedStringResource.recipeEditorYieldScalingToggle, isOn: scalingEnabledBinding)
       .accessibilityIdentifier("recipe-editor-yield-scaling")
 
     if recipeYield?.quantity != nil {
@@ -26,12 +26,12 @@ struct RecipeYieldEditor: View {
         accessibilityIdentifier: "recipe-editor-yield-quantity"
       )
       EditorTextField(
-        "Yield unit",
+        .recipeEditorYieldUnitField,
         text: unitTextBinding,
-        prompt: "servings, loaves, skillets…"
+        prompt: .recipeEditorYieldUnitPrompt
       )
       .accessibilityIdentifier("recipe-editor-yield-unit")
-      Text("The numeric yield is the basis used to scale ingredient amounts.")
+      Text(.recipeEditorYieldScalingNote)
         .font(.caption)
         .foregroundStyle(.secondary)
     }

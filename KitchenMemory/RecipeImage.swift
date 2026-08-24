@@ -8,6 +8,7 @@ import SwiftUI
 struct RecipeImage: View {
   let media: RecipeMedia?
   var contentMode: ContentMode = .fill
+  @Environment(\.locale) private var locale
 
   var body: some View {
     Group {
@@ -28,7 +29,10 @@ struct RecipeImage: View {
     // the recipe. The detail hero remains exposed, so its imported alt text is
     // useful; the generic fallback still gives the otherwise visual placeholder
     // a meaningful description.
-    .accessibilityLabel(media?.accessibilityLabel ?? String(localized: "Recipe image"))
+    .accessibilityLabel(
+      media?.accessibilityLabel
+        ?? LocalizedStringResource.recipeImageFallbackAccessibilityLabel.localized(for: locale)
+    )
   }
 
 }

@@ -69,7 +69,47 @@ final class KitchenMemoryUITests: XCTestCase {
   }
 
   @MainActor
-  private func launchApp() -> XCUIApplication {
+  func testSupportedInterfaceLocalesLaunchTheLocalizedShell() {
+    for localeIdentifier in ["en-US", "fr-CA", "es-MX"] {
+      let app = launchApp(additionalArguments: [
+        "-AppleLanguages", "(\(localeIdentifier))",
+        "-AppleLocale", localeIdentifier,
+      ])
+      openSettings(in: app)
+
+      let privacy = app.descendants(matching: .any)["settings-privacy"]
+      XCTAssertTrue(
+        privacy.waitForExistence(timeout: 5),
+        "Missing localized Privacy row for \(localeIdentifier)"
+      )
+      activate(privacy)
+      XCTAssertTrue(
+        app.descendants(matching: .any)["privacy-display"].waitForExistence(timeout: 3),
+        "Missing localized Privacy display for \(localeIdentifier)"
+      )
+      app.terminate()
+    }
+  }
+
+  @MainActor
+  func testLocalizationStressModesLaunchTheDurableShell() {
+    let stressArguments = [
+      ["-NSDoubleLocalizedStrings", "YES"],
+      ["-NSForceRightToLeftWritingDirection", "YES"],
+    ]
+
+    for arguments in stressArguments {
+      let app = launchApp(additionalArguments: arguments)
+      XCTAssertTrue(
+        app.descendants(matching: .any)["recipe-library"].exists,
+        "The durable shell failed under localization arguments: \(arguments)"
+      )
+      app.terminate()
+    }
+  }
+
+  @MainActor
+  private func launchApp(additionalArguments: [String] = []) -> XCUIApplication {
 #if os(iOS)
     XCUIDevice.shared.orientation = .portrait
 #endif
@@ -78,6 +118,7 @@ final class KitchenMemoryUITests: XCTestCase {
     // UI automation always uses disposable sample data and must never touch a
     // developer's local Kitchen.
     app.launchArguments.append("--ui-testing")
+    app.launchArguments.append(contentsOf: additionalArguments)
     app.launch()
 
     let recipeLibrary = app.descendants(matching: .any)["recipe-library"]

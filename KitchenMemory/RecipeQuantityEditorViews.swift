@@ -35,11 +35,11 @@ struct IngredientQuantityEditor: View {
   private var simpleEntry: some View {
     VStack(alignment: .leading, spacing: 8) {
       EditorTextField(
-        "Amount",
+        .recipeEditorQuantityAmountField,
         text: simpleAmountBinding,
-        prompt: "Optional — 2, 1/2, to taste…"
+        prompt: .recipeEditorQuantitySimpleAmountPrompt
       )
-      Button("Use precise quantity…", systemImage: "slider.horizontal.3") {
+      Button(.recipeEditorQuantityActionUsePrecise, systemImage: "slider.horizontal.3") {
         showsPreciseEntry = true
       }
       .accessibilityIdentifier("show-precise-quantity")
@@ -52,9 +52,9 @@ struct IngredientQuantityEditor: View {
         Text(summary)
           .foregroundStyle(.secondary)
       } label: {
-        EditorFieldLabel("Amount")
+        EditorFieldLabel(.recipeEditorQuantityAmountField)
       }
-      Button("Edit precise quantity…", systemImage: "slider.horizontal.3") {
+      Button(.recipeEditorQuantityActionEditPrecise, systemImage: "slider.horizontal.3") {
         showsPreciseEntry = true
       }
       .accessibilityIdentifier("show-precise-quantity")
@@ -70,7 +70,7 @@ struct IngredientQuantityEditor: View {
       )
 
       if package == nil {
-        Button("Add package size", systemImage: "shippingbox") {
+        Button(.recipeEditorPackageActionAdd, systemImage: "shippingbox") {
           package = PackageDescription(
             quantity: QuantityExpression(
               kind: .exact,
@@ -80,7 +80,7 @@ struct IngredientQuantityEditor: View {
           )
         }
       } else {
-        GroupBox("Package size (optional)") {
+        GroupBox(LocalizedStringResource.recipeEditorPackageGroup) {
           VStack(alignment: .leading, spacing: 10) {
             QuantityExpressionEditor(
               quantity: packageQuantityBinding,
@@ -88,18 +88,18 @@ struct IngredientQuantityEditor: View {
               accessibilityIdentifier: nil
             )
             EditorTextField(
-              "Package unit",
+              .recipeEditorPackageUnitField,
               text: packageUnitBinding,
-              prompt: "ounces, grams, milliliters…"
+              prompt: .recipeEditorPackageUnitPrompt
             )
-            Button("Remove package size", role: .destructive) {
+            Button(.recipeEditorPackageActionRemove, role: .destructive) {
               package = nil
             }
           }
         }
       }
 
-      Button("Done with quantity details") {
+      Button(.recipeEditorQuantityActionDone) {
         showsPreciseEntry = false
       }
     }
@@ -124,11 +124,14 @@ struct IngredientQuantityEditor: View {
         }
         .joined(separator: " ")
       if !packageText.isEmpty {
-        parts.append(String(localized: "Package: \(packageText)", locale: locale))
+        parts.append(
+          LocalizedStringResource.recipeEditorQuantityPackageSummary(package: packageText)
+            .localized(for: locale)
+        )
       }
     }
     return parts.isEmpty
-      ? String(localized: "Not specified", locale: locale)
+      ? LocalizedStringResource.valueNotSpecified.localized(for: locale)
       : parts.joined(separator: ", ")
   }
 
@@ -175,42 +178,42 @@ struct QuantityExpressionEditor: View {
         Text(kind.label).tag(kind)
       }
     } label: {
-      EditorFieldLabel("Quantity type")
+      EditorFieldLabel(.recipeEditorQuantityKindField)
     }
     .identified(accessibilityIdentifier.map { "\($0)-kind" })
 
     switch quantity?.kind ?? .none {
     case .none:
-      Text("No quantity specified")
+      Text(.recipeEditorQuantityNoneMessage)
         .foregroundStyle(.secondary)
     case .exact:
       RationalQuantityEditor(
-        "Quantity",
+        .recipeEditorQuantityExactField,
         quantity: lowerBoundBinding,
         accessibilityIdentifier: accessibilityIdentifier.map { "\($0)-lower" }
       )
     case .range:
       RationalQuantityEditor(
-        "From",
+        .recipeEditorQuantityRangeLowerField,
         quantity: lowerBoundBinding,
         accessibilityIdentifier: accessibilityIdentifier.map { "\($0)-lower" }
       )
       RationalQuantityEditor(
-        "Through",
+        .recipeEditorQuantityRangeUpperField,
         quantity: upperBoundBinding,
         accessibilityIdentifier: accessibilityIdentifier.map { "\($0)-upper" }
       )
     case .approximate:
       RationalQuantityEditor(
-        "About",
+        .recipeEditorQuantityApproximateField,
         quantity: lowerBoundBinding,
         accessibilityIdentifier: accessibilityIdentifier.map { "\($0)-lower" }
       )
     case .text:
       EditorTextField(
-        "Amount",
+        .recipeEditorQuantityAmountField,
         text: textBinding,
-        prompt: "to taste, as needed, a handful…"
+        prompt: .recipeEditorQuantityWrittenPrompt
       )
     }
   }
@@ -275,12 +278,13 @@ struct QuantityExpressionEditor: View {
 }
 
 private struct RationalQuantityEditor: View {
-  let label: String
+  let label: LocalizedStringResource
   @Binding var quantity: RationalQuantity
   let accessibilityIdentifier: String?
+  @Environment(\.locale) private var locale
 
   init(
-    _ label: String,
+    _ label: LocalizedStringResource,
     quantity: Binding<RationalQuantity>,
     accessibilityIdentifier: String?
   ) {
@@ -298,17 +302,27 @@ private struct RationalQuantityEditor: View {
           Image(systemName: "minus")
         }
         .disabled(quantity.numerator == 0)
-        .accessibilityLabel("Decrease \(label.lowercased())")
+        .accessibilityLabel(
+          Text(
+            .recipeEditorQuantityActionDecrease(
+              field: label.localized(for: locale).lowercased(with: locale)
+            )
+          )
+        )
         .identified(accessibilityIdentifier.map { "\($0)-decrement" })
 
-        TextField("Numerator", value: numeratorBinding, format: .number)
+        TextField(LocalizedStringResource.recipeEditorQuantityNumeratorField, value: numeratorBinding, format: .number)
           .labelsHidden()
           .frame(maxWidth: 90)
           .identified(accessibilityIdentifier.map { "\($0)-numerator" })
-        Text("/")
+        Text(verbatim: "/")
           .foregroundStyle(.secondary)
           .accessibilityHidden(true)
-        TextField("Denominator", value: denominatorBinding, format: .number)
+        TextField(
+          LocalizedStringResource.recipeEditorQuantityDenominatorField,
+          value: denominatorBinding,
+          format: .number
+        )
           .labelsHidden()
           .frame(maxWidth: 90)
           .identified(accessibilityIdentifier.map { "\($0)-denominator" })
@@ -320,14 +334,20 @@ private struct RationalQuantityEditor: View {
           Image(systemName: "plus")
         }
         .disabled(quantity.numerator == Int.max)
-        .accessibilityLabel("Increase \(label.lowercased())")
+        .accessibilityLabel(
+          Text(
+            .recipeEditorQuantityActionIncrease(
+              field: label.localized(for: locale).lowercased(with: locale)
+            )
+          )
+        )
         .identified(accessibilityIdentifier.map { "\($0)-increment" })
       }
       // Form promotes automatic-style buttons to a shared row action on iOS.
       // Keep decrement and increment independent instead of firing them together.
       .buttonStyle(.borderless)
       .accessibilityElement(children: .contain)
-      .accessibilityLabel(label)
+      .accessibilityLabel(Text(label))
     } label: {
       EditorFieldLabel(label)
     }
@@ -360,13 +380,13 @@ private extension View {
 }
 
 private extension QuantityExpression.Kind {
-  var label: String {
+  var label: LocalizedStringResource {
     switch self {
-    case .none: String(localized: "None")
-    case .exact: String(localized: "Exact")
-    case .range: String(localized: "Range")
-    case .approximate: String(localized: "Approximate")
-    case .text: String(localized: "Words")
+    case .none: .recipeQuantityKindNone
+    case .exact: .recipeQuantityKindExact
+    case .range: .recipeQuantityKindRange
+    case .approximate: .recipeQuantityKindApproximate
+    case .text: .recipeQuantityKindWords
     }
   }
 }
