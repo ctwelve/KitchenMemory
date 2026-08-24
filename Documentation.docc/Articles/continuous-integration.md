@@ -105,9 +105,9 @@ while tests in the development workflow remain advisory during ordinary work.
 
 Xcode Cloud reports the pull-request result to GitHub. To make the gate prevent
 rather than merely warn about a failed merge candidate, `main` requires the
-aggregate `KitchenMemory | Slice-dev and bug PRs to main` result from the Xcode
-Cloud GitHub App. The production workflow then verifies that the actual merge
-result still builds for both supported platforms.
+aggregate `KitchenMemory | PR to main from slice/ or bugs/` result from the
+Xcode Cloud GitHub App. The production workflow then verifies that the actual
+merge result still builds for both supported platforms.
 
 ### GitHub enforcement boundary
 
