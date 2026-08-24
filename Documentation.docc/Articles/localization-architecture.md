@@ -6,8 +6,8 @@ Copyright © 2026 the Kitchen Memory contributors.
 SPDX-License-Identifier: GPL-3.0-only
 -->
 
-- Status: Implemented foundation
-- Date: 2026-08-22
+- Status: Implemented 0.1 interface contract
+- Date: 2026-08-23
 
 Kitchen Memory's first localization set is American English (`en-US`), Canadian
 French (`fr-CA`), and Mexican Spanish (`es-MX`). American English is the
@@ -37,25 +37,31 @@ not look up interface strings.
 
 ### Localization-key lifecycle
 
-Readable `en-US` source strings are the current development key and fallback.
-That is a deliberate velocity tradeoff: it is acceptable during development and
-acceptable to ship to production while the interface is still changing. It is
-not the intended permanent representation of stable interface copy.
-
-Once an interface area is considered stable, its catalog entries graduate to
-semantic localization identifiers such as `recipe.editor.save-revision`. The
-catalog then provides an explicit `en-US` value alongside every other supported
-localization, and the English sentence is no longer embedded in application code
-or used as the durable key. Each graduated entry carries enough translator
-context to explain its screen, purpose, tone, placeholders, plural operands, and
+The frozen 0.1 interface has graduated to semantic localization identifiers such
+as `recipe.editor.save-revision`. Every catalog entry provides explicit `en-US`,
+`fr-CA`, and `es-MX` values, and English sentences are no longer embedded in
+application code or used as durable keys. Application code uses Xcode's generated
+`LocalizedStringResource` symbols, including generated functions with named
+operands for formatted messages. Each entry carries translator context that
+explains its screen, purpose, tone, placeholders, plural operands, or
 accessibility role where those details are not already obvious.
 
-This graduation happens area by area rather than as a flag-day rewrite. A stable
-area is complete when its user-visible literals have semantic keys, explicit
-`en-US` values, translator context, and locale-specific plural or formatting
-tests where applicable. Sentence fragments are not introduced merely to reuse a
-key, and source-authored recipe wording remains outside this interface-copy
-abstraction.
+This makes product meaning the stable layer while allowing layout to change. A
+0.2 redesign should reuse an existing key when the control still expresses the
+same meaning, add a new semantic key when meaning or translator context changes,
+and remove an obsolete key only after no supported release or retained surface
+uses it. Moving a Save action from a toolbar to a menu does not rename its key;
+turning Save into a different operation does. Sentence fragments are not
+introduced merely to reuse a key, and source-authored recipe wording remains
+outside this interface-copy abstraction.
+
+`LocalizationCatalogTests` enforces the 0.1 catalog contract. Keys must be
+semantic and manually managed; translator comments and all three locales are
+required; every value must be reviewed and nonempty; plural structures must
+match; and formatted values must use named placeholders with identical
+signatures in every locale. The test target embeds an exact JSON copy of the raw
+catalog at build time so this source-level contract remains available when CI
+builds and runs tests on separate hosts.
 
 This boundary is now enforced. The former English-oriented `renderedText`,
 `structuredDisplayText`, and `effectiveDisplayText` domain helpers are gone.
@@ -158,7 +164,7 @@ changing the application locale.
 
 ## Testing boundary
 
-Localization tests remain fast and deterministic:
+Localization proof remains layered and deterministic:
 
 - select `en`, `fr-CA`, and `es-MX` explicitly rather than inheriting the host;
 - exercise every pluralized formatter with representative values for each
@@ -167,9 +173,15 @@ Localization tests remain fast and deterministic:
 - decode every localized recipe asset and validate stable identity relationships;
 - preserve source strings and numerical domain values across presentation
   locales; and
-- keep UI smoke tests identifier-driven rather than asserting translated copy.
+- keep UI smoke tests identifier-driven rather than asserting translated copy;
+- launch the durable shell and Privacy display under every supported interface
+  locale; and
+- launch smoke coverage with doubled localized strings and forced right-to-left
+  writing direction to expose basic layout assumptions.
 
-Pseudo-localization, longer-text layout review, right-to-left layout proofing,
-and focused accessibility automation belong to interface stabilization. Their
-deferral does not justify leaving durable strings or formatters outside the
-localization boundary now.
+These UI checks prove reachability and structural survival, not linguistic
+quality or pixel-perfect layout. Native review of the three locales, long text,
+right-to-left direction, Dynamic Type, and assistive technologies remains part
+of release hardening. The identifier-driven smoke boundary from
+<doc:0007-business-logic-coverage-and-ui-smoke-tests> still applies: a localized
+screen is not a reason to encode its provisional visual hierarchy in tests.

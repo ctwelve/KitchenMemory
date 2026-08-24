@@ -11,7 +11,7 @@ struct KitchenLoadingView: View {
         .font(.system(size: 44))
         .foregroundStyle(.tint)
         .accessibilityHidden(true)
-      ProgressView("Preparing Your Kitchen…")
+      ProgressView(.startupLoading)
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .background(Color("AppBackground"))
@@ -31,20 +31,20 @@ struct SampleRecipeDecisionView: View {
         .accessibilityHidden(true)
 
       VStack(spacing: 8) {
-        Text("Add Sample Recipes?")
+        Text(.startupSamplesTitle)
           .font(.title2.bold())
-        Text("Kitchen Memory includes a small collection of sample recipes. Add them to your recipe library?")
+        Text(.startupSamplesMessage)
           .foregroundStyle(.secondary)
           .multilineTextAlignment(.center)
       }
 
       HStack {
-        Button("Not Now", action: decline)
-        Button("Add Sample Recipes", action: accept)
+        Button(.actionNotNow, action: decline)
+        Button(.samplesActionAdd, action: accept)
           .buttonStyle(.borderedProminent)
       }
 
-      Text("You can add them later from Settings.")
+      Text(.startupSamplesLaterMessage)
         .font(.footnote)
         .foregroundStyle(.secondary)
     }

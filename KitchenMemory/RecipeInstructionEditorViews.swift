@@ -8,12 +8,14 @@ import SwiftUI
 struct InstructionSectionEditor: View {
   @Binding var section: InstructionSection
   let moveUp: () -> Void; let moveDown: () -> Void; let delete: () -> Void
+  @Environment(\.locale) private var locale
   var body: some View {
     EditorDisclosureGroup(
-      title: section.title ?? "Instruction section",
+      title: section.title
+        ?? LocalizedStringResource.recipeEditorInstructionSectionFallbackTitle.localized(for: locale),
       accessibilityIdentifier: "instruction-editor-section-\(section.id.rawValue.uuidString)"
     ) {
-      EditorTextField("Section name", text: titleBinding, prompt: "Optional")
+      EditorTextField(.recipeEditorSectionNameField, text: titleBinding, prompt: .fieldOptionalPrompt)
       ForEach(section.steps.indices, id: \.self) { index in
         InstructionEditor(
             step: $section.steps[index],
@@ -22,12 +24,14 @@ struct InstructionSectionEditor: View {
             delete: { section.steps.remove(at: index) }
         )
       }
-      Button("Add Step", systemImage: "plus") { section.steps.append(InstructionStep(text: "")) }
+      Button(.recipeEditorInstructionsActionAddStep, systemImage: "plus") {
+        section.steps.append(InstructionStep(text: ""))
+      }
       HStack {
-        Button("Move Up", action: moveUp)
-        Button("Move Down", action: moveDown)
+        Button(.actionMoveUp, action: moveUp)
+        Button(.actionMoveDown, action: moveDown)
         Spacer()
-        Button("Delete Section", role: .destructive, action: delete)
+        Button(.actionDeleteSection, role: .destructive, action: delete)
       }
     }
   }
@@ -46,18 +50,21 @@ struct InstructionSectionEditor: View {
 private struct InstructionEditor: View {
   @Binding var step: InstructionStep
   let moveUp: () -> Void; let moveDown: () -> Void; let delete: () -> Void
+  @Environment(\.locale) private var locale
   var body: some View {
     EditorDisclosureGroup(
-      title: step.text.isEmpty ? "New step" : step.text,
+      title: step.text.isEmpty
+        ? LocalizedStringResource.recipeEditorInstructionFallbackTitle.localized(for: locale)
+        : step.text,
       accessibilityIdentifier: "instruction-editor-step-\(step.id.rawValue.uuidString)"
     ) {
-      EditorTextField("Step title", text: nameBinding, prompt: "Optional")
-      EditorTextField("Instruction", text: $step.text, multiline: true)
+      EditorTextField(.recipeEditorInstructionTitleField, text: nameBinding, prompt: .fieldOptionalPrompt)
+      EditorTextField(.recipeEditorInstructionTextField, text: $step.text, multiline: true)
       HStack {
-        Button("Move Up", action: moveUp)
-        Button("Move Down", action: moveDown)
+        Button(.actionMoveUp, action: moveUp)
+        Button(.actionMoveDown, action: moveDown)
         Spacer()
-        Button("Delete", role: .destructive, action: delete)
+        Button(.actionDelete, role: .destructive, action: delete)
       }
     }
   }
@@ -106,8 +113,12 @@ struct EditorDisclosureGroup<Content: View>: View {
       .buttonStyle(.plain)
       .accessibilityIdentifier(accessibilityIdentifier)
       .accessibilityLabel(title)
-      .accessibilityValue(isExpanded ? "Expanded" : "Collapsed")
-      .accessibilityHint(isExpanded ? "Collapse" : "Expand")
+      .accessibilityValue(
+        Text(isExpanded ? .accessibilityDisclosureExpandedValue : .accessibilityDisclosureCollapsedValue)
+      )
+      .accessibilityHint(
+        Text(isExpanded ? .accessibilityDisclosureCollapseHint : .accessibilityDisclosureExpandHint)
+      )
 
       if isExpanded {
         VStack(alignment: .leading, spacing: 10) {
@@ -126,15 +137,15 @@ struct EditorDisclosureGroup<Content: View>: View {
 /// recipe supplies text. `LabeledContent` gives macOS its traditional
 /// label-and-control layout and retains the same semantic pairing elsewhere.
 struct EditorTextField: View {
-  let label: String
+  let label: LocalizedStringResource
   @Binding var text: String
-  let prompt: String?
+  let prompt: LocalizedStringResource?
   let multiline: Bool
 
   init(
-    _ label: String,
+    _ label: LocalizedStringResource,
     text: Binding<String>,
-    prompt: String? = nil,
+    prompt: LocalizedStringResource? = nil,
     multiline: Bool = false
   ) {
     self.label = label
@@ -184,9 +195,9 @@ struct EditorTextField: View {
 }
 
 struct EditorFieldLabel: View {
-  let text: String
+  let text: LocalizedStringResource
 
-  init(_ text: String) {
+  init(_ text: LocalizedStringResource) {
     self.text = text
   }
 

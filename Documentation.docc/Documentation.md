@@ -29,6 +29,7 @@ presentation architecture.
 - <doc:naming>
 - <doc:alpha-roadmap>
 - <doc:release-engineering>
+- <doc:privacy>
 - <doc:open-questions>
 
 ### Domain and workflows
@@ -59,3 +60,4 @@ presentation architecture.
 - <doc:0005-testing-and-comprehension>
 - <doc:0006-shared-ui-for-foundation-slices>
 - <doc:0007-business-logic-coverage-and-ui-smoke-tests>
+- <doc:0008-freeze-the-0-1-localization-contract>

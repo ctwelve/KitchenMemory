@@ -9,7 +9,12 @@
     }
   ],
   "defaultOptions" : {
-    "codeCoverage" : false
+    "codeCoverage" : false,
+    "commandLineArgumentEntries" : [
+      {
+        "argument" : "--unit-testing"
+      }
+    ]
   },
   "testTargets" : [
     {

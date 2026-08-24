@@ -13,19 +13,13 @@ enum RecipeLibraryIssue: Equatable {
   func message(locale: Locale = .current) -> String {
     switch self {
     case .read:
-      String(localized: "Kitchen Memory could not read this recipe library.", locale: locale)
+      LocalizedStringResource.libraryFailureRead.localized(for: locale)
     case .save:
-      String(localized: "Kitchen Memory could not save this recipe.", locale: locale)
+      LocalizedStringResource.libraryFailureSave.localized(for: locale)
     case .reset:
-      String(
-        localized: "Kitchen Memory could not reset this Kitchen. No reset was completed.",
-        locale: locale
-      )
+      LocalizedStringResource.libraryFailureReset.localized(for: locale)
     case .samples:
-      String(
-        localized: "Kitchen Memory could not add the sample recipes. Your existing recipes were not changed.",
-        locale: locale
-      )
+      LocalizedStringResource.libraryFailureSamples.localized(for: locale)
     }
   }
 }

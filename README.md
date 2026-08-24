@@ -45,9 +45,11 @@ pantry inventory, meal planning, shopping, and household sharing follow later.
 ## Documentation
 
 - [Documentation library](Documentation.docc/Documentation.md) — complete guide
+- [Privacy](PRIVACY.md) — what the app does with data and how private debug reports are handled
 - [Product doctrine](Documentation.docc/Articles/product-doctrine.md) — consolidated product direction
 - [0.1 roadmap](Documentation.docc/Articles/alpha-roadmap.md) — completed feature slices and release boundary
 - [0.1 release engineering](Documentation.docc/Articles/release-engineering.md) — hardening and release gates
+- [Privacy engineering](Documentation.docc/Articles/privacy.md) — release and implementation boundaries
 - [Naming and voice](Documentation.docc/Articles/naming.md)
 - [Product brief](Documentation.docc/Articles/product-brief.md)
 - [Recipe domain model](Documentation.docc/Articles/recipe-domain-model.md)
@@ -64,6 +66,7 @@ pantry inventory, meal planning, shopping, and household sharing follow later.
 - [Continuous integration](Documentation.docc/Articles/continuous-integration.md)
 - [Accessibility engineering](Documentation.docc/Articles/accessibility-engineering.md)
 - [Testing strategy](Documentation.docc/Articles/Decisions/0007-business-logic-coverage-and-ui-smoke-tests.md)
+- [0.1 localization contract](Documentation.docc/Articles/Decisions/0008-freeze-the-0-1-localization-contract.md)
 - [Open questions](Documentation.docc/Articles/open-questions.md)
 - [Architecture decisions](Documentation.docc/Documentation.md#Architecture-decisions)
 - [Artificial intelligence use](AI.md)

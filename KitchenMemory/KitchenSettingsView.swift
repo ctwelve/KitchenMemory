@@ -8,19 +8,11 @@ import SwiftUI
 
 private enum KitchenResetCopy {
   static func title(locale: Locale) -> String {
-    String(localized: "Reset Kitchen?", locale: locale)
+    LocalizedStringResource.settingsResetConfirmationTitle.localized(for: locale)
   }
 
   static func message(locale: Locale) -> String {
-    let source = """
-      All recipes, edits, revision history, imported source captures, and recipe metadata in this \
-      Kitchen will be permanently deleted. Kitchen Memory will restore only the sample recipes \
-      included with this version. This cannot be undone.
-      """
-    return String(
-      localized: String.LocalizationValue(source),
-      locale: locale
-    )
+    LocalizedStringResource.settingsResetConfirmationMessage.localized(for: locale)
   }
 }
 
@@ -40,8 +32,8 @@ struct KitchenCommands: Commands {
   @FocusedValue(\.resetKitchenAction) private var resetKitchenAction
 
   var body: some Commands {
-    CommandMenu("Kitchen") {
-      Button("Reset Kitchen…", role: .destructive) {
+    CommandMenu(.menuKitchenTitle) {
+      Button(.settingsResetAction, role: .destructive) {
         resetKitchenAction?()
       }
       .disabled(resetKitchenAction == nil)
@@ -61,37 +53,37 @@ struct KitchenSettingsView: View {
   var body: some View {
     Form {
       if model.personalCloudStatus != .notConfigured {
-        Section("iCloud Sync") {
+        Section(.settingsIcloudSection) {
           personalCloudStatusLabel
         }
       }
 
-      Section("Sample Recipes") {
+      Section(.settingsSamplesSection) {
         samplePresenceLabel
 
-        Text("Installation checks stable recipe identities and adds only missing samples.")
+        Text(.settingsSamplesInstallationMessage)
           .foregroundStyle(.secondary)
 
         Button(action: model.acceptSampleRecipes) {
           if model.issue == .samples {
-            Text("Try Again")
+            Text(.actionTryAgain)
           } else if model.samplePresence == .partial {
-            Text("Install Missing Sample Recipes")
+            Text(.settingsSamplesActionInstallMissing)
           } else if model.samplePresence == .complete {
-            Text("Sample Recipes Installed")
+            Text(.settingsSamplesActionInstalled)
           } else {
-            Text("Install Sample Recipes")
+            Text(.settingsSamplesActionInstall)
           }
         }
         .disabled(model.samplePresence == .complete && model.issue != .samples)
         .accessibilityIdentifier("add-sample-recipes")
       }
 
-      Section("Kitchen Data") {
-        Text("Restore this Kitchen to the sample recipes included with the current version of Kitchen Memory.")
+      Section(.settingsDataSection) {
+        Text(.settingsResetSummary)
         .foregroundStyle(.secondary)
 
-        Button("Reset Kitchen…", role: .destructive) {
+        Button(.settingsResetAction, role: .destructive) {
           isShowingResetConfirmation = true
         }
         .accessibilityIdentifier("settings-reset-kitchen")
@@ -101,8 +93,27 @@ struct KitchenSettingsView: View {
             .foregroundStyle(.red)
         }
       }
+
+      Section {
+        NavigationLink {
+          PrivacyDisplayView()
+        } label: {
+          Label {
+            VStack(alignment: .leading, spacing: 2) {
+              Text(.privacyTitle)
+              Text(.settingsPrivacySummary)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            }
+          } icon: {
+            Image(systemName: "hand.raised.fill")
+              .foregroundStyle(.tint)
+          }
+        }
+        .accessibilityIdentifier("settings-privacy")
+      }
     }
-    .navigationTitle("Settings")
+    .navigationTitle(.settingsTitle)
 #if os(macOS)
     .formStyle(.grouped)
     .frame(width: 480, height: 360)
@@ -112,7 +123,7 @@ struct KitchenSettingsView: View {
 #else
     .toolbar {
       ToolbarItem(placement: .confirmationAction) {
-        Button("Done") { dismiss() }
+        Button(.actionDone) { dismiss() }
       }
     }
 #endif
@@ -129,25 +140,25 @@ struct KitchenSettingsView: View {
     case .notConfigured:
       EmptyView()
     case .checking:
-      Label("Checking iCloud status…", systemImage: "icloud")
+      Label(.settingsIcloudStatusChecking, systemImage: "icloud")
         .foregroundStyle(.secondary)
     case .available:
-      Label("iCloud sync is available.", systemImage: "checkmark.icloud.fill")
+      Label(.settingsIcloudStatusAvailable, systemImage: "checkmark.icloud.fill")
         .foregroundStyle(.green)
     case .syncing:
-      Label("Kitchen Memory is syncing with iCloud.", systemImage: "arrow.triangle.2.circlepath.icloud")
+      Label(.settingsIcloudStatusSyncing, systemImage: "arrow.triangle.2.circlepath.icloud")
         .foregroundStyle(.secondary)
     case .noAccount:
-      Label("Sign in to iCloud to sync your recipes.", systemImage: "person.crop.circle.badge.exclamationmark")
+      Label(.settingsIcloudStatusNoAccount, systemImage: "person.crop.circle.badge.exclamationmark")
         .foregroundStyle(.secondary)
     case .restricted:
-      Label("iCloud access is restricted on this device.", systemImage: "lock.icloud")
+      Label(.settingsIcloudStatusRestricted, systemImage: "lock.icloud")
         .foregroundStyle(.secondary)
     case .temporarilyUnavailable:
-      Label("iCloud sync is temporarily unavailable.", systemImage: "exclamationmark.icloud")
+      Label(.settingsIcloudStatusTemporarilyUnavailable, systemImage: "exclamationmark.icloud")
         .foregroundStyle(.yellow)
     case .failed:
-      Label("iCloud sync needs attention.", systemImage: "exclamationmark.icloud.fill")
+      Label(.settingsIcloudStatusFailed, systemImage: "exclamationmark.icloud.fill")
         .foregroundStyle(.red)
     }
   }
@@ -156,16 +167,16 @@ struct KitchenSettingsView: View {
   private var samplePresenceLabel: some View {
     switch model.samplePresence {
     case .complete:
-      Label("All sample recipes are installed.", systemImage: "checkmark.circle.fill")
+      Label(.settingsSamplesStatusComplete, systemImage: "checkmark.circle.fill")
         .foregroundStyle(.green)
     case .partial:
-      Label("Some sample recipes are missing.", systemImage: "exclamationmark.triangle.fill")
+      Label(.settingsSamplesStatusPartial, systemImage: "exclamationmark.triangle.fill")
         .foregroundStyle(.yellow)
     case .none:
-      Label("No sample recipes are installed.", systemImage: "xmark.circle")
+      Label(.settingsSamplesStatusNone, systemImage: "xmark.circle")
         .foregroundStyle(.secondary)
     case .unavailable:
-      Label("Sample recipe status is unavailable.", systemImage: "questionmark.circle")
+      Label(.settingsSamplesStatusUnavailable, systemImage: "questionmark.circle")
         .foregroundStyle(.secondary)
     }
   }
@@ -178,8 +189,8 @@ extension View {
     locale: Locale
   ) -> some View {
     alert(KitchenResetCopy.title(locale: locale), isPresented: isPresented) {
-      Button("Cancel", role: .cancel) {}
-      Button("Reset Kitchen", role: .destructive) {
+      Button(.actionCancel, role: .cancel) {}
+      Button(.settingsResetConfirmationAction, role: .destructive) {
         model.resetKitchen()
       }
       .accessibilityIdentifier("confirm-reset-kitchen")

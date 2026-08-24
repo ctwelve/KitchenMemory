@@ -44,7 +44,9 @@ struct KitchenMemoryApp: App {
     }
 
     Settings {
-      KitchenSettingsView(model: dependencies.libraryModel)
+      NavigationStack {
+        KitchenSettingsView(model: dependencies.libraryModel)
+      }
     }
 #else
     WindowGroup {
@@ -91,14 +93,16 @@ enum AppBuildEnvironment: CaseIterable {
 enum AppRuntimeConfiguration {
   /// Whether this process may replace durable storage with an in-memory store.
   ///
-  /// UI automation needs deterministic disposable state, but launch arguments
-  /// are also ordinary process input on macOS. The switch exists only in the
-  /// Testing and non-distributable ProductionTesting configurations.
+  /// Automated test hosts need deterministic disposable state. Test-plan and
+  /// UI-test launch arguments are also ordinary process input on macOS, so
+  /// both switches remain confined to the Testing and non-distributable
+  /// ProductionTesting configurations.
   static func usesInMemoryStore(
     arguments: [String],
     buildEnvironment: AppBuildEnvironment = .current
   ) -> Bool {
-    buildEnvironment.permitsUITestHarness && arguments.contains("--ui-testing")
+    buildEnvironment.permitsUITestHarness
+      && (arguments.contains("--ui-testing") || arguments.contains("--unit-testing"))
   }
 
   /// Whether the host process should attach its durable store to CloudKit.

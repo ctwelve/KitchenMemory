@@ -10,13 +10,15 @@ struct IngredientSectionEditor: View {
   let moveUp: () -> Void
   let moveDown: () -> Void
   let delete: () -> Void
+  @Environment(\.locale) private var locale
 
   var body: some View {
     EditorDisclosureGroup(
-      title: section.title ?? "Ingredient section",
+      title: section.title
+        ?? LocalizedStringResource.recipeEditorIngredientSectionFallbackTitle.localized(for: locale),
       accessibilityIdentifier: "ingredient-editor-section-\(section.id.rawValue.uuidString)"
     ) {
-      EditorTextField("Section name", text: titleBinding, prompt: "Optional")
+      EditorTextField(.recipeEditorSectionNameField, text: titleBinding, prompt: .fieldOptionalPrompt)
       ForEach(section.ingredients.indices, id: \.self) { index in
         IngredientEditor(
             ingredient: $section.ingredients[index],
@@ -25,15 +27,15 @@ struct IngredientSectionEditor: View {
             delete: { section.ingredients.remove(at: index) }
         )
       }
-      Button("Add Ingredient", systemImage: "plus") {
+      Button(.recipeEditorIngredientsActionAdd, systemImage: "plus") {
         section.ingredients.append(RecipeIngredient(parseState: .edited))
       }
         .accessibilityIdentifier("add-ingredient-\(section.id.rawValue.uuidString)")
       HStack {
-        Button("Move Up", action: moveUp)
-        Button("Move Down", action: moveDown)
+        Button(.actionMoveUp, action: moveUp)
+        Button(.actionMoveDown, action: moveDown)
         Spacer()
-        Button("Delete Section", role: .destructive, action: delete)
+        Button(.actionDeleteSection, role: .destructive, action: delete)
       }
     }
   }
@@ -59,49 +61,57 @@ private struct IngredientEditor: View {
   var body: some View {
     EditorDisclosureGroup(
       title: !ingredient.hasMeaningfulDisplayContent
-        ? "New ingredient"
+        ? LocalizedStringResource.recipeEditorIngredientFallbackTitle.localized(for: locale)
         : RecipePresentationFormatter(locale: locale).ingredient(ingredient),
       accessibilityIdentifier: "ingredient-editor-row-\(ingredient.id.rawValue.uuidString)"
     ) {
       LabeledContent {
-        Text(ingredient.originalText.isEmpty ? "Not available" : ingredient.originalText)
+        Text(
+          ingredient.originalText.isEmpty
+            ? LocalizedStringResource.valueNotAvailable.localized(for: locale)
+            : ingredient.originalText
+        )
           .foregroundStyle(.secondary)
           .textSelection(.enabled)
       } label: {
-        EditorFieldLabel("Original wording")
+        EditorFieldLabel(.recipeEditorIngredientOriginalWordingField)
       }
       Picker(selection: $ingredient.presentationMode) {
         ForEach(RecipeIngredient.PresentationMode.allCases, id: \.self) {
           Text($0.label).tag($0)
         }
       } label: {
-        EditorFieldLabel("Presentation")
+        EditorFieldLabel(.recipeEditorIngredientPresentationField)
       }
       if ingredient.presentationMode == .custom {
         EditorTextField(
-          "Custom text",
+          .recipeEditorIngredientCustomTextField,
           text: optionalBinding(\.customDisplayText),
           multiline: true
         )
       }
-      EditorTextField("Ingredient name", text: optionalBinding(\.ingredientText))
+      EditorTextField(.recipeEditorIngredientNameField, text: optionalBinding(\.ingredientText))
       IngredientQuantityEditor(quantity: $ingredient.quantity, package: $ingredient.package)
-      EditorTextField("Unit", text: optionalBinding(\.unitText))
-      EditorTextField("Preparation", text: optionalBinding(\.preparation), multiline: true)
-      EditorTextField("Note", text: optionalBinding(\.note), multiline: true)
+      EditorTextField(.recipeEditorIngredientUnitField, text: optionalBinding(\.unitText))
+      EditorTextField(
+        .recipeEditorIngredientPreparationField,
+        text: optionalBinding(\.preparation),
+        multiline: true
+      )
+      EditorTextField(.recipeEditorIngredientNoteField, text: optionalBinding(\.note), multiline: true)
       Toggle(isOn: $ingredient.isOptional) {
-        EditorFieldLabel("Optional")
+        EditorFieldLabel(.fieldOptionalPrompt)
       }
       Picker(selection: $ingredient.scalingBehavior) {
         ForEach(RecipeIngredient.ScalingBehavior.allCases, id: \.self) { Text($0.label).tag($0) }
       } label: {
-        EditorFieldLabel("Scaling")
+        EditorFieldLabel(.recipeEditorIngredientScalingField)
       }
         HStack {
-            Button("Move Up", action: moveUp)
-            Button("Move Down", action: moveDown)
+            Button(.actionMoveUp, action: moveUp)
+            Button(.actionMoveDown, action: moveDown)
             Spacer()
-            Button("Delete", role: .destructive, action: delete)
+            Button(.actionDelete, role: .destructive, action: delete)
         }
     }
   }
@@ -115,20 +125,20 @@ private struct IngredientEditor: View {
 
 private extension RecipeIngredient.ScalingBehavior {
   static var allCases: [Self] { [.linear, .fixed, .manualReview] }
-  var label: String {
+  var label: LocalizedStringResource {
     switch self {
-    case .linear: String(localized: "Linear")
-    case .fixed: String(localized: "Fixed")
-    case .manualReview: String(localized: "Manual review")
+    case .linear: .recipeIngredientScalingLinear
+    case .fixed: .recipeIngredientScalingFixed
+    case .manualReview: .recipeIngredientScalingManualReview
     }
   }
 }
 private extension RecipeIngredient.PresentationMode {
-  var label: String {
+  var label: LocalizedStringResource {
     switch self {
-    case .structured: String(localized: "Structured")
-    case .original: String(localized: "Original")
-    case .custom: String(localized: "Custom")
+    case .structured: .recipeIngredientPresentationStructured
+    case .original: .recipeSourceKindOriginal
+    case .custom: .recipeIngredientPresentationCustom
     }
   }
 }

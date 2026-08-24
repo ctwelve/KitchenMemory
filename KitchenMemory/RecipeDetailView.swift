@@ -38,14 +38,14 @@ struct RecipeDetailView: View {
         source
         if !revision.equipment.isEmpty {
           recipeSection(
-            "Equipment",
+            .recipeDetailEquipmentSection,
             systemImage: "frying.pan",
             accessibilityIdentifier: "equipment-section"
           ) {
             VStack(alignment: .leading, spacing: 10) {
               HStack(spacing: 6) {
                 Image(systemName: "info.circle").accessibilityHidden(true)
-                Text("Equipment does not scale automatically. Check that it fits the working yield.")
+                Text(.recipeDetailEquipmentScalingNote)
                   .accessibilityIdentifier("equipment-scaling-help")
               }
               .font(.caption)
@@ -58,7 +58,7 @@ struct RecipeDetailView: View {
         }
 
         recipeSection(
-          "Ingredients",
+          .recipeDetailIngredientsSection,
           systemImage: "carrot",
           accessibilityIdentifier: "ingredients-section"
         ) {
@@ -84,7 +84,7 @@ struct RecipeDetailView: View {
           }
         }
         recipeSection(
-          "Instructions",
+          .recipeDetailInstructionsSection,
           systemImage: "list.number",
           accessibilityIdentifier: "instructions-section"
         ) {
@@ -119,7 +119,7 @@ struct RecipeDetailView: View {
     // The label describes the screen as a whole; children remain contained
     // and navigable rather than being collapsed into one enormous utterance.
     .accessibilityIdentifier("recipe-detail")
-    .accessibilityLabel("\(revision.title) recipe")
+    .accessibilityLabel(Text(.recipeDetailAccessibilityLabel(title: revision.title)))
     .background(Color("AppBackground"))
     .navigationTitle(revision.title)
 #if os(iOS)
@@ -165,10 +165,10 @@ private extension RecipeDetailView {
       }
 
       if let authorName = revision.authorName {
-        Text("By \(authorName)")
+        Text(.recipeDetailAuthor(author: authorName))
           .font(.subheadline)
           .foregroundStyle(.primary)
-          .accessibilityLabel("By \(authorName)")
+          .accessibilityLabel(Text(.recipeDetailAuthor(author: authorName)))
           .accessibilityIdentifier("recipe-author")
       }
     }
@@ -201,7 +201,7 @@ private extension RecipeDetailView {
           // the visual children directly produced unstable macOS roles and
           // different label/value exposure between iOS and macOS.
           .accessibilityRepresentation {
-            Text("\(value.label), \(value.value)")
+            Text(.recipeMetadataAccessibilityValue(label: value.label, value: value.value))
               // The identifier names the concept, while the spoken value may
               // change with recipe content. Tests can therefore find Yield
               // without encoding its current wording into the query.
@@ -227,7 +227,7 @@ private extension RecipeDetailView {
     if revision.recipeYield != nil {
       values.append(
         .init(
-          label: String(localized: "Yield", locale: locale),
+          label: LocalizedStringResource.recipeMetadataYield.localized(for: locale),
           value: scalingSelection.displayedYield(locale: locale),
           systemImage: "person.2"
         )
@@ -236,7 +236,7 @@ private extension RecipeDetailView {
     if let prepDuration = revision.prepDuration {
       values.append(
         .init(
-          label: String(localized: "Prep", locale: locale),
+          label: LocalizedStringResource.recipeMetadataPrep.localized(for: locale),
           value: duration(prepDuration),
           systemImage: "clock"
         )
@@ -245,7 +245,7 @@ private extension RecipeDetailView {
     if let cookDuration = revision.cookDuration {
       values.append(
         .init(
-          label: String(localized: "Cook", locale: locale),
+          label: LocalizedStringResource.recipeMetadataCook.localized(for: locale),
           value: duration(cookDuration),
           systemImage: "flame"
         )
@@ -254,7 +254,7 @@ private extension RecipeDetailView {
     if let totalDuration = revision.totalDuration {
       values.append(
         .init(
-          label: String(localized: "Total", locale: locale),
+          label: LocalizedStringResource.recipeMetadataTotal.localized(for: locale),
           value: duration(totalDuration),
           systemImage: "timer"
         )
@@ -273,7 +273,7 @@ private extension RecipeDetailView {
             VStack(alignment: .trailing, spacing: 2) {
               Text(
                 recipeSource.title
-                  ?? String(localized: "Open Source", locale: locale)
+                  ?? LocalizedStringResource.recipeSourceActionOpen.localized(for: locale)
               )
               // Imported titles are untrusted display text. Keeping the actual
               // destination host visible prevents a title from disguising a
@@ -288,7 +288,7 @@ private extension RecipeDetailView {
             Text(recipeSource.title ?? recipeSource.kind.rawValue.capitalized)
               .foregroundStyle(.primary)
             if recipeSource.canonicalURL != nil {
-              Text("Link unavailable")
+              Text(.recipeSourceLinkUnavailable)
                 .font(.caption)
                 .foregroundStyle(.secondary)
             }
@@ -298,7 +298,7 @@ private extension RecipeDetailView {
         HStack(spacing: 8) {
           Image(systemName: "link")
             .accessibilityHidden(true)
-          Text("Source")
+          Text(.recipeSourceLabel)
         }
         .foregroundStyle(Color("IconMark"))
       }
@@ -316,7 +316,7 @@ private extension RecipeDetailView {
   }
 
   private func recipeSection<Content: View>(
-    _ title: String,
+    _ title: LocalizedStringResource,
     systemImage: String,
     accessibilityIdentifier: String,
     @ViewBuilder content: () -> Content
@@ -328,7 +328,7 @@ private extension RecipeDetailView {
           // Symbol would duplicate it and expose an implementation detail.
           .accessibilityHidden(true)
         Text(title)
-          .accessibilityLabel(title)
+          .accessibilityLabel(Text(title))
           .accessibilityHeading(.h2)
           .accessibilityIdentifier(accessibilityIdentifier)
       }

@@ -58,11 +58,12 @@ target implementation details:
 | `ProductionTesting` | production UI smoke-test host only | off | release |
 
 `ProductionTesting` is deliberately non-distributable. It retains production
-compiler behavior while admitting the disposable UI-test store switch that is
-compiled out of the actual `Production` application. `KitchenMemory Debugging`
-runs `Develop`, `KitchenMemory Testing` runs the non-UI plan with `Testing`, and
-`KitchenMemory Production` archives `Production` while running its UI target
-through `ProductionTesting`.
+compiler behavior while admitting disposable automated-test storage that is
+disabled in the actual `Production` application. Hosted unit tests and UI-test
+launches use that storage only in a testing configuration. `KitchenMemory
+Debugging` runs `Develop`, `KitchenMemory Testing` runs the non-UI plan with
+`Testing`, and `KitchenMemory Production` archives `Production` while running
+its UI target through `ProductionTesting`.
 
 Production retains automatic signing but does not pin an Apple Development
 identity. Xcode therefore remains responsible for selecting the appropriate

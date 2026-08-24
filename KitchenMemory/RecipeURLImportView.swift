@@ -31,13 +31,13 @@ struct RecipeURLImportView: View {
 #endif
       }
       .accessibilityIdentifier("recipe-url-import-scroll")
-      .navigationTitle(session.candidates.isEmpty ? "Import Recipe" : "Choose Recipe")
+      .navigationTitle(session.candidates.isEmpty ? .recipeImportTitle : .recipeImportChooseTitle)
 #if os(iOS)
       .navigationBarTitleDisplayMode(.inline)
 #endif
       .toolbar {
         ToolbarItem(placement: .cancellationAction) {
-          Button("Cancel") { dismiss() }
+          Button(.actionCancel) { dismiss() }
         }
       }
       .onDisappear {
@@ -74,7 +74,7 @@ struct RecipeURLImportView: View {
         beginImport()
       } label: {
         Label {
-          Text(session.isLoading ? "Fetching Recipe" : "Fetch Recipe")
+          Text(session.isLoading ? .recipeImportFetchProgress : .recipeImportFetchAction)
         } icon: {
           if session.isLoading {
             ProgressView()
@@ -88,7 +88,9 @@ struct RecipeURLImportView: View {
         }
       }
       .disabled(session.isLoading || session.normalizedURL == nil)
-      .accessibilityLabel(session.isLoading ? "Fetching recipe" : "Fetch recipe")
+      .accessibilityLabel(
+        Text(session.isLoading ? .recipeImportFetchProgress : .recipeImportFetchAction)
+      )
       .accessibilityIdentifier("recipe-import-fetch")
     }
   }
@@ -100,12 +102,12 @@ struct RecipeURLImportView: View {
       urlTextField
         .labelsHidden()
     } label: {
-      Text("Recipe webpage")
+      Text(.recipeImportWebpageField)
         .font(.subheadline.weight(.semibold))
     }
 #else
     VStack(alignment: .leading, spacing: 6) {
-      Text("Recipe webpage")
+      Text(.recipeImportWebpageField)
         .font(.subheadline.weight(.semibold))
       urlTextField
     }
@@ -114,9 +116,9 @@ struct RecipeURLImportView: View {
 
   private var urlTextField: some View {
     TextField(
-      "Recipe webpage",
+      LocalizedStringResource.recipeImportWebpageField,
       text: $session.enteredURL,
-      prompt: Text("https://example.com/recipe").foregroundStyle(.secondary)
+      prompt: Text(verbatim: "https://example.com/recipe").foregroundStyle(.secondary)
     )
     .foregroundStyle(.primary)
     .textContentType(.URL)
@@ -125,17 +127,15 @@ struct RecipeURLImportView: View {
     .textInputAutocapitalization(.never)
 #endif
     .autocorrectionDisabled()
-    .accessibilityLabel("Recipe webpage URL")
+    .accessibilityLabel(Text(.recipeImportWebpageAccessibilityLabel))
     .onSubmit { beginImport() }
   }
 
   private var privacySection: some View {
-    Section("Privacy") {
-      // swiftlint:disable:next line_length
-      Text("Kitchen Memory follows redirects and downloads the resulting HTML with an ephemeral request that supplies no cookies or app credentials. It runs no page scripts and downloads no images during review.")
+    Section(.privacyTitle) {
+      Text(.recipeImportPrivacyFetching)
         .foregroundStyle(.secondary)
-      // swiftlint:disable:next line_length
-      Text("If you save a recipe, Kitchen Memory keeps the final source URL and one bounded JSON-LD recipe-metadata block locally, including source fields not shown in the review editor.")
+      Text(.recipeImportPrivacyStorage)
         .foregroundStyle(.secondary)
     }
   }
@@ -149,7 +149,7 @@ struct RecipeURLImportView: View {
           VStack(alignment: .leading, spacing: 4) {
             Text(
               candidate.draft.title.isEmpty
-                ? String(localized: "Untitled recipe", locale: locale)
+                ? LocalizedStringResource.recipeImportCandidateUntitled.localized(for: locale)
                 : candidate.draft.title
             )
               .font(.headline)
@@ -168,12 +168,12 @@ struct RecipeURLImportView: View {
           .frame(maxWidth: .infinity, alignment: .leading)
         }
         .buttonStyle(.plain)
-        .accessibilityHint("Review this recipe before saving")
+        .accessibilityHint(Text(.recipeImportCandidateReviewHint))
       }
     } header: {
-      Text("This page contains multiple recipes")
+      Text(.recipeImportCandidatesSection)
     } footer: {
-      Button("Use a Different URL") {
+      Button(.recipeImportActionDifferentUrl) {
         session.useDifferentURL()
       }
     }
@@ -185,7 +185,9 @@ struct RecipeURLImportView: View {
     // does not necessarily revisit that button when an asynchronous operation
     // begins. Announce the state transition without moving keyboard or
     // VoiceOver focus away from the URL field.
-    AccessibilityNotification.Announcement("Fetching recipe").post()
+    AccessibilityNotification.Announcement(
+      LocalizedStringResource.recipeImportFetchProgress.localized(for: locale)
+    ).post()
     importTask?.cancel()
     importTask = Task {
       do {
@@ -196,7 +198,8 @@ struct RecipeURLImportView: View {
           select(candidate)
         case .choose:
           AccessibilityNotification.Announcement(
-            "\(loaded.count) recipes found. Choose a recipe to review."
+            LocalizedStringResource.recipeImportAnnouncementCandidateCount(count: loaded.count)
+              .localized(for: locale)
           ).post()
         case nil:
           break
@@ -209,13 +212,17 @@ struct RecipeURLImportView: View {
         // does not make newly inserted text a live region. A native
         // announcement ensures the failure is heard while preserving the
         // person's current focus so they can correct the URL immediately.
-        AccessibilityNotification.Announcement("Recipe import failed. \(message)").post()
+        AccessibilityNotification.Announcement(
+          LocalizedStringResource.recipeImportAnnouncementFailed(message: message)
+            .localized(for: locale)
+        ).post()
       }
     }
   }
 
   private func reviewNoteCount(_ count: Int) -> String {
-    String(localized: "\(count) review note", locale: locale)
+    LocalizedStringResource.importReviewConcernReviewNoteCount(count: count)
+      .localized(for: locale)
   }
 
   private static func message(
@@ -224,23 +231,17 @@ struct RecipeURLImportView: View {
   ) -> String {
     switch failure {
     case .noRecipeCandidates:
-      String(localized: "No Schema.org recipe was found on this page.", locale: locale)
+      LocalizedStringResource.recipeImportFailureNoCandidates.localized(for: locale)
     case .disallowedAddress:
-      String(localized: "For safety, Kitchen Memory cannot fetch this address or redirect.", locale: locale)
+      LocalizedStringResource.recipeImportFailureDisallowedAddress.localized(for: locale)
     case .pageTooLarge:
-      String(localized: "This page contains too much data to import safely.", locale: locale)
+      LocalizedStringResource.recipeImportFailurePageTooLarge.localized(for: locale)
     case .unsupportedPage:
-      String(localized: "This address did not return a supported HTML recipe page.", locale: locale)
+      LocalizedStringResource.recipeImportFailureUnsupportedPage.localized(for: locale)
     case .networkFailure:
-      String(
-        localized: "The webpage could not be downloaded. Check your connection and try again.",
-        locale: locale
-      )
+      LocalizedStringResource.recipeImportFailureNetwork.localized(for: locale)
     case .unknown:
-      String(
-        localized: "Kitchen Memory could not import this webpage. Check the URL and try again.",
-        locale: locale
-      )
+      LocalizedStringResource.recipeImportFailureUnknown.localized(for: locale)
     }
   }
 }

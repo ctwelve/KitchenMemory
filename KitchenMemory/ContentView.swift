@@ -41,7 +41,7 @@ struct ContentView: View {
   private var recipeLibrary: some View {
     NavigationSplitView(columnVisibility: $columnVisibility) {
       recipeList
-        .navigationTitle("Recipes")
+        .navigationTitle(.libraryTitle)
 #if os(macOS)
         .navigationSplitViewColumnWidth(min: 240, ideal: 300)
 #endif
@@ -53,7 +53,7 @@ struct ContentView: View {
             Button {
               activeSheet = .create
             } label: {
-              ToolbarIconLabel("New Recipe", systemImage: "plus")
+              ToolbarIconLabel(.libraryActionNewRecipe, systemImage: "plus")
             }
             .accessibilityIdentifier("new-recipe")
           }
@@ -61,7 +61,7 @@ struct ContentView: View {
             Button {
               activeSheet = .importURL
             } label: {
-              ToolbarIconLabel("Import Recipe", systemImage: "square.and.arrow.down")
+              ToolbarIconLabel(.libraryActionImportRecipe, systemImage: "square.and.arrow.down")
             }
             .accessibilityIdentifier("import-recipe")
           }
@@ -73,7 +73,7 @@ struct ContentView: View {
                 ToolbarIconLabel(sidebarToggleTitle, systemImage: "sidebar.left")
               }
               .accessibilityIdentifier("toggle-sidebar")
-              .help(sidebarToggleTitle)
+              .help(Text(sidebarToggleTitle))
             }
           }
 #if !os(macOS)
@@ -81,7 +81,7 @@ struct ContentView: View {
             Button {
               isShowingSettings = true
             } label: {
-              ToolbarIconLabel("Settings", systemImage: "gearshape")
+              ToolbarIconLabel(.settingsTitle, systemImage: "gearshape")
             }
             .accessibilityIdentifier("open-settings")
           }
@@ -119,10 +119,10 @@ struct ContentView: View {
 #endif
   }
 
-  private var sidebarToggleTitle: String {
+  private var sidebarToggleTitle: LocalizedStringResource {
     columnVisibility == .detailOnly
-      ? String(localized: "Show Sidebar", locale: locale)
-      : String(localized: "Hide Sidebar", locale: locale)
+      ? .librarySidebarActionShow
+      : .librarySidebarActionHide
   }
 
   private var sidebarTogglePlacement: ToolbarItemPlacement {
@@ -143,17 +143,17 @@ struct ContentView: View {
   private var recipeList: some View {
     if let issue = model.issue {
       ContentUnavailableView {
-        Label("Recipes Unavailable", systemImage: "exclamationmark.triangle")
+        Label(.libraryUnavailableTitle, systemImage: "exclamationmark.triangle")
       } description: {
         Text(issue.message(locale: locale))
       } actions: {
-        Button("Try Again") { model.retryCurrentIssue() }
+        Button(.actionTryAgain) { model.retryCurrentIssue() }
       }
     } else if model.hasLoaded && model.recipes.isEmpty {
       ContentUnavailableView(
-        "No Recipes",
+        .libraryEmptyTitle,
         systemImage: "book.closed",
-        description: Text("Recipes saved to this Kitchen will appear here.")
+        description: Text(.libraryEmptyMessage)
       )
     } else {
       List(model.recipes, id: \.recipe.id, selection: $model.selectedRecipeID) { storedRecipe in
@@ -168,11 +168,11 @@ struct ContentView: View {
       // This identifier is also our launch-complete signal in UI tests. It is
       // applied to the List itself so it survives row reuse and empty states.
       .accessibilityIdentifier("recipe-library")
-      .accessibilityLabel("Recipe library")
+      .accessibilityLabel(Text(.libraryAccessibilityLabel))
       .listStyle(.sidebar)
       .overlay {
         if !model.hasLoaded {
-          ProgressView("Loading Recipes")
+          ProgressView(.libraryLoading)
         }
       }
     }
@@ -189,16 +189,16 @@ struct ContentView: View {
         .toolbar {
           ToolbarItem(placement: .primaryAction) {
             Button { activeSheet = .edit(selectedRecipe) } label: {
-              Label("Edit", systemImage: "pencil")
+              Label(.recipeActionEdit, systemImage: "pencil")
             }
               .accessibilityIdentifier("edit-recipe")
           }
         }
     } else {
       ContentUnavailableView(
-        "Select a Recipe",
+        .librarySelectionEmptyTitle,
         systemImage: "book.pages",
-        description: Text("Choose a recipe to read its ingredients and instructions.")
+        description: Text(.librarySelectionEmptyMessage)
       )
       .frame(maxWidth: .infinity, maxHeight: .infinity)
       .background(Color("AppBackground"))
@@ -234,10 +234,10 @@ struct ContentView: View {
 }
 
 private struct ToolbarIconLabel: View {
-  let title: String
+  let title: LocalizedStringResource
   let systemImage: String
 
-  init(_ title: String, systemImage: String) {
+  init(_ title: LocalizedStringResource, systemImage: String) {
     self.title = title
     self.systemImage = systemImage
   }
@@ -248,7 +248,7 @@ private struct ToolbarIconLabel: View {
       // SF Symbols have different intrinsic heights. A shared box keeps their
       // visible lower edges aligned without changing the toolbar button target.
       .frame(width: 20, height: 20, alignment: .bottom)
-      .accessibilityLabel(title)
+      .accessibilityLabel(Text(title))
   }
 }
 
