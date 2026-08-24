@@ -155,6 +155,13 @@ testing configurations through the committed test plans' `--unit-testing`
 launch argument. Ordinary development and production launches continue to use
 durable storage.
 
+UI smoke launches also ignore persisted application-window restoration state.
+On macOS, XCUITest can nevertheless relaunch a live `WindowGroup` application
+without creating its primary window. The smoke harness detects the missing
+expected surface and invokes the public Command-N New Window path before making
+assertions. This keeps launches deterministic without depending on localized
+menu copy or altering ordinary application behavior.
+
 The localization contract test reads an exact JSON copy of the raw String
 Catalog from its test bundle. A declared test-target build phase embeds that
 copy while the source checkout is available. This is necessary because Xcode
@@ -214,11 +221,11 @@ The first release-engineering pass uses the production workflow as release
 evidence rather than as a ceremonial final build. Its acceptance and
 distribution gates are defined in <doc:release-engineering>.
 
-### Current iOS UI-runner diagnostic
+### Current UI-runner diagnostic
 
-With Xcode 26.6 and the iOS 26.5 simulator, Xcode may report internal
+With Xcode 26.6, both the iOS 26.5 simulator and macOS 26.6.2 may report internal
 `DebuggerVersionStore` / `no debugger version` messages while launching XCUI
-tests. Its fallback launcher currently proceeds and the smoke tests execute.
+tests. The fallback launcher currently proceeds and the smoke tests execute.
 Treat the messages as Apple tooling diagnostics, but treat any assertion reached
 inside a test body as an ordinary test failure requiring investigation.
 
