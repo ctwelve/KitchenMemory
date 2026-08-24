@@ -71,20 +71,28 @@ struct KitchenMemoryApp: App {
     }
 
     return AppStartupState.prepare {
-#if DEVELOP
+      let personalCloudContainerIdentifier = try AppRuntimeConfiguration
+        .personalCloudContainerIdentifier(
+          environment: ProcessInfo.processInfo.environment,
+          infoDictionary: Bundle.main.infoDictionary ?? [:]
+        )
+#if DEVELOP && os(macOS)
       if AppRuntimeConfiguration.initializesCloudKitSchema(
         arguments: ProcessInfo.processInfo.arguments
       ) {
-        try CloudKitDevelopmentSchemaInitializer.initialize()
+        guard let personalCloudContainerIdentifier else {
+          throw AppRuntimeConfigurationError.cloudKitContainerIdentifierMissing
+        }
+        try CloudKitDevelopmentSchemaInitializer.initialize(
+          containerIdentifier: personalCloudContainerIdentifier
+        )
       }
 #endif
       return try AppDependencies(
         inMemory: AppRuntimeConfiguration.usesInMemoryStore(
           arguments: ProcessInfo.processInfo.arguments
         ),
-        synchronizesWithPersonalCloud: AppRuntimeConfiguration.synchronizesWithPersonalCloud(
-          environment: ProcessInfo.processInfo.environment
-        )
+        personalCloudContainerIdentifier: personalCloudContainerIdentifier
       )
     }
   }
@@ -146,6 +154,8 @@ enum AppBuildEnvironment: CaseIterable {
 }
 
 enum AppRuntimeConfiguration {
+  static let cloudKitContainerInfoKey = "KitchenMemoryCloudKitContainerIdentifier"
+
   /// Whether this process may replace durable storage with an in-memory store.
   ///
   /// Automated test hosts need deterministic disposable state. Test-plan and
@@ -185,13 +195,44 @@ enum AppRuntimeConfiguration {
       && environment["XCTestConfigurationFilePath"] == nil
   }
 
+  /// Returns the signed build's configured container only when this launch
+  /// participates in personal sync.
+  ///
+  /// The same build setting feeds Info.plist and the code-signing entitlements,
+  /// keeping the runtime store from silently selecting a different container
+  /// than the one Apple authorized in the signature.
+  static func personalCloudContainerIdentifier(
+    environment: [String: String],
+    infoDictionary: [String: Any],
+    buildEnvironment: AppBuildEnvironment = .current
+  ) throws -> String? {
+    guard synchronizesWithPersonalCloud(
+      environment: environment,
+      buildEnvironment: buildEnvironment
+    ) else { return nil }
+    guard let identifier = infoDictionary[cloudKitContainerInfoKey] as? String,
+          identifier.hasPrefix("iCloud."),
+          identifier.count > "iCloud.".count else {
+      throw AppRuntimeConfigurationError.cloudKitContainerIdentifierMissing
+    }
+    return identifier
+  }
+
   static func initializesCloudKitSchema(
     arguments: [String],
     buildEnvironment: AppBuildEnvironment = .current
   ) -> Bool {
+#if os(macOS)
     buildEnvironment.permitsCloudKitSchemaAdministration
       && arguments.contains("--initialize-cloudkit-schema")
+#else
+    false
+#endif
   }
+}
+
+enum AppRuntimeConfigurationError: Error, Equatable {
+  case cloudKitContainerIdentifierMissing
 }
 
 @MainActor
@@ -203,13 +244,16 @@ struct AppDependencies {
 
   init(
     inMemory: Bool = false,
-    synchronizesWithPersonalCloud: Bool = false,
+    personalCloudContainerIdentifier: String? = nil,
     sampleOnboardingStore: (any SampleRecipeOnboardingStoring)? = nil,
     sampleProvider: (any SampleRecipeProviding)? = nil
   ) throws {
-    let synchronization: KitchenMemoryStoreSynchronization = synchronizesWithPersonalCloud
-      ? .personalCloud(containerIdentifier: KitchenMemorySchema.personalCloudContainerIdentifier)
-      : .localOnly
+    let synchronization: KitchenMemoryStoreSynchronization
+    if let personalCloudContainerIdentifier {
+      synchronization = .personalCloud(containerIdentifier: personalCloudContainerIdentifier)
+    } else {
+      synchronization = .localOnly
+    }
     let modelContainer = try KitchenMemorySchema.makeContainer(
       inMemory: inMemory,
       synchronization: synchronization
@@ -237,20 +281,20 @@ struct AppDependencies {
     )
     self.modelContainer = modelContainer
     self.libraryModel = libraryModel
-    persistentStoreChangeObserver = synchronizesWithPersonalCloud
+    persistentStoreChangeObserver = personalCloudContainerIdentifier != nil
       ? PersistentStoreChangeObserver {
         libraryModel.reloadAfterExternalStoreChange()
       }
       : nil
-    let personalCloudStatusMonitor = synchronizesWithPersonalCloud
-      ? PersonalCloudStatusMonitor(
+    let personalCloudStatusMonitor = personalCloudContainerIdentifier.map { containerIdentifier in
+      PersonalCloudStatusMonitor(
         accountChecker: CloudKitAccountChecker(
-          containerIdentifier: KitchenMemorySchema.personalCloudContainerIdentifier
+          containerIdentifier: containerIdentifier
         )
       ) { status in
         libraryModel.updatePersonalCloudStatus(status)
       }
-      : nil
+    }
     self.personalCloudStatusMonitor = personalCloudStatusMonitor
     personalCloudStatusMonitor?.start()
   }

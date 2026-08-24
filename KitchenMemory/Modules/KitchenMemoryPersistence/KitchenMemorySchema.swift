@@ -20,9 +20,6 @@ public enum KitchenMemorySchemaError: Error, Equatable {
 }
 
 public enum KitchenMemorySchema {
-  /// The private CloudKit container shared by the iPhone, iPad, and Mac apps.
-  public static let personalCloudContainerIdentifier = "iCloud.net.ctwelve.KitchenMemory"
-
   /// Creates an in-memory test container or the app's durable container.
   ///
   /// Tests and explicitly located stores remain local. The application opts its

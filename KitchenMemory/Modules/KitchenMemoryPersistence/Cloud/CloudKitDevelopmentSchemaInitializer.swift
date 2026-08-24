@@ -2,7 +2,7 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: GPL-3.0-only
 
-#if DEVELOP
+#if DEVELOP && os(macOS)
 import CoreData
 import SwiftData
 
@@ -18,17 +18,17 @@ public enum CloudKitDevelopmentSchemaInitializer {
     case persistentStoreUnavailable
   }
 
-  public static func initialize() throws {
+  public static func initialize(containerIdentifier: String) throws {
     try autoreleasepool {
       let schema = Schema(versionedSchema: KitchenMemorySchemaV1.self)
       let configuration = ModelConfiguration(
         "KitchenMemory",
         schema: schema,
-        cloudKitDatabase: .private(KitchenMemorySchema.personalCloudContainerIdentifier)
+        cloudKitDatabase: .private(containerIdentifier)
       )
       let description = NSPersistentStoreDescription(url: configuration.url)
       description.cloudKitContainerOptions = NSPersistentCloudKitContainerOptions(
-        containerIdentifier: KitchenMemorySchema.personalCloudContainerIdentifier
+        containerIdentifier: containerIdentifier
       )
       description.shouldAddStoreAsynchronously = false
 

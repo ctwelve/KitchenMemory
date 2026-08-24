@@ -74,8 +74,12 @@ pantry inventory, meal planning, shopping, and household sharing follow later.
 
 ## Development
 
-Open `KitchenMemory.xcodeproj` in Xcode and run the **KitchenMemory Debugging**
-scheme on My Mac or an iOS Simulator. The application is based on Xcode's standard
+Open `KitchenMemory.xcodeproj` in Xcode and run the **KitchenMemory Development**
+scheme on My Mac, an iOS Simulator, or a development device. Its app identifier
+and local sandbox are deliberately separate from Production. Its signed
+entitlements also select `iCloud.net.ctwelve.dev.KitchenMemory`, so development
+records and schema administration cannot touch the production container.
+The application is based on Xcode's standard
 multiplatform SwiftUI structure and uses SwiftData as its first local persistence
 implementation. On first launch, it creates an empty local Kitchen and asks
 whether the person wants to install the bundled sample recipe pack. The answer

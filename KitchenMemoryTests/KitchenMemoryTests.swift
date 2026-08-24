@@ -228,14 +228,55 @@ final class KitchenMemoryTests: XCTestCase {
     ))
   }
 
+  func testPersonalCloudContainerComesFromTheSignedBuildConfiguration() throws {
+    let productionInfo = [
+      AppRuntimeConfiguration.cloudKitContainerInfoKey: "iCloud.net.ctwelve.KitchenMemory",
+    ]
+
+    XCTAssertEqual(
+      try AppRuntimeConfiguration.personalCloudContainerIdentifier(
+        environment: [:],
+        infoDictionary: productionInfo,
+        buildEnvironment: .production
+      ),
+      "iCloud.net.ctwelve.KitchenMemory"
+    )
+    XCTAssertNil(try AppRuntimeConfiguration.personalCloudContainerIdentifier(
+      environment: [:],
+      infoDictionary: [:],
+      buildEnvironment: .testing
+    ))
+    XCTAssertThrowsError(try AppRuntimeConfiguration.personalCloudContainerIdentifier(
+      environment: [:],
+      infoDictionary: [:],
+      buildEnvironment: .develop
+    )) { error in
+      XCTAssertEqual(
+        error as? AppRuntimeConfigurationError,
+        .cloudKitContainerIdentifierMissing
+      )
+    }
+  }
+
   func testCloudKitSchemaInitializationRequiresDevelopAndTheExplicitArgument() {
+#if os(macOS)
     XCTAssertTrue(AppRuntimeConfiguration.initializesCloudKitSchema(
       arguments: ["KitchenMemory", "--initialize-cloudkit-schema"],
       buildEnvironment: .develop
     ))
+#else
+    XCTAssertFalse(AppRuntimeConfiguration.initializesCloudKitSchema(
+      arguments: ["KitchenMemory", "--initialize-cloudkit-schema"],
+      buildEnvironment: .develop
+    ))
+#endif
     XCTAssertFalse(AppRuntimeConfiguration.initializesCloudKitSchema(
       arguments: ["KitchenMemory", "--initialize-cloudkit-schema"],
       buildEnvironment: .production
+    ))
+    XCTAssertFalse(AppRuntimeConfiguration.initializesCloudKitSchema(
+      arguments: ["KitchenMemory"],
+      buildEnvironment: .develop
     ))
   }
 }

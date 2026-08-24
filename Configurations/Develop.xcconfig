@@ -4,4 +4,5 @@
 
 #include "Base.xcconfig"
 
+KITCHEN_MEMORY_CLOUDKIT_CONTAINER = iCloud.net.ctwelve.dev.KitchenMemory
 SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited) DEBUG DEVELOP

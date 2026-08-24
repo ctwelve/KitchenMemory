@@ -7,7 +7,7 @@ SPDX-License-Identifier: GPL-3.0-only
 -->
 
 Xcode Cloud is Kitchen Memory's continuous-integration system. Three shared
-schemes make the workflow boundary explicit: `KitchenMemory Debugging` owns
+schemes make the workflow boundary explicit: `KitchenMemory Development` owns
 ordinary developer runs, `KitchenMemory Testing` owns deterministic non-UI
 validation, and `KitchenMemory Production` owns production UI smoke tests and
 archives. CI-only replacements for those actions should be avoided.
@@ -21,7 +21,11 @@ The development workflow starts for meaningful project changes pushed to
 Build, Analyze, and Test actions using the shared
 `KitchenMemory Testing` scheme, but does not archive a product. Its actions use
 `Testing` and do not include UI automation. Local developer runs use
-`KitchenMemory Debugging`, whose Run and Analyze actions use `Develop`.
+`KitchenMemory Development`, whose Run and Analyze actions use `Develop`. Its
+distinct bundle identifier keeps Development's local store, CloudKit metadata,
+and onboarding preferences out of the Production app sandbox. Its separate
+CloudKit container also keeps development records and schema administration
+away from production service state.
 
 The completed feature baseline was collected on `slice/completion` before its
 merge to `main`. Release engineering begins from that `main` baseline and uses
@@ -248,7 +252,7 @@ inside a test body as an ordinary test failure requiring investigation.
 
 ## Static analysis
 
-The Debugging and Testing schemes mark the application as buildable for Analyze. Project build
+The Development and Testing schemes mark the application as buildable for Analyze. Project build
 settings select Xcode's `deep` static-analyzer mode specifically for the Analyze
 action. The analyzer does not run during every ordinary build, avoiding a slower
 duplicate pass during day-to-day development.
@@ -259,7 +263,7 @@ Run the same action locally with:
 DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer \
   xcodebuild -skipPackagePluginValidation analyze \
   -project KitchenMemory.xcodeproj \
-  -scheme 'KitchenMemory Debugging' \
+  -scheme 'KitchenMemory Development' \
   -destination 'platform=macOS' \
   -derivedDataPath /private/tmp/KitchenMemoryAnalyze \
   CODE_SIGNING_ALLOWED=NO

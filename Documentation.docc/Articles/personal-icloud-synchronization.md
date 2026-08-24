@@ -114,8 +114,10 @@ Cooking sessions therefore become a new aggregate and new additive records in
 Schema administration is an explicit development operation, not application
 startup behavior.
 
-1. Build and sign a `Develop` application with the development iCloud container.
-2. Launch it once with `--initialize-cloudkit-schema`.
+1. Build and sign `KitchenMemory Development` for My Mac. Its distinct app
+   identifier gives the Development store its own sandbox, while its entitlements
+   select the separate `iCloud.net.ctwelve.dev.KitchenMemory` container.
+2. Launch that Mac app once with `--initialize-cloudkit-schema`.
 3. Inspect record types, indexes, and security roles in CloudKit Console.
 4. Exercise create, edit, delete, offline, reconnect, and concurrent-edit paths
    on at least two devices using the same development iCloud account.
@@ -123,15 +125,30 @@ startup behavior.
    correction is intentional.
 6. Deploy the schema to production only as a deliberate release operation.
 
-The Develop-only argument temporarily hands the default store to
+The Develop-and-macOS-only argument temporarily hands the Development app's
+default store to
 `NSPersistentCloudKitContainer`, asks it to initialize the development schema,
 unloads that store, and then lets the ordinary SwiftData container open it.
 The initializer lives with the rest of the store implementation in
-`KitchenMemoryPersistence/Cloud`. Debug, Testing, ProductionTesting, and
-Production builds do not contain this switch.
+`KitchenMemoryPersistence/Cloud`. iOS, Debug, Testing, ProductionTesting, and
+Production builds do not contain this switch. Ordinary Development and
+Production launches still create their initial local Kitchen without schema
+administration; the one-shot operation publishes server schema, not user data.
 
 Production schema deployment is one-way in practical terms. It must never be a
 routine build step, CI action, or automatic launch task.
+
+Development and Production intentionally use different CloudKit containers as
+well as different app identifiers. Before a release schema is promoted, its
+additive definition must be initialized and reviewed in the production
+container's Development environment, then deliberately deployed to that
+container's Production environment. The ordinary Development app never receives
+the production container entitlement.
+
+No current shared scheme performs that production-container administration.
+Adding one is release-engineering work: it must use an explicitly reviewed,
+Mac-only configuration and must not turn schema initialization or deployment
+into an ordinary build, archive, or application-launch side effect.
 
 ## 1.0 validation boundary
 
