@@ -20,25 +20,6 @@ final class KitchenMemorySchemaSynchronizationTests: XCTestCase {
     XCTAssertNil(configuration.cloudKitContainerIdentifier)
   }
 
-  func testDisposableConfigurationsUseUniqueStoreIdentities() throws {
-    let schema = Schema(versionedSchema: KitchenMemorySchemaV1.self)
-    let first = try KitchenMemorySchema.makeConfiguration(
-      schema: schema,
-      inMemory: true,
-      storeURL: nil,
-      synchronization: .localOnly
-    )
-    let second = try KitchenMemorySchema.makeConfiguration(
-      schema: schema,
-      inMemory: true,
-      storeURL: nil,
-      synchronization: .localOnly
-    )
-
-    XCTAssertTrue(first.name.hasPrefix("KitchenMemory-"))
-    XCTAssertNotEqual(first.name, second.name)
-  }
-
   func testPersonalCloudConfigurationUsesTheNamedPrivateContainer() throws {
     let configuration = try KitchenMemorySchema.makeConfiguration(
       schema: Schema(versionedSchema: KitchenMemorySchemaV1.self),

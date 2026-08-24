@@ -152,12 +152,12 @@ the testing exception does not alter a shipped application.
 
 Application-hosted XCTest processes also select an in-memory store in those two
 testing configurations through the committed test plans' `--unit-testing`
-launch argument. Every disposable SwiftData container also receives a unique
-configuration name. That avoids deliberately reusing one process-global store
-identity across test containers and directly addresses a SwiftData
-test-isolation failure acknowledged by Apple as FB22755700. Ordinary development
-and production launches retain the stable `KitchenMemory` configuration name
-and continue to use durable storage.
+launch argument. `RecipeLibraryModel` also declares an explicit empty
+deinitializer to avoid a Swift 6.2 runtime defect that can double-free task-local
+state while destroying an actor-isolated class on macOS 26.2. Swift tracks the
+matching defect as [swiftlang/swift#88036](https://github.com/swiftlang/swift/issues/88036);
+the workaround can retire after affected OS versions are no longer supported.
+Ordinary development and production launches continue to use durable storage.
 
 The localization contract test reads an exact JSON copy of the raw String
 Catalog from its test bundle. A declared test-target build phase embeds that
