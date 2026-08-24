@@ -141,6 +141,28 @@ final class KitchenMemoryTests: XCTestCase {
     ))
   }
 
+  func testHostedUnitTestsUseDisposableStorageOnlyInTestingBuilds() {
+    let hostedTestEnvironment = [
+      "XCTestConfigurationFilePath": "/tmp/KitchenMemory.xctestconfiguration",
+    ]
+
+    XCTAssertTrue(AppRuntimeConfiguration.usesInMemoryStore(
+      arguments: ["KitchenMemory"],
+      environment: hostedTestEnvironment,
+      buildEnvironment: .testing
+    ))
+    XCTAssertTrue(AppRuntimeConfiguration.usesInMemoryStore(
+      arguments: ["KitchenMemory"],
+      environment: hostedTestEnvironment,
+      buildEnvironment: .productionTesting
+    ))
+    XCTAssertFalse(AppRuntimeConfiguration.usesInMemoryStore(
+      arguments: ["KitchenMemory"],
+      environment: hostedTestEnvironment,
+      buildEnvironment: .production
+    ))
+  }
+
   func testHostedUnitTestsDisablePersonalCloudInCloudEnabledBuilds() {
     XCTAssertFalse(AppRuntimeConfiguration.synchronizesWithPersonalCloud(
       environment: ["XCTestConfigurationFilePath": "/tmp/KitchenMemory.xctestconfiguration"],
