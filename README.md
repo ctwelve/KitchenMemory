@@ -49,6 +49,7 @@ pantry inventory, meal planning, shopping, and household sharing follow later.
 - [Product doctrine](Documentation.docc/Articles/product-doctrine.md) — consolidated product direction
 - [0.1 roadmap](Documentation.docc/Articles/alpha-roadmap.md) — completed feature slices and release boundary
 - [0.1 release engineering](Documentation.docc/Articles/release-engineering.md) — hardening and release gates
+- [0.1 release evidence](Documentation.docc/Articles/release-evidence-0.1.md) — candidate results, acceptance matrix, and blockers
 - [Privacy engineering](Documentation.docc/Articles/privacy.md) — release and implementation boundaries
 - [Naming and voice](Documentation.docc/Articles/naming.md)
 - [Product brief](Documentation.docc/Articles/product-brief.md)

@@ -21,6 +21,10 @@ branch is merged. Focused fixes should remain small and reviewable; this pass is
 not permission to redesign settled domain boundaries or quietly add deferred
 features.
 
+Record candidate-specific results in <doc:release-evidence-0.1>. A plan states
+what must be proven; the evidence ledger identifies the exact source state,
+environment, result, and non-private record that earned each release claim.
+
 ## Release candidate
 
 The candidate is the personal, local-first 0.1 application for iPhone, iPad,

@@ -29,6 +29,7 @@ presentation architecture.
 - <doc:naming>
 - <doc:alpha-roadmap>
 - <doc:release-engineering>
+- <doc:release-evidence-0.1>
 - <doc:privacy>
 - <doc:open-questions>
 
