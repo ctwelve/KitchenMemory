@@ -70,12 +70,13 @@ final class LocalizationCatalogTests: XCTestCase {
   }
 
   private func loadCatalog() throws -> [String: Any] {
-    let repositoryRoot = URL(fileURLWithPath: #filePath)
-      .deletingLastPathComponent()
-      .deletingLastPathComponent()
-    let catalogURL = repositoryRoot
-      .appendingPathComponent("KitchenMemory")
-      .appendingPathComponent("Localizable.xcstrings")
+    let catalogURL = try XCTUnwrap(
+      Bundle(for: Self.self).url(
+        forResource: "LocalizationCatalog",
+        withExtension: "json"
+      ),
+      "The raw String Catalog contract was not embedded in the test bundle."
+    )
     let data = try Data(contentsOf: catalogURL)
     return try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
   }

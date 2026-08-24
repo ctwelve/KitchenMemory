@@ -59,7 +59,9 @@ outside this interface-copy abstraction.
 semantic and manually managed; translator comments and all three locales are
 required; every value must be reviewed and nonempty; plural structures must
 match; and formatted values must use named placeholders with identical
-signatures in every locale.
+signatures in every locale. The test target embeds an exact JSON copy of the raw
+catalog at build time so this source-level contract remains available when CI
+builds and runs tests on separate hosts.
 
 This boundary is now enforced. The former English-oriented `renderedText`,
 `structuredDisplayText`, and `effectiveDisplayText` domain helpers are gone.

@@ -143,6 +143,19 @@ relevant interface is stable. See
 <doc:accessibility-engineering>. Localization ownership and its non-UI testing
 boundary are described in <doc:localization-architecture>.
 
+The `Testing` and `ProductionTesting` configurations deliberately use a minimal
+macOS entitlement file. Their application-hosted tests do not enable personal
+CloudKit synchronization, and Xcode Cloud's macOS test runner cannot launch a
+host application carrying restricted iCloud and push-notification entitlements.
+Development and production configurations retain the complete entitlement set;
+the testing exception does not alter a shipped application.
+
+The localization contract test reads an exact JSON copy of the raw String
+Catalog from its test bundle. A declared test-target build phase embeds that
+copy while the source checkout is available. This is necessary because Xcode
+Cloud may execute `test-without-building` on a different host that receives the
+test products but not the original repository path recorded by `#filePath`.
+
 The committed non-UI test plan collects code coverage. Evaluate the durable domain,
 import, persistence, and product-logic sources separately from SwiftUI
 views and test bundles; an app-wide percentage is not the business-logic metric.
