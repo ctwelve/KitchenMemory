@@ -10,10 +10,18 @@ SPDX-License-Identifier: GPL-3.0-only
 - Candidate version: 0.1.0
 - Evidence opened: 2026-08-24
 
-This ledger records the evidence required to call Kitchen Memory 0.1 a release
-baseline. The release gates and exit criteria are defined in
-<doc:release-engineering>; this article records what was actually exercised,
-where it ran, and which source state earned the result.
+This ledger is a practice run of disciplined acceptance for an early alpha. It
+records enough evidence to exercise the release process and expose weak gates;
+it does not claim that 0.1 has met every criterion expected of a public 1.0.
+The release gates and exit criteria are defined in <doc:release-engineering>;
+this article records what was actually exercised, where it ran, and which
+source state earned the result.
+
+An alpha may deliberately use a smaller representative exercise or defer a
+gate whose cost is disproportionate to what the candidate can establish. Mark
+that decision explicitly rather than silently treating the gate as passed.
+The twenty-recipe corpus and human review of every translated locale are 1.0
+gates, not 0.1 blockers.
 
 Evidence applies only to the identified commit and environment. A later change
 invalidates every result whose behavior or artifact it can affect. Use the
@@ -70,18 +78,27 @@ numbers, UDIDs, Apple IDs, or other account identifiers.
 | Apple-silicon Mac | Clean, outside Xcode | macOS 26.6.2 | Unassigned | Not run | Current development Mac; clean artifact installation remains unproven |
 | iPhone or iPad | Update over an older candidate | Unassigned | Unassigned | Deferred | Required after beta distribution exists |
 
-## Recipe acceptance corpus
+## Recipe acceptance
+
+For 0.1, exercise the bundled example recipes plus a small number of varied,
+non-private additions. The walkthrough should include manual entry or editing,
+an ordinary import, a deliberately imperfect import, relaunch, revision,
+scaling, reading, and source review. Record the exact small set used, but do not
+inflate its size into a broad corpus claim.
+
+The following twenty-recipe corpus is retained as a 1.0 gate and is deferred
+for this alpha candidate.
 
 Exercise twenty recipes without committing their private contents. Each group
 contains four corpus entries; label them `C01` through `C20` in execution notes.
 
 | IDs | Required shape | Result | Evidence note |
 | --- | --- | --- | --- |
-| C01–C04 | Manual entry: sparse, incomplete, multi-section, and metadata-rich | Not run | — |
-| C05–C08 | Straightforward Schema.org imports from varied publishers | Not run | — |
-| C09–C12 | Partial, nested, multi-candidate, or otherwise messy imports | Not run | — |
-| C13–C16 | Exact, ranged, approximate, written, and intentionally unscalable quantities | Not run | — |
-| C17–C20 | Long-form and authored-language examples across the release locales | Not run | — |
+| C01–C04 | Manual entry: sparse, incomplete, multi-section, and metadata-rich | Deferred | Required for 1.0 acceptance |
+| C05–C08 | Straightforward Schema.org imports from varied publishers | Deferred | Required for 1.0 acceptance |
+| C09–C12 | Partial, nested, multi-candidate, or otherwise messy imports | Deferred | Required for 1.0 acceptance |
+| C13–C16 | Exact, ranged, approximate, written, and intentionally unscalable quantities | Deferred | Required for 1.0 acceptance |
+| C17–C20 | Long-form and authored-language examples across the release locales | Deferred | Required for 1.0 acceptance |
 
 For every entry, exercise the applicable path through import or entry, review,
 save, relaunch, revision, scaling, reading, and source review. Record a concise
@@ -112,7 +129,8 @@ resulting library graph and stable identities on both devices.
 
 | Surface | Required review | Result | Evidence note |
 | --- | --- | --- | --- |
-| `en-US`, `fr-CA`, and `es-MX` | Catalog, plurals, authored samples, and representative long text | Not run | Native-language review may be completed by separate reviewers |
+| `en-US`, `fr-CA`, and `es-MX` alpha check | Automated catalog contract plus developer review of representative layouts and fallback behavior | Not run | Human review is not claimed for 0.1 |
+| `fr-CA` and `es-MX` human review | Native-language review of meaning, tone, plurals, and authored samples | Deferred | Required before 1.0 acceptance |
 | Durable application shell | VoiceOver, keyboard/focus, Dynamic Type where applicable | Not run | — |
 | Settings and privacy display | Clear state, recovery language, privacy accuracy | Not run | — |
 | Import and review | Error identification, source preservation, accessible controls | Not run | — |
@@ -147,12 +165,17 @@ but any barrier that prevents ordinary 0.1 use is release blocking.
 
 ## Execution order
 
-1. Assign the supported-device matrix and run clean-install checks.
-2. Exercise the recipe corpus locally before introducing synchronization.
-3. Run the two-device synchronization and recovery matrix.
+1. Assign the available supported devices and run representative clean-install
+   checks, beginning with a direct installation on physical iPhone hardware.
+2. Exercise the small 0.1 recipe set locally before introducing
+   synchronization; retain the twenty-recipe corpus for 1.0.
+3. Run the alpha-appropriate subset of the two-device synchronization and
+   recovery matrix, recording every omitted scenario as deferred rather than
+   passed.
 4. Correct release-blocking defects with regression coverage and re-establish
    affected automated evidence.
-5. Complete localization, accessibility, privacy, and diagnostic review.
+5. Complete the 0.1 developer localization, accessibility, privacy, and
+   diagnostic review; retain native-language review for 1.0.
 6. Review and promote the production CloudKit schema.
 7. Create the immutable release tag, inspect the archives, and verify the
    notarized Mac artifact outside Xcode.
