@@ -10,6 +10,38 @@ import XCTest
 
 @MainActor
 final class KitchenMemoryTests: XCTestCase {
+  private final class DescriptionRecorder: @unchecked Sendable {
+    var wasRead = false
+  }
+
+  private struct PrivateStartupFailure: Error, CustomStringConvertible {
+    let recorder: DescriptionRecorder
+
+    var description: String {
+      recorder.wasRead = true
+      return "private startup details"
+    }
+  }
+
+  func testStartupPreparationMakesFailureRetryableWithoutReadingPrivateDetails() throws {
+    let recorder = DescriptionRecorder()
+    var shouldFail = true
+    let prepare: () -> AppStartupState = {
+      AppStartupState.prepare {
+        if shouldFail { throw PrivateStartupFailure(recorder: recorder) }
+        return try AppDependencies(inMemory: true)
+      }
+    }
+
+    XCTAssertNil(prepare().dependencies)
+    XCTAssertFalse(recorder.wasRead)
+
+    shouldFail = false
+    let recovered = try XCTUnwrap(prepare().dependencies)
+    recovered.libraryModel.loadIfNeeded()
+    XCTAssertEqual(recovered.libraryModel.recipes.count, 2)
+  }
+
   func testStarterRecipeLoadsThroughAppComposition() throws {
     let dependencies = try AppDependencies(inMemory: true)
 
@@ -137,6 +169,31 @@ final class KitchenMemoryTests: XCTestCase {
     ))
     XCTAssertFalse(AppRuntimeConfiguration.usesInMemoryStore(
       arguments: ["KitchenMemory", "--ui-testing"],
+      buildEnvironment: .production
+    ))
+  }
+
+  func testStartupFailureSimulationIsConfinedToTestHarnessBuilds() {
+    let arguments = ["KitchenMemory", "--simulate-startup-failure"]
+
+    XCTAssertTrue(AppRuntimeConfiguration.simulatesStartupFailure(
+      arguments: arguments,
+      buildEnvironment: .testing
+    ))
+    XCTAssertTrue(AppRuntimeConfiguration.simulatesStartupFailure(
+      arguments: arguments,
+      buildEnvironment: .productionTesting
+    ))
+    XCTAssertFalse(AppRuntimeConfiguration.simulatesStartupFailure(
+      arguments: arguments,
+      buildEnvironment: .debug
+    ))
+    XCTAssertFalse(AppRuntimeConfiguration.simulatesStartupFailure(
+      arguments: arguments,
+      buildEnvironment: .develop
+    ))
+    XCTAssertFalse(AppRuntimeConfiguration.simulatesStartupFailure(
+      arguments: arguments,
       buildEnvironment: .production
     ))
   }

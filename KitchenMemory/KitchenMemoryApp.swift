@@ -10,10 +10,67 @@ import SwiftUI
 
 @main
 struct KitchenMemoryApp: App {
-  private let dependencies: AppDependencies
+  @State private var startupState: AppStartupState
 
   init() {
-    do {
+    _startupState = State(initialValue: Self.prepareDependencies())
+  }
+
+  var body: some Scene {
+#if os(macOS)
+    WindowGroup {
+      applicationContent
+    }
+    .commands {
+      KitchenCommands()
+    }
+
+    Settings {
+      settingsContent
+    }
+#else
+    WindowGroup {
+      applicationContent
+    }
+#endif
+  }
+
+  @ViewBuilder
+  private var applicationContent: some View {
+    switch startupState {
+    case .ready(let dependencies):
+      ContentView(model: dependencies.libraryModel)
+    case .unavailable:
+      KitchenUnavailableView(retry: retryPreparation)
+    }
+  }
+
+#if os(macOS)
+  @ViewBuilder
+  private var settingsContent: some View {
+    switch startupState {
+    case .ready(let dependencies):
+      NavigationStack {
+        KitchenSettingsView(model: dependencies.libraryModel)
+      }
+    case .unavailable:
+      KitchenUnavailableView(retry: retryPreparation)
+    }
+  }
+#endif
+
+  private func retryPreparation() {
+    startupState = Self.prepareDependencies()
+  }
+
+  private static func prepareDependencies() -> AppStartupState {
+    if AppRuntimeConfiguration.simulatesStartupFailure(
+      arguments: ProcessInfo.processInfo.arguments
+    ) {
+      return .unavailable
+    }
+
+    return AppStartupState.prepare {
 #if DEVELOP
       if AppRuntimeConfiguration.initializesCloudKitSchema(
         arguments: ProcessInfo.processInfo.arguments
@@ -21,7 +78,7 @@ struct KitchenMemoryApp: App {
         try CloudKitDevelopmentSchemaInitializer.initialize()
       }
 #endif
-      dependencies = try AppDependencies(
+      return try AppDependencies(
         inMemory: AppRuntimeConfiguration.usesInMemoryStore(
           arguments: ProcessInfo.processInfo.arguments
         ),
@@ -29,30 +86,28 @@ struct KitchenMemoryApp: App {
           environment: ProcessInfo.processInfo.environment
         )
       )
+    }
+  }
+}
+
+enum AppStartupState {
+  case ready(AppDependencies)
+  case unavailable
+
+  static func prepare(using makeDependencies: () throws -> AppDependencies) -> Self {
+    do {
+      return .ready(try makeDependencies())
     } catch {
-      fatalError("Could not prepare Kitchen Memory: \(error)")
+      // Persistence and CloudKit errors can contain local paths or framework
+      // identifiers. The 0.1 app has no private diagnostic collection path, so
+      // do not interpolate or retain the underlying error merely for logging.
+      return .unavailable
     }
   }
 
-  var body: some Scene {
-#if os(macOS)
-    WindowGroup {
-      ContentView(model: dependencies.libraryModel)
-    }
-    .commands {
-      KitchenCommands()
-    }
-
-    Settings {
-      NavigationStack {
-        KitchenSettingsView(model: dependencies.libraryModel)
-      }
-    }
-#else
-    WindowGroup {
-      ContentView(model: dependencies.libraryModel)
-    }
-#endif
+  var dependencies: AppDependencies? {
+    guard case .ready(let dependencies) = self else { return nil }
+    return dependencies
   }
 }
 
@@ -103,6 +158,18 @@ enum AppRuntimeConfiguration {
   ) -> Bool {
     buildEnvironment.permitsUITestHarness
       && (arguments.contains("--ui-testing") || arguments.contains("--unit-testing"))
+  }
+
+  /// Whether UI automation should present the privacy-safe startup failure.
+  ///
+  /// This is process input, so it is ignored by every distributable build
+  /// configuration even if somebody launches the app with the same argument.
+  static func simulatesStartupFailure(
+    arguments: [String],
+    buildEnvironment: AppBuildEnvironment = .current
+  ) -> Bool {
+    buildEnvironment.permitsUITestHarness
+      && arguments.contains("--simulate-startup-failure")
   }
 
   /// Whether the host process should attach its durable store to CloudKit.

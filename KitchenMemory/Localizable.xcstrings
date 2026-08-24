@@ -385,6 +385,54 @@
       "comment" : "Instruction shown in the detail area when no recipe is selected.",
       "extractionState" : "manual"
     },
+    "startup.unavailable.title" : {
+      "localizations" : {
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo abrir Kitchen Memory"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible d’ouvrir Kitchen Memory"
+          }
+        },
+        "en-US" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kitchen Memory Couldn’t Open"
+          }
+        }
+      },
+      "comment" : "Title shown when the application cannot prepare the recipe library during startup.",
+      "extractionState" : "manual"
+    },
+    "startup.unavailable.message" : {
+      "localizations" : {
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo preparar tu recetario. Intenta de nuevo. Si el problema continúa, cierra y vuelve a abrir la app."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre bibliothèque de recettes n’a pas pu être préparée. Réessayez. Si le problème persiste, quittez l’app, puis rouvrez-la."
+          }
+        },
+        "en-US" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your recipe library couldn’t be prepared. Try again. If the problem continues, quit and reopen the app."
+          }
+        }
+      },
+      "comment" : "Privacy-safe startup recovery guidance shown without exposing the underlying persistence or iCloud error.",
+      "extractionState" : "manual"
+    },
     "startup.loading" : {
       "localizations" : {
         "es-MX" : {
