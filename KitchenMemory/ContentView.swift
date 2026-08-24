@@ -43,7 +43,7 @@ struct ContentView: View {
       recipeList
         .navigationTitle(.libraryTitle)
 #if os(macOS)
-        .navigationSplitViewColumnWidth(min: 240, ideal: 300)
+        .navigationSplitViewColumnWidth(min: 280, ideal: 320)
 #endif
         // NavigationSplitView installs this item on its sidebar column, so
         // removal must be scoped to the same view rather than the split root.
