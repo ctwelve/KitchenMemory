@@ -23,8 +23,7 @@ struct KitchenMemoryApp: App {
 #endif
       dependencies = try AppDependencies(
         inMemory: AppRuntimeConfiguration.usesInMemoryStore(
-          arguments: ProcessInfo.processInfo.arguments,
-          environment: ProcessInfo.processInfo.environment
+          arguments: ProcessInfo.processInfo.arguments
         ),
         synchronizesWithPersonalCloud: AppRuntimeConfiguration.synchronizesWithPersonalCloud(
           environment: ProcessInfo.processInfo.environment
@@ -94,18 +93,16 @@ enum AppBuildEnvironment: CaseIterable {
 enum AppRuntimeConfiguration {
   /// Whether this process may replace durable storage with an in-memory store.
   ///
-  /// Automated test hosts need deterministic disposable state. UI-test launch
-  /// arguments are also ordinary process input on macOS, so both that switch
-  /// and XCTest process detection remain confined to the Testing and
-  /// non-distributable ProductionTesting configurations.
+  /// Automated test hosts need deterministic disposable state. Test-plan and
+  /// UI-test launch arguments are also ordinary process input on macOS, so
+  /// both switches remain confined to the Testing and non-distributable
+  /// ProductionTesting configurations.
   static func usesInMemoryStore(
     arguments: [String],
-    environment: [String: String] = [:],
     buildEnvironment: AppBuildEnvironment = .current
   ) -> Bool {
     buildEnvironment.permitsUITestHarness
-      && (arguments.contains("--ui-testing")
-        || environment["XCTestConfigurationFilePath"] != nil)
+      && (arguments.contains("--ui-testing") || arguments.contains("--unit-testing"))
   }
 
   /// Whether the host process should attach its durable store to CloudKit.

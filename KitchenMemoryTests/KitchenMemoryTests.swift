@@ -142,25 +142,22 @@ final class KitchenMemoryTests: XCTestCase {
   }
 
   func testHostedUnitTestsUseDisposableStorageOnlyInTestingBuilds() {
-    let hostedTestEnvironment = [
-      "XCTestConfigurationFilePath": "/tmp/KitchenMemory.xctestconfiguration",
-    ]
-
     XCTAssertTrue(AppRuntimeConfiguration.usesInMemoryStore(
-      arguments: ["KitchenMemory"],
-      environment: hostedTestEnvironment,
+      arguments: ["KitchenMemory", "--unit-testing"],
       buildEnvironment: .testing
     ))
     XCTAssertTrue(AppRuntimeConfiguration.usesInMemoryStore(
-      arguments: ["KitchenMemory"],
-      environment: hostedTestEnvironment,
+      arguments: ["KitchenMemory", "--unit-testing"],
       buildEnvironment: .productionTesting
     ))
     XCTAssertFalse(AppRuntimeConfiguration.usesInMemoryStore(
-      arguments: ["KitchenMemory"],
-      environment: hostedTestEnvironment,
+      arguments: ["KitchenMemory", "--unit-testing"],
       buildEnvironment: .production
     ))
+  }
+
+  func testCommittedTestPlanRequestsDisposableHostedStorage() {
+    XCTAssertTrue(ProcessInfo.processInfo.arguments.contains("--unit-testing"))
   }
 
   func testHostedUnitTestsDisablePersonalCloudInCloudEnabledBuilds() {

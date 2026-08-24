@@ -151,10 +151,11 @@ Development and production configurations retain the complete entitlement set;
 the testing exception does not alter a shipped application.
 
 Application-hosted XCTest processes also select an in-memory store in those two
-testing configurations. Xcode Cloud may launch several macOS test workers at
-once; giving each host disposable storage prevents otherwise independent
-workers from contending for the application's durable SwiftData store. Ordinary
-development and production launches continue to use durable storage.
+testing configurations through the committed test plans' `--unit-testing`
+launch argument. Xcode Cloud may launch several macOS test workers at once;
+giving each host disposable storage prevents otherwise independent workers from
+contending for the application's durable SwiftData store. Ordinary development
+and production launches continue to use durable storage.
 
 The localization contract test reads an exact JSON copy of the raw String
 Catalog from its test bundle. A declared test-target build phase embeds that
