@@ -51,8 +51,8 @@ non-private data derived to reproduce the behavior. See <doc:privacy>.
 | Localization-catalog contract | `b5937b6` | Passed | Focused local test passed 1/1 on macOS 26.6.2 with Xcode 26.6, 2026-08-24 |
 | Archive-tag version simulation | `b5937b6` | Passed | The `release/0.1.0` tag-to-marketing-version contract validated across five application configurations, 2026-08-24; no artifact or Cloud-assigned build number exists yet |
 | Local ProductionValidation non-UI suite | `d90fb85` | Passed | 252/252 tests on macOS 26.6.2 with Xcode 26.6, 2026-08-24; includes domain, import, persistence, app composition, privacy-manifest, and localization-catalog contracts |
-| Signed local macOS UI smoke suite | `d90fb85` | Passed | 10/10 tests on macOS 26.6.2 with Xcode 26.6, 2026-08-24; includes privacy-safe startup recovery, supported locales, localization stress modes, settings/privacy, recipe navigation, and sidebar behavior |
-| Unsigned Production bundle preflight | `d90fb85` | Passed | Fresh macOS and generic iOS builds succeeded on 2026-08-24; both report version 0.1.0, source build-number seed 1, and minimum OS 26.0; privacy manifest matched source byte-for-byte and all three locale bundles were present |
+| Signed local macOS UI smoke suite | `a02694a` | Passed | 10/10 tests on macOS 26.6.2 with Xcode 26.6, 2026-08-24; includes privacy-safe startup recovery, supported locales, localization stress modes, settings/privacy, recipe navigation, and the 280/320-point sidebar behavior |
+| Unsigned Production bundle preflight | `a02694a` | Passed | Fresh macOS and generic iOS builds succeeded on 2026-08-24; both report version 0.1.0, source build-number seed 1, and minimum OS 26.0; privacy manifest matched source byte-for-byte and all three locale bundles were present |
 
 These rows establish the release-engineering infrastructure baseline. They do
 not replace installation, synchronization, localization, accessibility, archive,
