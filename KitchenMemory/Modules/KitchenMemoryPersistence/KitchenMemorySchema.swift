@@ -73,8 +73,11 @@ public enum KitchenMemorySchema {
         cloudKitDatabase: cloudKitDatabase
       )
     }
+    let configurationName = inMemory
+      ? "KitchenMemory-\(UUID().uuidString)"
+      : "KitchenMemory"
     return ModelConfiguration(
-      "KitchenMemory",
+      configurationName,
       schema: schema,
       isStoredInMemoryOnly: inMemory,
       cloudKitDatabase: cloudKitDatabase

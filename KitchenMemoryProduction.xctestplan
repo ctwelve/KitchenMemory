@@ -18,7 +18,7 @@
   },
   "testTargets" : [
     {
-      "parallelizable" : false,
+      "parallelizable" : true,
       "target" : {
         "containerPath" : "container:KitchenMemory.xcodeproj",
         "identifier" : "A1C4E7AC302A63B900E2C0DB",

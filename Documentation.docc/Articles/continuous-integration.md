@@ -152,17 +152,12 @@ the testing exception does not alter a shipped application.
 
 Application-hosted XCTest processes also select an in-memory store in those two
 testing configurations through the committed test plans' `--unit-testing`
-launch argument. The application-hosted unit-test target is deliberately not
-parallelizable: Xcode Cloud's macOS 26.2 runners have repeatedly aborted a
-subset of storage-composition workers while the same tests pass locally with
-eight workers. Serializing the host preserves every assertion without
-making concurrent hosted-app launch behavior part of the unit-test contract.
-Ordinary development and production launches continue to use durable storage.
-
-If test duration later warrants parallel execution, first move the durable
-domain, logic, and persistence suites into an unhosted test target. Keep the
-small application-composition suite hosted and serialized; do not make every
-unit test pay for a full application process merely to recover runner speed.
+launch argument. Every disposable SwiftData container also receives a unique
+configuration name. That avoids deliberately reusing one process-global store
+identity across test containers and directly addresses a SwiftData
+test-isolation failure acknowledged by Apple as FB22755700. Ordinary development
+and production launches retain the stable `KitchenMemory` configuration name
+and continue to use durable storage.
 
 The localization contract test reads an exact JSON copy of the raw String
 Catalog from its test bundle. A declared test-target build phase embeds that
