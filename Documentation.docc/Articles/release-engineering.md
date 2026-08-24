@@ -68,17 +68,28 @@ fix, test, diagnostic, or documentation change; it should not expand this loop.
 
 ### Production builds and distribution
 
-- Run the `KitchenMemory Production` Test, Analyze, and Archive actions for iOS
-  and macOS with normal signing, production entitlements, and the production
-  CloudKit environment.
+- Require the development and pull-request Test and Analyze gates to pass for
+  the final candidate. Then allow the intentional iOS and macOS production Build
+  actions to pass on the resulting `main` commit.
+- Run the iOS and macOS Archive actions from the reviewed release tag with normal
+  signing, production entitlements, and the production CloudKit environment.
 - Confirm version and build numbering, archive contents, privacy declarations,
   credits, license resources, localized metadata, and icon/launch assets.
-- Establish and document the chosen beta-distribution path for each platform,
+- TestFlight distribution is not configured yet. The release archives are
+  prepared for App Store Connect, but no post-action sends them to a tester
+  group. Establish and document the beta-distribution path before beta testing,
   including installation on clean devices and update installation over an older
   candidate.
-- Create a tag beginning with `release-` only for a reviewed commit already on
-  `main`. That tag starts the configured notarization workflow; release tags are
-  immutable evidence and must never be moved to a different commit or reused.
+- Set the project's marketing version, commit it, and allow the reviewed commit
+  to pass the required `main` actions before creating a matching tag such as
+  `release/0.1.0`. The tag starts the configured archive and notarization
+  workflow; release tags are immutable evidence and must never be moved to a
+  different commit or reused. Keep the source build number at `1`; Xcode Cloud
+  owns the distributed build sequence.
+- Before public distribution, configure GitHub rulesets to require the selected
+  Xcode Cloud merge checks on `main` and to restrict creation, update, and
+  deletion of `release/*` tags. Xcode Cloud validates a release after it starts;
+  GitHub must enforce which commit may be tagged and keep that tag immutable.
 - Verify the notarized Mac artifact installs and launches outside Xcode before
   treating the workflow result as release evidence.
 - Record the production-schema promotion, archive, and submission steps so they
@@ -110,7 +121,9 @@ fix, test, diagnostic, or documentation change; it should not expand this loop.
 
 The first release-engineering pass is complete when:
 
-- all required production CI actions pass from the final `main` candidate;
+- all required development and pull-request Test and Analyze gates pass for the
+  final candidate, the configured production Build actions pass on `main`, and
+  all Archive actions pass from its immutable release tag;
 - signed archives and the notarized Mac artifact install and launch on the
   supported device classes;
 - the acceptance corpus preserves meaningful recipe content across relaunch and

@@ -35,25 +35,48 @@ logic test or coverage check is a product defect.
 
 ### Main production
 
-The production workflow starts for meaningful project changes merged or pushed
-to `main`. It uses `KitchenMemory Production` and requires UI-smoke Test,
-Analyze, and Archive on iOS and macOS to pass. The Test action uses the
-release-optimized, non-distributable `ProductionTesting` configuration; Analyze
-and Archive use `Production`. Each Archive action therefore already builds the
-distribution product, so a separate Build action would duplicate that work.
+The `Merge to main` workflow starts for selected project changes merged or
+pushed to `main`. It currently contains an iOS Build action for Any iOS Device
+and a macOS Build action for Any Mac, both using `KitchenMemory Production`. It
+does not contain Test, Analyze, Archive, or post-actions. Signed distribution
+archives therefore remain an explicit release-tag operation.
 
-Repeating the tests on `main` verifies the actual merge result, including its
-interaction with changes that landed after a slice branch began. Running Analyze
-and Archive across every supported platform deliberately pays the full production
-confidence cost on `main`; the slice workflow remains the lighter development
-feedback loop.
+This division is intentional. Test and Analyze are handled by the development
+and pull-request workflows under their respective gates; `Merge to main`
+verifies that the actual merge result still compiles as a production build on
+both platforms without repeating those actions. It is production-build
+evidence, not distribution evidence.
 
 ### Release tags and notarization
 
-The notarization workflow is attached to `main` and starts when a tag name begins
-with `release-`. A release tag must point to a reviewed commit already present on
-`main` whose required production actions have passed. Creating the tag is a
-release operation, not an exploratory build shortcut.
+The enabled, restricted-editing `Tag to release/` workflow starts only when a
+custom tag name begins with `release/`. A tag must have the exact form
+`release/<major>.<minor>.<patch>` and point to a reviewed commit already present
+on `main` whose required production evidence has passed. The trigger accepts any
+file change and does not auto-cancel an older release build.
+
+The workflow runs an iOS Archive action for Any iOS Device and a macOS Archive
+action for Any Mac, both using `KitchenMemory Production`. Both archives select
+App Store Connect distribution preparation. The `Notarize - macOS` post-action
+is attached specifically to the macOS archive. Creating the tag is a release
+operation, not an exploratory build shortcut.
+
+There is no TestFlight post-action or tester-group distribution configured.
+App Store Connect preparation makes an archive eligible for later distribution;
+it does not by itself publish the build to TestFlight testers. Add that separate
+post-action only when the beta path and its groups are ready.
+
+The committed Xcode project remains the source of truth for
+`MARKETING_VERSION`, and its `CURRENT_PROJECT_VERSION` remains `1`. Xcode Cloud
+assigns and increments the distributed build number without a source edit. The
+post-clone contract is read-only: on a release tag, it requires the numeric tag
+suffix to match every application configuration's marketing version and confirms
+that every source build number is still `1`.
+
+Branch, pull-request, and `main` actions have no associated tag and skip this
+release-only check successfully. An Archive action without a release tag fails,
+as do malformed or mismatched release tags. CI never needs credentials that can
+write version changes back to `main`.
 
 Treat release tags as immutable evidence: never move, reuse, or recreate one for
 a different commit. Confirm that the version and build metadata match the tag,
@@ -62,12 +85,17 @@ workflow without an installation check is incomplete release evidence.
 
 ### Change filters
 
-Both workflows use file and folder conditions so source, project, dependency,
-test, asset, lint, and cloud-script changes run CI. Documentation-only and other
-non-product maintenance changes do not spend a full build allocation. Keep the
-filters conservative: configuration such as `.swiftlint.yml`, `Package.resolved`,
-the shared scheme and test plan, and `ci_scripts` can change build behavior even
-when no Swift source changed.
+The release-tag workflow accepts any file change because the tag itself is the
+deliberate release signal. The other workflows use an all-file exclusion rule:
+they do not start when every changed path is one of the root `README.md`,
+`LICENSE`, `COPYRIGHT`, `AI.md`, or `.gitignore` files. A commit that also
+changes any other path still starts the workflow. This corresponds to Xcode
+Cloud's `DO_NOT_START_IF_ALL_FILES_MATCH` rule mode.
+
+This denylist keeps product, project, dependency, test, asset, lint, tooling,
+and cloud-script changes covered without maintaining a fragile allowlist.
+Update it only for root-level files that cannot affect the product or CI
+contract.
 
 ### Pull-request gate
 
@@ -78,8 +106,27 @@ while tests in the development workflow remain advisory during ordinary work.
 Xcode Cloud reports the pull-request result to GitHub. To make the gate prevent
 rather than merely warn about a failed merge candidate, configure the resulting
 Xcode Cloud build or Test action as a required GitHub status check for `main`.
-The production workflow repeats required tests after merge to verify the actual
-result on `main`.
+The production workflow then verifies that the actual merge result still builds
+for both supported platforms.
+
+### GitHub enforcement boundary
+
+Xcode Cloud supplies build and action results but does not provide all of the
+repository controls required by the release policy. GitHub rulesets own that
+boundary. Before public distribution, configure them to:
+
+- require the selected Xcode Cloud Test and Analyze checks before merging to
+  `main`;
+- prevent force-pushes and deletion of `main`;
+- target tags matching `release/*`, restrict creation to the release operator,
+  and prevent tag updates and deletion; and
+- require the applicable successful Xcode Cloud status on the target commit
+  before a release tag can be created, once the stable check names are visible
+  in GitHub.
+
+Keep bypass access narrow and intentional. The Ruby release contract validates
+the tag and committed version inside Xcode Cloud; GitHub provides the missing
+controls over which commit may be tagged and whether the tag can later move.
 
 The UI target contains smoke tests only. Localization of durable copy and
 formatting proceeds independently, but comprehensive localized-layout assertions,
@@ -134,9 +181,9 @@ rewrite cannot silently change the meaning of an existing seed/case pair.
 
 Xcode Cloud workflow metadata and start conditions live in Xcode Cloud rather
 than in this repository. Keep its actions, requirements, branch patterns, tag
-prefixes, and change filters aligned with this policy. Add TestFlight as a
-distribution post-action when that beta path is ready; notarization is already
-driven by the `release-` tag prefix.
+prefixes, and change filters aligned with this policy. TestFlight distribution
+is intentionally absent for now; archives and notarization are driven only by
+the `release/` tag prefix.
 
 The first release-engineering pass uses the production workflow as release
 evidence rather than as a ceremonial final build. Its acceptance and
@@ -203,11 +250,25 @@ must be reviewed like source changes.
 
 ## Maintenance
 
-Xcode Cloud can update its Xcode and macOS environment. Treat a toolchain change
-as a deliberate migration: run the Testing and Production schemes locally with
-that Xcode version, review new analyzer and linter diagnostics, and then update
-the workflow.
+The workflows use a shared macOS alias mapped to macOS 26.2, the oldest current
+Tahoe release supported by the project. This provides a stable deployment
+environment while keeping the selected version centralized in Xcode Cloud.
 
-Custom scripts in `ci_scripts` run for every cloud action. Keep them short,
-deterministic, and limited to environment preparation so build, test, Analyze,
-and archive behavior remains visible in the shared schemes.
+Treat every environment or alias change as a deliberate migration: run the
+Testing and Production schemes locally with that Xcode version, review new
+analyzer and linter diagnostics, and then update all applicable workflows.
+
+Custom scripts in `ci_scripts` run for every cloud action. The post-clone script
+runs the dependency-free Ruby contract tests and the read-only release check on
+every action. Run the same checks locally with:
+
+```sh
+ruby Tools/Tests/check_release_version_test.rb
+ruby Tools/check-release-version.rb \
+  --tag release/0.1.0 \
+  --action archive
+```
+
+Keep cloud scripts short, deterministic, and limited to environment preparation
+so build, test, Analyze, and Archive behavior remains visible in the shared
+schemes.
