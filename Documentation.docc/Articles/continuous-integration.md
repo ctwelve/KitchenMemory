@@ -103,6 +103,20 @@ The pull-request workflow starts for meaningful project changes in pull requests
 from `slice/*` or `bugs/*` into `main`. Its Test action is required to pass,
 while tests in the development workflow remain advisory during ordinary work.
 
+The repository-owned `PR source policy` GitHub Actions check runs for every
+pull request into `main`, including source branches that Xcode Cloud deliberately
+does not accept. It succeeds only for `slice/*` and `bugs/*`; an ineligible
+branch receives an immediate naming failure instead of silently waiting for a
+Cloud workflow that cannot start. The workflow checks only pull-request metadata,
+does not check out or execute proposed source, and has read-only repository
+permission.
+
+GitHub applies required status checks to the protected target branch rather
+than conditionally interpreting the pull request's source name. Consequently,
+an ineligible pull request may still display the Xcode Cloud result as expected
+until it is renamed or closed. Do not weaken the required check's Xcode Cloud
+GitHub App binding or fabricate its status to hide that platform limitation.
+
 Xcode Cloud reports the pull-request result to GitHub. To make the gate prevent
 rather than merely warn about a failed merge candidate, `main` requires the
 aggregate `KitchenMemory | PR to main from slice/ or bugs/` result from the
@@ -114,12 +128,15 @@ merge result still builds for both supported platforms.
 Xcode Cloud supplies build and action results but does not provide all of the
 repository controls required by the release policy. GitHub owns that boundary.
 
-Classic branch protection on `main` requires a pull request, the strict aggregate
-Xcode Cloud pull-request result, and resolution of review conversations. It
-applies to administrators, blocks force-pushes and deletion, and deliberately
-allows merge commits. Zero approving reviews are required while the project has
-one release operator; the pull request remains the reviewable unit even when a
-second human approval is unavailable.
+Classic branch protection on `main` requires a pull request, the repository's
+`PR source policy` check, the strict aggregate Xcode Cloud pull-request result,
+and resolution of review conversations. The two required checks have distinct
+trusted sources: GitHub Actions owns branch eligibility, and the Xcode Cloud
+GitHub App owns build and test acceptance. Protection applies to administrators,
+blocks force-pushes and deletion, and deliberately allows merge commits. Zero
+approving reviews are required while the project has one release operator; the
+pull request remains the reviewable unit even when a second human approval is
+unavailable.
 
 Three active tag rulesets target `release/*`:
 
