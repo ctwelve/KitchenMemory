@@ -19,6 +19,23 @@ struct KitchenLoadingView: View {
   }
 }
 
+struct KitchenUnavailableView: View {
+  let retry: () -> Void
+
+  var body: some View {
+    ContentUnavailableView {
+      Label(.startupUnavailableTitle, systemImage: "exclamationmark.triangle")
+    } description: {
+      Text(.startupUnavailableMessage)
+    } actions: {
+      Button(.actionTryAgain, action: retry)
+        .accessibilityIdentifier("retry-startup")
+    }
+    .frame(maxWidth: .infinity, maxHeight: .infinity)
+    .background(Color("AppBackground"))
+  }
+}
+
 struct SampleRecipeDecisionView: View {
   let accept: () -> Void
   let decline: () -> Void

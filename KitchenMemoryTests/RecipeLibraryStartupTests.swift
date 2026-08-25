@@ -24,6 +24,27 @@ final class RecipeLibraryStartupTests: XCTestCase {
     }
   }
 
+  @MainActor
+  private final class FakeUbiquitousKeyValueStore: UbiquitousKeyValueStoring {
+    var values: [String: String] = [:]
+    var synchronizationCount = 0
+
+    var notificationObject: AnyObject { self }
+
+    func onboardingString(forKey key: String) -> String? {
+      values[key]
+    }
+
+    func setOnboardingString(_ value: String, forKey key: String) {
+      values[key] = value
+    }
+
+    func synchronizeOnboardingStore() -> Bool {
+      synchronizationCount += 1
+      return true
+    }
+  }
+
   func testUndecidedResponseShowsChoiceBeforeAnEmptyLibrary() throws {
     let preferences = VolatileSampleRecipeOnboardingStore()
     let dependencies = try AppDependencies(
@@ -53,6 +74,41 @@ final class RecipeLibraryStartupTests: XCTestCase {
 
     dependencies.libraryModel.loadIfNeeded()
     XCTAssertEqual(dependencies.libraryModel.startupState, .choosingSamples)
+  }
+
+  func testExistingKitchenSkipsAQuestionThatWasNeverAnsweredOnThisDevice() throws {
+    let preferences = VolatileSampleRecipeOnboardingStore()
+    let dependencies = try AppDependencies(
+      inMemory: true,
+      sampleOnboardingStore: preferences,
+      initialKitchenWasCreatedOverride: false
+    )
+
+    dependencies.libraryModel.loadIfNeeded()
+
+    XCTAssertEqual(dependencies.libraryModel.startupState, .ready)
+    XCTAssertEqual(dependencies.libraryModel.sampleOnboardingResponse, .undecided)
+    XCTAssertTrue(dependencies.libraryModel.recipes.isEmpty)
+  }
+
+  func testRemoteContentDismissesAnInapplicableQuestionWithoutInventingAnAnswer() throws {
+    let preferences = VolatileSampleRecipeOnboardingStore()
+    let dependencies = try AppDependencies(
+      inMemory: true,
+      sampleOnboardingStore: preferences,
+      initialKitchenWasCreatedOverride: true
+    )
+    dependencies.libraryModel.loadIfNeeded()
+    XCTAssertEqual(dependencies.libraryModel.startupState, .choosingSamples)
+
+    XCTAssertTrue(
+      dependencies.libraryModel.createRecipe(from: RecipeDraft(title: "Synced Recipe"))
+    )
+    dependencies.libraryModel.reloadAfterExternalStoreChange()
+
+    XCTAssertEqual(dependencies.libraryModel.startupState, .ready)
+    XCTAssertEqual(dependencies.libraryModel.sampleOnboardingResponse, .undecided)
+    XCTAssertEqual(preferences.response, .undecided)
   }
 
   func testDecliningPersistsTheChoiceAndRevealsTheEmptyLibrary() throws {
@@ -163,5 +219,92 @@ final class RecipeLibraryStartupTests: XCTestCase {
 
     store.response = .accepted
     XCTAssertEqual(store.response, .accepted)
+  }
+
+  func testUbiquitousStoreMirrorsExplicitAnswersAndReceivesICloudChanges() throws {
+    let suiteName = "RecipeLibraryStartupTests.iCloud.\(UUID().uuidString)"
+    let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
+    defer { defaults.removePersistentDomain(forName: suiteName) }
+    let cloudStore = FakeUbiquitousKeyValueStore()
+    let store = UbiquitousSampleRecipeOnboardingStore(
+      defaults: defaults,
+      ubiquitousStore: cloudStore,
+      notificationCenter: NotificationCenter()
+    )
+    var receivedResponses: [SampleRecipeOnboardingResponse] = []
+
+    store.startObservingChanges { receivedResponses.append($0) }
+    XCTAssertEqual(cloudStore.synchronizationCount, 1)
+
+    store.response = .declined
+    XCTAssertEqual(
+      cloudStore.values[UserDefaultsSampleRecipeOnboardingStore.key],
+      SampleRecipeOnboardingResponse.declined.rawValue
+    )
+    XCTAssertEqual(store.response, .declined)
+
+    cloudStore.values[UserDefaultsSampleRecipeOnboardingStore.key] =
+      SampleRecipeOnboardingResponse.accepted.rawValue
+    store.receiveExternalChange(
+      changedKeys: [UserDefaultsSampleRecipeOnboardingStore.key],
+      reason: NSUbiquitousKeyValueStoreServerChange
+    )
+
+    XCTAssertEqual(store.response, .accepted)
+    XCTAssertEqual(receivedResponses, [.accepted])
+    XCTAssertEqual(
+      defaults.string(forKey: UserDefaultsSampleRecipeOnboardingStore.key),
+      SampleRecipeOnboardingResponse.accepted.rawValue
+    )
+  }
+
+  func testUbiquitousStoreMigratesAnExistingLocalAnswerAfterSynchronization() throws {
+    let suiteName = "RecipeLibraryStartupTests.migration.\(UUID().uuidString)"
+    let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
+    defer { defaults.removePersistentDomain(forName: suiteName) }
+    defaults.set(
+      SampleRecipeOnboardingResponse.declined.rawValue,
+      forKey: UserDefaultsSampleRecipeOnboardingStore.key
+    )
+    let cloudStore = FakeUbiquitousKeyValueStore()
+    let store = UbiquitousSampleRecipeOnboardingStore(
+      defaults: defaults,
+      ubiquitousStore: cloudStore,
+      notificationCenter: NotificationCenter()
+    )
+
+    store.startObservingChanges { _ in }
+
+    XCTAssertEqual(
+      cloudStore.values[UserDefaultsSampleRecipeOnboardingStore.key],
+      SampleRecipeOnboardingResponse.declined.rawValue
+    )
+  }
+
+  func testICloudAccountChangeDoesNotRetainThePreviousAccountsAnswer() throws {
+    let suiteName = "RecipeLibraryStartupTests.account.\(UUID().uuidString)"
+    let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
+    defer { defaults.removePersistentDomain(forName: suiteName) }
+    defaults.set(
+      SampleRecipeOnboardingResponse.declined.rawValue,
+      forKey: UserDefaultsSampleRecipeOnboardingStore.key
+    )
+    let cloudStore = FakeUbiquitousKeyValueStore()
+    let store = UbiquitousSampleRecipeOnboardingStore(
+      defaults: defaults,
+      ubiquitousStore: cloudStore,
+      notificationCenter: NotificationCenter()
+    )
+    var receivedResponse: SampleRecipeOnboardingResponse?
+    store.startObservingChanges { receivedResponse = $0 }
+    cloudStore.values.removeValue(forKey: UserDefaultsSampleRecipeOnboardingStore.key)
+
+    store.receiveExternalChange(
+      changedKeys: nil,
+      reason: NSUbiquitousKeyValueStoreAccountChange
+    )
+
+    XCTAssertEqual(store.response, .undecided)
+    XCTAssertEqual(receivedResponse, .undecided)
   }
 }

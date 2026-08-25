@@ -29,6 +29,17 @@ public enum SampleRecipePresence: Equatable, Sendable {
   case unavailable
 }
 
+/// The personal Kitchen plus whether this launch had to create it locally.
+public struct PreparedKitchen: Equatable, Sendable {
+  public let kitchen: Kitchen
+  public let wasCreated: Bool
+
+  public init(kitchen: Kitchen, wasCreated: Bool) {
+    self.kitchen = kitchen
+    self.wasCreated = wasCreated
+  }
+}
+
 /// Creates the first empty Kitchen without treating absence of recipes as permission.
 @MainActor
 public struct KitchenBootstrapService {
@@ -47,16 +58,25 @@ public struct KitchenBootstrapService {
   }
 
   public func prepareInitialKitchen(named name: String = "Home Kitchen") throws -> Kitchen {
+    try prepareInitialKitchenWithStatus(named: name).kitchen
+  }
+
+  /// Distinguishes a truly new local Kitchen from one already present in the store.
+  public func prepareInitialKitchenWithStatus(
+    named name: String = "Home Kitchen"
+  ) throws -> PreparedKitchen {
     if let personalKitchen = try repository.kitchen(id: Self.personalKitchenID) {
-      return personalKitchen
+      return PreparedKitchen(kitchen: personalKitchen, wasCreated: false)
     }
     // Preserve a pre-sync development Kitchen rather than orphaning its recipes.
     // Development data is reset before release, so fresh 1.0 installations all
     // use the deterministic personal identity above.
-    if let legacyKitchen = try repository.kitchens().first { return legacyKitchen }
+    if let legacyKitchen = try repository.kitchens().first {
+      return PreparedKitchen(kitchen: legacyKitchen, wasCreated: false)
+    }
     let kitchen = Kitchen(id: Self.personalKitchenID, name: name)
     try repository.create(kitchen, with: [])
-    return kitchen
+    return PreparedKitchen(kitchen: kitchen, wasCreated: true)
   }
 }
 

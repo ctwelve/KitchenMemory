@@ -24,8 +24,8 @@ export DEVELOPER_DIR
 
 xcodebuild test \
   -project "$PROJECT_ROOT/KitchenMemory.xcodeproj" \
-  -scheme "KitchenMemory Testing" \
-  -testPlan KitchenMemoryTesting \
+  -scheme "KitchenMemory macOS Testing" \
+  -testPlan KitchenMemoryMacTesting \
   -destination 'platform=macOS' \
   -derivedDataPath "$DERIVED_DATA_PATH" \
   -resultBundlePath "$RESULT_BUNDLE" \

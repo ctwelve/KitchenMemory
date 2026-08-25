@@ -19,6 +19,18 @@ final class KitchenServicesFailureTests: XCTestCase {
     XCTAssertEqual(try service.prepareInitialKitchen(), kitchen)
   }
 
+  func testBootstrapReportsWhetherItCreatedOrFoundThePersonalKitchen() throws {
+    let repository = try makeRepository()
+    let service = KitchenBootstrapService(repository: repository)
+
+    let firstPreparation = try service.prepareInitialKitchenWithStatus()
+    let secondPreparation = try service.prepareInitialKitchenWithStatus()
+
+    XCTAssertTrue(firstPreparation.wasCreated)
+    XCTAssertFalse(secondPreparation.wasCreated)
+    XCTAssertEqual(firstPreparation.kitchen, secondPreparation.kitchen)
+  }
+
   func testBootstrapPreservesALegacyKitchenUntilDevelopmentDataIsReset() throws {
     let repository = try makeRepository()
     let legacyKitchen = Kitchen(name: "Legacy Kitchen")

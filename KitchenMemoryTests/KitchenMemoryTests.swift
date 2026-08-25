@@ -10,6 +10,38 @@ import XCTest
 
 @MainActor
 final class KitchenMemoryTests: XCTestCase {
+  private final class DescriptionRecorder: @unchecked Sendable {
+    var wasRead = false
+  }
+
+  private struct PrivateStartupFailure: Error, CustomStringConvertible {
+    let recorder: DescriptionRecorder
+
+    var description: String {
+      recorder.wasRead = true
+      return "private startup details"
+    }
+  }
+
+  func testStartupPreparationMakesFailureRetryableWithoutReadingPrivateDetails() throws {
+    let recorder = DescriptionRecorder()
+    var shouldFail = true
+    let prepare: () -> AppStartupState = {
+      AppStartupState.prepare {
+        if shouldFail { throw PrivateStartupFailure(recorder: recorder) }
+        return try AppDependencies(inMemory: true)
+      }
+    }
+
+    XCTAssertNil(prepare().dependencies)
+    XCTAssertFalse(recorder.wasRead)
+
+    shouldFail = false
+    let recovered = try XCTUnwrap(prepare().dependencies)
+    recovered.libraryModel.loadIfNeeded()
+    XCTAssertEqual(recovered.libraryModel.recipes.count, 2)
+  }
+
   func testStarterRecipeLoadsThroughAppComposition() throws {
     let dependencies = try AppDependencies(inMemory: true)
 
@@ -141,6 +173,31 @@ final class KitchenMemoryTests: XCTestCase {
     ))
   }
 
+  func testStartupFailureSimulationIsConfinedToTestHarnessBuilds() {
+    let arguments = ["KitchenMemory", "--simulate-startup-failure"]
+
+    XCTAssertTrue(AppRuntimeConfiguration.simulatesStartupFailure(
+      arguments: arguments,
+      buildEnvironment: .testing
+    ))
+    XCTAssertTrue(AppRuntimeConfiguration.simulatesStartupFailure(
+      arguments: arguments,
+      buildEnvironment: .productionTesting
+    ))
+    XCTAssertFalse(AppRuntimeConfiguration.simulatesStartupFailure(
+      arguments: arguments,
+      buildEnvironment: .debug
+    ))
+    XCTAssertFalse(AppRuntimeConfiguration.simulatesStartupFailure(
+      arguments: arguments,
+      buildEnvironment: .develop
+    ))
+    XCTAssertFalse(AppRuntimeConfiguration.simulatesStartupFailure(
+      arguments: arguments,
+      buildEnvironment: .production
+    ))
+  }
+
   func testHostedUnitTestsUseDisposableStorageOnlyInTestingBuilds() {
     XCTAssertTrue(AppRuntimeConfiguration.usesInMemoryStore(
       arguments: ["KitchenMemory", "--unit-testing"],
@@ -171,14 +228,55 @@ final class KitchenMemoryTests: XCTestCase {
     ))
   }
 
+  func testPersonalCloudContainerComesFromTheSignedBuildConfiguration() throws {
+    let productionInfo = [
+      AppRuntimeConfiguration.cloudKitContainerInfoKey: "iCloud.net.ctwelve.KitchenMemory",
+    ]
+
+    XCTAssertEqual(
+      try AppRuntimeConfiguration.personalCloudContainerIdentifier(
+        environment: [:],
+        infoDictionary: productionInfo,
+        buildEnvironment: .production
+      ),
+      "iCloud.net.ctwelve.KitchenMemory"
+    )
+    XCTAssertNil(try AppRuntimeConfiguration.personalCloudContainerIdentifier(
+      environment: [:],
+      infoDictionary: [:],
+      buildEnvironment: .testing
+    ))
+    XCTAssertThrowsError(try AppRuntimeConfiguration.personalCloudContainerIdentifier(
+      environment: [:],
+      infoDictionary: [:],
+      buildEnvironment: .develop
+    )) { error in
+      XCTAssertEqual(
+        error as? AppRuntimeConfigurationError,
+        .cloudKitContainerIdentifierMissing
+      )
+    }
+  }
+
   func testCloudKitSchemaInitializationRequiresDevelopAndTheExplicitArgument() {
+#if os(macOS)
     XCTAssertTrue(AppRuntimeConfiguration.initializesCloudKitSchema(
       arguments: ["KitchenMemory", "--initialize-cloudkit-schema"],
       buildEnvironment: .develop
     ))
+#else
+    XCTAssertFalse(AppRuntimeConfiguration.initializesCloudKitSchema(
+      arguments: ["KitchenMemory", "--initialize-cloudkit-schema"],
+      buildEnvironment: .develop
+    ))
+#endif
     XCTAssertFalse(AppRuntimeConfiguration.initializesCloudKitSchema(
       arguments: ["KitchenMemory", "--initialize-cloudkit-schema"],
       buildEnvironment: .production
+    ))
+    XCTAssertFalse(AppRuntimeConfiguration.initializesCloudKitSchema(
+      arguments: ["KitchenMemory"],
+      buildEnvironment: .develop
     ))
   }
 }

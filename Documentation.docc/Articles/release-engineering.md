@@ -12,14 +12,24 @@ SPDX-License-Identifier: GPL-3.0-only
 The 0.1 feature baseline is complete. Kitchen Memory can create, import, review,
 revise, scale, read, localize, and privately synchronize recipes. The next pass
 is therefore not Slice 11 and does not introduce another product capability. It
-is the project's first release-engineering pass: prove that the existing product
-can be built, installed, operated, diagnosed, and recovered with release-level
-discipline.
+is the project's first release-engineering pass: practice proving that the
+existing product can be built, installed, operated, diagnosed, and recovered
+with release-level discipline.
+
+This is an early-alpha rehearsal, not a claim that 0.1 satisfies the full 1.0
+acceptance bar. Expensive gates may be exercised with a representative subset
+or deferred when they do not protect an immediate alpha risk. Every reduction
+must remain explicit in the candidate evidence; a deferred gate is never a
+passing result.
 
 Hardening begins from `main` after the completed feature-slice integration
 branch is merged. Focused fixes should remain small and reviewable; this pass is
 not permission to redesign settled domain boundaries or quietly add deferred
 features.
+
+Record candidate-specific results in <doc:release-evidence-0.1>. A plan states
+what must be proven; the evidence ledger identifies the exact source state,
+environment, result, and non-private record that earned each release claim.
 
 ## Release candidate
 
@@ -51,8 +61,10 @@ fix, test, diagnostic, or documentation change; it should not expand this loop.
 - Exercise local persistence, immutable revision history, import limits,
   localization fallback, sample identities, and synchronization convergence.
 - Add regression tests for every release-blocking defect found during the pass.
-- Run an acceptance corpus of roughly twenty varied real recipes through manual
-  entry, URL import, correction, relaunch, scaling, and source review.
+- For 0.1, run the bundled examples and a small number of varied, non-private
+  additions through manual entry or editing, URL import, correction, relaunch,
+  scaling, and source review. A roughly twenty-recipe corpus remains a 1.0
+  acceptance gate.
 
 ### Data and iCloud
 
@@ -98,8 +110,11 @@ fix, test, diagnostic, or documentation change; it should not expand this loop.
 
 ### Person-facing quality
 
-- Verify every release locale for catalog completeness, plural behavior, sample
-  content, and representative longer-text layouts.
+- For 0.1, enforce automated catalog completeness and perform a developer
+  walkthrough of plural behavior, sample content, fallback behavior, and
+  representative longer-text layouts. Native-language review of every
+  translated locale remains a 1.0 acceptance gate and must not be implied by
+  the alpha walkthrough.
 - Audit the durable application shell, Settings, import/review path, recipe
   reading, scaling, and failure surfaces for accessibility on supported
   platforms. Provisional editing interactions remain candidates for later
@@ -127,10 +142,10 @@ The first release-engineering pass is complete when:
   all Archive actions pass from its immutable release tag;
 - signed archives and the notarized Mac artifact install and launch on the
   supported device classes;
-- the acceptance corpus preserves meaningful recipe content across relaunch and
-  synchronization exercises;
-- release locales and stable workflows pass the agreed accessibility and layout
-  review;
+- the representative 0.1 recipe set preserves meaningful recipe content across
+  the selected relaunch and synchronization exercises;
+- release locales and stable workflows pass the explicitly scoped alpha
+  accessibility and layout review;
 - the production CloudKit schema and distribution procedure are documented and
   rehearsed; and
 - no open defect can lose data, corrupt source meaning, prevent ordinary use, or

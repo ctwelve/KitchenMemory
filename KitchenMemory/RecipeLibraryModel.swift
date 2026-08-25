@@ -24,6 +24,7 @@ final class RecipeLibraryModel {
   private let resetService: KitchenResetService
   private let sampleInstaller: SampleRecipeInstallService
   private let sampleOnboardingStore: any SampleRecipeOnboardingStoring
+  private var hasEstablishedKitchenEvidence: Bool
 
   private(set) var recipes: [StoredRecipe] = []
   var selectedRecipeID: Recipe.ID?
@@ -41,7 +42,8 @@ final class RecipeLibraryModel {
     importer: any RecipeImportServing,
     resetService: KitchenResetService,
     sampleInstaller: SampleRecipeInstallService,
-    sampleOnboardingStore: any SampleRecipeOnboardingStoring
+    sampleOnboardingStore: any SampleRecipeOnboardingStoring,
+    kitchenWasCreated: Bool
   ) {
     self.kitchenID = kitchenID
     self.library = library
@@ -50,7 +52,11 @@ final class RecipeLibraryModel {
     self.resetService = resetService
     self.sampleInstaller = sampleInstaller
     self.sampleOnboardingStore = sampleOnboardingStore
+    hasEstablishedKitchenEvidence = !kitchenWasCreated
     sampleOnboardingResponse = sampleOnboardingStore.response
+    sampleOnboardingStore.startObservingChanges { [weak self] response in
+      self?.receiveSampleOnboardingResponse(response)
+    }
   }
 
   var selectedRecipe: StoredRecipe? {
@@ -60,7 +66,7 @@ final class RecipeLibraryModel {
   func loadIfNeeded() {
     guard !hasLoaded else { return }
     reload()
-    startupState = sampleOnboardingResponse == .undecided ? .choosingSamples : .ready
+    reconcileStartupState()
   }
 
   func reload() {
@@ -75,6 +81,7 @@ final class RecipeLibraryModel {
   func reloadAfterExternalStoreChange() {
     guard hasLoaded else { return }
     reload()
+    reconcileStartupState()
   }
 
   func updatePersonalCloudStatus(_ status: PersonalCloudStatus) {
@@ -122,6 +129,7 @@ final class RecipeLibraryModel {
       }
       issue = nil
       hasLoaded = true
+      if !recipes.isEmpty { hasEstablishedKitchenEvidence = true }
       return true
     } catch {
       recipes = []
@@ -131,6 +139,19 @@ final class RecipeLibraryModel {
       hasLoaded = true
       return false
     }
+  }
+
+  private func receiveSampleOnboardingResponse(_ response: SampleRecipeOnboardingResponse) {
+    sampleOnboardingResponse = response
+    if hasLoaded { reconcileStartupState() }
+  }
+
+  private func reconcileStartupState() {
+    sampleOnboardingResponse = sampleOnboardingStore.response
+    startupState = sampleOnboardingResponse == .undecided
+      && !hasEstablishedKitchenEvidence
+      ? .choosingSamples
+      : .ready
   }
 
   func createRecipe(from draft: RecipeDraft) -> Bool {

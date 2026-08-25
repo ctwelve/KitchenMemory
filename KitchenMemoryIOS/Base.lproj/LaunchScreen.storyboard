@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="24765" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="01J-lp-oVM">
+    <device id="retina5_5" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24743"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--View Controller-->
+        <scene sceneID="EHf-IW-A2E">
+            <objects>
+                <viewController id="01J-lp-oVM" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Ze5-6b-2t3">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" image="LaunchScreenBackground" translatesAutoresizingMaskIntoConstraints="NO" id="WcF-NW-3gQ">
+                                <rect key="frame" x="0.0" y="322" width="414" height="414"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" priority="751" constant="640" id="61B-fz-Fmd"/>
+                                    <constraint firstAttribute="width" secondItem="WcF-NW-3gQ" secondAttribute="height" id="I6j-59-hcR"/>
+                                    <constraint firstAttribute="width" relation="lessThanOrEqual" constant="640" id="b0C-uI-R24"/>
+                                </constraints>
+                            </imageView>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" image="LaunchScreenFadeTop" translatesAutoresizingMaskIntoConstraints="NO" id="ttQ-mT-r1Z">
+                                <rect key="frame" x="0.0" y="322" width="414" height="116"/>
+                            </imageView>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" image="LaunchScreenFadeLeading" translatesAutoresizingMaskIntoConstraints="NO" id="I5a-Eh-XuN">
+                                <rect key="frame" x="0.0" y="322" width="116" height="414"/>
+                            </imageView>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" image="LaunchScreenFadeTrailing" translatesAutoresizingMaskIntoConstraints="NO" id="8xc-Q1-SMn" userLabel="LaunchScreenFadeTrailing">
+                                <rect key="frame" x="298" y="322" width="116" height="414"/>
+                            </imageView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Kitchen Memory" textAlignment="natural" lineBreakMode="wordWrap" numberOfLines="2" baselineAdjustment="alignBaselines" minimumScaleFactor="0.75" translatesAutoresizingMaskIntoConstraints="NO" id="KmT-it-Le1" userLabel="AppTitle">
+                                <rect key="frame" x="32" y="68" width="350" height="100"/>
+                                <fontDescription key="fontDescription" name="Georgia-Bold" family="Georgia" pointSize="44"/>
+                                <color key="textColor" name="AccentColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Preparing your kitchen…" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" translatesAutoresizingMaskIntoConstraints="NO" id="PrP-ar-InG" userLabel="PreparationMessage">
+                                <rect key="frame" x="34" y="180" width="346" height="22"/>
+                                <fontDescription key="fontDescription" type="system" weight="medium" pointSize="18"/>
+                                <color key="textColor" systemColor="secondaryLabelColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="© 2026 Kitchen Memory Project contributors." textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.75" translatesAutoresizingMaskIntoConstraints="NO" id="CpR-ig-Ht1" userLabel="CopyrightNotice">
+                                <rect key="frame" x="20" y="705.66666666666663" width="374" height="14.333333333333371"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="Bcu-3y-fUS"/>
+                        <color key="backgroundColor" name="AppBackground"/>
+                        <constraints>
+                            <constraint firstItem="WcF-NW-3gQ" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Ze5-6b-2t3" secondAttribute="leading" id="2Cw-yc-hBW"/>
+                            <constraint firstItem="I5a-Eh-XuN" firstAttribute="leading" secondItem="WcF-NW-3gQ" secondAttribute="leading" id="7vK-jZ-2mI"/>
+                            <constraint firstItem="WcF-NW-3gQ" firstAttribute="width" secondItem="Ze5-6b-2t3" secondAttribute="width" priority="750" id="9FR-RM-bXW"/>
+                            <constraint firstItem="PrP-ar-InG" firstAttribute="top" secondItem="KmT-it-Le1" secondAttribute="bottom" constant="12" id="A8z-yP-X4q"/>
+                            <constraint firstItem="PrP-ar-InG" firstAttribute="leading" secondItem="KmT-it-Le1" secondAttribute="leading" constant="2" id="BNW-6C-5PY"/>
+                            <constraint firstItem="8xc-Q1-SMn" firstAttribute="bottom" secondItem="WcF-NW-3gQ" secondAttribute="bottom" id="C2A-B3-d4E"/>
+                            <constraint firstItem="I5a-Eh-XuN" firstAttribute="top" secondItem="WcF-NW-3gQ" secondAttribute="top" id="FvL-c9-qWn"/>
+                            <constraint firstItem="ttQ-mT-r1Z" firstAttribute="top" secondItem="WcF-NW-3gQ" secondAttribute="top" id="Ga6-ML-iHG"/>
+                            <constraint firstItem="ttQ-mT-r1Z" firstAttribute="height" secondItem="WcF-NW-3gQ" secondAttribute="height" multiplier="0.28" id="HBG-VR-p3q"/>
+                            <constraint firstItem="I5a-Eh-XuN" firstAttribute="bottom" secondItem="WcF-NW-3gQ" secondAttribute="bottom" id="JQi-3Q-RNM"/>
+                            <constraint firstItem="8xc-Q1-SMn" firstAttribute="top" secondItem="WcF-NW-3gQ" secondAttribute="top" id="M5N-o6-P7q"/>
+                            <constraint firstItem="KmT-it-Le1" firstAttribute="top" secondItem="Bcu-3y-fUS" secondAttribute="top" constant="48" id="N2f-yz-CnB"/>
+                            <constraint firstAttribute="bottom" secondItem="WcF-NW-3gQ" secondAttribute="bottom" id="RS7-6x-nyL"/>
+                            <constraint firstItem="ttQ-mT-r1Z" firstAttribute="leading" secondItem="WcF-NW-3gQ" secondAttribute="leading" id="Shc-8k-PkP"/>
+                            <constraint firstItem="I5a-Eh-XuN" firstAttribute="width" secondItem="WcF-NW-3gQ" secondAttribute="width" multiplier="0.28" id="Uhf-fH-BFq"/>
+                            <constraint firstAttribute="trailing" secondItem="WcF-NW-3gQ" secondAttribute="trailing" id="ZJt-97-RAp"/>
+                            <constraint firstItem="8xc-Q1-SMn" firstAttribute="width" secondItem="WcF-NW-3gQ" secondAttribute="width" multiplier="0.28" id="e8F-g9-H0i"/>
+                            <constraint firstItem="KmT-it-Le1" firstAttribute="leading" secondItem="Bcu-3y-fUS" secondAttribute="leading" constant="32" id="fD4-Dx-ZxC"/>
+                            <constraint firstItem="Bcu-3y-fUS" firstAttribute="trailing" secondItem="PrP-ar-InG" secondAttribute="trailing" constant="34" id="gQW-Ga-YSb"/>
+                            <constraint firstItem="CpR-ig-Ht1" firstAttribute="leading" secondItem="Bcu-3y-fUS" secondAttribute="leading" constant="20" id="h7E-fM-V4c"/>
+                            <constraint firstItem="Bcu-3y-fUS" firstAttribute="bottom" secondItem="CpR-ig-Ht1" secondAttribute="bottom" constant="16" id="j69-QD-KTR"/>
+                            <constraint firstItem="Bcu-3y-fUS" firstAttribute="trailing" secondItem="CpR-ig-Ht1" secondAttribute="trailing" constant="20" id="kYV-vR-QqL"/>
+                            <constraint firstItem="8xc-Q1-SMn" firstAttribute="trailing" secondItem="WcF-NW-3gQ" secondAttribute="trailing" id="r1S-t2-U3v"/>
+                            <constraint firstItem="Bcu-3y-fUS" firstAttribute="trailing" secondItem="KmT-it-Le1" secondAttribute="trailing" constant="32" id="tHe-X9-3Sp"/>
+                            <constraint firstItem="ttQ-mT-r1Z" firstAttribute="trailing" secondItem="WcF-NW-3gQ" secondAttribute="trailing" id="zxS-6h-Tpg"/>
+                        </constraints>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="iYj-Kq-Ea1" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="52.173913043478265" y="374.18478260869568"/>
+        </scene>
+    </scenes>
+    <color key="tintColor" name="AppBackground"/>
+    <resources>
+        <image name="LaunchScreenBackground" width="1280" height="1280"/>
+        <image name="LaunchScreenFadeLeading" width="100" height="100"/>
+        <image name="LaunchScreenFadeTop" width="100" height="100"/>
+        <image name="LaunchScreenFadeTrailing" width="100" height="100"/>
+        <namedColor name="AccentColor">
+            <color red="0.65100002288818359" green="0.29399999976158142" blue="0.16500000655651093" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="AppBackground">
+            <color red="0.96899998188018799" green="0.94499999284744263" blue="0.9100000262260437" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <systemColor name="secondaryLabelColor">
+            <color red="0.23529411759999999" green="0.23529411759999999" blue="0.26274509800000001" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+    </resources>
+</document>

@@ -11,8 +11,17 @@ module KitchenMemory
   module ReleaseVersion
     VERSION_PATTERN = /\A(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\z/.freeze
     TAG_PATTERN = /\Arelease\/((?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*))\z/.freeze
+    APP_TARGETS = ["KitchenMemoryIOS", "KitchenMemoryMacOS"].freeze
+    APP_CONFIGURATIONS = [
+      "Debug",
+      "Develop",
+      "Testing",
+      "Production",
+      "ProductionTesting"
+    ].freeze
     APP_CONFIGURATION_PATTERN = %r{
-      ^[\t ]*[0-9A-F]+\s+/\*\s+.*?\s+configuration\s+for\s+PBXNativeTarget\s+"KitchenMemory"\s+\*/\s+=\s+\{\n
+      ^[\t ]*[0-9A-F]+\s+/\*\s+([^\r\n]*?)\s+configuration\s+for\s+PBXNativeTarget\s+
+      "(KitchenMemory(?:IOS|MacOS))"\s+\*/\s+=\s+\{\n
       (.*?)
       ^[\t ]*\};$
     }mx.freeze
@@ -24,9 +33,34 @@ module KitchenMemory
     module_function
 
     def source_values(project_contents)
-      configurations = project_contents.scan(APP_CONFIGURATION_PATTERN).flatten
+      matches = project_contents.scan(APP_CONFIGURATION_PATTERN)
+      configurations = matches.map(&:last)
       if configurations.empty?
-        raise ContractError, "could not find KitchenMemory application build configurations"
+        raise ContractError, "could not find Kitchen Memory application build configurations"
+      end
+
+      discovered_targets = matches.map { |match| match[1] }.uniq.sort
+      unless discovered_targets == APP_TARGETS.sort
+        raise ContractError, "both KitchenMemoryIOS and KitchenMemoryMacOS must define versions"
+      end
+
+      APP_TARGETS.each do |target|
+        names = matches.each_with_object([]) do |(name, matched_target, _body), result|
+          result << name if matched_target == target
+        end
+        counts = names.each_with_object(Hash.new(0)) { |name, result| result[name] += 1 }
+        missing = APP_CONFIGURATIONS.reject { |name| counts.key?(name) }
+        unexpected = counts.keys.reject { |name| APP_CONFIGURATIONS.include?(name) }
+        duplicates = counts.select { |_name, count| count > 1 }.keys
+        next if missing.empty? && unexpected.empty? && duplicates.empty? && names.length == APP_CONFIGURATIONS.length
+
+        details = []
+        details << "missing: #{missing.join(', ')}" unless missing.empty?
+        details << "unexpected: #{unexpected.join(', ')}" unless unexpected.empty?
+        details << "duplicate: #{duplicates.join(', ')}" unless duplicates.empty?
+        raise ContractError,
+              "#{target} configurations must be exactly #{APP_CONFIGURATIONS.join(', ')} " \
+              "(#{details.join('; ')})"
       end
 
       marketing_versions = configurations.map { |body| body[MARKETING_SETTING, 1] }

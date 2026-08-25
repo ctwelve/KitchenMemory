@@ -14,10 +14,10 @@ fi
 RESULT_BUNDLE=$1
 SCRIPT_DIRECTORY=$(CDPATH= cd "$(dirname "$0")" && pwd)
 PROJECT_ROOT=$(dirname "$SCRIPT_DIRECTORY")
-DOMAIN_DIRECTORY="$PROJECT_ROOT/KitchenMemory/Modules/KitchenMemoryDomain"
-IMPORT_DIRECTORY="$PROJECT_ROOT/KitchenMemory/Modules/KitchenMemoryImport"
-LOGIC_DIRECTORY="$PROJECT_ROOT/KitchenMemory/Modules/KitchenMemoryLogic"
-PERSISTENCE_DIRECTORY="$PROJECT_ROOT/KitchenMemory/Modules/KitchenMemoryPersistence"
+DOMAIN_DIRECTORY="$PROJECT_ROOT/KitchenMemoryDomain"
+IMPORT_DIRECTORY="$PROJECT_ROOT/KitchenMemoryImport"
+LOGIC_DIRECTORY="$PROJECT_ROOT/KitchenMemoryLogic"
+PERSISTENCE_DIRECTORY="$PROJECT_ROOT/KitchenMemoryPersistence"
 PERSISTENCE_RUNTIME_ADAPTER="$PERSISTENCE_DIRECTORY/Cloud/PersonalCloudStatusMonitor.swift"
 
 if [ ! -r "$RESULT_BUNDLE" ]; then
@@ -52,9 +52,9 @@ if ! INPUT_TIMESTAMPS=$(find \
   "$PROJECT_ROOT/KitchenMemoryTests" \
   "$PROJECT_ROOT/Configurations" \
   "$PROJECT_ROOT/KitchenMemory.xcodeproj/project.pbxproj" \
-  "$PROJECT_ROOT/KitchenMemory.xcodeproj/xcshareddata/xcschemes/KitchenMemory Testing.xcscheme" \
+  "$PROJECT_ROOT/KitchenMemory.xcodeproj/xcshareddata/xcschemes/KitchenMemory macOS Testing.xcscheme" \
   "$PROJECT_ROOT/KitchenMemory.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved" \
-  "$PROJECT_ROOT/KitchenMemoryTesting.xctestplan" \
+  "$PROJECT_ROOT/KitchenMemoryMacTesting.xctestplan" \
   -type f -exec stat -f '%Fm %N' {} +); then
   echo "Coverage gate error: could not inventory coverage inputs" >&2
   exit 2

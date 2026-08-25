@@ -15,10 +15,10 @@ happened while cooking without silently changing the canonical recipe. This
 catalog collects the product doctrine, architecture, workflows, engineering
 practice, and accepted decisions that guide its implementation.
 
-The current application uses a basic shared SwiftUI interface to exercise the
-product's foundation slices. That interface is implementation scaffolding, not
-a commitment that the mature Mac and mobile products must share one
-presentation architecture.
+The native iOS and macOS application targets currently compile a basic shared
+SwiftUI layer to exercise the product's foundation slices. That interface is
+implementation scaffolding, not a commitment that the mature Mac and mobile
+products must share one presentation architecture.
 
 ## Topics
 
@@ -29,6 +29,7 @@ presentation architecture.
 - <doc:naming>
 - <doc:alpha-roadmap>
 - <doc:release-engineering>
+- <doc:release-evidence-0.1>
 - <doc:privacy>
 - <doc:open-questions>
 
@@ -61,3 +62,4 @@ presentation architecture.
 - <doc:0006-shared-ui-for-foundation-slices>
 - <doc:0007-business-logic-coverage-and-ui-smoke-tests>
 - <doc:0008-freeze-the-0-1-localization-contract>
+- <doc:0009-separate-native-app-targets>

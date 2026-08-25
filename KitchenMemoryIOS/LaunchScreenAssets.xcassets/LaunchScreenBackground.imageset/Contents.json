@@ -1,0 +1,30 @@
+{
+  "images" : [
+    {
+      "filename" : "base.jpg",
+      "idiom" : "universal"
+    },
+    {
+      "filename" : "en_US.jpg",
+      "idiom" : "universal",
+      "locale" : "en-US"
+    },
+    {
+      "filename" : "fr_CA.jpg",
+      "idiom" : "universal",
+      "locale" : "fr-CA"
+    },
+    {
+      "filename" : "es_MX.jpg",
+      "idiom" : "universal",
+      "locale" : "es-MX"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  },
+  "properties" : {
+    "localizable" : true
+  }
+}

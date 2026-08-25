@@ -9,24 +9,43 @@ require "minitest/autorun"
 require_relative "../check-release-version"
 
 class CheckReleaseVersionTest < Minitest::Test
-  PROJECT = <<~PROJECT.freeze
-		A1 /* Debug configuration for PBXNativeTarget "KitchenMemory" */ = {
+  CONFIGURATIONS = %w[Debug Develop Testing Production ProductionTesting].freeze
+
+  def self.project(ios_configurations = CONFIGURATIONS, macos_configurations = CONFIGURATIONS)
+    targets = {
+      "KitchenMemoryIOS" => ios_configurations,
+      "KitchenMemoryMacOS" => macos_configurations
+    }
+    identifier = 0
+
+    targets.flat_map do |target, configurations|
+      configurations.map do |configuration|
+        identifier += 1
+        <<~CONFIGURATION
+		#{format('%024X', identifier)} /* #{configuration} configuration for PBXNativeTarget "#{target}" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CURRENT_PROJECT_VERSION = 1;
 				MARKETING_VERSION = 0.1.0;
+			};
+			name = #{configuration};
+		};
+        CONFIGURATION
+      end
+    end.join
+  end
+
+  PBXPROJECT_CONFIGURATION = <<~CONFIGURATION.freeze
+		FFFFFFFFFFFFFFFFFFFFFFFF /* Debug configuration for PBXProject "KitchenMemory" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CURRENT_PROJECT_VERSION = 99;
+				MARKETING_VERSION = 99.0.0;
 			};
 			name = Debug;
 		};
-		A2 /* Production configuration for PBXNativeTarget "KitchenMemory" */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CURRENT_PROJECT_VERSION = 1;
-				MARKETING_VERSION = 0.1.0;
-			};
-			name = Production;
-		};
-  PROJECT
+  CONFIGURATION
+  PROJECT = (PBXPROJECT_CONFIGURATION + project).freeze
 
   def test_matching_release_tag_passes
     version, build, configuration_count = KitchenMemory::ReleaseVersion.validate(
@@ -37,7 +56,15 @@ class CheckReleaseVersionTest < Minitest::Test
 
     assert_equal "0.1.0", version
     assert_equal "1", build
-    assert_equal 2, configuration_count
+    assert_equal 10, configuration_count
+  end
+
+  def test_ignores_project_level_build_configurations
+    version, build, configuration_count = KitchenMemory::ReleaseVersion.source_values(PROJECT)
+
+    assert_equal "0.1.0", version
+    assert_equal "1", build
+    assert_equal 10, configuration_count
   end
 
   def test_missing_tag_skips_nonarchive_action
@@ -108,5 +135,62 @@ class CheckReleaseVersionTest < Minitest::Test
         action: "archive"
       )
     end
+  end
+
+  def test_rejects_project_missing_one_platform_target
+    ios_only = PROJECT.gsub("KitchenMemoryMacOS", "KitchenMemoryIOS")
+
+    error = assert_raises(KitchenMemory::ReleaseVersion::ContractError) do
+      KitchenMemory::ReleaseVersion.validate(
+        project_contents: ios_only,
+        tag: "release/0.1.0",
+        action: "archive"
+      )
+    end
+
+    assert_includes error.message, "both KitchenMemoryIOS and KitchenMemoryMacOS"
+  end
+
+  def test_rejects_missing_application_configuration
+    project = self.class.project(CONFIGURATIONS - ["Develop"], CONFIGURATIONS)
+
+    error = assert_raises(KitchenMemory::ReleaseVersion::ContractError) do
+      KitchenMemory::ReleaseVersion.validate(
+        project_contents: project,
+        tag: "release/0.1.0",
+        action: "archive"
+      )
+    end
+
+    assert_includes error.message, "missing: Develop"
+  end
+
+  def test_rejects_duplicate_application_configuration
+    project = self.class.project(CONFIGURATIONS + ["Debug"], CONFIGURATIONS)
+
+    error = assert_raises(KitchenMemory::ReleaseVersion::ContractError) do
+      KitchenMemory::ReleaseVersion.validate(
+        project_contents: project,
+        tag: "release/0.1.0",
+        action: "archive"
+      )
+    end
+
+    assert_includes error.message, "duplicate: Debug"
+  end
+
+  def test_rejects_unexpected_application_configuration
+    ios_configurations = CONFIGURATIONS.map { |name| name == "Develop" ? "Beta" : name }
+    project = self.class.project(ios_configurations, CONFIGURATIONS)
+
+    error = assert_raises(KitchenMemory::ReleaseVersion::ContractError) do
+      KitchenMemory::ReleaseVersion.validate(
+        project_contents: project,
+        tag: "release/0.1.0",
+        action: "archive"
+      )
+    end
+
+    assert_includes error.message, "unexpected: Beta"
   end
 end

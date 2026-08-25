@@ -1,0 +1,37 @@
+{
+  "configurations" : [
+    {
+      "id" : "D51CB9C4-36EA-4E47-A124-807B26397412",
+      "name" : "Production Validation",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "codeCoverage" : false,
+    "commandLineArgumentEntries" : [
+      {
+        "argument" : "--unit-testing"
+      }
+    ]
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:KitchenMemory.xcodeproj",
+        "identifier" : "D20000000000000000000021",
+        "name" : "KitchenMemoryMacTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:KitchenMemory.xcodeproj",
+        "identifier" : "A1C4E7B6302A63B900E2C0DB",
+        "name" : "KitchenMemoryUITests"
+      }
+    }
+  ],
+  "version" : 1
+}

@@ -155,13 +155,14 @@ portable format.
 Use one `KitchenMemoryDomain` module, organized by feature. Separate modules for
 recipes, kitchens, pantry, planning, and sessions would create dependencies among
 concepts that intentionally share identities and rules. The app's internal
-modules are native Xcode framework targets under `KitchenMemory/Modules`; they
+modules are native Xcode framework targets in root-level folders; they
 are not separately distributed packages.
 
 The implemented `KitchenMemoryDomain` module begins with the
-`Kitchen → Recipe → RecipeRevision` slice. The application target owns
-deterministic starter resources and their loader, keeping Apple resource APIs
-out of the domain module without creating a framework for app-specific data.
+`Kitchen → Recipe → RecipeRevision` slice. The shared `KitchenMemory/`
+application layer owns deterministic starter resources and their loader, and
+both native app targets compile that layer. This keeps Apple resource APIs out
+of the domain module without creating a framework for app-specific data.
 
 `KitchenMemoryPersistence` is the first SwiftData adapter behind that boundary.
 It uses internal relational records with application-owned UUID foreign keys and

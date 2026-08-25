@@ -6,11 +6,39 @@ Copyright © 2026 the Kitchen Memory contributors.
 SPDX-License-Identifier: GPL-3.0-only
 -->
 
-Xcode Cloud is Kitchen Memory's continuous-integration system. Three shared
-schemes make the workflow boundary explicit: `KitchenMemory Debugging` owns
-ordinary developer runs, `KitchenMemory Testing` owns deterministic non-UI
-validation, and `KitchenMemory Production` owns production UI smoke tests and
-archives. CI-only replacements for those actions should be avoided.
+Xcode Cloud is Kitchen Memory's continuous-integration system. Six shared
+schemes make both the platform and workflow boundary explicit. iOS and macOS
+each have `Development`, `Testing`, and `Production` schemes. Development owns
+ordinary developer runs, Testing owns deterministic non-UI validation, and
+Production owns production UI smoke tests and archives. CI-only replacements
+for those actions should be avoided. Development also retains a local Profile
+action using the `Production` configuration.
+
+## Scheme, plan, and destination contract
+
+| Shared scheme | Run / Analyze | Test build | Test plan and targets | Native destination | Profile / Archive |
+| --- | --- | --- | --- | --- | --- |
+| `KitchenMemory iOS Development` | `Develop` | `Testing` | `KitchenMemoryIOSTesting`: `KitchenMemoryIOSTests` | iOS device or Simulator | `Production` / No |
+| `KitchenMemory iOS Testing` | `Testing` | `Testing` | `KitchenMemoryIOSTesting`: `KitchenMemoryIOSTests` | iOS device or Simulator | No / No |
+| `KitchenMemory iOS Production` | `Production` | `ProductionTesting` | `KitchenMemoryIOSProduction`: `KitchenMemoryIOSTests` and shared UI smoke hosted by `KitchenMemoryIOS` | iOS device or Simulator | `Production` / `Production` |
+| `KitchenMemory macOS Development` | `Develop` | `Testing` | `KitchenMemoryMacTesting`: `KitchenMemoryMacTests` | native macOS | `Production` / No |
+| `KitchenMemory macOS Testing` | `Testing` | `Testing` | `KitchenMemoryMacTesting`: `KitchenMemoryMacTests` | native macOS | No / No |
+| `KitchenMemory macOS Production` | `Production` | `ProductionTesting` | `KitchenMemoryMacProduction`: `KitchenMemoryMacTests` and shared UI smoke hosted by `KitchenMemoryMacOS` | native macOS | `Production` / `Production` |
+
+Each scheme has one top-level app buildable; Xcode adds the four linked
+framework targets through ordinary dependency resolution. Each plan currently
+has one plan configuration: `Core and Application Tests` for Testing or
+`Production Validation` for Production. Additional plan configurations would
+alter arguments, environment, diagnostics, and repetition for the same target
+set. They would not select a platform, destination, or test host. Combining iOS
+and macOS into two configurations of one plan would still ask Xcode to assemble
+both target graphs. The separate platform plans and Cloud actions therefore
+express an actual build boundary, not cosmetic duplication.
+
+The iOS schemes do not expose Mac Catalyst, Mac Designed for iPhone or iPad, or
+visionOS Designed for iPhone or iPad destinations. The macOS schemes expose
+native Mac destinations only. Compatibility products require an explicit target
+and acceptance decision; they are not incidental CI coverage.
 
 ## Workflow policy
 
@@ -18,10 +46,15 @@ archives. CI-only replacements for those actions should be avoided.
 
 The development workflow starts for meaningful project changes pushed to
 `slice/*` integration branches and `bugs/*` hardening branches. It performs
-Build, Analyze, and Test actions using the shared
-`KitchenMemory Testing` scheme, but does not archive a product. Its actions use
-`Testing` and do not include UI automation. Local developer runs use
-`KitchenMemory Debugging`, whose Run and Analyze actions use `Develop`.
+Build, Analyze, and Test actions using `KitchenMemory iOS Testing` and
+`KitchenMemory macOS Testing`, but does not archive a product. Those actions use
+`Testing` and do not include UI automation. Local developer runs use the
+corresponding platform's Development scheme, whose Run and Analyze actions use
+`Develop`. The distinct development bundle identifier keeps local stores,
+CloudKit metadata, and onboarding preferences out of the Production app
+sandbox. Its separate
+CloudKit container also keeps development records and schema administration
+away from production service state.
 
 The completed feature baseline was collected on `slice/completion` before its
 merge to `main`. Release engineering begins from that `main` baseline and uses
@@ -37,8 +70,9 @@ logic test or coverage check is a product defect.
 
 The `Merge to main` workflow starts for selected project changes merged or
 pushed to `main`. It currently contains an iOS Build action for Any iOS Device
-and a macOS Build action for Any Mac, both using `KitchenMemory Production`. It
-does not contain Test, Analyze, Archive, or post-actions. Signed distribution
+using `KitchenMemory iOS Production` and a macOS Build action for Any Mac using
+`KitchenMemory macOS Production`. It does not contain Test, Analyze, Archive,
+or post-actions. Signed distribution
 archives therefore remain an explicit release-tag operation.
 
 This division is intentional. Test and Analyze are handled by the development
@@ -56,10 +90,10 @@ on `main` whose required production evidence has passed. The trigger accepts any
 file change and does not auto-cancel an older release build.
 
 The workflow runs an iOS Archive action for Any iOS Device and a macOS Archive
-action for Any Mac, both using `KitchenMemory Production`. Both archives select
-App Store Connect distribution preparation. The `Notarize - macOS` post-action
-is attached specifically to the macOS archive. Creating the tag is a release
-operation, not an exploratory build shortcut.
+action for Any Mac, using the corresponding platform's Production scheme. Both
+archives select App Store Connect distribution preparation. The
+`Notarize - macOS` post-action is attached specifically to the macOS archive.
+Creating the tag is a release operation, not an exploratory build shortcut.
 
 There is no TestFlight post-action or tester-group distribution configured.
 App Store Connect preparation makes an archive eligible for later distribution;
@@ -103,6 +137,20 @@ The pull-request workflow starts for meaningful project changes in pull requests
 from `slice/*` or `bugs/*` into `main`. Its Test action is required to pass,
 while tests in the development workflow remain advisory during ordinary work.
 
+The repository-owned `PR source policy` GitHub Actions check runs for every
+pull request into `main`, including source branches that Xcode Cloud deliberately
+does not accept. It succeeds only for `slice/*` and `bugs/*`; an ineligible
+branch receives an immediate naming failure instead of silently waiting for a
+Cloud workflow that cannot start. The workflow checks only pull-request metadata,
+does not check out or execute proposed source, and has read-only repository
+permission.
+
+GitHub applies required status checks to the protected target branch rather
+than conditionally interpreting the pull request's source name. Consequently,
+an ineligible pull request may still display the Xcode Cloud result as expected
+until it is renamed or closed. Do not weaken the required check's Xcode Cloud
+GitHub App binding or fabricate its status to hide that platform limitation.
+
 Xcode Cloud reports the pull-request result to GitHub. To make the gate prevent
 rather than merely warn about a failed merge candidate, `main` requires the
 aggregate `KitchenMemory | PR to main from slice/ or bugs/` result from the
@@ -114,12 +162,15 @@ merge result still builds for both supported platforms.
 Xcode Cloud supplies build and action results but does not provide all of the
 repository controls required by the release policy. GitHub owns that boundary.
 
-Classic branch protection on `main` requires a pull request, the strict aggregate
-Xcode Cloud pull-request result, and resolution of review conversations. It
-applies to administrators, blocks force-pushes and deletion, and deliberately
-allows merge commits. Zero approving reviews are required while the project has
-one release operator; the pull request remains the reviewable unit even when a
-second human approval is unavailable.
+Classic branch protection on `main` requires a pull request, the repository's
+`PR source policy` check, the strict aggregate Xcode Cloud pull-request result,
+and resolution of review conversations. The two required checks have distinct
+trusted sources: GitHub Actions owns branch eligibility, and the Xcode Cloud
+GitHub App owns build and test acceptance. Protection applies to administrators,
+blocks force-pushes and deletion, and deliberately allows merge commits. Zero
+approving reviews are required while the project has one release operator; the
+pull request remains the reviewable unit even when a second human approval is
+unavailable.
 
 Three active tag rulesets target `release/*`:
 
@@ -143,10 +194,11 @@ relevant interface is stable. See
 <doc:accessibility-engineering>. Localization ownership and its non-UI testing
 boundary are described in <doc:localization-architecture>.
 
-The `Testing` and `ProductionTesting` configurations deliberately use a minimal
-macOS entitlement file. Their application-hosted tests do not enable personal
-CloudKit synchronization, and Xcode Cloud's macOS test runner cannot launch a
-host application carrying restricted iCloud and push-notification entitlements.
+The `Testing` and `ProductionTesting` configurations deliberately use minimal
+platform-specific entitlement files. Their application-hosted tests do not
+carry personal CloudKit or push-notification capabilities. This is least
+privilege on iOS and is also required because Xcode Cloud's macOS test runner
+cannot launch a host application carrying those restricted entitlements.
 Development and production configurations retain the complete entitlement set;
 the testing exception does not alter a shipped application.
 
@@ -155,21 +207,29 @@ testing configurations through the committed test plans' `--unit-testing`
 launch argument. Ordinary development and production launches continue to use
 durable storage.
 
+UI smoke launches also ignore persisted application-window restoration state.
+On macOS, XCUITest can nevertheless relaunch a live `WindowGroup` application
+without creating its primary window. The smoke harness detects the missing
+expected surface and invokes the public Command-N New Window path before making
+assertions. This keeps launches deterministic without depending on localized
+menu copy or altering ordinary application behavior.
+
 The localization contract test reads an exact JSON copy of the raw String
 Catalog from its test bundle. A declared test-target build phase embeds that
 copy while the source checkout is available. This is necessary because Xcode
 Cloud may execute `test-without-building` on a different host that receives the
 test products but not the original repository path recorded by `#filePath`.
 
-The committed non-UI test plan collects code coverage. Evaluate the durable domain,
-import, persistence, and product-logic sources separately from SwiftUI
-views and test bundles; an app-wide percentage is not the business-logic metric.
-Use uncovered executable lines to find missing behavior and boundary tests, not
-to justify exercising provisional views through UI automation.
+Both committed non-UI test plans collect code coverage, and both platform lanes
+are correctness gates. Evaluate the durable domain, import, persistence, and
+product-logic sources separately from SwiftUI views and test bundles; an
+app-wide percentage is not the business-logic metric. Use uncovered executable
+lines to find missing behavior and boundary tests, not to justify exercising
+provisional views through UI automation.
 
 ### Core framework coverage gate
 
-Generate a fresh coverage bundle from the complete non-UI test target and apply
+Generate a fresh coverage bundle from the complete macOS non-UI suite and apply
 the gate in the same run:
 
 ```sh
@@ -177,9 +237,13 @@ Tools/run-core-framework-coverage.sh
 ```
 
 The runner creates a unique evidence directory under `/private/tmp`, prints its
-location, runs the committed non-UI test plan, and invokes the checker only
-after Xcode succeeds. The Testing scheme and plan exclude the UI target; the
-Production scheme and plan include it.
+location, runs `KitchenMemory macOS Testing` with
+`KitchenMemoryMacTesting.xctestplan`, and invokes the checker only after Xcode
+succeeds. This macOS result is the canonical exact line-coverage artifact for
+the four shared frameworks. It avoids reporting the same source lines twice;
+it does not replace the required iOS correctness lane. Both Testing plans
+exclude the UI target; both Production plans include the shared UI target with
+their native application-test target.
 
 To check an existing result bundle directly, pass it to:
 
@@ -214,17 +278,17 @@ The first release-engineering pass uses the production workflow as release
 evidence rather than as a ceremonial final build. Its acceptance and
 distribution gates are defined in <doc:release-engineering>.
 
-### Current iOS UI-runner diagnostic
+### Current UI-runner diagnostic
 
-With Xcode 26.6 and the iOS 26.5 simulator, Xcode may report internal
+With Xcode 26.6, both the iOS 26.5 simulator and macOS 26.6.2 may report internal
 `DebuggerVersionStore` / `no debugger version` messages while launching XCUI
-tests. Its fallback launcher currently proceeds and the smoke tests execute.
+tests. The fallback launcher currently proceeds and the smoke tests execute.
 Treat the messages as Apple tooling diagnostics, but treat any assertion reached
 inside a test body as an ordinary test failure requiring investigation.
 
 ## Static analysis
 
-The Debugging and Testing schemes mark the application as buildable for Analyze. Project build
+The Development and Testing schemes mark the application as buildable for Analyze. Project build
 settings select Xcode's `deep` static-analyzer mode specifically for the Analyze
 action. The analyzer does not run during every ordinary build, avoiding a slower
 duplicate pass during day-to-day development.
@@ -235,7 +299,7 @@ Run the same action locally with:
 DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer \
   xcodebuild -skipPackagePluginValidation analyze \
   -project KitchenMemory.xcodeproj \
-  -scheme 'KitchenMemory Debugging' \
+  -scheme 'KitchenMemory macOS Development' \
   -destination 'platform=macOS' \
   -derivedDataPath /private/tmp/KitchenMemoryAnalyze \
   CODE_SIGNING_ALLOWED=NO
@@ -262,7 +326,8 @@ mechanical churn are not CI policy.
 
 When adding an opt-in rule:
 
-1. audit it across the application, frameworks, and both test targets;
+1. audit it across both applications, the frameworks, both application-test
+   targets, and the shared UI-test target;
 2. confirm that its findings represent defects or an agreed maintenance cost;
 3. bring the current tree to zero violations before making it required; and
 4. avoid a baseline unless an incremental migration has been explicitly chosen.
@@ -290,15 +355,25 @@ Testing and Production schemes locally with that Xcode version, review new
 analyzer and linter diagnostics, and then update all applicable workflows.
 
 Custom scripts in `ci_scripts` run for every cloud action. The post-clone script
-runs the dependency-free Ruby contract tests and the read-only release check on
-every action. Run the same checks locally with:
+runs the dependency-free Ruby contract tests, validates the live target/scheme/
+plan structure, and performs the read-only release check on every action. Run
+the same checks locally with:
 
 ```sh
 ruby Tools/Tests/check_release_version_test.rb
+ruby Tools/Tests/check_project_structure_test.rb
+ruby Tools/check-project-structure.rb
 ruby Tools/check-release-version.rb \
   --tag release/0.1.0 \
   --action archive
 ```
+
+The structure contract also pins each project configuration to its matching
+xcconfig; the development and production bundle namespaces; platform plist,
+entitlement, and synchronized-folder ownership; scheme action configurations,
+eligibility, and runnable products; and each test plan's coverage and launch-
+argument policy. Treat a contract failure as a reviewable project change, not
+as a reason to weaken the checker until the project happens to pass.
 
 Keep cloud scripts short, deterministic, and limited to environment preparation
 so build, test, Analyze, and Archive behavior remains visible in the shared

@@ -57,3 +57,7 @@ visual workflow is useful, and hybrid approaches.
   separately designed mobile application without replacing the shared core.
 - Presentation-framework selection is deferred until a representative editor
   prototype can provide evidence.
+
+<doc:0009-separate-native-app-targets> gives iOS and macOS distinct product
+targets while retaining this shared 0.1 application layer. It does not
+supersede this decision or make shared presentation a requirement for 0.2.
