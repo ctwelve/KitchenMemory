@@ -17,14 +17,6 @@
 		A157AD5D303D0D6B0090A9CA /* KitchenMemoryImport.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000012 /* KitchenMemoryImport.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		A157AD5E303D0D6B0090A9CA /* KitchenMemoryPersistence.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000013 /* KitchenMemoryPersistence.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		A157AD5F303D0D6B0090A9CA /* KitchenMemoryLogic.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B30000000000000000000011 /* KitchenMemoryLogic.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		A157AD61303D0D6B0090A9CA /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = A1C4E839302A6FCA00E2C0DB /* LICENSE */; };
-		A157AD62303D0D6B0090A9CA /* AI.md in Resources */ = {isa = PBXBuildFile; fileRef = A1C4E837302A6FCA00E2C0DB /* AI.md */; };
-		A157AD63303D0D6B0090A9CA /* COPYRIGHT in Resources */ = {isa = PBXBuildFile; fileRef = A1C4E838302A6FCA00E2C0DB /* COPYRIGHT */; };
-		A157AD64303D0D6B0090A9CA /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = A1C4E83A302A6FCA00E2C0DB /* README.md */; };
-		A1C933B730381D9300DE2E1C /* COPYRIGHT in Resources */ = {isa = PBXBuildFile; fileRef = A1C4E838302A6FCA00E2C0DB /* COPYRIGHT */; };
-		A1C933B830381D9800DE2E1C /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = A1C4E839302A6FCA00E2C0DB /* LICENSE */; };
-		A1C933B930381D9E00DE2E1C /* AI.md in Resources */ = {isa = PBXBuildFile; fileRef = A1C4E837302A6FCA00E2C0DB /* AI.md */; };
-		A1C933BA30381DAB00DE2E1C /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = A1C4E83A302A6FCA00E2C0DB /* README.md */; };
 		B20000000000000000000101 /* KitchenMemoryDomain.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000011 /* KitchenMemoryDomain.framework */; };
 		B20000000000000000000102 /* KitchenMemoryImport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000012 /* KitchenMemoryImport.framework */; };
 		B20000000000000000000103 /* KitchenMemoryPersistence.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000013 /* KitchenMemoryPersistence.framework */; };
@@ -205,10 +197,6 @@
 		A1C4E79E302A63B800E2C0DB /* KitchenMemory.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KitchenMemory.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1C4E7AD302A63B900E2C0DB /* KitchenMemoryIOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KitchenMemoryIOSTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1C4E7B7302A63B900E2C0DB /* KitchenMemoryUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KitchenMemoryUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		A1C4E837302A6FCA00E2C0DB /* AI.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = AI.md; sourceTree = "<group>"; };
-		A1C4E838302A6FCA00E2C0DB /* COPYRIGHT */ = {isa = PBXFileReference; lastKnownFileType = text; path = COPYRIGHT; sourceTree = "<group>"; };
-		A1C4E839302A6FCA00E2C0DB /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
-		A1C4E83A302A6FCA00E2C0DB /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		B20000000000000000000011 /* KitchenMemoryDomain.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = KitchenMemoryDomain.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B20000000000000000000012 /* KitchenMemoryImport.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = KitchenMemoryImport.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B20000000000000000000013 /* KitchenMemoryPersistence.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = KitchenMemoryPersistence.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -382,10 +370,6 @@
 				D20000000000000000000081 /* KitchenMemoryMacTesting.xctestplan */,
 				C10000000000000000000011 /* KitchenMemoryIOSProduction.xctestplan */,
 				D20000000000000000000082 /* KitchenMemoryMacProduction.xctestplan */,
-				A1C4E837302A6FCA00E2C0DB /* AI.md */,
-				A1C4E838302A6FCA00E2C0DB /* COPYRIGHT */,
-				A1C4E839302A6FCA00E2C0DB /* LICENSE */,
-				A1C4E83A302A6FCA00E2C0DB /* README.md */,
 				A1C4E7A0302A63B800E2C0DB /* KitchenMemory */,
 				A1C4E7B0302A63B900E2C0DB /* KitchenMemoryTests */,
 				A1C4E7BA302A63B900E2C0DB /* KitchenMemoryUITests */,
@@ -732,19 +716,11 @@
 		A157AD60303D0D6B0090A9CA /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
-				A157AD61303D0D6B0090A9CA /* LICENSE in Resources */,
-				A157AD62303D0D6B0090A9CA /* AI.md in Resources */,
-				A157AD63303D0D6B0090A9CA /* COPYRIGHT in Resources */,
-				A157AD64303D0D6B0090A9CA /* README.md in Resources */,
 			);
 		};
 		A1C4E79C302A63B800E2C0DB /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
-				A1C933B830381D9800DE2E1C /* LICENSE in Resources */,
-				A1C933B930381D9E00DE2E1C /* AI.md in Resources */,
-				A1C933B730381D9300DE2E1C /* COPYRIGHT in Resources */,
-				A1C933BA30381DAB00DE2E1C /* README.md in Resources */,
 			);
 		};
 		A1C4E7AB302A63B900E2C0DB /* Resources */ = {
