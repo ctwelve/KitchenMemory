@@ -44,7 +44,9 @@ struct KitchenCommands: Commands {
 
 struct KitchenSettingsView: View {
   @Bindable var model: RecipeLibraryModel
+  let cloudSyncSettings: CloudSyncSettings?
   @State private var isShowingResetConfirmation = false
+  @State private var isShowingCloudReconnectionConfirmation = false
   @Environment(\.locale) private var locale
 #if !os(macOS)
   @Environment(\.dismiss) private var dismiss
@@ -52,9 +54,51 @@ struct KitchenSettingsView: View {
 
   var body: some View {
     Form {
-      if model.personalCloudStatus != .notConfigured {
+      if let cloudSyncSettings {
         Section(.settingsIcloudSection) {
-          personalCloudStatusLabel
+          Toggle(
+            .settingsIcloudToggle,
+            isOn: Binding(
+              get: { cloudSyncSettings.isEnabled },
+              set: { newValue in
+                if cloudSyncSettings.requestChange(to: newValue)
+                  == .requiresReconnectionConfirmation {
+                  isShowingCloudReconnectionConfirmation = true
+                }
+              }
+            )
+          )
+          .accessibilityIdentifier("settings-icloud-sync")
+          .alert(
+            .settingsIcloudReconnectTitle,
+            isPresented: $isShowingCloudReconnectionConfirmation
+          ) {
+            Button(.actionCancel, role: .cancel) {}
+            Button(.settingsIcloudReconnectAction) {
+              cloudSyncSettings.confirmReconnection()
+            }
+            .accessibilityIdentifier("confirm-icloud-reconnection")
+          } message: {
+            Text(.settingsIcloudReconnectMessage)
+          }
+
+          Text(.settingsIcloudSummary)
+            .foregroundStyle(.secondary)
+
+          if cloudSyncSettings.requiresRelaunch {
+            Label(
+              cloudSyncSettings.isEnabled
+                ? LocalizedStringResource.settingsIcloudPendingEnable
+                : LocalizedStringResource.settingsIcloudPendingDisable,
+              systemImage: "arrow.clockwise"
+            )
+            .foregroundStyle(.secondary)
+          } else if cloudSyncSettings.isEnabled {
+            personalCloudStatusLabel
+          } else {
+            Label(.settingsIcloudStatusDisabled, systemImage: "icloud.slash")
+              .foregroundStyle(.secondary)
+          }
         }
       }
 
@@ -116,7 +160,7 @@ struct KitchenSettingsView: View {
     .navigationTitle(.settingsTitle)
 #if os(macOS)
     .formStyle(.grouped)
-    .frame(width: 480, height: 360)
+    .frame(width: 480, height: 460)
     .focusedSceneValue(\.resetKitchenAction) {
       isShowingResetConfirmation = true
     }

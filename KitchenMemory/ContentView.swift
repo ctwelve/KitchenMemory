@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
   @Bindable var model: RecipeLibraryModel
+  let cloudSyncSettings: CloudSyncSettings?
   @Environment(\.horizontalSizeClass) private var horizontalSizeClass
   @Environment(\.locale) private var locale
   @State private var activeSheet: ActiveRecipeSheet?
@@ -105,7 +106,10 @@ struct ContentView: View {
 #else
     .sheet(isPresented: $isShowingSettings) {
       NavigationStack {
-        KitchenSettingsView(model: model)
+        KitchenSettingsView(
+          model: model,
+          cloudSyncSettings: cloudSyncSettings
+        )
       }
     }
 #endif
@@ -301,5 +305,8 @@ private struct RecipeRow: View {
 }
 
 #Preview {
-  ContentView(model: AppDependencies.preview.libraryModel)
+  ContentView(
+    model: AppDependencies.preview.libraryModel,
+    cloudSyncSettings: nil
+  )
 }

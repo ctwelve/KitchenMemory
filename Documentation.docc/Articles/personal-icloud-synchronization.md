@@ -64,6 +64,19 @@ not cross into the macOS product. `Debug`, `Testing`, and the non-distributable
 `ProductionTesting` UI-smoke hosts use explicit local or in-memory stores and
 never require an iCloud account.
 
+Develop and Production preserve the pre-0.1.2 synchronization behavior by
+default, but Settings lets a person opt this device out. The choice is a local
+`UserDefaults` preference rather than an iCloud preference: disabling sync on a
+travel Mac must not silently disable it on an iPhone at home. The same named
+durable store changes between SwiftData's explicit `.private` and `.none`
+CloudKit configurations; recipe content never moves into an alternate store.
+Because a `ModelContainer` selects its CloudKit database when constructed, a
+change is recorded immediately but takes effect on the next clean app launch.
+SwiftData history remains in that durable store during local-only launches; a
+repository test reopens the store and verifies those transactions are still
+available for reconnection. The signed multi-device acceptance exercise remains
+the authority for confirming that managed CloudKit exports that retained work.
+
 The sample-recipe onboarding answer is a small cross-device preference, not
 recipe content. Cloud-enabled builds mirror it in `UserDefaults` for offline
 startup and synchronize it through `NSUbiquitousKeyValueStore`. Incoming iCloud
@@ -87,6 +100,14 @@ available” with “every record has synchronized”: an in-progress event says
 syncing, a completed error says attention is required, and a successful event
 returns to available. Account-change notifications trigger a fresh check.
 
+Re-enabling synchronization after a local-only launch is a reconnection, not a
+simple inverse toggle. The app requires explicit confirmation before recording
+that choice and explains that this device's recipes and revision history will
+merge with the iCloud copy on the next launch. Managed CloudKit then imports and
+exports changes accumulated while the copies were disconnected. The person is
+asked to review the combined library after sync completes rather than treating
+either copy as an unquestionable backup.
+
 ## Schema rules
 
 SwiftData's managed CloudKit integration requires persisted attributes to be
@@ -104,13 +125,25 @@ incompatible correction is necessary.
 Because managed CloudKit synchronization cannot enforce SwiftData uniqueness,
 two offline devices can still create separate storage rows carrying the same
 domain UUID. Repository reads collapse those rows by logical identity throughout
-the recipe graph. If concurrent edits point one recipe UUID at different
-immutable revisions, the highest revision number wins; equal revision numbers
-use the revision UUID as a stable tie-breaker. Both revisions remain in history.
-This rule gives every device the same result without confusing an internal
-CloudKit record name with product identity. Deletion conflicts and user-facing
-revision recovery still require the multi-device acceptance exercises before
-1.0.
+the recipe graph. The mutable `RecipeRecord.currentRevisionID` is not allowed to
+erase a competing branch merely because CloudKit resolves that pointer with
+last-writer-wins: the repository considers every immutable revision carrying the
+recipe UUID. The highest revision number wins; equal revision numbers use the
+revision UUID as a stable tie-breaker. Every revision remains in history.
+
+V2 makes deletion equally explicit. A reset writes an append-only deletion
+marker before physically removing recipe content. Any unresolved marker hides
+stale recipe rows that later return from a disconnected device. An explicit
+restore writes a resolution for each deletion marker that device has actually
+observed; deleting a marker is never used as distributed restoration intent.
+Markers and resolutions may arrive in any order or be duplicated without
+changing the eventual result. This is a repository reconciliation rule, not a
+CloudKit type exposed to Domain or Logic.
+
+Together these rules make edit, delete, and observed-restore outcomes converge
+without confusing an internal CloudKit record name with product identity. The
+signed multi-device acceptance matrix still verifies Apple's transport and the
+person-facing recovery sequence before release.
 
 After the first production schema is deployed:
 
@@ -119,6 +152,12 @@ After the first production schema is deployed:
   changes;
 - add CloudKit record types and fields additively; and
 - validate older app versions and offline data before promotion.
+
+Kitchen Memory 0.1.2 introduces `KitchenMemorySchemaV2` through a lightweight
+local migration and two additive CloudKit record types for recipe deletion and
+deletion resolution. The V1 record types and fields remain unchanged. Those new
+types must be initialized, reviewed, and deployed to the production container
+before a V2 build is distributed.
 
 Cooking sessions therefore become a new aggregate and new additive records in
 0.2. They do not require columns to be reserved in recipe records now.

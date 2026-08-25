@@ -226,6 +226,11 @@ final class KitchenMemoryTests: XCTestCase {
       environment: [:],
       buildEnvironment: .production
     ))
+    XCTAssertFalse(AppRuntimeConfiguration.synchronizesWithPersonalCloud(
+      environment: [:],
+      cloudSyncIsEnabled: false,
+      buildEnvironment: .production
+    ))
   }
 
   func testPersonalCloudContainerComesFromTheSignedBuildConfiguration() throws {
@@ -245,6 +250,12 @@ final class KitchenMemoryTests: XCTestCase {
       environment: [:],
       infoDictionary: [:],
       buildEnvironment: .testing
+    ))
+    XCTAssertNil(try AppRuntimeConfiguration.personalCloudContainerIdentifier(
+      environment: [:],
+      infoDictionary: [:],
+      cloudSyncIsEnabled: false,
+      buildEnvironment: .production
     ))
     XCTAssertThrowsError(try AppRuntimeConfiguration.personalCloudContainerIdentifier(
       environment: [:],

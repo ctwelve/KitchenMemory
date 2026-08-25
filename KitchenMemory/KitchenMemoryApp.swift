@@ -39,7 +39,10 @@ struct KitchenMemoryApp: App {
   private var applicationContent: some View {
     switch startupState {
     case .ready(let dependencies):
-      ContentView(model: dependencies.libraryModel)
+      ContentView(
+        model: dependencies.libraryModel,
+        cloudSyncSettings: dependencies.cloudSyncSettings
+      )
     case .unavailable:
       KitchenUnavailableView(retry: retryPreparation)
     }
@@ -51,7 +54,10 @@ struct KitchenMemoryApp: App {
     switch startupState {
     case .ready(let dependencies):
       NavigationStack {
-        KitchenSettingsView(model: dependencies.libraryModel)
+        KitchenSettingsView(
+          model: dependencies.libraryModel,
+          cloudSyncSettings: dependencies.cloudSyncSettings
+        )
       }
     case .unavailable:
       KitchenUnavailableView(retry: retryPreparation)
@@ -71,10 +77,13 @@ struct KitchenMemoryApp: App {
     }
 
     return AppStartupState.prepare {
+      let cloudSyncPreference = UserDefaultsCloudSyncPreference()
+      let cloudSyncIsEnabled = cloudSyncPreference.isEnabled
       let personalCloudContainerIdentifier = try AppRuntimeConfiguration
         .personalCloudContainerIdentifier(
           environment: ProcessInfo.processInfo.environment,
-          infoDictionary: Bundle.main.infoDictionary ?? [:]
+          infoDictionary: Bundle.main.infoDictionary ?? [:],
+          cloudSyncIsEnabled: cloudSyncIsEnabled
         )
 #if DEVELOP && os(macOS)
       if AppRuntimeConfiguration.initializesCloudKitSchema(
@@ -92,7 +101,14 @@ struct KitchenMemoryApp: App {
         inMemory: AppRuntimeConfiguration.usesInMemoryStore(
           arguments: ProcessInfo.processInfo.arguments
         ),
-        personalCloudContainerIdentifier: personalCloudContainerIdentifier
+        personalCloudContainerIdentifier: personalCloudContainerIdentifier,
+        cloudSyncSettings: AppBuildEnvironment.current
+          .offersCloudSyncSetting
+          ? CloudSyncSettings(
+            preference: cloudSyncPreference,
+            isEnabledAtLaunch: cloudSyncIsEnabled
+          )
+          : nil
       )
     }
   }
@@ -144,6 +160,10 @@ enum AppBuildEnvironment: CaseIterable {
     self == .develop || self == .production
   }
 
+  var offersCloudSyncSetting: Bool {
+    self == .develop || self == .production || self == .productionTesting
+  }
+
   var permitsUITestHarness: Bool {
     self == .testing || self == .productionTesting
   }
@@ -189,9 +209,11 @@ enum AppRuntimeConfiguration {
   /// evidence never depend on an iCloud account.
   static func synchronizesWithPersonalCloud(
     environment: [String: String],
+    cloudSyncIsEnabled: Bool = true,
     buildEnvironment: AppBuildEnvironment = .current
   ) -> Bool {
-    buildEnvironment.synchronizesWithPersonalCloud
+    cloudSyncIsEnabled
+      && buildEnvironment.synchronizesWithPersonalCloud
       && environment["XCTestConfigurationFilePath"] == nil
   }
 
@@ -204,10 +226,12 @@ enum AppRuntimeConfiguration {
   static func personalCloudContainerIdentifier(
     environment: [String: String],
     infoDictionary: [String: Any],
+    cloudSyncIsEnabled: Bool = true,
     buildEnvironment: AppBuildEnvironment = .current
   ) throws -> String? {
     guard synchronizesWithPersonalCloud(
       environment: environment,
+      cloudSyncIsEnabled: cloudSyncIsEnabled,
       buildEnvironment: buildEnvironment
     ) else { return nil }
     guard let identifier = infoDictionary[cloudKitContainerInfoKey] as? String,
@@ -241,10 +265,12 @@ struct AppDependencies {
   let libraryModel: RecipeLibraryModel
   let persistentStoreChangeObserver: PersistentStoreChangeObserver?
   let personalCloudStatusMonitor: PersonalCloudStatusMonitor?
+  let cloudSyncSettings: CloudSyncSettings?
 
   init(
     inMemory: Bool = false,
     personalCloudContainerIdentifier: String? = nil,
+    cloudSyncSettings: CloudSyncSettings? = nil,
     sampleOnboardingStore: (any SampleRecipeOnboardingStoring)? = nil,
     sampleProvider: (any SampleRecipeProviding)? = nil,
     initialKitchenWasCreatedOverride: Bool? = nil
@@ -285,6 +311,7 @@ struct AppDependencies {
     )
     self.modelContainer = modelContainer
     self.libraryModel = libraryModel
+    self.cloudSyncSettings = cloudSyncSettings
     persistentStoreChangeObserver = personalCloudContainerIdentifier != nil
       ? PersistentStoreChangeObserver {
         libraryModel.reloadAfterExternalStoreChange()

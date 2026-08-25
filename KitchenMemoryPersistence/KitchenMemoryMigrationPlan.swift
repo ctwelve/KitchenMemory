@@ -4,12 +4,10 @@
 
 import SwiftData
 
-/// The first persisted Kitchen Memory schema.
+/// The immutable schema shipped by Kitchen Memory 0.1.0.
 ///
-/// This pre-release schema intentionally remains mutable while Kitchen Memory
-/// has no external users. A change to V1 requires deleting development stores.
-/// After the first release, this type becomes immutable and later changes add
-/// a new schema plus a migration stage.
+/// Published local and CloudKit names remain frozen. Every later change adds a
+/// new schema and migration stage rather than editing this definition.
 public enum KitchenMemorySchemaV1: VersionedSchema {
   public static let versionIdentifier = Schema.Version(1, 0, 0)
 
@@ -26,14 +24,40 @@ public enum KitchenMemorySchemaV1: VersionedSchema {
   ]
 }
 
+/// Adds durable recipe-deletion intent and observed restoration records.
+///
+/// V1's recipe graph remains byte-for-byte compatible. The two new additive
+/// record types let every repository read converge after disconnected devices
+/// exchange edits and deletions without changing Domain values.
+public enum KitchenMemorySchemaV2: VersionedSchema {
+  public static let versionIdentifier = Schema.Version(2, 0, 0)
+
+  public static let models: [any PersistentModel.Type] = [
+    KitchenRecord.self,
+    RecipeRecord.self,
+    RecipeDeletionRecord.self,
+    RecipeDeletionResolutionRecord.self,
+    RecipeRevisionRecord.self,
+    RecipeMediaRecord.self,
+    EquipmentRecord.self,
+    IngredientSectionRecord.self,
+    RecipeIngredientRecord.self,
+    InstructionSectionRecord.self,
+    InstructionStepRecord.self,
+  ]
+}
+
 /// The ordered migration path for Kitchen Memory's private local store.
 ///
-/// V1 is the only schema in this source tree. There is deliberately no
-/// migration stage while development stores are disposable.
+/// Released V1 stores migrate additively to V2; neither existing recipe rows
+/// nor the deployed V1 CloudKit record types are renamed or repurposed.
 public enum KitchenMemoryMigrationPlan: SchemaMigrationPlan {
   public static let schemas: [any VersionedSchema.Type] = [
-    KitchenMemorySchemaV1.self
+    KitchenMemorySchemaV1.self,
+    KitchenMemorySchemaV2.self,
   ]
 
-  public static let stages: [MigrationStage] = []
+  public static let stages: [MigrationStage] = [
+    .lightweight(fromVersion: KitchenMemorySchemaV1.self, toVersion: KitchenMemorySchemaV2.self),
+  ]
 }

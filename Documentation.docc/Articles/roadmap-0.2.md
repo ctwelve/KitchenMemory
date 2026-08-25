@@ -47,9 +47,10 @@ introducing a cooking-session aggregate, changing the production persistence
 schema, or adding speculative 0.2 infrastructure.
 
 The pass includes repository-wide product and engineering polish, accurate
-documentation, and focused sample-content corrections. It is complete when its
-accepted fixes pass the existing 0.1 behavior, privacy, localization, build,
-and test contracts.
+documentation, focused sample-content corrections, and a device-local iCloud
+sync opt-out with explicit long-disconnected reconnection consent. It is
+complete when its accepted fixes pass the existing 0.1 behavior, privacy,
+localization, build, and test contracts.
 
 ## Slice 11 — 0.1.3 session foundation
 

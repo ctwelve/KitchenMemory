@@ -203,12 +203,12 @@ add sharing capability. A distinct store framework should wait until a future
 implementation has a genuinely different lifecycle, such as a versioned
 document package or direct shared-Kitchen repository.
 
-The store begins at `KitchenMemorySchemaV1` under
-`KitchenMemoryMigrationPlan`. V1 remains intentionally mutable before the first
-release, with development stores deleted after incompatible changes. At first
-release V1 becomes immutable; every later local schema change must add a new
-version and an explicit migration stage. The production CloudKit schema follows
-the corresponding additive rule: later features may introduce record types and
+The released store begins at immutable `KitchenMemorySchemaV1` under
+`KitchenMemoryMigrationPlan`. V2 adds durable recipe-deletion and observed-
+restoration records through a lightweight migration; it does not alter a V1
+record. Every later local schema change likewise adds a new version and an
+explicit migration stage. The production CloudKit schema follows the
+corresponding additive rule: later features may introduce record types and
 fields but must not remove or redefine published elements.
 
 ## Localization resources
