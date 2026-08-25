@@ -82,7 +82,7 @@ module KitchenMemory
       [marketing_versions.first, build_numbers.first, configurations.length]
     end
 
-    def validate(project_contents:, tag:, action:)
+    def validate(project_contents:, tag:, action:, release_contents: nil)
       if tag.to_s.empty?
         if action == "archive"
           raise ContractError, "Archive requires an immutable release/<major>.<minor>.<patch> tag"
@@ -103,6 +103,11 @@ module KitchenMemory
               "release tag #{tag.inspect} does not match source marketing version " \
               "#{marketing_version.inspect}"
       end
+      if release_contents && release_contents.strip != match[1]
+        raise ContractError,
+              "release tag #{tag.inspect} does not match root RELEASE marker " \
+              "#{release_contents.strip.inspect}"
+      end
 
       [marketing_version, build_number, configuration_count]
     end
@@ -114,7 +119,8 @@ if __FILE__ == $PROGRAM_NAME
   options = {
     tag: ENV["CI_TAG"],
     action: ENV["CI_XCODEBUILD_ACTION"],
-    project_path: project_path
+    project_path: project_path,
+    release_path: File.expand_path("../RELEASE", __dir__)
   }
 
   OptionParser.new do |arguments|
@@ -124,13 +130,17 @@ if __FILE__ == $PROGRAM_NAME
       options[:action] = action
     end
     arguments.on("--project PATH", "Path to project.pbxproj") { |path| options[:project_path] = path }
+    arguments.on("--release-file PATH", "Path to the root release marker") do |path|
+      options[:release_path] = path
+    end
   end.parse!
 
   begin
     result = KitchenMemory::ReleaseVersion.validate(
       project_contents: File.read(options[:project_path]),
       tag: options[:tag],
-      action: options[:action]
+      action: options[:action],
+      release_contents: File.read(options[:release_path])
     )
     if result == :not_a_release
       puts "No release tag is associated with this action; release version check skipped."

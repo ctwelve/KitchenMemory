@@ -101,6 +101,30 @@ class CheckReleaseVersionTest < Minitest::Test
     assert_includes error.message, "does not match"
   end
 
+  def test_matching_release_marker_passes
+    version, = KitchenMemory::ReleaseVersion.validate(
+      project_contents: PROJECT,
+      tag: "release/0.1.0",
+      action: "archive",
+      release_contents: "0.1.0\n"
+    )
+
+    assert_equal "0.1.0", version
+  end
+
+  def test_rejects_release_marker_that_does_not_match_tag
+    error = assert_raises(KitchenMemory::ReleaseVersion::ContractError) do
+      KitchenMemory::ReleaseVersion.validate(
+        project_contents: PROJECT,
+        tag: "release/0.1.0",
+        action: "archive",
+        release_contents: "0.0.9\n"
+      )
+    end
+
+    assert_includes error.message, "root RELEASE marker"
+  end
+
   def test_rejects_malformed_release_tag
     ["release-0.1.0", "release/0.1", "release/0.1.0-beta.1"].each do |tag|
       assert_raises(KitchenMemory::ReleaseVersion::ContractError) do

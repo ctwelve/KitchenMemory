@@ -1,0 +1,171 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "Kitchen Memory 0.1.1 source dependency inventory",
+  "documentNamespace": "https://github.com/ctwelve/KitchenMemory/sbom/0.1.1/2026-08-25",
+  "creationInfo": {
+    "created": "2026-08-25T00:00:00Z",
+    "creators": ["Organization: Kitchen Memory contributors"]
+  },
+  "documentDescribes": ["SPDXRef-Package-KitchenMemory"],
+  "packages": [
+    {
+      "name": "Kitchen Memory",
+      "SPDXID": "SPDXRef-Package-KitchenMemory",
+      "versionInfo": "0.1.1",
+      "downloadLocation": "https://github.com/ctwelve/KitchenMemory",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "GPL-3.0-only",
+      "copyrightText": "Copyright 2026 the Kitchen Memory contributors",
+      "primaryPackagePurpose": "APPLICATION",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:github/ctwelve/KitchenMemory@0.1.1"
+        }
+      ]
+    },
+    {
+      "name": "Defaults",
+      "SPDXID": "SPDXRef-Package-Defaults",
+      "versionInfo": "9.0.9",
+      "downloadLocation": "https://github.com/sindresorhus/Defaults",
+      "filesAnalyzed": false,
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "00a7465a0668a87fa159e779b9d80f1f9652357e"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT",
+      "copyrightText": "NOASSERTION",
+      "primaryPackagePurpose": "LIBRARY",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:github/sindresorhus/Defaults@9.0.9"
+        },
+        {
+          "referenceCategory": "OTHER",
+          "referenceType": "resolved-package-identity",
+          "referenceLocator": "defaults"
+        }
+      ]
+    },
+    {
+      "name": "swift-syntax",
+      "SPDXID": "SPDXRef-Package-swift-syntax",
+      "versionInfo": "603.0.2",
+      "downloadLocation": "https://github.com/swiftlang/swift-syntax",
+      "filesAnalyzed": false,
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "79e4b74a295b6eb74a8b585e3a39d29e70c1dbd1"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "Apache-2.0",
+      "copyrightText": "NOASSERTION",
+      "primaryPackagePurpose": "SOURCE",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:github/swiftlang/swift-syntax@603.0.2"
+        },
+        {
+          "referenceCategory": "OTHER",
+          "referenceType": "resolved-package-identity",
+          "referenceLocator": "swift-syntax"
+        }
+      ]
+    },
+    {
+      "name": "SwiftLintPlugins",
+      "SPDXID": "SPDXRef-Package-SwiftLintPlugins",
+      "versionInfo": "0.65.0",
+      "downloadLocation": "https://github.com/SimplyDanny/SwiftLintPlugins",
+      "filesAnalyzed": false,
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "3292bab28e6e92000161348003fdef8edc4e582d"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT",
+      "copyrightText": "NOASSERTION",
+      "primaryPackagePurpose": "SOURCE",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:github/SimplyDanny/SwiftLintPlugins@0.65.0"
+        },
+        {
+          "referenceCategory": "OTHER",
+          "referenceType": "resolved-package-identity",
+          "referenceLocator": "swiftlintplugins"
+        }
+      ]
+    },
+    {
+      "name": "SwiftLintBinary",
+      "SPDXID": "SPDXRef-Package-SwiftLintBinary",
+      "versionInfo": "0.65.0",
+      "downloadLocation": "https://github.com/realm/SwiftLint/releases/download/0.65.0/SwiftLintBinary.artifactbundle.zip",
+      "filesAnalyzed": false,
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "eb333bd76dfb5f46d21fdf3615fe39bb938956ca0b8e94c241c4b2db6e696b90"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT",
+      "copyrightText": "NOASSERTION",
+      "primaryPackagePurpose": "SOURCE",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:github/realm/SwiftLint@0.65.0"
+        }
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-Package-KitchenMemory"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-KitchenMemory",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Defaults"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-SwiftLintPlugins",
+      "relationshipType": "BUILD_DEPENDENCY_OF",
+      "relatedSpdxElement": "SPDXRef-Package-KitchenMemory"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-swift-syntax",
+      "relationshipType": "OPTIONAL_DEPENDENCY_OF",
+      "relatedSpdxElement": "SPDXRef-Package-Defaults",
+      "comment": "Resolved for Defaults macro targets; Kitchen Memory does not link DefaultsMacros."
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-SwiftLintBinary",
+      "relationshipType": "BUILD_DEPENDENCY_OF",
+      "relatedSpdxElement": "SPDXRef-Package-SwiftLintPlugins"
+    }
+  ]
+}

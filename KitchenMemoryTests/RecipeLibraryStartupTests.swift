@@ -24,27 +24,6 @@ final class RecipeLibraryStartupTests: XCTestCase {
     }
   }
 
-  @MainActor
-  private final class FakeUbiquitousKeyValueStore: UbiquitousKeyValueStoring {
-    var values: [String: String] = [:]
-    var synchronizationCount = 0
-
-    var notificationObject: AnyObject { self }
-
-    func onboardingString(forKey key: String) -> String? {
-      values[key]
-    }
-
-    func setOnboardingString(_ value: String, forKey key: String) {
-      values[key] = value
-    }
-
-    func synchronizeOnboardingStore() -> Bool {
-      synchronizationCount += 1
-      return true
-    }
-  }
-
   func testUndecidedResponseShowsChoiceBeforeAnEmptyLibrary() throws {
     let preferences = VolatileSampleRecipeOnboardingStore()
     let dependencies = try AppDependencies(
@@ -219,90 +198,51 @@ final class RecipeLibraryStartupTests: XCTestCase {
 
     store.response = .accepted
     XCTAssertEqual(store.response, .accepted)
-  }
-
-  func testUbiquitousStoreMirrorsExplicitAnswersAndReceivesICloudChanges() throws {
-    let suiteName = "RecipeLibraryStartupTests.iCloud.\(UUID().uuidString)"
-    let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
-    defer { defaults.removePersistentDomain(forName: suiteName) }
-    let cloudStore = FakeUbiquitousKeyValueStore()
-    let store = UbiquitousSampleRecipeOnboardingStore(
-      defaults: defaults,
-      ubiquitousStore: cloudStore,
-      notificationCenter: NotificationCenter()
-    )
-    var receivedResponses: [SampleRecipeOnboardingResponse] = []
-
-    store.startObservingChanges { receivedResponses.append($0) }
-    XCTAssertEqual(cloudStore.synchronizationCount, 1)
-
-    store.response = .declined
-    XCTAssertEqual(
-      cloudStore.values[UserDefaultsSampleRecipeOnboardingStore.key],
-      SampleRecipeOnboardingResponse.declined.rawValue
-    )
-    XCTAssertEqual(store.response, .declined)
-
-    cloudStore.values[UserDefaultsSampleRecipeOnboardingStore.key] =
-      SampleRecipeOnboardingResponse.accepted.rawValue
-    store.receiveExternalChange(
-      changedKeys: [UserDefaultsSampleRecipeOnboardingStore.key],
-      reason: NSUbiquitousKeyValueStoreServerChange
-    )
-
-    XCTAssertEqual(store.response, .accepted)
-    XCTAssertEqual(receivedResponses, [.accepted])
     XCTAssertEqual(
       defaults.string(forKey: UserDefaultsSampleRecipeOnboardingStore.key),
       SampleRecipeOnboardingResponse.accepted.rawValue
     )
   }
 
-  func testUbiquitousStoreMigratesAnExistingLocalAnswerAfterSynchronization() throws {
-    let suiteName = "RecipeLibraryStartupTests.migration.\(UUID().uuidString)"
+  func testDefaultsStoreObservesChanges() async throws {
+    let suiteName = "RecipeLibraryStartupTests.iCloud.\(UUID().uuidString)"
     let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
     defer { defaults.removePersistentDomain(forName: suiteName) }
-    defaults.set(
-      SampleRecipeOnboardingResponse.declined.rawValue,
-      forKey: UserDefaultsSampleRecipeOnboardingStore.key
-    )
-    let cloudStore = FakeUbiquitousKeyValueStore()
-    let store = UbiquitousSampleRecipeOnboardingStore(
-      defaults: defaults,
-      ubiquitousStore: cloudStore,
-      notificationCenter: NotificationCenter()
-    )
+    let store = UserDefaultsSampleRecipeOnboardingStore(defaults: defaults)
+    let changed = expectation(description: "Defaults change observed")
+    var receivedResponse: SampleRecipeOnboardingResponse?
 
-    store.startObservingChanges { _ in }
+    store.startObservingChanges {
+      receivedResponse = $0
+      changed.fulfill()
+    }
 
-    XCTAssertEqual(
-      cloudStore.values[UserDefaultsSampleRecipeOnboardingStore.key],
-      SampleRecipeOnboardingResponse.declined.rawValue
-    )
+    store.response = .declined
+    await fulfillment(of: [changed], timeout: 1)
+
+    XCTAssertEqual(store.response, .declined)
+    XCTAssertEqual(receivedResponse, .declined)
   }
 
-  func testICloudAccountChangeDoesNotRetainThePreviousAccountsAnswer() throws {
+  func testICloudAccountChangeDoesNotRetainThePreviousAccountsAnswer() async throws {
     let suiteName = "RecipeLibraryStartupTests.account.\(UUID().uuidString)"
     let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
     defer { defaults.removePersistentDomain(forName: suiteName) }
-    defaults.set(
-      SampleRecipeOnboardingResponse.declined.rawValue,
-      forKey: UserDefaultsSampleRecipeOnboardingStore.key
-    )
-    let cloudStore = FakeUbiquitousKeyValueStore()
     let store = UbiquitousSampleRecipeOnboardingStore(
       defaults: defaults,
-      ubiquitousStore: cloudStore,
-      notificationCenter: NotificationCenter()
+      notificationCenter: NotificationCenter(),
+      synchronizesWithPersonalCloud: false
     )
+    store.response = .declined
+    let changed = expectation(description: "Account change observed")
     var receivedResponse: SampleRecipeOnboardingResponse?
-    store.startObservingChanges { receivedResponse = $0 }
-    cloudStore.values.removeValue(forKey: UserDefaultsSampleRecipeOnboardingStore.key)
+    store.startObservingChanges {
+      receivedResponse = $0
+      changed.fulfill()
+    }
 
-    store.receiveExternalChange(
-      changedKeys: nil,
-      reason: NSUbiquitousKeyValueStoreAccountChange
-    )
+    store.receiveExternalChange(reason: NSUbiquitousKeyValueStoreAccountChange)
+    await fulfillment(of: [changed], timeout: 1)
 
     XCTAssertEqual(store.response, .undecided)
     XCTAssertEqual(receivedResponse, .undecided)
