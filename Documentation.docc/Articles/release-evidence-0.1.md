@@ -6,9 +6,12 @@ Copyright © 2026 the Kitchen Memory contributors.
 SPDX-License-Identifier: GPL-3.0-only
 -->
 
-- Status: Active
+- Status: Public-alpha artifact accepted; GitHub draft prepared
 - Candidate version: 0.1.0
 - Evidence opened: 2026-08-24
+- Accepted source: `98038e9c5acbc8c423b92589d5778438706db5fe`
+- Immutable tag: `release/0.1.0`
+- Direct macOS artifact: 0.1.0 (1), accepted 2026-08-25
 
 This ledger is a practice run of disciplined acceptance for an early alpha. It
 records enough evidence to exercise the release process and expose weak gates;
@@ -57,18 +60,19 @@ non-private data derived to reproduce the behavior. See <doc:privacy>.
 | Release-version contract | `b5937b6` | Passed | Marketing version 0.1.0 and the committed Xcode Cloud seed policy checked by every Cloud action; local contract passed 7 tests and 17 assertions on 2026-08-24 |
 | Privacy-manifest policy contract | `b5937b6` | Passed | Focused local test passed 1/1 on macOS 26.6.2 with Xcode 26.6, 2026-08-24 |
 | Localization-catalog contract | `b5937b6` | Passed | Focused local test passed 1/1 on macOS 26.6.2 with Xcode 26.6, 2026-08-24 |
-| Archive-tag version simulation | `b5937b6` | Passed | The `release/0.1.0` tag-to-marketing-version contract validated across five application configurations, 2026-08-24; no artifact or Cloud-assigned build number exists yet |
+| Archive-tag version simulation | `b5937b6` | Passed | The `release/0.1.0` tag-to-marketing-version contract validated across five application configurations, 2026-08-24; no artifact or Cloud-assigned build number existed at that historical source state |
 | Local ProductionValidation non-UI suite | `d90fb85` | Passed | 252/252 tests on macOS 26.6.2 with Xcode 26.6, 2026-08-24; includes domain, import, persistence, app composition, privacy-manifest, and localization-catalog contracts |
 | Signed local macOS UI smoke suite | `a02694a` | Passed | 10/10 tests on macOS 26.6.2 with Xcode 26.6, 2026-08-24; includes privacy-safe startup recovery, supported locales, localization stress modes, settings/privacy, recipe navigation, and the 280/320-point sidebar behavior |
 | Unsigned Production bundle preflight | `a02694a` | Passed | Fresh macOS and generic iOS builds succeeded on 2026-08-24; both report version 0.1.0, source build-number seed 1, and minimum OS 26.0; privacy manifest matched source byte-for-byte and all three locale bundles were present |
+| Final pull-request iOS tests | `d451a73` | Passed | [Xcode Cloud action](https://appstoreconnect.apple.com/teams/69a6de82-7580-47e3-e053-5b8c7c11a4d1/apps/6803723477/ci/builds/c0d7b83a-ded3-4bd9-9b15-d7972caf15b0/action/dd3a5584-6fd6-43c3-8766-d4fa8c5f7c65), 2026-08-24, 5m48s |
+| Final pull-request macOS tests | `d451a73` | Passed | [Xcode Cloud action](https://appstoreconnect.apple.com/teams/69a6de82-7580-47e3-e053-5b8c7c11a4d1/apps/6803723477/ci/builds/c0d7b83a-ded3-4bd9-9b15-d7972caf15b0/action/2245f735-3322-4fd3-8ba7-163e492efe8a), 2026-08-24, 3m44s; 261/261 tests |
+| Final branch iOS and macOS Build and Analyze | `d451a73` | Passed | [Xcode Cloud build](https://appstoreconnect.apple.com/teams/69a6de82-7580-47e3-e053-5b8c7c11a4d1/apps/6803723477/ci/builds/46c14d11-fba7-47e4-b38b-160467a28dbd), 2026-08-24; all four actions and the GitHub source-branch policy passed |
+| Accepted `main` Production builds | `98038e9` | Passed | [Xcode Cloud build](https://appstoreconnect.apple.com/teams/69a6de82-7580-47e3-e053-5b8c7c11a4d1/apps/6803723477/ci/builds/e01a5ac4-4b77-4267-b61c-0b6ba8e4f08e), 2026-08-24; iOS and macOS Production actions passed |
+| Final release-version contract | `98038e9` | Passed | `release/0.1.0` validated marketing version 0.1.0 and source build 1 across 10 application configurations before tag creation, 2026-08-24 |
 
-The separate native app-target change establishes a new build and test graph.
-Keep the rows above as historical evidence for their recorded source states.
-After the split is committed, append fresh rows for both platform Testing lanes,
-both Production test graphs, native iOS and macOS UI smoke, the exact framework
-coverage gate, and the release-version and project-structure contracts. Record
-the actual accepted commit in each new row; do not relabel an older result or
-use an uncommitted working tree as release evidence.
+The final rows establish the separate native app-target build and test graph on
+the accepted candidate. Earlier rows remain historical evidence for the source
+states they name; they are not relabeled as results for `98038e9`.
 
 These rows establish the release-engineering infrastructure baseline. They do
 not replace installation, synchronization, localization, accessibility, archive,
@@ -81,9 +85,9 @@ numbers, UDIDs, Apple IDs, or other account identifiers.
 
 | Device class | Installation | OS | Candidate | Result | Evidence note |
 | --- | --- | --- | --- | --- | --- |
-| iPhone 16 Pro Max | Clean | Record at execution | Unassigned | Not run | Paired device available 2026-08-24; private device name and identifier omitted |
+| iPhone 16 Pro Max | Clean development install | Record at execution | Development candidate | Passed | Signed Development application launched and exercised on physical hardware; final Production iOS artifact remains unassigned and is not claimed |
 | 12.9-inch iPad Pro (3rd generation) | Clean | Record at execution | Unassigned | Not run | Paired device unavailable 2026-08-24; private device name and identifier omitted |
-| Apple-silicon Mac | Clean, outside Xcode | macOS 26.6.2 | Unassigned | Not run | Current development Mac; clean artifact installation remains unproven |
+| Apple-silicon Mac | Direct artifact, outside Xcode | macOS 26.6.2 | 0.1.0 (1) | Passed | Extracted signed and notarized Developer ID application installed, launched, and completed an ordinary-use walkthrough on 2026-08-25 |
 | iPhone or iPad | Update over an older candidate | Unassigned | Unassigned | Deferred | Required after beta distribution exists |
 
 ## Recipe acceptance
@@ -93,6 +97,13 @@ non-private additions. The walkthrough should include manual entry or editing,
 an ordinary import, a deliberately imperfect import, relaunch, revision,
 scaling, reading, and source review. Record the exact small set used, but do not
 inflate its size into a broad corpus claim.
+
+| 0.1 exercise | Result | Evidence note |
+| --- | --- | --- |
+| Bundled starter catalog | Passed | Three stable recipe families with `en-US`, `fr-CA`, and `es-MX` authored variants loaded; catalog-count and identity contracts passed on the final candidate |
+| Manual revision | Passed | A bundled hotdish recipe was edited in the Development environment, the revised timing displayed after save, and the exercise was reproduced after resetting the Development store |
+| Source-rich varied sample | Passed | The final catalog includes a metadata-rich recipe reconstructed from a two-part source conversation, preserving structured sections, source attribution, and gallery media without treating the side dish as a separate meal record |
+| Twenty-recipe breadth corpus | Deferred | Required for 1.0; the three-family alpha set is not represented as equivalent evidence |
 
 The following twenty-recipe corpus is retained as a 1.0 gate and is deferred
 for this alpha candidate.
@@ -122,7 +133,7 @@ resulting library graph and stable identities on both devices.
 | Scenario | Expected result | Result | Evidence note |
 | --- | --- | --- | --- |
 | Create on device A | Complete recipe graph appears on device B | Not run | — |
-| Revise on device B | Immutable revision history converges on device A | Not run | — |
+| Revise on device B | Immutable revision history converges on device A | Not run | A signed Development exercise observed an edit arrive through iCloud, but the complete final-candidate graph and revision-history comparison was not recorded |
 | Work offline, then reconnect | Local work remains usable and later converges | Not run | — |
 | Concurrent revisions | Both immutable revisions survive deterministically | Not run | — |
 | Delete a recipe | Deletion converges without restoring unrelated samples | Not run | — |
@@ -130,14 +141,14 @@ resulting library graph and stable identities on both devices.
 | Remove or restrict the iCloud account | Local behavior remains intelligible; no false success | Not run | — |
 | Relaunch during recovery | Stored content and recovery state remain coherent | Not run | — |
 | Compare stable identities | Kitchen, recipe, revision, child-row, media, and sample IDs survive | Not run | — |
-| Review generated V1 schema | Clean-install schema matches the frozen model | Not run | — |
-| Promote the production schema | Promotion is recorded and irreversible fields are reviewed | Not run | Required only after every preceding V1 gate passes |
+| Review generated V1 schema | Clean-install schema matches the frozen model | Passed | Production-container Development schema was exported and reviewed: nine application record types, expected fields, indexes, and security roles; no destructive change appeared in the deployment preview |
+| Promote the production schema | Promotion is recorded and irreversible fields are reviewed | Passed | `iCloud.net.ctwelve.KitchenMemory` deployed to Production on 2026-08-24 after adding the missing duration and custom-display fields and their indexes; this alpha exception does not imply that every 1.0 synchronization scenario passed |
 
 ## Person-facing quality
 
 | Surface | Required review | Result | Evidence note |
 | --- | --- | --- | --- |
-| `en-US`, `fr-CA`, and `es-MX` alpha check | Automated catalog contract plus developer review of representative layouts and fallback behavior | Not run | Human review is not claimed for 0.1 |
+| `en-US`, `fr-CA`, and `es-MX` alpha check | Automated catalog contract plus developer review of representative layouts and fallback behavior | Passed | Final catalog and localized sample contracts passed; launch and representative layouts were exercised during device acceptance; native-language review is not claimed |
 | `fr-CA` and `es-MX` human review | Native-language review of meaning, tone, plurals, and authored samples | Deferred | Required before 1.0 acceptance |
 | Durable application shell | VoiceOver, keyboard/focus, Dynamic Type where applicable | Not run | — |
 | Settings and privacy display | Clear state, recovery language, privacy accuracy | Not run | — |
@@ -153,15 +164,19 @@ but any barrier that prevents ordinary 0.1 use is release blocking.
 
 | Gate | Result | Evidence note |
 | --- | --- | --- |
-| Privacy manifest matches the release binary and bundled dependencies | Not run | — |
-| Version, credits, license, localized metadata, icons, and launch assets | Not run | — |
-| Immutable `release/0.1.0` tag created from the accepted candidate | Not run | Create only after earlier gates pass |
-| Xcode Cloud-assigned artifact build number recorded | Not run | Known only after the protected release tag produces an accepted artifact |
+| Privacy manifest matches the release binary and bundled dependencies | Passed | Extracted 0.1.0 (1) macOS artifact manifest matched `KitchenMemory/PrivacyInfo.xcprivacy` byte-for-byte on 2026-08-25 |
+| Version, credits, license, localized metadata, icons, and launch assets | Passed | Extracted artifact reports 0.1.0 (1), production bundle and CloudKit identifiers, macOS 26.0 minimum, universal Intel/Apple-silicon executable, localized strings and credits, application icon, and GPL-3.0-only notice |
+| Immutable `release/0.1.0` tag created from the accepted candidate | Passed | Annotated tag object `e391799` peels to accepted merge commit `98038e9`; the remote tag was verified after creation and was not moved |
+| Xcode Cloud-assigned artifact build number recorded | Deferred | Xcode Cloud did not import the new Git tag or start the tag workflow; the local Developer ID fallback intentionally retains source build 1 |
 | Signed iOS archive | Not run | — |
-| Signed and notarized macOS archive | Not run | — |
-| Notarized Mac artifact installs and launches outside Xcode | Not run | — |
+| Signed and notarized macOS archive | Passed | Local Xcode archive exported with Developer ID; extracted application passed strict deep signature verification, Gatekeeper assessment as `Notarized Developer ID`, and stapled-ticket validation on 2026-08-25 |
+| Notarized Mac artifact installs and launches outside Xcode | Passed | The release operator installed and exercised the exported application outside Xcode on 2026-08-25 |
 | TestFlight installation and update path | Deferred | Distribution is intentionally not configured yet |
-| Production-schema, archive, and submission procedure rehearsed | Not run | — |
+| Production-schema, archive, and submission procedure rehearsed | Passed with exception | Production schema and local Mac archive/notarization were completed; the protected tag was created correctly, but Apple's source synchronization did not launch the configured Cloud archives |
+
+The accepted release archive is `KitchenMemory-0.1.0-macOS.zip` (6,413,260
+bytes). Its SHA-256 digest is
+`b44b1abc65b5eb5548f40aea1d89dafe9d1cf5f2284739a4ce7cc9dcb8fdc268`.
 
 ## Known issues and blockers
 
@@ -169,22 +184,19 @@ but any barrier that prevents ordinary 0.1 use is release blocking.
 | --- | --- | --- |
 | Toolchain diagnostic | Accepted | macOS 26.2 Swift/XCTest actor-isolated teardown can abort application-hosted tests; CI uses the latest runtime. See [swiftlang/swift#87316](https://github.com/swiftlang/swift/issues/87316). |
 | Toolchain diagnostic | Accepted | Xcode 26.6 may emit `DebuggerVersionStore` messages while an iOS or macOS UI-test fallback launcher proceeds; assertions remain ordinary failures. See <doc:continuous-integration>. |
+| Release-process exception | Accepted for 0.1 | GitHub contained the correct immutable annotated tag, but Xcode Cloud showed no available tags and did not start `Tag to release/`. The release operator used the same accepted source state for a local Developer ID archive, notarization, and direct GitHub distribution. Do not move the tag to replay the event. |
 | Release blocker | None recorded | Add every unresolved data-loss, source-corruption, ordinary-use, or false-sync-success defect here. |
 
-## Execution order
+## Follow-up boundary
 
-1. Assign the available supported devices and run representative clean-install
-   checks, beginning with a direct installation on physical iPhone hardware.
-2. Exercise the small 0.1 recipe set locally before introducing
-   synchronization; retain the twenty-recipe corpus for 1.0.
-3. Run the alpha-appropriate subset of the two-device synchronization and
-   recovery matrix, recording every omitted scenario as deferred rather than
-   passed.
-4. Correct release-blocking defects with regression coverage and re-establish
-   affected automated evidence.
-5. Complete the 0.1 developer localization, accessibility, privacy, and
-   diagnostic review; retain native-language review for 1.0.
-6. Review and promote the production CloudKit schema.
-7. Create the immutable release tag, inspect the archives, and verify the
-   notarized Mac artifact outside Xcode.
-8. Configure and rehearse beta distribution before inviting testers.
+The direct macOS artifact is accepted for the public 0.1 alpha and attached to
+a GitHub draft release. Public iOS
+distribution, TestFlight installation and updates, the broader two-device
+recovery matrix, native-language review, the twenty-recipe corpus, and the
+remaining accessibility walkthroughs stay explicitly open. They are not
+retroactively converted into passing evidence by publication of the Mac build.
+
+Before the next tagged release, verify that Xcode Cloud can see a harmless new
+tag before depending on tag automation, or document and approve a durable
+manual-start fallback that still selects the immutable release tag. The 0.1 tag
+must remain fixed at `98038e9` regardless of the service-side failure.

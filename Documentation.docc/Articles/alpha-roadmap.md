@@ -7,13 +7,16 @@ SPDX-License-Identifier: GPL-3.0-only
 -->
 
 
-- Status: Feature baseline complete; release engineering next
-- Date: 2026-08-23
+- Status: 0.1 public-alpha artifact accepted; publication prepared
+- Baseline completed: 2026-08-23
+- Alpha artifact accepted: 2026-08-25
 
 This roadmap records the feature slices that produced the 0.1 baseline and the
 boundary between feature development and release engineering. Slices 1 through
-10 are complete. The next pass is not Slice 11: it hardens the integrated
-product without introducing another product capability.
+10 and the deliberately reduced public-alpha acceptance exercise are complete.
+Version 0.1.0 is prepared as a signed and notarized direct-download macOS
+application in a GitHub draft release; public iOS and TestFlight distribution
+remain later work.
 
 ## Alpha definition
 
@@ -190,17 +193,20 @@ refresh, development schema administration, and recovery documentation. Local
 and cloud persistence now live together behind `KitchenMemoryPersistence`,
 while Domain and Logic remain independent of Apple storage mechanics.
 
-## 0.1 release engineering — Hardening
+## 0.1 release engineering — Completed alpha exercise
 
-The feature loop now moves into its first release-engineering pass. This work is
-deliberately not numbered as Slice 11: its unit of progress is release evidence,
+The feature loop moved through its first release-engineering pass. This work was
+deliberately not numbered as Slice 11: its unit of progress was release evidence,
 not another feature increment.
 
-The pass covers production builds and archives, real-device and cross-device
-acceptance, V1 schema promotion, synchronization recovery, localization and
-accessibility review, privacy-conscious diagnostics, beta distribution, and a
-repeatable release procedure. Its full gates and exit criteria live in
-<doc:release-engineering>.
+The pass established final green candidate builds, protected release tagging,
+V1 production-schema promotion, privacy and localization contracts, physical-
+device Development acceptance, and a signed, notarized, post-extraction-
+validated Mac artifact that launched outside Xcode. When Xcode Cloud failed to
+import the release tag, the alpha used an explicit local Developer ID archive
+fallback without moving the immutable tag. Public iOS/TestFlight distribution
+and the broader 1.0-quality acceptance matrix remain deferred. Full results live
+in <doc:release-evidence-0.1>.
 
 ## 0.2 feature release — Cooking sessions
 
