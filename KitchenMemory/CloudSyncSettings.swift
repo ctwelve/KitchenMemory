@@ -2,39 +2,7 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: GPL-3.0-only
 
-import Foundation
 import Observation
-
-@MainActor
-protocol CloudSyncPreferenceStoring: AnyObject {
-  var isEnabled: Bool { get set }
-}
-
-/// Keeps the iCloud transport choice local to this device.
-///
-/// The default preserves the synchronization behavior of installations that
-/// predate the setting. Unlike sample onboarding, this choice must not travel
-/// through iCloud and silently enable or disable another device.
-@MainActor
-final class UserDefaultsCloudSyncPreference: CloudSyncPreferenceStoring {
-  static let key = "personalCloudSynchronizationEnabled"
-
-  private let defaults: UserDefaults
-
-  init(defaults: UserDefaults = .standard) {
-    self.defaults = defaults
-  }
-
-  var isEnabled: Bool {
-    get {
-      guard defaults.object(forKey: Self.key) != nil else { return true }
-      return defaults.bool(forKey: Self.key)
-    }
-    set {
-      defaults.set(newValue, forKey: Self.key)
-    }
-  }
-}
 
 /// Presents an honest pending state while the current store remains open.
 ///
@@ -54,7 +22,7 @@ final class CloudSyncSettings {
   let isEnabledAtLaunch: Bool
   private(set) var isEnabled: Bool {
     didSet {
-      preference.isEnabled = isEnabled
+      preference.personalCloudSynchronizationEnabled = isEnabled
     }
   }
 
@@ -64,7 +32,7 @@ final class CloudSyncSettings {
   ) {
     self.preference = preference
     self.isEnabledAtLaunch = isEnabledAtLaunch
-    isEnabled = preference.isEnabled
+    isEnabled = preference.personalCloudSynchronizationEnabled
   }
 
   var requiresRelaunch: Bool {

@@ -65,13 +65,14 @@ not cross into the macOS product. `Debug`, `Testing`, and the non-distributable
 never require an iCloud account.
 
 Develop and Production preserve the pre-0.1.2 synchronization behavior by
-default, but Settings lets a person opt this device out. The choice is a local
-`UserDefaults` preference rather than an iCloud preference: disabling sync on a
-travel Mac must not silently disable it on an iPhone at home. The same named
-durable store changes between SwiftData's explicit `.private` and `.none`
-CloudKit configurations; recipe content never moves into an alternate store.
-Because a `ModelContainer` selects its CloudKit database when constructed, a
-change is recorded immediately but takes effect on the next clean app launch.
+default, but Settings lets a person opt this device out. The shared application
+preferences store gives that key device-local scope rather than iCloud scope:
+disabling sync on a travel Mac must not silently disable it on an iPhone at
+home. The same named durable store changes between SwiftData's explicit
+`.private` and `.none` CloudKit configurations; recipe content never moves into
+an alternate store. Because a `ModelContainer` selects its CloudKit database
+when constructed, a change is recorded immediately but takes effect on the next
+clean app launch.
 SwiftData history remains in that durable store during local-only launches; a
 repository test reopens the store and verifies those transactions are still
 available for reconnection. The signed multi-device acceptance exercise remains
@@ -171,12 +172,14 @@ schema metadata is the authority for which structural stages remain.
 
 Version 0.1.1 makes a direct cutover from the released
 `sampleRecipes.consent` key to the typed `sampleRecipesConsent` key in both
-UserDefaults and iCloud key-value storage. Defaults owns typed serialization,
-observation, timestamp conflict resolution, and transport through
-`NSUbiquitousKeyValueStore`; Kitchen Memory still clears the answer when the
-iCloud account changes. It does not migrate or dual-write the old preference.
-An alpha user may therefore be asked for the sample-recipe choice again after
-updating; recipe content is not changed or removed.
+UserDefaults and iCloud key-value storage. `DefaultsKitchenPreferencesStore`
+centralizes typed serialization, stable key names, defaults, and observation.
+The Defaults package provides timestamp conflict resolution and transport
+through `NSUbiquitousKeyValueStore`; Kitchen Memory still assigns each key's
+scope and clears the onboarding answer when the iCloud account changes. It does
+not migrate or dual-write the old preference. An alpha user may therefore be
+asked for the sample-recipe choice again after updating; recipe content is not
+changed or removed.
 
 Future data rewrites that do not change the SwiftData schema need an equally
 explicit, durable migration ledger. They must not become content probes that

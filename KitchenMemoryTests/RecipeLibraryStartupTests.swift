@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 @testable import KitchenMemory
-import Foundation
 import KitchenMemoryDomain
 import KitchenMemoryLogic
 import KitchenMemoryPersistence
@@ -25,10 +24,10 @@ final class RecipeLibraryStartupTests: XCTestCase {
   }
 
   func testUndecidedResponseShowsChoiceBeforeAnEmptyLibrary() throws {
-    let preferences = VolatileSampleRecipeOnboardingStore()
+    let preferences = VolatileKitchenPreferencesStore()
     let dependencies = try AppDependencies(
       inMemory: true,
-      sampleOnboardingStore: preferences
+      preferencesStore: preferences
     )
 
     dependencies.libraryModel.loadIfNeeded()
@@ -36,14 +35,14 @@ final class RecipeLibraryStartupTests: XCTestCase {
     XCTAssertEqual(dependencies.libraryModel.startupState, .choosingSamples)
     XCTAssertEqual(dependencies.libraryModel.sampleOnboardingResponse, .undecided)
     XCTAssertTrue(dependencies.libraryModel.recipes.isEmpty)
-    XCTAssertEqual(preferences.response, .undecided)
+    XCTAssertEqual(preferences.sampleRecipeOnboardingResponse, .undecided)
   }
 
   func testExternalChangeBeforeInitialLoadLeavesStartupOwnedByLoad() throws {
-    let preferences = VolatileSampleRecipeOnboardingStore()
+    let preferences = VolatileKitchenPreferencesStore()
     let dependencies = try AppDependencies(
       inMemory: true,
-      sampleOnboardingStore: preferences
+      preferencesStore: preferences
     )
 
     dependencies.libraryModel.reloadAfterExternalStoreChange()
@@ -56,10 +55,10 @@ final class RecipeLibraryStartupTests: XCTestCase {
   }
 
   func testExistingKitchenSkipsAQuestionThatWasNeverAnsweredOnThisDevice() throws {
-    let preferences = VolatileSampleRecipeOnboardingStore()
+    let preferences = VolatileKitchenPreferencesStore()
     let dependencies = try AppDependencies(
       inMemory: true,
-      sampleOnboardingStore: preferences,
+      preferencesStore: preferences,
       initialKitchenWasCreatedOverride: false
     )
 
@@ -71,10 +70,10 @@ final class RecipeLibraryStartupTests: XCTestCase {
   }
 
   func testRemoteContentDismissesAnInapplicableQuestionWithoutInventingAnAnswer() throws {
-    let preferences = VolatileSampleRecipeOnboardingStore()
+    let preferences = VolatileKitchenPreferencesStore()
     let dependencies = try AppDependencies(
       inMemory: true,
-      sampleOnboardingStore: preferences,
+      preferencesStore: preferences,
       initialKitchenWasCreatedOverride: true
     )
     dependencies.libraryModel.loadIfNeeded()
@@ -87,14 +86,14 @@ final class RecipeLibraryStartupTests: XCTestCase {
 
     XCTAssertEqual(dependencies.libraryModel.startupState, .ready)
     XCTAssertEqual(dependencies.libraryModel.sampleOnboardingResponse, .undecided)
-    XCTAssertEqual(preferences.response, .undecided)
+    XCTAssertEqual(preferences.sampleRecipeOnboardingResponse, .undecided)
   }
 
   func testDecliningPersistsTheChoiceAndRevealsTheEmptyLibrary() throws {
-    let preferences = VolatileSampleRecipeOnboardingStore()
+    let preferences = VolatileKitchenPreferencesStore()
     let dependencies = try AppDependencies(
       inMemory: true,
-      sampleOnboardingStore: preferences
+      preferencesStore: preferences
     )
     dependencies.libraryModel.loadIfNeeded()
 
@@ -102,15 +101,15 @@ final class RecipeLibraryStartupTests: XCTestCase {
 
     XCTAssertEqual(dependencies.libraryModel.startupState, .ready)
     XCTAssertEqual(dependencies.libraryModel.sampleOnboardingResponse, .declined)
-    XCTAssertEqual(preferences.response, .declined)
+    XCTAssertEqual(preferences.sampleRecipeOnboardingResponse, .declined)
     XCTAssertTrue(dependencies.libraryModel.recipes.isEmpty)
   }
 
   func testAcceptingAddsSamplesBesideUserContentOnlyOnce() throws {
-    let preferences = VolatileSampleRecipeOnboardingStore()
+    let preferences = VolatileKitchenPreferencesStore()
     let dependencies = try AppDependencies(
       inMemory: true,
-      sampleOnboardingStore: preferences
+      preferencesStore: preferences
     )
     dependencies.libraryModel.loadIfNeeded()
     XCTAssertTrue(
@@ -124,17 +123,17 @@ final class RecipeLibraryStartupTests: XCTestCase {
     XCTAssertEqual(dependencies.libraryModel.startupState, .ready)
     XCTAssertEqual(dependencies.libraryModel.sampleOnboardingResponse, .accepted)
     XCTAssertEqual(dependencies.libraryModel.samplePresence, .complete)
-    XCTAssertEqual(preferences.response, .accepted)
+    XCTAssertEqual(preferences.sampleRecipeOnboardingResponse, .accepted)
     XCTAssertEqual(dependencies.libraryModel.recipes.count, 4)
     XCTAssertEqual(Set(dependencies.libraryModel.recipes.map(\.recipe.id)), firstIDs)
     XCTAssertTrue(dependencies.libraryModel.recipes.contains { $0.revision.title == "Keep Me" })
   }
 
   func testAnsweredOnboardingDoesNotAutomaticallyReinsertMissingSamples() throws {
-    let preferences = VolatileSampleRecipeOnboardingStore(response: .accepted)
+    let preferences = VolatileKitchenPreferencesStore(sampleRecipeOnboardingResponse: .accepted)
     let dependencies = try AppDependencies(
       inMemory: true,
-      sampleOnboardingStore: preferences
+      preferencesStore: preferences
     )
 
     dependencies.libraryModel.loadIfNeeded()
@@ -146,11 +145,11 @@ final class RecipeLibraryStartupTests: XCTestCase {
   }
 
   func testExplicitFailedInstallationKeepsResponseAndCanBeRetried() throws {
-    let preferences = VolatileSampleRecipeOnboardingStore(response: .declined)
+    let preferences = VolatileKitchenPreferencesStore(sampleRecipeOnboardingResponse: .declined)
     let samples = RecoveringSampleProvider()
     let dependencies = try AppDependencies(
       inMemory: true,
-      sampleOnboardingStore: preferences,
+      preferencesStore: preferences,
       sampleProvider: samples
     )
 
@@ -159,7 +158,7 @@ final class RecipeLibraryStartupTests: XCTestCase {
 
     XCTAssertEqual(dependencies.libraryModel.startupState, .ready)
     XCTAssertEqual(dependencies.libraryModel.issue, .samples)
-    XCTAssertEqual(preferences.response, .accepted)
+    XCTAssertEqual(preferences.sampleRecipeOnboardingResponse, .accepted)
     XCTAssertTrue(dependencies.libraryModel.recipes.isEmpty)
 
     samples.shouldFail = false
@@ -171,10 +170,10 @@ final class RecipeLibraryStartupTests: XCTestCase {
   }
 
   func testResetRecordsAcceptedResponseAfterDecliningSamples() throws {
-    let preferences = VolatileSampleRecipeOnboardingStore(response: .declined)
+    let preferences = VolatileKitchenPreferencesStore(sampleRecipeOnboardingResponse: .declined)
     let dependencies = try AppDependencies(
       inMemory: true,
-      sampleOnboardingStore: preferences
+      preferencesStore: preferences
     )
     dependencies.libraryModel.loadIfNeeded()
 
@@ -182,69 +181,8 @@ final class RecipeLibraryStartupTests: XCTestCase {
 
     XCTAssertEqual(dependencies.libraryModel.sampleOnboardingResponse, .accepted)
     XCTAssertEqual(dependencies.libraryModel.samplePresence, .complete)
-    XCTAssertEqual(preferences.response, .accepted)
+    XCTAssertEqual(preferences.sampleRecipeOnboardingResponse, .accepted)
     XCTAssertEqual(dependencies.libraryModel.recipes.count, 3)
   }
 
-  func testUserDefaultsStoreTreatsMissingAndUnknownValuesAsUndecided() throws {
-    let suiteName = "RecipeLibraryStartupTests.\(UUID().uuidString)"
-    let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
-    defer { defaults.removePersistentDomain(forName: suiteName) }
-    let store = UserDefaultsSampleRecipeOnboardingStore(defaults: defaults)
-
-    XCTAssertEqual(store.response, .undecided)
-    defaults.set("future-value", forKey: UserDefaultsSampleRecipeOnboardingStore.key)
-    XCTAssertEqual(store.response, .undecided)
-
-    store.response = .accepted
-    XCTAssertEqual(store.response, .accepted)
-    XCTAssertEqual(
-      defaults.string(forKey: UserDefaultsSampleRecipeOnboardingStore.key),
-      SampleRecipeOnboardingResponse.accepted.rawValue
-    )
-  }
-
-  func testDefaultsStoreObservesChanges() async throws {
-    let suiteName = "RecipeLibraryStartupTests.iCloud.\(UUID().uuidString)"
-    let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
-    defer { defaults.removePersistentDomain(forName: suiteName) }
-    let store = UserDefaultsSampleRecipeOnboardingStore(defaults: defaults)
-    let changed = expectation(description: "Defaults change observed")
-    var receivedResponse: SampleRecipeOnboardingResponse?
-
-    store.startObservingChanges {
-      receivedResponse = $0
-      changed.fulfill()
-    }
-
-    store.response = .declined
-    await fulfillment(of: [changed], timeout: 1)
-
-    XCTAssertEqual(store.response, .declined)
-    XCTAssertEqual(receivedResponse, .declined)
-  }
-
-  func testICloudAccountChangeDoesNotRetainThePreviousAccountsAnswer() async throws {
-    let suiteName = "RecipeLibraryStartupTests.account.\(UUID().uuidString)"
-    let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
-    defer { defaults.removePersistentDomain(forName: suiteName) }
-    let store = UbiquitousSampleRecipeOnboardingStore(
-      defaults: defaults,
-      notificationCenter: NotificationCenter(),
-      synchronizesWithPersonalCloud: false
-    )
-    store.response = .declined
-    let changed = expectation(description: "Account change observed")
-    var receivedResponse: SampleRecipeOnboardingResponse?
-    store.startObservingChanges {
-      receivedResponse = $0
-      changed.fulfill()
-    }
-
-    store.receiveExternalChange(reason: NSUbiquitousKeyValueStoreAccountChange)
-    await fulfillment(of: [changed], timeout: 1)
-
-    XCTAssertEqual(store.response, .undecided)
-    XCTAssertEqual(receivedResponse, .undecided)
-  }
 }

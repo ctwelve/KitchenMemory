@@ -8,25 +8,11 @@ import XCTest
 @MainActor
 final class CloudSyncSettingsTests: XCTestCase {
   private final class PreferenceStub: CloudSyncPreferenceStoring {
-    var isEnabled: Bool
+    var personalCloudSynchronizationEnabled: Bool
 
     init(isEnabled: Bool) {
-      self.isEnabled = isEnabled
+      personalCloudSynchronizationEnabled = isEnabled
     }
-  }
-
-  func testPreferencePreservesExistingEnabledBehaviorAndStoresOptOut() throws {
-    let suiteName = "CloudSyncSettingsTests.preference.\(UUID().uuidString)"
-    let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
-    defer { defaults.removePersistentDomain(forName: suiteName) }
-    let preference = UserDefaultsCloudSyncPreference(defaults: defaults)
-
-    XCTAssertTrue(preference.isEnabled)
-
-    preference.isEnabled = false
-
-    XCTAssertFalse(preference.isEnabled)
-    XCTAssertFalse(UserDefaultsCloudSyncPreference(defaults: defaults).isEnabled)
   }
 
   func testReconnectingLocalLibraryRequiresExplicitMergeConfirmation() {
@@ -41,12 +27,12 @@ final class CloudSyncSettingsTests: XCTestCase {
       .requiresReconnectionConfirmation
     )
     XCTAssertFalse(settings.isEnabled)
-    XCTAssertFalse(preference.isEnabled)
+    XCTAssertFalse(preference.personalCloudSynchronizationEnabled)
 
     settings.confirmReconnection()
 
     XCTAssertTrue(settings.isEnabled)
-    XCTAssertTrue(preference.isEnabled)
+    XCTAssertTrue(preference.personalCloudSynchronizationEnabled)
     XCTAssertTrue(settings.requiresRelaunch)
   }
 

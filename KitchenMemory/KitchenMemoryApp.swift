@@ -77,8 +77,11 @@ struct KitchenMemoryApp: App {
     }
 
     return AppStartupState.prepare {
-      let cloudSyncPreference = UserDefaultsCloudSyncPreference()
-      let cloudSyncIsEnabled = cloudSyncPreference.isEnabled
+      let preferences = DefaultsKitchenPreferencesStore(
+        permitsPersonalPreferencesICloud:
+          AppBuildEnvironment.current.synchronizesWithPersonalCloud
+      )
+      let cloudSyncIsEnabled = preferences.personalCloudSynchronizationEnabled
       let personalCloudContainerIdentifier = try AppRuntimeConfiguration
         .personalCloudContainerIdentifier(
           environment: ProcessInfo.processInfo.environment,
@@ -102,10 +105,11 @@ struct KitchenMemoryApp: App {
           arguments: ProcessInfo.processInfo.arguments
         ),
         personalCloudContainerIdentifier: personalCloudContainerIdentifier,
+        preferencesStore: preferences,
         cloudSyncSettings: AppBuildEnvironment.current
           .offersCloudSyncSetting
           ? CloudSyncSettings(
-            preference: cloudSyncPreference,
+            preference: preferences,
             isEnabledAtLaunch: cloudSyncIsEnabled
           )
           : nil
@@ -270,8 +274,8 @@ struct AppDependencies {
   init(
     inMemory: Bool = false,
     personalCloudContainerIdentifier: String? = nil,
+    preferencesStore: (any KitchenPreferencesStoring)? = nil,
     cloudSyncSettings: CloudSyncSettings? = nil,
-    sampleOnboardingStore: (any SampleRecipeOnboardingStoring)? = nil,
     sampleProvider: (any SampleRecipeProviding)? = nil,
     initialKitchenWasCreatedOverride: Bool? = nil
   ) throws {
@@ -287,15 +291,15 @@ struct AppDependencies {
     let preparedKitchen = try KitchenBootstrapService(repository: repository)
       .prepareInitialKitchenWithStatus()
     let kitchen = preparedKitchen.kitchen
-    let onboardingStore = sampleOnboardingStore ?? Self.defaultOnboardingStore(
+    let preferences = preferencesStore ?? Self.defaultPreferencesStore(
       inMemory: inMemory,
-      synchronizesWithPersonalCloud: personalCloudContainerIdentifier != nil
+      permitsPersonalPreferencesICloud: personalCloudContainerIdentifier != nil
     )
     let sampleInstaller = SampleRecipeInstallService(repository: repository, samples: samples)
 
     // Disposable previews and UI smoke tests request a ready-made fixture.
     // Durable launches never infer installation permission from this path.
-    if inMemory, sampleOnboardingStore == nil {
+    if inMemory, preferencesStore == nil {
       try sampleInstaller.install(in: kitchen.id)
     }
 
@@ -306,7 +310,7 @@ struct AppDependencies {
       importer: RecipeImportService(),
       resetService: KitchenResetService(repository: repository, samples: samples),
       sampleInstaller: sampleInstaller,
-      sampleOnboardingStore: onboardingStore,
+      samplePreferences: preferences,
       kitchenWasCreated: initialKitchenWasCreatedOverride ?? preparedKitchen.wasCreated
     )
     self.modelContainer = modelContainer
@@ -349,13 +353,15 @@ struct AppDependencies {
     return .personalCloud(containerIdentifier: personalCloudContainerIdentifier)
   }
 
-  private static func defaultOnboardingStore(
+  private static func defaultPreferencesStore(
     inMemory: Bool,
-    synchronizesWithPersonalCloud: Bool
-  ) -> any SampleRecipeOnboardingStoring {
-    if inMemory { return VolatileSampleRecipeOnboardingStore(response: .accepted) }
-    return synchronizesWithPersonalCloud
-      ? UbiquitousSampleRecipeOnboardingStore()
-      : UserDefaultsSampleRecipeOnboardingStore()
+    permitsPersonalPreferencesICloud: Bool
+  ) -> any KitchenPreferencesStoring {
+    if inMemory {
+      return VolatileKitchenPreferencesStore(sampleRecipeOnboardingResponse: .accepted)
+    }
+    return DefaultsKitchenPreferencesStore(
+      permitsPersonalPreferencesICloud: permitsPersonalPreferencesICloud
+    )
   }
 }
