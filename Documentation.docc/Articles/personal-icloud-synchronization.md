@@ -123,6 +123,30 @@ After the first production schema is deployed:
 Cooking sessions therefore become a new aggregate and new additive records in
 0.2. They do not require columns to be reserved in recipe records now.
 
+## 0.1 production deployment record
+
+The first production schema for `iCloud.net.ctwelve.KitchenMemory` was deployed
+on 2026-08-24 for accepted source commit `98038e9`. The deployment preview
+contained nine Kitchen Memory record types, the expected indexes, and the
+standard `_world`, `_icloud`, and `_creator` security roles. No record type,
+field, index, or role deletion appeared in the preview.
+
+Final comparison against the frozen V1 model found four fields missing from the
+production container's Development schema. They were added and reviewed before
+deployment:
+
+- `CD_prepSeconds`, `CD_cookSeconds`, and `CD_totalSeconds` on
+  `CD_RecipeRevisionRecord` as queryable and sortable integer fields; and
+- `CD_customDisplayText` on `CD_RecipeIngredientRecord` as a queryable,
+  searchable, and sortable string field.
+
+After deployment, Production was inspected directly: all nine application
+record types were present, both affected record types contained 22 fields, and
+the expected custom-display and duration indexes were visible. This deployment
+freezes the published V1 names and meanings under the additive-evolution rules
+above. It does not substitute for the still-open two-device production recovery
+matrix in <doc:release-evidence-0.1>.
+
 ## Development schema workflow
 
 Schema administration is an explicit development operation, not application

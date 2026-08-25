@@ -271,10 +271,30 @@ rewrite cannot silently change the meaning of an existing seed/case pair.
 Xcode Cloud workflow metadata and start conditions live in Xcode Cloud rather
 than in this repository. Keep its actions, requirements, branch patterns, tag
 prefixes, and change filters aligned with this policy. TestFlight distribution
-is intentionally absent for now; archives and notarization are driven only by
-the `release/` tag prefix.
+is intentionally absent for now; the normal archive and notarization workflow
+is driven only by the `release/` tag prefix.
 
-The first release-engineering pass uses the production workflow as release
+### 0.1 tag synchronization exception
+
+GitHub accepted the immutable annotated `release/0.1.0` tag and reported that it
+peeled to accepted merge commit `98038e9`, whose iOS and macOS `Merge to main`
+actions were green. Xcode Cloud nevertheless did not import the tag, list it as
+an available manual source, or start `Tag to release/`. The workflow remained
+active and correctly configured for tags beginning with `release/`.
+
+The tag was not moved, deleted, or recreated to replay the external event. The
+0.1 public alpha instead used a local Developer ID macOS archive from the same
+accepted source, followed by notarization, stapling, post-ZIP verification, and
+outside-Xcode acceptance. This is a recorded service-side exception, not the
+new default release path.
+
+Before relying on the next release tag, confirm that Xcode Cloud can import a
+harmless newly pushed tag. If automatic synchronization remains unavailable,
+approve a manual-start mechanism that still selects the immutable release tag
+and preserves the version contract; do not broaden the archive workflow to
+ordinary `main` commits merely to work around a missing tag event.
+
+The first release-engineering pass used the production workflow as release
 evidence rather than as a ceremonial final build. Its acceptance and
 distribution gates are defined in <doc:release-engineering>.
 

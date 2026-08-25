@@ -7,9 +7,10 @@ SPDX-License-Identifier: GPL-3.0-only
 -->
 
 
-## Working idea
+## Product
 
-A private, collaborative recipe book for a family, designed around how people
+A private, local-first recipe book that begins with one person's Apple devices
+and is designed to grow into calm household collaboration around how people
 actually remember what is in their kitchen.
 
 The application should eventually connect recipes, meal plans, shopping, and a
@@ -81,7 +82,13 @@ inventory maintenance.
 - Later: a cook reviewing a pantry suggestion based on several exact and fuzzy
   holdings of the same ingredient.
 
-## First useful release
+## First useful release — 0.1.0 public alpha
+
+The first useful release artifact was accepted on 2026-08-25 as a signed and
+notarized direct-download macOS application and prepared in a GitHub draft. The
+same source contains native iPhone and iPad targets, but public iOS distribution
+and TestFlight remain deferred. The alpha proves the core recipe loop with a
+deliberately smaller acceptance set than the one required for 1.0.
 
 ### In scope
 
@@ -110,9 +117,14 @@ inventory maintenance.
 - Multi-person Kitchen sharing and live collaboration.
 - True peer-to-peer synchronization.
 
-## Success signals
+## Alpha evidence and 1.0 success signals
 
-The first release succeeds when a household can:
+The 0.1 exercise established manual revision, bounded import, structured
+reading and scaling, local persistence, private Development iCloud propagation,
+production-schema deployment, and a notarized Mac artifact. It did not claim
+the breadth of the eventual 1.0 acceptance corpus.
+
+Before 1.0, the product should demonstrate that a household can:
 
 1. Import twenty recipes from varied websites without losing meaningful text.
 2. Correct imperfect imports faster than re-entering the recipe.

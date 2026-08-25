@@ -6,30 +6,53 @@ Copyright © 2026 the Kitchen Memory contributors.
 SPDX-License-Identifier: GPL-3.0-only
 -->
 
-- Status: Accepted plan
-- Date: 2026-08-23
+- Status: 0.1 public-alpha artifact accepted; publication draft prepared
+- Planned: 2026-08-23
+- Completed: 2026-08-25
 
 The 0.1 feature baseline is complete. Kitchen Memory can create, import, review,
-revise, scale, read, localize, and privately synchronize recipes. The next pass
-is therefore not Slice 11 and does not introduce another product capability. It
-is the project's first release-engineering pass: practice proving that the
-existing product can be built, installed, operated, diagnosed, and recovered
-with release-level discipline.
+revise, scale, read, localize, and privately synchronize recipes. The following
+work was therefore not Slice 11 and did not introduce another product
+capability. It was the project's first release-engineering pass: practice
+proving that the existing product could be built, installed, operated,
+diagnosed, and recovered with release-level discipline.
 
-This is an early-alpha rehearsal, not a claim that 0.1 satisfies the full 1.0
+This was an early-alpha rehearsal, not a claim that 0.1 satisfies the full 1.0
 acceptance bar. Expensive gates may be exercised with a representative subset
 or deferred when they do not protect an immediate alpha risk. Every reduction
 must remain explicit in the candidate evidence; a deferred gate is never a
 passing result.
 
-Hardening begins from `main` after the completed feature-slice integration
-branch is merged. Focused fixes should remain small and reviewable; this pass is
-not permission to redesign settled domain boundaries or quietly add deferred
+Hardening began from `main` after the completed feature-slice integration branch
+was merged. Focused fixes remained small and reviewable; the pass was not
+permission to redesign settled domain boundaries or quietly add deferred
 features.
 
 Record candidate-specific results in <doc:release-evidence-0.1>. A plan states
 what must be proven; the evidence ledger identifies the exact source state,
 environment, result, and non-private record that earned each release claim.
+
+## 0.1 outcome
+
+The accepted candidate is merge commit `98038e9`, protected by the immutable
+annotated tag `release/0.1.0`. Its final pull-request Test, Build, Analyze, source-
+branch policy, and `main` Production Build actions passed. The production
+CloudKit schema was reviewed and deliberately deployed before distribution.
+
+Xcode Cloud did not import the new Git tag and therefore did not start the two
+configured Archive actions. GitHub held the correct tag and target throughout;
+moving or recreating that evidence to replay a service event was rejected. For
+this alpha, the release operator instead archived the same accepted source
+locally, exported a universal Developer ID macOS application, notarized it,
+stapled the ticket, installed it outside Xcode, and completed an ordinary-use
+walkthrough. The verified 0.1.0 (1) ZIP and its checksum are attached to a
+GitHub draft release for the existing tag; publication remains an explicit
+release-operator action.
+
+That fallback is an explicit 0.1 exception, not a silent weakening of the normal
+contract. There is no public iOS artifact or TestFlight group. The broader
+synchronization, recovery, accessibility, localization, and recipe-corpus gates
+listed in <doc:release-evidence-0.1> remain deferred or open exactly as recorded.
 
 ## Release candidate
 
@@ -83,8 +106,11 @@ fix, test, diagnostic, or documentation change; it should not expand this loop.
 - Require the development and pull-request Test and Analyze gates to pass for
   the final candidate. Then allow the intentional iOS and macOS production Build
   actions to pass on the resulting `main` commit.
-- Run the iOS and macOS Archive actions from the reviewed release tag with normal
-  signing, production entitlements, and the production CloudKit environment.
+- Normally run the iOS and macOS Archive actions from the reviewed release tag
+  with normal signing, production entitlements, and the production CloudKit
+  environment. The documented 0.1 fallback produced only the directly
+  distributed Developer ID macOS artifact after Apple's tag synchronization
+  failed.
 - Confirm version and build numbering, archive contents, privacy declarations,
   credits, license resources, localized metadata, and icon/launch assets.
 - TestFlight distribution is not configured yet. The release archives are
@@ -94,10 +120,12 @@ fix, test, diagnostic, or documentation change; it should not expand this loop.
   candidate.
 - Set the project's marketing version, commit it, and allow the reviewed commit
   to pass the required `main` actions before creating a matching tag such as
-  `release/0.1.0`. The tag starts the configured archive and notarization
-  workflow; release tags are immutable evidence and must never be moved to a
-  different commit or reused. Keep the source build number at `1`; Xcode Cloud
-  owns the distributed build sequence.
+  `release/0.1.0`. The tag is intended to start the configured archive and
+  notarization workflow; release tags are immutable evidence and must never be
+  moved to a different commit or reused, even when a service fails to consume
+  the event. Keep the source build number at `1`; Xcode Cloud owns Cloud-
+  distributed build numbers, while an explicitly accepted local artifact may
+  retain the source build number.
 - GitHub requires the aggregate Xcode Cloud pull-request result before merging
   to `main`. Active `release/*` rulesets restrict creation to the release
   operator, require a successful Xcode Cloud `Merge to main` result on the
@@ -133,9 +161,9 @@ fix, test, diagnostic, or documentation change; it should not expand this loop.
 - Maintain a release-blocker list and known-issues record. A workaround must be
   explicit; an unexplained intermittent failure is not a passing result.
 
-## Exit criteria
+## Exit criteria and alpha reduction
 
-The first release-engineering pass is complete when:
+The full release-engineering target is complete when:
 
 - all required development and pull-request Test and Analyze gates pass for the
   final candidate, the configured production Build actions pass on `main`, and
@@ -151,6 +179,14 @@ The first release-engineering pass is complete when:
 - no open defect can lose data, corrupt source meaning, prevent ordinary use, or
   leave a synchronization failure falsely reported as success.
 
-Passing these gates establishes the 0.1 release baseline. Feature development
-then resumes with the 0.2 cooking-session work described in
-<doc:cooking-sessions>.
+The 0.1 public alpha intentionally completed a smaller acceptance exercise. It
+passed the final automated candidate, production schema, immutable tag, direct
+Mac signing/notarization, post-extraction security validation, and outside-Xcode
+launch gates. It deferred public iOS/TestFlight distribution, native-language
+review, the twenty-recipe corpus, and much of the broad device/recovery matrix.
+The precise result is recorded in <doc:release-evidence-0.1>; publication does
+not convert any omitted row into a pass.
+
+This accepted alpha baseline allows feature development to resume with the 0.2
+cooking-session work described in <doc:cooking-sessions>, while the deferred
+1.0-quality gates remain visible release work.
