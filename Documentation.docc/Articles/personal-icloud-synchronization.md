@@ -56,10 +56,13 @@ does not need to be rewritten merely because the transport scope changes.
 `Develop` launches use the private database in
 `iCloud.net.ctwelve.dev.KitchenMemory`; `Production` uses
 `iCloud.net.ctwelve.KitchenMemory`. They select the Development and Production
-CloudKit environments respectively. The application target enables iCloud,
-push notifications, and the remote-notification background mode. `Debug`,
-`Testing`, and the non-distributable `ProductionTesting` UI-smoke host use
-explicit local or in-memory stores and never require an iCloud account.
+CloudKit environments respectively. `KitchenMemory iOS` and
+`KitchenMemory macOS` own separate entitlement files while selecting those
+environment-specific containers. The iOS target owns its
+remote-notification background declaration; that iOS-only bundle setting does
+not cross into the macOS product. `Debug`, `Testing`, and the non-distributable
+`ProductionTesting` UI-smoke hosts use explicit local or in-memory stores and
+never require an iCloud account.
 
 The sample-recipe onboarding answer is a small cross-device preference, not
 recipe content. Cloud-enabled builds mirror it in `UserDefaults` for offline
@@ -125,7 +128,7 @@ Cooking sessions therefore become a new aggregate and new additive records in
 Schema administration is an explicit development operation, not application
 startup behavior.
 
-1. Build and sign `KitchenMemory Development` for My Mac. Its distinct app
+1. Build and sign `KitchenMemory macOS Development` for My Mac. Its distinct app
    identifier gives the Development store its own sandbox, while its entitlements
    select the separate `iCloud.net.ctwelve.dev.KitchenMemory` container.
 2. Launch that Mac app once with `--initialize-cloudkit-schema`.

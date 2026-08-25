@@ -27,13 +27,15 @@ table of sentence fragments.
 ## Interface language
 
 Application-shell labels, actions, settings, validation messages, and formatted
-counts belong in String Catalogs owned by the `KitchenMemory` application target.
-The catalogs carry the plural variants required by each supported locale. As
-interface copy stabilizes, ambiguous terms, placeholders, tone, and screen
-context receive translator comments at their extraction sites. Views and
-presentation adapters request localized values; `KitchenMemoryDomain`,
-`KitchenMemoryImport`, `KitchenMemoryPersistence`, and `KitchenMemoryLogic` do
-not look up interface strings.
+counts belong in String Catalogs in the shared `KitchenMemory/` application
+layer. Explicit target membership compiles those catalogs into both
+`KitchenMemory iOS` and `KitchenMemory macOS`. The catalogs carry the plural
+variants required by each supported locale. As interface copy stabilizes,
+ambiguous terms, placeholders, tone, and screen context receive translator
+comments at their extraction sites. Views and presentation adapters request
+localized values; `KitchenMemoryDomain`, `KitchenMemoryImport`,
+`KitchenMemoryPersistence`, and `KitchenMemoryLogic` do not look up interface
+strings.
 
 ### Localization-key lifecycle
 
@@ -59,9 +61,9 @@ outside this interface-copy abstraction.
 semantic and manually managed; translator comments and all three locales are
 required; every value must be reviewed and nonempty; plural structures must
 match; and formatted values must use named placeholders with identical
-signatures in every locale. The test target embeds an exact JSON copy of the raw
-catalog at build time so this source-level contract remains available when CI
-builds and runs tests on separate hosts.
+signatures in every locale. Both platform application-test targets embed an
+exact JSON copy of the raw catalog at build time so this source-level contract
+remains available when CI builds and runs tests on separate hosts.
 
 This boundary is now enforced. The former English-oriented `renderedText`,
 `structuredDisplayText`, and `effectiveDisplayText` domain helpers are gone.

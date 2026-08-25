@@ -74,14 +74,15 @@ pantry inventory, meal planning, shopping, and household sharing follow later.
 
 ## Development
 
-Open `KitchenMemory.xcodeproj` in Xcode and run the **KitchenMemory Development**
-scheme on My Mac, an iOS Simulator, or a development device. Its app identifier
-and local sandbox are deliberately separate from Production. Its signed
-entitlements also select `iCloud.net.ctwelve.dev.KitchenMemory`, so development
+Open `KitchenMemory.xcodeproj` in Xcode and run **KitchenMemory iOS Development**
+for an iOS Simulator or development device, or **KitchenMemory macOS Development**
+for My Mac. Their shared development app identifier and platform-specific local
+sandboxes are deliberately separate from Production. Their signed entitlements
+also select `iCloud.net.ctwelve.dev.KitchenMemory`, so development
 records and schema administration cannot touch the production container.
-The application is based on Xcode's standard
-multiplatform SwiftUI structure and uses SwiftData as its first local persistence
-implementation. On first launch, it creates an empty local Kitchen and asks
+The two app targets currently share a SwiftUI application layer and use
+SwiftData as their first local persistence implementation. On first launch, it
+creates an empty local Kitchen and asks
 whether the person wants to install the bundled sample recipe pack. The answer
 is stored independently of recipe data only to avoid repeating onboarding; it
 is not standing permission to restore deleted content. Settings derives
@@ -93,20 +94,21 @@ authored variants are related by the sample manifest rather than pretending
 that two different recipe payloads are one durable recipe revision.
 
 The app's internal domain, import, persistence, and product-logic modules live
-under `KitchenMemory/Modules` as native Xcode framework targets. Bundled starter
-content and presentation adapters compile directly into `KitchenMemory`.
-Business-logic, application, and persistence tests run in the shared
-`KitchenMemory Testing` scheme and committed non-UI test plan:
+in root-level folders as native Xcode framework targets. Shared presentation,
+localization, and starter content live in `KitchenMemory`; platform-owned files
+live in `KitchenMemoryIOS` and `KitchenMemoryMac`. Business-logic, application,
+and persistence tests run in both platform Testing schemes using the committed
+platform-specific non-UI test plans:
 
 ```sh
 xcodebuild test \
   -project KitchenMemory.xcodeproj \
-  -scheme 'KitchenMemory Testing' \
+  -scheme 'KitchenMemory macOS Testing' \
   -destination 'platform=macOS'
 ```
 
-The small UI smoke suite runs only through the `KitchenMemory Production`
-scheme. See the architecture and continuous-integration documentation for the
+The small UI smoke suite runs only through the two platform Production schemes.
+See the architecture and continuous-integration documentation for the
 Debug, Develop, Testing, Production, and non-distributable ProductionTesting
 configuration policy.
 

@@ -10,14 +10,14 @@
          <BuildActionEntry
             buildForTesting = "YES"
             buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "A1C4E79D302A63B800E2C0DB"
+               BlueprintIdentifier = "A157AD4A303D0D6B0090A9CA"
                BuildableName = "KitchenMemory.app"
-               BlueprintName = "KitchenMemory"
+               BlueprintName = "KitchenMemory macOS"
                ReferencedContainer = "container:KitchenMemory.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -30,7 +30,7 @@
       shouldUseLaunchSchemeArgsEnv = "YES">
       <TestPlans>
          <TestPlanReference
-            reference = "container:KitchenMemoryTesting.xctestplan"
+            reference = "container:KitchenMemoryMacTesting.xctestplan"
             default = "YES">
          </TestPlanReference>
       </TestPlans>
@@ -40,16 +40,16 @@
             parallelizable = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "A1C4E7AC302A63B900E2C0DB"
-               BuildableName = "KitchenMemoryTests.xctest"
-               BlueprintName = "KitchenMemoryTests"
+               BlueprintIdentifier = "D20000000000000000000021"
+               BuildableName = "KitchenMemoryMacTests.xctest"
+               BlueprintName = "KitchenMemoryMacTests"
                ReferencedContainer = "container:KitchenMemory.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
-      buildConfiguration = "Develop"
+      buildConfiguration = "Testing"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       launchStyle = "0"
@@ -63,15 +63,15 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "A1C4E79D302A63B800E2C0DB"
+            BlueprintIdentifier = "A157AD4A303D0D6B0090A9CA"
             BuildableName = "KitchenMemory.app"
-            BlueprintName = "KitchenMemory"
+            BlueprintName = "KitchenMemory macOS"
             ReferencedContainer = "container:KitchenMemory.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
    <ProfileAction
-      buildConfiguration = "Production"
+      buildConfiguration = "Testing"
       shouldUseLaunchSchemeArgsEnv = "YES"
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
@@ -80,18 +80,18 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "A1C4E79D302A63B800E2C0DB"
+            BlueprintIdentifier = "A157AD4A303D0D6B0090A9CA"
             BuildableName = "KitchenMemory.app"
-            BlueprintName = "KitchenMemory"
+            BlueprintName = "KitchenMemory macOS"
             ReferencedContainer = "container:KitchenMemory.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
    <AnalyzeAction
-      buildConfiguration = "Develop">
+      buildConfiguration = "Testing">
    </AnalyzeAction>
    <ArchiveAction
-      buildConfiguration = "Production"
+      buildConfiguration = "Testing"
       revealArchiveInOrganizer = "YES">
    </ArchiveAction>
 </Scheme>

@@ -7,11 +7,11 @@ SPDX-License-Identifier: GPL-3.0-only
 -->
 
 
-The product is a native SwiftUI application for iPhone, iPad, and Mac, with a
-display-centric tvOS client planned for a later phase. The Mac application is not
-merely an enlarged phone interface: it should grow into a powerful library-
-management and automation environment while sharing the same recipe domain and
-import engine.
+The product uses separate native SwiftUI application targets for iPhone and
+iPad, and for Mac, with a display-centric tvOS client planned for a later phase.
+The Mac application is not merely an enlarged phone interface: it should grow
+into a powerful library-management and automation environment while sharing the
+same recipe domain and import engine.
 
 ## Platform roles
 
@@ -38,6 +38,22 @@ Mac product may use AppKit and Storyboards for precise interaction and visual
 design, while mobile may retain SwiftUI, use UIKit, or adopt a hybrid. Whatever
 the result, the platforms continue to share the product core rather than a
 compromised interface. See <doc:0006-shared-ui-for-foundation-slices>.
+
+## Native product targets and destinations
+
+`KitchenMemory iOS` is the native iPhone and iPad product.
+`KitchenMemory macOS` is the native Mac product. Their shared 0.1 source layer
+does not make them one runnable, archive, entitlement surface, or launch-screen
+contract.
+
+The iOS target supports iOS devices and iOS Simulator only. Mac Catalyst, Mac
+Designed for iPhone or iPad, and visionOS Designed for iPhone or iPad are
+explicitly unsupported. The macOS target supports native macOS destinations
+only. This keeps Xcode and Xcode Cloud destination lists aligned with products
+the project actually builds and accepts. A future Catalyst, visionOS, or tvOS
+target must be an explicit product decision with its own interaction,
+capability, testing, and release contract. See
+<doc:0009-separate-native-app-targets>.
 
 The tvOS client should emphasize legibility at kitchen distance, simple remote
 navigation, clear progress through instructions, timers, and reliable access to
@@ -121,13 +137,14 @@ RecipeScalingState     transient working-yield selection
 File import, search, export, batch work, and cooking sessions will extend this
 same boundary when their slices arrive.
 
-### KitchenMemory application target
+### KitchenMemory application layer and native targets
 
-The SwiftUI interface, `RecipeLibraryModel` composition glue, bundled sample
-resources, localization catalogs, and Apple-platform integrations. Platform-
-specific scenes, commands, and presentation strings belong here; reusable recipe
-behavior does not. See <doc:implementation-architecture> and
-<doc:localization-architecture>.
+The shared `KitchenMemory/` layer contains the SwiftUI interface,
+`RecipeLibraryModel` composition glue, bundled sample resources, and
+localization catalogs, with membership in both native app targets.
+Platform-owned resources, entitlements, and future presentation code belong in
+`KitchenMemoryIOS/` or `KitchenMemoryMac/`; reusable recipe behavior does not.
+See <doc:implementation-architecture> and <doc:localization-architecture>.
 
 An eventual tvOS target should consume `KitchenMemoryDomain` and the read/cook-oriented
 Logic operations while supplying its own focused presentation layer. Its

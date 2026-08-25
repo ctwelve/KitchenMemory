@@ -7,14 +7,14 @@ SPDX-License-Identifier: GPL-3.0-only
 -->
 
 Kitchen Memory uses native Xcode framework targets for boundaries that carry
-independent technical responsibilities. Interface code, platform composition,
-and bundled starter content compile directly into the application target.
+independent technical responsibilities. Separate iOS and macOS application
+targets currently consume the same shared SwiftUI presentation, composition,
+localization, and starter content.
 
 ## Target organization
 
-`KitchenMemory/Modules` contains four internal frameworks. They enforce
-dependency direction inside the Xcode project; they are not separately
-distributed products.
+Four root-level folders contain the internal frameworks. They enforce dependency
+direction inside the Xcode project; they are not separately distributed products.
 
 - `KitchenMemoryDomain` owns persistence-independent domain values.
 - `KitchenMemoryImport` owns deterministic Schema.org recipe discovery and
@@ -25,14 +25,16 @@ distributed products.
 - `KitchenMemoryLogic` owns product operations and presentation-independent
   workflow state.
 
-The application target links all four frameworks because composition adapters
+Both application targets link all four frameworks because composition adapters
 exchange domain values, construct persistence and import implementations, and
 inject Logic operations. Import and persistence each depend on the domain but
 not on one another. Logic coordinates all three public boundaries without
 depending on the application or SwiftUI.
 
 ```text
-KitchenMemory application ──→ all four internal frameworks
+KitchenMemory iOS ───┐
+                     ├──→ all four internal frameworks
+KitchenMemory macOS ─┘
 
 KitchenMemoryLogic
 ├── KitchenMemoryImport ───────┐
@@ -43,6 +45,17 @@ KitchenMemoryLogic
 This structure keeps reusable technical boundaries explicit without turning
 small, app-specific groups of files into framework products merely for source
 organization.
+
+`KitchenMemory/` is the shared application layer. `KitchenMemoryIOS/` and
+`KitchenMemoryMac/` contain resources and entitlements owned by only one app
+target. Each root-level framework folder belongs only to its matching framework
+target. This direct target membership replaces filename conventions and
+per-file platform filters.
+
+The shared SwiftUI layer is an explicit 0.1 compromise, not a permanent promise.
+The app-target boundary lets 0.2 replace either platform's presentation with
+UIKit, AppKit, or platform-specific SwiftUI without moving product logic again.
+See <doc:0009-separate-native-app-targets>.
 
 ## Build environments
 
@@ -60,10 +73,10 @@ target implementation details:
 `ProductionTesting` is deliberately non-distributable. It retains production
 compiler behavior while admitting disposable automated-test storage that is
 disabled in the actual `Production` application. Hosted unit tests and UI-test
-launches use that storage only in a testing configuration. `KitchenMemory
-Debugging` runs `Develop`, `KitchenMemory Testing` runs the non-UI plan with
-`Testing`, and `KitchenMemory Production` archives `Production` while running
-its UI target through `ProductionTesting`.
+launches use that storage only in a testing configuration. Each platform's
+Development scheme runs `Develop`, each Testing scheme runs the non-UI plan with
+`Testing`, and each Production scheme archives `Production` while running its UI
+target through `ProductionTesting`.
 
 Production retains automatic signing but does not pin an Apple Development
 identity. Xcode therefore remains responsible for selecting the appropriate
@@ -87,9 +100,10 @@ input, and lets complete product behavior run in fast framework tests.
 
 ### Application composition and stitching points
 
-The application target contains a deliberately small set of stitching points.
-They connect platform facilities and replaceable SwiftUI presentation to the
-stable framework boundaries without moving business rules back into the app.
+The shared application layer contains a deliberately small set of stitching
+points, compiled into both native app targets. They connect platform facilities
+and replaceable SwiftUI presentation to the stable framework boundaries without
+moving business rules back into the app.
 
 ```text
 KitchenMemoryApp
@@ -200,11 +214,11 @@ fields but must not remove or redefine published elements.
 ## Localization resources
 
 String Catalogs, locale-aware presentation formatters, and localized bundled
-content belong to the application target. English-oriented display helpers have
-been removed from the domain; the frameworks return semantic domain values and
-typed failures rather than choosing interface language. This keeps formatting
-and pluralization replaceable without making locale a hidden input to business
-rules.
+content belong to the shared application layer and have membership in both app
+targets. English-oriented display helpers have been removed from the domain;
+the frameworks return semantic domain values and typed failures rather than
+choosing interface language. This keeps formatting and pluralization replaceable
+without making locale a hidden input to business rules.
 
 Interface copy and authored recipe content use separate resources. String
 Catalogs hold labels, actions, errors, and pluralized messages. Complete sample
@@ -215,9 +229,9 @@ instructions, ingredients, attribution, and accessibility descriptions. See
 ## Sample resources
 
 Deterministic starter content is application data, so its loader and resources
-live directly in the `KitchenMemory` target. The source asset catalog is
-`KitchenMemory/SampleRecipes.xcassets`, separate from the application's visual
-assets.
+live directly in the shared `KitchenMemory/` layer with membership in both app
+targets. The source asset catalog is `KitchenMemory/SampleRecipes.xcassets`,
+separate from the shared visual asset catalog.
 
 Assets for one recipe may be collected in an organizational asset-catalog
 group. The sample loader resolves nested source data sets when Xcode copies the
@@ -276,17 +290,22 @@ the application-owned loader.
 
 ## Tests
 
-Framework, application, and integration tests belong to the shared
-`KitchenMemory Testing` scheme and `KitchenMemoryTesting.xctestplan`. Tests for starter content
-and app composition live directly in `KitchenMemoryTests`; framework tests
-remain grouped by their corresponding module, including
+Framework, application, and integration tests belong to both platform Testing
+schemes and the platform-specific `KitchenMemoryIOSTesting.xctestplan` and
+`KitchenMemoryMacTesting.xctestplan` plans. Tests for starter content
+and app composition live directly in `KitchenMemoryTests`; that shared source
+folder belongs to the platform-specific `KitchenMemoryIOSTests` and
+`KitchenMemoryMacTests` host targets. Framework tests remain grouped by their
+corresponding module, including
 `KitchenMemoryLogicTests` and the cloud-specific
 `KitchenMemoryPersistenceTests/Cloud` group. The exact coverage gate currently
 requires every executable line in the four internal frameworks to be covered by
-this non-UI suite.
+the canonical macOS non-UI result. The iOS and macOS application-test lanes are
+both correctness gates; using one platform's result for the shared-source metric
+does not make the other platform optional.
 
-The `KitchenMemory Production` scheme is the only scheme that references
-`KitchenMemoryProduction.xctestplan` and the UI target. Its application-shell
-smoke tests compile under `ProductionTesting`, never under ordinary Debug,
-Develop, Testing, or distributable Production actions. See
+The two platform Production schemes are the only schemes that reference
+the platform-specific production plans and the shared UI target. Their
+application-shell smoke tests compile under `ProductionTesting`, never under
+ordinary Debug, Develop, Testing, or distributable Production actions. See
 <doc:0007-business-logic-coverage-and-ui-smoke-tests>.

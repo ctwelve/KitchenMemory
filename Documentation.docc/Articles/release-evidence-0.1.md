@@ -62,6 +62,14 @@ non-private data derived to reproduce the behavior. See <doc:privacy>.
 | Signed local macOS UI smoke suite | `a02694a` | Passed | 10/10 tests on macOS 26.6.2 with Xcode 26.6, 2026-08-24; includes privacy-safe startup recovery, supported locales, localization stress modes, settings/privacy, recipe navigation, and the 280/320-point sidebar behavior |
 | Unsigned Production bundle preflight | `a02694a` | Passed | Fresh macOS and generic iOS builds succeeded on 2026-08-24; both report version 0.1.0, source build-number seed 1, and minimum OS 26.0; privacy manifest matched source byte-for-byte and all three locale bundles were present |
 
+The separate native app-target change establishes a new build and test graph.
+Keep the rows above as historical evidence for their recorded source states.
+After the split is committed, append fresh rows for both platform Testing lanes,
+both Production test graphs, native iOS and macOS UI smoke, the exact framework
+coverage gate, and the release-version and project-structure contracts. Record
+the actual accepted commit in each new row; do not relabel an older result or
+use an uncommitted working tree as release evidence.
+
 These rows establish the release-engineering infrastructure baseline. They do
 not replace installation, synchronization, localization, accessibility, archive,
 or recovery acceptance.
