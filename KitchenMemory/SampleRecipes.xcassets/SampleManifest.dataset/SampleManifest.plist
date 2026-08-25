@@ -28,6 +28,15 @@
 				<dict><key>localeIdentifier</key><string>es-MX</string><key>recipeID</key><string>F2020000-0000-4000-8000-000000000002</string><key>dataAssetName</key><string>DirtyFriedRiceRecipe-es-MX</string><key>heroImageAssetName</key><string>DirtyFriedRiceHero</string></dict>
 			</array>
 		</dict>
+		<dict>
+			<key>familyID</key><string>F0030000-0000-4000-8000-000000000003</string>
+			<key>variants</key>
+			<array>
+				<dict><key>localeIdentifier</key><string>en-US</string><key>recipeID</key><string>E3D10000-0000-4000-8000-000000000001</string><key>dataAssetName</key><string>RedEngineRecipe</string></dict>
+				<dict><key>localeIdentifier</key><string>fr-CA</string><key>recipeID</key><string>F1030000-0000-4000-8000-000000000003</string><key>dataAssetName</key><string>RedEngineRecipe-fr-CA</string></dict>
+				<dict><key>localeIdentifier</key><string>es-MX</string><key>recipeID</key><string>F2030000-0000-4000-8000-000000000003</string><key>dataAssetName</key><string>RedEngineRecipe-es-MX</string></dict>
+			</array>
+		</dict>
 	</array>
 </dict>
 </plist>

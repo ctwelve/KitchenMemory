@@ -1,0 +1,758 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>formatVersion</key>
+	<integer>1</integer>
+	<key>recipeID</key>
+	<string>F2030000-0000-4000-8000-000000000003</string>
+	<key>revision</key>
+	<dict>
+		<key>authorName</key>
+		<string>cTwelve</string>
+		<key>categories</key>
+		<array>
+			<string>Cena</string>
+			<string>Pasta</string>
+			<string>Cocina de despensa</string>
+		</array>
+		<key>contentLanguage</key>
+		<string>es-MX</string>
+		<key>cuisines</key>
+		<array>
+			<string>Fusión italoestadounidense</string>
+		</array>
+		<key>equipment</key>
+		<array/>
+		<key>id</key>
+		<string>F2300000-0000-4000-8000-000000000003</string>
+		<key>ingredientSections</key>
+		<array>
+			<dict>
+				<key>id</key>
+				<string>F2350001-0000-4000-8000-000000000001</string>
+				<key>ingredients</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>F2360001-0000-4000-8000-000000000001</string>
+						<key>ingredientText</key>
+						<string>rigatoni</string>
+						<key>isOptional</key>
+						<false/>
+						<key>originalText</key>
+						<string>1 lb de rigatoni</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>denominator</key>
+								<integer>1</integer>
+								<key>numerator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>unitText</key>
+						<string>libra</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>F2360002-0000-4000-8000-000000000002</string>
+						<key>ingredientText</key>
+						<string>salchicha de res</string>
+						<key>isOptional</key>
+						<false/>
+						<key>originalText</key>
+						<string>1 lb de salchicha de res, rebanada en monedas</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>preparation</key>
+						<string>rebanada en monedas</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>denominator</key>
+								<integer>1</integer>
+								<key>numerator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>unitText</key>
+						<string>libra</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>F2360003-0000-4000-8000-000000000003</string>
+						<key>ingredientText</key>
+						<string>cebolla</string>
+						<key>isOptional</key>
+						<false/>
+						<key>note</key>
+						<string>Dos cebollas medianas también funcionan.</string>
+						<key>originalText</key>
+						<string>1 cebolla cómicamente grande, en cubos (o 2 medianas)</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>preparation</key>
+						<string>en cubos</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>denominator</key>
+								<integer>1</integer>
+								<key>numerator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>unitText</key>
+						<string>cómicamente grande</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>F2360004-0000-4000-8000-000000000004</string>
+						<key>ingredientText</key>
+						<string>mantequilla</string>
+						<key>isOptional</key>
+						<false/>
+						<key>originalText</key>
+						<string>2 cdas de mantequilla (¼ de barra)</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>denominator</key>
+								<integer>1</integer>
+								<key>numerator</key>
+								<integer>2</integer>
+							</dict>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>unitText</key>
+						<string>cucharadas</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>F2360005-0000-4000-8000-000000000005</string>
+						<key>ingredientText</key>
+						<string>sazonador Montreal para carne</string>
+						<key>isOptional</key>
+						<false/>
+						<key>originalText</key>
+						<string>Sazonador Montreal para carne, con moderación</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>con moderación</string>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>F2360006-0000-4000-8000-000000000006</string>
+						<key>ingredientText</key>
+						<string>sal</string>
+						<key>isOptional</key>
+						<false/>
+						<key>originalText</key>
+						<string>Sal, especialmente si la mantequilla no tiene sal</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>al gusto</string>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>F2360007-0000-4000-8000-000000000007</string>
+						<key>ingredientText</key>
+						<string>pasta de tomate</string>
+						<key>isOptional</key>
+						<false/>
+						<key>originalText</key>
+						<string>1 lata pequeña de pasta de tomate</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>denominator</key>
+								<integer>1</integer>
+								<key>numerator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>unitText</key>
+						<string>lata pequeña</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>F2360008-0000-4000-8000-000000000008</string>
+						<key>ingredientText</key>
+						<string>vodka</string>
+						<key>isOptional</key>
+						<true/>
+						<key>originalText</key>
+						<string>Un chorrito pequeño de vodka</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>un chorrito pequeño</string>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>F2360009-0000-4000-8000-000000000009</string>
+						<key>ingredientText</key>
+						<string>tomates Ro-Tel con chiles verdes</string>
+						<key>isOptional</key>
+						<false/>
+						<key>note</key>
+						<string>La receta original usó la variedad con chile Hatch.</string>
+						<key>originalText</key>
+						<string>1 lata de tomates Ro-Tel con chiles verdes, con todo y líquido</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>denominator</key>
+								<integer>1</integer>
+								<key>numerator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>unitText</key>
+						<string>lata</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>F236000A-0000-4000-8000-00000000000A</string>
+						<key>ingredientText</key>
+						<string>salsa preparada con carne para pasta</string>
+						<key>isOptional</key>
+						<false/>
+						<key>note</key>
+						<string>Usa una salsa de tomate preparada para pasta, no salsa de tomate sencilla.</string>
+						<key>originalText</key>
+						<string>2 latas de salsa preparada Hunt’s con carne para pasta</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>denominator</key>
+								<integer>1</integer>
+								<key>numerator</key>
+								<integer>2</integer>
+							</dict>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>unitText</key>
+						<string>latas</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>F236000B-0000-4000-8000-00000000000B</string>
+						<key>ingredientText</key>
+						<string>ajo</string>
+						<key>isOptional</key>
+						<false/>
+						<key>note</key>
+						<string>Si Keen tiene la cuchara, renuncia al control de esta variable.</string>
+						<key>originalText</key>
+						<string>Ajo, muchísimo; fresco o de frasco</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>muchísimo</string>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+					</dict>
+				</array>
+				<key>title</key>
+				<string>Rigatoni y Motor Rojo</string>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>F2350002-0000-4000-8000-000000000002</string>
+				<key>ingredients</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>F236000C-0000-4000-8000-00000000000C</string>
+						<key>ingredientText</key>
+						<string>pecorino romano</string>
+						<key>isOptional</key>
+						<false/>
+						<key>originalText</key>
+						<string>Pecorino romano, rallado generosamente</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>preparation</key>
+						<string>rallado</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>generosamente</string>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>F236000D-0000-4000-8000-00000000000D</string>
+						<key>ingredientText</key>
+						<string>hoja de laurel</string>
+						<key>isOptional</key>
+						<false/>
+						<key>originalText</key>
+						<string>1 hoja de laurel</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>denominator</key>
+								<integer>1</integer>
+								<key>numerator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>fixed</string>
+						<key>unitText</key>
+						<string>hoja</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>F236000E-0000-4000-8000-00000000000E</string>
+						<key>ingredientText</key>
+						<string>orégano seco</string>
+						<key>isOptional</key>
+						<false/>
+						<key>originalText</key>
+						<string>Orégano seco, al gusto</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>al gusto</string>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>F236000F-0000-4000-8000-00000000000F</string>
+						<key>ingredientText</key>
+						<string>albahaca liofilizada</string>
+						<key>isOptional</key>
+						<false/>
+						<key>originalText</key>
+						<string>Albahaca liofilizada, al gusto</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>al gusto</string>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>F2360010-0000-4000-8000-000000000010</string>
+						<key>ingredientText</key>
+						<string>hojuelas de chile rojo</string>
+						<key>isOptional</key>
+						<false/>
+						<key>originalText</key>
+						<string>Hojuelas de chile rojo, al gusto</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>al gusto</string>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>F2360011-0000-4000-8000-000000000011</string>
+						<key>ingredientText</key>
+						<string>pimienta larga</string>
+						<key>isOptional</key>
+						<true/>
+						<key>originalText</key>
+						<string>Aproximadamente ½ espiga de pimienta larga, recién molida</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>preparation</key>
+						<string>recién molida</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>approximate</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>denominator</key>
+								<integer>2</integer>
+								<key>numerator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>unitText</key>
+						<string>espiga</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>F2360012-0000-4000-8000-000000000012</string>
+						<key>ingredientText</key>
+						<string>clavo molido</string>
+						<key>isOptional</key>
+						<true/>
+						<key>note</key>
+						<string>Si alguien puede identificar el clavo, usaste demasiado.</string>
+						<key>originalText</key>
+						<string>Una pizca minúscula de clavo molido</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>una pizca minúscula</string>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>F2360013-0000-4000-8000-000000000013</string>
+						<key>ingredientText</key>
+						<string>azúcar</string>
+						<key>isOptional</key>
+						<true/>
+						<key>note</key>
+						<string>Agrégala solo si la salsa sigue demasiado viva a tomate; no debe quedar dulce.</string>
+						<key>originalText</key>
+						<string>Aproximadamente 1 cdta de azúcar, solo si la salsa lo pide</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>approximate</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>denominator</key>
+								<integer>1</integer>
+								<key>numerator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>unitText</key>
+						<string>cucharadita</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>F2360014-0000-4000-8000-000000000014</string>
+						<key>ingredientText</key>
+						<string>salsa Worcestershire</string>
+						<key>isOptional</key>
+						<true/>
+						<key>originalText</key>
+						<string>Unas gotas de salsa Worcestershire</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>unas gotas</string>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>F2360015-0000-4000-8000-000000000015</string>
+						<key>ingredientText</key>
+						<string>pimienta negra</string>
+						<key>isOptional</key>
+						<false/>
+						<key>originalText</key>
+						<string>Pimienta negra, según sea necesario</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>según sea necesario</string>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+					</dict>
+				</array>
+				<key>title</key>
+				<string>Sazonado y acabado</string>
+			</dict>
+		</array>
+		<key>instructionSections</key>
+		<array>
+			<dict>
+				<key>id</key>
+				<string>F2370001-0000-4000-8000-000000000001</string>
+				<key>steps</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>F2380001-0000-4000-8000-000000000001</string>
+						<key>name</key>
+						<string>Logra ONYO</string>
+						<key>text</key>
+						<string>Derrite la mantequilla en un sartén grande y ancho a fuego medio. Agrega la cebolla, sal y un poco de sazonador Montreal. Cocina con paciencia hasta que quede completamente suave, translúcida y dulce; continúa hasta obtener bordes dorados y algunos trocitos crujientes. Prueba un onyo. Si la respuesta es «sí, muy sí», continúa.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>F2380002-0000-4000-8000-000000000002</string>
+						<key>name</key>
+						<string>Despliega la SOSIG</string>
+						<key>text</key>
+						<string>Agrega la salchicha rebanada. Extiende todo lo más posible y déjalo quieto por ratos para que algunas caras de la salchicha se doren de verdad. Remueve y redistribuye ocasionalmente para formar grasa rendida y fondo sin sacrificar la cebolla.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>F2380003-0000-4000-8000-000000000003</string>
+						<key>name</key>
+						<string>Cocina la pasta de tomate con ganas</string>
+						<key>text</key>
+						<string>Incorpora bien la pasta de tomate en la grasa y cocínala hasta que cambie de rojo brillante a rojo ladrillo profundo. Deja que parte toque directamente el sartén. Agrega el chorrito de vodka, raspa el fondo y cocina hasta que casi desaparezca el olor evidente a alcohol.</string>
+					</dict>
+				</array>
+				<key>title</key>
+				<string>Construye los cimientos</string>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>F2370002-0000-4000-8000-000000000002</string>
+				<key>steps</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>F2380004-0000-4000-8000-000000000004</string>
+						<key>name</key>
+						<string>Arma la salsa</string>
+						<key>text</key>
+						<string>Agrega el Ro-Tel con todo y líquido y raspa el sartén. Cocínalo unos minutos con el tomate concentrado. Agrega el ajo, las dos latas de salsa preparada con carne, laurel, orégano, albahaca, chile rojo, pimienta larga y la pizca más pequeña imaginable de clavo. Lleva a hervor muy suave.</string>
+					</dict>
+					<dict>
+						<key>duration</key>
+						<dict>
+							<key>seconds</key>
+							<integer>1800</integer>
+						</dict>
+						<key>id</key>
+						<string>F2380005-0000-4000-8000-000000000005</string>
+						<key>name</key>
+						<string>Deja de estarle moviendo</string>
+						<key>text</key>
+						<string>Deja en paz el gabinete de especias y cocina a fuego lento por lo menos 30 minutos, de preferencia más, removiendo y raspando periódicamente. Prueba. Si está equilibrada pero aún demasiado viva a tomate, agrega aproximadamente 1 cdta de azúcar a toda la tanda. Cerca del final, agrega unas gotas de Worcestershire. Ajusta únicamente lo que la salsa realmente pida y retira el laurel.</string>
+					</dict>
+				</array>
+				<key>title</key>
+				<string>Construye el Motor Rojo</string>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>F2370003-0000-4000-8000-000000000003</string>
+				<key>steps</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>F2380006-0000-4000-8000-000000000006</string>
+						<key>name</key>
+						<string>Rigatoni</string>
+						<key>text</key>
+						<string>Cuece el rigatoni en agua bien salada hasta que quede apenas al dente y reserva un poco del agua antes de escurrir. Mezcla la pasta con la salsa y agrega suficiente pecorino rallado para que forme parte de la salsa y no sea solo cobertura. Afloja con agua de cocción si hace falta. La salsa debe agarrarse con fuerza a las estrías y entrar en los tubos, no formar un charco debajo.</string>
+					</dict>
+				</array>
+				<key>title</key>
+				<string>Termina la pasta</string>
+			</dict>
+		</array>
+		<key>keywords</key>
+		<array>
+			<string>rigatoni</string>
+			<string>salchicha de res</string>
+			<string>salsa de tomate</string>
+			<string>pimienta larga</string>
+			<string>tanda grande</string>
+		</array>
+		<key>media</key>
+		<array>
+			<dict>
+				<key>accessibilityLabel</key>
+				<string>Un plato de rigatoni cubierto con salsa roja oscura de salchicha y tomate, con brócoli al lado</string>
+				<key>assetName</key>
+				<string>RedEngineGallery0</string>
+				<key>id</key>
+				<string>F2320000-0000-4000-8000-000000000003</string>
+				<key>role</key>
+				<string>gallery</string>
+			</dict>
+		</array>
+		<key>recipeID</key>
+		<string>F2030000-0000-4000-8000-000000000003</string>
+		<key>recipeYield</key>
+		<dict>
+			<key>originalText</key>
+			<string>Rinde una tanda enorme con bastantes sobras</string>
+		</dict>
+		<key>revisionNumber</key>
+		<integer>1</integer>
+		<key>source</key>
+		<dict>
+			<key>authorName</key>
+			<string>cTwelve</string>
+			<key>canonicalURL</key>
+			<dict>
+				<key>relative</key>
+				<string>https://chatgpt.com/share/6a8d0c0c-b420-83ea-b94d-50d5b4c13cf3</string>
+			</dict>
+			<key>kind</key>
+			<string>webpage</string>
+			<key>publisherName</key>
+			<string>ChatGPT</string>
+			<key>title</key>
+			<string>El Motor Rojo, reconstruido de Forensic Pantry Cuisine y Red Sauce Concoction</string>
+		</dict>
+		<key>summary</key>
+		<string>Rigatoni con salchicha de res bien dorada, tomate cocinado a fondo, pimienta larga y pecorino romano, siempre dejando que mande la lengua.</string>
+		<key>title</key>
+		<string>El Motor Rojo</string>
+	</dict>
+</dict>
+</plist>

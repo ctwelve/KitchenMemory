@@ -1,0 +1,826 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>formatVersion</key>
+	<integer>1</integer>
+	<key>recipeID</key>
+	<string>E3D10000-0000-4000-8000-000000000001</string>
+	<key>revision</key>
+	<dict>
+		<key>authorName</key>
+		<string>cTwelve</string>
+		<key>categories</key>
+		<array>
+			<string>Dinner</string>
+			<string>Pasta</string>
+			<string>Pantry cooking</string>
+		</array>
+		<key>contentLanguage</key>
+		<string>en-US</string>
+		<key>cuisines</key>
+		<array>
+			<string>Italian-American fusion</string>
+		</array>
+		<key>equipment</key>
+		<array>
+			<dict>
+				<key>id</key>
+				<string>E3D40001-0000-4000-8000-000000000001</string>
+				<key>isOptional</key>
+				<false/>
+				<key>name</key>
+				<string>large broad pan or saucier</string>
+				<key>originalText</key>
+				<string>One large broad pan or saucier</string>
+				<key>quantity</key>
+				<dict>
+					<key>kind</key>
+					<string>exact</string>
+					<key>lowerBound</key>
+					<dict>
+						<key>denominator</key>
+						<integer>1</integer>
+						<key>numerator</key>
+						<integer>1</integer>
+					</dict>
+				</dict>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>E3D40002-0000-4000-8000-000000000002</string>
+				<key>isOptional</key>
+				<false/>
+				<key>name</key>
+				<string>large pasta pot</string>
+				<key>originalText</key>
+				<string>One large pot for the rigatoni</string>
+				<key>quantity</key>
+				<dict>
+					<key>kind</key>
+					<string>exact</string>
+					<key>lowerBound</key>
+					<dict>
+						<key>denominator</key>
+						<integer>1</integer>
+						<key>numerator</key>
+						<integer>1</integer>
+					</dict>
+				</dict>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>E3D40003-0000-4000-8000-000000000003</string>
+				<key>isOptional</key>
+				<false/>
+				<key>name</key>
+				<string>knife and cutting board</string>
+				<key>originalText</key>
+				<string>Knife and cutting board</string>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>E3D40004-0000-4000-8000-000000000004</string>
+				<key>isOptional</key>
+				<true/>
+				<key>name</key>
+				<string>spice grinder or mortar and pestle</string>
+				<key>originalText</key>
+				<string>Long-pepper grinder or mortar and pestle</string>
+			</dict>
+		</array>
+		<key>id</key>
+		<string>E3D20000-0000-4000-8000-000000000001</string>
+		<key>ingredientSections</key>
+		<array>
+			<dict>
+				<key>id</key>
+				<string>E3D50001-0000-4000-8000-000000000001</string>
+				<key>ingredients</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>E3D60001-0000-4000-8000-000000000001</string>
+						<key>ingredientText</key>
+						<string>rigatoni</string>
+						<key>isOptional</key>
+						<false/>
+						<key>originalText</key>
+						<string>1 lb rigatoni</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>denominator</key>
+								<integer>1</integer>
+								<key>numerator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>unitText</key>
+						<string>pound</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>E3D60002-0000-4000-8000-000000000002</string>
+						<key>ingredientText</key>
+						<string>beef sausage</string>
+						<key>isOptional</key>
+						<false/>
+						<key>originalText</key>
+						<string>1 lb beef sausage, sliced into coins</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>preparation</key>
+						<string>sliced into coins</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>denominator</key>
+								<integer>1</integer>
+								<key>numerator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>unitText</key>
+						<string>pound</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>E3D60003-0000-4000-8000-000000000003</string>
+						<key>ingredientText</key>
+						<string>onion</string>
+						<key>isOptional</key>
+						<false/>
+						<key>note</key>
+						<string>Two medium onions are equivalent.</string>
+						<key>originalText</key>
+						<string>1 comically large onion, diced (or 2 medium onions)</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>preparation</key>
+						<string>diced</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>denominator</key>
+								<integer>1</integer>
+								<key>numerator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>unitText</key>
+						<string>comically large</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>E3D60004-0000-4000-8000-000000000004</string>
+						<key>ingredientText</key>
+						<string>butter</string>
+						<key>isOptional</key>
+						<false/>
+						<key>originalText</key>
+						<string>2 tbsp butter (¼ stick)</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>denominator</key>
+								<integer>1</integer>
+								<key>numerator</key>
+								<integer>2</integer>
+							</dict>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>unitText</key>
+						<string>tablespoons</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>E3D60005-0000-4000-8000-000000000005</string>
+						<key>ingredientText</key>
+						<string>Montreal steak seasoning</string>
+						<key>isOptional</key>
+						<false/>
+						<key>originalText</key>
+						<string>Montreal steak seasoning, modestly</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>modestly</string>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>E3D60006-0000-4000-8000-000000000006</string>
+						<key>ingredientText</key>
+						<string>salt</string>
+						<key>isOptional</key>
+						<false/>
+						<key>note</key>
+						<string>The onions need salt even though the Montreal seasoning also contains some.</string>
+						<key>originalText</key>
+						<string>Salt, especially if the butter is unsalted</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>to taste</string>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>E3D60007-0000-4000-8000-000000000007</string>
+						<key>ingredientText</key>
+						<string>tomato paste</string>
+						<key>isOptional</key>
+						<false/>
+						<key>originalText</key>
+						<string>1 small can tomato paste</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>denominator</key>
+								<integer>1</integer>
+								<key>numerator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>unitText</key>
+						<string>small can</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>E3D60008-0000-4000-8000-000000000008</string>
+						<key>ingredientText</key>
+						<string>vodka</string>
+						<key>isOptional</key>
+						<true/>
+						<key>originalText</key>
+						<string>A small glug of vodka</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>a small glug</string>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>E3D60009-0000-4000-8000-000000000009</string>
+						<key>ingredientText</key>
+						<string>Ro-Tel diced tomatoes and green chiles</string>
+						<key>isOptional</key>
+						<false/>
+						<key>note</key>
+						<string>The original used the Hatch chile variety.</string>
+						<key>originalText</key>
+						<string>1 can Ro-Tel diced tomatoes and green chiles, liquid included</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>denominator</key>
+								<integer>1</integer>
+								<key>numerator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>unitText</key>
+						<string>can</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>E3D6000A-0000-4000-8000-00000000000A</string>
+						<key>ingredientText</key>
+						<string>Hunt's prepared meat pasta sauce</string>
+						<key>isOptional</key>
+						<false/>
+						<key>note</key>
+						<string>Use a prepared tomato-based pasta sauce, not plain tomato sauce.</string>
+						<key>originalText</key>
+						<string>2 cans Hunt's prepared meat pasta sauce</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>denominator</key>
+								<integer>1</integer>
+								<key>numerator</key>
+								<integer>2</integer>
+							</dict>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>unitText</key>
+						<string>cans</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>E3D6000B-0000-4000-8000-00000000000B</string>
+						<key>ingredientText</key>
+						<string>garlic</string>
+						<key>isOptional</key>
+						<false/>
+						<key>note</key>
+						<string>If Keen is holding the spoon, surrender control of this variable.</string>
+						<key>originalText</key>
+						<string>Garlic—a lot; fresh or jarred</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>a lot</string>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+					</dict>
+				</array>
+				<key>title</key>
+				<string>Rigatoni and red engine</string>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>E3D50002-0000-4000-8000-000000000002</string>
+				<key>ingredients</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>E3D6000C-0000-4000-8000-00000000000C</string>
+						<key>ingredientText</key>
+						<string>Pecorino Romano</string>
+						<key>isOptional</key>
+						<false/>
+						<key>originalText</key>
+						<string>Pecorino Romano, generously grated</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>preparation</key>
+						<string>grated</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>generously</string>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>E3D6000D-0000-4000-8000-00000000000D</string>
+						<key>ingredientText</key>
+						<string>bay leaf</string>
+						<key>isOptional</key>
+						<false/>
+						<key>originalText</key>
+						<string>1 bay leaf</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>denominator</key>
+								<integer>1</integer>
+								<key>numerator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>fixed</string>
+						<key>unitText</key>
+						<string>leaf</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>E3D6000E-0000-4000-8000-00000000000E</string>
+						<key>ingredientText</key>
+						<string>dried oregano</string>
+						<key>isOptional</key>
+						<false/>
+						<key>originalText</key>
+						<string>Dried oregano, to taste</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>to taste</string>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>E3D6000F-0000-4000-8000-00000000000F</string>
+						<key>ingredientText</key>
+						<string>freeze-dried basil</string>
+						<key>isOptional</key>
+						<false/>
+						<key>originalText</key>
+						<string>Freeze-dried basil, to taste</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>to taste</string>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>E3D60010-0000-4000-8000-000000000010</string>
+						<key>ingredientText</key>
+						<string>crushed red pepper flakes</string>
+						<key>isOptional</key>
+						<false/>
+						<key>originalText</key>
+						<string>Crushed red pepper flakes, to taste</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>to taste</string>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>E3D60011-0000-4000-8000-000000000011</string>
+						<key>ingredientText</key>
+						<string>long pepper</string>
+						<key>isOptional</key>
+						<true/>
+						<key>originalText</key>
+						<string>About ½ long-pepper catkin, freshly ground</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>preparation</key>
+						<string>freshly ground</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>approximate</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>denominator</key>
+								<integer>2</integer>
+								<key>numerator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>unitText</key>
+						<string>catkin</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>E3D60012-0000-4000-8000-000000000012</string>
+						<key>ingredientText</key>
+						<string>ground clove</string>
+						<key>isOptional</key>
+						<true/>
+						<key>note</key>
+						<string>If somebody can identify clove, you used too much.</string>
+						<key>originalText</key>
+						<string>One tiny pinch ground clove</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>one tiny pinch</string>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>E3D60013-0000-4000-8000-000000000013</string>
+						<key>ingredientText</key>
+						<string>sugar</string>
+						<key>isOptional</key>
+						<true/>
+						<key>note</key>
+						<string>Add only if the finished sauce remains noticeably tomato-bright; do not make it sweet.</string>
+						<key>originalText</key>
+						<string>About 1 tsp sugar, only if the sauce asks for it</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>approximate</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>denominator</key>
+								<integer>1</integer>
+								<key>numerator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>unitText</key>
+						<string>teaspoon</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>E3D60014-0000-4000-8000-000000000014</string>
+						<key>ingredientText</key>
+						<string>Worcestershire sauce</string>
+						<key>isOptional</key>
+						<true/>
+						<key>originalText</key>
+						<string>A few drops Worcestershire sauce</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>a few drops</string>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>E3D60015-0000-4000-8000-000000000015</string>
+						<key>ingredientText</key>
+						<string>black pepper</string>
+						<key>isOptional</key>
+						<false/>
+						<key>originalText</key>
+						<string>Black pepper, as needed</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>as needed</string>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+					</dict>
+				</array>
+				<key>title</key>
+				<string>Seasoning and finish</string>
+			</dict>
+		</array>
+		<key>instructionSections</key>
+		<array>
+			<dict>
+				<key>id</key>
+				<string>E3D70001-0000-4000-8000-000000000001</string>
+				<key>steps</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>E3D80001-0000-4000-8000-000000000001</string>
+						<key>name</key>
+						<string>Achieve ONYO</string>
+						<key>text</key>
+						<string>Melt the butter in a large broad pan over medium heat. Add the diced onion, salt, and a modest shake of Montreal seasoning. Cook patiently until completely soft, translucent, and sweet, then continue until golden-brown edges and occasional crispy bits appear. Taste an onyo. If the response is “yes, very yes,” proceed.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>E3D80002-0000-4000-8000-000000000002</string>
+						<key>name</key>
+						<string>Deploy SOSIG</string>
+						<key>text</key>
+						<string>Add the sliced sausage. Spread everything out as much as practical and leave it alone for stretches so some sausage faces brown properly. Stir and redistribute occasionally, building rendered fat and fond without sacrificing the onions.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>E3D80003-0000-4000-8000-000000000003</string>
+						<key>name</key>
+						<string>Cook the tomato paste hard</string>
+						<key>text</key>
+						<string>Work the tomato paste thoroughly into the fat and cook it from bright red toward deep brick-red or orange. Let some contact the pan directly. Add the small glug of vodka, scrape up the fond, and cook until the obvious alcohol aroma has largely disappeared.</string>
+					</dict>
+				</array>
+				<key>title</key>
+				<string>Build the foundation</string>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>E3D70002-0000-4000-8000-000000000002</string>
+				<key>steps</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>E3D80004-0000-4000-8000-000000000004</string>
+						<key>name</key>
+						<string>Assemble the sauce</string>
+						<key>text</key>
+						<string>Add the Ro-Tel, liquid and all, and scrape the pan clean. Cook it into the concentrated tomato mixture for a few minutes. Add the garlic, both cans of prepared Hunt's meat pasta sauce, bay leaf, oregano, basil, red pepper flakes, long pepper, and the tiniest imaginable pinch of clove. Bring to a gentle simmer.</string>
+					</dict>
+					<dict>
+						<key>duration</key>
+						<dict>
+							<key>seconds</key>
+							<integer>1800</integer>
+						</dict>
+						<key>id</key>
+						<string>E3D80005-0000-4000-8000-000000000005</string>
+						<key>name</key>
+						<string>Stop screwing with it</string>
+						<key>text</key>
+						<string>Leave the spice cabinet alone and simmer gently for at least 30 minutes, preferably longer, stirring and scraping periodically. Taste. If it is balanced but still tomato-bright, add about 1 teaspoon sugar to the entire batch. Near the end, add a few drops of Worcestershire for invisible savory depth. Adjust only what the sauce actually asks for, then remove the bay leaf.</string>
+					</dict>
+				</array>
+				<key>title</key>
+				<string>Build the Red Engine</string>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>E3D70003-0000-4000-8000-000000000003</string>
+				<key>steps</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>E3D80006-0000-4000-8000-000000000006</string>
+						<key>name</key>
+						<string>Rigatoni</string>
+						<key>text</key>
+						<string>Cook the rigatoni in well-salted water until just al dente, reserving some pasta water before draining. Combine pasta and sauce, then add enough grated Pecorino that it becomes part of the sauce rather than merely a topping. Loosen with pasta water if needed. The sauce should cling aggressively to the ridges and work inside the tubes, not puddle underneath.</string>
+					</dict>
+				</array>
+				<key>title</key>
+				<string>Finish the pasta</string>
+			</dict>
+		</array>
+		<key>keywords</key>
+		<array>
+			<string>rigatoni</string>
+			<string>beef sausage</string>
+			<string>tomato sauce</string>
+			<string>long pepper</string>
+			<string>large batch</string>
+			<string>pantry raid</string>
+		</array>
+		<key>media</key>
+		<array>
+			<dict>
+				<key>accessibilityLabel</key>
+				<string>A plate of rigatoni coated in deep red sausage and tomato sauce, with broccoli alongside</string>
+				<key>assetName</key>
+				<string>RedEngineGallery0</string>
+				<key>id</key>
+				<string>E3D30000-0000-4000-8000-000000000001</string>
+				<key>role</key>
+				<string>gallery</string>
+			</dict>
+		</array>
+		<key>recipeID</key>
+		<string>E3D10000-0000-4000-8000-000000000001</string>
+		<key>recipeYield</key>
+		<dict>
+			<key>originalText</key>
+			<string>Makes one very large batch with substantial leftovers</string>
+		</dict>
+		<key>revisionNumber</key>
+		<integer>1</integer>
+		<key>source</key>
+		<dict>
+			<key>authorName</key>
+			<string>cTwelve</string>
+			<key>canonicalURL</key>
+			<dict>
+				<key>relative</key>
+				<string>https://chatgpt.com/share/6a8d0c0c-b420-83ea-b94d-50d5b4c13cf3</string>
+			</dict>
+			<key>kind</key>
+			<string>webpage</string>
+			<key>publisherName</key>
+			<string>ChatGPT</string>
+			<key>title</key>
+			<string>The Red Engine, reconstructed from Forensic Pantry Cuisine and Red Sauce Concoction</string>
+		</dict>
+		<key>summary</key>
+		<string>Rigatoni with browned beef sausage, deeply cooked tomato, long pepper, Pecorino Romano, and the governing principle that the tongue remains in command.</string>
+		<key>title</key>
+		<string>The Red Engine</string>
+	</dict>
+</dict>
+</plist>
