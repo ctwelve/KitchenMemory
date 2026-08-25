@@ -20,10 +20,10 @@ action using the `Production` configuration.
 | --- | --- | --- | --- | --- | --- |
 | `KitchenMemory iOS Development` | `Develop` | `Testing` | `KitchenMemoryIOSTesting`: `KitchenMemoryIOSTests` | iOS device or Simulator | `Production` / No |
 | `KitchenMemory iOS Testing` | `Testing` | `Testing` | `KitchenMemoryIOSTesting`: `KitchenMemoryIOSTests` | iOS device or Simulator | No / No |
-| `KitchenMemory iOS Production` | `Production` | `ProductionTesting` | `KitchenMemoryIOSProduction`: `KitchenMemoryIOSTests` and shared UI smoke hosted by `KitchenMemory iOS` | iOS device or Simulator | `Production` / `Production` |
+| `KitchenMemory iOS Production` | `Production` | `ProductionTesting` | `KitchenMemoryIOSProduction`: `KitchenMemoryIOSTests` and shared UI smoke hosted by `KitchenMemoryIOS` | iOS device or Simulator | `Production` / `Production` |
 | `KitchenMemory macOS Development` | `Develop` | `Testing` | `KitchenMemoryMacTesting`: `KitchenMemoryMacTests` | native macOS | `Production` / No |
 | `KitchenMemory macOS Testing` | `Testing` | `Testing` | `KitchenMemoryMacTesting`: `KitchenMemoryMacTests` | native macOS | No / No |
-| `KitchenMemory macOS Production` | `Production` | `ProductionTesting` | `KitchenMemoryMacProduction`: `KitchenMemoryMacTests` and shared UI smoke hosted by `KitchenMemory macOS` | native macOS | `Production` / `Production` |
+| `KitchenMemory macOS Production` | `Production` | `ProductionTesting` | `KitchenMemoryMacProduction`: `KitchenMemoryMacTests` and shared UI smoke hosted by `KitchenMemoryMacOS` | native macOS | `Production` / `Production` |
 
 Each scheme has one top-level app buildable; Xcode adds the four linked
 framework targets through ordinary dependency resolution. Each plan currently

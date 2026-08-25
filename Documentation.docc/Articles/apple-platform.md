@@ -41,8 +41,8 @@ compromised interface. See <doc:0006-shared-ui-for-foundation-slices>.
 
 ## Native product targets and destinations
 
-`KitchenMemory iOS` is the native iPhone and iPad product.
-`KitchenMemory macOS` is the native Mac product. Their shared 0.1 source layer
+`KitchenMemoryIOS` is the native iPhone and iPad product.
+`KitchenMemoryMacOS` is the native Mac product. Their shared 0.1 source layer
 does not make them one runnable, archive, entitlement surface, or launch-screen
 contract.
 

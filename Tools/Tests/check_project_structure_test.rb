@@ -179,7 +179,7 @@ class CheckProjectStructureTest < Minitest::Test
     def configuration_settings(target_name, configuration_name)
       platforms = KitchenMemory::ProjectStructure::TARGET_PLATFORMS.fetch(target_name).join(" ")
       lines = ["\t\t\t\tSUPPORTED_PLATFORMS = \"#{platforms}\";\n"]
-      if target_name == "KitchenMemory iOS"
+      if target_name == "KitchenMemoryIOS"
         KitchenMemory::ProjectStructure::IOS_COMPATIBILITY_EXCLUSIONS.each do |setting, value|
           lines << "\t\t\t\t#{setting} = #{value};\n"
         end
@@ -247,7 +247,7 @@ class CheckProjectStructureTest < Minitest::Test
         flavor = name.split.last
         action_configurations = KitchenMemory::ProjectStructure::SCHEME_ACTION_CONFIGURATIONS.fetch(flavor)
         archive = flavor == "Production" ? "YES" : "NO"
-        profile = flavor == "Testing" ? "NO" : "YES"
+        profile = "YES"
         testables = KitchenMemory::ProjectStructure::PLANS.fetch(plan).map do |target_name|
           <<~TESTABLE
             <TestableReference skipped="NO">
@@ -343,11 +343,11 @@ class CheckProjectStructureTest < Minitest::Test
 
   def test_rejects_incomplete_application_configuration_matrix
     configurations = KitchenMemory::ProjectStructure::APP_CONFIGURATIONS - ["Develop"]
-    fixture = Fixture.new("KitchenMemory iOS" => configurations)
+    fixture = Fixture.new("KitchenMemoryIOS" => configurations)
 
     error = assert_contract_error { validate(fixture) }
 
-    assert_includes error.message, "KitchenMemory iOS configurations"
+    assert_includes error.message, "KitchenMemoryIOS configurations"
     assert_includes error.message, "missing: Develop"
   end
 
@@ -382,7 +382,7 @@ class CheckProjectStructureTest < Minitest::Test
 
     error = assert_contract_error { validate(fixture) }
 
-    assert_includes error.message, "KitchenMemory iOS Debug must use KitchenMemoryIOS/Info.plist"
+    assert_includes error.message, "KitchenMemoryIOS Debug must use KitchenMemoryIOS/Info.plist"
   end
 
   def test_rejects_wrong_testing_entitlements
@@ -394,7 +394,7 @@ class CheckProjectStructureTest < Minitest::Test
 
     error = assert_contract_error { validate(fixture) }
 
-    assert_includes error.message, "KitchenMemory iOS Testing must use only"
+    assert_includes error.message, "KitchenMemoryIOS Testing must use only"
     assert_includes error.message, "KitchenMemory-Testing.entitlements"
   end
 
@@ -416,7 +416,7 @@ class CheckProjectStructureTest < Minitest::Test
 
     error = assert_contract_error { validate(fixture) }
 
-    assert_includes error.message, "KitchenMemory iOS synchronized groups"
+    assert_includes error.message, "KitchenMemoryIOS synchronized groups"
     assert_includes error.message, "missing: KitchenMemoryIOS"
   end
 
@@ -453,8 +453,8 @@ class CheckProjectStructureTest < Minitest::Test
   def test_rejects_incomplete_sdk_conditional_ui_test_host_map
     fixture = Fixture.new
     fixture.project.sub!(
-      '"TEST_TARGET_NAME[sdk=macosx*]" = "KitchenMemory macOS";',
-      '"TEST_TARGET_NAME[sdk=macosx*]" = "KitchenMemory iOS";'
+      '"TEST_TARGET_NAME[sdk=macosx*]" = "KitchenMemoryMacOS";',
+      '"TEST_TARGET_NAME[sdk=macosx*]" = "KitchenMemoryIOS";'
     )
 
     error = assert_contract_error { validate(fixture) }
@@ -586,15 +586,15 @@ class CheckProjectStructureTest < Minitest::Test
       document,
       "/Scheme/LaunchAction/BuildableProductRunnable/BuildableReference"
     )
-    reference.attributes["BlueprintIdentifier"] = fixture.target_ids.fetch("KitchenMemory macOS")
-    reference.attributes["BlueprintName"] = "KitchenMemory macOS"
+    reference.attributes["BlueprintIdentifier"] = fixture.target_ids.fetch("KitchenMemoryMacOS")
+    reference.attributes["BlueprintName"] = "KitchenMemoryMacOS"
     updated_scheme = String.new
     document.write(updated_scheme)
     fixture.schemes[scheme_name] = updated_scheme
 
     error = assert_contract_error { validate(fixture) }
 
-    assert_includes error.message, "LaunchAction must run only KitchenMemory iOS"
+    assert_includes error.message, "LaunchAction must run only KitchenMemoryIOS"
   end
 
   def test_rejects_plan_target_identifier_that_does_not_exist
@@ -612,7 +612,7 @@ class CheckProjectStructureTest < Minitest::Test
   def test_rejects_scheme_buildable_identifier_that_does_not_exist
     fixture = Fixture.new
     scheme_name = "KitchenMemory macOS Testing.xcscheme"
-    valid_identifier = fixture.target_ids.fetch("KitchenMemory macOS")
+    valid_identifier = fixture.target_ids.fetch("KitchenMemoryMacOS")
     fixture.schemes[scheme_name] = fixture.schemes.fetch(scheme_name).sub(
       valid_identifier,
       "EEEEEEEEEEEEEEEEEEEEEEEE"

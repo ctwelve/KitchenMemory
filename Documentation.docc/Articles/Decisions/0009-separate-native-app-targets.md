@@ -35,8 +35,8 @@ application host.
 
 Use two native application targets:
 
-- `KitchenMemory iOS` supports native iPhone and iPad destinations.
-- `KitchenMemory macOS` supports native Mac destinations.
+- `KitchenMemoryIOS` supports native iPhone and iPad destinations.
+- `KitchenMemoryMacOS` supports native Mac destinations.
 
 Keep the provisional 0.1 presentation, composition, localization, and starter
 content in `KitchenMemory/`, with explicit membership in both app targets.

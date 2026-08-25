@@ -13,8 +13,8 @@ class CheckReleaseVersionTest < Minitest::Test
 
   def self.project(ios_configurations = CONFIGURATIONS, macos_configurations = CONFIGURATIONS)
     targets = {
-      "KitchenMemory iOS" => ios_configurations,
-      "KitchenMemory macOS" => macos_configurations
+      "KitchenMemoryIOS" => ios_configurations,
+      "KitchenMemoryMacOS" => macos_configurations
     }
     identifier = 0
 
@@ -138,7 +138,7 @@ class CheckReleaseVersionTest < Minitest::Test
   end
 
   def test_rejects_project_missing_one_platform_target
-    ios_only = PROJECT.gsub("KitchenMemory macOS", "KitchenMemory iOS")
+    ios_only = PROJECT.gsub("KitchenMemoryMacOS", "KitchenMemoryIOS")
 
     error = assert_raises(KitchenMemory::ReleaseVersion::ContractError) do
       KitchenMemory::ReleaseVersion.validate(
@@ -148,7 +148,7 @@ class CheckReleaseVersionTest < Minitest::Test
       )
     end
 
-    assert_includes error.message, "both KitchenMemory iOS and KitchenMemory macOS"
+    assert_includes error.message, "both KitchenMemoryIOS and KitchenMemoryMacOS"
   end
 
   def test_rejects_missing_application_configuration

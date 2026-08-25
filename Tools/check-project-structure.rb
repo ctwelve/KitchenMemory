@@ -20,8 +20,8 @@ module KitchenMemory
       ProductionTesting
     ].freeze
     TARGET_TYPES = {
-      "KitchenMemory iOS" => "com.apple.product-type.application",
-      "KitchenMemory macOS" => "com.apple.product-type.application",
+      "KitchenMemoryIOS" => "com.apple.product-type.application",
+      "KitchenMemoryMacOS" => "com.apple.product-type.application",
       "KitchenMemoryIOSTests" => "com.apple.product-type.bundle.unit-test",
       "KitchenMemoryMacTests" => "com.apple.product-type.bundle.unit-test",
       "KitchenMemoryUITests" => "com.apple.product-type.bundle.ui-testing",
@@ -31,8 +31,8 @@ module KitchenMemory
       "KitchenMemoryPersistence" => "com.apple.product-type.framework"
     }.freeze
     TARGET_PLATFORMS = {
-      "KitchenMemory iOS" => %w[iphoneos iphonesimulator],
-      "KitchenMemory macOS" => %w[macosx],
+      "KitchenMemoryIOS" => %w[iphoneos iphonesimulator],
+      "KitchenMemoryMacOS" => %w[macosx],
       "KitchenMemoryIOSTests" => %w[iphoneos iphonesimulator],
       "KitchenMemoryMacTests" => %w[macosx],
       "KitchenMemoryUITests" => %w[iphoneos iphonesimulator macosx],
@@ -47,15 +47,15 @@ module KitchenMemory
       "SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD" => "NO"
     }.freeze
     UI_TEST_HOSTS = {
-      "TEST_TARGET_NAME[sdk=iphoneos*]" => "KitchenMemory iOS",
-      "TEST_TARGET_NAME[sdk=iphonesimulator*]" => "KitchenMemory iOS",
-      "TEST_TARGET_NAME[sdk=macosx*]" => "KitchenMemory macOS"
+      "TEST_TARGET_NAME[sdk=iphoneos*]" => "KitchenMemoryIOS",
+      "TEST_TARGET_NAME[sdk=iphonesimulator*]" => "KitchenMemoryIOS",
+      "TEST_TARGET_NAME[sdk=macosx*]" => "KitchenMemoryMacOS"
     }.freeze
     PROJECT_CONFIGURATION_FILES = APP_CONFIGURATIONS.to_h do |configuration|
       [configuration, "#{configuration}.xcconfig"]
     end.freeze
     APP_FILE_CONTRACTS = {
-      "KitchenMemory iOS" => {
+      "KitchenMemoryIOS" => {
         info_plist: "KitchenMemoryIOS/Info.plist",
         entitlement_keys: [
           "CODE_SIGN_ENTITLEMENTS[sdk=iphoneos*]",
@@ -64,7 +64,7 @@ module KitchenMemory
         production_entitlements: "KitchenMemoryIOS/KitchenMemory.entitlements",
         testing_entitlements: "KitchenMemoryIOS/KitchenMemory-Testing.entitlements"
       },
-      "KitchenMemory macOS" => {
+      "KitchenMemoryMacOS" => {
         info_plist: "KitchenMemoryMac/Info.plist",
         entitlement_keys: ["CODE_SIGN_ENTITLEMENTS"],
         production_entitlements: "KitchenMemoryMac/KitchenMemory.entitlements",
@@ -76,8 +76,8 @@ module KitchenMemory
     }.freeze
     PRODUCTION_BUNDLE_IDENTIFIER = "net.ctwelve.KitchenMemory"
     SYNCHRONIZED_GROUPS = {
-      "KitchenMemory iOS" => ["KitchenMemory", "KitchenMemoryIOS"],
-      "KitchenMemory macOS" => ["KitchenMemory", "KitchenMemoryMac"],
+      "KitchenMemoryIOS" => ["KitchenMemory", "KitchenMemoryIOS"],
+      "KitchenMemoryMacOS" => ["KitchenMemory", "KitchenMemoryMac"],
       "KitchenMemoryIOSTests" => ["KitchenMemoryTests"],
       "KitchenMemoryMacTests" => ["KitchenMemoryTests"],
       "KitchenMemoryUITests" => ["KitchenMemoryUITests"],
@@ -87,8 +87,8 @@ module KitchenMemory
       "KitchenMemoryPersistence" => ["KitchenMemoryPersistence"]
     }.freeze
     PLATFORM_INFO_EXCEPTIONS = {
-      "KitchenMemoryIOS" => "KitchenMemory iOS",
-      "KitchenMemoryMac" => "KitchenMemory macOS"
+      "KitchenMemoryIOS" => "KitchenMemoryIOS",
+      "KitchenMemoryMac" => "KitchenMemoryMacOS"
     }.freeze
     PLANS = {
       "KitchenMemoryIOSTesting.xctestplan" => ["KitchenMemoryIOSTests"],
@@ -145,27 +145,27 @@ module KitchenMemory
     }.freeze
     SCHEMES = {
       "KitchenMemory iOS Development" => {
-        app: "KitchenMemory iOS",
+        app: "KitchenMemoryIOS",
         plan: "KitchenMemoryIOSTesting.xctestplan"
       },
       "KitchenMemory iOS Testing" => {
-        app: "KitchenMemory iOS",
+        app: "KitchenMemoryIOS",
         plan: "KitchenMemoryIOSTesting.xctestplan"
       },
       "KitchenMemory iOS Production" => {
-        app: "KitchenMemory iOS",
+        app: "KitchenMemoryIOS",
         plan: "KitchenMemoryIOSProduction.xctestplan"
       },
       "KitchenMemory macOS Development" => {
-        app: "KitchenMemory macOS",
+        app: "KitchenMemoryMacOS",
         plan: "KitchenMemoryMacTesting.xctestplan"
       },
       "KitchenMemory macOS Testing" => {
-        app: "KitchenMemory macOS",
+        app: "KitchenMemoryMacOS",
         plan: "KitchenMemoryMacTesting.xctestplan"
       },
       "KitchenMemory macOS Production" => {
-        app: "KitchenMemory macOS",
+        app: "KitchenMemoryMacOS",
         plan: "KitchenMemoryMacProduction.xctestplan"
       }
     }.freeze
@@ -358,13 +358,13 @@ module KitchenMemory
         end
       end
 
-      configurations.fetch("KitchenMemory iOS").each do |configuration|
+      configurations.fetch("KitchenMemoryIOS").each do |configuration|
         IOS_COMPATIBILITY_EXCLUSIONS.each do |setting, expected_value|
           actual_value = configuration[:settings][setting]
           next if actual_value == expected_value
 
           raise ContractError,
-                "KitchenMemory iOS #{configuration[:name]} must set #{setting} to " \
+                "KitchenMemoryIOS #{configuration[:name]} must set #{setting} to " \
                 "#{expected_value}; found #{actual_value.inspect}"
         end
       end
@@ -601,7 +601,7 @@ module KitchenMemory
       expected_attributes = {
         "buildForTesting" => "YES",
         "buildForRunning" => "YES",
-        "buildForProfiling" => flavor == "Testing" ? "NO" : "YES",
+        "buildForProfiling" => "YES",
         "buildForArchiving" => flavor == "Production" ? "YES" : "NO",
         "buildForAnalyzing" => "YES"
       }

@@ -32,9 +32,9 @@ not on one another. Logic coordinates all three public boundaries without
 depending on the application or SwiftUI.
 
 ```text
-KitchenMemory iOS ───┐
+KitchenMemoryIOS ─────┐
                      ├──→ all four internal frameworks
-KitchenMemory macOS ─┘
+KitchenMemoryMacOS ───┘
 
 KitchenMemoryLogic
 ├── KitchenMemoryImport ───────┐

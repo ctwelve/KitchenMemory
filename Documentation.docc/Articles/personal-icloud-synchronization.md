@@ -56,8 +56,8 @@ does not need to be rewritten merely because the transport scope changes.
 `Develop` launches use the private database in
 `iCloud.net.ctwelve.dev.KitchenMemory`; `Production` uses
 `iCloud.net.ctwelve.KitchenMemory`. They select the Development and Production
-CloudKit environments respectively. `KitchenMemory iOS` and
-`KitchenMemory macOS` own separate entitlement files while selecting those
+CloudKit environments respectively. `KitchenMemoryIOS` and
+`KitchenMemoryMacOS` own separate entitlement files while selecting those
 environment-specific containers. The iOS target owns its
 remote-notification background declaration; that iOS-only bundle setting does
 not cross into the macOS product. `Debug`, `Testing`, and the non-distributable

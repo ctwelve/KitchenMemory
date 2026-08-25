@@ -17,7 +17,7 @@
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "A1C4E79D302A63B800E2C0DB"
                BuildableName = "KitchenMemory.app"
-               BlueprintName = "KitchenMemory iOS"
+               BlueprintName = "KitchenMemoryIOS"
                ReferencedContainer = "container:KitchenMemory.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -65,7 +65,7 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "A1C4E79D302A63B800E2C0DB"
             BuildableName = "KitchenMemory.app"
-            BlueprintName = "KitchenMemory iOS"
+            BlueprintName = "KitchenMemoryIOS"
             ReferencedContainer = "container:KitchenMemory.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -82,7 +82,7 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "A1C4E79D302A63B800E2C0DB"
             BuildableName = "KitchenMemory.app"
-            BlueprintName = "KitchenMemory iOS"
+            BlueprintName = "KitchenMemoryIOS"
             ReferencedContainer = "container:KitchenMemory.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

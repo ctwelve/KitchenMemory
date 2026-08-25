@@ -214,19 +214,19 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		A147845D3037AF5A00B16FC1 /* Exceptions for "KitchenMemoryIOS" folder in "KitchenMemory iOS" target */ = {
+		A11789FE303D332A009F963D /* Exceptions for "KitchenMemoryIOS" folder in "KitchenMemoryIOS" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
-			target = A1C4E79D302A63B800E2C0DB /* KitchenMemory iOS */;
+			target = A1C4E79D302A63B800E2C0DB /* KitchenMemoryIOS */;
 		};
-		A157AD6D303D0D6C0090A9CA /* Exceptions for "KitchenMemoryMac" folder in "KitchenMemory macOS" target */ = {
+		A157AD6D303D0D6C0090A9CA /* Exceptions for "KitchenMemoryMac" folder in "KitchenMemoryMacOS" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
-			target = A157AD4A303D0D6B0090A9CA /* KitchenMemory macOS */;
+			target = A157AD4A303D0D6B0090A9CA /* KitchenMemoryMacOS */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -249,7 +249,7 @@
 		D10000000000000000000011 /* KitchenMemoryIOS */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				A147845D3037AF5A00B16FC1 /* Exceptions for "KitchenMemoryIOS" folder in "KitchenMemory iOS" target */,
+				A11789FE303D332A009F963D /* Exceptions for "KitchenMemoryIOS" folder in "KitchenMemoryIOS" target */,
 			);
 			path = KitchenMemoryIOS;
 			sourceTree = "<group>";
@@ -257,7 +257,7 @@
 		D10000000000000000000012 /* KitchenMemoryMac */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				A157AD6D303D0D6C0090A9CA /* Exceptions for "KitchenMemoryMac" folder in "KitchenMemory macOS" target */,
+				A157AD6D303D0D6C0090A9CA /* Exceptions for "KitchenMemoryMac" folder in "KitchenMemoryMacOS" target */,
 			);
 			path = KitchenMemoryMac;
 			sourceTree = "<group>";
@@ -357,22 +357,22 @@
 		A1C4E795302A63B800E2C0DB = {
 			isa = PBXGroup;
 			children = (
+				C10000000000000000000010 /* Configurations */,
+				A1532352302C2FF100C8D534 /* Documentation.docc */,
+				A1C4E7A0302A63B800E2C0DB /* KitchenMemory */,
 				D10000000000000000000011 /* KitchenMemoryIOS */,
 				D10000000000000000000012 /* KitchenMemoryMac */,
 				D10000000000000000000013 /* KitchenMemoryDomain */,
 				D10000000000000000000014 /* KitchenMemoryImport */,
 				D10000000000000000000015 /* KitchenMemoryLogic */,
 				D10000000000000000000016 /* KitchenMemoryPersistence */,
-				A15E8F41303912A6009B0A22 /* .swiftlint.yml */,
-				C10000000000000000000010 /* Configurations */,
-				A1532352302C2FF100C8D534 /* Documentation.docc */,
 				A15962C5302BC01A00926925 /* KitchenMemoryIOSTesting.xctestplan */,
 				D20000000000000000000081 /* KitchenMemoryMacTesting.xctestplan */,
 				C10000000000000000000011 /* KitchenMemoryIOSProduction.xctestplan */,
 				D20000000000000000000082 /* KitchenMemoryMacProduction.xctestplan */,
-				A1C4E7A0302A63B800E2C0DB /* KitchenMemory */,
 				A1C4E7B0302A63B900E2C0DB /* KitchenMemoryTests */,
 				A1C4E7BA302A63B900E2C0DB /* KitchenMemoryUITests */,
+				A15E8F41303912A6009B0A22 /* .swiftlint.yml */,
 				A1C4E79F302A63B800E2C0DB /* Products */,
 			);
 			sourceTree = "<group>";
@@ -409,9 +409,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		A157AD4A303D0D6B0090A9CA /* KitchenMemory macOS */ = {
+		A157AD4A303D0D6B0090A9CA /* KitchenMemoryMacOS */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = A157AD65303D0D6B0090A9CA /* Build configuration list for PBXNativeTarget "KitchenMemory macOS" */;
+			buildConfigurationList = A157AD65303D0D6B0090A9CA /* Build configuration list for PBXNativeTarget "KitchenMemoryMacOS" */;
 			buildPhases = (
 				A157AD54303D0D6B0090A9CA /* Sources */,
 				A157AD56303D0D6B0090A9CA /* Frameworks */,
@@ -431,14 +431,14 @@
 				A1C4E7A0302A63B800E2C0DB /* KitchenMemory */,
 				D10000000000000000000012 /* KitchenMemoryMac */,
 			);
-			name = "KitchenMemory macOS";
+			name = KitchenMemoryMacOS;
 			productName = KitchenMemory;
 			productReference = A157AD6B303D0D6B0090A9CA /* KitchenMemory.app */;
 			productType = "com.apple.product-type.application";
 		};
-		A1C4E79D302A63B800E2C0DB /* KitchenMemory iOS */ = {
+		A1C4E79D302A63B800E2C0DB /* KitchenMemoryIOS */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = A1C4E7C1302A63B900E2C0DB /* Build configuration list for PBXNativeTarget "KitchenMemory iOS" */;
+			buildConfigurationList = A1C4E7C1302A63B900E2C0DB /* Build configuration list for PBXNativeTarget "KitchenMemoryIOS" */;
 			buildPhases = (
 				A1C4E79A302A63B800E2C0DB /* Sources */,
 				A1C4E79B302A63B800E2C0DB /* Frameworks */,
@@ -458,7 +458,7 @@
 				A1C4E7A0302A63B800E2C0DB /* KitchenMemory */,
 				D10000000000000000000011 /* KitchenMemoryIOS */,
 			);
-			name = "KitchenMemory iOS";
+			name = KitchenMemoryIOS;
 			productName = KitchenMemory;
 			productReference = A1C4E79E302A63B800E2C0DB /* KitchenMemory.app */;
 			productType = "com.apple.product-type.application";
@@ -699,8 +699,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				A1C4E79D302A63B800E2C0DB /* KitchenMemory iOS */,
-				A157AD4A303D0D6B0090A9CA /* KitchenMemory macOS */,
+				A1C4E79D302A63B800E2C0DB /* KitchenMemoryIOS */,
+				A157AD4A303D0D6B0090A9CA /* KitchenMemoryMacOS */,
 				A1C4E7AC302A63B900E2C0DB /* KitchenMemoryIOSTests */,
 				D20000000000000000000021 /* KitchenMemoryMacTests */,
 				A1C4E7B6302A63B900E2C0DB /* KitchenMemoryUITests */,
@@ -959,18 +959,18 @@
 		};
 		D20000000000000000000053 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = A157AD4A303D0D6B0090A9CA /* KitchenMemory macOS */;
+			target = A157AD4A303D0D6B0090A9CA /* KitchenMemoryMacOS */;
 			targetProxy = D20000000000000000000062 /* PBXContainerItemProxy */;
 		};
 		D20000000000000000000054 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = A1C4E79D302A63B800E2C0DB /* KitchenMemory iOS */;
+			target = A1C4E79D302A63B800E2C0DB /* KitchenMemoryIOS */;
 			targetProxy = D20000000000000000000063 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		A157AD66303D0D6B0090A9CA /* Debug configuration for PBXNativeTarget "KitchenMemory macOS" */ = {
+		A157AD66303D0D6B0090A9CA /* Debug configuration for PBXNativeTarget "KitchenMemoryMacOS" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -1007,7 +1007,7 @@
 			};
 			name = Debug;
 		};
-		A157AD67303D0D6B0090A9CA /* Develop configuration for PBXNativeTarget "KitchenMemory macOS" */ = {
+		A157AD67303D0D6B0090A9CA /* Develop configuration for PBXNativeTarget "KitchenMemoryMacOS" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -1044,7 +1044,7 @@
 			};
 			name = Develop;
 		};
-		A157AD68303D0D6B0090A9CA /* Testing configuration for PBXNativeTarget "KitchenMemory macOS" */ = {
+		A157AD68303D0D6B0090A9CA /* Testing configuration for PBXNativeTarget "KitchenMemoryMacOS" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -1081,7 +1081,7 @@
 			};
 			name = Testing;
 		};
-		A157AD69303D0D6B0090A9CA /* Production configuration for PBXNativeTarget "KitchenMemory macOS" */ = {
+		A157AD69303D0D6B0090A9CA /* Production configuration for PBXNativeTarget "KitchenMemoryMacOS" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -1130,7 +1130,7 @@
 			};
 			name = Production;
 		};
-		A157AD6A303D0D6B0090A9CA /* ProductionTesting configuration for PBXNativeTarget "KitchenMemory macOS" */ = {
+		A157AD6A303D0D6B0090A9CA /* ProductionTesting configuration for PBXNativeTarget "KitchenMemoryMacOS" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -1301,7 +1301,7 @@
 			};
 			name = Production;
 		};
-		A1C4E7C2302A63B900E2C0DB /* Debug configuration for PBXNativeTarget "KitchenMemory iOS" */ = {
+		A1C4E7C2302A63B900E2C0DB /* Debug configuration for PBXNativeTarget "KitchenMemoryIOS" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -1351,7 +1351,7 @@
 			};
 			name = Debug;
 		};
-		A1C4E7C3302A63B900E2C0DB /* Production configuration for PBXNativeTarget "KitchenMemory iOS" */ = {
+		A1C4E7C3302A63B900E2C0DB /* Production configuration for PBXNativeTarget "KitchenMemoryIOS" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -1476,9 +1476,9 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				"TEST_TARGET_NAME[sdk=iphoneos*]" = "KitchenMemory iOS";
-				"TEST_TARGET_NAME[sdk=iphonesimulator*]" = "KitchenMemory iOS";
-				"TEST_TARGET_NAME[sdk=macosx*]" = "KitchenMemory macOS";
+				"TEST_TARGET_NAME[sdk=iphoneos*]" = KitchenMemoryIOS;
+				"TEST_TARGET_NAME[sdk=iphonesimulator*]" = KitchenMemoryIOS;
+				"TEST_TARGET_NAME[sdk=macosx*]" = KitchenMemoryMacOS;
 			};
 			name = Debug;
 		};
@@ -1505,9 +1505,9 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				"TEST_TARGET_NAME[sdk=iphoneos*]" = "KitchenMemory iOS";
-				"TEST_TARGET_NAME[sdk=iphonesimulator*]" = "KitchenMemory iOS";
-				"TEST_TARGET_NAME[sdk=macosx*]" = "KitchenMemory macOS";
+				"TEST_TARGET_NAME[sdk=iphoneos*]" = KitchenMemoryIOS;
+				"TEST_TARGET_NAME[sdk=iphonesimulator*]" = KitchenMemoryIOS;
+				"TEST_TARGET_NAME[sdk=macosx*]" = KitchenMemoryMacOS;
 			};
 			name = Production;
 		};
@@ -1783,7 +1783,7 @@
 			};
 			name = Develop;
 		};
-		C10000000000000000000102 /* Develop configuration for PBXNativeTarget "KitchenMemory iOS" */ = {
+		C10000000000000000000102 /* Develop configuration for PBXNativeTarget "KitchenMemoryIOS" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -1882,9 +1882,9 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				"TEST_TARGET_NAME[sdk=iphoneos*]" = "KitchenMemory iOS";
-				"TEST_TARGET_NAME[sdk=iphonesimulator*]" = "KitchenMemory iOS";
-				"TEST_TARGET_NAME[sdk=macosx*]" = "KitchenMemory macOS";
+				"TEST_TARGET_NAME[sdk=iphoneos*]" = KitchenMemoryIOS;
+				"TEST_TARGET_NAME[sdk=iphonesimulator*]" = KitchenMemoryIOS;
+				"TEST_TARGET_NAME[sdk=macosx*]" = KitchenMemoryMacOS;
 			};
 			name = Develop;
 		};
@@ -2056,7 +2056,7 @@
 			};
 			name = Testing;
 		};
-		C10000000000000000000202 /* Testing configuration for PBXNativeTarget "KitchenMemory iOS" */ = {
+		C10000000000000000000202 /* Testing configuration for PBXNativeTarget "KitchenMemoryIOS" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -2155,9 +2155,9 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				"TEST_TARGET_NAME[sdk=iphoneos*]" = "KitchenMemory iOS";
-				"TEST_TARGET_NAME[sdk=iphonesimulator*]" = "KitchenMemory iOS";
-				"TEST_TARGET_NAME[sdk=macosx*]" = "KitchenMemory macOS";
+				"TEST_TARGET_NAME[sdk=iphoneos*]" = KitchenMemoryIOS;
+				"TEST_TARGET_NAME[sdk=iphonesimulator*]" = KitchenMemoryIOS;
+				"TEST_TARGET_NAME[sdk=macosx*]" = KitchenMemoryMacOS;
 			};
 			name = Testing;
 		};
@@ -2322,7 +2322,7 @@
 			};
 			name = ProductionTesting;
 		};
-		C10000000000000000000302 /* ProductionTesting configuration for PBXNativeTarget "KitchenMemory iOS" */ = {
+		C10000000000000000000302 /* ProductionTesting configuration for PBXNativeTarget "KitchenMemoryIOS" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -2421,9 +2421,9 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				"TEST_TARGET_NAME[sdk=iphoneos*]" = "KitchenMemory iOS";
-				"TEST_TARGET_NAME[sdk=iphonesimulator*]" = "KitchenMemory iOS";
-				"TEST_TARGET_NAME[sdk=macosx*]" = "KitchenMemory macOS";
+				"TEST_TARGET_NAME[sdk=iphoneos*]" = KitchenMemoryIOS;
+				"TEST_TARGET_NAME[sdk=iphonesimulator*]" = KitchenMemoryIOS;
+				"TEST_TARGET_NAME[sdk=macosx*]" = KitchenMemoryMacOS;
 			};
 			name = ProductionTesting;
 		};
@@ -2659,14 +2659,14 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		A157AD65303D0D6B0090A9CA /* Build configuration list for PBXNativeTarget "KitchenMemory macOS" */ = {
+		A157AD65303D0D6B0090A9CA /* Build configuration list for PBXNativeTarget "KitchenMemoryMacOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				A157AD66303D0D6B0090A9CA /* Debug configuration for PBXNativeTarget "KitchenMemory macOS" */,
-				A157AD67303D0D6B0090A9CA /* Develop configuration for PBXNativeTarget "KitchenMemory macOS" */,
-				A157AD68303D0D6B0090A9CA /* Testing configuration for PBXNativeTarget "KitchenMemory macOS" */,
-				A157AD69303D0D6B0090A9CA /* Production configuration for PBXNativeTarget "KitchenMemory macOS" */,
-				A157AD6A303D0D6B0090A9CA /* ProductionTesting configuration for PBXNativeTarget "KitchenMemory macOS" */,
+				A157AD66303D0D6B0090A9CA /* Debug configuration for PBXNativeTarget "KitchenMemoryMacOS" */,
+				A157AD67303D0D6B0090A9CA /* Develop configuration for PBXNativeTarget "KitchenMemoryMacOS" */,
+				A157AD68303D0D6B0090A9CA /* Testing configuration for PBXNativeTarget "KitchenMemoryMacOS" */,
+				A157AD69303D0D6B0090A9CA /* Production configuration for PBXNativeTarget "KitchenMemoryMacOS" */,
+				A157AD6A303D0D6B0090A9CA /* ProductionTesting configuration for PBXNativeTarget "KitchenMemoryMacOS" */,
 			);
 			defaultConfigurationName = Production;
 		};
@@ -2681,14 +2681,14 @@
 			);
 			defaultConfigurationName = Production;
 		};
-		A1C4E7C1302A63B900E2C0DB /* Build configuration list for PBXNativeTarget "KitchenMemory iOS" */ = {
+		A1C4E7C1302A63B900E2C0DB /* Build configuration list for PBXNativeTarget "KitchenMemoryIOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				A1C4E7C2302A63B900E2C0DB /* Debug configuration for PBXNativeTarget "KitchenMemory iOS" */,
-				C10000000000000000000102 /* Develop configuration for PBXNativeTarget "KitchenMemory iOS" */,
-				C10000000000000000000202 /* Testing configuration for PBXNativeTarget "KitchenMemory iOS" */,
-				A1C4E7C3302A63B900E2C0DB /* Production configuration for PBXNativeTarget "KitchenMemory iOS" */,
-				C10000000000000000000302 /* ProductionTesting configuration for PBXNativeTarget "KitchenMemory iOS" */,
+				A1C4E7C2302A63B900E2C0DB /* Debug configuration for PBXNativeTarget "KitchenMemoryIOS" */,
+				C10000000000000000000102 /* Develop configuration for PBXNativeTarget "KitchenMemoryIOS" */,
+				C10000000000000000000202 /* Testing configuration for PBXNativeTarget "KitchenMemoryIOS" */,
+				A1C4E7C3302A63B900E2C0DB /* Production configuration for PBXNativeTarget "KitchenMemoryIOS" */,
+				C10000000000000000000302 /* ProductionTesting configuration for PBXNativeTarget "KitchenMemoryIOS" */,
 			);
 			defaultConfigurationName = Production;
 		};
