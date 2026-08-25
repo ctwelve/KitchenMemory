@@ -77,10 +77,25 @@ struct KitchenMemoryApp: App {
     }
 
     return AppStartupState.prepare {
-      let preferences = DefaultsKitchenPreferencesStore(
+      let usesInMemoryStore = AppRuntimeConfiguration.usesInMemoryStore(
+        arguments: ProcessInfo.processInfo.arguments
+      )
+      let durablePreferences = DefaultsKitchenPreferencesStore(
         permitsPersonalPreferencesICloud:
           AppBuildEnvironment.current.synchronizesWithPersonalCloud
       )
+      let cloudSyncPreferenceOverride = AppRuntimeConfiguration
+        .uiTestCloudSyncPreferenceOverride(
+          arguments: ProcessInfo.processInfo.arguments
+        )
+      let preferences: any KitchenPreferencesStoring = usesInMemoryStore
+        ? VolatileKitchenPreferencesStore(
+          sampleRecipeOnboardingResponse: .accepted,
+          personalCloudSynchronizationEnabled:
+            cloudSyncPreferenceOverride
+              ?? durablePreferences.personalCloudSynchronizationEnabled
+        )
+        : durablePreferences
       let cloudSyncIsEnabled = preferences.personalCloudSynchronizationEnabled
       let personalCloudContainerIdentifier = try AppRuntimeConfiguration
         .personalCloudContainerIdentifier(
@@ -101,11 +116,10 @@ struct KitchenMemoryApp: App {
       }
 #endif
       return try AppDependencies(
-        inMemory: AppRuntimeConfiguration.usesInMemoryStore(
-          arguments: ProcessInfo.processInfo.arguments
-        ),
+        inMemory: usesInMemoryStore,
         personalCloudContainerIdentifier: personalCloudContainerIdentifier,
         preferencesStore: preferences,
+        installsSampleFixture: usesInMemoryStore,
         cloudSyncSettings: AppBuildEnvironment.current
           .offersCloudSyncSetting
           ? CloudSyncSettings(
@@ -206,6 +220,22 @@ enum AppRuntimeConfiguration {
       && arguments.contains("--simulate-startup-failure")
   }
 
+  /// Gives UI automation a deterministic long-disconnected-device starting point.
+  ///
+  /// The override is ignored by distributable builds and without the ordinary
+  /// UI-test harness flag, so process arguments cannot alter real preferences.
+  static func uiTestCloudSyncPreferenceOverride(
+    arguments: [String],
+    buildEnvironment: AppBuildEnvironment = .current
+  ) -> Bool? {
+    guard buildEnvironment.permitsUITestHarness,
+          arguments.contains("--ui-testing"),
+          arguments.contains("--ui-testing-cloud-sync-disabled") else {
+      return nil
+    }
+    return false
+  }
+
   /// Whether the host process should attach its durable store to CloudKit.
   ///
   /// Develop and Production attach ordinary launches to personal CloudKit.
@@ -275,6 +305,7 @@ struct AppDependencies {
     inMemory: Bool = false,
     personalCloudContainerIdentifier: String? = nil,
     preferencesStore: (any KitchenPreferencesStoring)? = nil,
+    installsSampleFixture: Bool = false,
     cloudSyncSettings: CloudSyncSettings? = nil,
     sampleProvider: (any SampleRecipeProviding)? = nil,
     initialKitchenWasCreatedOverride: Bool? = nil
@@ -299,7 +330,7 @@ struct AppDependencies {
 
     // Disposable previews and UI smoke tests request a ready-made fixture.
     // Durable launches never infer installation permission from this path.
-    if inMemory, preferencesStore == nil {
+    if inMemory, preferencesStore == nil || installsSampleFixture {
       try sampleInstaller.install(in: kitchen.id)
     }
 

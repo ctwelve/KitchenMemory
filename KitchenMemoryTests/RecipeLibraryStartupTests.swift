@@ -144,6 +144,23 @@ final class RecipeLibraryStartupTests: XCTestCase {
     XCTAssertNil(dependencies.libraryModel.issue)
   }
 
+  func testExplicitDisposableFixtureInstallsSamplesWithProvidedPreferences() throws {
+    let preferences = VolatileKitchenPreferencesStore(
+      sampleRecipeOnboardingResponse: .accepted
+    )
+    let dependencies = try AppDependencies(
+      inMemory: true,
+      preferencesStore: preferences,
+      installsSampleFixture: true
+    )
+
+    dependencies.libraryModel.loadIfNeeded()
+
+    XCTAssertEqual(dependencies.libraryModel.startupState, .ready)
+    XCTAssertEqual(dependencies.libraryModel.samplePresence, .complete)
+    XCTAssertEqual(dependencies.libraryModel.recipes.count, 3)
+  }
+
   func testExplicitFailedInstallationKeepsResponseAndCanBeRetried() throws {
     let preferences = VolatileKitchenPreferencesStore(sampleRecipeOnboardingResponse: .declined)
     let samples = RecoveringSampleProvider()

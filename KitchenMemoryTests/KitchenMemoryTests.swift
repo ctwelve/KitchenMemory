@@ -198,6 +198,30 @@ final class KitchenMemoryTests: XCTestCase {
     ))
   }
 
+  func testCloudSyncPreferenceOverrideIsConfinedToUITestHarnessBuilds() {
+    let arguments = [
+      "KitchenMemory",
+      "--ui-testing",
+      "--ui-testing-cloud-sync-disabled",
+    ]
+
+    XCTAssertEqual(
+      AppRuntimeConfiguration.uiTestCloudSyncPreferenceOverride(
+        arguments: arguments,
+        buildEnvironment: .productionTesting
+      ),
+      false
+    )
+    XCTAssertNil(AppRuntimeConfiguration.uiTestCloudSyncPreferenceOverride(
+      arguments: arguments,
+      buildEnvironment: .production
+    ))
+    XCTAssertNil(AppRuntimeConfiguration.uiTestCloudSyncPreferenceOverride(
+      arguments: ["KitchenMemory", "--ui-testing-cloud-sync-disabled"],
+      buildEnvironment: .productionTesting
+    ))
+  }
+
   func testHostedUnitTestsUseDisposableStorageOnlyInTestingBuilds() {
     XCTAssertTrue(AppRuntimeConfiguration.usesInMemoryStore(
       arguments: ["KitchenMemory", "--unit-testing"],

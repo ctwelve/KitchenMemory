@@ -43,8 +43,10 @@ the root `RELEASE` marker changes only for a deliberately submitted release.
 
 Version 0.1.2 is the bounded polish pass immediately before 0.2 feature work.
 It collects coherent corrections against the public-alpha baseline without
-introducing a cooking-session aggregate, changing the production persistence
-schema, or adding speculative 0.2 infrastructure.
+introducing a cooking-session aggregate or adding speculative 0.2
+infrastructure. Its bounded additive V2 persistence schema records recipe
+deletion intent and observed restoration so a long-disconnected device can
+rejoin private synchronization without silently reviving deleted recipes.
 
 The pass includes repository-wide product and engineering polish, accurate
 documentation, focused sample-content corrections, and a device-local iCloud
@@ -65,12 +67,12 @@ Deliver the smallest durable cooking session from end to end:
   activity; viewing a recipe does not create history.
 - Persist, relaunch, resume, finish, and abandon through Logic and repository
   boundaries rather than directly through SwiftUI or SwiftData.
-- Introduce an immutable SwiftData V2 schema and additive private CloudKit
+- Introduce an immutable SwiftData V3 schema and additive private CloudKit
   record types without rewriting existing recipe content.
 - Add one deliberately simple start-or-resume presentation on each supported
   native product.
 - Exhaustively test domain rules, Logic operations, repository mapping, and
-  V1-to-V2 migration.
+  V2-to-V3 migration.
 
 The initial historical-reference recommendation is a hybrid: keep stable
 `Kitchen.ID`, `Recipe.ID`, and `RecipeRevision.ID` references while capturing a

@@ -72,7 +72,7 @@ final class KitchenMemoryUITests: XCTestCase {
   @MainActor
   func testReconnectingICloudSyncRequiresMergeConfirmation() {
     let app = launchApp(additionalArguments: [
-      "-personalCloudSynchronizationEnabled", "NO",
+      "--ui-testing-cloud-sync-disabled",
     ])
     openSettings(in: app)
 
