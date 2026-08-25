@@ -144,9 +144,9 @@ final class SampleRecipeCatalogTests: XCTestCase {
             RationalQuantity(numerator: 1, denominator: 2)
         )
         XCTAssertTrue(revision.ingredientSections[1].ingredients[7].isOptional)
-        XCTAssertTrue(revision.ingredientSections[1].ingredients[7].note?.contains("tomato-bright") == true)
+        XCTAssertEqual(revision.ingredientSections[1].ingredients[7].note?.contains("tomato-bright"), true)
         XCTAssertEqual(revision.instructionSections[1].steps[1].duration?.seconds, 1_800)
-        XCTAssertTrue(revision.instructionSections[1].steps[1].name?.contains("Stop screwing") == true)
+        XCTAssertEqual(revision.instructionSections[1].steps[1].name?.contains("Stop screwing"), true)
     }
 
     func testLocaleSelectionHonorsPreferenceOrderAndFallbacks() throws {
