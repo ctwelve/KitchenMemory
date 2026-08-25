@@ -20,6 +20,9 @@
 			<key>unitText</key><string>servings</string>
 			<key>originalText</key><string>Serves 8 generously</string>
 		</dict>
+		<key>prepDuration</key><dict><key>seconds</key><integer>1800</integer></dict>
+		<key>cookDuration</key><dict><key>seconds</key><integer>1200</integer></dict>
+		<key>totalDuration</key><dict><key>seconds</key><integer>3600</integer></dict>
 		<key>cuisines</key><array><string>Midwestern</string></array>
 		<key>categories</key><array><string>Dinner</string><string>Hotdish</string></array>
 		<key>keywords</key><array><string>casserole</string><string>comfort food</string><string>tuna</string><string>noodles</string></array>

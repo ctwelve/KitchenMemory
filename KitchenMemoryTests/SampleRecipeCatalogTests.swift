@@ -16,7 +16,7 @@ final class SampleRecipeCatalogTests: XCTestCase {
         XCTAssertEqual(manifest.formatVersion, 2)
         XCTAssertEqual(
             manifest.recipes.compactMap { $0.variant(preferredLanguages: ["en-US"])?.dataAssetName },
-            ["TunaNoodleHotdishRecipe", "DirtyFriedRiceRecipe"]
+            ["TunaNoodleHotdishRecipe", "DirtyFriedRiceRecipe", "RedEngineRecipe"]
         )
     }
 
@@ -50,6 +50,21 @@ final class SampleRecipeCatalogTests: XCTestCase {
         XCTAssertTrue(materialization.revision.instructionSections[1].steps[1].text.contains("Montreal"))
         XCTAssertTrue(materialization.revision.instructionSections[1].steps[3].text.contains("cayenne"))
         XCTAssertTrue(materialization.revision.instructionSections[1].steps[5].text.contains("burned electrical wire"))
+    }
+
+    func testTunaNoodleHotdishVariantsCarryObservedTimings() throws {
+        let reference = try XCTUnwrap(SampleRecipeCatalog.loadManifest().recipes.first)
+
+        for localeIdentifier in ["en-US", "fr-CA", "es-MX"] {
+            let variant = try XCTUnwrap(
+                reference.variant(preferredLanguages: [localeIdentifier])
+            )
+            let revision = try SampleRecipeCatalog.loadRecipe(variant).revision
+
+            XCTAssertEqual(revision.prepDuration?.seconds, 1_800)
+            XCTAssertEqual(revision.cookDuration?.seconds, 1_200)
+            XCTAssertEqual(revision.totalDuration?.seconds, 3_600)
+        }
     }
 
     func testDirtyFriedRicePreservesFuzzyAmountsSourceAndThermalTechnique() throws {
@@ -93,6 +108,47 @@ final class SampleRecipeCatalogTests: XCTestCase {
         XCTAssertTrue(revision.instructionSections[2].steps[3].text.contains("thermal flywheel"))
     }
 
+    func testRedEnginePreservesObservedCookAndConditionalSeasoning() throws {
+        let manifest = try SampleRecipeCatalog.loadManifest()
+        let reference = try XCTUnwrap(
+            manifest.recipes.first {
+                $0.variants.contains { $0.dataAssetName == "RedEngineRecipe" }
+            }
+        )
+        let document = try SampleRecipeCatalog.loadRecipe(
+            try XCTUnwrap(reference.variant(preferredLanguages: ["en-US"]))
+        )
+        let revision = document.revision
+
+        XCTAssertEqual(revision.title, "The Red Engine")
+        XCTAssertEqual(
+            revision.recipeYield?.originalText,
+            "Makes one very large batch with substantial leftovers"
+        )
+        XCTAssertEqual(
+            revision.source?.canonicalURL?.absoluteString,
+            "https://chatgpt.com/share/6a8d0c0c-b420-83ea-b94d-50d5b4c13cf3"
+        )
+        XCTAssertNil(revision.prepDuration)
+        XCTAssertNil(revision.cookDuration)
+        XCTAssertNil(revision.totalDuration)
+        XCTAssertNil(reference.variant(preferredLanguages: ["en-US"])?.heroImageAssetName)
+        XCTAssertEqual(revision.media.map(\.role), [.gallery])
+        XCTAssertEqual(revision.media.map(\.assetName), ["RedEngineGallery0"])
+        XCTAssertEqual(revision.ingredientSections.map(\.ingredients.count), [11, 10])
+        XCTAssertEqual(revision.instructionSections.map(\.steps.count), [3, 2, 1])
+        XCTAssertTrue(revision.ingredientSections[0].ingredients[2].originalText.contains("comically large"))
+        XCTAssertTrue(revision.ingredientSections[0].ingredients[9].originalText.contains("Hunt's"))
+        XCTAssertEqual(
+            revision.ingredientSections[1].ingredients[5].quantity?.lowerBound,
+            RationalQuantity(numerator: 1, denominator: 2)
+        )
+        XCTAssertTrue(revision.ingredientSections[1].ingredients[7].isOptional)
+        XCTAssertEqual(revision.ingredientSections[1].ingredients[7].note?.contains("tomato-bright"), true)
+        XCTAssertEqual(revision.instructionSections[1].steps[1].duration?.seconds, 1_800)
+        XCTAssertEqual(revision.instructionSections[1].steps[1].name?.contains("Stop screwing"), true)
+    }
+
     func testLocaleSelectionHonorsPreferenceOrderAndFallbacks() throws {
         let reference = try XCTUnwrap(SampleRecipeCatalog.loadManifest().recipes.first)
 
@@ -114,8 +170,8 @@ final class SampleRecipeCatalogTests: XCTestCase {
                 in: manifest,
                 preferredLanguages: [localeIdentifier]
             )
-            XCTAssertEqual(references.count, 2)
-            XCTAssertEqual(Set(references.map(\.recipeID)).count, 2)
+            XCTAssertEqual(references.count, 3)
+            XCTAssertEqual(Set(references.map(\.recipeID)).count, 3)
 
             for reference in references {
                 let document = try SampleRecipeCatalog.loadRecipe(reference)

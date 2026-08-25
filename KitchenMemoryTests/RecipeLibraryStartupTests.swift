@@ -146,7 +146,7 @@ final class RecipeLibraryStartupTests: XCTestCase {
     XCTAssertEqual(dependencies.libraryModel.sampleOnboardingResponse, .accepted)
     XCTAssertEqual(dependencies.libraryModel.samplePresence, .complete)
     XCTAssertEqual(preferences.response, .accepted)
-    XCTAssertEqual(dependencies.libraryModel.recipes.count, 3)
+    XCTAssertEqual(dependencies.libraryModel.recipes.count, 4)
     XCTAssertEqual(Set(dependencies.libraryModel.recipes.map(\.recipe.id)), firstIDs)
     XCTAssertTrue(dependencies.libraryModel.recipes.contains { $0.revision.title == "Keep Me" })
   }
@@ -188,7 +188,7 @@ final class RecipeLibraryStartupTests: XCTestCase {
 
     XCTAssertNil(dependencies.libraryModel.issue)
     XCTAssertEqual(dependencies.libraryModel.samplePresence, .complete)
-    XCTAssertEqual(dependencies.libraryModel.recipes.count, 2)
+    XCTAssertEqual(dependencies.libraryModel.recipes.count, 3)
   }
 
   func testResetRecordsAcceptedResponseAfterDecliningSamples() throws {
@@ -204,7 +204,7 @@ final class RecipeLibraryStartupTests: XCTestCase {
     XCTAssertEqual(dependencies.libraryModel.sampleOnboardingResponse, .accepted)
     XCTAssertEqual(dependencies.libraryModel.samplePresence, .complete)
     XCTAssertEqual(preferences.response, .accepted)
-    XCTAssertEqual(dependencies.libraryModel.recipes.count, 2)
+    XCTAssertEqual(dependencies.libraryModel.recipes.count, 3)
   }
 
   func testUserDefaultsStoreTreatsMissingAndUnknownValuesAsUndecided() throws {

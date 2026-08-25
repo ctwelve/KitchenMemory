@@ -39,7 +39,7 @@ final class KitchenMemoryTests: XCTestCase {
     shouldFail = false
     let recovered = try XCTUnwrap(prepare().dependencies)
     recovered.libraryModel.loadIfNeeded()
-    XCTAssertEqual(recovered.libraryModel.recipes.count, 2)
+    XCTAssertEqual(recovered.libraryModel.recipes.count, 3)
   }
 
   func testStarterRecipeLoadsThroughAppComposition() throws {
@@ -47,7 +47,7 @@ final class KitchenMemoryTests: XCTestCase {
 
     dependencies.libraryModel.loadIfNeeded()
 
-    XCTAssertEqual(dependencies.libraryModel.recipes.count, 2)
+    XCTAssertEqual(dependencies.libraryModel.recipes.count, 3)
     XCTAssertEqual(
       dependencies.libraryModel.selectedRecipe?.revision.title,
       "Dirty Fried Rice"
@@ -60,7 +60,7 @@ final class KitchenMemoryTests: XCTestCase {
     dependencies.libraryModel.loadIfNeeded()
     dependencies.libraryModel.reload()
 
-    XCTAssertEqual(dependencies.libraryModel.recipes.count, 2)
+    XCTAssertEqual(dependencies.libraryModel.recipes.count, 3)
   }
 
   func testNewStoreCreatesOneEmptyKitchenWithoutAssumingSamplePermission() throws {
