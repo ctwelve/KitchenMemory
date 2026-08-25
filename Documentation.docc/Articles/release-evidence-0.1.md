@@ -6,7 +6,7 @@ Copyright © 2026 the Kitchen Memory contributors.
 SPDX-License-Identifier: GPL-3.0-only
 -->
 
-- Status: Public-alpha artifact accepted; GitHub draft prepared
+- Status: Public alpha published
 - Candidate version: 0.1.0
 - Evidence opened: 2026-08-24
 - Accepted source: `98038e9c5acbc8c423b92589d5778438706db5fe`
@@ -189,9 +189,9 @@ bytes). Its SHA-256 digest is
 
 ## Follow-up boundary
 
-The direct macOS artifact is accepted for the public 0.1 alpha and attached to
-a GitHub draft release. Public iOS
-distribution, TestFlight installation and updates, the broader two-device
+The direct macOS artifact is accepted for the public 0.1 alpha and published in
+the GitHub prerelease for its immutable tag. Public iOS distribution, TestFlight
+installation and updates, the broader two-device
 recovery matrix, native-language review, the twenty-recipe corpus, and the
 remaining accessibility walkthroughs stay explicitly open. They are not
 retroactively converted into passing evidence by publication of the Mac build.

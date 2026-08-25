@@ -805,11 +805,6 @@
 		<dict>
 			<key>authorName</key>
 			<string>cTwelve</string>
-			<key>canonicalURL</key>
-			<dict>
-				<key>relative</key>
-				<string>https://chatgpt.com/share/6a8d0c0c-b420-83ea-b94d-50d5b4c13cf3</string>
-			</dict>
 			<key>kind</key>
 			<string>webpage</string>
 			<key>publisherName</key>

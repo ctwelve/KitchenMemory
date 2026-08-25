@@ -45,17 +45,28 @@ class CheckSoftwareInventoryTest < Minitest::Test
   def sbom(
     version: "0.1.1",
     dependency_version: "9.0.9",
-    revision: "00a7465a0668a87fa159e779b9d80f1f9652357e"
+    revision: "00a7465a0668a87fa159e779b9d80f1f9652357e",
+    document_version: version,
+    namespace_version: document_version,
+    package_url_version: version
   )
     JSON.generate(
       "spdxVersion" => "SPDX-2.3",
       "dataLicense" => "CC0-1.0",
+      "name" => "Kitchen Memory #{document_version} source dependency inventory",
+      "documentNamespace" => "https://example.test/sbom/#{namespace_version}/fixture",
       "packages" => [
         {
           "name" => "Kitchen Memory",
           "SPDXID" => "SPDXRef-Package-KitchenMemory",
           "versionInfo" => version,
-          "licenseDeclared" => "GPL-3.0-only"
+          "licenseDeclared" => "GPL-3.0-only",
+          "externalRefs" => [
+            {
+              "referenceType" => "purl",
+              "referenceLocator" => "pkg:github/ctwelve/KitchenMemory@#{package_url_version}"
+            }
+          ]
         },
         {
           "name" => "Defaults",
@@ -93,10 +104,32 @@ class CheckSoftwareInventoryTest < Minitest::Test
 
   def test_rejects_stale_application_version
     error = assert_raises(KitchenMemory::SoftwareInventory::ContractError) do
-      validate(sbom(version: "0.1.0"))
+      validate(sbom(
+        version: "0.1.0",
+        document_version: "0.1.1",
+        package_url_version: "0.1.1"
+      ))
     end
 
     assert_includes error.message, "SBOM version"
+  end
+
+  def test_rejects_stale_document_version
+    assert_raises(KitchenMemory::SoftwareInventory::ContractError) do
+      validate(sbom(document_version: "0.1.0"))
+    end
+  end
+
+  def test_rejects_stale_document_namespace
+    assert_raises(KitchenMemory::SoftwareInventory::ContractError) do
+      validate(sbom(namespace_version: "0.1.0"))
+    end
+  end
+
+  def test_rejects_stale_application_package_url
+    assert_raises(KitchenMemory::SoftwareInventory::ContractError) do
+      validate(sbom(package_url_version: "0.1.0"))
+    end
   end
 
   def test_rejects_stale_dependency_version

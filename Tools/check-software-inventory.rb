@@ -12,6 +12,7 @@ module KitchenMemory
   module SoftwareInventory
     RESOLVED_IDENTITY_REFERENCE = "resolved-package-identity"
     APP_PACKAGE_ID = "SPDXRef-Package-KitchenMemory"
+    APP_PACKAGE_URL_PREFIX = "pkg:github/ctwelve/KitchenMemory@"
 
     class ContractError < StandardError; end
 
@@ -30,9 +31,28 @@ module KitchenMemory
       end
 
       marketing_version, = ReleaseVersion.source_values(project_contents)
+      assert_equal(
+        "SBOM document name",
+        sbom["name"],
+        "Kitchen Memory #{marketing_version} source dependency inventory"
+      )
+      namespace_segment = "/sbom/#{marketing_version}/"
+      unless sbom.fetch("documentNamespace", "").include?(namespace_segment)
+        raise ContractError,
+              "SBOM document namespace must contain #{namespace_segment.inspect}"
+      end
+
       app = packages_by_id.fetch(APP_PACKAGE_ID)
       assert_equal("Kitchen Memory SBOM version", app["versionInfo"], marketing_version)
       assert_equal("Kitchen Memory declared license", app["licenseDeclared"], "GPL-3.0-only")
+      app_package_url = app.fetch("externalRefs", []).find do |entry|
+        entry["referenceType"] == "purl"
+      end&.fetch("referenceLocator")
+      assert_equal(
+        "Kitchen Memory package URL",
+        app_package_url,
+        "#{APP_PACKAGE_URL_PREFIX}#{marketing_version}"
+      )
 
       resolved_packages = packages.each_with_object([]) do |package, result|
         identity = resolved_identity(package)

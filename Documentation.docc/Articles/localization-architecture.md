@@ -113,7 +113,9 @@ supported variant in this order:
 3. the English development asset.
 
 Recipe property lists remain explicit named data sets because Xcode's built-in
-asset-localization wells do not cover data sets. Image, color, and symbol assets
+asset-localization wells do not cover data sets. Every recipe data-asset and
+payload name includes its complete locale identifier, including `-en-US`; the
+catalog has no implicit base-language recipe. Image, color, and symbol assets
 may use the asset catalog's language and region variations when their visual
 content genuinely needs adaptation. Shared food photography should normally
 remain shared; localized accessibility descriptions travel with the recipe

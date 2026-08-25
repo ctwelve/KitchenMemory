@@ -7,15 +7,15 @@ SPDX-License-Identifier: GPL-3.0-only
 -->
 
 
-- Status: 0.1 public-alpha artifact accepted; publication prepared
+- Status: 0.1 public alpha published
 - Baseline completed: 2026-08-23
 - Alpha artifact accepted: 2026-08-25
 
 This roadmap records the feature slices that produced the 0.1 baseline and the
 boundary between feature development and release engineering. Slices 1 through
 10 and the deliberately reduced public-alpha acceptance exercise are complete.
-Version 0.1.0 is prepared as a signed and notarized direct-download macOS
-application in a GitHub draft release; public iOS and TestFlight distribution
+Version 0.1.0 is published as a signed and notarized direct-download macOS
+application in a GitHub prerelease; public iOS and TestFlight distribution
 remain later work.
 
 ## Alpha definition
@@ -210,17 +210,15 @@ in <doc:release-evidence-0.1>.
 
 ## 0.2 feature release — Cooking sessions
 
-Cooking sessions become the first post-alpha feature slice. This release will
-support starting and resuming a session for a specific recipe revision and
-working scale, lightweight ingredient and step progress, notes and deviations,
-and an explicit finish or abandon action without mutating the maintained recipe.
+Cooking sessions become the first post-alpha product capability. A bounded
+0.1.2 polish pass precedes four versioned feature slices: session foundation,
+cooking progress, cheap notes and deviations, and history plus release closure.
+The detailed scope, decision gates, exit criteria, and explicit deferrals live
+in <doc:roadmap-0.2>.
 
-The current domain and persistence model do not implement this aggregate. Before
-0.2 persistence work begins, resolve the session's revision-reference or
-snapshot policy, ownership and sharing behavior, progress granularity, and
-deviation targets. Then add an immutable SwiftData schema version and additive
-CloudKit record types and fields. Because sessions are a new aggregate, existing
-recipe records should not require a content rewrite merely to accommodate them.
+The current domain and persistence model do not implement the session aggregate.
+Version 0.2 introduces it through an immutable SwiftData schema version and
+additive CloudKit records without rewriting existing recipe content.
 
 ## Sequence and boundaries
 
@@ -233,7 +231,8 @@ Structured editing
           → Internationalization foundation
             → iCloud synchronization foundation
               → 0.1 release engineering
-                → 0.2 cooking sessions
+                → 0.1.2 alpha polish
+                  → 0.2 cooking-session slices
 ```
 
 Pantry holdings, shopping lists, planned cooks, cooking sessions, meal planning,

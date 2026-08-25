@@ -84,11 +84,11 @@ inventory maintenance.
 
 ## First useful release — 0.1.0 public alpha
 
-The first useful release artifact was accepted on 2026-08-25 as a signed and
-notarized direct-download macOS application and prepared in a GitHub draft. The
-same source contains native iPhone and iPad targets, but public iOS distribution
-and TestFlight remain deferred. The alpha proves the core recipe loop with a
-deliberately smaller acceptance set than the one required for 1.0.
+The first useful release artifact was accepted and published on 2026-08-25 as a
+signed and notarized direct-download macOS application in a GitHub prerelease.
+The same source contains native iPhone and iPad targets, but public iOS
+distribution and TestFlight remain deferred. The alpha proves the core recipe
+loop with a deliberately smaller acceptance set than the one required for 1.0.
 
 ### In scope
 

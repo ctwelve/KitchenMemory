@@ -51,12 +51,13 @@ public versions are ordinary history, not failed releases. Only an intentional
 release commit and tag advance `RELEASE` and begin distribution.
 
 The root `RELEASE` marker records the last submitted release version. It remains
-at 0.1.0 during 0.1.1 development. The final release operation changes it to
-`0.1.1` in a dedicated source commit, attaches the annotated `release/0.1.1`
-tag to that exact commit, and submits the commit and tag together. `RELEASE` is
-deliberately a build-visible root file rather than excluded documentation: Xcode
-Cloud requires a newly imported file change as well as the tag before it starts
-the Archive workflow.
+at 0.1.0 while later working versions such as 0.1.1 and 0.1.2 remain unsubmitted.
+An intentional release operation changes it to the selected version in a
+dedicated source commit, attaches the matching annotated tag to that exact
+commit, and submits the commit and tag together. `RELEASE` is deliberately a
+build-visible root file rather than excluded documentation: Xcode Cloud requires
+a newly imported file change as well as the tag before it starts the Archive
+workflow.
 
 The read-only release contract requires the root marker, every application
 configuration's `MARKETING_VERSION`, and the numeric suffix of the immutable

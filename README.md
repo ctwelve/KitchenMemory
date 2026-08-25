@@ -123,7 +123,9 @@ xcodebuild test \
 
 The shared SwiftUI interface is a deliberately provisional 0.1 shell. The
 business logic and native app boundaries are intended to survive deeper Mac and
-mobile interface work in 0.2.
+mobile interface work in 0.2. The accepted 0.2 roadmap delivers cooking sessions
+through bounded foundation, progress, deviation, and history slices; see the
+DocC catalog for the detailed scope and release boundary.
 
 ## License
 
