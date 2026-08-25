@@ -17,6 +17,8 @@
 		A157AD5D303D0D6B0090A9CA /* KitchenMemoryImport.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000012 /* KitchenMemoryImport.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		A157AD5E303D0D6B0090A9CA /* KitchenMemoryPersistence.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000013 /* KitchenMemoryPersistence.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		A157AD5F303D0D6B0090A9CA /* KitchenMemoryLogic.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B30000000000000000000011 /* KitchenMemoryLogic.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		A18D21B9303D644B00009405 /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = A18D21B8303D644B00009405 /* Defaults */; };
+		A18D21BE303D64A000009405 /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = A18D21BD303D64A000009405 /* Defaults */; };
 		B20000000000000000000101 /* KitchenMemoryDomain.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000011 /* KitchenMemoryDomain.framework */; };
 		B20000000000000000000102 /* KitchenMemoryImport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000012 /* KitchenMemoryImport.framework */; };
 		B20000000000000000000103 /* KitchenMemoryPersistence.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000013 /* KitchenMemoryPersistence.framework */; };
@@ -292,6 +294,7 @@
 				A157AD58303D0D6B0090A9CA /* KitchenMemoryImport.framework in Frameworks */,
 				A157AD59303D0D6B0090A9CA /* KitchenMemoryPersistence.framework in Frameworks */,
 				A157AD5A303D0D6B0090A9CA /* KitchenMemoryLogic.framework in Frameworks */,
+				A18D21B9303D644B00009405 /* Defaults in Frameworks */,
 			);
 		};
 		A1C4E79B302A63B800E2C0DB /* Frameworks */ = {
@@ -301,6 +304,7 @@
 				B20000000000000000000102 /* KitchenMemoryImport.framework in Frameworks */,
 				B20000000000000000000103 /* KitchenMemoryPersistence.framework in Frameworks */,
 				B30000000000000000000101 /* KitchenMemoryLogic.framework in Frameworks */,
+				A18D21BE303D64A000009405 /* Defaults in Frameworks */,
 			);
 		};
 		A1C4E7AA302A63B900E2C0DB /* Frameworks */ = {
@@ -432,6 +436,9 @@
 				D10000000000000000000012 /* KitchenMemoryMac */,
 			);
 			name = KitchenMemoryMacOS;
+			packageProductDependencies = (
+				A18D21B8303D644B00009405 /* Defaults */,
+			);
 			productName = KitchenMemory;
 			productReference = A157AD6B303D0D6B0090A9CA /* KitchenMemory.app */;
 			productType = "com.apple.product-type.application";
@@ -459,6 +466,9 @@
 				D10000000000000000000011 /* KitchenMemoryIOS */,
 			);
 			name = KitchenMemoryIOS;
+			packageProductDependencies = (
+				A18D21BD303D64A000009405 /* Defaults */,
+			);
 			productName = KitchenMemory;
 			productReference = A1C4E79E302A63B800E2C0DB /* KitchenMemory.app */;
 			productType = "com.apple.product-type.application";
@@ -693,6 +703,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				A12691A8302E7ECF004E6195 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */,
+				A18D21B7303D644B00009405 /* XCRemoteSwiftPackageReference "Defaults" */,
 			);
 			preferredProjectObjectVersion = 100;
 			productRefGroup = A1C4E79F302A63B800E2C0DB /* Products */;
@@ -990,7 +1001,7 @@
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Kitchen Memory Project contributors.";
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 0.1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory;
 				PRODUCT_NAME = KitchenMemory;
 				REGISTER_APP_GROUPS = YES;
@@ -1027,7 +1038,7 @@
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Kitchen Memory Project contributors.";
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 0.1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.dev.KitchenMemory;
 				PRODUCT_NAME = KitchenMemory;
 				REGISTER_APP_GROUPS = YES;
@@ -1064,7 +1075,7 @@
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Kitchen Memory Project contributors.";
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 0.1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory;
 				PRODUCT_NAME = KitchenMemory;
 				REGISTER_APP_GROUPS = YES;
@@ -1107,7 +1118,7 @@
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Kitchen Memory Project contributors.";
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 0.1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory;
 				PRODUCT_NAME = KitchenMemory;
 				REGISTER_APP_GROUPS = YES;
@@ -1157,7 +1168,7 @@
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Kitchen Memory Project contributors.";
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 0.1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory;
 				PRODUCT_NAME = KitchenMemory;
 				REGISTER_APP_GROUPS = YES;
@@ -1330,7 +1341,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 0.1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory;
 				PRODUCT_NAME = KitchenMemory;
 				REGISTER_APP_GROUPS = YES;
@@ -1380,7 +1391,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 0.1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory;
 				PRODUCT_NAME = KitchenMemory;
 				REGISTER_APP_GROUPS = YES;
@@ -1812,7 +1823,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 0.1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.dev.KitchenMemory;
 				PRODUCT_NAME = KitchenMemory;
 				REGISTER_APP_GROUPS = YES;
@@ -2085,7 +2096,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 0.1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory;
 				PRODUCT_NAME = KitchenMemory;
 				REGISTER_APP_GROUPS = YES;
@@ -2351,7 +2362,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 0.1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory;
 				PRODUCT_NAME = KitchenMemory;
 				REGISTER_APP_GROUPS = YES;
@@ -2780,6 +2791,14 @@
 				minimumVersion = 0.65.0;
 			};
 		};
+		A18D21B7303D644B00009405 /* XCRemoteSwiftPackageReference "Defaults" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sindresorhus/Defaults";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 9.0.9;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -2787,6 +2806,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = A12691A8302E7ECF004E6195 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */;
 			productName = "plugin:SwiftLintBuildToolPlugin";
+		};
+		A18D21B8303D644B00009405 /* Defaults */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A18D21B7303D644B00009405 /* XCRemoteSwiftPackageReference "Defaults" */;
+			productName = Defaults;
+		};
+		A18D21BD303D64A000009405 /* Defaults */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A18D21B7303D644B00009405 /* XCRemoteSwiftPackageReference "Defaults" */;
+			productName = Defaults;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

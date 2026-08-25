@@ -133,3 +133,6 @@ on AI-assisted development.
 
 Kitchen Memory is free software licensed under the
 [GNU General Public License, version 3 only](LICENSE) (`GPL-3.0-only`).
+The reviewed third-party package and build-tool inventory is available in
+[DEPENDENCIES.md](DEPENDENCIES.md), with its machine-readable SPDX record in
+[SBOM.spdx.json](SBOM.spdx.json).

@@ -15,10 +15,10 @@ happened while cooking without silently changing the canonical recipe. This
 catalog collects the product doctrine, architecture, workflows, engineering
 practice, and accepted decisions that guide its implementation.
 
-Version 0.1.0 is the first public-alpha candidate. Its direct-download macOS
-application is signed with Developer ID, notarized by Apple, and prepared in a
-GitHub draft attached to the immutable `release/0.1.0` source tag. The iPhone
-and iPad product is implemented in the source tree but is not yet publicly
+Version 0.1.0 is the first public alpha. Its direct-download macOS application
+is signed with Developer ID, notarized by Apple, and published in the GitHub
+release attached to the immutable `release/0.1.0` source tag. The iPhone and
+iPad product is implemented in the source tree but is not yet publicly
 distributed through TestFlight or the App Store. See
 <doc:release-evidence-0.1> for the exact claims and deferred gates.
 

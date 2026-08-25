@@ -123,6 +123,27 @@ After the first production schema is deployed:
 Cooking sessions therefore become a new aggregate and new additive records in
 0.2. They do not require columns to be reserved in recipe records now.
 
+## Migration authority
+
+Kitchen Memory does not infer whether a migration ran by repeatedly examining
+recipe content. SwiftData structural changes are declared through immutable
+`VersionedSchema` types and `KitchenMemoryMigrationPlan`; the persistent store's
+schema metadata is the authority for which structural stages remain.
+
+Version 0.1.1 makes a direct cutover from the released
+`sampleRecipes.consent` key to the typed `sampleRecipesConsent` key in both
+UserDefaults and iCloud key-value storage. Defaults owns typed serialization,
+observation, timestamp conflict resolution, and transport through
+`NSUbiquitousKeyValueStore`; Kitchen Memory still clears the answer when the
+iCloud account changes. It does not migrate or dual-write the old preference.
+An alpha user may therefore be asked for the sample-recipe choice again after
+updating; recipe content is not changed or removed.
+
+Future data rewrites that do not change the SwiftData schema need an equally
+explicit, durable migration ledger. They must not become content probes that
+scan a person's Kitchen on every launch, and they must not rely on private Core
+Data metadata.
+
 ## 0.1 production deployment record
 
 The first production schema for `iCloud.net.ctwelve.KitchenMemory` was deployed

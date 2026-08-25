@@ -45,9 +45,10 @@ and acceptance decision; they are not incidental CI coverage.
 ### Integration and hardening development
 
 The development workflow starts for meaningful project changes pushed to
-`slice/*` integration branches and `bugs/*` hardening branches. It performs
-Build, Analyze, and Test actions using `KitchenMemory iOS Testing` and
-`KitchenMemory macOS Testing`, but does not archive a product. Those actions use
+`slice/*` integration branches, `bugs/*` hardening branches, and
+`release-eng/*` release-infrastructure branches. All three governed lanes
+perform Build, Analyze, and Test actions using `KitchenMemory iOS Testing` and
+`KitchenMemory macOS Testing`, but never archive a product. Those actions use
 `Testing` and do not include UI automation. Local developer runs use the
 corresponding platform's Development scheme, whose Run and Analyze actions use
 `Develop`. The distinct development bundle identifier keeps local stores,
@@ -61,6 +62,12 @@ merge to `main`. Release engineering begins from that `main` baseline and uses
 focused reviewed fixes rather than extending the integration branch as an
 indefinite parallel trunk. A future batch of feature slices may establish a new
 temporary `slice/*` integration branch.
+
+`release-eng/*` owns repeatable release plumbing and its directly supporting
+hardening: CI contracts, dependency inventory, SBOM maintenance, version and tag
+validation, packaging, signing, notarization, and distribution automation. It
+is not a second feature lane. User-visible defects remain `bugs/*`, while new
+product capability remains `slice/*`.
 
 Build, Analyze, and the non-UI Test action are required to pass. The core
 framework coverage gate has reached exact complete line coverage; a failing
@@ -107,6 +114,27 @@ post-clone contract is read-only: on a release tag, it requires the numeric tag
 suffix to match every application configuration's marketing version and confirms
 that every source build number is still `1`.
 
+After the 0.1.0 public alpha, each product slice commits its next semantic
+`MARKETING_VERSION` when the slice begins. This makes every accepted slice a
+distinct potential release while preserving the source build-number seed at
+`1`. Ordinary untagged Build, Analyze, and Test actions accept the new version;
+Archive still requires an immutable matching `release/<major>.<minor>.<patch>`
+tag.
+
+Advancing a working version does not require publishing it. Patch versions may
+represent either focused bug fixes or coherent feature work smaller than the
+next minor release, and development may move past an accepted version without
+creating a tag or artifact. `RELEASE` changes only for a version deliberately
+selected for distribution.
+
+The root `RELEASE` file is the build-visible release marker. During development
+it records the last submitted version. A final release commit advances the file
+to the current marketing version and receives the matching annotated tag before
+the commit and tag are submitted together. Tagged Archive actions reject any
+disagreement among `RELEASE`, `MARKETING_VERSION`, and the tag. Do not add this
+file to Xcode Cloud's documentation-only path exclusions: its change is the
+source event that lets the tag start a fresh Archive workflow.
+
 Branch, pull-request, and `main` actions have no associated tag and skip this
 release-only check successfully. An Archive action without a release tag fails,
 as do malformed or mismatched release tags. CI never needs credentials that can
@@ -134,16 +162,17 @@ contract.
 ### Pull-request gate
 
 The pull-request workflow starts for meaningful project changes in pull requests
-from `slice/*` or `bugs/*` into `main`. Its Test action is required to pass,
-while tests in the development workflow remain advisory during ordinary work.
+from `slice/*`, `bugs/*`, or `release-eng/*` into `main`. Its Test action is
+required to pass, while tests in the development workflow remain advisory during
+ordinary work.
 
 The repository-owned `PR source policy` GitHub Actions check runs for every
 pull request into `main`, including source branches that Xcode Cloud deliberately
-does not accept. It succeeds only for `slice/*` and `bugs/*`; an ineligible
-branch receives an immediate naming failure instead of silently waiting for a
-Cloud workflow that cannot start. The workflow checks only pull-request metadata,
-does not check out or execute proposed source, and has read-only repository
-permission.
+does not accept. It succeeds only for `slice/*`, `bugs/*`, and `release-eng/*`;
+an ineligible branch receives an immediate naming failure instead of silently
+waiting for a Cloud workflow that cannot start. The workflow checks only pull-
+request metadata, does not check out or execute proposed source, and has read-
+only repository permission.
 
 GitHub applies required status checks to the protected target branch rather
 than conditionally interpreting the pull request's source name. Consequently,
@@ -153,9 +182,11 @@ GitHub App binding or fabricate its status to hide that platform limitation.
 
 Xcode Cloud reports the pull-request result to GitHub. To make the gate prevent
 rather than merely warn about a failed merge candidate, `main` requires the
-aggregate `KitchenMemory | PR to main from slice/ or bugs/` result from the
+aggregate `KitchenMemory | PR to main from governed branches` result from the
 Xcode Cloud GitHub App. The production workflow then verifies that the actual
-merge result still builds for both supported platforms.
+merge result still builds for both supported platforms. After renaming the
+Cloud workflow, GitHub must observe that exact result at least once before it
+can replace the former required check in branch protection.
 
 ### GitHub enforcement boundary
 
@@ -382,11 +413,16 @@ the same checks locally with:
 ```sh
 ruby Tools/Tests/check_release_version_test.rb
 ruby Tools/Tests/check_project_structure_test.rb
+ruby Tools/Tests/check_software_inventory_test.rb
 ruby Tools/check-project-structure.rb
-ruby Tools/check-release-version.rb \
-  --tag release/0.1.0 \
-  --action archive
+ruby Tools/check-software-inventory.rb
+ruby Tools/check-release-version.rb
 ```
+
+The untagged command is the ordinary development check. Before submitting a
+release, rerun it with `--tag release/<version> --action archive` after the
+project marketing version and root `RELEASE` marker have both been advanced to
+that same version.
 
 The structure contract also pins each project configuration to its matching
 xcconfig; the development and production bundle namespaces; platform plist,

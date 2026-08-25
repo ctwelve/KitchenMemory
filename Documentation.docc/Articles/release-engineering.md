@@ -6,7 +6,7 @@ Copyright © 2026 the Kitchen Memory contributors.
 SPDX-License-Identifier: GPL-3.0-only
 -->
 
-- Status: 0.1 public-alpha artifact accepted; publication draft prepared
+- Status: 0.1 public alpha published
 - Planned: 2026-08-23
 - Completed: 2026-08-25
 
@@ -28,6 +28,41 @@ was merged. Focused fixes remained small and reviewable; the pass was not
 permission to redesign settled domain boundaries or quietly add deferred
 features.
 
+## Versioned slice discipline
+
+The working application version now advances with every product slice. Version
+0.1.1 is the first slice built on the functioning 0.1.0 public-alpha baseline.
+A slice chooses and commits its next semantic marketing version when work
+begins, so every accepted slice is identifiable and can become a release
+candidate without a later version-only rewrite.
+
+This rule advances `MARKETING_VERSION` across every iOS and macOS application
+configuration. It does not change the source `CURRENT_PROJECT_VERSION`, which
+remains the Xcode Cloud seed value `1`. A release still requires a matching
+immutable `release/<major>.<minor>.<patch>` tag and all applicable acceptance,
+production-build, archive, signing, and distribution evidence; advancing a
+slice version does not claim that those release gates have passed.
+
+Version allocation and publication are separate decisions. A patch version may
+identify a focused bug fix or a coherent body of feature work that hangs
+together without constituting the next minor release. Kitchen Memory may accept
+that version and begin the next one without publishing an artifact; skipped
+public versions are ordinary history, not failed releases. Only an intentional
+release commit and tag advance `RELEASE` and begin distribution.
+
+The root `RELEASE` marker records the last submitted release version. It remains
+at 0.1.0 during 0.1.1 development. The final release operation changes it to
+`0.1.1` in a dedicated source commit, attaches the annotated `release/0.1.1`
+tag to that exact commit, and submits the commit and tag together. `RELEASE` is
+deliberately a build-visible root file rather than excluded documentation: Xcode
+Cloud requires a newly imported file change as well as the tag before it starts
+the Archive workflow.
+
+The read-only release contract requires the root marker, every application
+configuration's `MARKETING_VERSION`, and the numeric suffix of the immutable
+release tag to agree. An untagged development commit may have a newer marketing
+version than `RELEASE`; it is a potential release, not a submitted one.
+
 Record candidate-specific results in <doc:release-evidence-0.1>. A plan states
 what must be proven; the evidence ledger identifies the exact source state,
 environment, result, and non-private record that earned each release claim.
@@ -45,9 +80,9 @@ moving or recreating that evidence to replay a service event was rejected. For
 this alpha, the release operator instead archived the same accepted source
 locally, exported a universal Developer ID macOS application, notarized it,
 stapled the ticket, installed it outside Xcode, and completed an ordinary-use
-walkthrough. The verified 0.1.0 (1) ZIP and its checksum are attached to a
-GitHub draft release for the existing tag; publication remains an explicit
-release-operator action.
+walkthrough. The verified 0.1.0 (1) ZIP and its checksum were published in the
+GitHub prerelease for the existing tag after the release documentation merged
+and the resulting iOS and macOS Production Build actions passed.
 
 That fallback is an explicit 0.1 exception, not a silent weakening of the normal
 contract. There is no public iOS artifact or TestFlight group. The broader

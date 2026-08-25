@@ -2,8 +2,31 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: GPL-3.0-only
 
+import Defaults
 import Foundation
 import KitchenMemoryLogic
+
+private enum StoredSampleRecipeOnboardingResponse: String, Defaults.Serializable {
+  case undecided
+  case accepted
+  case declined
+
+  init(_ response: SampleRecipeOnboardingResponse) {
+    switch response {
+    case .undecided: self = .undecided
+    case .accepted: self = .accepted
+    case .declined: self = .declined
+    }
+  }
+
+  var response: SampleRecipeOnboardingResponse {
+    switch self {
+    case .undecided: .undecided
+    case .accepted: .accepted
+    case .declined: .declined
+    }
+  }
+}
 
 @MainActor
 protocol SampleRecipeOnboardingStoring: AnyObject {
@@ -23,23 +46,34 @@ extension SampleRecipeOnboardingStoring {
 /// standing authority to restore or download sample content later.
 @MainActor
 final class UserDefaultsSampleRecipeOnboardingStore: SampleRecipeOnboardingStoring {
-  // Preserve the released development key while giving its Swift API the more
-  // precise onboarding name.
-  static let key = "sampleRecipes.consent"
+  static let key = "sampleRecipesConsent"
 
-  private let defaults: UserDefaults
+  private let defaultsKey: Defaults.Key<StoredSampleRecipeOnboardingResponse>
+  private var observation: (any Defaults.Observation)?
 
-  init(defaults: UserDefaults = .standard) {
-    self.defaults = defaults
+  init(
+    defaults: UserDefaults = .standard,
+    synchronizesWithPersonalCloud: Bool = false
+  ) {
+    defaultsKey = Defaults.Key(
+      Self.key,
+      default: .undecided,
+      suite: defaults,
+      iCloud: synchronizesWithPersonalCloud
+    )
   }
 
   var response: SampleRecipeOnboardingResponse {
-    get {
-      guard let rawValue = defaults.string(forKey: Self.key) else { return .undecided }
-      return SampleRecipeOnboardingResponse(rawValue: rawValue) ?? .undecided
-    }
-    set {
-      defaults.set(newValue.rawValue, forKey: Self.key)
+    get { Defaults[defaultsKey].response }
+    set { Defaults[defaultsKey] = StoredSampleRecipeOnboardingResponse(newValue) }
+  }
+
+  func startObservingChanges(
+    _ onChange: @escaping @MainActor (SampleRecipeOnboardingResponse) -> Void
+  ) {
+    observation = Defaults.observe(defaultsKey, options: []) { change in
+      let response = change.newValue.response
+      Task { @MainActor in onChange(response) }
     }
   }
 }
@@ -55,31 +89,7 @@ final class VolatileSampleRecipeOnboardingStore: SampleRecipeOnboardingStoring {
   }
 }
 
-@MainActor
-protocol UbiquitousKeyValueStoring: AnyObject {
-  var notificationObject: AnyObject { get }
-  func onboardingString(forKey key: String) -> String?
-  func setOnboardingString(_ value: String, forKey key: String)
-  @discardableResult func synchronizeOnboardingStore() -> Bool
-}
-
-extension NSUbiquitousKeyValueStore: UbiquitousKeyValueStoring {
-  var notificationObject: AnyObject { self }
-
-  func onboardingString(forKey key: String) -> String? {
-    string(forKey: key)
-  }
-
-  func setOnboardingString(_ value: String, forKey key: String) {
-    set(value, forKey: key)
-  }
-
-  func synchronizeOnboardingStore() -> Bool {
-    synchronize()
-  }
-}
-
-/// Mirrors one small preference locally while iCloud carries it between devices.
+/// Lets Defaults mirror one small preference through iCloud between devices.
 ///
 /// Recipe content remains the stronger signal that a Kitchen is established:
 /// iCloud key-value delivery is eventual and must never hold the library hostage.
@@ -87,17 +97,18 @@ extension NSUbiquitousKeyValueStore: UbiquitousKeyValueStoring {
 final class UbiquitousSampleRecipeOnboardingStore: NSObject,
   SampleRecipeOnboardingStoring {
   private let localStore: UserDefaultsSampleRecipeOnboardingStore
-  private let ubiquitousStore: any UbiquitousKeyValueStoring
   private let notificationCenter: NotificationCenter
   private var onChange: (@MainActor (SampleRecipeOnboardingResponse) -> Void)?
 
   init(
     defaults: UserDefaults = .standard,
-    ubiquitousStore: any UbiquitousKeyValueStoring = NSUbiquitousKeyValueStore.default,
-    notificationCenter: NotificationCenter = .default
+    notificationCenter: NotificationCenter = .default,
+    synchronizesWithPersonalCloud: Bool = true
   ) {
-    localStore = UserDefaultsSampleRecipeOnboardingStore(defaults: defaults)
-    self.ubiquitousStore = ubiquitousStore
+    localStore = UserDefaultsSampleRecipeOnboardingStore(
+      defaults: defaults,
+      synchronizesWithPersonalCloud: synchronizesWithPersonalCloud
+    )
     self.notificationCenter = notificationCenter
     super.init()
   }
@@ -107,68 +118,41 @@ final class UbiquitousSampleRecipeOnboardingStore: NSObject,
   }
 
   var response: SampleRecipeOnboardingResponse {
-    get {
-      guard let remoteResponse else { return localStore.response }
-      localStore.response = remoteResponse
-      return remoteResponse
-    }
-    set {
-      localStore.response = newValue
-      ubiquitousStore.setOnboardingString(newValue.rawValue, forKey: Self.key)
-    }
+    get { localStore.response }
+    set { localStore.response = newValue }
   }
 
   func startObservingChanges(
     _ onChange: @escaping @MainActor (SampleRecipeOnboardingResponse) -> Void
   ) {
     self.onChange = onChange
+    localStore.startObservingChanges { [weak self] response in
+      self?.onChange?(response)
+    }
     notificationCenter.addObserver(
       self,
       selector: #selector(ubiquitousStoreDidChange),
       name: NSUbiquitousKeyValueStore.didChangeExternallyNotification,
-      object: ubiquitousStore.notificationObject
+      object: NSUbiquitousKeyValueStore.default
     )
-    let synchronized = ubiquitousStore.synchronizeOnboardingStore()
-    migrateLocalResponseIfNeeded(afterSuccessfulSynchronization: synchronized)
-  }
-
-  private static let key = UserDefaultsSampleRecipeOnboardingStore.key
-
-  private var remoteResponse: SampleRecipeOnboardingResponse? {
-    guard let rawValue = ubiquitousStore.onboardingString(forKey: Self.key) else {
-      return nil
-    }
-    return SampleRecipeOnboardingResponse(rawValue: rawValue)
-  }
-
-  private func migrateLocalResponseIfNeeded(afterSuccessfulSynchronization: Bool) {
-    guard afterSuccessfulSynchronization,
-          remoteResponse == nil,
-          localStore.response != .undecided else { return }
-    ubiquitousStore.setOnboardingString(localStore.response.rawValue, forKey: Self.key)
   }
 
   @objc nonisolated private func ubiquitousStoreDidChange(_ notification: Notification) {
-    let changedKeys = notification.userInfo?[NSUbiquitousKeyValueStoreChangedKeysKey]
-      as? [String]
     let reason = (notification.userInfo?[NSUbiquitousKeyValueStoreChangeReasonKey]
       as? NSNumber)?.intValue
     Task { @MainActor [weak self] in
-      self?.receiveExternalChange(changedKeys: changedKeys, reason: reason)
+      self?.receiveExternalChange(reason: reason)
     }
   }
 
-  func receiveExternalChange(changedKeys: [String]?, reason: Int?) {
-    let accountChanged = reason == NSUbiquitousKeyValueStoreAccountChange
-    guard accountChanged || changedKeys?.contains(Self.key) != false else { return }
-
-    if let remoteResponse {
-      localStore.response = remoteResponse
-      onChange?(remoteResponse)
-    } else if accountChanged {
-      // A preference from a previous Apple account must not follow the person
-      // into a different private CloudKit account.
-      localStore.response = .undecided
+  func receiveExternalChange(reason: Int?) {
+    guard reason == NSUbiquitousKeyValueStoreAccountChange else { return }
+    // A preference from a previous Apple account must not follow the person
+    // into a different private CloudKit account. Defaults owns ordinary remote
+    // changes; this product-specific account boundary remains ours.
+    let wasUndecided = localStore.response == .undecided
+    localStore.response = .undecided
+    if wasUndecided {
       onChange?(.undecided)
     }
   }

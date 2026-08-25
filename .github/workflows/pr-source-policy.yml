@@ -28,11 +28,11 @@ jobs:
         shell: bash
         run: |
           case "$HEAD_REF" in
-            slice/*|bugs/*)
+            slice/*|bugs/*|release-eng/*)
               echo "Eligible pull-request source: $HEAD_REF"
               ;;
             *)
-              echo "::error title=Ineligible pull-request source::Pull requests to main must come from slice/* or bugs/*. Rename $HEAD_REF before opening or updating the pull request."
+              echo "::error title=Ineligible pull-request source::Pull requests to main must come from slice/*, bugs/*, or release-eng/*. Rename $HEAD_REF before opening or updating the pull request."
               exit 1
               ;;
           esac
