@@ -697,6 +697,198 @@
       "comment" : "Settings section title for private iCloud synchronization status.",
       "extractionState" : "manual"
     },
+    "settings.icloud.toggle" : {
+      "localizations" : {
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincronizar recetas con iCloud"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchroniser les recettes avec iCloud"
+          }
+        },
+        "en-US" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sync recipes with iCloud"
+          }
+        }
+      },
+      "comment" : "Device-local setting that enables or disables private iCloud recipe synchronization on the next launch.",
+      "extractionState" : "manual"
+    },
+    "settings.icloud.summary" : {
+      "localizations" : {
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mantiene la biblioteca de recetas de este dispositivo en tu base de datos privada de iCloud y disponible en Kitchen Memory en tus otros dispositivos."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conserve la bibliothèque de recettes de cet appareil dans votre base de données iCloud privée et la rend accessible dans Kitchen Memory sur vos autres appareils."
+          }
+        },
+        "en-US" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keeps this device’s recipe library in your private iCloud database and available to Kitchen Memory on your other devices."
+          }
+        }
+      },
+      "comment" : "Explains the scope of the private iCloud recipe synchronization setting.",
+      "extractionState" : "manual"
+    },
+    "settings.icloud.pending-enable" : {
+      "localizations" : {
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La sincronización se activará la próxima vez que abras Kitchen Memory."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La synchronisation sera activée la prochaine fois que vous ouvrirez Kitchen Memory."
+          }
+        },
+        "en-US" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sync will turn on the next time you open Kitchen Memory."
+          }
+        }
+      },
+      "comment" : "Honest pending state after a person enables iCloud synchronization while the local-only store remains open.",
+      "extractionState" : "manual"
+    },
+    "settings.icloud.pending-disable" : {
+      "localizations" : {
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La sincronización se desactivará la próxima vez que abras Kitchen Memory. Las recetas que ya están en este dispositivo permanecerán aquí."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La synchronisation sera désactivée la prochaine fois que vous ouvrirez Kitchen Memory. Les recettes déjà sur cet appareil y resteront."
+          }
+        },
+        "en-US" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sync will turn off the next time you open Kitchen Memory. Recipes already on this device will remain here."
+          }
+        }
+      },
+      "comment" : "Honest pending state and local-data reassurance after a person disables iCloud synchronization.",
+      "extractionState" : "manual"
+    },
+    "settings.icloud.reconnect.title" : {
+      "localizations" : {
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Volver a conectar este dispositivo a iCloud?"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reconnecter cet appareil à iCloud?"
+          }
+        },
+        "en-US" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reconnect this device to iCloud?"
+          }
+        }
+      },
+      "comment" : "Confirmation title shown before a previously local-only recipe library rejoins iCloud synchronization.",
+      "extractionState" : "manual"
+    },
+    "settings.icloud.reconnect.message" : {
+      "localizations" : {
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La próxima vez que abras Kitchen Memory, las recetas y el historial de revisiones de este dispositivo se combinarán con iCloud. Los cambios o eliminaciones realizados en cualquiera de las bibliotecas mientras estuvieron desconectadas pueden afectar la biblioteca combinada. Revísala cuando termine la sincronización."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La prochaine fois que vous ouvrirez Kitchen Memory, les recettes et l’historique des révisions de cet appareil seront fusionnés avec iCloud. Les modifications ou suppressions apportées dans l’une ou l’autre bibliothèque pendant la déconnexion peuvent affecter la bibliothèque fusionnée. Vérifiez-la une fois la synchronisation terminée."
+          }
+        },
+        "en-US" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The next time you open Kitchen Memory, recipes and revision history from this device will merge with iCloud. Changes or removals made in either library while disconnected may affect the combined library. Review it after sync finishes."
+          }
+        }
+      },
+      "comment" : "Explains that reconnecting a long-disconnected device merges divergent local and iCloud history rather than choosing one copy silently.",
+      "extractionState" : "manual"
+    },
+    "settings.icloud.reconnect.action" : {
+      "localizations" : {
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Combinar y sincronizar"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fusionner et synchroniser"
+          }
+        },
+        "en-US" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Merge and Sync"
+          }
+        }
+      },
+      "comment" : "Confirmation action that opts a previously local-only device back into iCloud synchronization.",
+      "extractionState" : "manual"
+    },
+    "settings.icloud.status.disabled" : {
+      "localizations" : {
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La sincronización con iCloud está desactivada en este dispositivo."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La synchronisation iCloud est désactivée sur cet appareil."
+          }
+        },
+        "en-US" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud sync is off on this device."
+          }
+        }
+      },
+      "comment" : "Status confirming that private iCloud synchronization is disabled on this device.",
+      "extractionState" : "manual"
+    },
     "settings.samples.section" : {
       "localizations" : {
         "es-MX" : {

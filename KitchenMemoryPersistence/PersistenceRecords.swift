@@ -39,6 +39,39 @@ import SwiftData
   }
 }
 
+/// Durable deletion intent that survives stale rows returning from another device.
+///
+/// Records are append-only. A recipe remains deleted while any marker lacks an
+/// explicit resolution, so a disconnected edit cannot accidentally masquerade
+/// as a deliberate restore.
+@Model final class RecipeDeletionRecord {
+  var id: UUID = UUID()
+  var recipeID: UUID = UUID()
+  var kitchenID: UUID = UUID()
+
+  init(id: UUID, recipeID: UUID, kitchenID: UUID) {
+    self.id = id
+    self.recipeID = recipeID
+    self.kitchenID = kitchenID
+  }
+}
+
+/// An observed restoration of one specific durable deletion marker.
+///
+/// Keeping the marker and its resolution makes the outcome convergent even if
+/// CloudKit delivers them out of order or repeats either row.
+@Model final class RecipeDeletionResolutionRecord {
+  var id: UUID = UUID()
+  var deletionID: UUID = UUID()
+  var recipeID: UUID = UUID()
+
+  init(id: UUID, deletionID: UUID, recipeID: UUID) {
+    self.id = id
+    self.deletionID = deletionID
+    self.recipeID = recipeID
+  }
+}
+
 @Model final class RecipeRevisionRecord {
   var id: UUID = UUID()
   var recipeID: UUID = UUID()

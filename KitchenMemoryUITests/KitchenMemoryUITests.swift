@@ -70,6 +70,28 @@ final class KitchenMemoryUITests: XCTestCase {
   }
 
   @MainActor
+  func testReconnectingICloudSyncRequiresMergeConfirmation() {
+    let app = launchApp(additionalArguments: [
+      "--ui-testing-cloud-sync-disabled",
+    ])
+    openSettings(in: app)
+
+    let synchronizationToggle = app.descendants(matching: .any)["settings-icloud-sync"]
+    XCTAssertTrue(synchronizationToggle.waitForExistence(timeout: 5))
+#if os(iOS)
+    // XCTest targets the center of the full SwiftUI row by default, while the
+    // iOS 26 Form exposes the actionable switch at the trailing edge.
+    synchronizationToggle.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 0.5)).tap()
+    XCTAssertTrue(app.alerts.firstMatch.waitForExistence(timeout: 3))
+#else
+    activate(synchronizationToggle)
+    XCTAssertTrue(
+      app.buttons["confirm-icloud-reconnection"].waitForExistence(timeout: 3)
+    )
+#endif
+  }
+
+  @MainActor
   func testEnglishInterfaceLaunchesTheLocalizedShell() {
     assertLocalizedShell(localeIdentifier: "en-US")
   }
@@ -205,6 +227,11 @@ final class KitchenMemoryUITests: XCTestCase {
     openSettings(in: app)
 
     let privacy = app.descendants(matching: .any)["settings-privacy"]
+#if !os(macOS)
+    if !privacy.waitForExistence(timeout: 2) {
+      app.swipeUp()
+    }
+#endif
     XCTAssertTrue(
       privacy.waitForExistence(timeout: 5),
       "Missing localized Privacy row for \(localeIdentifier)"

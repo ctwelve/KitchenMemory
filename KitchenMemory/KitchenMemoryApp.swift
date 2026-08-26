@@ -39,7 +39,10 @@ struct KitchenMemoryApp: App {
   private var applicationContent: some View {
     switch startupState {
     case .ready(let dependencies):
-      ContentView(model: dependencies.libraryModel)
+      ContentView(
+        model: dependencies.libraryModel,
+        cloudSyncSettings: dependencies.cloudSyncSettings
+      )
     case .unavailable:
       KitchenUnavailableView(retry: retryPreparation)
     }
@@ -51,7 +54,10 @@ struct KitchenMemoryApp: App {
     switch startupState {
     case .ready(let dependencies):
       NavigationStack {
-        KitchenSettingsView(model: dependencies.libraryModel)
+        KitchenSettingsView(
+          model: dependencies.libraryModel,
+          cloudSyncSettings: dependencies.cloudSyncSettings
+        )
       }
     case .unavailable:
       KitchenUnavailableView(retry: retryPreparation)
@@ -64,38 +70,91 @@ struct KitchenMemoryApp: App {
   }
 
   private static func prepareDependencies() -> AppStartupState {
+    let arguments = ProcessInfo.processInfo.arguments
     if AppRuntimeConfiguration.simulatesStartupFailure(
-      arguments: ProcessInfo.processInfo.arguments
+      arguments: arguments
     ) {
       return .unavailable
     }
 
     return AppStartupState.prepare {
-      let personalCloudContainerIdentifier = try AppRuntimeConfiguration
-        .personalCloudContainerIdentifier(
-          environment: ProcessInfo.processInfo.environment,
-          infoDictionary: Bundle.main.infoDictionary ?? [:]
-        )
-#if DEVELOP && os(macOS)
-      if AppRuntimeConfiguration.initializesCloudKitSchema(
-        arguments: ProcessInfo.processInfo.arguments
-      ) {
-        guard let personalCloudContainerIdentifier else {
-          throw AppRuntimeConfigurationError.cloudKitContainerIdentifierMissing
-        }
-        try CloudKitDevelopmentSchemaInitializer.initialize(
-          containerIdentifier: personalCloudContainerIdentifier
-        )
-      }
-#endif
-      return try AppDependencies(
-        inMemory: AppRuntimeConfiguration.usesInMemoryStore(
-          arguments: ProcessInfo.processInfo.arguments
-        ),
-        personalCloudContainerIdentifier: personalCloudContainerIdentifier
-      )
+      try makeDependencies(arguments: arguments)
     }
   }
+
+  private static func makeDependencies(arguments: [String]) throws -> AppDependencies {
+    let usesInMemoryStore = AppRuntimeConfiguration.usesInMemoryStore(
+      arguments: arguments
+    )
+    let durablePreferences = DefaultsKitchenPreferencesStore(
+      permitsPersonalPreferencesICloud:
+        AppBuildEnvironment.current.synchronizesWithPersonalCloud
+    )
+    let preferences = makePreferences(
+      arguments: arguments,
+      usesInMemoryStore: usesInMemoryStore,
+      durablePreferences: durablePreferences
+    )
+    let cloudSyncIsEnabled = preferences.personalCloudSynchronizationEnabled
+    let personalCloudContainerIdentifier = try AppRuntimeConfiguration
+      .personalCloudContainerIdentifier(
+        environment: ProcessInfo.processInfo.environment,
+        infoDictionary: Bundle.main.infoDictionary ?? [:],
+        cloudSyncIsEnabled: cloudSyncIsEnabled
+      )
+#if DEVELOP && os(macOS)
+    try initializeCloudKitSchemaIfRequested(
+      arguments: arguments,
+      containerIdentifier: personalCloudContainerIdentifier
+    )
+#endif
+
+    return try AppDependencies(
+      inMemory: usesInMemoryStore,
+      personalCloudContainerIdentifier: personalCloudContainerIdentifier,
+      preferencesStore: preferences,
+      installsSampleFixture: usesInMemoryStore,
+      cloudSyncSettings: AppBuildEnvironment.current
+        .offersCloudSyncSetting
+        ? CloudSyncSettings(
+          preference: preferences,
+          isEnabledAtLaunch: cloudSyncIsEnabled
+        )
+        : nil
+    )
+  }
+
+  private static func makePreferences(
+    arguments: [String],
+    usesInMemoryStore: Bool,
+    durablePreferences: DefaultsKitchenPreferencesStore
+  ) -> any KitchenPreferencesStoring {
+    guard usesInMemoryStore else { return durablePreferences }
+
+    return VolatileKitchenPreferencesStore(
+      sampleRecipeOnboardingResponse: .accepted,
+      personalCloudSynchronizationEnabled: AppRuntimeConfiguration
+        .uiTestCloudSyncPreferenceOverride(arguments: arguments)
+        ?? durablePreferences.personalCloudSynchronizationEnabled
+    )
+  }
+
+#if DEVELOP && os(macOS)
+  private static func initializeCloudKitSchemaIfRequested(
+    arguments: [String],
+    containerIdentifier: String?
+  ) throws {
+    guard AppRuntimeConfiguration.initializesCloudKitSchema(arguments: arguments) else {
+      return
+    }
+    guard let containerIdentifier else {
+      throw AppRuntimeConfigurationError.cloudKitContainerIdentifierMissing
+    }
+    try CloudKitDevelopmentSchemaInitializer.initialize(
+      containerIdentifier: containerIdentifier
+    )
+  }
+#endif
 }
 
 enum AppStartupState {
@@ -116,40 +175,6 @@ enum AppStartupState {
   var dependencies: AppDependencies? {
     guard case .ready(let dependencies) = self else { return nil }
     return dependencies
-  }
-}
-
-enum AppBuildEnvironment: CaseIterable {
-  case debug
-  case develop
-  case testing
-  case production
-  case productionTesting
-
-  static var current: Self {
-#if TESTING && PRODUCTION
-    .productionTesting
-#elseif TESTING
-    .testing
-#elseif DEVELOP
-    .develop
-#elseif PRODUCTION
-    .production
-#else
-    .debug
-#endif
-  }
-
-  var synchronizesWithPersonalCloud: Bool {
-    self == .develop || self == .production
-  }
-
-  var permitsUITestHarness: Bool {
-    self == .testing || self == .productionTesting
-  }
-
-  var permitsCloudKitSchemaAdministration: Bool {
-    self == .develop
   }
 }
 
@@ -182,6 +207,22 @@ enum AppRuntimeConfiguration {
       && arguments.contains("--simulate-startup-failure")
   }
 
+  /// Gives UI automation a deterministic long-disconnected-device starting point.
+  ///
+  /// The override is ignored by distributable builds and without the ordinary
+  /// UI-test harness flag, so process arguments cannot alter real preferences.
+  static func uiTestCloudSyncPreferenceOverride(
+    arguments: [String],
+    buildEnvironment: AppBuildEnvironment = .current
+  ) -> Bool? {
+    guard buildEnvironment.permitsUITestHarness,
+          arguments.contains("--ui-testing"),
+          arguments.contains("--ui-testing-cloud-sync-disabled") else {
+      return nil
+    }
+    return false
+  }
+
   /// Whether the host process should attach its durable store to CloudKit.
   ///
   /// Develop and Production attach ordinary launches to personal CloudKit.
@@ -189,9 +230,11 @@ enum AppRuntimeConfiguration {
   /// evidence never depend on an iCloud account.
   static func synchronizesWithPersonalCloud(
     environment: [String: String],
+    cloudSyncIsEnabled: Bool = true,
     buildEnvironment: AppBuildEnvironment = .current
   ) -> Bool {
-    buildEnvironment.synchronizesWithPersonalCloud
+    cloudSyncIsEnabled
+      && buildEnvironment.synchronizesWithPersonalCloud
       && environment["XCTestConfigurationFilePath"] == nil
   }
 
@@ -204,10 +247,12 @@ enum AppRuntimeConfiguration {
   static func personalCloudContainerIdentifier(
     environment: [String: String],
     infoDictionary: [String: Any],
+    cloudSyncIsEnabled: Bool = true,
     buildEnvironment: AppBuildEnvironment = .current
   ) throws -> String? {
     guard synchronizesWithPersonalCloud(
       environment: environment,
+      cloudSyncIsEnabled: cloudSyncIsEnabled,
       buildEnvironment: buildEnvironment
     ) else { return nil }
     guard let identifier = infoDictionary[cloudKitContainerInfoKey] as? String,
@@ -241,11 +286,14 @@ struct AppDependencies {
   let libraryModel: RecipeLibraryModel
   let persistentStoreChangeObserver: PersistentStoreChangeObserver?
   let personalCloudStatusMonitor: PersonalCloudStatusMonitor?
+  let cloudSyncSettings: CloudSyncSettings?
 
   init(
     inMemory: Bool = false,
     personalCloudContainerIdentifier: String? = nil,
-    sampleOnboardingStore: (any SampleRecipeOnboardingStoring)? = nil,
+    preferencesStore: (any KitchenPreferencesStoring)? = nil,
+    installsSampleFixture: Bool = false,
+    cloudSyncSettings: CloudSyncSettings? = nil,
     sampleProvider: (any SampleRecipeProviding)? = nil,
     initialKitchenWasCreatedOverride: Bool? = nil
   ) throws {
@@ -261,15 +309,15 @@ struct AppDependencies {
     let preparedKitchen = try KitchenBootstrapService(repository: repository)
       .prepareInitialKitchenWithStatus()
     let kitchen = preparedKitchen.kitchen
-    let onboardingStore = sampleOnboardingStore ?? Self.defaultOnboardingStore(
+    let preferences = preferencesStore ?? Self.defaultPreferencesStore(
       inMemory: inMemory,
-      synchronizesWithPersonalCloud: personalCloudContainerIdentifier != nil
+      permitsPersonalPreferencesICloud: personalCloudContainerIdentifier != nil
     )
     let sampleInstaller = SampleRecipeInstallService(repository: repository, samples: samples)
 
     // Disposable previews and UI smoke tests request a ready-made fixture.
     // Durable launches never infer installation permission from this path.
-    if inMemory, sampleOnboardingStore == nil {
+    if inMemory, preferencesStore == nil || installsSampleFixture {
       try sampleInstaller.install(in: kitchen.id)
     }
 
@@ -280,11 +328,12 @@ struct AppDependencies {
       importer: RecipeImportService(),
       resetService: KitchenResetService(repository: repository, samples: samples),
       sampleInstaller: sampleInstaller,
-      sampleOnboardingStore: onboardingStore,
+      samplePreferences: preferences,
       kitchenWasCreated: initialKitchenWasCreatedOverride ?? preparedKitchen.wasCreated
     )
     self.modelContainer = modelContainer
     self.libraryModel = libraryModel
+    self.cloudSyncSettings = cloudSyncSettings
     persistentStoreChangeObserver = personalCloudContainerIdentifier != nil
       ? PersistentStoreChangeObserver {
         libraryModel.reloadAfterExternalStoreChange()
@@ -322,13 +371,15 @@ struct AppDependencies {
     return .personalCloud(containerIdentifier: personalCloudContainerIdentifier)
   }
 
-  private static func defaultOnboardingStore(
+  private static func defaultPreferencesStore(
     inMemory: Bool,
-    synchronizesWithPersonalCloud: Bool
-  ) -> any SampleRecipeOnboardingStoring {
-    if inMemory { return VolatileSampleRecipeOnboardingStore(response: .accepted) }
-    return synchronizesWithPersonalCloud
-      ? UbiquitousSampleRecipeOnboardingStore()
-      : UserDefaultsSampleRecipeOnboardingStore()
+    permitsPersonalPreferencesICloud: Bool
+  ) -> any KitchenPreferencesStoring {
+    if inMemory {
+      return VolatileKitchenPreferencesStore(sampleRecipeOnboardingResponse: .accepted)
+    }
+    return DefaultsKitchenPreferencesStore(
+      permitsPersonalPreferencesICloud: permitsPersonalPreferencesICloud
+    )
   }
 }

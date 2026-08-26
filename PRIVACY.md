@@ -16,13 +16,15 @@ The 0.1 application does not include advertising, analytics, telemetry, or a
 crash-reporting service. It declares no tracking and no collected data in its
 Apple privacy manifest.
 
-Kitchen Memory uses `UserDefaults` for one app-local preference: remembering
-your answer to the sample-recipe onboarding question. When private iCloud sync
-is available, Apple's iCloud key-value store carries that same small preference
-between your devices. The app also privately synchronizes your recipe library
-through your iCloud account. Private iCloud synchronization is a feature you
-direct, not a way for this project to observe you, and it will never be
-repurposed for analytics.
+Kitchen Memory uses `UserDefaults` for two preferences: remembering your answer
+to the sample-recipe onboarding question and whether this device should
+synchronize recipes with iCloud. When private iCloud sync is available, Apple's
+iCloud key-value store carries only the sample-recipe answer between your
+devices. The synchronization choice stays on this device so one device cannot
+silently change another device's setting. The app privately synchronizes your
+recipe library through your iCloud account only while that setting is enabled.
+Private iCloud synchronization is a feature you direct, not a way for this
+project to observe you, and it will never be repurposed for analytics.
 
 ## Debugging and support
 

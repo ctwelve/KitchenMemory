@@ -1,10 +1,8 @@
 #!/bin/sh
 
-#  ci_post_clone.sh
-#  KitchenMemory
-#
-#  Created by Justin Croonenberghs on 8/20/26.
-#
+# Kitchen Memory
+# Copyright © 2026 the Kitchen Memory contributors.
+# SPDX-License-Identifier: GPL-3.0-only
 
 set -eu
 

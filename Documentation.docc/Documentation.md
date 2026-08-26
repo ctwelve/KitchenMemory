@@ -35,6 +35,7 @@ products must share one presentation architecture.
 - <doc:product-brief>
 - <doc:naming>
 - <doc:alpha-roadmap>
+- <doc:roadmap-0.2>
 - <doc:release-notes-0.1>
 - <doc:release-engineering>
 - <doc:release-evidence-0.1>

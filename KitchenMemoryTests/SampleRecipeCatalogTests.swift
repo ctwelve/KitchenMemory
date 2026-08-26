@@ -16,8 +16,15 @@ final class SampleRecipeCatalogTests: XCTestCase {
         XCTAssertEqual(manifest.formatVersion, 2)
         XCTAssertEqual(
             manifest.recipes.compactMap { $0.variant(preferredLanguages: ["en-US"])?.dataAssetName },
-            ["TunaNoodleHotdishRecipe", "DirtyFriedRiceRecipe", "RedEngineRecipe"]
+            [
+                "TunaNoodleHotdishRecipe-en-US",
+                "DirtyFriedRiceRecipe-en-US",
+                "RedEngineRecipe-en-US",
+            ]
         )
+        XCTAssertTrue(manifest.recipes.flatMap(\.variants).allSatisfy {
+            $0.dataAssetName.hasSuffix("-\($0.localeIdentifier)")
+        })
     }
 
     func testTunaNoodleHotdishUsesFullRecipeContentAndDestinationKitchen() throws {
@@ -71,7 +78,7 @@ final class SampleRecipeCatalogTests: XCTestCase {
         let manifest = try SampleRecipeCatalog.loadManifest()
         let reference = try XCTUnwrap(
             manifest.recipes.first {
-                $0.variants.contains { $0.dataAssetName == "DirtyFriedRiceRecipe" }
+                $0.variants.contains { $0.dataAssetName == "DirtyFriedRiceRecipe-en-US" }
             }
         )
         let document = try SampleRecipeCatalog.loadRecipe(
@@ -112,7 +119,7 @@ final class SampleRecipeCatalogTests: XCTestCase {
         let manifest = try SampleRecipeCatalog.loadManifest()
         let reference = try XCTUnwrap(
             manifest.recipes.first {
-                $0.variants.contains { $0.dataAssetName == "RedEngineRecipe" }
+                $0.variants.contains { $0.dataAssetName == "RedEngineRecipe-en-US" }
             }
         )
         let document = try SampleRecipeCatalog.loadRecipe(
@@ -125,10 +132,7 @@ final class SampleRecipeCatalogTests: XCTestCase {
             revision.recipeYield?.originalText,
             "Makes one very large batch with substantial leftovers"
         )
-        XCTAssertEqual(
-            revision.source?.canonicalURL?.absoluteString,
-            "https://chatgpt.com/share/6a8d0c0c-b420-83ea-b94d-50d5b4c13cf3"
-        )
+        XCTAssertNil(revision.source?.canonicalURL)
         XCTAssertNil(revision.prepDuration)
         XCTAssertNil(revision.cookDuration)
         XCTAssertNil(revision.totalDuration)

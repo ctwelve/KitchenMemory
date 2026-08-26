@@ -127,7 +127,10 @@ final class KitchenMemoryTests: XCTestCase {
       XCTAssertNil(RecipeSourceURLPolicy.validatedURL(from: value), value)
     }
   }
+}
 
+@MainActor
+final class AppRuntimeConfigurationTests: XCTestCase {
   func testBuildEnvironmentPolicyKeepsCloudAndTestHarnessesSeparate() {
     XCTAssertFalse(AppBuildEnvironment.debug.synchronizesWithPersonalCloud)
     XCTAssertTrue(AppBuildEnvironment.develop.synchronizesWithPersonalCloud)
@@ -198,6 +201,29 @@ final class KitchenMemoryTests: XCTestCase {
     ))
   }
 
+  func testCloudSyncPreferenceOverrideIsConfinedToUITestHarnessBuilds() throws {
+    let arguments = [
+      "KitchenMemory",
+      "--ui-testing",
+      "--ui-testing-cloud-sync-disabled",
+    ]
+
+    XCTAssertFalse(
+      try XCTUnwrap(AppRuntimeConfiguration.uiTestCloudSyncPreferenceOverride(
+        arguments: arguments,
+        buildEnvironment: .productionTesting
+      ))
+    )
+    XCTAssertNil(AppRuntimeConfiguration.uiTestCloudSyncPreferenceOverride(
+      arguments: arguments,
+      buildEnvironment: .production
+    ))
+    XCTAssertNil(AppRuntimeConfiguration.uiTestCloudSyncPreferenceOverride(
+      arguments: ["KitchenMemory", "--ui-testing-cloud-sync-disabled"],
+      buildEnvironment: .productionTesting
+    ))
+  }
+
   func testHostedUnitTestsUseDisposableStorageOnlyInTestingBuilds() {
     XCTAssertTrue(AppRuntimeConfiguration.usesInMemoryStore(
       arguments: ["KitchenMemory", "--unit-testing"],
@@ -226,6 +252,11 @@ final class KitchenMemoryTests: XCTestCase {
       environment: [:],
       buildEnvironment: .production
     ))
+    XCTAssertFalse(AppRuntimeConfiguration.synchronizesWithPersonalCloud(
+      environment: [:],
+      cloudSyncIsEnabled: false,
+      buildEnvironment: .production
+    ))
   }
 
   func testPersonalCloudContainerComesFromTheSignedBuildConfiguration() throws {
@@ -245,6 +276,12 @@ final class KitchenMemoryTests: XCTestCase {
       environment: [:],
       infoDictionary: [:],
       buildEnvironment: .testing
+    ))
+    XCTAssertNil(try AppRuntimeConfiguration.personalCloudContainerIdentifier(
+      environment: [:],
+      infoDictionary: [:],
+      cloudSyncIsEnabled: false,
+      buildEnvironment: .production
     ))
     XCTAssertThrowsError(try AppRuntimeConfiguration.personalCloudContainerIdentifier(
       environment: [:],

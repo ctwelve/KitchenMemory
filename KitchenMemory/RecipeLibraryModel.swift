@@ -23,7 +23,7 @@ final class RecipeLibraryModel {
   private let importer: any RecipeImportServing
   private let resetService: KitchenResetService
   private let sampleInstaller: SampleRecipeInstallService
-  private let sampleOnboardingStore: any SampleRecipeOnboardingStoring
+  private let samplePreferences: any SampleRecipeOnboardingStoring
   private var hasEstablishedKitchenEvidence: Bool
 
   private(set) var recipes: [StoredRecipe] = []
@@ -42,7 +42,7 @@ final class RecipeLibraryModel {
     importer: any RecipeImportServing,
     resetService: KitchenResetService,
     sampleInstaller: SampleRecipeInstallService,
-    sampleOnboardingStore: any SampleRecipeOnboardingStoring,
+    samplePreferences: any SampleRecipeOnboardingStoring,
     kitchenWasCreated: Bool
   ) {
     self.kitchenID = kitchenID
@@ -51,10 +51,10 @@ final class RecipeLibraryModel {
     self.importer = importer
     self.resetService = resetService
     self.sampleInstaller = sampleInstaller
-    self.sampleOnboardingStore = sampleOnboardingStore
+    self.samplePreferences = samplePreferences
     hasEstablishedKitchenEvidence = !kitchenWasCreated
-    sampleOnboardingResponse = sampleOnboardingStore.response
-    sampleOnboardingStore.startObservingChanges { [weak self] response in
+    sampleOnboardingResponse = samplePreferences.sampleRecipeOnboardingResponse
+    samplePreferences.startObservingSampleRecipeOnboardingResponse { [weak self] response in
       self?.receiveSampleOnboardingResponse(response)
     }
   }
@@ -89,7 +89,7 @@ final class RecipeLibraryModel {
   }
 
   func acceptSampleRecipes() {
-    sampleOnboardingStore.response = .accepted
+    samplePreferences.sampleRecipeOnboardingResponse = .accepted
     sampleOnboardingResponse = .accepted
     startupState = .loading
     let sampleInstallFailed = !installSamples()
@@ -99,7 +99,7 @@ final class RecipeLibraryModel {
   }
 
   func declineSampleRecipes() {
-    sampleOnboardingStore.response = .declined
+    samplePreferences.sampleRecipeOnboardingResponse = .declined
     sampleOnboardingResponse = .declined
     startupState = .ready
   }
@@ -147,7 +147,7 @@ final class RecipeLibraryModel {
   }
 
   private func reconcileStartupState() {
-    sampleOnboardingResponse = sampleOnboardingStore.response
+    sampleOnboardingResponse = samplePreferences.sampleRecipeOnboardingResponse
     startupState = sampleOnboardingResponse == .undecided
       && !hasEstablishedKitchenEvidence
       ? .choosingSamples
@@ -184,7 +184,7 @@ final class RecipeLibraryModel {
   func resetKitchen() -> Bool {
     do {
       try resetService.reset(kitchenID: kitchenID)
-      sampleOnboardingStore.response = .accepted
+      samplePreferences.sampleRecipeOnboardingResponse = .accepted
       sampleOnboardingResponse = .accepted
       reload()
       return true

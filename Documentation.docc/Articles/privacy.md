@@ -16,9 +16,12 @@ advertising profiles, engagement measurements, or saleable data.
 The shipped privacy manifest must describe the code in the current release. The
 0.1 application declares no tracking and no collected data. Its only declared
 required-reason API is `UserDefaults`, used to retain the app-local answer to the
-sample-recipe onboarding question. Private iCloud synchronization is a
-person-directed product function, not telemetry, and must never be repurposed as
-an analytics channel.
+sample-recipe onboarding question and the device-local iCloud synchronization
+choice. One application preferences store owns both keys while preserving those
+different scopes. Only the onboarding answer uses iCloud key-value storage; the
+synchronization choice must not travel to another device. Private iCloud
+synchronization is a person-directed product function, not telemetry, and must
+never be repurposed as an analytics channel.
 
 ## Diagnostic boundary
 

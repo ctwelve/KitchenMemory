@@ -132,6 +132,7 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
       )
       try writer.upsert(recipe)
       try writer.replace(revision)
+      try writer.resolveDeletions(for: recipe.id)
     }
   }
 
@@ -157,26 +158,36 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
       predicate: #Predicate { $0.id == identifier })
     let recipeRecords = try context.fetch(recipeDescriptor)
     guard !recipeRecords.isEmpty else { return nil }
+    guard try activeDeletionIDs(for: id).isEmpty else { return nil }
     let currentRevisionIDs = Set(recipeRecords.map(\.currentRevisionID))
     let currentRevisionRecords = try context.fetch(FetchDescriptor<RecipeRevisionRecord>())
       .filter { currentRevisionIDs.contains($0.id) }
-    let revisionRecords = currentRevisionRecords.filter { $0.recipeID == identifier }
-    if revisionRecords.isEmpty, let mismatched = currentRevisionRecords.first {
+    if let mismatched = currentRevisionRecords.first(where: { $0.recipeID != identifier }) {
       throw KitchenMemoryPersistenceError.inconsistentStoredRecipeIdentity(
         recipeID: id,
         revisionID: .init(rawValue: mismatched.id)
       )
     }
+    // CloudKit may resolve concurrent writes to RecipeRecord.currentRevisionID
+    // with last-writer-wins while retaining both immutable revision rows. Read
+    // every revision for the stable recipe identity so the mutable pointer can
+    // never erase a valid branch from product-level reconciliation.
+    let revisionRecords = try context.fetch(
+      FetchDescriptor<RecipeRevisionRecord>(
+        predicate: #Predicate { $0.recipeID == identifier }
+      )
+    )
     guard let revisionRecord = revisionRecords.max(by: Self.precedesForCurrentRevision) else {
       throw KitchenMemoryPersistenceError.missingCurrentRevision
     }
-    let recipeRecord = recipeRecords.first { $0.currentRevisionID == revisionRecord.id }
-    guard let recipeRecord else { throw KitchenMemoryPersistenceError.missingCurrentRevision }
+    guard let recipeRecord = recipeRecords.first else {
+      throw KitchenMemoryPersistenceError.missingCurrentRevision
+    }
 
     let recipe = Recipe(
       id: .init(rawValue: recipeRecord.id),
       kitchenID: .init(rawValue: recipeRecord.kitchenID),
-      currentRevisionID: .init(rawValue: recipeRecord.currentRevisionID)
+      currentRevisionID: .init(rawValue: revisionRecord.id)
     )
     return StoredRecipe(recipe: recipe, revision: try domainRevision(from: revisionRecord))
   }
@@ -202,6 +213,7 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
         guard try writer.recipe(id: stored.id) == nil else { continue }
         try writer.upsert(stored.recipe)
         try writer.replace(stored.revision)
+        try writer.resolveDeletions(for: stored.id)
       }
     }
   }
@@ -209,13 +221,18 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
   public func revisions(for recipeID: Recipe.ID) throws -> [RecipeRevision] {
     let identifier = recipeID.rawValue
     let descriptor = FetchDescriptor<RecipeRevisionRecord>(
-      predicate: #Predicate { $0.recipeID == identifier },
-      sortBy: [SortDescriptor(\.revisionNumber, order: .reverse)]
+      predicate: #Predicate { $0.recipeID == identifier }
     )
     var seenIDs = Set<UUID>()
     return try context.fetch(descriptor)
       .filter { seenIDs.insert($0.id).inserted }
       .map(domainRevision)
+      .sorted { lhs, rhs in
+        if lhs.revisionNumber != rhs.revisionNumber {
+          return lhs.revisionNumber > rhs.revisionNumber
+        }
+        return lhs.id.rawValue.uuidString > rhs.id.rawValue.uuidString
+      }
   }
 
   private static func precedesForCurrentRevision(
@@ -293,6 +310,17 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     let revisionRecords = try context.fetch(FetchDescriptor<RecipeRevisionRecord>())
       .filter { recipeIdentifiers.contains($0.recipeID) }
 
+    var deletedRecipeIDs = Set<UUID>()
+    for recipe in recipeRecords where deletedRecipeIDs.insert(recipe.id).inserted {
+      context.insert(
+        RecipeDeletionRecord(
+          id: UUID(),
+          recipeID: recipe.id,
+          kitchenID: recipe.kitchenID
+        )
+      )
+    }
+
     for revision in revisionRecords {
       try deleteRevisionRows(revisionID: revision.id)
       context.delete(revision)
@@ -304,6 +332,35 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     for stored in recipes {
       try upsert(stored.recipe)
       try replace(stored.revision)
+      try resolveDeletions(for: stored.id)
+    }
+  }
+
+  private func activeDeletionIDs(for recipeID: Recipe.ID) throws -> Set<UUID> {
+    let identifier = recipeID.rawValue
+    let deletions = try context.fetch(
+      FetchDescriptor<RecipeDeletionRecord>(
+        predicate: #Predicate { $0.recipeID == identifier }
+      )
+    )
+    let resolutions = try context.fetch(
+      FetchDescriptor<RecipeDeletionResolutionRecord>(
+        predicate: #Predicate { $0.recipeID == identifier }
+      )
+    )
+    return Set(deletions.map(\.id)).subtracting(resolutions.map(\.deletionID))
+  }
+
+  private func resolveDeletions(for recipeID: Recipe.ID) throws {
+    let identifier = recipeID.rawValue
+    for deletionID in try activeDeletionIDs(for: recipeID) {
+      context.insert(
+        RecipeDeletionResolutionRecord(
+          id: UUID(),
+          deletionID: deletionID,
+          recipeID: identifier
+        )
+      )
     }
   }
 

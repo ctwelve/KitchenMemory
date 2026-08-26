@@ -112,7 +112,9 @@ KitchenMemoryApp
     ├── BundledSampleRecipeProvider
     ├── KitchenBootstrapService
     ├── SampleRecipeInstallService
-    ├── SampleRecipeOnboardingStoring
+    ├── KitchenPreferencesStoring
+    │   ├── SampleRecipeOnboardingStoring
+    │   └── CloudSyncPreferenceStoring
     ├── PersistentStoreChangeObserver
     ├── PersonalCloudStatusMonitor
     └── RecipeLibraryModel
@@ -124,7 +126,7 @@ KitchenMemoryApp
 
 `AppDependencies` is the composition root. It creates the concrete SwiftData
 repository and asset-backed sample provider, asks the bootstrap service for the
-initial empty Kitchen, selects the durable or disposable onboarding store, and
+initial empty Kitchen, selects the durable or disposable preferences store, and
 injects the resulting collaborators into `RecipeLibraryModel`. For a managed
 personal-cloud store it also connects the persistence framework's remote-change
 and status adapters to that model. Concrete construction stays here so neither
@@ -149,12 +151,17 @@ Bootstrap itself creates an empty Kitchen and never interprets emptiness as
 permission. A future background-asset provider can replace the bundled adapter
 without changing these use cases.
 
-`SampleRecipeOnboardingStoring` persists `undecided`, `accepted`, or `declined`
-outside recipe storage to prevent repeating the onboarding question. It is not
-standing authority to reinsert a deleted recipe: current presence comes from
-the repository, and repair requires an explicit Settings action. The in-app
-startup gate moves through loading, sample choice, and library states; the
-operating-system launch screen remains static and does not perform product work.
+`KitchenPreferencesStoring` is the application preference boundary. Its
+Defaults-backed implementation owns stable key names, typed defaults,
+observation, and each key's synchronization scope. Consumers receive narrower
+capabilities: the recipe-library state machine sees only
+`SampleRecipeOnboardingStoring`, while cloud configuration sees only
+`CloudSyncPreferenceStoring`. The onboarding value persists `undecided`,
+`accepted`, or `declined` outside recipe storage, but it is not standing
+authority to reinsert a deleted recipe: current presence comes from the
+repository, and repair requires an explicit Settings action. The in-app startup
+gate moves through loading, sample choice, and library states; the operating-
+system launch screen remains static and does not perform product work.
 
 Views own transient presentation and bind directly to pure workflow values such
 as `RecipeEditSession`, `RecipeImportSession`, and `RecipeScalingState`. They ask
@@ -203,12 +210,12 @@ add sharing capability. A distinct store framework should wait until a future
 implementation has a genuinely different lifecycle, such as a versioned
 document package or direct shared-Kitchen repository.
 
-The store begins at `KitchenMemorySchemaV1` under
-`KitchenMemoryMigrationPlan`. V1 remains intentionally mutable before the first
-release, with development stores deleted after incompatible changes. At first
-release V1 becomes immutable; every later local schema change must add a new
-version and an explicit migration stage. The production CloudKit schema follows
-the corresponding additive rule: later features may introduce record types and
+The released store begins at immutable `KitchenMemorySchemaV1` under
+`KitchenMemoryMigrationPlan`. V2 adds durable recipe-deletion and observed-
+restoration records through a lightweight migration; it does not alter a V1
+record. Every later local schema change likewise adds a new version and an
+explicit migration stage. The production CloudKit schema follows the
+corresponding additive rule: later features may introduce record types and
 fields but must not remove or redefine published elements.
 
 ## Localization resources
