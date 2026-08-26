@@ -70,66 +70,91 @@ struct KitchenMemoryApp: App {
   }
 
   private static func prepareDependencies() -> AppStartupState {
+    let arguments = ProcessInfo.processInfo.arguments
     if AppRuntimeConfiguration.simulatesStartupFailure(
-      arguments: ProcessInfo.processInfo.arguments
+      arguments: arguments
     ) {
       return .unavailable
     }
 
     return AppStartupState.prepare {
-      let usesInMemoryStore = AppRuntimeConfiguration.usesInMemoryStore(
-        arguments: ProcessInfo.processInfo.arguments
-      )
-      let durablePreferences = DefaultsKitchenPreferencesStore(
-        permitsPersonalPreferencesICloud:
-          AppBuildEnvironment.current.synchronizesWithPersonalCloud
-      )
-      let cloudSyncPreferenceOverride = AppRuntimeConfiguration
-        .uiTestCloudSyncPreferenceOverride(
-          arguments: ProcessInfo.processInfo.arguments
-        )
-      let preferences: any KitchenPreferencesStoring = usesInMemoryStore
-        ? VolatileKitchenPreferencesStore(
-          sampleRecipeOnboardingResponse: .accepted,
-          personalCloudSynchronizationEnabled:
-            cloudSyncPreferenceOverride
-              ?? durablePreferences.personalCloudSynchronizationEnabled
-        )
-        : durablePreferences
-      let cloudSyncIsEnabled = preferences.personalCloudSynchronizationEnabled
-      let personalCloudContainerIdentifier = try AppRuntimeConfiguration
-        .personalCloudContainerIdentifier(
-          environment: ProcessInfo.processInfo.environment,
-          infoDictionary: Bundle.main.infoDictionary ?? [:],
-          cloudSyncIsEnabled: cloudSyncIsEnabled
-        )
-#if DEVELOP && os(macOS)
-      if AppRuntimeConfiguration.initializesCloudKitSchema(
-        arguments: ProcessInfo.processInfo.arguments
-      ) {
-        guard let personalCloudContainerIdentifier else {
-          throw AppRuntimeConfigurationError.cloudKitContainerIdentifierMissing
-        }
-        try CloudKitDevelopmentSchemaInitializer.initialize(
-          containerIdentifier: personalCloudContainerIdentifier
-        )
-      }
-#endif
-      return try AppDependencies(
-        inMemory: usesInMemoryStore,
-        personalCloudContainerIdentifier: personalCloudContainerIdentifier,
-        preferencesStore: preferences,
-        installsSampleFixture: usesInMemoryStore,
-        cloudSyncSettings: AppBuildEnvironment.current
-          .offersCloudSyncSetting
-          ? CloudSyncSettings(
-            preference: preferences,
-            isEnabledAtLaunch: cloudSyncIsEnabled
-          )
-          : nil
-      )
+      try makeDependencies(arguments: arguments)
     }
   }
+
+  private static func makeDependencies(arguments: [String]) throws -> AppDependencies {
+    let usesInMemoryStore = AppRuntimeConfiguration.usesInMemoryStore(
+      arguments: arguments
+    )
+    let durablePreferences = DefaultsKitchenPreferencesStore(
+      permitsPersonalPreferencesICloud:
+        AppBuildEnvironment.current.synchronizesWithPersonalCloud
+    )
+    let preferences = makePreferences(
+      arguments: arguments,
+      usesInMemoryStore: usesInMemoryStore,
+      durablePreferences: durablePreferences
+    )
+    let cloudSyncIsEnabled = preferences.personalCloudSynchronizationEnabled
+    let personalCloudContainerIdentifier = try AppRuntimeConfiguration
+      .personalCloudContainerIdentifier(
+        environment: ProcessInfo.processInfo.environment,
+        infoDictionary: Bundle.main.infoDictionary ?? [:],
+        cloudSyncIsEnabled: cloudSyncIsEnabled
+      )
+#if DEVELOP && os(macOS)
+    try initializeCloudKitSchemaIfRequested(
+      arguments: arguments,
+      containerIdentifier: personalCloudContainerIdentifier
+    )
+#endif
+
+    return try AppDependencies(
+      inMemory: usesInMemoryStore,
+      personalCloudContainerIdentifier: personalCloudContainerIdentifier,
+      preferencesStore: preferences,
+      installsSampleFixture: usesInMemoryStore,
+      cloudSyncSettings: AppBuildEnvironment.current
+        .offersCloudSyncSetting
+        ? CloudSyncSettings(
+          preference: preferences,
+          isEnabledAtLaunch: cloudSyncIsEnabled
+        )
+        : nil
+    )
+  }
+
+  private static func makePreferences(
+    arguments: [String],
+    usesInMemoryStore: Bool,
+    durablePreferences: DefaultsKitchenPreferencesStore
+  ) -> any KitchenPreferencesStoring {
+    guard usesInMemoryStore else { return durablePreferences }
+
+    return VolatileKitchenPreferencesStore(
+      sampleRecipeOnboardingResponse: .accepted,
+      personalCloudSynchronizationEnabled: AppRuntimeConfiguration
+        .uiTestCloudSyncPreferenceOverride(arguments: arguments)
+        ?? durablePreferences.personalCloudSynchronizationEnabled
+    )
+  }
+
+#if DEVELOP && os(macOS)
+  private static func initializeCloudKitSchemaIfRequested(
+    arguments: [String],
+    containerIdentifier: String?
+  ) throws {
+    guard AppRuntimeConfiguration.initializesCloudKitSchema(arguments: arguments) else {
+      return
+    }
+    guard let containerIdentifier else {
+      throw AppRuntimeConfigurationError.cloudKitContainerIdentifierMissing
+    }
+    try CloudKitDevelopmentSchemaInitializer.initialize(
+      containerIdentifier: containerIdentifier
+    )
+  }
+#endif
 }
 
 enum AppStartupState {
@@ -150,44 +175,6 @@ enum AppStartupState {
   var dependencies: AppDependencies? {
     guard case .ready(let dependencies) = self else { return nil }
     return dependencies
-  }
-}
-
-enum AppBuildEnvironment: CaseIterable {
-  case debug
-  case develop
-  case testing
-  case production
-  case productionTesting
-
-  static var current: Self {
-#if TESTING && PRODUCTION
-    .productionTesting
-#elseif TESTING
-    .testing
-#elseif DEVELOP
-    .develop
-#elseif PRODUCTION
-    .production
-#else
-    .debug
-#endif
-  }
-
-  var synchronizesWithPersonalCloud: Bool {
-    self == .develop || self == .production
-  }
-
-  var offersCloudSyncSetting: Bool {
-    self == .develop || self == .production || self == .productionTesting
-  }
-
-  var permitsUITestHarness: Bool {
-    self == .testing || self == .productionTesting
-  }
-
-  var permitsCloudKitSchemaAdministration: Bool {
-    self == .develop
   }
 }
 

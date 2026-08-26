@@ -127,7 +127,10 @@ final class KitchenMemoryTests: XCTestCase {
       XCTAssertNil(RecipeSourceURLPolicy.validatedURL(from: value), value)
     }
   }
+}
 
+@MainActor
+final class AppRuntimeConfigurationTests: XCTestCase {
   func testBuildEnvironmentPolicyKeepsCloudAndTestHarnessesSeparate() {
     XCTAssertFalse(AppBuildEnvironment.debug.synchronizesWithPersonalCloud)
     XCTAssertTrue(AppBuildEnvironment.develop.synchronizesWithPersonalCloud)
@@ -198,19 +201,18 @@ final class KitchenMemoryTests: XCTestCase {
     ))
   }
 
-  func testCloudSyncPreferenceOverrideIsConfinedToUITestHarnessBuilds() {
+  func testCloudSyncPreferenceOverrideIsConfinedToUITestHarnessBuilds() throws {
     let arguments = [
       "KitchenMemory",
       "--ui-testing",
       "--ui-testing-cloud-sync-disabled",
     ]
 
-    XCTAssertEqual(
-      AppRuntimeConfiguration.uiTestCloudSyncPreferenceOverride(
+    XCTAssertFalse(
+      try XCTUnwrap(AppRuntimeConfiguration.uiTestCloudSyncPreferenceOverride(
         arguments: arguments,
         buildEnvironment: .productionTesting
-      ),
-      false
+      ))
     )
     XCTAssertNil(AppRuntimeConfiguration.uiTestCloudSyncPreferenceOverride(
       arguments: arguments,
