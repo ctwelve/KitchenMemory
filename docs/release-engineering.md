@@ -64,7 +64,8 @@ configuration's `MARKETING_VERSION`, and the numeric suffix of the immutable
 release tag to agree. An untagged development commit may have a newer marketing
 version than `RELEASE`; it is a potential release, not a submitted one.
 
-Record candidate-specific results in <doc:release-evidence-0.1>. A plan states
+Record candidate-specific results in
+[0.1 release evidence](release-evidence-0.1.md). A plan states
 what must be proven; the evidence ledger identifies the exact source state,
 environment, result, and non-private record that earned each release claim.
 
@@ -88,7 +89,8 @@ and the resulting iOS and macOS Production Build actions passed.
 That fallback is an explicit 0.1 exception, not a silent weakening of the normal
 contract. There is no public iOS artifact or TestFlight group. The broader
 synchronization, recovery, accessibility, localization, and recipe-corpus gates
-listed in <doc:release-evidence-0.1> remain deferred or open exactly as recorded.
+listed in [0.1 release evidence](release-evidence-0.1.md) remain deferred or open
+exactly as recorded.
 
 ## Release candidate
 
@@ -191,7 +193,7 @@ fix, test, diagnostic, or documentation change; it should not expand this loop.
 - Ensure operational failures produce actionable, privacy-conscious diagnostics
   without logging recipe contents or unnecessary account identifiers.
 - Verify the shipped privacy manifest against the release binary and the
-  diagnostic boundary in <doc:privacy>.
+  diagnostic boundary in [privacy engineering](privacy.md).
 - Document what iCloud synchronization does and does not replace, how local data
   behaves offline, and which reset or recovery actions are destructive.
 - Maintain a release-blocker list and known-issues record. A workaround must be
@@ -220,9 +222,10 @@ passed the final automated candidate, production schema, immutable tag, direct
 Mac signing/notarization, post-extraction security validation, and outside-Xcode
 launch gates. It deferred public iOS/TestFlight distribution, native-language
 review, the twenty-recipe corpus, and much of the broad device/recovery matrix.
-The precise result is recorded in <doc:release-evidence-0.1>; publication does
+The precise result is recorded in
+[0.1 release evidence](release-evidence-0.1.md); publication does
 not convert any omitted row into a pass.
 
 This accepted alpha baseline allows feature development to resume with the 0.2
-cooking-session work described in <doc:cooking-sessions>, while the deferred
+cooking-session work described in [cooking sessions](cooking-sessions.md), while the deferred
 1.0-quality gates remain visible release work.

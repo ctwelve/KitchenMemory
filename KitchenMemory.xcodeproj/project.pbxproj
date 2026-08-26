@@ -7,8 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A1532353302C2FF100C8D534 /* Documentation.docc in Sources */ = {isa = PBXBuildFile; fileRef = A1532352302C2FF100C8D534 /* Documentation.docc */; };
-		A157AD55303D0D6B0090A9CA /* Documentation.docc in Sources */ = {isa = PBXBuildFile; fileRef = A1532352302C2FF100C8D534 /* Documentation.docc */; };
 		A157AD57303D0D6B0090A9CA /* KitchenMemoryDomain.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000011 /* KitchenMemoryDomain.framework */; };
 		A157AD58303D0D6B0090A9CA /* KitchenMemoryImport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000012 /* KitchenMemoryImport.framework */; };
 		A157AD59303D0D6B0090A9CA /* KitchenMemoryPersistence.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000013 /* KitchenMemoryPersistence.framework */; };
@@ -192,10 +190,14 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		A1532352302C2FF100C8D534 /* Documentation.docc */ = {isa = PBXFileReference; lastKnownFileType = folder.documentationcatalog; path = Documentation.docc; sourceTree = "<group>"; };
 		A157AD6B303D0D6B0090A9CA /* KitchenMemory.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KitchenMemory.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A15962C5302BC01A00926925 /* KitchenMemoryIOSTesting.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = KitchenMemoryIOSTesting.xctestplan; sourceTree = "<group>"; };
 		A15E8F41303912A6009B0A22 /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
+		A1BC7A50303F76CE0082EE96 /* AGENTS.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = AGENTS.md; sourceTree = "<group>"; };
+		A1BC7A51303F76CE0082EE96 /* AI.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = AI.md; sourceTree = "<group>"; };
+		A1BC7A52303F76CE0082EE96 /* DEPENDENCIES.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = DEPENDENCIES.md; sourceTree = "<group>"; };
+		A1BC7A53303F76CE0082EE96 /* PRIVACY.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = PRIVACY.md; sourceTree = "<group>"; };
+		A1BC7A54303F76CE0082EE96 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		A1C4E79E302A63B800E2C0DB /* KitchenMemory.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KitchenMemory.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1C4E7AD302A63B900E2C0DB /* KitchenMemoryIOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KitchenMemoryIOSTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1C4E7B7302A63B900E2C0DB /* KitchenMemoryUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KitchenMemoryUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -233,6 +235,21 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		A1BC7A45303F76700082EE96 /* docs */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = docs;
+			sourceTree = "<group>";
+		};
+		A1BC7A4F303F76990082EE96 /* Tools */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Tools;
+			sourceTree = "<group>";
+		};
+		A1BC7B05303F76CE0082EE96 /* skills */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = skills;
+			sourceTree = "<group>";
+		};
 		A1C4E7A0302A63B800E2C0DB /* KitchenMemory */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = KitchenMemory;
@@ -361,8 +378,15 @@
 		A1C4E795302A63B800E2C0DB = {
 			isa = PBXGroup;
 			children = (
+				A1BC7A50303F76CE0082EE96 /* AGENTS.md */,
+				A1BC7A51303F76CE0082EE96 /* AI.md */,
+				A1BC7A52303F76CE0082EE96 /* DEPENDENCIES.md */,
+				A1BC7A53303F76CE0082EE96 /* PRIVACY.md */,
+				A1BC7A54303F76CE0082EE96 /* README.md */,
+				A1BC7B05303F76CE0082EE96 /* skills */,
+				A1BC7A4F303F76990082EE96 /* Tools */,
+				A1BC7A45303F76700082EE96 /* docs */,
 				C10000000000000000000010 /* Configurations */,
-				A1532352302C2FF100C8D534 /* Documentation.docc */,
 				A1C4E7A0302A63B800E2C0DB /* KitchenMemory */,
 				D10000000000000000000011 /* KitchenMemoryIOS */,
 				D10000000000000000000012 /* KitchenMemoryMac */,
@@ -810,13 +834,11 @@
 		A157AD54303D0D6B0090A9CA /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
-				A157AD55303D0D6B0090A9CA /* Documentation.docc in Sources */,
 			);
 		};
 		A1C4E79A302A63B800E2C0DB /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
-				A1532353302C2FF100C8D534 /* Documentation.docc in Sources */,
 			);
 		};
 		A1C4E7A9302A63B900E2C0DB /* Sources */ = {

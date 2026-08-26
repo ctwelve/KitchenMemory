@@ -13,7 +13,7 @@ stability of the interface being proved.
 The current shared SwiftUI interface is replaceable scaffolding. During this
 phase, use native semantics and avoid creating obvious barriers, but keep UI
 automation to the application-shell smoke tests defined by
-<doc:0007-business-logic-coverage-and-ui-smoke-tests>. Comprehensive audits and
+[ADR 0007](adr/0007-business-logic-coverage-and-ui-smoke-tests.md). Comprehensive audits and
 interaction-specific accessibility tests resume when the relevant interface is
 stable enough to represent a shipping contract.
 

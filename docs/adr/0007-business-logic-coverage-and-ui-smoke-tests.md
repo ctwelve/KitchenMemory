@@ -92,6 +92,6 @@ exercise notification delivery, concurrency hops, and stale-result rejection.
   behavior before tests treat user-facing copy as a stable contract.
 - ADR 0005 still governs test frameworks and code comprehension; this decision
   narrows where each kind of test should be invested.
-- <doc:0009-separate-native-app-targets> defines the current two-target,
+- [ADR 0009](0009-separate-native-app-targets.md) defines the current two-target,
   four-plan topology without changing this division between durable logic
   coverage and application-shell smoke coverage.

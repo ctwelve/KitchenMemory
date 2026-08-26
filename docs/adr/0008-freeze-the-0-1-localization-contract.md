@@ -38,7 +38,7 @@ A future redesign may rearrange or replace views without renaming keys whose
 product meaning is unchanged. Add or retire keys when meaning changes, not merely
 when layout changes. Authored recipe content remains outside the interface
 catalog and continues to follow the resource model in
-<doc:localization-architecture>.
+[localization architecture](../localization-architecture.md).
 
 ## Consequences
 

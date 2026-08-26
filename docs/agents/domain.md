@@ -5,8 +5,8 @@ How the engineering skills consume this repository's domain documentation while 
 ## Before exploring, read these
 
 - **`CONTEXT.md`** at the repository root when it exists.
-- **`Documentation.docc/Articles/Decisions/`**: read ADRs that touch the area about to be changed.
-- **`Documentation.docc/Articles/`**: read topical architecture and product articles relevant to the work.
+- **`docs/adr/`**: read ADRs that touch the area about to be changed.
+- **`docs/`**: read topical architecture and product articles relevant to the work.
 
 If `CONTEXT.md` does not exist, proceed silently. The `/domain-modeling` skill creates it lazily when terms or decisions are resolved.
 
@@ -16,14 +16,15 @@ Kitchen Memory is a single-context repository:
 
 ```text
 /
-├── CONTEXT.md                                  # Created lazily when needed
-└── Documentation.docc/
-    └── Articles/
-        ├── Decisions/                          # Architecture decision records
-        └── *.md                                # Product and architecture articles
+├── CONTEXT.md                  # Created lazily when needed
+└── docs/
+    ├── adr/                    # Architecture decision records
+    ├── agents/                 # Agent-specific repository guidance
+    └── *.md                    # Product and architecture articles
 ```
 
-Keep ADRs in the existing DocC decision catalog rather than introducing a parallel `docs/adr/` directory.
+Keep development documentation in `docs/`. Reserve a future application DocC
+catalog for the completed internal design intended to accompany the mature app.
 
 ## Use the glossary's vocabulary
 

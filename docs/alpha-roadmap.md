@@ -206,7 +206,7 @@ validated Mac artifact that launched outside Xcode. When Xcode Cloud failed to
 import the release tag, the alpha used an explicit local Developer ID archive
 fallback without moving the immutable tag. Public iOS/TestFlight distribution
 and the broader 1.0-quality acceptance matrix remain deferred. Full results live
-in <doc:release-evidence-0.1>.
+in [0.1 release evidence](release-evidence-0.1.md).
 
 ## 0.2 feature release — Cooking sessions
 
@@ -214,7 +214,7 @@ Cooking sessions become the first post-alpha product capability. A bounded
 0.1.2 polish pass precedes four versioned feature slices: session foundation,
 cooking progress, cheap notes and deviations, and history plus release closure.
 The detailed scope, decision gates, exit criteria, and explicit deferrals live
-in <doc:roadmap-0.2>.
+in [the roadmap to 0.2](roadmap-0.2.md).
 
 The current domain and persistence model do not implement the session aggregate.
 Version 0.2 introduces it through an immutable SwiftData schema version and

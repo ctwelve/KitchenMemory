@@ -208,7 +208,7 @@ record types were present, both affected record types contained 22 fields, and
 the expected custom-display and duration indexes were visible. This deployment
 freezes the published V1 names and meanings under the additive-evolution rules
 above. It does not substitute for the still-open two-device production recovery
-matrix in <doc:release-evidence-0.1>.
+matrix in [0.1 release evidence](release-evidence-0.1.md).
 
 ## Development schema workflow
 

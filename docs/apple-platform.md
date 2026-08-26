@@ -37,7 +37,8 @@ until representative Mac and mobile interactions can be compared. The later
 Mac product may use AppKit and Storyboards for precise interaction and visual
 design, while mobile may retain SwiftUI, use UIKit, or adopt a hybrid. Whatever
 the result, the platforms continue to share the product core rather than a
-compromised interface. See <doc:0006-shared-ui-for-foundation-slices>.
+compromised interface. See
+[ADR 0006](adr/0006-shared-ui-for-foundation-slices.md).
 
 ## Native product targets and destinations
 
@@ -53,7 +54,7 @@ only. This keeps Xcode and Xcode Cloud destination lists aligned with products
 the project actually builds and accepts. A future Catalyst, visionOS, or tvOS
 target must be an explicit product decision with its own interaction,
 capability, testing, and release contract. See
-<doc:0009-separate-native-app-targets>.
+[ADR 0009](adr/0009-separate-native-app-targets.md).
 
 The tvOS client should emphasize legibility at kitchen distance, simple remote
 navigation, clear progress through instructions, timers, and reliable access to
@@ -144,7 +145,8 @@ The shared `KitchenMemory/` layer contains the SwiftUI interface,
 localization catalogs, with membership in both native app targets.
 Platform-owned resources, entitlements, and future presentation code belong in
 `KitchenMemoryIOS/` or `KitchenMemoryMac/`; reusable recipe behavior does not.
-See <doc:implementation-architecture> and <doc:localization-architecture>.
+See [implementation architecture](implementation-architecture.md) and
+[localization architecture](localization-architecture.md).
 
 An eventual tvOS target should consume `KitchenMemoryDomain` and the read/cook-oriented
 Logic operations while supplying its own focused presentation layer. Its

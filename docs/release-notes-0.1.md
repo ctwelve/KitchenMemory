@@ -80,7 +80,7 @@ verified after extracting the distributable ZIP. The installed artifact then
 launched and completed an ordinary-use walkthrough outside Xcode.
 
 Full engineering evidence is recorded in
-[the 0.1 release ledger](https://github.com/ctwelve/KitchenMemory/blob/main/Documentation.docc/Articles/release-evidence-0.1.md).
+[the 0.1 release ledger](release-evidence-0.1.md).
 
 Kitchen Memory is free software licensed under the GNU General Public License,
 version 3 only (`GPL-3.0-only`), without warranty.

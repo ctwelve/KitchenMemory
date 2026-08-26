@@ -433,9 +433,9 @@ module KitchenMemory
 
         groups_by_path[path] = group
       end
-      expected_paths = SYNCHRONIZED_GROUPS.values.flatten.uniq
-      assert_exact_names("synchronized root groups", groups_by_path.keys, expected_paths)
-
+      # Xcode also uses synchronized root groups for navigator-only folders.
+      # Build ownership is the target reference contract enforced below, not
+      # the existence of a synchronized group in the project navigator.
       SYNCHRONIZED_GROUPS.each do |target_name, expected_paths_for_target|
         actual_paths = targets.fetch(target_name)[:synchronized_group_ids].map do |identifier|
           group = groups_by_id[identifier]
