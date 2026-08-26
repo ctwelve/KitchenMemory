@@ -35,6 +35,28 @@ Recipe revision and working yield
      Intelligible history
 ```
 
+## 0.2 architecture revisions
+
+The architecture work that prepares and supports these product slices is kept
+in three independently reviewable revisions. These are source-history
+checkpoints within the road to 0.2.0, not marketing-version allocations; the
+working application version advances only when its corresponding product slice
+begins.
+
+1. **Protect the Cooking Session seam.** Record `CookingSession` as a distinct
+   Logic and persistence module before V3 schema work can widen the recipe
+   repository.
+2. **Deepen the Recipe Library module.** Replace its shallow read forwarding
+   with coherent library intentions and outcomes, while keeping observable
+   presentation state in the application layer.
+3. **Deepen application runtime composition.** Express valid launch modes
+   coherently and keep store selection, bootstrap order, and long-lived adapter
+   lifecycle inside the runtime implementation.
+
+Each revision receives its own commit and validation evidence. Revision 3 is
+performed against the dependency pressure created by the first two revisions;
+it does not introduce speculative Cooking Session types before Slice 11.
+
 The slices below are potential releases under the versioned-slice discipline
 in [release engineering](release-engineering.md). Advancing a working version
 does not publish it;
@@ -61,6 +83,9 @@ Deliver the smallest durable cooking session from end to end:
 
 - Settle historical recipe-reference, session authority, progress, and
   synchronization policies before freezing persistence records.
+- Implement the distinct Cooking Session module and persistence seam accepted
+  in [ADR 0010](adr/0010-distinct-cooking-session-module.md); do not add session
+  operations to `RecipeRepository`.
 - Add plain domain values and lifecycle rules for active, finished, and
   abandoned sessions.
 - Start from a specific recipe revision and reading-only working scale.
