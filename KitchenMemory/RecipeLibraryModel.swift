@@ -17,12 +17,7 @@ final class RecipeLibraryModel {
     case ready
   }
 
-  private let kitchenID: Kitchen.ID
   private let library: RecipeLibrary
-  private let editor: RecipeEditor
-  private let importer: any RecipeImportServing
-  private let resetService: KitchenResetService
-  private let sampleInstaller: SampleRecipeInstallService
   private let samplePreferences: any SampleRecipeOnboardingStoring
   private var hasEstablishedKitchenEvidence: Bool
 
@@ -36,21 +31,11 @@ final class RecipeLibraryModel {
   private(set) var personalCloudStatus: PersonalCloudStatus = .notConfigured
 
   init(
-    kitchenID: Kitchen.ID,
     library: RecipeLibrary,
-    editor: RecipeEditor,
-    importer: any RecipeImportServing,
-    resetService: KitchenResetService,
-    sampleInstaller: SampleRecipeInstallService,
     samplePreferences: any SampleRecipeOnboardingStoring,
     kitchenWasCreated: Bool
   ) {
-    self.kitchenID = kitchenID
     self.library = library
-    self.editor = editor
-    self.importer = importer
-    self.resetService = resetService
-    self.sampleInstaller = sampleInstaller
     self.samplePreferences = samplePreferences
     hasEstablishedKitchenEvidence = !kitchenWasCreated
     sampleOnboardingResponse = samplePreferences.sampleRecipeOnboardingResponse
@@ -115,17 +100,14 @@ final class RecipeLibraryModel {
   @discardableResult
   private func reload(selecting preferredRecipeID: Recipe.ID?) -> Bool {
     do {
-      recipes = try library.recipes(in: kitchenID)
+      let contents = try library.load()
+      recipes = contents.recipes
+      samplePresence = contents.samplePresence
       if let preferredRecipeID,
          recipes.contains(where: { $0.recipe.id == preferredRecipeID }) {
         selectedRecipeID = preferredRecipeID
       } else if !recipes.contains(where: { $0.recipe.id == selectedRecipeID }) {
         selectedRecipeID = recipes.first?.recipe.id
-      }
-      do {
-        samplePresence = try sampleInstaller.presence(in: kitchenID)
-      } catch {
-        samplePresence = .unavailable
       }
       issue = nil
       hasLoaded = true
@@ -156,7 +138,7 @@ final class RecipeLibraryModel {
 
   func createRecipe(from draft: RecipeDraft) -> Bool {
     do {
-      let stored = try editor.create(in: kitchenID, from: draft)
+      let stored = try library.create(from: draft)
       reload(selecting: stored.recipe.id)
       return true
     } catch {
@@ -167,7 +149,7 @@ final class RecipeLibraryModel {
 
   func reviseRecipe(id: Recipe.ID, from draft: RecipeDraft) -> Bool {
     do {
-      let stored = try editor.revise(recipeID: id, from: draft)
+      let stored = try library.revise(recipeID: id, from: draft)
       reload(selecting: stored.recipe.id)
       return true
     } catch {
@@ -177,13 +159,13 @@ final class RecipeLibraryModel {
   }
 
   func importRecipe(from url: URL) async throws -> [RecipeImportOption] {
-    try await importer.importRecipe(from: url)
+    try await library.importRecipe(from: url)
   }
 
   @discardableResult
   func resetKitchen() -> Bool {
     do {
-      try resetService.reset(kitchenID: kitchenID)
+      try library.reset()
       samplePreferences.sampleRecipeOnboardingResponse = .accepted
       sampleOnboardingResponse = .accepted
       reload()
@@ -196,7 +178,7 @@ final class RecipeLibraryModel {
 
   private func installSamples() -> Bool {
     do {
-      try sampleInstaller.install(in: kitchenID)
+      try library.installSamples()
       return true
     } catch {
       return false

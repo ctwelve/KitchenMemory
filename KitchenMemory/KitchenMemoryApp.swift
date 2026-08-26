@@ -313,21 +313,21 @@ struct AppDependencies {
       inMemory: inMemory,
       permitsPersonalPreferencesICloud: personalCloudContainerIdentifier != nil
     )
-    let sampleInstaller = SampleRecipeInstallService(repository: repository, samples: samples)
+    let library = RecipeLibrary(
+      kitchenID: kitchen.id,
+      repository: repository,
+      samples: samples,
+      importer: RecipeImportService()
+    )
 
     // Disposable previews and UI smoke tests request a ready-made fixture.
     // Durable launches never infer installation permission from this path.
     if inMemory, preferencesStore == nil || installsSampleFixture {
-      try sampleInstaller.install(in: kitchen.id)
+      try library.installSamples()
     }
 
     let libraryModel = RecipeLibraryModel(
-      kitchenID: kitchen.id,
-      library: RecipeLibrary(repository: repository),
-      editor: RecipeEditor(repository: repository),
-      importer: RecipeImportService(),
-      resetService: KitchenResetService(repository: repository, samples: samples),
-      sampleInstaller: sampleInstaller,
+      library: library,
       samplePreferences: preferences,
       kitchenWasCreated: initialKitchenWasCreatedOverride ?? preparedKitchen.wasCreated
     )

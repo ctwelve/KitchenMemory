@@ -182,9 +182,11 @@ add immutable versions and deliberate migration stages. Production CloudKit
 evolution is additive: new feature aggregates may add types and fields, while
 published schema elements keep their original meaning.
 
-`KitchenMemoryLogic` supplies the product use cases. `RecipeLibrary` provides
-Kitchen-scoped listing and stable-identifier lookup to SwiftUI without exposing
-SwiftData records; editing, import interpretation, scaling state, bootstrap, and
-reset behavior share the same UI-independent boundary. The app's recipe view
-exercises that path from the persistent current revision through ordered
+`KitchenMemoryLogic` supplies the product operations. `RecipeLibrary` is the
+Kitchen-scoped module for loading library content, creating and revising recipes,
+interpreting imports, managing bundled samples, and performing an explicitly
+confirmed reset without exposing SwiftData records. Scaling state and bootstrap
+remain separate because they have different lifecycles. The app's observable
+model projects library outcomes into selection and presentation state; the
+recipe view then reads the persistent current revision through ordered
 ingredients and steps.

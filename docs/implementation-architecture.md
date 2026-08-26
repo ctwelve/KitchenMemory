@@ -118,10 +118,11 @@ KitchenMemoryApp
     ├── PersistentStoreChangeObserver
     ├── PersonalCloudStatusMonitor
     └── RecipeLibraryModel
-        ├── RecipeLibrary
-        ├── RecipeEditor
-        ├── RecipeImportService
-        └── KitchenResetService
+        └── RecipeLibrary
+            ├── RecipeEditor
+            ├── RecipeImportService
+            ├── SampleRecipeInstallService
+            └── KitchenResetService
 ```
 
 `AppDependencies` is the composition root. It creates the concrete SwiftData
@@ -132,15 +133,19 @@ personal-cloud store it also connects the persistence framework's remote-change
 and status adapters to that model. Concrete construction stays here so neither
 the views nor the reusable frameworks need to locate their own dependencies.
 
-`RecipeLibraryModel` is the principal application glue. It owns the UI-facing
-state for one Kitchen: the loaded recipe list, current selection, load state,
-sample-onboarding and live pack-presence states, startup phase, and typed
-presentation issue. Every library-wide read or mutation passes through it. The
-model delegates validation and durable operations to
-`KitchenMemoryLogic`, then applies the small amount of presentation coordination
-that follows a successful operation, such as reloading the list while preserving
-or changing the selection. Its main-actor isolation and observation belong to
-the app boundary; recipe rules do not.
+`RecipeLibrary` is the deep Logic module for one Kitchen's recipe-library
+intentions. Its interface loads durable content with current sample presence,
+creates or revises through immutable recipe history, interprets imports, installs
+samples, and resets after confirmation. Repository access and the smaller
+editing, import, sample, and reset implementations remain behind that interface.
+
+`RecipeLibraryModel` is the observable presentation projection. It owns the
+loaded recipe list, current selection, sample-onboarding response, startup phase,
+personal-cloud status, and typed presentation issue. Every durable library
+intention crosses the `RecipeLibrary` seam; the model applies only presentation
+consequences such as retaining or changing selection and choosing localized
+failure categories. Its main-actor isolation and observation belong to the app
+layer; recipe rules do not.
 
 `BundledSampleRecipeProvider` adapts the application asset catalog to
 `SampleRecipeProviding`. `SampleRecipeInstallService` adds only recipe UUIDs
@@ -165,8 +170,8 @@ system launch screen remains static and does not perform product work.
 
 Views own transient presentation and bind directly to pure workflow values such
 as `RecipeEditSession`, `RecipeImportSession`, and `RecipeScalingState`. They ask
-`RecipeLibraryModel` to cross the library boundary rather than constructing
-repositories or use cases themselves. `RecipeLibraryIssue` is the final
+`RecipeLibraryModel` to cross the library seam rather than constructing
+repositories or Logic operations themselves. `RecipeLibraryIssue` is the final
 presentation seam: it converts typed failure categories into user-facing copy.
 That copy now comes from String Catalogs without changing the underlying logic.
 
