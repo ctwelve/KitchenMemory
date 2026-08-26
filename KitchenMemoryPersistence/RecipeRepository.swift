@@ -157,7 +157,7 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     let recipeDescriptor = FetchDescriptor<RecipeRecord>(
       predicate: #Predicate { $0.id == identifier })
     let recipeRecords = try context.fetch(recipeDescriptor)
-    guard !recipeRecords.isEmpty else { return nil }
+    guard let recipeRecord = recipeRecords.first else { return nil }
     guard try activeDeletionIDs(for: id).isEmpty else { return nil }
     let currentRevisionIDs = Set(recipeRecords.map(\.currentRevisionID))
     let currentRevisionRecords = try context.fetch(FetchDescriptor<RecipeRevisionRecord>())
@@ -180,10 +180,6 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     guard let revisionRecord = revisionRecords.max(by: Self.precedesForCurrentRevision) else {
       throw KitchenMemoryPersistenceError.missingCurrentRevision
     }
-    guard let recipeRecord = recipeRecords.first else {
-      throw KitchenMemoryPersistenceError.missingCurrentRevision
-    }
-
     let recipe = Recipe(
       id: .init(rawValue: recipeRecord.id),
       kitchenID: .init(rawValue: recipeRecord.kitchenID),

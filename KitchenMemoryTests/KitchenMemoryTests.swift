@@ -29,38 +29,49 @@ final class KitchenMemoryTests: XCTestCase {
     let prepare: () -> AppStartupState = {
       AppStartupState.prepare {
         if shouldFail { throw PrivateStartupFailure(recorder: recorder) }
-        return try AppDependencies(inMemory: true)
+        return try AppRuntime.testing()
       }
     }
 
-    XCTAssertNil(prepare().dependencies)
+    XCTAssertNil(prepare().preparedApp)
     XCTAssertFalse(recorder.wasRead)
 
     shouldFail = false
-    let recovered = try XCTUnwrap(prepare().dependencies)
+    let recovered = try XCTUnwrap(prepare().preparedApp)
     recovered.libraryModel.loadIfNeeded()
     XCTAssertEqual(recovered.libraryModel.recipes.count, 3)
   }
 
   func testStarterRecipeLoadsThroughAppComposition() throws {
-    let dependencies = try AppDependencies(inMemory: true)
+    let preparedApp = try AppRuntime.testing()
 
-    dependencies.libraryModel.loadIfNeeded()
+    preparedApp.libraryModel.loadIfNeeded()
 
-    XCTAssertEqual(dependencies.libraryModel.recipes.count, 3)
+    XCTAssertEqual(preparedApp.libraryModel.recipes.count, 3)
     XCTAssertEqual(
-      dependencies.libraryModel.selectedRecipe?.revision.title,
+      preparedApp.libraryModel.selectedRecipe?.revision.title,
       "Dirty Fried Rice"
     )
   }
 
+  func testCurrentRuntimeUsesTheCommittedHostedTestPlan() throws {
+    let preparedApp = try XCTUnwrap(AppRuntime.prepare().preparedApp)
+
+    preparedApp.libraryModel.loadIfNeeded()
+
+    XCTAssertEqual(preparedApp.libraryModel.recipes.count, 3)
+    XCTAssertNil(preparedApp.cloudSyncSettings)
+    XCTAssertNil(preparedApp.persistentStoreChangeObserver)
+    XCTAssertNil(preparedApp.personalCloudStatusMonitor)
+  }
+
   func testReloadingDoesNotDuplicateStarterContent() throws {
-    let dependencies = try AppDependencies(inMemory: true)
+    let preparedApp = try AppRuntime.testing()
 
-    dependencies.libraryModel.loadIfNeeded()
-    dependencies.libraryModel.reload()
+    preparedApp.libraryModel.loadIfNeeded()
+    preparedApp.libraryModel.reload()
 
-    XCTAssertEqual(dependencies.libraryModel.recipes.count, 3)
+    XCTAssertEqual(preparedApp.libraryModel.recipes.count, 3)
   }
 
   func testNewStoreCreatesOneEmptyKitchenWithoutAssumingSamplePermission() throws {
@@ -68,8 +79,9 @@ final class KitchenMemoryTests: XCTestCase {
       modelContainer: try KitchenMemorySchema.makeContainer(inMemory: true)
     )
 
-    let firstKitchen = try AppDependencies.prepareInitialKitchen(repository: repository)
-    let secondKitchen = try AppDependencies.prepareInitialKitchen(repository: repository)
+    let bootstrap = KitchenBootstrapService(repository: repository)
+    let firstKitchen = try bootstrap.prepareInitialKitchen()
+    let secondKitchen = try bootstrap.prepareInitialKitchen()
 
     XCTAssertEqual(firstKitchen, secondKitchen)
     XCTAssertEqual(try repository.kitchens(), [firstKitchen])
@@ -77,26 +89,26 @@ final class KitchenMemoryTests: XCTestCase {
   }
 
   func testResetKitchenRemovesUserRecipesAndRestoresCurrentSamples() throws {
-    let dependencies = try AppDependencies(inMemory: true)
-    dependencies.libraryModel.loadIfNeeded()
+    let preparedApp = try AppRuntime.testing()
+    preparedApp.libraryModel.loadIfNeeded()
     let manifest = try SampleRecipeCatalog.loadManifest()
 
     XCTAssertTrue(
-      dependencies.libraryModel.createRecipe(from: RecipeDraft(title: "Temporary Recipe"))
+      preparedApp.libraryModel.createRecipe(from: RecipeDraft(title: "Temporary Recipe"))
     )
-    let temporaryRecipeID = try XCTUnwrap(dependencies.libraryModel.selectedRecipeID)
-    XCTAssertEqual(dependencies.libraryModel.recipes.count, manifest.recipes.count + 1)
+    let temporaryRecipeID = try XCTUnwrap(preparedApp.libraryModel.selectedRecipeID)
+    XCTAssertEqual(preparedApp.libraryModel.recipes.count, manifest.recipes.count + 1)
 
-    XCTAssertTrue(dependencies.libraryModel.resetKitchen())
+    XCTAssertTrue(preparedApp.libraryModel.resetKitchen())
     XCTAssertEqual(
-      Set(dependencies.libraryModel.recipes.map(\.recipe.id)),
+      Set(preparedApp.libraryModel.recipes.map(\.recipe.id)),
       Set(try SampleRecipeCatalog.localizedRecipes(
         in: manifest,
         preferredLanguages: Locale.preferredLanguages
       ).map(\.recipeID))
     )
     XCTAssertFalse(
-      dependencies.libraryModel.recipes.contains { $0.recipe.id == temporaryRecipeID }
+      preparedApp.libraryModel.recipes.contains { $0.recipe.id == temporaryRecipeID }
     )
   }
 
@@ -130,7 +142,7 @@ final class KitchenMemoryTests: XCTestCase {
 }
 
 @MainActor
-final class AppRuntimeConfigurationTests: XCTestCase {
+final class AppLaunchPlanTests: XCTestCase {
   func testBuildEnvironmentPolicyKeepsCloudAndTestHarnessesSeparate() {
     XCTAssertFalse(AppBuildEnvironment.debug.synchronizesWithPersonalCloud)
     XCTAssertTrue(AppBuildEnvironment.develop.synchronizesWithPersonalCloud)
@@ -165,155 +177,150 @@ final class AppRuntimeConfigurationTests: XCTestCase {
 #endif
   }
 
-  func testUITestingUsesDisposableStorageOnlyInTestingBuilds() {
-    XCTAssertTrue(AppRuntimeConfiguration.usesInMemoryStore(
-      arguments: ["KitchenMemory", "--ui-testing"],
-      buildEnvironment: .productionTesting
-    ))
-    XCTAssertFalse(AppRuntimeConfiguration.usesInMemoryStore(
-      arguments: ["KitchenMemory", "--ui-testing"],
-      buildEnvironment: .production
-    ))
+  func testUITestingProducesOneCoherentDisposableLaunchPlan() throws {
+    let plan = try AppLaunchPlan.resolve(
+      inputs: inputs(
+        arguments: [
+          "KitchenMemory",
+          "--ui-testing",
+          "--ui-testing-cloud-sync-disabled",
+        ],
+        buildEnvironment: .productionTesting
+      ),
+      durableCloudSyncIsEnabled: true
+    )
+
+    XCTAssertEqual(plan.store, .inMemory)
+    XCTAssertEqual(plan.sampleFixture, .installed)
+    XCTAssertFalse(plan.cloudSyncIsEnabledAtLaunch)
+    XCTAssertTrue(plan.offersCloudSyncSetting)
   }
 
-  func testStartupFailureSimulationIsConfinedToTestHarnessBuilds() {
+  func testStartupFailureSimulationIsPartOfTheLaunchPlan() throws {
     let arguments = ["KitchenMemory", "--simulate-startup-failure"]
 
-    XCTAssertTrue(AppRuntimeConfiguration.simulatesStartupFailure(
-      arguments: arguments,
-      buildEnvironment: .testing
-    ))
-    XCTAssertTrue(AppRuntimeConfiguration.simulatesStartupFailure(
-      arguments: arguments,
-      buildEnvironment: .productionTesting
-    ))
-    XCTAssertFalse(AppRuntimeConfiguration.simulatesStartupFailure(
-      arguments: arguments,
-      buildEnvironment: .debug
-    ))
-    XCTAssertFalse(AppRuntimeConfiguration.simulatesStartupFailure(
-      arguments: arguments,
-      buildEnvironment: .develop
-    ))
-    XCTAssertFalse(AppRuntimeConfiguration.simulatesStartupFailure(
-      arguments: arguments,
-      buildEnvironment: .production
-    ))
+    XCTAssertTrue(try plan(arguments: arguments, buildEnvironment: .testing)
+      .simulatesStartupFailure)
+    XCTAssertTrue(try plan(arguments: arguments, buildEnvironment: .productionTesting)
+      .simulatesStartupFailure)
+    XCTAssertFalse(try plan(arguments: arguments, buildEnvironment: .debug)
+      .simulatesStartupFailure)
+    XCTAssertFalse(try plan(arguments: arguments, buildEnvironment: .develop)
+      .simulatesStartupFailure)
+    XCTAssertFalse(try plan(arguments: arguments, buildEnvironment: .production)
+      .simulatesStartupFailure)
   }
 
-  func testCloudSyncPreferenceOverrideIsConfinedToUITestHarnessBuilds() throws {
+  func testProductionIgnoresTestingArguments() throws {
     let arguments = [
       "KitchenMemory",
       "--ui-testing",
       "--ui-testing-cloud-sync-disabled",
     ]
+    let production = try plan(arguments: arguments, buildEnvironment: .production)
 
-    XCTAssertFalse(
-      try XCTUnwrap(AppRuntimeConfiguration.uiTestCloudSyncPreferenceOverride(
-        arguments: arguments,
-        buildEnvironment: .productionTesting
-      ))
+    XCTAssertEqual(
+      production.store,
+      .personalCloud(containerIdentifier: "iCloud.net.ctwelve.KitchenMemory")
     )
-    XCTAssertNil(AppRuntimeConfiguration.uiTestCloudSyncPreferenceOverride(
-      arguments: arguments,
-      buildEnvironment: .production
-    ))
-    XCTAssertNil(AppRuntimeConfiguration.uiTestCloudSyncPreferenceOverride(
-      arguments: ["KitchenMemory", "--ui-testing-cloud-sync-disabled"],
-      buildEnvironment: .productionTesting
-    ))
+    XCTAssertTrue(production.cloudSyncIsEnabledAtLaunch)
+    XCTAssertEqual(production.sampleFixture, .empty)
   }
 
-  func testHostedUnitTestsUseDisposableStorageOnlyInTestingBuilds() {
-    XCTAssertTrue(AppRuntimeConfiguration.usesInMemoryStore(
-      arguments: ["KitchenMemory", "--unit-testing"],
-      buildEnvironment: .testing
-    ))
-    XCTAssertTrue(AppRuntimeConfiguration.usesInMemoryStore(
-      arguments: ["KitchenMemory", "--unit-testing"],
-      buildEnvironment: .productionTesting
-    ))
-    XCTAssertFalse(AppRuntimeConfiguration.usesInMemoryStore(
-      arguments: ["KitchenMemory", "--unit-testing"],
-      buildEnvironment: .production
-    ))
+  func testHostedUnitTestPlanUsesDisposableStorageAndNeverPersonalCloud() throws {
+    for buildEnvironment in [AppBuildEnvironment.testing, .productionTesting] {
+      let hosted = try plan(
+        arguments: ["KitchenMemory", "--unit-testing"],
+        buildEnvironment: buildEnvironment
+      )
+      XCTAssertEqual(hosted.store, .inMemory)
+      XCTAssertEqual(hosted.sampleFixture, .installed)
+    }
+
+    let developHosted = try AppLaunchPlan.resolve(
+      inputs: inputs(
+        environment: [
+          "XCTestConfigurationFilePath": "/tmp/KitchenMemory.xctestconfiguration",
+        ],
+        buildEnvironment: .develop
+      ),
+      durableCloudSyncIsEnabled: true
+    )
+    XCTAssertEqual(developHosted.store, .local)
   }
 
   func testCommittedTestPlanRequestsDisposableHostedStorage() {
     XCTAssertTrue(ProcessInfo.processInfo.arguments.contains("--unit-testing"))
   }
 
-  func testHostedUnitTestsDisablePersonalCloudInCloudEnabledBuilds() {
-    XCTAssertFalse(AppRuntimeConfiguration.synchronizesWithPersonalCloud(
-      environment: ["XCTestConfigurationFilePath": "/tmp/KitchenMemory.xctestconfiguration"],
-      buildEnvironment: .develop
-    ))
-    XCTAssertTrue(AppRuntimeConfiguration.synchronizesWithPersonalCloud(
-      environment: [:],
-      buildEnvironment: .production
-    ))
-    XCTAssertFalse(AppRuntimeConfiguration.synchronizesWithPersonalCloud(
-      environment: [:],
-      cloudSyncIsEnabled: false,
-      buildEnvironment: .production
-    ))
+  func testDisabledCloudPreferenceSelectsTheLocalDurableStore() throws {
+    let plan = try AppLaunchPlan.resolve(
+      inputs: inputs(buildEnvironment: .production),
+      durableCloudSyncIsEnabled: false
+    )
+
+    XCTAssertEqual(plan.store, .local)
+    XCTAssertFalse(plan.cloudSyncIsEnabledAtLaunch)
   }
 
-  func testPersonalCloudContainerComesFromTheSignedBuildConfiguration() throws {
-    let productionInfo = [
-      AppRuntimeConfiguration.cloudKitContainerInfoKey: "iCloud.net.ctwelve.KitchenMemory",
-    ]
-
+  func testPersonalCloudStoreComesFromTheSignedBuildConfiguration() throws {
     XCTAssertEqual(
-      try AppRuntimeConfiguration.personalCloudContainerIdentifier(
-        environment: [:],
-        infoDictionary: productionInfo,
-        buildEnvironment: .production
-      ),
-      "iCloud.net.ctwelve.KitchenMemory"
+      try plan(buildEnvironment: .production).store,
+      .personalCloud(containerIdentifier: "iCloud.net.ctwelve.KitchenMemory")
     )
-    XCTAssertNil(try AppRuntimeConfiguration.personalCloudContainerIdentifier(
-      environment: [:],
-      infoDictionary: [:],
-      buildEnvironment: .testing
-    ))
-    XCTAssertNil(try AppRuntimeConfiguration.personalCloudContainerIdentifier(
-      environment: [:],
-      infoDictionary: [:],
-      cloudSyncIsEnabled: false,
-      buildEnvironment: .production
-    ))
-    XCTAssertThrowsError(try AppRuntimeConfiguration.personalCloudContainerIdentifier(
-      environment: [:],
-      infoDictionary: [:],
-      buildEnvironment: .develop
+    XCTAssertThrowsError(try AppLaunchPlan.resolve(
+      inputs: inputs(infoDictionary: [:], buildEnvironment: .develop),
+      durableCloudSyncIsEnabled: true
     )) { error in
       XCTAssertEqual(
-        error as? AppRuntimeConfigurationError,
+        error as? AppLaunchPlanError,
         .cloudKitContainerIdentifierMissing
       )
     }
   }
 
-  func testCloudKitSchemaInitializationRequiresDevelopAndTheExplicitArgument() {
+  func testCloudKitSchemaInitializationIsPartOfTheDevelopLaunchPlan() throws {
 #if os(macOS)
-    XCTAssertTrue(AppRuntimeConfiguration.initializesCloudKitSchema(
+    XCTAssertTrue(try plan(
       arguments: ["KitchenMemory", "--initialize-cloudkit-schema"],
       buildEnvironment: .develop
-    ))
+    ).initializesCloudKitSchema)
 #else
-    XCTAssertFalse(AppRuntimeConfiguration.initializesCloudKitSchema(
+    XCTAssertFalse(try plan(
       arguments: ["KitchenMemory", "--initialize-cloudkit-schema"],
       buildEnvironment: .develop
-    ))
+    ).initializesCloudKitSchema)
 #endif
-    XCTAssertFalse(AppRuntimeConfiguration.initializesCloudKitSchema(
+    XCTAssertFalse(try plan(
       arguments: ["KitchenMemory", "--initialize-cloudkit-schema"],
       buildEnvironment: .production
-    ))
-    XCTAssertFalse(AppRuntimeConfiguration.initializesCloudKitSchema(
-      arguments: ["KitchenMemory"],
-      buildEnvironment: .develop
-    ))
+    ).initializesCloudKitSchema)
+    XCTAssertFalse(try plan(buildEnvironment: .develop).initializesCloudKitSchema)
+  }
+
+  private func plan(
+    arguments: [String] = ["KitchenMemory"],
+    buildEnvironment: AppBuildEnvironment
+  ) throws -> AppLaunchPlan {
+    try AppLaunchPlan.resolve(
+      inputs: inputs(arguments: arguments, buildEnvironment: buildEnvironment),
+      durableCloudSyncIsEnabled: true
+    )
+  }
+
+  private func inputs(
+    arguments: [String] = ["KitchenMemory"],
+    environment: [String: String] = [:],
+    infoDictionary: [String: Any] = [
+      AppLaunchInputs.cloudKitContainerInfoKey: "iCloud.net.ctwelve.KitchenMemory",
+    ],
+    buildEnvironment: AppBuildEnvironment
+  ) -> AppLaunchInputs {
+    AppLaunchInputs(
+      arguments: arguments,
+      environment: environment,
+      infoDictionary: infoDictionary,
+      buildEnvironment: buildEnvironment
+    )
   }
 }
