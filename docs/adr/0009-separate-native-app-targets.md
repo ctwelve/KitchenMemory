@@ -15,7 +15,7 @@ Accepted.
 Kitchen Memory began with one multiplatform application target so the
 foundation slices could exercise one shared SwiftUI interface. That source
 strategy remains useful for 0.1 under
-<doc:0006-shared-ui-for-foundation-slices>, but one product target also made
+[ADR 0006](0006-shared-ui-for-foundation-slices.md), but one product target also made
 unrelated platform contracts share launch resources, entitlements, build
 settings, and destination behavior.
 
@@ -66,7 +66,7 @@ implicitly in Xcode's destination list.
 
 This decision changes product and resource ownership, not the current UI
 reuse decision. ADR 0006 remains accepted, and the testing-investment boundary
-in <doc:0007-business-logic-coverage-and-ui-smoke-tests> continues to apply.
+in [ADR 0007](0007-business-logic-coverage-and-ui-smoke-tests.md) continues to apply.
 
 ## Consequences
 

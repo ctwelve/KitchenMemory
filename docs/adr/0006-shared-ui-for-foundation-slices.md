@@ -58,6 +58,6 @@ visual workflow is useful, and hybrid approaches.
 - Presentation-framework selection is deferred until a representative editor
   prototype can provide evidence.
 
-<doc:0009-separate-native-app-targets> gives iOS and macOS distinct product
+[ADR 0009](0009-separate-native-app-targets.md) gives iOS and macOS distinct product
 targets while retaining this shared 0.1 application layer. It does not
 supersede this decision or make shared presentation a requirement for 0.2.

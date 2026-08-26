@@ -16,7 +16,8 @@ SPDX-License-Identifier: GPL-3.0-only
 This ledger is a practice run of disciplined acceptance for an early alpha. It
 records enough evidence to exercise the release process and expose weak gates;
 it does not claim that 0.1 has met every criterion expected of a public 1.0.
-The release gates and exit criteria are defined in <doc:release-engineering>;
+The release gates and exit criteria are defined in
+[release engineering](release-engineering.md);
 this article records what was actually exercised, where it ran, and which
 source state earned the result.
 
@@ -46,7 +47,8 @@ smallest non-private description necessary to identify the exercised shape.
 
 Store private diagnostic artifacts only for the immediate investigation, then
 delete them. A public regression test must use synthetic or otherwise
-non-private data derived to reproduce the behavior. See <doc:privacy>.
+non-private data derived to reproduce the behavior. See
+[privacy engineering](privacy.md).
 
 ## Automated baseline
 
@@ -183,7 +185,7 @@ bytes). Its SHA-256 digest is
 | Kind | Status | Record |
 | --- | --- | --- |
 | Toolchain diagnostic | Accepted | macOS 26.2 Swift/XCTest actor-isolated teardown can abort application-hosted tests; CI uses the latest runtime. See [swiftlang/swift#87316](https://github.com/swiftlang/swift/issues/87316). |
-| Toolchain diagnostic | Accepted | Xcode 26.6 may emit `DebuggerVersionStore` messages while an iOS or macOS UI-test fallback launcher proceeds; assertions remain ordinary failures. See <doc:continuous-integration>. |
+| Toolchain diagnostic | Accepted | Xcode 26.6 may emit `DebuggerVersionStore` messages while an iOS or macOS UI-test fallback launcher proceeds; assertions remain ordinary failures. See [continuous integration](continuous-integration.md). |
 | Release-process exception | Accepted for 0.1 | GitHub contained the correct immutable annotated tag, but Xcode Cloud showed no available tags and did not start `Tag to release/`. The release operator used the same accepted source state for a local Developer ID archive, notarization, and direct GitHub distribution. Do not move the tag to replay the event. |
 | Release blocker | None recorded | Add every unresolved data-loss, source-corruption, ordinary-use, or false-sync-success defect here. |
 

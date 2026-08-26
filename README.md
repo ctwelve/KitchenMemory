@@ -80,18 +80,18 @@ been flattened or silently rewritten.
 
 ## Documentation
 
-- [Documentation library](Documentation.docc/Documentation.md) — product,
+- [Development documentation](docs/README.md) — product,
   architecture, workflows, and engineering guidance
-- [0.1 release notes](Documentation.docc/Articles/release-notes-0.1.md)
-- [0.1 release evidence](Documentation.docc/Articles/release-evidence-0.1.md)
-- [0.1 release engineering](Documentation.docc/Articles/release-engineering.md)
-- [Product doctrine](Documentation.docc/Articles/product-doctrine.md)
-- [Product brief](Documentation.docc/Articles/product-brief.md)
-- [Recipe domain model](Documentation.docc/Articles/recipe-domain-model.md)
-- [Personal iCloud synchronization](Documentation.docc/Articles/personal-icloud-synchronization.md)
-- [Localization architecture](Documentation.docc/Articles/localization-architecture.md)
-- [Continuous integration](Documentation.docc/Articles/continuous-integration.md)
-- [Architecture decisions](Documentation.docc/Documentation.md#Architecture-decisions)
+- [0.1 release notes](docs/release-notes-0.1.md)
+- [0.1 release evidence](docs/release-evidence-0.1.md)
+- [0.1 release engineering](docs/release-engineering.md)
+- [Product doctrine](docs/product-doctrine.md)
+- [Product brief](docs/product-brief.md)
+- [Recipe domain model](docs/recipe-domain-model.md)
+- [Personal iCloud synchronization](docs/personal-icloud-synchronization.md)
+- [Localization architecture](docs/localization-architecture.md)
+- [Continuous integration](docs/continuous-integration.md)
+- [Architecture decisions](docs/README.md#architecture-decisions)
 - [Artificial intelligence use](AI.md)
 
 ## Building from source
@@ -125,7 +125,8 @@ The shared SwiftUI interface is a deliberately provisional 0.1 shell. The
 business logic and native app boundaries are intended to survive deeper Mac and
 mobile interface work in 0.2. The accepted 0.2 roadmap delivers cooking sessions
 through bounded foundation, progress, deviation, and history slices; see the
-DocC catalog for the detailed scope and release boundary.
+[roadmap to 0.2](docs/roadmap-0.2.md) for the detailed scope and release
+boundary.
 
 ## License
 

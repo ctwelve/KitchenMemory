@@ -36,7 +36,8 @@ Recipe revision and working yield
 ```
 
 The slices below are potential releases under the versioned-slice discipline
-in <doc:release-engineering>. Advancing a working version does not publish it;
+in [release engineering](release-engineering.md). Advancing a working version
+does not publish it;
 the root `RELEASE` marker changes only for a deliberately submitted release.
 
 ## Prelude — 0.1.2 alpha polish
@@ -206,7 +207,8 @@ cooking interaction is mobile-first.
 - A wholesale redesign of every 0.1 library, import, and editor screen.
 - TestFlight or App Store publication without a separate distribution decision.
 
-These boundaries preserve the distinction in <doc:product-doctrine> between the
+These boundaries preserve the distinction in
+[product doctrine](product-doctrine.md) between the
 published source, maintained recipe, planned cook, cooking session, and pantry
 observation. They also keep the 0.2 release small enough to prove that cooking
 history is valuable before later planning, pantry, media, and collaboration

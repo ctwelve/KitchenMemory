@@ -221,9 +221,10 @@ The UI target contains smoke tests only. Localization of durable copy and
 formatting proceeds independently, but comprehensive localized-layout assertions,
 accessibility audits, and interaction-specific UI suites are deferred until the
 relevant interface is stable. See
-<doc:0007-business-logic-coverage-and-ui-smoke-tests> and
-<doc:accessibility-engineering>. Localization ownership and its non-UI testing
-boundary are described in <doc:localization-architecture>.
+[ADR 0007](adr/0007-business-logic-coverage-and-ui-smoke-tests.md) and
+[accessibility engineering](accessibility-engineering.md). Localization
+ownership and its non-UI testing boundary are described in
+[localization architecture](localization-architecture.md).
 
 The `Testing` and `ProductionTesting` configurations deliberately use minimal
 platform-specific entitlement files. Their application-hosted tests do not
@@ -327,7 +328,7 @@ ordinary `main` commits merely to work around a missing tag event.
 
 The first release-engineering pass used the production workflow as release
 evidence rather than as a ceremonial final build. Its acceptance and
-distribution gates are defined in <doc:release-engineering>.
+distribution gates are defined in [release engineering](release-engineering.md).
 
 ### Current UI-runner diagnostic
 

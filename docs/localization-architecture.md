@@ -187,5 +187,5 @@ These UI checks prove reachability and structural survival, not linguistic
 quality or pixel-perfect layout. Native review of the three locales, long text,
 right-to-left direction, Dynamic Type, and assistive technologies remains part
 of release hardening. The identifier-driven smoke boundary from
-<doc:0007-business-logic-coverage-and-ui-smoke-tests> still applies: a localized
+[ADR 0007](adr/0007-business-logic-coverage-and-ui-smoke-tests.md) still applies: a localized
 screen is not a reason to encode its provisional visual hierarchy in tests.

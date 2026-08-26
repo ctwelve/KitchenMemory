@@ -55,7 +55,7 @@ per-file platform filters.
 The shared SwiftUI layer is an explicit 0.1 compromise, not a permanent promise.
 The app-target boundary lets 0.2 replace either platform's presentation with
 UIKit, AppKit, or platform-specific SwiftUI without moving product logic again.
-See <doc:0009-separate-native-app-targets>.
+See [ADR 0009](adr/0009-separate-native-app-targets.md).
 
 ## Build environments
 
@@ -200,7 +200,8 @@ explicit test URL remain local-only; they never require an iCloud entitlement or
 account. Persistence-owned adapters translate Core Data and CloudKit callbacks
 into plain status and refresh signals before the application connects them to
 `RecipeLibraryModel`. Domain, Logic, and the repository protocol remain unaware
-of the transport. See <doc:personal-icloud-synchronization>.
+of the transport. See
+[personal iCloud synchronization](personal-icloud-synchronization.md).
 
 SwiftData continues to own synchronization. The framework imports Core Data
 only for public managed-store notifications and development schema
@@ -231,7 +232,7 @@ Interface copy and authored recipe content use separate resources. String
 Catalogs hold labels, actions, errors, and pluralized messages. Complete sample
 recipe documents remain data assets so a translation preserves coherent
 instructions, ingredients, attribution, and accessibility descriptions. See
-<doc:localization-architecture>.
+[localization architecture](localization-architecture.md).
 
 ## Sample resources
 
@@ -315,4 +316,4 @@ The two platform Production schemes are the only schemes that reference
 the platform-specific production plans and the shared UI target. Their
 application-shell smoke tests compile under `ProductionTesting`, never under
 ordinary Debug, Develop, Testing, or distributable Production actions. See
-<doc:0007-business-logic-coverage-and-ui-smoke-tests>.
+[ADR 0007](adr/0007-business-logic-coverage-and-ui-smoke-tests.md).

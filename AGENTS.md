@@ -10,4 +10,4 @@ The canonical default triage labels are used unchanged. See `docs/agents/triage-
 
 ### Domain docs
 
-This repository uses a single-context layout with decisions in the DocC catalog. See `docs/agents/domain.md`.
+Before changing domain concepts, architecture, or product behavior, read the relevant development docs and decisions. See `docs/agents/domain.md`.
