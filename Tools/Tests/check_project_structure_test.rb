@@ -318,6 +318,20 @@ class CheckProjectStructureTest < Minitest::Test
     assert_equal 4, result[:plan_count]
   end
 
+  def test_allows_synchronized_navigator_group_without_target_membership
+    fixture = Fixture.new
+    fixture.project << <<~GROUP
+		FFFFFFFFFFFFFFFFFFFFFFFF /* docs */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = docs;
+		};
+    GROUP
+
+    result = validate(fixture)
+
+    assert_equal 9, result[:target_count]
+  end
+
   def test_rejects_missing_or_unexpected_native_target
     fixture = Fixture.new
     fixture.project.sub!('name = "KitchenMemoryLogic";', 'name = "OrphanedLogic";')
