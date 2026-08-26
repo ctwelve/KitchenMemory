@@ -107,31 +107,43 @@ moving business rules back into the app.
 
 ```text
 KitchenMemoryApp
-└── AppDependencies
-    ├── SwiftDataRecipeRepository
-    ├── BundledSampleRecipeProvider
-    ├── KitchenBootstrapService
-    ├── SampleRecipeInstallService
-    ├── KitchenPreferencesStoring
-    │   ├── SampleRecipeOnboardingStoring
-    │   └── CloudSyncPreferenceStoring
-    ├── PersistentStoreChangeObserver
-    ├── PersonalCloudStatusMonitor
-    └── RecipeLibraryModel
-        └── RecipeLibrary
-            ├── RecipeEditor
-            ├── RecipeImportService
-            ├── SampleRecipeInstallService
-            └── KitchenResetService
+└── AppRuntime
+    ├── AppLaunchPlan
+    └── PreparedApp
+        ├── SwiftDataRecipeRepository
+        ├── BundledSampleRecipeProvider
+        ├── KitchenBootstrapService
+        ├── KitchenPreferencesStoring
+        │   ├── SampleRecipeOnboardingStoring
+        │   └── CloudSyncPreferenceStoring
+        ├── PersistentStoreChangeObserver
+        ├── PersonalCloudStatusMonitor
+        └── RecipeLibraryModel
+            └── RecipeLibrary
+                ├── RecipeEditor
+                ├── RecipeImportService
+                ├── SampleRecipeInstallService
+                └── KitchenResetService
 ```
 
-`AppDependencies` is the composition root. It creates the concrete SwiftData
-repository and asset-backed sample provider, asks the bootstrap service for the
-initial empty Kitchen, selects the durable or disposable preferences store, and
-injects the resulting collaborators into `RecipeLibraryModel`. For a managed
-personal-cloud store it also connects the persistence framework's remote-change
-and status adapters to that model. Concrete construction stays here so neither
-the views nor the reusable frameworks need to locate their own dependencies.
+`AppRuntime` is the composition root. It translates process arguments, build
+policy, the signed CloudKit container, test-host state, and the stored sync
+choice into one `AppLaunchPlan`. The plan names a valid store mode, sample-fixture
+policy, launch-time sync state, Settings availability, schema-administration
+request, and privacy-safe failure simulation together rather than exposing
+independent flags to callers.
+
+The runtime then creates `PreparedApp`, which retains the model container,
+observable library projection, remote-change observer, personal-cloud status
+monitor, and optional sync settings for their complete lifetimes. Its
+implementation creates the concrete SwiftData repository and asset-backed
+sample provider, asks the bootstrap operation for the initial empty Kitchen,
+selects durable or disposable preferences, and prepares the Recipe Library.
+For a personal-cloud store it also starts and retains the persistence adapters
+that feed external changes and account status back into the library projection.
+`KitchenMemoryApp` sees only prepared or unavailable state and retry; tests use
+one explicit disposable runtime configuration rather than constructing the
+production graph through loosely related booleans and optionals.
 
 `RecipeLibrary` is the deep Logic module for one Kitchen's recipe-library
 intentions. Its interface loads durable content with current sample presence,

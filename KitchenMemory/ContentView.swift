@@ -306,7 +306,7 @@ private struct RecipeRow: View {
 
 #Preview {
   ContentView(
-    model: AppDependencies.preview.libraryModel,
+    model: PreparedApp.preview.libraryModel,
     cloudSyncSettings: nil
   )
 }
