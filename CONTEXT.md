@@ -23,3 +23,11 @@ _Avoid_: Abandoned session, paused session
 **Finished Session**:
 An immutable Cooking Session whose cook has explicitly declared the performance complete; further work begins by duplicating it into a new session.
 _Avoid_: Closed session, archived session
+
+**Session Entry**:
+One confirmed, session-owned piece of authored cooking reality, optionally anchored to one element of the Execution Snapshot.
+_Avoid_: Deviation, annotation, change record
+
+**Session Outcome**:
+An optional coarse assessment of the overall cook, distinct from whether the Cooking Session is Finished.
+_Avoid_: Recipe rating, completion state
