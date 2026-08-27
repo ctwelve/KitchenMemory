@@ -63,7 +63,7 @@ During a session, the cook should be able to:
 - Record an amount actually used.
 - Add a quick note to an ingredient, step, or the whole session.
 - Mark a step as skipped, changed, or problematic.
-- Finish or abandon the session.
+- Stop for later resumption or Finish the Session immutably.
 
 Checking an ingredient means “accounted for during this cook,” not necessarily
 “deducted precisely from the pantry.” Pantry effects should initially be prompts

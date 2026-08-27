@@ -21,7 +21,7 @@ A deliberately dormant Cooking Session that may be resumed but accepts no cookin
 _Avoid_: Abandoned session, paused session
 
 **Finished Session**:
-An immutable Cooking Session whose cook has explicitly declared the performance complete; further work begins by duplicating it into a new session.
+An immutable Cooking Session whose cook has explicitly declared the performance complete; only a Finished Session may serve as the durable source for derived work, and further cooking begins through Session Continuation.
 _Avoid_: Closed session, archived session
 
 **Session Entry**:

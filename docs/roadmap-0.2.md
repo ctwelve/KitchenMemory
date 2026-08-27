@@ -14,8 +14,8 @@ Version 0.2 makes one performance of a recipe a first-class, durable product
 concept without confusing cooking reality with the maintained recipe. The
 release is complete when a person can start from a particular recipe revision
 and working yield, make lightweight progress, record what differed, recover
-after interruption, finish or abandon explicitly, and later understand what
-happened.
+after interruption, Stop or Finish explicitly, and later understand what
+happened without reopening immutable history.
 
 The complete loop is:
 
@@ -30,7 +30,7 @@ Recipe revision and working yield
               ↓
  Resume after interruption or sync
               ↓
-       Finish or abandon
+        Stop or finish
               ↓
      Intelligible history
 ```
@@ -86,12 +86,12 @@ Deliver the smallest durable cooking session from end to end:
 - Implement the distinct Cooking Session module and persistence seam accepted
   in [ADR 0010](adr/0010-distinct-cooking-session-module.md); do not add session
   operations to `RecipeRepository`.
-- Add plain domain values and lifecycle rules for active, finished, and
-  abandoned sessions.
+- Add plain domain values and lifecycle rules for Active, Stopped, and Finished
+  Sessions.
 - Start from a specific recipe revision and reading-only working scale.
-- Make a session durable only after an explicit start or other meaningful
-  activity; viewing a recipe does not create history.
-- Persist, relaunch, resume, finish, and abandon through Logic and repository
+- Create a Session durably only after explicit Start has captured a sufficient
+  Execution Snapshot; viewing a Recipe does not create history.
+- Persist, relaunch, Resume, Stop, and Finish through Logic and repository
   boundaries rather than directly through SwiftUI or SwiftData.
 - Introduce an immutable SwiftData V3 schema and additive private CloudKit
   record types without rewriting existing recipe content.
@@ -116,7 +116,8 @@ without claiming multi-person live collaboration.
 
 - Starting a session does not mutate its recipe revision.
 - An active session survives process termination and ordinary relaunch.
-- Finish and abandon are explicit terminal actions.
+- Stop is an explicit resumable action; Finish is an explicit immutable
+  closure.
 - V1 stores open through the supported V2 migration path with recipes intact.
 - Development CloudKit receives only reviewed additive schema changes.
 
@@ -180,9 +181,9 @@ recipe promotion are not prerequisites for this slice.
 
 Complete the release promise and harden the whole session loop:
 
-- List active and completed sessions in the context of their recipe.
-- Reopen a historical session using its captured representation.
-- Distinguish active, finished, and abandoned sessions clearly.
+- List Active, Stopped, and Finished Sessions in the context of their Recipe.
+- Open Finished history observationally using its captured representation.
+- Distinguish Active, Stopped, and Finished Sessions clearly.
 - Resolve convergence for progress, notes, and competing terminal actions.
 - Exercise offline start, offline activity, relaunch, later synchronization,
   deletion, and recovery behavior.
@@ -203,7 +204,8 @@ Complete the release promise and harden the whole session loop:
 6. Exercise supported continuation on another personal device.
 7. Finish the session.
 8. Confirm that the maintained recipe is unchanged.
-9. Reopen the completed history and understand what was cooked.
+9. Open the Finished history without changing its lifecycle and understand what
+   was cooked.
 
 The slice is feature-complete only when this loop passes with bounded private
 diagnostics and no false synchronization-success claims.
