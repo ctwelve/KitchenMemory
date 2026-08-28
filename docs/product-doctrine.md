@@ -58,8 +58,8 @@ manual editing, or selected discoveries from cooking sessions.
 ### Cooking session
 
 One performance of one recipe revision. It records working scale, progress,
-deviations, observations, outcome, and session media without silently rewriting
-the maintained recipe.
+exact authored Session Entries, an optional outcome, and future session media
+without silently rewriting the maintained recipe.
 
 ### Ingredient
 
@@ -189,11 +189,12 @@ A single planned cook can produce shopping and preparation decisions. A weekly
 plan is a dated collection of planned cooks using the same reconciliation rules.
 Combined shopping preserves which planned cooks created each requirement.
 
-### Cooking sessions become durable on meaningful activity
+### Cooking sessions begin explicitly
 
-Viewing a recipe is not automatically permanent history. A cooking session
-becomes durable when a person explicitly starts cooking or records meaningful
-activity such as progress, a timer, a note, media, or a deviation.
+Viewing a recipe is not history. Explicit Start creates a Cooking Session only
+after a sufficient, immutable Execution Snapshot is locally durable. Later
+accepted progress, scale, Entry, Outcome, lifecycle, and disposition intentions
+remain Session-owned evidence.
 
 ### One media asset model
 
@@ -206,7 +207,8 @@ attachment rather than silently moving or duplicating the original.
 The early cooking-history vocabulary is:
 
 - Session outcome: great, okay, or unsuccessful.
-- Session notes and deviations.
+- Exact authored Session Entries, optionally anchored to captured cooking
+  context.
 - Session media.
 - Lightweight family reactions later.
 
@@ -268,7 +270,8 @@ Information moves between contexts intentionally:
 - A recipe revision and desired yield create a planned cook.
 - Planned decisions carry into a cooking session without editing the recipe.
 - Session media may be promoted to recipe media.
-- Session deviations may become a revision or variant through an explicit diff.
+- Selected Session Entries may inform a revision, variant, or new Recipe through
+  a later explicit review.
 - Session evidence may suggest a pantry correction.
 
 ## Platform doctrine
@@ -305,12 +308,12 @@ Horizons communicate dependency and focus, not dates or promises.
 ### Expansion
 
 - Kitchen sharing and multi-person synchronization.
-- Basic cooking sessions with progress and notes.
+- Basic cooking sessions with progress and Session Entries.
 - A basic planned cook that retains recipe revision and desired yield.
 - Pantry items with multiple exact, fuzzy, presence, and uncertain holdings.
 - Ingredient readiness decisions, combined shopping, and weekly collections of
   planned cooks.
-- Session deviations, outcomes, media, and revision promotion.
+- Session Entries, outcomes, media, and revision promotion.
 - Shopping suggestions and lightweight pantry cleanup.
 - Safari sharing, richer Mac workflows, and saved searches.
 

@@ -81,11 +81,10 @@ settle abstractly.
 
 ## Cooking sessions and recipe evolution
 
-- How much of the recipe is snapshotted so old sessions survive later edits?
-- Are cooking checkmarks per-device, per-person, or optionally live-shared?
-- Which deviation actions must be reachable with one tap in a busy kitchen?
-- Is a promoted deviation a new revision, a named variant, or a forked recipe?
-- How should repeated deviations trigger suggestions without becoming nagging?
+- When selected Session Entries become maintained Recipe work, should the person
+  create a new revision, a named variant, or a new Recipe?
+- How should repeated Session Entries trigger suggestions without becoming
+  nagging?
 - Which session media may be promoted to recipe media, and who may do so for a
   shared recipe?
 - Are session reviews, durable recipe ratings, comments, and lightweight

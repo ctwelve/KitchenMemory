@@ -56,7 +56,9 @@ Kitchen
 ├── PlannedCook[]
 │   └── IngredientDecision[]
 ├── CookingSession[]
-│   └── CookingDeviation[]
+│   ├── ExecutionSnapshot
+│   ├── SessionFact[]
+│   └── SessionClosure?
 ├── SourceCapture[]
 ├── MediaAsset[]
 ├── Folder[]
@@ -81,7 +83,7 @@ layer; the domain must not copy framework participants indiscriminately.
 | `Ingredient` | Kitchen-scoped normalized ingredient concept and aliases |
 | `PantryItem` | Kitchen knowledge about one ingredient and its holdings |
 | `PlannedCook` | One intention, scale, readiness decisions, and advance preparation |
-| `CookingSession` | One actual performance, progress, deviations, and outcome |
+| `CookingSession` | One actual performance, immutable context, accepted activity, and optional outcome |
 | `SourceCapture` | Preserved source evidence and provenance |
 | `MediaAsset` | Stable media identity and managed content |
 | `Folder` and `Tag` | Recipe-library organization |

@@ -62,9 +62,9 @@ never hold a recipe hostage until cleanup is complete.
 ### Record reality without rewriting intent
 
 A recipe describes what someone intends to cook. A cooking session records what
-actually happened: checked ingredients and steps, substitutions, omissions, and
-observations. Those deviations may later become an explicit revision or variant;
-they do not silently mutate the maintained recipe.
+actually happened: progress, working-scale changes, and exact authored Session
+Entries. Selected Entries may later inform an explicit revision, variant, or new
+Recipe; they do not silently mutate the maintained Recipe.
 
 ### Reconcile when knowledge matters
 
@@ -113,7 +113,7 @@ loop with a deliberately smaller acceptance set than the one required for 1.0.
 - OCR and image-based import.
 - AI-generated recipes.
 - Public recipe discovery or social feeds.
-- Cooking-session progress, deviations, and history.
+- Cooking-session progress, Session Entries, and history.
 - Multi-person Kitchen sharing and live collaboration.
 - True peer-to-peer synchronization.
 

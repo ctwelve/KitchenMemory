@@ -13,7 +13,7 @@ The immutable, self-contained cooking context captured from a Recipe Revision wh
 _Avoid_: Recipe copy, live recipe reference
 
 **Active Session**:
-A Cooking Session that may accept progress, notes, scale changes, and other cooking evidence, whether or not its interface is currently visible.
+A Cooking Session that may accept progress, Session Entries, scale changes, and other cooking evidence, whether or not its interface is currently visible.
 _Avoid_: Open session, foreground session
 
 **Stopped Session**:

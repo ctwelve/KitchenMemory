@@ -16,7 +16,8 @@ SPDX-License-Identifier: GPL-3.0-only
 
 The name describes the product beyond recipe storage. Source captures, maintained
 recipes, planned cooks, pantry observations, cooking sessions, photographs,
-deviations, and family knowledge are different things a kitchen can remember.
+Session Entries, and family knowledge are different things a kitchen can
+remember.
 
 The name remains a working direction until availability and trademark research
 are completed. Repository, bundle, and target renaming can wait until concrete

@@ -93,10 +93,11 @@ the following nonnegotiable inputs:
 - operation status, not global or per-record cross-device completion; and
 - additive-only production schema evolution.
 
-Those constraints favor representations that are reconstructable from stable
-identity and independently arriving facts, but choosing between append-only
-activity, mutable per-target progress, a hybrid, or another representation is
-explicitly left to the follow-on convergence decision.
+Those constraints favored representations reconstructable from stable identity
+and independently arriving facts. The follow-on convergence decision selected
+immutable causal Session Facts plus disposable deterministic projections; the
+frozen result is recorded in
+[Cooking Session V3](../cooking-session-v3-schema.md).
 
 ## Resolution-ready summary for issue #38
 
@@ -110,9 +111,8 @@ aggregate atomicity, deterministic domain ordering, delete/update intent,
 reconnection precedence, remote-device acknowledgement, or a global “synced”
 state.
 
-Issue #38 can therefore close as research when this matrix is accepted. Its
-result is evidence for the separate convergence decision; it must not silently
-become that decision.
+Issue #38 closed as research when this matrix was accepted. Its result informed,
+but did not itself make, the separate convergence and schema decisions.
 
 The V3 schema freeze used one alpha-sized signed smoke covering generated-schema
 compatibility, independent immutable inserts, one partial-arrival sequence,
