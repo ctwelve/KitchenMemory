@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 @testable import KitchenMemoryPersistence
+import CoreData
 import Foundation
 import KitchenMemoryDomain
 import SwiftData
@@ -10,6 +11,69 @@ import XCTest
 
 @MainActor
 final class KitchenMemorySchemaSynchronizationTests: XCTestCase {
+  func testV3AddsExactlyTheFiveFrozenCookingSessionRecordFamilies() {
+    let v2Names = Set(KitchenMemorySchemaV2.models.map { String(describing: $0) })
+    let v3Names = Set(KitchenMemorySchemaV3.models.map { String(describing: $0) })
+
+    XCTAssertEqual(
+      v3Names.subtracting(v2Names),
+      [
+        "CookingSessionRecord",
+        "SessionClosureRecord",
+        "SessionDeletionRecord",
+        "SessionDeletionResolutionRecord",
+        "SessionFactRecord",
+      ]
+    )
+    XCTAssertEqual(KitchenMemorySchemaV3.models.count, KitchenMemorySchemaV2.models.count + 5)
+  }
+
+  func testV3GeneratedSessionSchemaMatchesTheFrozenPhysicalContract() throws {
+    let model = try XCTUnwrap(
+      NSManagedObjectModel.makeManagedObjectModel(for: KitchenMemorySchemaV3.models)
+    )
+    let expectedFields: [String: Set<String>] = [
+      "CookingSessionRecord": [
+        "id", "kitchenID", "recipeID", "recipeRevisionID", "startedAt",
+        "snapshotFormatVersion", "snapshotData", "snapshotDigest",
+        "sourceSessionID", "sourceClosureID",
+      ],
+      "SessionFactRecord": [
+        "id", "sessionID", "kitchenID", "kind", "targetSnapshotElementID",
+        "authoredAt", "causalHeadsFormatVersion", "causalHeadsData",
+        "payloadFormatVersion", "payloadData", "payloadDigest",
+      ],
+      "SessionClosureRecord": [
+        "id", "sessionID", "kitchenID", "finishedAt", "causalHeadsFormatVersion",
+        "causalHeadsData", "snapshotFormatVersion", "snapshotDigest",
+        "projectionFormatVersion", "projectionDigest", "outcomeFormatVersion",
+        "outcomeData",
+      ],
+      "SessionDeletionRecord": [
+        "id", "sessionID", "kitchenID", "deletedAt", "sessionHeadsFormatVersion",
+        "sessionHeadsData", "dispositionHeadsFormatVersion", "dispositionHeadsData",
+      ],
+      "SessionDeletionResolutionRecord": [
+        "id", "deletionID", "sessionID", "kitchenID", "restoredAt",
+        "dispositionHeadsFormatVersion", "dispositionHeadsData",
+      ],
+    ]
+
+    for (name, fields) in expectedFields {
+      let entity = try XCTUnwrap(model.entitiesByName[name])
+      XCTAssertEqual(Set(entity.attributesByName.keys), fields, name)
+      XCTAssertTrue(entity.relationshipsByName.isEmpty, name)
+      XCTAssertTrue(entity.uniquenessConstraints.isEmpty, name)
+      XCTAssertTrue(entity.indexes.isEmpty, name)
+      XCTAssertTrue(
+        entity.attributesByName.values.allSatisfy {
+          !$0.allowsExternalBinaryDataStorage
+        },
+        name
+      )
+    }
+  }
+
   func testLocalConfigurationDisablesCloudKit() throws {
     let configuration = try KitchenMemorySchema.makeConfiguration(
       schema: Schema(versionedSchema: KitchenMemorySchemaV1.self),
@@ -115,73 +179,43 @@ final class KitchenMemorySchemaSynchronizationTests: XCTestCase {
     XCTAssertNil(configuration.cloudKitContainerIdentifier)
   }
 
-  // swiftlint:disable:next function_body_length
   func testReleasedV1StoreMigratesWithoutChangingRecipeContent() throws {
-    let directory = FileManager.default.temporaryDirectory
-      .appending(path: "KitchenMemoryV1MigrationTests")
-      .appending(path: UUID().uuidString)
-    try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-    defer { try? FileManager.default.removeItem(at: directory) }
-    let storeURL = directory.appending(path: "KitchenMemory.store")
-    let kitchenID = UUID()
-    let recipeID = UUID()
-    let revisionID = UUID()
-
-    do {
-      let schema = Schema(versionedSchema: KitchenMemorySchemaV1.self)
-      let configuration = ModelConfiguration(
-        "KitchenMemory",
-        schema: schema,
-        url: storeURL,
-        cloudKitDatabase: .none
-      )
-      let container = try ModelContainer(
-        for: schema,
-        configurations: [configuration]
-      )
-      let context = ModelContext(container)
-      context.insert(KitchenRecord(id: kitchenID, name: "Home"))
-      context.insert(
-        RecipeRecord(
-          id: recipeID,
-          kitchenID: kitchenID,
-          currentRevisionID: revisionID
-        )
-      )
-      context.insert(
-        RecipeRevisionRecord(
-          id: revisionID,
-          recipeID: recipeID,
-          revisionNumber: 1,
-          title: "V1 Soup",
-          summary: nil,
-          authorName: nil,
-          contentLanguage: nil,
-          sourceData: nil,
-          yieldData: nil,
-          prepSeconds: nil,
-          cookSeconds: nil,
-          totalSeconds: nil,
-          cuisinesData: Data("[]".utf8),
-          categoriesData: Data("[]".utf8),
-          keywordsData: Data("[]".utf8)
-        )
-      )
-      try context.save()
-    }
-
-    let migratedContainer = try KitchenMemorySchema.makeContainer(storeURL: storeURL)
+    let fixture = try MigrationFixtureStore.make(version: .releasedV1, title: "V1 Soup")
+    defer { fixture.remove() }
+    let migratedContainer = try KitchenMemorySchema.makeContainer(storeURL: fixture.storeURL)
     let repository = SwiftDataRecipeRepository(modelContainer: migratedContainer)
     let stored = try XCTUnwrap(
-      repository.recipe(id: Recipe.ID(rawValue: recipeID))
+      repository.recipe(id: Recipe.ID(rawValue: fixture.recipeID))
     )
 
-    XCTAssertEqual(migratedContainer.schema.version, Schema.Version(2, 0, 0))
+    XCTAssertEqual(migratedContainer.schema.version, Schema.Version(3, 0, 0))
     XCTAssertEqual(stored.revision.title, "V1 Soup")
     XCTAssertTrue(
       try ModelContext(migratedContainer)
         .fetch(FetchDescriptor<RecipeDeletionRecord>())
         .isEmpty
     )
+  }
+
+  func testReleasedV2StoreMigratesWithDeletionAndRestorationEvidenceIntact() throws {
+    let fixture = try MigrationFixtureStore.make(version: .releasedV2, title: "V2 Soup")
+    defer { fixture.remove() }
+    let migratedContainer = try KitchenMemorySchema.makeContainer(storeURL: fixture.storeURL)
+    let repository = SwiftDataRecipeRepository(modelContainer: migratedContainer)
+
+    XCTAssertEqual(migratedContainer.schema.version, Schema.Version(3, 0, 0))
+    XCTAssertEqual(
+      try repository.recipe(id: Recipe.ID(rawValue: fixture.recipeID))?.revision.title,
+      "V2 Soup"
+    )
+    let context = ModelContext(migratedContainer)
+    XCTAssertEqual(try context.fetch(FetchDescriptor<RecipeDeletionRecord>()).map(\.id), [
+      try XCTUnwrap(fixture.deletionID),
+    ])
+    XCTAssertEqual(
+      try context.fetch(FetchDescriptor<RecipeDeletionResolutionRecord>()).map(\.id),
+      [try XCTUnwrap(fixture.resolutionID)]
+    )
+    XCTAssertTrue(try context.fetch(FetchDescriptor<CookingSessionRecord>()).isEmpty)
   }
 }

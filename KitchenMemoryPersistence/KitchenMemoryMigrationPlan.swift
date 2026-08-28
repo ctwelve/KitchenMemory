@@ -47,6 +47,19 @@ public enum KitchenMemorySchemaV2: VersionedSchema {
   ]
 }
 
+/// Adds immutable Cooking Session document evidence without changing V2 rows.
+public enum KitchenMemorySchemaV3: VersionedSchema {
+  public static let versionIdentifier = Schema.Version(3, 0, 0)
+
+  public static let models: [any PersistentModel.Type] = KitchenMemorySchemaV2.models + [
+    CookingSessionRecord.self,
+    SessionFactRecord.self,
+    SessionClosureRecord.self,
+    SessionDeletionRecord.self,
+    SessionDeletionResolutionRecord.self,
+  ]
+}
+
 /// The ordered migration path for Kitchen Memory's private local store.
 ///
 /// Released V1 stores migrate additively to V2; neither existing recipe rows
@@ -55,9 +68,11 @@ public enum KitchenMemoryMigrationPlan: SchemaMigrationPlan {
   public static let schemas: [any VersionedSchema.Type] = [
     KitchenMemorySchemaV1.self,
     KitchenMemorySchemaV2.self,
+    KitchenMemorySchemaV3.self,
   ]
 
   public static let stages: [MigrationStage] = [
     .lightweight(fromVersion: KitchenMemorySchemaV1.self, toVersion: KitchenMemorySchemaV2.self),
+    .lightweight(fromVersion: KitchenMemorySchemaV2.self, toVersion: KitchenMemorySchemaV3.self),
   ]
 }

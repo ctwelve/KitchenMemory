@@ -86,7 +86,7 @@ final class SwiftDataRecipeRepositoryAtomicityTests: XCTestCase {
   }
 
   private func readOnlyContainer(storeURL: URL) throws -> ModelContainer {
-    let schema = Schema(versionedSchema: KitchenMemorySchemaV2.self)
+    let schema = Schema(versionedSchema: KitchenMemorySchemaV3.self)
     let configuration = ModelConfiguration(
       "KitchenMemoryReadOnly",
       schema: schema,

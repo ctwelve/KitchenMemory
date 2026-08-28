@@ -212,8 +212,9 @@ That copy now comes from String Catalogs without changing the underlying logic.
 domain boundary. It deliberately includes both the local SwiftData store and
 the managed personal-CloudKit behavior of that same store. Its record types are
 intentionally internal: application and interface code exchange `Kitchen`,
-`Recipe`, and `RecipeRevision` values through `RecipeRepository` and never
-retain SwiftData models.
+`Recipe`, and `RecipeRevision` values through `RecipeRepository`, and complete
+classified Cooking Session evidence through `CookingSessionRepository`; neither
+seam exposes or retains SwiftData models.
 
 The initial schema stores kitchens, recipes, revisions, media, equipment,
 sections, ingredients, and instruction steps as separate rows connected by
@@ -227,6 +228,15 @@ is an actor-bound unit of work. Background import will use a separate context
 rather than moving SwiftData records between actors. The repository enforces the
 Kitchen ownership boundary when saving and exposes Kitchen-scoped recipe lists
 already reconstructed as domain values.
+
+`SwiftDataCookingSessionRepository` is a separate main-actor adapter over the
+same container. Its public transaction vocabulary encodes the smallest complete
+V3 append boundaries: root, Fact, Closure, Closure plus Delete, Delete, observed
+Restore set, Closure resolution, or continuation root. Reads query immutable
+rows through scalar Kitchen Memory identities, retain physical duplicates and
+collisions, reject declaration placeholders, then delegate all product meaning
+to `SessionEvidenceProjector`. `InMemoryCookingSessionRepository` implements the
+same seam for Logic tests without making SwiftData part of command behavior.
 
 `KitchenMemorySchema.makeContainer()` selects either SwiftData's standard
 permanent store with a named private CloudKit database or an explicit local-only
@@ -250,10 +260,15 @@ document package or direct shared-Kitchen repository.
 The released store begins at immutable `KitchenMemorySchemaV1` under
 `KitchenMemoryMigrationPlan`. V2 adds durable recipe-deletion and observed-
 restoration records through a lightweight migration; it does not alter a V1
-record. Every later local schema change likewise adds a new version and an
-explicit migration stage. The production CloudKit schema follows the
-corresponding additive rule: later features may introduce record types and
-fields but must not remove or redefine published elements.
+record. V3 adds exactly `CookingSessionRecord`, `SessionFactRecord`,
+`SessionClosureRecord`, `SessionDeletionRecord`, and
+`SessionDeletionResolutionRecord`, with scalar UUID links and no relationships,
+uniqueness constraints, external storage, or mutable projections. The complete
+local chain is V1 to V2 to V3 through two lightweight stages; preserved fixture
+stores prove Recipe history and V2 disposition evidence survive. The production
+CloudKit schema follows the corresponding additive rule: later features may
+introduce record types and fields but must not remove or redefine published
+elements.
 
 ## Localization resources
 
