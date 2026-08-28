@@ -290,6 +290,7 @@ public struct SessionRecovery: Equatable, Sendable {
         case malformedCausalHeads
         case malformedPayload
         case malformedSnapshot
+        case placeholderBearingRecord
         case rootCollision
         case cycle
     }

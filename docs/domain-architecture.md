@@ -196,23 +196,24 @@ application layer owns deterministic starter resources and their loader, and
 both native app targets compile that layer. This keeps Apple resource APIs out
 of the domain module without creating a framework for app-specific data.
 
-`KitchenMemoryPersistence` is the first SwiftData adapter behind that boundary.
-It uses internal relational records with application-owned UUID foreign keys and
-explicit ordering columns. A domain-facing repository performs all mapping, so
-neither callers nor domain values depend on SwiftData model identity. The first
-repository supports saving and loading a kitchen, a recipe's current revision,
-and its saved revision history (newest first).
+`KitchenMemoryPersistence` supplies SwiftData adapters behind that boundary.
+Recipe rows use application-owned UUID foreign keys and explicit ordering
+columns behind `RecipeRepository`. Cooking Sessions use a separate
+`CookingSessionRepository`: five immutable document-evidence record families,
+scalar UUID associations, complete append transactions, and classified reads
+through the deterministic evidence projector. Neither callers nor domain values
+depend on SwiftData model identity or CloudKit metadata.
 
 The initial store uses SwiftData's standard location. Slice 10 adds private
 cross-device synchronization behind the same repository boundary after a
 focused prototype selects the CloudKit integration and proves recovery behavior.
 Shared-Kitchen collaboration remains a separate problem involving participants,
 permissions, and shared database scope. The database is not the export format.
-It is installed through an explicit V1 migration plan. Before first release V1
-may change with a development-store reset; after release, later schema changes
-add immutable versions and deliberate migration stages. Production CloudKit
-evolution is additive: new feature aggregates may add types and fields, while
-published schema elements keep their original meaning.
+The store evolves through immutable schema definitions and an ordered migration
+plan. Released V1 remains unchanged, V2 adds recipe deletion disposition, and V3
+adds Cooking Session evidence through a second lightweight stage. Production
+CloudKit evolution is additive: new feature aggregates may add types and fields,
+while published schema elements keep their original meaning.
 
 `KitchenMemoryLogic` supplies the product operations. `RecipeLibrary` is the
 Kitchen-scoped module for loading library content, creating and revising recipes,

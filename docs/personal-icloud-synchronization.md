@@ -20,8 +20,8 @@ make them SwiftData concerns.
 
 The application composition root asks `KitchenMemorySchema` for either a local
 store or a private-CloudKit store. The choice and container identifier live in
-`KitchenMemoryPersistence`. `KitchenMemoryDomain`, `KitchenMemoryLogic`, and
-`RecipeRepository` expose no CloudKit types.
+`KitchenMemoryPersistence`. `KitchenMemoryDomain`, `KitchenMemoryLogic`,
+`RecipeRepository`, and `CookingSessionRepository` expose no CloudKit types.
 
 ```text
 RecipeLibraryModel
@@ -33,6 +33,11 @@ SwiftDataRecipeRepository
         │
 local SwiftData store ⇄ private CloudKit database
 ```
+
+Cooking Sessions use a parallel `SwiftDataCookingSessionRepository` over that
+same store. It reconstructs and classifies immutable V3 evidence before Logic
+sees a Session; managed CloudKit delivery order and physical identity never
+cross the seam.
 
 This preserves two independent identities:
 
@@ -154,14 +159,20 @@ After the first production schema is deployed:
 - add CloudKit record types and fields additively; and
 - validate older app versions and offline data before promotion.
 
-Kitchen Memory 0.1.2 introduces `KitchenMemorySchemaV2` through a lightweight
+Kitchen Memory 0.1.2 introduced `KitchenMemorySchemaV2` through a lightweight
 local migration and two additive CloudKit record types for recipe deletion and
 deletion resolution. The V1 record types and fields remain unchanged. Those new
 types must be initialized, reviewed, and deployed to the production container
 before a V2 build is distributed.
 
-Cooking sessions therefore become a new aggregate and new additive records in
-0.2. They do not require columns to be reserved in recipe records now.
+Kitchen Memory 0.2 implements `KitchenMemorySchemaV3` as a second lightweight
+stage. It adds exactly the five generated entities `CookingSessionRecord`,
+`SessionFactRecord`, `SessionClosureRecord`, `SessionDeletionRecord`, and
+`SessionDeletionResolutionRecord`; their generated names match the frozen
+contract. They use scalar UUID attributes, schema-compatible placeholders,
+ordinary inline `Data`, and no relationships, uniqueness constraints, or local
+indexes. Repository validation prevents placeholders or partial evidence from
+becoming ordinary state. V1 and V2 model definitions remain unchanged.
 
 ## Migration authority
 
@@ -222,14 +233,16 @@ startup behavior.
 3. Inspect record types, indexes, and security roles in CloudKit Console.
 4. Exercise create, edit, delete, offline, reconnect, and concurrent-edit paths
    on at least two devices using the same development iCloud account.
-5. Reset the development environment when a pre-release incompatible V1
-   correction is intentional.
+5. Reset the development environment only when a deliberate pre-release
+   incompatible correction is authorized.
 6. Deploy the schema to production only as a deliberate release operation.
 
 The Develop-and-macOS-only argument temporarily hands the Development app's
 default store to
 `NSPersistentCloudKitContainer`, asks it to initialize the development schema,
 unloads that store, and then lets the ordinary SwiftData container open it.
+The initializer builds the complete V3 managed model; it remains an explicit
+one-shot operation and does not imply Production promotion.
 The initializer lives with the rest of the store implementation in
 `KitchenMemoryPersistence/Cloud`. iOS, Debug, Testing, ProductionTesting, and
 Production builds do not contain this switch. Ordinary Development and

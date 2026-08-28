@@ -98,6 +98,32 @@ typed failures into presentation strings. This boundary keeps current sheets
 replaceable by future in-page editing without rewriting validation or losing
 input, and lets complete product behavior run in fast framework tests.
 
+`CookingSessions` is the Kitchen-scoped Logic interface for Cooking Session
+work. Presentation supplies an explicit Start or a typed command with its
+stable identity, then receives either an accepted projection, retained evidence
+that needs attention, or a typed Logic error. The interface hides exact Recipe
+Revision lookup, immutable snapshot creation, deterministic Session-owned
+identities, causal-frontier selection, idempotency comparison, and repository
+transaction choice. Classified Kitchen, Recipe, history, and single-Session
+queries cross the same interface; a Recipe read alone never creates history.
+
+Logic depends on `RecipeRepository` for the exact source Revision and on
+`CookingSessionRepository` for complete retained evidence and atomic appends.
+The repository does not decide command validity: Logic enforces lifecycle,
+conflict, meaningful-draft, and continuation preconditions before selecting one
+of the frozen persistence transactions. After an append, Logic reads the
+durable classification back instead of treating a successful function return
+as product success. This also makes a retry after an ambiguous post-write
+failure converge on the caller's original evidence rather than append a new
+fact.
+
+The public failure contract distinguishes missing or foreign Recipes, missing
+Revisions, insufficient snapshots, identity collisions, invalid intentions,
+encoding failure, and repository read/write failure. Forward-incompatible or
+competing retained evidence is not flattened into those errors: it remains a
+typed `UnavailableSession` or `SessionRecovery` attention result for
+presentation. Logic imports neither SwiftUI nor CloudKit.
+
 ## Deterministic Cooking Session engine
 
 `KitchenMemoryDomain` owns the Slice 11 Cooking Session evidence engine. Its
@@ -212,8 +238,9 @@ That copy now comes from String Catalogs without changing the underlying logic.
 domain boundary. It deliberately includes both the local SwiftData store and
 the managed personal-CloudKit behavior of that same store. Its record types are
 intentionally internal: application and interface code exchange `Kitchen`,
-`Recipe`, and `RecipeRevision` values through `RecipeRepository` and never
-retain SwiftData models.
+`Recipe`, and `RecipeRevision` values through `RecipeRepository`, and complete
+classified Cooking Session evidence through `CookingSessionRepository`; neither
+seam exposes or retains SwiftData models.
 
 The initial schema stores kitchens, recipes, revisions, media, equipment,
 sections, ingredients, and instruction steps as separate rows connected by
@@ -227,6 +254,15 @@ is an actor-bound unit of work. Background import will use a separate context
 rather than moving SwiftData records between actors. The repository enforces the
 Kitchen ownership boundary when saving and exposes Kitchen-scoped recipe lists
 already reconstructed as domain values.
+
+`SwiftDataCookingSessionRepository` is a separate main-actor adapter over the
+same container. Its public transaction vocabulary encodes the smallest complete
+V3 append boundaries: root, Fact, Closure, Closure plus Delete, Delete, observed
+Restore set, Closure resolution, or continuation root. Reads query immutable
+rows through scalar Kitchen Memory identities, retain physical duplicates and
+collisions, reject declaration placeholders, then delegate all product meaning
+to `SessionEvidenceProjector`. `InMemoryCookingSessionRepository` implements the
+same seam for Logic tests without making SwiftData part of command behavior.
 
 `KitchenMemorySchema.makeContainer()` selects either SwiftData's standard
 permanent store with a named private CloudKit database or an explicit local-only
@@ -250,10 +286,15 @@ document package or direct shared-Kitchen repository.
 The released store begins at immutable `KitchenMemorySchemaV1` under
 `KitchenMemoryMigrationPlan`. V2 adds durable recipe-deletion and observed-
 restoration records through a lightweight migration; it does not alter a V1
-record. Every later local schema change likewise adds a new version and an
-explicit migration stage. The production CloudKit schema follows the
-corresponding additive rule: later features may introduce record types and
-fields but must not remove or redefine published elements.
+record. V3 adds exactly `CookingSessionRecord`, `SessionFactRecord`,
+`SessionClosureRecord`, `SessionDeletionRecord`, and
+`SessionDeletionResolutionRecord`, with scalar UUID links and no relationships,
+uniqueness constraints, external storage, or mutable projections. The complete
+local chain is V1 to V2 to V3 through two lightweight stages; preserved fixture
+stores prove Recipe history and V2 disposition evidence survive. The production
+CloudKit schema follows the corresponding additive rule: later features may
+introduce record types and fields but must not remove or redefine published
+elements.
 
 ## Localization resources
 

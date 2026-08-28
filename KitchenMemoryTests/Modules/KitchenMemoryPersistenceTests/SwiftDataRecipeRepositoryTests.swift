@@ -54,7 +54,7 @@ final class SwiftDataRecipeRepositoryTests: XCTestCase {
   func testContainerUsesTheCurrentVersionedSchemaAndMigrationPlan() throws {
     let container = try KitchenMemorySchema.makeContainer(inMemory: true)
 
-    XCTAssertEqual(container.schema.version, Schema.Version(2, 0, 0))
+    XCTAssertEqual(container.schema.version, Schema.Version(3, 0, 0))
     XCTAssertNotNil(container.migrationPlan)
   }
 
