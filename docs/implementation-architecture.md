@@ -98,6 +98,32 @@ typed failures into presentation strings. This boundary keeps current sheets
 replaceable by future in-page editing without rewriting validation or losing
 input, and lets complete product behavior run in fast framework tests.
 
+`CookingSessions` is the Kitchen-scoped Logic interface for Cooking Session
+work. Presentation supplies an explicit Start or a typed command with its
+stable identity, then receives either an accepted projection, retained evidence
+that needs attention, or a typed Logic error. The interface hides exact Recipe
+Revision lookup, immutable snapshot creation, deterministic Session-owned
+identities, causal-frontier selection, idempotency comparison, and repository
+transaction choice. Classified Kitchen, Recipe, history, and single-Session
+queries cross the same interface; a Recipe read alone never creates history.
+
+Logic depends on `RecipeRepository` for the exact source Revision and on
+`CookingSessionRepository` for complete retained evidence and atomic appends.
+The repository does not decide command validity: Logic enforces lifecycle,
+conflict, meaningful-draft, and continuation preconditions before selecting one
+of the frozen persistence transactions. After an append, Logic reads the
+durable classification back instead of treating a successful function return
+as product success. This also makes a retry after an ambiguous post-write
+failure converge on the caller's original evidence rather than append a new
+fact.
+
+The public failure contract distinguishes missing or foreign Recipes, missing
+Revisions, insufficient snapshots, identity collisions, invalid intentions,
+encoding failure, and repository read/write failure. Forward-incompatible or
+competing retained evidence is not flattened into those errors: it remains a
+typed `UnavailableSession` or `SessionRecovery` attention result for
+presentation. Logic imports neither SwiftUI nor CloudKit.
+
 ## Deterministic Cooking Session engine
 
 `KitchenMemoryDomain` owns the Slice 11 Cooking Session evidence engine. Its
