@@ -208,15 +208,19 @@ Complete the release promise and harden the whole session loop:
    was cooked.
 
 The slice is feature-complete only when this loop passes with bounded private
-diagnostics and no false synchronization-success claims.
+diagnostics and no false synchronization-success claims. The exact automated,
+risk-shaped, physical-device, localization, accessibility, and human evidence
+is defined by the [0.2 acceptance contract](acceptance-0.2.md).
 
 ## 0.2 release engineering
 
 Release engineering follows the accepted 0.2.0 feature state and is not another
-numbered product slice. It records immutable-schema review and production
-promotion, the device and recovery matrix, privacy and localization evidence,
-production builds, archive and signing results, distribution decisions, and an
-immutable `release/0.2.0` tag if the version is deliberately submitted.
+numbered product slice. It records immutable-schema review and promotion
+readiness, the device and recovery matrix, privacy and localization evidence,
+production builds, archive and signing results, and distribution decisions in
+`release-evidence-0.2.md`. Production schema promotion, a `RELEASE` change, and
+an immutable `release/0.2.0` tag occur only in a dedicated publication task if
+the version is deliberately submitted.
 
 Physical-device iPhone and iPad acceptance belongs to the feature evidence.
 Public TestFlight or App Store distribution remains a separate product and
