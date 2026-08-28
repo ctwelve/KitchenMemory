@@ -65,9 +65,11 @@ Kitchen
 └── Tag[]
 ```
 
-Only the Kitchen, Recipe, and RecipeRevision portion is implemented today. The
-remaining branches are accepted ownership direction for later product slices,
-not claims about current source types or persistence tables.
+Kitchen, Recipe, RecipeRevision, and the persistence-independent Cooking Session
+evidence model are implemented today. The remaining branches are accepted
+ownership direction for later product slices, not claims about current source
+types or persistence tables. Cooking Session persistence is intentionally still
+outside the implemented storage schema.
 
 `KitchenMember` represents product-level attribution and household behavior.
 CloudKit share participation and permission remain authoritative in the sync
@@ -110,6 +112,34 @@ Creating a revision is an intentional domain action. SwiftData save history and
 CloudKit conflict metadata are implementation details and do not substitute for
 recipe revisions.
 
+## Cooking Session evidence
+
+A `CookingSession` is one device-independent performance of one retained recipe
+revision. Its root captures a canonical `ExecutionSnapshot` containing the
+material needed to understand that performance even when the recipe changes
+later. Snapshot ingredient and instruction identities belong to the Session;
+optional source identities preserve provenance without making the mutable recipe
+the authority for historical meaning.
+
+Accepted activity is an unordered retained evidence set: immutable `SessionFact`
+values form a causal graph rooted at the Session, and an optional
+`SessionClosure` commits the exact snapshot digest, causal heads, closed
+projection digest, and outcome. Delivery order and exact physical duplicates do
+not affect reconstruction. Concurrent facts preserve independent work and expose
+competing values as typed conflicts. Stop and Resume are activity facts;
+Finished is absorbing and comes only from a valid Closure. Evidence arriving
+outside that Closure remains retained as late evidence and cannot silently alter
+the finished projection. Continuing begins a new Session with paired source
+provenance and a copied, explicitly mapped baseline.
+
+Deletion is a separate disposition graph. It hides neither Session evidence nor
+conflict state, restoration must explicitly descend from the deletion it
+resolves, and concurrent deletion/restoration is surfaced as needing attention.
+The projector has exactly three result classes: a complete Session projection,
+`UnavailableSession` for retained evidence the current reader cannot yet
+reconstruct, or `SessionRecovery` for invalid or contradictory evidence. It does
+not synthesize a plausible partial Session.
+
 ## Persistence boundary
 
 The first persistence implementation uses SwiftData records such as
@@ -121,7 +151,7 @@ queries, migrations, performance, or CloudKit compatibility. In particular,
 domain invariants should not be weakened merely because a storage framework
 requires optional relationships or cannot enforce uniqueness.
 
-The initial implemented slice is:
+The implemented persistence slice remains:
 
 ```text
 Kitchen → Recipe → RecipeRevision
