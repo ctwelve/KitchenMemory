@@ -98,6 +98,25 @@ typed failures into presentation strings. This boundary keeps current sheets
 replaceable by future in-page editing without rewriting validation or losing
 input, and lets complete product behavior run in fast framework tests.
 
+## Deterministic Cooking Session engine
+
+`KitchenMemoryDomain` owns the Slice 11 Cooking Session evidence engine. Its
+public seam accepts only persistence-independent retained evidence and returns a
+complete `CookingSessionProjection`, `UnavailableSession`, or `SessionRecovery`.
+The projector coalesces exact duplicates, validates identity membership,
+digests, causal references, acyclicity, Closure consistency, continuation
+provenance, and the independent deletion graph before deriving lifecycle,
+progress, scale, entries, outcome, late evidence, and explicit conflicts.
+
+Permanent V1 codecs provide canonical bytes for execution snapshots, causal
+heads, fact payloads, outcomes, and closed projections. Causal heads use sorted
+UUID bytes; JSON codecs use sorted keys and reject well-formed noncanonical
+representations on read. SHA-256 digests therefore describe exact stable bytes,
+not a decoder's best-effort interpretation. The engine imports Foundation and
+CryptoKit only. It has no SwiftData, CloudKit, repository, actor, device, or UI
+dependency, so later persistence and synchronization slices are adapters around
+this domain contract rather than authorities over its merge behavior.
+
 ### Application composition and stitching points
 
 The shared application layer contains a deliberately small set of stitching
