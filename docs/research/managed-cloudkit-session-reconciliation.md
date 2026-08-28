@@ -73,7 +73,7 @@ Cooking Session implementation.
    console inspection does not become an application dependency.
 7. Capture OS, Xcode, and SDK versions with the result. Managed behavior that
    Apple has not documented remains version-specific evidence and must be
-   rerun before the V3 schema review and final 0.2 release acceptance.
+   rerun before final 0.2 release acceptance.
 
 ## Decision gates unlocked by this research
 
@@ -110,10 +110,18 @@ aggregate atomicity, deterministic domain ordering, delete/update intent,
 reconnection precedence, remote-device acknowledgement, or a global “synced”
 state.
 
-Issue #38 can therefore close as research when this matrix is accepted. Before
-V3 freezes, run E1–E7 as one signed, synthetic two-device spike. Its result is
-evidence for the separate convergence decision; it must not silently become
-that decision.
+Issue #38 can therefore close as research when this matrix is accepted. Its
+result is evidence for the separate convergence decision; it must not silently
+become that decision.
+
+The later V3 schema decision narrowed the pre-freeze physical gate to one
+alpha-sized signed smoke covering generated-schema compatibility, independent
+immutable inserts, one partial-arrival sequence, duplicate logical identity,
+and one deliberately large Execution Snapshot. That smoke tests only the facts
+capable of falsifying the chosen physical representation. E1–E7 remain the
+broader transport and release-acceptance matrix; notification timing,
+local-only reconnection, physical deletion, and the lack of global receipt
+acknowledgement do not all block the alpha schema decision.
 
 ## Primary Apple sources
 

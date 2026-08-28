@@ -28,6 +28,14 @@ _Avoid_: Closed session, archived session
 One confirmed, session-owned piece of authored cooking reality, optionally anchored to one element of the Execution Snapshot.
 _Avoid_: Deviation, annotation, change record
 
+**Session Fact**:
+Immutable evidence of one accepted cooking intention whose causal context allows device-independent reconciliation without making clocks or devices authoritative.
+_Avoid_: Event log row, mutable activity record
+
+**Session Closure**:
+Immutable evidence that seals one complete observed Session frontier and makes the resulting Finished Session stable enough to source later work.
+_Avoid_: Finished flag, mutable status
+
 **Session Outcome**:
 An optional coarse assessment of the overall cook, distinct from whether the Cooking Session is Finished.
 _Avoid_: Recipe rating, completion state
