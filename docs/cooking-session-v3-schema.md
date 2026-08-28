@@ -6,15 +6,16 @@ Copyright © 2026 the Kitchen Memory contributors.
 SPDX-License-Identifier: GPL-3.0-only
 -->
 
-- Status: Accepted candidate; physical schema smoke pending
+- Status: Decision-frozen; compact physical schema smoke passed
 - Decided: 2026-08-27
 - Scope: Additive SwiftData and private managed-CloudKit representation for
   Kitchen Memory 0.2 Cooking Sessions
 
-This document freezes the candidate meaning and shape of V3. It does not
+This document freezes the meaning and shape of V3. It does not
 implement the models, initialize a CloudKit schema, deploy Production changes,
-or authorize physical pruning. The candidate becomes decision-frozen only when
-the bounded physical smoke below does not falsify it.
+or authorize physical pruning. The bounded Development smoke recorded in
+[issue #48](https://github.com/ctwelve/KitchenMemory/issues/48) did not falsify
+the representation.
 
 It applies the domain/persistence boundary in [ADR 0003](adr/0003-domain-persistence-boundary.md),
 the additive CloudKit policy in [ADR 0004](adr/0004-apple-persistence-and-portability.md),
@@ -150,10 +151,11 @@ when managed CloudKit imports only part of that transaction.
   unencrypted managed fields keep future user-authorized raw recovery possible.
   This is an at-introduction decision: changing it later requires additive
   replacement fields, record types, or a new container generation.
-- The physical smoke decides whether `snapshotData` needs external storage. If
-  a realistic large envelope cannot save, synchronize, and cold-read safely,
-  the envelope candidate is falsified and the measured normalized fallback is
-  reconsidered before V3 freezes.
+- `snapshotData` remains an ordinary `Data` attribute without
+  `@Attribute(.externalStorage)` in V3. The generated model reported inline
+  storage, and a 2 MiB synthetic envelope saved, synchronized, and cold-read
+  intact on both smoke devices. A future measured failure may introduce an
+  additive format or record type; it does not reopen this frozen field.
 
 ## Envelope formats
 
@@ -426,25 +428,27 @@ copying, stable domain identity, rebuilt relationships and shares, verified
 cutover, and prolonged access to both containers. The old container is never
 automatically destroyed.
 
-## Candidate-freeze smoke
+## Freeze evidence
 
-One compact signed Development experiment blocks candidate freeze:
+The compact signed Development experiment in
+[issue #48](https://github.com/ctwelve/KitchenMemory/issues/48) passed:
 
-1. Load the five-model schema and inspect generated defaults, fields, indexes,
-   and external-storage behavior.
-2. On two personal devices, create one root, independently add immutable Facts
-   offline, reconnect, and prove both survive.
-3. Import one scrambled root/Fact/Closure/Delete/Restore sequence and prove
-   eventual reconstruction without partial ordinary presentation.
-4. Inject identical and conflicting physical duplicates and prove coalescence
-   versus Recovery.
-5. Synchronize one deliberately large synthetic snapshot and record inline,
-   asset, failure, and cold-read behavior.
+1. The five exact model types generated with the expected fields and
+   optionality, no relationships, no uniqueness constraints, no local indexes,
+   and no external-storage flags.
+2. Separate Mac and iPhone stores preserved each device's independently
+   authored immutable Facts through convergence.
+3. An incomplete scrambled prefix remained Unavailable; root, Fact, Closure,
+   Delete, and Restore evidence eventually reconstructed as Restored.
+4. Identical physical duplicates produced one logical fingerprint and
+   coalesced; conflicting duplicates produced two fingerprints and Recovery.
+5. A 2 MiB synthetic Execution Snapshot synchronized and cold-read intact on
+   both devices as inline model data.
 
-Use only synthetic nonprivate content and bounded identifiers. One reconnect
-order suffices here because deterministic Logic tests exhaust delivery
-permutations. Failure of insert preservation, schema compatibility, or the
-realistic envelope reopens the relevant representation decision.
+The probe used only synthetic nonprivate content and bounded identifiers in the
+Development container. The radios were not manually forced offline; separate
+stores and pre-convergence insertion supplied independence for this alpha gate.
+Deterministic Logic tests still exhaust delivery permutations.
 
 The broader notification, event, local-only reconnection, physical-deletion,
 and receipt-acknowledgement exercises remain staged 0.2 acceptance evidence.

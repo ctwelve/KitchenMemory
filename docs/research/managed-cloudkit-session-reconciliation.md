@@ -114,14 +114,15 @@ Issue #38 can therefore close as research when this matrix is accepted. Its
 result is evidence for the separate convergence decision; it must not silently
 become that decision.
 
-The later V3 schema decision narrowed the pre-freeze physical gate to one
-alpha-sized signed smoke covering generated-schema compatibility, independent
-immutable inserts, one partial-arrival sequence, duplicate logical identity,
-and one deliberately large Execution Snapshot. That smoke tests only the facts
-capable of falsifying the chosen physical representation. E1–E7 remain the
-broader transport and release-acceptance matrix; notification timing,
-local-only reconnection, physical deletion, and the lack of global receipt
-acknowledgement do not all block the alpha schema decision.
+The V3 schema freeze used one alpha-sized signed smoke covering generated-schema
+compatibility, independent immutable inserts, one partial-arrival sequence,
+duplicate logical identity, and one deliberately large Execution Snapshot.
+That probe passed and is recorded in
+[issue #48](https://github.com/ctwelve/KitchenMemory/issues/48). It tested only
+the facts capable of falsifying the chosen physical representation. E1–E7
+remain the broader transport and release-acceptance matrix; notification
+timing, local-only reconnection, physical deletion, and the lack of global
+receipt acknowledgement do not all block the alpha schema decision.
 
 ## Primary Apple sources
 

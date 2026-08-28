@@ -40,8 +40,8 @@ completeness, lifecycle, or deletion authority.
   arrival and framework-owned object identity part of the domain contract.
 - **Normalized immutable snapshot graph:** preserves stable scalar identity but
   expands one Start or Continue operation into many independently arriving
-  records. It remains the measured fallback only if the complete envelope fails
-  the V3 physical smoke.
+  records. It was the measured fallback, but the complete envelope passed the
+  V3 physical smoke.
 - **Immutable document envelope:** keeps creation sufficient in one local row,
   preserves authored order inside the envelope, and leaves independently
   authored activity as insert-preserving Facts.

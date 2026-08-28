@@ -115,7 +115,7 @@ or unmaintainable. Such a cutover is a separate migration product: it must
 preserve application identity, account for private ownership, rebuild sharing,
 and prove resumable per-user copying before any old-container path is retired.
 
-The accepted V3 candidate deliberately does not request optional CloudKit
+The frozen V3 contract deliberately does not request optional CloudKit
 field-level encryption for Session attributes. Cookbook content does not
 justify the resulting recovery and future multi-user key constraints, and
 Kitchen Memory retains user-authorized raw recovery as a deliberate escape
