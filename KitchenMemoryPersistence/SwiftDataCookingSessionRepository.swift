@@ -87,36 +87,54 @@ public final class SwiftDataCookingSessionRepository: CookingSessionRepository {
 
   public func deletions(in kitchenID: Kitchen.ID) throws -> [SessionDeletionEvidence] {
     let identifier = kitchenID.rawValue
-    return try context.fetch(
+    let records = try context.fetch(
       FetchDescriptor<SessionDeletionRecord>(predicate: #Predicate { $0.kitchenID == identifier })
-    ).map(\.evidence).sorted(by: deletionEvidenceOrder)
+    )
+    return try completeDeletionEvidence(records)
   }
 
   public func deletions(for sessionID: CookingSession.ID) throws -> [SessionDeletionEvidence] {
     let identifier = sessionID.rawValue
-    return try context.fetch(
+    let records = try context.fetch(
       FetchDescriptor<SessionDeletionRecord>(predicate: #Predicate { $0.sessionID == identifier })
-    ).map(\.evidence).sorted(by: deletionEvidenceOrder)
+    )
+    return try completeDeletionEvidence(records)
   }
 
   public func deletions(id: SessionDeletion.ID) throws -> [SessionDeletionEvidence] {
     let identifier = id.rawValue
-    return try context.fetch(
+    let records = try context.fetch(
       FetchDescriptor<SessionDeletionRecord>(predicate: #Predicate { $0.id == identifier })
-    ).map(\.evidence).sorted(by: deletionEvidenceOrder)
+    )
+    return try completeDeletionEvidence(records)
   }
 
   public func restorations(
     for deletionID: SessionDeletion.ID
   ) throws -> [SessionDeletionResolutionEvidence] {
     let identifier = deletionID.rawValue
-    return try context.fetch(
+    let records = try context.fetch(
       FetchDescriptor<SessionDeletionResolutionRecord>(
         predicate: #Predicate { $0.deletionID == identifier }
       )
-    ).map(\.evidence).sorted {
+    )
+    let evidence = records.map(\.evidence)
+    guard evidence.allSatisfy(\.isComplete) else {
+      throw CookingSessionRepositoryError.placeholderBearingEvidence
+    }
+    return evidence.sorted {
       $0.id.rawValue.uuidString < $1.id.rawValue.uuidString
     }
+  }
+
+  private func completeDeletionEvidence(
+    _ records: [SessionDeletionRecord]
+  ) throws -> [SessionDeletionEvidence] {
+    let evidence = records.map(\.evidence)
+    guard evidence.allSatisfy(\.isComplete) else {
+      throw CookingSessionRepositoryError.placeholderBearingEvidence
+    }
+    return evidence.sorted(by: cookingSessionDeletionOrder)
   }
 
   private func performIsolatedWrite(
@@ -275,12 +293,4 @@ private extension SessionDeletionResolutionRecord {
       dispositionHeadsData: restoration.dispositionHeadsData
     )
   }
-}
-
-private func deletionEvidenceOrder(
-  _ lhs: SessionDeletionEvidence,
-  _ rhs: SessionDeletionEvidence
-) -> Bool {
-  if lhs.deletedAt != rhs.deletedAt { return lhs.deletedAt > rhs.deletedAt }
-  return lhs.id.rawValue.uuidString < rhs.id.rawValue.uuidString
 }

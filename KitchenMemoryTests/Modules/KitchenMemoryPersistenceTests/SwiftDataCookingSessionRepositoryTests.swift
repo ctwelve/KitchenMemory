@@ -95,6 +95,8 @@ final class SwiftDataCookingSessionRepositoryTests: XCTestCase {
     XCTAssertEqual(session.disposition, .ordinary)
   }
 
+  // The five-family placeholder matrix proves state and evidence-query behavior together.
+  // swiftlint:disable:next function_body_length
   func testPlaceholderBearingImportedRowCannotBecomeOrdinaryState() throws {
     let container = try KitchenMemorySchema.makeContainer(inMemory: true)
     let context = ModelContext(container)
@@ -110,7 +112,29 @@ final class SwiftDataCookingSessionRepositoryTests: XCTestCase {
       sourceSessionID: nil,
       sourceClosureID: nil
     )
+    let deletionID = id(118)
+    let placeholderDeletion = SessionDeletionRecord(
+      id: deletionID,
+      sessionID: zero,
+      kitchenID: zero,
+      deletedAt: .distantPast,
+      sessionHeadsFormatVersion: -1,
+      sessionHeadsData: Data(),
+      dispositionHeadsFormatVersion: -1,
+      dispositionHeadsData: Data()
+    )
+    let placeholderRestoration = SessionDeletionResolutionRecord(
+      id: id(119),
+      deletionID: deletionID,
+      sessionID: zero,
+      kitchenID: zero,
+      restoredAt: .distantPast,
+      dispositionHeadsFormatVersion: -1,
+      dispositionHeadsData: Data()
+    )
     context.insert(placeholder)
+    context.insert(placeholderDeletion)
+    context.insert(placeholderRestoration)
     try context.save()
 
     let repository = SwiftDataCookingSessionRepository(modelContainer: container)
@@ -122,6 +146,18 @@ final class SwiftDataCookingSessionRepositoryTests: XCTestCase {
     }
     XCTAssertEqual(recovery.reasons, [.placeholderBearingRecord])
     XCTAssertEqual(recovery.evidence.roots.count, 1)
+    XCTAssertEqual(recovery.evidence.deletions.count, 1)
+    XCTAssertEqual(recovery.evidence.restorations.count, 1)
+    XCTAssertThrowsError(
+      try repository.deletions(id: SessionDeletion.ID(rawValue: deletionID))
+    ) { error in
+      XCTAssertEqual(error as? CookingSessionRepositoryError, .placeholderBearingEvidence)
+    }
+    XCTAssertThrowsError(
+      try repository.restorations(for: SessionDeletion.ID(rawValue: deletionID))
+    ) { error in
+      XCTAssertEqual(error as? CookingSessionRepositoryError, .placeholderBearingEvidence)
+    }
   }
 
   func testFinishResolutionDeleteAndContinueEachAppendTheirCompleteEvidence() throws {
@@ -240,6 +276,36 @@ final class SwiftDataCookingSessionRepositoryTests: XCTestCase {
     guard case .recovery = try repository.session(id: root.id) else {
       XCTFail("Outcome bytes without a matching closed projection must stay in Recovery")
       return
+    }
+  }
+
+  func testFixedSeedReconstructionPermutationsRetainOneStableResult() throws {
+    let root = try makeRoot()
+    let closure = try makeClosure(root: root)
+    let deletion = makeDeletion(root: root, closure: closure)
+    let restoration = makeRestoration(root: root, deletion: deletion)
+    let transactions: [CookingSessionTransaction] = [
+      .start(root),
+      .finish(closure),
+      .delete(deletion),
+      .restore([restoration]),
+    ]
+
+    for seed in 1 ... 16 {
+      let repository = SwiftDataCookingSessionRepository(
+        modelContainer: try KitchenMemorySchema.makeContainer(inMemory: true)
+      )
+      for transaction in shuffled(transactions, seed: UInt64(seed)) {
+        try repository.append(transaction)
+        try repository.append(transaction)
+      }
+
+      guard case let .session(session) = try repository.session(id: root.id) else {
+        XCTFail("Seed \(seed) did not reconstruct an ordinary Session")
+        continue
+      }
+      XCTAssertEqual(session.lifecycle, .finished, "seed \(seed)")
+      XCTAssertEqual(session.disposition, .ordinary, "seed \(seed)")
     }
   }
 
@@ -481,6 +547,16 @@ final class SwiftDataCookingSessionRepositoryTests: XCTestCase {
 
   private func id(_ value: Int) -> UUID {
     UUID(uuidString: String(format: "00000000-0000-0000-0000-%012d", value))!
+  }
+
+  private func shuffled<Value>(_ values: [Value], seed: UInt64) -> [Value] {
+    var result = values
+    var state = seed
+    for index in stride(from: result.count - 1, through: 1, by: -1) {
+      state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+      result.swapAt(index, Int(state % UInt64(index + 1)))
+    }
+    return result
   }
 
   private func assertActive(

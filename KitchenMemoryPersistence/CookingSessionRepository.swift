@@ -107,17 +107,17 @@ public final class InMemoryCookingSessionRepository: CookingSessionRepository {
   public func deletions(in kitchenID: Kitchen.ID) throws -> [SessionDeletionEvidence] {
     evidenceBySession.values.flatMap(\.deletions)
       .filter { $0.kitchenID == kitchenID }
-      .sorted(by: deletionOrder)
+      .sorted(by: cookingSessionDeletionOrder)
   }
 
   public func deletions(for sessionID: CookingSession.ID) throws -> [SessionDeletionEvidence] {
-    (evidenceBySession[sessionID]?.deletions ?? []).sorted(by: deletionOrder)
+    (evidenceBySession[sessionID]?.deletions ?? []).sorted(by: cookingSessionDeletionOrder)
   }
 
   public func deletions(id: SessionDeletion.ID) throws -> [SessionDeletionEvidence] {
     evidenceBySession.values.flatMap(\.deletions)
       .filter { $0.id == id }
-      .sorted(by: deletionOrder)
+      .sorted(by: cookingSessionDeletionOrder)
   }
 
   public func restorations(
@@ -218,7 +218,10 @@ private func finishedEvidenceOrder(
   return lhs.0.sessionID.rawValue.uuidString < rhs.0.sessionID.rawValue.uuidString
 }
 
-private func deletionOrder(_ lhs: SessionDeletionEvidence, _ rhs: SessionDeletionEvidence) -> Bool {
+func cookingSessionDeletionOrder(
+  _ lhs: SessionDeletionEvidence,
+  _ rhs: SessionDeletionEvidence
+) -> Bool {
   if lhs.deletedAt != rhs.deletedAt { return lhs.deletedAt > rhs.deletedAt }
   return lhs.id.rawValue.uuidString < rhs.id.rawValue.uuidString
 }
