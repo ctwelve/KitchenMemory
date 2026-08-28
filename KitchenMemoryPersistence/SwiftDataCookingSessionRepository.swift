@@ -33,7 +33,19 @@ public final class SwiftDataCookingSessionRepository: CookingSessionRepository {
     return stored.projection
   }
 
+  public func evidence(id: CookingSession.ID) throws -> SessionEvidence? {
+    let stored = try storedEvidence(sessionID: id)
+    return stored.evidence.isEmpty ? nil : stored.evidence
+  }
+
   public func sessions(in kitchenID: Kitchen.ID) throws -> [SessionProjectionResult] {
+    try storedEvidence(in: kitchenID)
+      .sorted { $0.evidence.sessionID.rawValue.uuidString
+        < $1.evidence.sessionID.rawValue.uuidString }
+      .map(\.projection)
+  }
+
+  private func storedEvidence(in kitchenID: Kitchen.ID) throws -> [StoredSessionEvidence] {
     let identifier = kitchenID.rawValue
     var ids = Set(try context.fetch(
       FetchDescriptor<CookingSessionRecord>(predicate: #Predicate { $0.kitchenID == identifier })
@@ -52,7 +64,9 @@ public final class SwiftDataCookingSessionRepository: CookingSessionRepository {
         predicate: #Predicate { $0.kitchenID == identifier }
       )
     ).map(\.sessionID))
-    return try classify(sessionIDs: ids)
+    return try ids.map {
+      try storedEvidence(sessionID: .init(rawValue: $0))
+    }.filter { $0.evidence.belongs(to: kitchenID) }
   }
 
   public func sessions(for recipeID: Recipe.ID) throws -> [SessionProjectionResult] {
@@ -63,26 +77,38 @@ public final class SwiftDataCookingSessionRepository: CookingSessionRepository {
     return try classify(sessionIDs: ids)
   }
 
+  public func sessions(
+    for recipeID: Recipe.ID,
+    in kitchenID: Kitchen.ID
+  ) throws -> [SessionProjectionResult] {
+    let recipeIdentifier = recipeID.rawValue
+    let kitchenIdentifier = kitchenID.rawValue
+    let ids = Set(try context.fetch(
+      FetchDescriptor<CookingSessionRecord>(predicate: #Predicate {
+        $0.recipeID == recipeIdentifier && $0.kitchenID == kitchenIdentifier
+      })
+    ).map(\.id))
+    return try classify(sessionIDs: ids)
+  }
+
   public func finishedSessions(
     in kitchenID: Kitchen.ID,
     limit: Int
   ) throws -> [SessionProjectionResult] {
     guard limit > 0 else { return [] }
-    let identifier = kitchenID.rawValue
-    let closures = try context.fetch(
-      FetchDescriptor<SessionClosureRecord>(predicate: #Predicate { $0.kitchenID == identifier })
-    )
-    let grouped = Dictionary(grouping: closures, by: \.sessionID)
-    let ids = grouped.sorted { lhs, rhs in
-      let lhsDate = lhs.value.reduce(Date.distantPast) { max($0, $1.finishedAt) }
-      let rhsDate = rhs.value.reduce(Date.distantPast) { max($0, $1.finishedAt) }
-      if lhsDate != rhsDate { return lhsDate > rhsDate }
-      return lhs.key.uuidString < rhs.key.uuidString
+    return try storedEvidence(in: kitchenID).compactMap {
+      stored -> (StoredSessionEvidence, Date)? in
+      guard let finishedAt = stored.evidence.closures.map(\.finishedAt).max()
+      else { return nil }
+      return (stored, finishedAt)
     }
-      .map(\.key)
-    return try ids.prefix(limit).map {
-      try storedEvidence(sessionID: .init(rawValue: $0)).projection
-    }
+      .sorted { lhs, rhs in
+        if lhs.1 != rhs.1 { return lhs.1 > rhs.1 }
+        return lhs.0.evidence.sessionID.rawValue.uuidString
+          < rhs.0.evidence.sessionID.rawValue.uuidString
+      }
+      .prefix(limit)
+      .map(\.0.projection)
   }
 
   public func deletions(in kitchenID: Kitchen.ID) throws -> [SessionDeletionEvidence] {
@@ -209,6 +235,17 @@ private extension SessionEvidence {
   var isEmpty: Bool {
     roots.isEmpty && facts.isEmpty && closures.isEmpty
       && deletions.isEmpty && restorations.isEmpty
+  }
+
+  func belongs(to kitchenID: Kitchen.ID) -> Bool {
+    if !roots.isEmpty {
+      return roots.contains { $0.kitchenID == kitchenID }
+    }
+    let kitchenIDs = Set(facts.map(\.kitchenID))
+      .union(closures.map(\.kitchenID))
+      .union(deletions.map(\.kitchenID))
+      .union(restorations.map(\.kitchenID))
+    return kitchenIDs.contains(kitchenID)
   }
 }
 

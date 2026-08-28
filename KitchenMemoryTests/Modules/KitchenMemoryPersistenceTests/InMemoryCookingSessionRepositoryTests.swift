@@ -68,6 +68,29 @@ final class InMemoryCookingSessionRepositoryTests: XCTestCase {
     XCTAssertEqual(try repository.sessions(for: second.recipeID).map(\.sessionID), [second.id])
   }
 
+  func testRootAuthorityExcludesForeignAggregateWithLocalChildren() throws {
+    let repository = InMemoryCookingSessionRepository()
+    let localKitchenID = Kitchen.ID(rawValue: id(24))
+    let foreign = try makeRoot(
+      sessionID: CookingSession.ID(rawValue: id(25)),
+      kitchenID: Kitchen.ID(rawValue: id(26))
+    )
+    try repository.append(.start(foreign))
+    try repository.append(.activity(try makeFact(
+      sessionID: foreign.id,
+      kitchenID: localKitchenID,
+      kind: .stop
+    )))
+    try repository.append(.finish(try makeClosure(
+      root: foreign,
+      kitchenID: localKitchenID
+    )))
+
+    XCTAssertTrue(try repository.sessions(in: localKitchenID).isEmpty)
+    XCTAssertTrue(try repository.finishedSessions(in: localKitchenID, limit: 1).isEmpty)
+    XCTAssertEqual(try repository.sessions(in: foreign.kitchenID).map(\.sessionID), [foreign.id])
+  }
+
   func testFinishedAndDispositionQueriesExposeRetainedDomainEvidence() throws {
     let repository = InMemoryCookingSessionRepository()
     let root = try makeRoot()
@@ -253,7 +276,8 @@ final class InMemoryCookingSessionRepositoryTests: XCTestCase {
   private func makeClosure(
     root: CookingSessionRootEvidence,
     id: SessionClosure.ID? = nil,
-    finishedAt: Date = Date(timeIntervalSince1970: 120)
+    finishedAt: Date = Date(timeIntervalSince1970: 120),
+    kitchenID: Kitchen.ID? = nil
   ) throws -> SessionClosureEvidence {
     let snapshot = try ExecutionSnapshotCodec.decode(
       formatVersion: root.snapshotFormatVersion,
@@ -266,7 +290,7 @@ final class InMemoryCookingSessionRepositoryTests: XCTestCase {
     return SessionClosureEvidence(
       id: id ?? SessionClosure.ID(rawValue: self.id(40)),
       sessionID: root.id,
-      kitchenID: root.kitchenID,
+      kitchenID: kitchenID ?? root.kitchenID,
       finishedAt: finishedAt,
       causalHeadsFormatVersion: heads.formatVersion,
       causalHeadsData: heads.data,

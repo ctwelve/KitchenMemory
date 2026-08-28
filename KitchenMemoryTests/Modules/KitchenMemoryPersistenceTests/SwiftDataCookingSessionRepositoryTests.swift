@@ -69,6 +69,31 @@ final class SwiftDataCookingSessionRepositoryTests: XCTestCase {
     XCTAssertEqual(recovery.evidence.roots.count, 3)
   }
 
+  func testRootAuthorityExcludesForeignAggregateWithLocalChildren() throws {
+    let repository = SwiftDataCookingSessionRepository(
+      modelContainer: try KitchenMemorySchema.makeContainer(inMemory: true)
+    )
+    let localKitchenID = Kitchen.ID(rawValue: id(110))
+    let foreign = try makeRoot(
+      id: CookingSession.ID(rawValue: id(111)),
+      kitchenID: Kitchen.ID(rawValue: id(112))
+    )
+    try repository.append(.start(foreign))
+    try repository.append(.activity(try makeFact(
+      root: foreign,
+      kitchenID: localKitchenID,
+      kind: .stop
+    )))
+    try repository.append(.finish(try makeClosure(
+      root: foreign,
+      kitchenID: localKitchenID
+    )))
+
+    XCTAssertTrue(try repository.sessions(in: localKitchenID).isEmpty)
+    XCTAssertTrue(try repository.finishedSessions(in: localKitchenID, limit: 1).isEmpty)
+    XCTAssertEqual(try repository.sessions(in: foreign.kitchenID).map(\.sessionID), [foreign.id])
+  }
+
   func testFinishDeleteAndRestoreUseCompleteTransactionsAndQueries() throws {
     let container = try KitchenMemorySchema.makeContainer(inMemory: true)
     let repository = SwiftDataCookingSessionRepository(modelContainer: container)
@@ -382,12 +407,13 @@ final class SwiftDataCookingSessionRepositoryTests: XCTestCase {
   }
 
   private func makeRoot(
-    id: CookingSession.ID? = nil
+    id: CookingSession.ID? = nil,
+    kitchenID: Kitchen.ID? = nil
   ) throws -> CookingSessionRootEvidence {
     let snapshot = try ExecutionSnapshotCodec.encode(ExecutionSnapshot(title: "Soup"))
     return CookingSessionRootEvidence(
       id: id ?? CookingSession.ID(rawValue: self.id(100)),
-      kitchenID: Kitchen.ID(rawValue: self.id(101)),
+      kitchenID: kitchenID ?? Kitchen.ID(rawValue: self.id(101)),
       recipeID: Recipe.ID(rawValue: self.id(102)),
       recipeRevisionID: RecipeRevision.ID(rawValue: self.id(103)),
       startedAt: Date(timeIntervalSince1970: 200),
@@ -399,6 +425,7 @@ final class SwiftDataCookingSessionRepositoryTests: XCTestCase {
 
   private func makeFact(
     root: CookingSessionRootEvidence,
+    kitchenID: Kitchen.ID? = nil,
     kind: SessionFact.Kind
   ) throws -> SessionFactEvidence {
     let heads = CausalHeadsCodec.encode([root.id.rawValue])
@@ -406,7 +433,7 @@ final class SwiftDataCookingSessionRepositoryTests: XCTestCase {
     return SessionFactEvidence(
       id: SessionFact.ID(rawValue: id(104)),
       sessionID: root.id,
-      kitchenID: root.kitchenID,
+      kitchenID: kitchenID ?? root.kitchenID,
       kind: kind.rawValue,
       targetSnapshotElementID: nil,
       authoredAt: Date(timeIntervalSince1970: 210),
@@ -421,7 +448,8 @@ final class SwiftDataCookingSessionRepositoryTests: XCTestCase {
   private func makeClosure(
     root: CookingSessionRootEvidence,
     id: SessionClosure.ID? = nil,
-    finishedAt: Date = Date(timeIntervalSince1970: 220)
+    finishedAt: Date = Date(timeIntervalSince1970: 220),
+    kitchenID: Kitchen.ID? = nil
   ) throws -> SessionClosureEvidence {
     let snapshot = try ExecutionSnapshotCodec.decode(
       formatVersion: root.snapshotFormatVersion,
@@ -434,7 +462,7 @@ final class SwiftDataCookingSessionRepositoryTests: XCTestCase {
     return SessionClosureEvidence(
       id: id ?? SessionClosure.ID(rawValue: self.id(105)),
       sessionID: root.id,
-      kitchenID: root.kitchenID,
+      kitchenID: kitchenID ?? root.kitchenID,
       finishedAt: finishedAt,
       causalHeadsFormatVersion: heads.formatVersion,
       causalHeadsData: heads.data,

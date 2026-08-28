@@ -30,9 +30,15 @@ public enum CookingSessionRepositoryError: Error, Equatable {
 @MainActor
 public protocol CookingSessionRepository: AnyObject {
   func append(_ transaction: CookingSessionTransaction) throws
+  /// Returns the retained evidence needed by Logic to prepare an idempotent command.
+  func evidence(id: CookingSession.ID) throws -> SessionEvidence?
   func session(id: CookingSession.ID) throws -> SessionProjectionResult?
   func sessions(in kitchenID: Kitchen.ID) throws -> [SessionProjectionResult]
   func sessions(for recipeID: Recipe.ID) throws -> [SessionProjectionResult]
+  func sessions(
+    for recipeID: Recipe.ID,
+    in kitchenID: Kitchen.ID
+  ) throws -> [SessionProjectionResult]
   func finishedSessions(
     in kitchenID: Kitchen.ID,
     limit: Int
@@ -76,9 +82,13 @@ public final class InMemoryCookingSessionRepository: CookingSessionRepository {
     evidenceBySession[id].map(SessionEvidenceProjector.project)
   }
 
+  public func evidence(id: CookingSession.ID) throws -> SessionEvidence? {
+    evidenceBySession[id]
+  }
+
   public func sessions(in kitchenID: Kitchen.ID) throws -> [SessionProjectionResult] {
     classifiedEvidence {
-      $0.kitchenIDs.contains(kitchenID)
+      $0.belongs(to: kitchenID)
     }
   }
 
@@ -88,13 +98,22 @@ public final class InMemoryCookingSessionRepository: CookingSessionRepository {
     }
   }
 
+  public func sessions(
+    for recipeID: Recipe.ID,
+    in kitchenID: Kitchen.ID
+  ) throws -> [SessionProjectionResult] {
+    classifiedEvidence {
+      $0.roots.contains { $0.recipeID == recipeID && $0.kitchenID == kitchenID }
+    }
+  }
+
   public func finishedSessions(
     in kitchenID: Kitchen.ID,
     limit: Int
   ) throws -> [SessionProjectionResult] {
     guard limit > 0 else { return [] }
     return evidenceBySession.values.compactMap { evidence in
-      guard evidence.kitchenIDs.contains(kitchenID),
+      guard evidence.belongs(to: kitchenID),
             let finishedAt = evidence.closures.map(\.finishedAt).max()
       else { return nil }
       return (evidence, finishedAt)
@@ -143,6 +162,15 @@ public final class InMemoryCookingSessionRepository: CookingSessionRepository {
     evidenceBySession.values.filter(predicate)
       .sorted { $0.sessionID.rawValue.uuidString < $1.sessionID.rawValue.uuidString }
       .map { SessionEvidenceProjector.project($0) }
+  }
+}
+
+private extension SessionEvidence {
+  func belongs(to kitchenID: Kitchen.ID) -> Bool {
+    if !roots.isEmpty {
+      return roots.contains { $0.kitchenID == kitchenID }
+    }
+    return kitchenIDs.contains(kitchenID)
   }
 }
 
