@@ -9,6 +9,7 @@ enum PropertyTestSeedName: String, CaseIterable {
     case domainRationalInverseScaling = "domain.rational.inverse-scaling"
     case domainRationalMultiplication = "domain.rational.multiplication"
     case domainRationalNormalization = "domain.rational.normalization"
+    case domainSessionEvidence = "domain.session-evidence"
     case importIngredientMixedFractions = "import.ingredient.mixed-fractions"
     case importNormalizerMarkup = "import.normalizer.markup"
     case importURLPublicHosts = "import.url.public-hosts"
