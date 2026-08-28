@@ -170,7 +170,7 @@ Candidate signals include:
 - Qualitative amount and package state.
 - Age and confidence of observations.
 - Planned recipe requirements.
-- Recent cooking-session deviations such as “didn't have.”
+- Recent user-authored Session Entries such as “didn't have.”
 - An unopened reserve.
 
 The most valuable time to request correction is while reconciling a planned cook.

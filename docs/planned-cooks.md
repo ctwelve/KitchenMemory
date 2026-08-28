@@ -200,7 +200,7 @@ Starting a cooking session from a planned cook carries forward:
 - Completed preparation work.
 - Notes relevant to execution.
 
-Finishing or abandoning the cooking session updates the plan's lifecycle while
+Finishing or stopping the cooking session updates the plan's lifecycle while
 keeping its prior intent intelligible.
 
 ## Same product, focused surfaces

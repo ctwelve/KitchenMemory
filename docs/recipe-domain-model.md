@@ -251,7 +251,7 @@ multiple holdings, each with exact, approximate, qualitative, presence-only, or
 unknown knowledge. Recipe work should preserve this seam without prematurely
 forcing those concepts into its persistence schema.
 
-Cooking progress and deviations are similarly session-specific rather than
+Cooking progress and Session Entries are similarly Session-specific rather than
 properties of `Recipe`; see `cooking-sessions.md`.
 
 Readiness and meal planning connect a particular recipe revision and yield to

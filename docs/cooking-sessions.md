@@ -1,4 +1,4 @@
-# Cooking sessions and deviations
+# Cooking Sessions
 
 <!--
 Kitchen Memory
@@ -6,176 +6,139 @@ Copyright © 2026 the Kitchen Memory contributors.
 SPDX-License-Identifier: GPL-3.0-only
 -->
 
+- Status: Accepted 0.2 product contract
+- Decided: 2026-08-27
 
-- Status: Deferred 0.2 exploration
+A Recipe Revision describes maintained intent. A Cooking Session records one
+device-independent performance of that revision without silently editing it.
+The performance may move among one person's devices, but simultaneous live
+cooking, device ownership, and multi-person collaboration are not 0.2 promises.
 
-The accepted simplifications distilled from this exploration are recorded in
-`product-doctrine.md`; unresolved detail remains here for future design work.
+The precise evidence and storage contracts live in
+[Cooking Session V3](cooking-session-v3-schema.md). The ordered implementation
+route lives in the [0.2 roadmap](roadmap-0.2.md).
 
-Cooking sessions are deliberately outside the 0.1 persistence and production
-CloudKit schema. The current application has neither session domain types nor
-session persistence records. The 0.2 feature slice must first settle the
-unresolved ownership, historical-reference, progress, and deviation boundaries
-described below, then introduce a new immutable SwiftData schema version and
-additive CloudKit record types and fields.
+## Start and historical context
 
-This is expected schema evolution, not a rewrite of recipe data. CloudKit's
-production schema may grow but published types and fields cannot be removed or
-repurposed, so the 0.1 synchronization foundation must establish an additive
-schema policy without guessing at a premature session representation.
+Viewing a Recipe never creates a Session. Explicit Start mints one stable
+Session identity and succeeds only after one sufficient, immutable Execution
+Snapshot is locally durable.
 
-A saved recipe describes an intended preparation. Cooking it creates a temporary
-working session: ingredients and steps can be checked off, and the cook can note
-what actually happened without editing the source recipe mid-cook.
+The snapshot is self-contained cooking context: authored Recipe content,
+working yield and structured quantities, targetable Session-owned ingredient
+and instruction identities, lightweight provenance, and optional media
+references. Recipe and Recipe Revision identities explain where it came from;
+the source objects are not runtime dependencies.
 
-A session may begin directly from a recipe or from a `PlannedCook`. The latter
-provides working yield, readiness decisions, completed preparation, and planned
-substitutions or omissions.
+A sparse or imperfect Recipe may still produce a sufficient snapshot. Missing
+required envelope material does not produce a partial user-visible Session.
 
-## Separation of concerns
+## Lifecycle
 
-```text
-Recipe
-  the maintained instructions
+A Session has three initial lifecycle states:
 
-PlannedCook
-  what the kitchen intends to prepare this time
+- **Active** accepts progress, working-scale changes, Session Entries, and
+  Outcome changes.
+- **Stopped** is deliberately dormant and resumable. It accepts no cooking
+  activity until explicit Resume.
+- **Finished** is an immutable closure created only after careful user
+  confirmation.
 
-CookingSession
-  one performance of that recipe
+Only durable user actions change lifecycle. Sleep, process termination,
+navigation, network loss, inactivity, or another device appearing never Stops,
+Resumes, or Finishes a Session.
 
-RecipeRevision or RecipeVariant
-  a deliberate recipe change derived from experience
-```
+Finish may occur from Active or Stopped. Finished never reopens or accepts
+further evidence. Further cooking begins through Session Continuation: a new
+Active Session with its own identities, a self-contained inherited baseline,
+and explicit lineage to the Finished source.
 
-This separation lets the normal recipe screen remain primarily a reading and
-cooking surface while still capturing valuable deviations.
+Several Sessions may be Active at once. Presentation may recommend one current
+Session locally, but devices, clocks, and view state are never lifecycle
+authority.
 
-## Cooking mode
+## Cooking interaction
 
-During a session, the cook should be able to:
+During an Active Session, the cook may:
 
-- Check off ingredient lines.
-- Check off instruction steps.
-- Move backward and forward without losing progress.
-- Mark an ingredient as unavailable.
-- Record a substitution.
-- Record an amount actually used.
-- Add a quick note to an ingredient, step, or the whole session.
-- Mark a step as skipped, changed, or problematic.
-- Finish or abandon the session.
+- account for or reopen an ingredient row;
+- complete, skip, or reopen an instruction step;
+- replace the working scale and resulting structured quantities;
+- move backward and forward without losing progress;
+- submit exact authored Session Entries for the whole Session or one stable
+  snapshot element; and
+- optionally set, change, or clear a coarse Session Outcome.
 
-Checking an ingredient means “accounted for during this cook,” not necessarily
-“deducted precisely from the pantry.” Pantry effects should initially be prompts
-or suggestions, particularly when the pantry amount is fuzzy.
+Progress records resulting state rather than toggles or deltas. An ingredient
+check means “accounted for during this cook,” not precise pantry consumption.
+Conflicting progress uses a nonhiding ordinary presentation until the person
+resolves it.
 
-## Deviations
+The representative interface recomposes for available container space rather
+than platform identity. It favors what to do next, rapid independent intentions,
+large readable content, native accessibility semantics, and recoverable local
+drafts without turning the cooking surface into Recipe editing.
 
-A deviation records the difference between recipe intent and cooking reality.
-Candidate types include:
+## Session Entries and Outcome
 
-```text
-ingredient unavailable
-ingredient substituted
-amount changed
-ingredient omitted
-ingredient added
-step skipped
-step changed
-timing changed
-free-form observation
-```
+A Session Entry is exact user-authored text, optionally anchored to one
+Session-owned ingredient or instruction identity. It does not carry a deviation
+enum, reason, input-modality marker, inferred structure, or automatic Recipe
+meaning.
 
-Examples:
+Entries may be causally revised, retargeted, or withdrawn without deleting
+earlier evidence. A local meaningful draft survives navigation, Stop, and
+process relaunch. Finish and remote Finish must offer explicit handling for that
+draft; no path silently loses or misassigns it.
 
-```text
-Didn't have buttermilk.
-Substituted yogurt + water for buttermilk.
-Used half the sugar.
-Cooked 12 minutes longer than written.
-Added smoked paprika after tasting.
-```
+Session Outcome is optional and distinct from lifecycle. Its initial coarse
+values are great, okay, and unsuccessful. Finishing with no Entries or Outcome
+remains useful history and does not manufacture a conclusion that the Recipe
+was followed or was excellent.
 
-The original recipe remains untouched. Deviations belong to the session until a
-person deliberately promotes them.
+## Synchronization and recovery
 
-Planned substitutions and omissions enter the session as expected deviations.
-The session records whether the cook followed, changed, or abandoned those plans.
+Accepted intentions are immutable causal Facts with stable retry identities.
+Personal CloudKit synchronization transports them asynchronously; deterministic
+set union and reconstruction define product meaning. Arrival order, timestamps,
+device identity, CloudKit identity, and framework-event success never choose a
+winner or prove global synchronization.
 
-## From a deviation to a recipe
+Missing roots or predecessors and well-formed unknown formats produce an
+Unavailable Session, withheld from ordinary presentation while synchronization
+may still complete. Positive invariant violations produce a Session Requiring
+Recovery whose evidence remains retained and retryable.
 
-After cooking, the app may summarize the session and offer choices:
+Finished absorbs late or concurrent evidence without erasing it. Competing
+Closures require explicit human selection from the observed candidates; timing
+may support a recommendation but never a silent choice.
 
-- Keep the notes only in cooking history.
-- Apply selected corrections to the recipe as a new revision.
-- Create a named variant or fork.
-- Discard incidental notes.
+## History, deletion, and later use
 
-A repeated deviation is particularly valuable:
+Sessions remain independently discoverable when their source Recipe changes,
+is deleted, or is temporarily absent. Finished history opens observationally
+from its self-contained evidence and may later source a deliberate Recipe
+workflow only because it is immutable.
 
-> You reduced the sugar the last three times you cooked this. Update your
-> recipe?
+Session Deletion is reversible disposition, separate from lifecycle. Any state
+may be deleted, deletion never cascades, and causal Restore resolves only the
+deletion evidence actually observed. Deleted Items and Recovery remain separate
+surfaces. Physical pruning, Empty Deleted Items, expiry, and permanent erasure
+require a later dependency-aware contract.
 
-Promotion must show an explicit diff. It should never quietly rewrite an
-imported or family recipe based on checked boxes and hurried kitchen notes.
+## Deferred work
 
-## Illustrative model
+The following do not belong to the 0.2 flow:
 
-```text
-CookingSession
-  id
-  recipeID
-  recipeRevisionID?
-  startedAt
-  finishedAt?
-  status
-  servingScale
-  ingredientProgress[]
-  stepProgress[]
-  deviations[]
-  notes[]
+- promoting selected Entries into a Recipe Revision, variant, or new Recipe;
+- repeated-pattern suggestions and AI-assisted interpretation;
+- Session media capture and management;
+- search, folders, tags, and durable Session organization;
+- timers, Live Activities, and Siri commands;
+- deliberate Session merging, advisory soft locks, Handoff, or local-network
+  discovery;
+- shared-Kitchen membership and multi-person live cooking; and
+- pantry deductions inferred from progress.
 
-CookingDeviation
-  target              // session, ingredient row, or step
-  kind
-  originalValue?
-  actualValue?
-  note?
-  recordedAt
-```
-
-The session should retain enough of the recipe version it used to remain
-meaningful after the maintained recipe changes. Whether this is a full snapshot
-or a revision reference is intentionally unresolved.
-
-## Pantry feedback
-
-Sessions provide evidence without pretending to know more than the cook entered:
-
-- “Didn't have” can correct pantry presence and influence shopping suggestions.
-- “Used the last of it” can close a holding.
-- A precise amount used may reduce a precise holding.
-- Checking off “salt to taste” should not perform inventory arithmetic.
-- A substitution may reveal that two ingredients can serve similar roles for
-  this household without globally declaring them equivalent.
-
-At the end of a session, a compact review might ask only about material pantry
-changes. The user should be able to skip it entirely.
-
-## Collaboration
-
-Session progress is personal by default unless a shared live-cooking experience
-proves useful. The resulting notes and proposed recipe changes may be shared with
-the kitchen.
-
-Concurrent editing and family recipe ownership will require a clear revision
-model before deviations can update shared recipes.
-
-## Principles to preserve
-
-1. Cooking mode is primarily for reading; interaction is lightweight.
-2. Checkmarks are session progress, not permanent recipe edits.
-3. Pantry deductions follow evidence and user intent, not assumptions.
-4. Deviations are cheap to record and safe to ignore later.
-5. Creating a revision or variant is explicit and reviewable.
-6. Cooking history remains intelligible after a recipe changes.
+These later features must preserve the central distinction: a Recipe is
+maintained intent, while a Cooking Session is retained cooking reality.
