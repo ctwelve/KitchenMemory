@@ -3,7 +3,7 @@
 <!--
 Kitchen Memory
 Copyright © 2026 the Kitchen Memory contributors
-SPDX-License-Identifier: GPL-3.0-only
+SPDX-License-Identifier: MIT
 -->
 
 - Status: Research complete; selection policy adopted by
@@ -72,11 +72,9 @@ activity, not a guarantee of future maintenance or correctness.
 - The app collects no analytics, diagnostics, or recipe content. Logging and
   support artifacts must respect the project's no-data posture
   ([privacy policy](../privacy.md)).
-- The source is `GPL-3.0-only`. Every package still needs a license and notice
-  review before adoption ([licensing decision](../adr/0002-gpl-3-only.md)). GNU's
-  compatibility guidance describes GPLv3 as compatible with Apache License 2.0
-  and permissive Expat/MIT-style licenses, but this is a screening aid rather
-  than legal advice ([GNU compatibility guide](https://www.gnu.org/licenses/license-compatibility.en.html)).
+- The source is MIT-licensed. Every package still needs a license and notice
+  review before adoption, and its terms must permit the intended combined
+  distribution ([licensing decision](../adr/0015-adopt-mit-license.md)).
 - A dependency change requires source, release, license, privacy, product,
   transitive-dependency, executable, resolved-file, SBOM, and signed-product
   review under the existing inventory procedure
@@ -542,8 +540,8 @@ note or ADR:
 3. Current release, supported Swift/Xcode and deployment targets, repository
    activity, tests/CI, maintainers, license, notices, privacy manifest, products,
    transitive dependencies, plugins/executables, and binary artifacts.
-4. GPL-3.0-only compatibility reviewed by the appropriate person; do not infer
-   legal approval from this survey.
+4. License compatibility and required notices reviewed by the appropriate
+   person; do not infer legal approval from this survey.
 5. Network, cache, filesystem, metadata, prompt, model, and diagnostic behavior
    under Kitchen Memory's privacy rules.
 6. Deterministic fixtures for failure, cancellation, resource limits, upgrades,

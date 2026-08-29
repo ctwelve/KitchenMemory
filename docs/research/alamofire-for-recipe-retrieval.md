@@ -3,7 +3,7 @@
 <!--
 Kitchen Memory
 Copyright © 2026 the Kitchen Memory contributors.
-SPDX-License-Identifier: GPL-3.0-only
+SPDX-License-Identifier: MIT
 -->
 
 - Status: Research complete; do not adopt for the current recipe fetcher
@@ -207,13 +207,11 @@ runtime component linked into `KitchenKit`, not merely a developer tool.
 · [KitchenKit boundary](../adr/0012-consolidate-business-code-in-kitchenkit.md)
 
 Alamofire 5.12.0 is released under the short permissive license commonly called
-MIT (the license text is the Expat form). The GNU project classifies the Expat
-license as GPL-compatible, so it is compatible with Kitchen Memory's
-`GPL-3.0-only` dependency rule, subject to preserving Alamofire's copyright and
-license notice in distributions. This is not a licensing blocker.
+MIT (the license text is the Expat form). It permits distribution with the
+MIT-licensed Kitchen Memory application, subject to preserving Alamofire's
+copyright and license notice in distributions. This is not a licensing blocker.
 [Alamofire license](https://github.com/Alamofire/Alamofire/blob/5.12.0/LICENSE)
-· [GNU license list: Expat](https://www.gnu.org/philosophy/license-list.html#Expat)
-· [Kitchen Memory licensing decision](../adr/0002-gpl-3-only.md)
+· [Kitchen Memory licensing decision](../adr/0015-adopt-mit-license.md)
 
 Alamofire's bundled privacy manifest declares no tracking and no collected data.
 It declares system boot time for approved reason `35F9.1`; its response source

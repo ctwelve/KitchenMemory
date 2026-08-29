@@ -3,7 +3,7 @@
 <!--
 Kitchen Memory
 Copyright © 2026 the Kitchen Memory contributors.
-SPDX-License-Identifier: GPL-3.0-only
+SPDX-License-Identifier: MIT
 -->
 
 Build a faithful, private, local-first recipe book for real household kitchens.
@@ -67,7 +67,7 @@ products must share one presentation architecture.
 ### Architecture decisions
 
 - [0001: Apple platform](adr/0001-apple-platform.md)
-- [0002: GPL-3.0-only](adr/0002-gpl-3-only.md)
+- [0002: GPL-3.0-only (superseded)](adr/0002-gpl-3-only.md)
 - [0003: Domain-persistence boundary](adr/0003-domain-persistence-boundary.md)
 - [0004: Apple persistence and portability](adr/0004-apple-persistence-and-portability.md)
 - [0005: Testing and comprehension](adr/0005-testing-and-comprehension.md)
@@ -80,3 +80,4 @@ products must share one presentation architecture.
 - [0012: Consolidate business code in KitchenKit](adr/0012-consolidate-business-code-in-kitchenkit.md)
 - [0013: Unified native multiplatform app target](adr/0013-unified-native-multiplatform-app-target.md)
 - [0014: Native capabilities and evidence-based dependencies](adr/0014-prefer-native-capabilities-and-evidence-based-dependencies.md)
+- [0015: Adopt the MIT License](adr/0015-adopt-mit-license.md)

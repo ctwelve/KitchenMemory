@@ -1,6 +1,6 @@
 // Kitchen Memory
 // Copyright © 2026 the Kitchen Memory contributors.
-// SPDX-License-Identifier: GPL-3.0-only
+// SPDX-License-Identifier: MIT
 
 // Coherent recipe-library operations live in Logic rather than any one UI.
 

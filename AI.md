@@ -1,7 +1,7 @@
 <!--
 Kitchen Memory
 Copyright © 2026 the Kitchen Memory contributors.
-SPDX-License-Identifier: GPL-3.0-only
+SPDX-License-Identifier: MIT
 -->
 
 # Artificial intelligence use
@@ -38,9 +38,9 @@ holder of Kitchen Memory.
 ## Copyright and licensing
 
 AI assistance does not change the project's license. Material committed to this
-repository is accepted and distributed by its contributors under the GNU
-General Public License, version 3 only (`GPL-3.0-only`), unless a component is
-clearly identified otherwise. See [COPYRIGHT](COPYRIGHT) and [LICENSE](LICENSE).
+repository is accepted and distributed by its contributors under the MIT
+License (`MIT`), unless a component is clearly identified otherwise. See
+[COPYRIGHT](COPYRIGHT) and [LICENSE](LICENSE).
 
 Contributors are responsible for checking AI-assisted material and must not
 knowingly submit content that infringes another party's rights or is

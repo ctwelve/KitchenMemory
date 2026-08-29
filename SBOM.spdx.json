@@ -17,7 +17,7 @@
       "downloadLocation": "https://github.com/ctwelve/KitchenMemory",
       "filesAnalyzed": false,
       "licenseConcluded": "NOASSERTION",
-      "licenseDeclared": "GPL-3.0-only",
+      "licenseDeclared": "MIT",
       "copyrightText": "Copyright 2026 the Kitchen Memory contributors",
       "primaryPackagePurpose": "APPLICATION",
       "externalRefs": [

@@ -1,6 +1,6 @@
 // Kitchen Memory
 // Copyright © 2026 the Kitchen Memory contributors.
-// SPDX-License-Identifier: GPL-3.0-only
+// SPDX-License-Identifier: MIT
 
 /// The durable identity of a maintained dish.
 public struct Recipe: Codable, Equatable, Identifiable, Sendable {
