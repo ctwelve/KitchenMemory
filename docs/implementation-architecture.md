@@ -7,9 +7,9 @@ SPDX-License-Identifier: GPL-3.0-only
 -->
 
 Kitchen Memory builds its presentation-independent business implementation as
-one native Xcode framework and Swift module, `KitchenKit`. Separate iOS and
-macOS application targets currently consume the same shared SwiftUI
-presentation, composition, localization, and starter content.
+one native Xcode framework and Swift module, `KitchenKit`. One native
+multiplatform `KitchenMemory` application target consumes it for iPhone, iPad,
+iOS Simulator, and Mac destinations.
 
 ## Target organization
 
@@ -22,15 +22,13 @@ presentation, composition, localization, and starter content.
 - `Logic/` owns product operations and presentation-independent workflow state.
 
 These are architectural seams, not separately importable Swift submodules.
-Both applications link one framework and write `import KitchenKit`. Import and
+The application links one framework and writes `import KitchenKit`. Import and
 Persistence depend conceptually on Domain but not on one another; Logic
 coordinates all three responsibilities without depending on the application or
 SwiftUI.
 
 ```text
-KitchenMemoryIOS ─────┐
-                     ├──→ KitchenKit
-KitchenMemoryMacOS ───┘
+KitchenMemory ───────────→ KitchenKit
 
 KitchenKit
 ├── Logic ────────┬──→ Import ───────┐
@@ -41,15 +39,19 @@ KitchenKit
 This structure keeps technical responsibilities explicit without turning source
 organization into independently linked products.
 
-`KitchenMemory/` is the shared application layer. `KitchenMemoryIOS/` and
-`KitchenMemoryMacOS/` contain resources and entitlements owned by only one app
-target. `KitchenKit/` belongs only to the KitchenKit target. This direct target
-membership replaces filename conventions and per-file platform filters.
+`KitchenMemory/` is the application layer and synchronized source owner. It
+contains shared code and resources, separate editor-friendly iOS and macOS
+property lists, separate ordinary/testing entitlement files for iOS and macOS,
+and the iOS-only localized launch resources. SDK-qualified settings select the
+property list and entitlements, while platform filters exclude launch resources
+from Mac products.
+`KitchenKit/` belongs only to the KitchenKit target.
 
 The shared SwiftUI layer is an explicit 0.1 compromise, not a permanent promise.
-The app-target boundary lets 0.2 replace either platform's presentation with
-UIKit, AppKit, or platform-specific SwiftUI without moving product logic again.
-See [ADR 0009](adr/0009-separate-native-app-targets.md).
+File-level platform filters and compilation conditions let 0.2 replace either
+platform's presentation with UIKit, AppKit, or platform-specific SwiftUI
+without moving product logic or recreating a target prematurely. See
+[ADR 0013](adr/0013-unified-native-multiplatform-app-target.md).
 
 ## Build environments
 
@@ -66,12 +68,12 @@ target implementation details:
 
 `ProductionTesting` is deliberately non-distributable. It retains production
 compiler behavior while admitting disposable automated-test storage that is
-disabled in the actual `Production` application. The saved `KitchenMemoryIOS`
-and `KitchenMemoryMacOS` schemes use `Testing` for their default Test and
-Analyze actions, `Debug` for Run, and `Production` for Profile and Archive.
-Their platform plans run hosted tests and UI smoke together; the UI harness
-selects disposable storage through its launch arguments. A release-equivalent
-UI smoke run may select `ProductionTesting` explicitly.
+disabled in the actual `Production` application. The saved `KitchenMemory`
+scheme uses `Testing` for its default Test and Analyze actions, `Debug` for Run,
+and `Production` for Profile and Archive. Its plan runs hosted tests and UI
+smoke together on either native destination; the UI harness selects disposable
+storage through its launch arguments. A release-equivalent UI smoke run may
+select `ProductionTesting` explicitly.
 
 The project keeps `MERGED_BINARY_TYPE` at `automatic` so Xcode can optimize
 framework linkage for the selected build. Because hosted test products may
@@ -147,8 +149,8 @@ this domain contract rather than authorities over its merge behavior.
 
 ### Application composition and stitching points
 
-The shared application layer contains a deliberately small set of stitching
-points, compiled into both native app targets. They connect platform facilities
+The application layer contains a deliberately small set of stitching points,
+compiled into both native products from the multiplatform target. They connect platform facilities
 and replaceable SwiftUI presentation to the stable framework boundaries without
 moving business rules back into the app.
 
@@ -385,17 +387,15 @@ the suite once on macOS.
 Property-test seeds and their generator live in `KitchenKitTests/Support/`.
 
 Tests for starter content, presentation formatting, application composition,
-resources, and hosted runtime behavior live in `KitchenMemoryTests`; that
-folder belongs only to the platform-specific `KitchenMemoryIOSTests` and
-`KitchenMemoryMacTests` host targets. All three shared schemes build only their
-primary product and leave test-target membership solely to their referenced
-plan. The checked-in `KitchenMemoryIOS.xctestplan` and
-`KitchenMemoryMacOS.xctestplan` each contain
-their native hosted target and the shared `KitchenMemoryUITests` smoke target.
-Their schemes use `Testing` for Test so both kinds of test receive a
-least-privilege, disposable host. The exact coverage gate requires every
+resources, and hosted runtime behavior live in one multiplatform
+`KitchenMemoryTests` target. The two shared schemes build only their primary
+products and leave test-target membership solely to their referenced plans.
+The checked-in `KitchenMemory.xctestplan` contains `KitchenMemoryTests` and the
+shared `KitchenMemoryUITests` smoke target, and runs unchanged on iOS Simulator
+and native macOS. The scheme uses `Testing` for Test so both kinds of test
+receive a least-privilege, disposable host. The exact coverage gate requires every
 executable business-logic line in KitchenKit to be covered by the core macOS
-result. Both complete app plans remain correctness gates; the shared-source
-metric does not make either optional. See
+result. Both destination-level application runs remain correctness gates; the
+shared-source metric does not make either optional. See
 [ADR 0007](adr/0007-business-logic-coverage-and-ui-smoke-tests.md) for the
 business-logic-versus-UI testing investment boundary.

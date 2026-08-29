@@ -24,8 +24,8 @@ distributed through TestFlight or the App Store. See
 [0.1 release evidence](release-evidence-0.1.md) for the exact claims and
 deferred gates.
 
-The native iOS and macOS application targets currently compile a basic shared
-SwiftUI layer to exercise the product's foundation slices. That interface is
+The native multiplatform application target currently compiles a basic shared
+SwiftUI layer for iPhone, iPad, and Mac to exercise the product's foundation slices. That interface is
 implementation scaffolding, not a commitment that the mature Mac and mobile
 products must share one presentation architecture.
 
@@ -78,3 +78,4 @@ products must share one presentation architecture.
 - [0010: Distinct Cooking Session module seam](adr/0010-distinct-cooking-session-module.md)
 - [0011: Cooking Session document envelopes](adr/0011-use-document-envelopes-for-cooking-sessions.md)
 - [0012: Consolidate business code in KitchenKit](adr/0012-consolidate-business-code-in-kitchenkit.md)
+- [0013: Unified native multiplatform app target](adr/0013-unified-native-multiplatform-app-target.md)

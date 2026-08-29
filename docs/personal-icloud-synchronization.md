@@ -61,11 +61,11 @@ does not need to be rewritten merely because the transport scope changes.
 `Develop` launches use the private database in
 `iCloud.net.ctwelve.dev.KitchenMemory`; `Production` uses
 `iCloud.net.ctwelve.KitchenMemory`. They select the Development and Production
-CloudKit environments respectively. `KitchenMemoryIOS` and
-`KitchenMemoryMacOS` own separate entitlement files while selecting those
-environment-specific containers. The iOS target owns its
-remote-notification background declaration; that iOS-only bundle setting does
-not cross into the macOS product. `Debug`, `Testing`, and the non-distributable
+CloudKit environments respectively. The multiplatform `KitchenMemory` target
+selects separate iOS and macOS entitlement files while retaining those
+environment-specific containers. SDK-qualified settings select separate iOS
+and macOS property lists, so the iOS remote-notification background declaration
+is not carried into the Mac product. `Debug`, `Testing`, and the non-distributable
 `ProductionTesting` UI-smoke hosts use explicit local or in-memory stores and
 never require an iCloud account.
 
@@ -226,8 +226,8 @@ matrix in [0.1 release evidence](release-evidence-0.1.md).
 Schema administration is an explicit development operation, not application
 startup behavior.
 
-1. Build and sign `KitchenMemoryMacOS` with the `Develop` configuration for My
-   Mac. Its distinct app identifier gives the Development store its own sandbox,
+1. Build and sign the `KitchenMemory` scheme with the `Develop` configuration
+   for My Mac. Its distinct app identifier gives the Development store its own sandbox,
    while its entitlements select the separate
    `iCloud.net.ctwelve.dev.KitchenMemory` container.
 2. Launch that Mac app once with `--initialize-cloudkit-schema`.

@@ -194,7 +194,7 @@ without becoming separately linked products.
 The implemented Domain responsibility begins with the
 `Kitchen → Recipe → RecipeRevision` slice. The shared `KitchenMemory/`
 application layer owns deterministic starter resources and their loader, and
-both native app targets compile that layer. This keeps Apple resource APIs out
+the native multiplatform app target compiles that layer for iOS and Mac. This keeps Apple resource APIs out
 of Domain without creating a framework for app-specific data.
 
 The Persistence responsibility supplies SwiftData adapters behind that seam.

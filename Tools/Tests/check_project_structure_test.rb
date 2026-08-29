@@ -18,10 +18,7 @@ class CheckProjectStructureTest < Minitest::Test
       @target_ids = identifier_map(target_names, 100)
       @configuration_list_ids = identifier_map(target_names, 1_000)
       @group_ids = identifier_map(group_paths, 300)
-      @exception_ids = {
-        "KitchenMemoryIOS" => format("%024X", 400),
-        "KitchenMemoryMacOS" => format("%024X", 401)
-      }
+      @exception_ids = {"KitchenMemory" => format("%024X", 400)}
       @prebuild_phase_ids = identifier_map(
         KitchenMemory::ProjectStructure::TEST_PREBUILD_PHASES.keys,
         500
@@ -111,10 +108,13 @@ class CheckProjectStructureTest < Minitest::Test
         <<~EXCEPTION
 		#{identifier} /* Info.plist exception for #{path} */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Info.plist,
-			);
-			target = #{@target_ids.fetch(target_name)} /* #{target_name} */;
+				membershipExceptions = (
+#{KitchenMemory::ProjectStructure::APPLICATION_MEMBERSHIP_EXCEPTIONS.map { |member| "\t\t\t\t\t#{member},\n" }.join}
+				);
+				platformFiltersByRelativePath = {
+#{KitchenMemory::ProjectStructure::IOS_ONLY_LAUNCH_RESOURCES.map { |path| "\t\t\t\t\t#{path.include?(" ") ? path.inspect : path} = (\n\t\t\t\t\t\tios,\n\t\t\t\t\t);\n" }.join}
+				};
+				target = #{@target_ids.fetch(target_name)} /* #{target_name} */;
 		};
         EXCEPTION
       end
@@ -215,7 +215,7 @@ class CheckProjectStructureTest < Minitest::Test
     def configuration_settings(target_name, configuration_name)
       platforms = KitchenMemory::ProjectStructure::TARGET_PLATFORMS.fetch(target_name).join(" ")
       lines = ["\t\t\t\tSUPPORTED_PLATFORMS = \"#{platforms}\";\n"]
-      if target_name == "KitchenMemoryIOS"
+      if target_name == "KitchenMemory"
         KitchenMemory::ProjectStructure::IOS_COMPATIBILITY_EXCLUSIONS.each do |setting, value|
           lines << "\t\t\t\t#{setting} = #{value};\n"
         end
@@ -225,16 +225,24 @@ class CheckProjectStructureTest < Minitest::Test
           lines << "\t\t\t\t\"#{setting}\" = \"#{value}\";\n"
         end
       end
+      if target_name == "KitchenMemoryTests"
+        KitchenMemory::ProjectStructure::HOSTED_TEST_SETTINGS.each do |setting, value|
+          lines << "\t\t\t\t#{setting} = \"#{value}\";\n"
+        end
+      end
       contract = KitchenMemory::ProjectStructure::APP_FILE_CONTRACTS[target_name]
       if contract
-        lines << "\t\t\t\tINFOPLIST_FILE = #{contract[:info_plist]};\n"
-        entitlement_path = if %w[Testing ProductionTesting].include?(configuration_name)
-                             contract[:testing_entitlements]
-                           else
-                             contract[:production_entitlements]
-                           end
-        contract[:entitlement_keys].each do |setting|
-          lines << "\t\t\t\t\"#{setting}\" = \"#{entitlement_path}\";\n"
+        contract[:info_plist_settings].each do |setting, value|
+          rendered_setting = setting.include?("[") ? setting.inspect : setting
+          lines << "\t\t\t\t#{rendered_setting} = #{value};\n"
+        end
+        entitlements = if %w[Testing ProductionTesting].include?(configuration_name)
+                         contract[:testing_entitlements]
+                       else
+                         contract[:production_entitlements]
+                       end
+        entitlements.each do |setting, path|
+          lines << "\t\t\t\t\"#{setting}\" = \"#{path}\";\n"
         end
         bundle_identifier = KitchenMemory::ProjectStructure::APP_BUNDLE_IDENTIFIERS.fetch(
           configuration_name,
@@ -342,9 +350,9 @@ class CheckProjectStructureTest < Minitest::Test
 
     result = validate(fixture)
 
-    assert_equal 7, result[:target_count]
-    assert_equal 3, result[:scheme_count]
-    assert_equal 3, result[:plan_count]
+    assert_equal 5, result[:target_count]
+    assert_equal 2, result[:scheme_count]
+    assert_equal 2, result[:plan_count]
     expected_core_groups = {
       "KitchenKit" => ["KitchenKit"],
       "KitchenKitTests" => ["KitchenKitTests"]
@@ -358,6 +366,17 @@ class CheckProjectStructureTest < Minitest::Test
     assert_equal expected_core_groups, actual_core_groups
   end
 
+  def test_rejects_obsolete_target_metadata
+    error = assert_contract_error do
+      KitchenMemory::ProjectStructure.validate_obsolete_project_metadata(
+        'remoteInfo = "KitchenMemory iOS";'
+      )
+    end
+
+    assert_includes error.message, "obsolete Xcode target metadata"
+    assert_includes error.message, "KitchenMemory iOS"
+  end
+
   def test_allows_synchronized_navigator_group_without_target_membership
     fixture = Fixture.new
     fixture.project << <<~GROUP
@@ -369,7 +388,7 @@ class CheckProjectStructureTest < Minitest::Test
 
     result = validate(fixture)
 
-    assert_equal 7, result[:target_count]
+    assert_equal 5, result[:target_count]
   end
 
   def test_rejects_missing_or_unexpected_native_target
@@ -397,11 +416,11 @@ class CheckProjectStructureTest < Minitest::Test
 
   def test_rejects_incomplete_application_configuration_matrix
     configurations = KitchenMemory::ProjectStructure::APP_CONFIGURATIONS - ["Develop"]
-    fixture = Fixture.new("KitchenMemoryIOS" => configurations)
+    fixture = Fixture.new("KitchenMemory" => configurations)
 
     error = assert_contract_error { validate(fixture) }
 
-    assert_includes error.message, "KitchenMemoryIOS configurations"
+    assert_includes error.message, "KitchenMemory configurations"
     assert_includes error.message, "missing: Develop"
   end
 
@@ -438,7 +457,7 @@ class CheckProjectStructureTest < Minitest::Test
 
   def test_rejects_localization_contract_phase_after_product_build_phase
     fixture = Fixture.new
-    target_name = "KitchenMemoryIOSTests"
+    target_name = "KitchenMemoryTests"
     prebuild = "#{fixture.prebuild_phase_ids.fetch(target_name)} " \
       "/* Embed Localization Catalog Contract */"
     sources = "#{fixture.source_phase_ids.fetch(target_name)} /* Sources */"
@@ -446,33 +465,53 @@ class CheckProjectStructureTest < Minitest::Test
 
     error = assert_contract_error { validate(fixture) }
 
-    assert_includes error.message, "KitchenMemoryIOSTests must run"
+    assert_includes error.message, "KitchenMemoryTests must run"
     assert_includes error.message, "before every product build phase"
   end
 
   def test_rejects_wrong_platform_info_plist
     fixture = Fixture.new
     fixture.project.sub!(
-      "INFOPLIST_FILE = KitchenMemoryIOS/Info.plist;",
-      "INFOPLIST_FILE = KitchenMemoryMacOS/Info.plist;"
+      '"INFOPLIST_FILE[sdk=macosx*]" = KitchenMemory/Info-macOS.plist;',
+      '"INFOPLIST_FILE[sdk=macosx*]" = KitchenMemory/Info-iOS.plist;'
     )
 
     error = assert_contract_error { validate(fixture) }
 
-    assert_includes error.message, "KitchenMemoryIOS Debug must use KitchenMemoryIOS/Info.plist"
+    assert_includes error.message, "KitchenMemory Debug must select the editable platform Info.plists by SDK"
+  end
+
+  def test_rejects_generated_unified_info_plist
+    fixture = Fixture.new
+    fixture.project.sub!("GENERATE_INFOPLIST_FILE = NO;", "GENERATE_INFOPLIST_FILE = YES;")
+
+    error = assert_contract_error { validate(fixture) }
+
+    assert_includes error.message, "KitchenMemory Debug must select the editable platform Info.plists by SDK"
+  end
+
+  def test_rejects_missing_ios_info_plist_selection
+    fixture = Fixture.new
+    fixture.project.sub!(
+      "\t\t\t\t\"INFOPLIST_FILE[sdk=iphoneos*]\" = KitchenMemory/Info-iOS.plist;\n",
+      ""
+    )
+
+    error = assert_contract_error { validate(fixture) }
+
+    assert_includes error.message, "KitchenMemory Debug must select the editable platform Info.plists by SDK"
   end
 
   def test_rejects_wrong_testing_entitlements
     fixture = Fixture.new
     fixture.project.sub!(
-      '"CODE_SIGN_ENTITLEMENTS[sdk=iphoneos*]" = "KitchenMemoryIOS/KitchenMemory-Testing.entitlements";',
-      '"CODE_SIGN_ENTITLEMENTS[sdk=iphoneos*]" = "KitchenMemoryIOS/KitchenMemory.entitlements";'
+      '"CODE_SIGN_ENTITLEMENTS[sdk=iphoneos*]" = "KitchenMemory/KitchenMemory-iOS-Testing.entitlements";',
+      '"CODE_SIGN_ENTITLEMENTS[sdk=iphoneos*]" = "KitchenMemory/KitchenMemory-iOS.entitlements";'
     )
 
     error = assert_contract_error { validate(fixture) }
 
-    assert_includes error.message, "KitchenMemoryIOS Testing must use only"
-    assert_includes error.message, "KitchenMemory-Testing.entitlements"
+    assert_includes error.message, "KitchenMemory Testing must select only"
   end
 
   def test_rejects_develop_configuration_using_production_bundle_identifier
@@ -489,33 +528,95 @@ class CheckProjectStructureTest < Minitest::Test
 
   def test_rejects_target_missing_synchronized_source_group
     fixture = Fixture.new
-    fixture.project.sub!(/^\s*[0-9A-F]+ \/\* KitchenMemoryIOS \*\/,[\t ]*\n/, "")
+    fixture.project.sub!(/^\s*[0-9A-F]+ \/\* KitchenMemory \*\/,[\t ]*\n/, "")
 
     error = assert_contract_error { validate(fixture) }
 
-    assert_includes error.message, "KitchenMemoryIOS synchronized groups"
-    assert_includes error.message, "missing: KitchenMemoryIOS"
+    assert_includes error.message, "KitchenMemory synchronized groups"
+    assert_includes error.message, "missing: KitchenMemory"
   end
 
   def test_rejects_platform_group_without_info_plist_exception
     fixture = Fixture.new
-    fixture.project.sub!(/^\s*[0-9A-F]+ \/\* Info.plist exception for KitchenMemoryIOS \*\/,[\t ]*\n/, "")
+    fixture.project.sub!(/^\s*[0-9A-F]+ \/\* Info.plist exception for KitchenMemory \*\/,[\t ]*\n/, "")
 
     error = assert_contract_error { validate(fixture) }
 
-    assert_includes error.message, "KitchenMemoryIOS must contain exactly one Info.plist membership exception"
+    assert_includes error.message, "KitchenMemory must contain exactly one Info.plist membership exception"
+  end
+
+  def test_accepts_the_unified_source_info_plist_membership_exception
+    fixture = Fixture.new
+
+    result = validate(fixture)
+
+    assert_equal 5, result[:target_count]
+  end
+
+  def test_rejects_missing_ios_only_launch_resource_filters
+    fixture = Fixture.new
+    fixture.project.sub!(/^[\t ]*platformFiltersByRelativePath = \{.*?^[\t ]*\};\n/m, "")
+
+    error = assert_contract_error { validate(fixture) }
+
+    assert_includes error.message, "iOS-only launch resource filters"
+  end
+
+  def test_accepts_separate_editable_platform_info_plists
+    ios_contents = File.read(File.expand_path("../../KitchenMemory/Info-iOS.plist", __dir__))
+    macos_contents = File.read(File.expand_path("../../KitchenMemory/Info-macOS.plist", __dir__))
+
+    KitchenMemory::ProjectStructure.validate_info_plist_sources(
+      ios_contents: ios_contents,
+      macos_contents: macos_contents
+    )
+  end
+
+  def test_rejects_ios_only_key_in_macos_info_plist
+    ios_contents = File.read(File.expand_path("../../KitchenMemory/Info-iOS.plist", __dir__))
+    macos_contents = File.read(File.expand_path("../../KitchenMemory/Info-macOS.plist", __dir__)).sub(
+      "</dict>",
+      "\t<key>UILaunchStoryboardName</key>\n\t<string>LaunchScreen</string>\n</dict>"
+    )
+
+    error = assert_contract_error do
+      KitchenMemory::ProjectStructure.validate_info_plist_sources(
+        ios_contents: ios_contents,
+        macos_contents: macos_contents
+      )
+    end
+
+    assert_includes error.message, "source macOS Info.plist keys"
+    assert_includes error.message, "unexpected: UILaunchStoryboardName"
+  end
+
+  def test_rejects_ios_info_plist_without_remote_notification_mode
+    ios_contents = File.read(File.expand_path("../../KitchenMemory/Info-iOS.plist", __dir__)).sub(
+      "\t\t<string>remote-notification</string>\n",
+      ""
+    )
+    macos_contents = File.read(File.expand_path("../../KitchenMemory/Info-macOS.plist", __dir__))
+
+    error = assert_contract_error do
+      KitchenMemory::ProjectStructure.validate_info_plist_sources(
+        ios_contents: ios_contents,
+        macos_contents: macos_contents
+      )
+    end
+
+    assert_includes error.message, "UIBackgroundModes must contain only remote-notification"
   end
 
   def test_rejects_non_native_application_platform
     fixture = Fixture.new
     fixture.project.sub!(
-      'SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";',
-      'SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";'
+      'SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";',
+      'SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";'
     )
 
     error = assert_contract_error { validate(fixture) }
 
-    assert_includes error.message, "must support only iphoneos, iphonesimulator"
+    assert_includes error.message, "must support only iphoneos, iphonesimulator, macosx"
   end
 
   def test_rejects_missing_ios_compatibility_exclusion
@@ -530,13 +631,22 @@ class CheckProjectStructureTest < Minitest::Test
   def test_rejects_incomplete_sdk_conditional_ui_test_host_map
     fixture = Fixture.new
     fixture.project.sub!(
-      '"TEST_TARGET_NAME[sdk=macosx*]" = "KitchenMemoryMacOS";',
-      '"TEST_TARGET_NAME[sdk=macosx*]" = "KitchenMemoryIOS";'
+      '"TEST_TARGET_NAME[sdk=macosx*]" = "KitchenMemory";',
+      '"TEST_TARGET_NAME[sdk=macosx*]" = "ObsoleteMacApp";'
     )
 
     error = assert_contract_error { validate(fixture) }
 
-    assert_includes error.message, "map native SDK hosts"
+    assert_includes error.message, "map every native SDK to KitchenMemory"
+  end
+
+  def test_rejects_missing_unified_hosted_test_settings
+    fixture = Fixture.new
+    fixture.project.sub!("\t\t\t\tBUNDLE_LOADER = \"$(TEST_HOST)\";\n", "")
+
+    error = assert_contract_error { validate(fixture) }
+
+    assert_includes error.message, "KitchenMemoryTests Debug must be hosted by KitchenMemory"
   end
 
   def test_rejects_host_settings_on_a_core_test_target
@@ -562,38 +672,38 @@ class CheckProjectStructureTest < Minitest::Test
 
   def test_rejects_platform_plan_without_ui_smoke_target
     fixture = Fixture.new
-    plan = JSON.parse(fixture.plans.fetch("KitchenMemoryMacOS.xctestplan"))
+    plan = JSON.parse(fixture.plans.fetch("KitchenMemory.xctestplan"))
     plan["testTargets"].reject! do |entry|
       entry.dig("target", "name") == "KitchenMemoryUITests"
     end
-    fixture.plans["KitchenMemoryMacOS.xctestplan"] = JSON.generate(plan)
+    fixture.plans["KitchenMemory.xctestplan"] = JSON.generate(plan)
 
     error = assert_contract_error { validate(fixture) }
 
-    assert_includes error.message, "KitchenMemoryMacOS.xctestplan test targets"
+    assert_includes error.message, "KitchenMemory.xctestplan test targets"
     assert_includes error.message, "missing: KitchenMemoryUITests"
   end
 
   def test_rejects_platform_plan_with_wrong_variable_expansion_target
     fixture = Fixture.new
-    plan = JSON.parse(fixture.plans.fetch("KitchenMemoryIOS.xctestplan"))
-    plan["defaultOptions"]["targetForVariableExpansion"]["name"] = "KitchenMemoryMacOS"
-    fixture.plans["KitchenMemoryIOS.xctestplan"] = JSON.generate(plan)
+    plan = JSON.parse(fixture.plans.fetch("KitchenMemory.xctestplan"))
+    plan["defaultOptions"]["targetForVariableExpansion"]["name"] = "KitchenKit"
+    fixture.plans["KitchenMemory.xctestplan"] = JSON.generate(plan)
 
     error = assert_contract_error { validate(fixture) }
 
-    assert_includes error.message, "expand variables against KitchenMemoryIOS"
+    assert_includes error.message, "expand variables against KitchenMemory"
   end
 
   def test_rejects_platform_scheme_using_debug_for_tests
     fixture = Fixture.new
-    fixture.schemes["KitchenMemoryMacOS.xcscheme"] = fixture.schemes.fetch(
-      "KitchenMemoryMacOS.xcscheme"
+    fixture.schemes["KitchenMemory.xcscheme"] = fixture.schemes.fetch(
+      "KitchenMemory.xcscheme"
     ).sub('TestAction buildConfiguration="Testing"', 'TestAction buildConfiguration="Debug"')
 
     error = assert_contract_error { validate(fixture) }
 
-    assert_includes error.message, "KitchenMemoryMacOS TestAction must use Testing"
+    assert_includes error.message, "KitchenMemory TestAction must use Testing"
   end
 
   def test_rejects_kitchenkit_plan_without_framework_test_target

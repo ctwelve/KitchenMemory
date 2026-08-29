@@ -10,15 +10,16 @@ and use naturally named types rather than `KM` prefixes or artificial
 framework gives callers a smaller interface and removes link products that do
 not represent independently consumable capabilities.
 
-This supersedes the separate-target portions of ADRs 0003, 0007, and 0009, but
-not their domain/persistence separation, testing-investment policy, or native
-application split. One `KitchenKitTests` target preserves responsibility-based
+This supersedes the separate-business-framework portions of ADRs 0003, 0007,
+and 0009, but not their domain/persistence separation or testing-investment
+policy. ADR 0013 later supersedes ADR 0009's native application split. One
+`KitchenKitTests` target preserves responsibility-based
 test folders and exact business-logic coverage through a minimal shared scheme
-and checked-in `KitchenKit.xctestplan`. Like the two native application schemes,
+and checked-in `KitchenKit.xctestplan`. Like the native application scheme,
 the framework scheme builds only its primary product and leaves test-target
-membership solely to its referenced plan. The two platform plans contain their
-hosted correctness targets and the shared UI smoke target; their default Test
-actions use the disposable `Testing` hosts.
+membership solely to its referenced plan. The multiplatform application plan
+contains its hosted correctness target and the shared UI smoke target; its
+default Test action uses the disposable `Testing` host on either destination.
 
 Keeping four compiler-enforced modules was rejected because their public
 interfaces and dependency order leaked one business implementation as four

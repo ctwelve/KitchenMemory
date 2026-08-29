@@ -11,18 +11,13 @@ require_relative "../check-release-version"
 class CheckReleaseVersionTest < Minitest::Test
   CONFIGURATIONS = %w[Debug Develop Testing Production ProductionTesting].freeze
 
-  def self.project(ios_configurations = CONFIGURATIONS, macos_configurations = CONFIGURATIONS)
-    targets = {
-      "KitchenMemoryIOS" => ios_configurations,
-      "KitchenMemoryMacOS" => macos_configurations
-    }
+  def self.project(configurations = CONFIGURATIONS)
     identifier = 0
 
-    targets.flat_map do |target, configurations|
-      configurations.map do |configuration|
-        identifier += 1
-        <<~CONFIGURATION
-		#{format('%024X', identifier)} /* #{configuration} configuration for PBXNativeTarget "#{target}" */ = {
+    configurations.map do |configuration|
+      identifier += 1
+      <<~CONFIGURATION
+		#{format('%024X', identifier)} /* #{configuration} configuration for PBXNativeTarget "KitchenMemory" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CURRENT_PROJECT_VERSION = 1;
@@ -30,8 +25,7 @@ class CheckReleaseVersionTest < Minitest::Test
 			};
 			name = #{configuration};
 		};
-        CONFIGURATION
-      end
+      CONFIGURATION
     end.join
   end
 
@@ -56,7 +50,7 @@ class CheckReleaseVersionTest < Minitest::Test
 
     assert_equal "0.1.0", version
     assert_equal "1", build
-    assert_equal 10, configuration_count
+    assert_equal 5, configuration_count
   end
 
   def test_ignores_project_level_build_configurations
@@ -64,7 +58,7 @@ class CheckReleaseVersionTest < Minitest::Test
 
     assert_equal "0.1.0", version
     assert_equal "1", build
-    assert_equal 10, configuration_count
+    assert_equal 5, configuration_count
   end
 
   def test_missing_tag_skips_nonarchive_action
@@ -161,22 +155,22 @@ class CheckReleaseVersionTest < Minitest::Test
     end
   end
 
-  def test_rejects_project_missing_one_platform_target
-    ios_only = PROJECT.gsub("KitchenMemoryMacOS", "KitchenMemoryIOS")
+  def test_rejects_project_missing_application_target
+    project = PROJECT.gsub("KitchenMemory", "NotKitchenMemory")
 
     error = assert_raises(KitchenMemory::ReleaseVersion::ContractError) do
       KitchenMemory::ReleaseVersion.validate(
-        project_contents: ios_only,
+        project_contents: project,
         tag: "release/0.1.0",
         action: "archive"
       )
     end
 
-    assert_includes error.message, "both KitchenMemoryIOS and KitchenMemoryMacOS"
+    assert_includes error.message, "could not find Kitchen Memory application build configurations"
   end
 
   def test_rejects_missing_application_configuration
-    project = self.class.project(CONFIGURATIONS - ["Develop"], CONFIGURATIONS)
+    project = self.class.project(CONFIGURATIONS - ["Develop"])
 
     error = assert_raises(KitchenMemory::ReleaseVersion::ContractError) do
       KitchenMemory::ReleaseVersion.validate(
@@ -190,7 +184,7 @@ class CheckReleaseVersionTest < Minitest::Test
   end
 
   def test_rejects_duplicate_application_configuration
-    project = self.class.project(CONFIGURATIONS + ["Debug"], CONFIGURATIONS)
+    project = self.class.project(CONFIGURATIONS + ["Debug"])
 
     error = assert_raises(KitchenMemory::ReleaseVersion::ContractError) do
       KitchenMemory::ReleaseVersion.validate(
@@ -204,8 +198,8 @@ class CheckReleaseVersionTest < Minitest::Test
   end
 
   def test_rejects_unexpected_application_configuration
-    ios_configurations = CONFIGURATIONS.map { |name| name == "Develop" ? "Beta" : name }
-    project = self.class.project(ios_configurations, CONFIGURATIONS)
+    configurations = CONFIGURATIONS.map { |name| name == "Develop" ? "Beta" : name }
+    project = self.class.project(configurations)
 
     error = assert_raises(KitchenMemory::ReleaseVersion::ContractError) do
       KitchenMemory::ReleaseVersion.validate(

@@ -179,7 +179,7 @@ the current source-built model is appropriate under all three linkage options.
 
 ## Hosted XCTest and coverage are the sharp edge
 
-`KitchenMemoryIOSTests` and `KitchenMemoryMacTests` are app-hosted bundles. Each
+`KitchenMemoryTests` is a multiplatform app-hosted bundle. It
 sets `BUNDLE_LOADER` to its app executable and directly links Domain, Import,
 Persistence, and Logic, while the host app also links those four products.
 [Xcode project](../../KitchenMemory.xcodeproj/project.pbxproj)

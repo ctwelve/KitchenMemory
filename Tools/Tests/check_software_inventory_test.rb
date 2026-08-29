@@ -12,11 +12,10 @@ class CheckSoftwareInventoryTest < Minitest::Test
   PROJECT = begin
     configurations = %w[Debug Develop Testing Production ProductionTesting]
     identifier = 0
-    %w[KitchenMemoryIOS KitchenMemoryMacOS].flat_map do |target|
-      configurations.map do |configuration|
-        identifier += 1
-        <<~CONFIGURATION
-		#{format('%024X', identifier)} /* #{configuration} configuration for PBXNativeTarget "#{target}" */ = {
+    configurations.map do |configuration|
+      identifier += 1
+      <<~CONFIGURATION
+		#{format('%024X', identifier)} /* #{configuration} configuration for PBXNativeTarget "KitchenMemory" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CURRENT_PROJECT_VERSION = 1;
@@ -24,8 +23,7 @@ class CheckSoftwareInventoryTest < Minitest::Test
 			};
 			name = #{configuration};
 		};
-        CONFIGURATION
-      end
+      CONFIGURATION
     end.join
   end
 

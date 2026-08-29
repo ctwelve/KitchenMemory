@@ -6,17 +6,17 @@ Copyright © 2026 the Kitchen Memory contributors.
 SPDX-License-Identifier: GPL-3.0-only
 -->
 
-- Status: Research complete; prototype specified but not yet run
+- Status: Adopted and validated by [ADR 0013](../adr/0013-unified-native-multiplatform-app-target.md)
 - Researched: 2026-08-29
-- Scope: Replacing the separate native `KitchenMemoryIOS` and
-  `KitchenMemoryMacOS` application targets with one native iOS/iPadOS/macOS
+- Scope: Replacing the former separate native iOS and macOS application targets
+  with one native iOS/iPadOS/macOS
   Xcode target, including signing, resources, tests, CI, distribution, and
   startup presentation
 
 ## Conclusion
 
-**Yes. Kitchen Memory is presently a strong candidate for one native
-multiplatform application target.** Apple explicitly supports iOS, iPadOS,
+**Yes. Kitchen Memory uses one native multiplatform application target.**
+Apple explicitly supports iOS, iPadOS,
 macOS, tvOS, and visionOS in one app target, recommends the arrangement when
 the platforms share substantial code and settings, and calls out a shared
 SwiftUI `App` lifecycle as the favorable case. Apple recommends separate
@@ -24,14 +24,13 @@ targets when the implementations do not overlap substantially, using UIKit on
 one platform and AppKit on another as its example.
 [Configuring a multiplatform app](https://developer.apple.com/documentation/xcode/configuring-a-multiplatform-app-target)
 
-Kitchen Memory matches Apple's favorable case unusually closely today. Both
-native targets compile one shared SwiftUI application layer, use the same
-`KitchenMemoryApp`, link the same `KitchenKit`, share localization, starter
-content, UI assets, privacy manifest, and Icon Composer app icon, and already
-use the same production and development bundle identifiers. The platform
-folders contain no platform-specific Swift source. The Mac folder contains only
-its property list and production/testing entitlements; the iOS folder contains
-those equivalents plus its required iOS launch-screen resources.
+Kitchen Memory matches Apple's favorable case unusually closely. The unified
+target compiles one shared SwiftUI application layer, uses `KitchenMemoryApp`,
+links `KitchenKit`, and shares localization, starter content, UI assets,
+privacy manifest, Icon Composer app icon, and production/development bundle
+identifiers. SDK-qualified settings select separate editable iOS and macOS
+property lists and entitlement files, while platform filters keep the localized
+launch-screen resources in iOS products only.
 [Current implementation architecture](../implementation-architecture.md)
 · [Shared app entry point](../../KitchenMemory/KitchenMemoryApp.swift)
 · [Xcode project](../../KitchenMemory.xcodeproj/project.pbxproj)
@@ -61,11 +60,11 @@ window, not by compiling `LaunchScreen.storyboard` for Mac.
 | Question | What it controls | Recommendation now |
 | --- | --- | --- |
 | Shared source? | Which files implement each build | Already shared; retain platform-specific file filters where needed |
-| One app target? | Membership and build settings for the native app product selected by a destination | Prototype and, if the gates pass, adopt one `KitchenMemory` target |
+| One app target? | Membership and build settings for the native app product selected by a destination | Adopted as one `KitchenMemory` target after the validation gates passed |
 | One bundle identifier / App ID? | Signing identity and system identity | Keep today's shared production ID; condition only if a future product decision requires independent apps |
 | One App Store Connect record? | Universal purchase and store metadata grouping | Compatible with the shared ID, but a distribution choice rather than a target requirement |
 | One scheme? | Build, run, test, profile, analyze, and archive action defaults | One app scheme is sufficient if platform CI actions choose destinations explicitly |
-| One test plan? | Test targets and runtime configurations invoked by Test | One app plan is plausible after the hosted-test target is also made multiplatform |
+| One test plan? | Test targets and runtime configurations invoked by Test | Adopted as one app plan containing the multiplatform hosted and UI-smoke targets |
 | One archive? | A distributable build for a class of destination | No; iOS and native macOS remain separate archive actions and artifacts |
 
 A target is Xcode's description of a product to build; a scheme selects targets
@@ -125,14 +124,12 @@ property list, a key may be qualified as
 · [Managing information property-list values](https://developer.apple.com/documentation/bundleresources/managing-your-app-s-information-property-list)
 
 Kitchen Memory could therefore use one source `Info.plist`, but that is not a
-prerequisite for one target. The lower-risk first prototype should preserve the
-existing source files and condition `INFOPLIST_FILE` by SDK. This keeps the
-iOS-only remote-notification and launch configuration out of the native Mac
-bundle while changing only target ownership. A later cleanup can combine the
-two small files with platform-qualified keys after inspecting both built
-property lists.
-[iOS property list](../../KitchenMemoryIOS/Info.plist)
-· [macOS property list](../../KitchenMemoryMacOS/Info.plist)
+prerequisite for one target. The adopted implementation preserves separate
+source files and conditions `INFOPLIST_FILE` by SDK. This keeps both files
+directly editable in Xcode's property-list editor and keeps the iOS-only
+remote-notification and launch configuration out of the native Mac bundle.
+[iOS property list](../../KitchenMemory/Info-iOS.plist)
+· [macOS property list](../../KitchenMemory/Info-macOS.plist)
 
 The main settings that need deliberate qualification are:
 
@@ -171,10 +168,10 @@ deliberately empty while macOS retains its least-privilege sandbox and network
 client. A unified target should select the existing files with
 SDK-qualified `CODE_SIGN_ENTITLEMENTS` values for each of `Debug`, `Develop`,
 `Testing`, `Production`, and `ProductionTesting`.
-[iOS production entitlements](../../KitchenMemoryIOS/KitchenMemory.entitlements)
-· [macOS production entitlements](../../KitchenMemoryMacOS/KitchenMemory.entitlements)
-· [iOS testing entitlements](../../KitchenMemoryIOS/KitchenMemory-Testing.entitlements)
-· [macOS testing entitlements](../../KitchenMemoryMacOS/KitchenMemory-Testing.entitlements)
+[iOS production entitlements](../../KitchenMemory/KitchenMemory-iOS.entitlements)
+· [macOS production entitlements](../../KitchenMemory/KitchenMemory-macOS.entitlements)
+· [iOS testing entitlements](../../KitchenMemory/KitchenMemory-iOS-Testing.entitlements)
+· [macOS testing entitlements](../../KitchenMemory/KitchenMemory-macOS-Testing.entitlements)
 
 The production targets already share `net.ctwelve.KitchenMemory`, and both
 development targets already share `net.ctwelve.dev.KitchenMemory`. A unified
@@ -203,7 +200,7 @@ storyboard, launch asset catalog, and localized launch strings as iOS-only
 resources using Xcode's platform filter. No duplicate Mac app icon or resource
 catalog is required.
 [Shared app icon](../../KitchenMemory/AppIcon.icon/icon.json)
-· [iOS launch storyboard](../../KitchenMemoryIOS/Base.lproj/LaunchScreen.storyboard)
+· [iOS launch storyboard](../../KitchenMemory/Base.lproj/LaunchScreen.storyboard)
 
 ## Tests, schemes, and plans
 
@@ -215,9 +212,7 @@ test-plan configuration is not a destination selector.
 [Configuring a target](https://developer.apple.com/documentation/xcode/configuring-a-new-target-in-your-project)
 · [Organizing tests with plans](https://developer.apple.com/documentation/xcode/organizing-tests-to-improve-feedback)
 
-Kitchen Memory's app-test source is already shared but is compiled into two
-hosted unit-test targets. The UI-smoke source already uses one multiplatform
-target. After the app target is unified, the coherent endpoint is:
+Kitchen Memory now uses this coherent endpoint:
 
 - one `KitchenMemory` native multiplatform app target;
 - one `KitchenMemoryTests` hosted multiplatform test target;
@@ -228,13 +223,12 @@ target. After the app target is unified, the coherent endpoint is:
 - the unchanged standalone `KitchenKit` scheme and plan for canonical
   business-logic coverage.
 
-This test-target merge is a second migration step, not proof that the app-target
-merge succeeded. First make both current platform plans pass against the
-prototype app target. Then replace the two hosted targets and two plans, and
-prove the single plan on both destinations. Retaining destination-specific
-schemes would also be valid if future Run/Profile arguments diverge, but they
-are not necessary merely to distinguish iOS from macOS because Xcode already
-does that through the destination.
+The migration proved app construction on both destinations before replacing
+the two hosted targets and platform plans. The resulting single plan then
+passed on both destinations. Destination-specific schemes remain an available
+future choice if Run/Profile arguments diverge, but they are not necessary
+merely to distinguish iOS from macOS because Xcode already does that through
+the destination.
 
 ## CI and distribution consequences
 
@@ -315,9 +309,10 @@ identities, or source membership. This is Apple's stated boundary for when one
 target stops being a good fit.
 [Configuring a multiplatform app](https://developer.apple.com/documentation/xcode/configuring-a-multiplatform-app-target)
 
-**Falsifier:** a one-target prototype preserves every existing build, test,
-signing, archive, and product-identity contract while deleting more duplicated
-configuration than it introduces in platform qualifications.
+**Falsified by the adoption:** the one-target implementation preserved every
+existing build, test, signing, archive, and product-identity contract while
+deleting more duplicated configuration than it introduced in platform
+qualifications.
 
 ### H1 — One native multiplatform app target now
 
@@ -332,10 +327,10 @@ supported destinations, both deployment floors, each environment's entitlement
 selection, iOS-only launch membership, Mac runpaths/hardening, shared bundle
 identities, and two-platform CI actions.
 
-**Falsifier:** the prototype needs numerous opaque exclusions, cannot select
-the intended entitlements and provisioning profiles in every environment,
-cannot host the shared tests on both destinations, or makes future
-platform-specific UI ownership harder to inspect than today's duplication.
+**Future falsifier:** the implementation accumulates numerous opaque
+exclusions, cannot select the intended entitlements and provisioning profiles
+in every environment, cannot host the shared tests on both destinations, or
+makes platform-specific UI ownership harder to inspect than separate targets.
 
 ### H2 — Merge only the app target but retain platform schemes and plans
 
@@ -348,54 +343,33 @@ diagnostics.
 their Xcode Cloud actions already select explicit destinations; then one scheme
 and plan communicate the topology more truthfully.
 
-## Recommendation
+## Outcome
 
-Run the prototype and expect to adopt **H1**, staged through **H2**. The current
-project is closer to Apple's multiplatform template than to Apple's example for
-separate targets, and the remaining differences are precisely the kinds of
-platform-specific settings, entitlements, and resources that Xcode supports in
-one target.
+Kitchen Memory adopted **H1** in [ADR 0013](../adr/0013-unified-native-multiplatform-app-target.md).
+The project is closer to Apple's multiplatform template than to Apple's example
+for separate targets, and its remaining differences are the platform-specific
+settings, entitlements, property lists, and resources that Xcode supports in
+one target. [ADR 0009](../adr/0009-separate-native-app-targets.md) is retained as
+the record of a useful earlier decision. If later UIKit/AppKit divergence makes
+the target shallow again, splitting it remains a reversible project-organization
+decision.
 
-Treat [ADR 0009](../adr/0009-separate-native-app-targets.md) as the record of a
-useful earlier decision, not a permanent build constraint. If the prototype
-passes, supersede its current status and update live architecture/CI documents
-in the same change. If later UIKit/AppKit divergence makes the target shallow
-again, splitting it is a reversible project-organization decision.
+## Validation record
 
-## Falsifiable prototype
+Issue 67 applied the falsifiable gates from this research to the adopted target:
 
-Perform this in a disposable branch or worktree using Xcode's native target,
-Supported Destinations, Signing & Capabilities, Build Phases platform filters,
-scheme, and test-plan editors:
+- the project checker proved exactly five native targets, two shared schemes,
+  and two saved plans, including SDK-qualified plist and entitlement selection;
+- all five configurations built for native macOS and iOS Simulator;
+- Analyze passed on both destinations;
+- the complete saved application plan passed on native Mac, and its 66 iOS
+  tests passed on iPhone Simulator after one transient localization smoke retry;
+- built products and separate signed Production archives preserved bundle
+  identity, platform-correct plist keys, iOS-only localized launch resources,
+  and the intended platform entitlements; and
+- the canonical `KitchenKit` lane remained exactly 8,166/8,166 covered business
+  logic lines, with the same 105 runtime-adapter lines excluded.
 
-1. Add a new app target named `KitchenMemoryPrototype` rather than deleting
-   either accepted target. Give it native iPhone, iPad, and Mac destinations.
-2. Add the shared `KitchenMemory/` application layer and `KitchenKit` dependency.
-   Preserve the shared Icon Composer file and shared resources.
-3. Use `SDKROOT = auto`; add iOS, iOS Simulator, and macOS supported platforms;
-   and reproduce the existing configuration matrix with SDK-qualified plist,
-   entitlement, runpath, hardened-runtime, and iOS launch settings.
-4. Add the launch storyboard, launch catalog, and launch localizations for iOS
-   only. Do not add them to the Mac resource build.
-5. Point the two existing hosted test targets and the UI target at the prototype
-   target one at a time. Keep the current platform plans for this first pass.
-6. Build `Debug`, `Develop`, `Testing`, `Production`, and `ProductionTesting` for
-   both native platforms. Run Analyze and each complete platform plan.
-7. Inspect the two built `Info.plist` files, linked/embedded `KitchenKit`, code
-   signatures, and effective entitlements. Confirm the iOS bundle has the launch
-   and remote-notification declarations; confirm the Mac bundle does not; confirm
-   Mac sandbox, network-client, hardened-runtime, and notification entitlements;
-   and confirm test hosts have only their intended least privilege.
-8. Produce unsigned local Production archives for generic iOS and native Mac.
-   Confirm there are two platform artifacts with the expected product name,
-   version, build, bundle ID, resources, and Mac notarization eligibility.
-9. Only after all of that passes, prototype one multiplatform hosted-test target,
-   one app plan, and one app scheme. Run that same plan on a compact iPhone
-   simulator and native Mac, then exercise the exact Xcode Cloud action matrix.
-
-Adopt the unified topology only if all of these assertions pass and the final
-qualified-setting count is smaller and clearer than the removed target/scheme/
-plan duplication. A failure in signing, built metadata, resource filtering,
-test hosting, archive identity, or CI destination selection falsifies the
-proposal until explained; it is not a reason to weaken an existing product
-contract.
+The remaining operational step is outside the repository: before push or
+merge, Xcode Cloud actions that named the deleted platform schemes must be
+migrated to `KitchenMemory` while retaining their existing native destination.

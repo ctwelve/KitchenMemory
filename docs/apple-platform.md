@@ -7,8 +7,8 @@ SPDX-License-Identifier: GPL-3.0-only
 -->
 
 
-The product uses separate native SwiftUI application targets for iPhone and
-iPad, and for Mac, with a display-centric tvOS client planned for a later phase.
+The product uses one native multiplatform SwiftUI application target for iPhone,
+iPad, and Mac, with a display-centric tvOS client planned for a later phase.
 The Mac application is not merely an enlarged phone interface: it should grow
 into a powerful library-management and automation environment while sharing the
 same recipe domain and import engine.
@@ -42,19 +42,19 @@ compromised interface. See
 
 ## Native product targets and destinations
 
-`KitchenMemoryIOS` is the native iPhone and iPad product.
-`KitchenMemoryMacOS` is the native Mac product. Their shared 0.1 source layer
-does not make them one runnable, archive, entitlement surface, or launch-screen
-contract.
+`KitchenMemory` is one native multiplatform target supporting iPhone, iPad, iOS
+Simulator, and native Mac destinations. Destination selection still produces
+separate platform binaries, bundles, entitlement surfaces, archives, and launch
+behavior. SDK-conditional settings select four platform/configuration-specific
+entitlement files; platform filters keep the localized launch storyboard and
+launch asset catalog in iOS products only.
 
-The iOS target supports iOS devices and iOS Simulator only. Mac Catalyst, Mac
-Designed for iPhone or iPad, and visionOS Designed for iPhone or iPad are
-explicitly unsupported. The macOS target supports native macOS destinations
-only. This keeps Xcode and Xcode Cloud destination lists aligned with products
-the project actually builds and accepts. A future Catalyst, visionOS, or tvOS
-target must be an explicit product decision with its own interaction,
-capability, testing, and release contract. See
-[ADR 0009](adr/0009-separate-native-app-targets.md).
+Mac Catalyst, Mac Designed for iPhone or iPad, and visionOS Designed for iPhone
+or iPad are explicitly unsupported. This keeps Xcode and Xcode Cloud destination
+lists aligned with products the project actually builds and accepts. A future
+Catalyst, visionOS, or tvOS product requires an explicit decision with its own
+interaction, capability, testing, and release contract. See
+[ADR 0013](adr/0013-unified-native-multiplatform-app-target.md).
 
 The tvOS client should emphasize legibility at kitchen distance, simple remote
 navigation, clear progress through instructions, timers, and reliable access to
@@ -138,13 +138,15 @@ RecipeScalingState     transient working-yield selection
 File import, search, export, batch work, and cooking sessions will extend this
 same boundary when their slices arrive.
 
-### KitchenMemory application layer and native targets
+### KitchenMemory application layer and native target
 
-The shared `KitchenMemory/` layer contains the SwiftUI interface,
-`RecipeLibraryModel` composition glue, bundled sample resources, and
-localization catalogs, with membership in both native app targets.
-Platform-owned resources, entitlements, and future presentation code belong in
-`KitchenMemoryIOS/` or `KitchenMemoryMacOS/`; reusable recipe behavior does not.
+The `KitchenMemory/` layer contains the SwiftUI interface,
+`RecipeLibraryModel` composition glue, bundled sample resources, localization
+catalogs, separate editor-friendly iOS and macOS property lists, four
+entitlement files, and the iOS-only launch resources. All belong to the native
+multiplatform app target; SDK-qualified settings and file-level platform
+filters preserve native differences. Reusable recipe behavior belongs in
+`KitchenKit`.
 See [implementation architecture](implementation-architecture.md) and
 [localization architecture](localization-architecture.md).
 
