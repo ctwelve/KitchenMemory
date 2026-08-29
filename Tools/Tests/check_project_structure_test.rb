@@ -242,6 +242,65 @@ class CheckProjectStructureTest < Minitest::Test
 
     def build_schemes
       KitchenMemory::ProjectStructure::SCHEMES.each_with_object({}) do |(name, expectation), result|
+        if expectation[:automatic_plan]
+          build_entries = expectation.fetch(:build_targets).map do |target_name|
+            product_attributes = if target_name == "KitchenKit"
+                                   {
+                                     "buildForTesting" => "YES",
+                                     "buildForRunning" => "YES",
+                                     "buildForProfiling" => "YES",
+                                     "buildForArchiving" => "YES",
+                                     "buildForAnalyzing" => "YES"
+                                   }
+                                 else
+                                   {
+                                     "buildForTesting" => "YES",
+                                     "buildForRunning" => "NO",
+                                     "buildForProfiling" => "NO",
+                                     "buildForArchiving" => "NO",
+                                     "buildForAnalyzing" => "YES"
+                                   }
+                                 end
+            attributes = product_attributes.map { |key, value| %(#{key}="#{value}") }.join("\n")
+            <<~ENTRY
+              <BuildActionEntry #{attributes}>
+                <BuildableReference
+                  BlueprintIdentifier="#{@target_ids.fetch(target_name)}"
+                  BlueprintName="#{target_name}"
+                  ReferencedContainer="container:KitchenMemory.xcodeproj"/>
+              </BuildActionEntry>
+            ENTRY
+          end.join
+          testables = expectation.fetch(:test_targets).map do |target_name|
+            <<~TESTABLE
+              <TestableReference skipped="NO">
+                <BuildableReference
+                  BlueprintIdentifier="#{@target_ids.fetch(target_name)}"
+                  BlueprintName="#{target_name}"
+                  ReferencedContainer="container:KitchenMemory.xcodeproj"/>
+              </TestableReference>
+            TESTABLE
+          end.join
+          result["#{name}.xcscheme"] = <<~SCHEME
+            <?xml version="1.0" encoding="UTF-8"?>
+            <Scheme>
+              <BuildAction>
+                <BuildActionEntries>
+                  #{build_entries}
+                </BuildActionEntries>
+              </BuildAction>
+              <TestAction buildConfiguration="Testing" shouldAutocreateTestPlan="YES">
+                <Testables>
+                  #{testables}
+                </Testables>
+              </TestAction>
+              <AnalyzeAction buildConfiguration="Testing"/>
+              <ArchiveAction buildConfiguration="Production"/>
+            </Scheme>
+          SCHEME
+          next
+        end
+
         if expectation[:core]
           plan = expectation.fetch(:plan)
           build_entries = expectation.fetch(:build_targets).map do |target_name|
@@ -362,35 +421,12 @@ class CheckProjectStructureTest < Minitest::Test
 
     result = validate(fixture)
 
-    assert_equal 13, result[:target_count]
-    assert_equal 7, result[:scheme_count]
-    assert_equal 5, result[:plan_count]
-    assert_equal(
-      %w[
-        KitchenMemoryDomainTests
-        KitchenMemoryImportTests
-        KitchenMemoryLogicTests
-        KitchenMemoryPersistenceTests
-      ],
-      KitchenMemory::ProjectStructure::PLANS.fetch("KitchenMemoryCoreTesting.xctestplan")
-    )
-    assert_equal(
-      ["KitchenMemoryIOSTests"],
-      KitchenMemory::ProjectStructure::PLANS.fetch("KitchenMemoryIOSTesting.xctestplan")
-    )
-    assert_equal(
-      ["KitchenMemoryMacTests"],
-      KitchenMemory::ProjectStructure::PLANS.fetch("KitchenMemoryMacTesting.xctestplan")
-    )
+    assert_equal 7, result[:target_count]
+    assert_equal 1, result[:scheme_count]
+    assert_equal 0, result[:plan_count]
     expected_core_groups = {
-      "KitchenMemoryDomainTests" => ["DomainTests", "SharedTestSupport"],
-      "KitchenMemoryImportTests" => ["ImportTests", "SharedTestSupport"],
-      "KitchenMemoryLogicTests" => ["LogicTests", "SharedTestSupport"],
-      "KitchenMemoryPersistenceTests" => ["PersistenceTests"],
-      "KitchenMemoryDomain" => ["Domain"],
-      "KitchenMemoryImport" => ["Import"],
-      "KitchenMemoryLogic" => ["Logic"],
-      "KitchenMemoryPersistence" => ["Persistence"]
+      "KitchenKit" => ["KitchenKit"],
+      "KitchenKitTests" => ["KitchenKitTests"]
     }
     actual_core_groups = expected_core_groups.keys.to_h do |target_name|
       [
@@ -412,18 +448,18 @@ class CheckProjectStructureTest < Minitest::Test
 
     result = validate(fixture)
 
-    assert_equal 13, result[:target_count]
+    assert_equal 7, result[:target_count]
   end
 
   def test_rejects_missing_or_unexpected_native_target
     fixture = Fixture.new
-    fixture.project.sub!('name = "KitchenMemoryLogic";', 'name = "OrphanedLogic";')
+    fixture.project.sub!('name = "KitchenKit";', 'name = "OrphanedKit";')
 
     error = assert_contract_error { validate(fixture) }
 
     assert_includes error.message, "native targets"
-    assert_includes error.message, "missing: KitchenMemoryLogic"
-    assert_includes error.message, "unexpected: OrphanedLogic"
+    assert_includes error.message, "missing: KitchenKit"
+    assert_includes error.message, "unexpected: OrphanedKit"
   end
 
   def test_rejects_wrong_target_product_type
@@ -450,11 +486,11 @@ class CheckProjectStructureTest < Minitest::Test
 
   def test_rejects_incomplete_framework_configuration_matrix
     configurations = KitchenMemory::ProjectStructure::APP_CONFIGURATIONS - ["ProductionTesting"]
-    fixture = Fixture.new("KitchenMemoryLogic" => configurations)
+    fixture = Fixture.new("KitchenKit" => configurations)
 
     error = assert_contract_error { validate(fixture) }
 
-    assert_includes error.message, "KitchenMemoryLogic configurations"
+    assert_includes error.message, "KitchenKit configurations"
     assert_includes error.message, "missing: ProductionTesting"
   end
 
@@ -561,186 +597,47 @@ class CheckProjectStructureTest < Minitest::Test
 
   def test_rejects_host_settings_on_a_core_test_target
     fixture = Fixture.new
-    fixture.project.sub!(
-      'SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";',
-      "SUPPORTED_PLATFORMS = \"iphoneos iphonesimulator macosx\";\n" \
-      "\t\t\t\tTEST_HOST = KitchenMemory.app;"
-    )
+    platforms = 'SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";'
+    insertion_index = fixture.project.rindex(platforms) + platforms.length
+    fixture.project.insert(insertion_index, "\n\t\t\t\tTEST_HOST = KitchenMemory.app;")
 
     error = assert_contract_error { validate(fixture) }
 
     assert_includes error.message, "must remain unhosted"
   end
 
-  def test_rejects_missing_test_plan_file
-    fixture = Fixture.new
-    fixture.plans.delete("KitchenMemoryIOSTesting.xctestplan")
-
-    error = assert_contract_error { validate(fixture) }
-
-    assert_includes error.message, "test plans"
-    assert_includes error.message, "missing: KitchenMemoryIOSTesting.xctestplan"
-  end
-
-  def test_rejects_wrong_test_plan_configuration_policy
-    fixture = Fixture.new
-    filename = "KitchenMemoryIOSProduction.xctestplan"
-    plan = JSON.parse(fixture.plans.fetch(filename))
-    plan.fetch("configurations") << {
-      "id" => "11111111-1111-1111-1111-111111111111",
-      "name" => "Extra Validation",
-      "options" => {}
-    }
-    fixture.plans[filename] = JSON.generate(plan)
-
-    error = assert_contract_error { validate(fixture) }
-
-    assert_includes error.message, "must contain only configuration"
-  end
-
-  def test_rejects_wrong_test_plan_coverage_policy
-    fixture = Fixture.new
-    filename = "KitchenMemoryCoreTesting.xctestplan"
-    plan = JSON.parse(fixture.plans.fetch(filename))
-    plan.fetch("defaultOptions")["codeCoverage"] = false
-    fixture.plans[filename] = JSON.generate(plan)
-
-    error = assert_contract_error { validate(fixture) }
-
-    assert_includes error.message, "codeCoverage must be true"
-  end
-
-  def test_rejects_per_configuration_test_plan_overrides
-    fixture = Fixture.new
-    filename = "KitchenMemoryIOSTesting.xctestplan"
-    plan = JSON.parse(fixture.plans.fetch(filename))
-    plan.fetch("configurations").first["options"] = { "codeCoverage" => false }
-    fixture.plans[filename] = JSON.generate(plan)
-
-    error = assert_contract_error { validate(fixture) }
-
-    assert_includes error.message, "configuration options must remain empty"
-  end
-
-  def test_rejects_extra_default_test_plan_argument
-    fixture = Fixture.new
-    filename = "KitchenMemoryMacProduction.xctestplan"
-    plan = JSON.parse(fixture.plans.fetch(filename))
-    plan.fetch("defaultOptions").fetch("commandLineArgumentEntries") << {
-      "argument" => "--unexpected"
-    }
-    fixture.plans[filename] = JSON.generate(plan)
-
-    error = assert_contract_error { validate(fixture) }
-
-    assert_includes error.message, "must pass only --unit-testing"
-  end
-
-  def test_rejects_scheme_pointing_to_wrong_test_plan
-    fixture = Fixture.new
-    scheme_name = "KitchenMemory iOS Development.xcscheme"
-    fixture.schemes[scheme_name] = fixture.schemes.fetch(scheme_name).sub(
-      "KitchenMemoryIOSTesting.xctestplan",
-      "KitchenMemoryIOSProduction.xctestplan"
-    )
-
-    error = assert_contract_error { validate(fixture) }
-
-    assert_includes error.message, "KitchenMemory iOS Development must reference only"
-  end
-
-  def test_rejects_development_scheme_that_can_archive
-    fixture = Fixture.new
-    scheme_name = "KitchenMemory iOS Development.xcscheme"
-    fixture.schemes[scheme_name] = fixture.schemes.fetch(scheme_name).sub(
-      'buildForArchiving="NO"',
-      'buildForArchiving="YES"'
-    )
-
-    error = assert_contract_error { validate(fixture) }
-
-    assert_includes error.message, "buildForArchiving to NO"
-  end
-
-  def test_rejects_incomplete_scheme_build_action_flags
-    fixture = Fixture.new
-    scheme_name = "KitchenMemory macOS Production.xcscheme"
-    fixture.schemes[scheme_name] = fixture.schemes.fetch(scheme_name).sub(
-      'buildForTesting="YES"',
-      'buildForTesting="NO"'
-    )
-
-    error = assert_contract_error { validate(fixture) }
-
-    assert_includes error.message, "buildForTesting to YES"
-  end
-
-  def test_rejects_scheme_action_using_wrong_configuration
-    fixture = Fixture.new
-    scheme_name = "KitchenMemory iOS Production.xcscheme"
-    fixture.schemes[scheme_name] = fixture.schemes.fetch(scheme_name).sub(
-      '<TestAction buildConfiguration="ProductionTesting">',
-      '<TestAction buildConfiguration="Production">'
-    )
-
-    error = assert_contract_error { validate(fixture) }
-
-    assert_includes error.message, "TestAction must use ProductionTesting"
-  end
-
-  def test_rejects_scheme_launching_other_platform_application
-    fixture = Fixture.new
-    scheme_name = "KitchenMemory iOS Development.xcscheme"
-    document = REXML::Document.new(fixture.schemes.fetch(scheme_name))
-    reference = REXML::XPath.first(
-      document,
-      "/Scheme/LaunchAction/BuildableProductRunnable/BuildableReference"
-    )
-    reference.attributes["BlueprintIdentifier"] = fixture.target_ids.fetch("KitchenMemoryMacOS")
-    reference.attributes["BlueprintName"] = "KitchenMemoryMacOS"
-    updated_scheme = String.new
-    document.write(updated_scheme)
-    fixture.schemes[scheme_name] = updated_scheme
-
-    error = assert_contract_error { validate(fixture) }
-
-    assert_includes error.message, "LaunchAction must run only KitchenMemoryIOS"
-  end
-
-  def test_rejects_plan_target_identifier_that_does_not_exist
-    fixture = Fixture.new
-    filename = "KitchenMemoryMacTesting.xctestplan"
-    plan = JSON.parse(fixture.plans.fetch(filename))
-    plan.fetch("testTargets").first.fetch("target")["identifier"] = "FFFFFFFFFFFFFFFFFFFFFFFF"
-    fixture.plans[filename] = JSON.generate(plan)
-
-    error = assert_contract_error { validate(fixture) }
-
-    assert_includes error.message, "references missing target identifier"
-  end
-
-  def test_rejects_scheme_buildable_identifier_that_does_not_exist
-    fixture = Fixture.new
-    scheme_name = "KitchenMemory macOS Testing.xcscheme"
-    valid_identifier = fixture.target_ids.fetch("KitchenMemoryMacOS")
-    fixture.schemes[scheme_name] = fixture.schemes.fetch(scheme_name).sub(
-      valid_identifier,
-      "EEEEEEEEEEEEEEEEEEEEEEEE"
-    )
-
-    error = assert_contract_error { validate(fixture) }
-
-    assert_includes error.message, "references missing target identifier"
-  end
-
   def test_rejects_unexpected_shared_scheme
     fixture = Fixture.new
-    fixture.schemes["Obsolete.xcscheme"] = fixture.schemes.values.first
+    fixture.schemes["Obsolete.xcscheme"] = "<Scheme/>"
 
     error = assert_contract_error { validate(fixture) }
 
     assert_includes error.message, "shared schemes"
     assert_includes error.message, "unexpected: Obsolete"
+  end
+
+  def test_rejects_saved_plan_for_kitchenkit_scheme
+    fixture = Fixture.new
+    fixture.schemes["KitchenKit.xcscheme"] = fixture.schemes.fetch("KitchenKit.xcscheme").sub(
+      '<Testables>',
+      '<TestPlans><TestPlanReference reference="container:KitchenKit.xctestplan"/></TestPlans><Testables>'
+    )
+
+    error = assert_contract_error { validate(fixture) }
+
+    assert_includes error.message, "automatic test plan"
+  end
+
+  def test_rejects_disabled_automatic_kitchenkit_plan
+    fixture = Fixture.new
+    fixture.schemes["KitchenKit.xcscheme"] = fixture.schemes.fetch("KitchenKit.xcscheme").sub(
+      'shouldAutocreateTestPlan="YES"',
+      'shouldAutocreateTestPlan="NO"'
+    )
+
+    error = assert_contract_error { validate(fixture) }
+
+    assert_includes error.message, "automatically create its test plan"
   end
 
   private

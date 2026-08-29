@@ -75,3 +75,6 @@ products must share one presentation architecture.
 - [0007: Business-logic coverage and UI smoke tests](adr/0007-business-logic-coverage-and-ui-smoke-tests.md)
 - [0008: Freeze the 0.1 localization contract](adr/0008-freeze-the-0-1-localization-contract.md)
 - [0009: Separate native app targets](adr/0009-separate-native-app-targets.md)
+- [0010: Distinct Cooking Session module seam](adr/0010-distinct-cooking-session-module.md)
+- [0011: Cooking Session document envelopes](adr/0011-use-document-envelopes-for-cooking-sessions.md)
+- [0012: Consolidate business code in KitchenKit](adr/0012-consolidate-business-code-in-kitchenkit.md)

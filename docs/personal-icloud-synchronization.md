@@ -20,13 +20,13 @@ make them SwiftData concerns.
 
 The application composition root asks `KitchenMemorySchema` for either a local
 store or a private-CloudKit store. The choice and container identifier live in
-`KitchenMemoryPersistence`. `KitchenMemoryDomain`, `KitchenMemoryLogic`,
+KitchenKit's Persistence responsibility. Its Domain and Logic responsibilities,
 `RecipeRepository`, and `CookingSessionRepository` expose no CloudKit types.
 
 ```text
 RecipeLibraryModel
         │
-KitchenMemoryLogic
+KitchenKit Logic
         │ domain-facing RecipeRepository
         ▼
 SwiftDataRecipeRepository
@@ -94,7 +94,7 @@ The answer remains authorization for one requested sample installation; it is
 not authority to restore or download samples automatically on another device.
 
 Managed CloudKit imports post a persistent-store remote-change notification.
-`KitchenMemoryPersistence` converts that callback into a concurrency-safe
+KitchenKit's Persistence responsibility converts that callback into a concurrency-safe
 refresh signal; the application composition root connects it to
 `RecipeLibraryModel` after the model has completed its initial load. This keeps
 Core Data and CloudKit callback mechanics out of Domain and Logic while avoiding
@@ -226,9 +226,10 @@ matrix in [0.1 release evidence](release-evidence-0.1.md).
 Schema administration is an explicit development operation, not application
 startup behavior.
 
-1. Build and sign `KitchenMemory macOS Development` for My Mac. Its distinct app
-   identifier gives the Development store its own sandbox, while its entitlements
-   select the separate `iCloud.net.ctwelve.dev.KitchenMemory` container.
+1. Build and sign `KitchenMemoryMacOS` with the `Develop` configuration for My
+   Mac. Its distinct app identifier gives the Development store its own sandbox,
+   while its entitlements select the separate
+   `iCloud.net.ctwelve.dev.KitchenMemory` container.
 2. Launch that Mac app once with `--initialize-cloudkit-schema`.
 3. Inspect record types, indexes, and security roles in CloudKit Console.
 4. Exercise create, edit, delete, offline, reconnect, and concurrent-edit paths

@@ -4,8 +4,7 @@
 
 import Foundation
 @testable import KitchenMemory
-import KitchenMemoryDomain
-import KitchenMemoryLogic
+import KitchenKit
 import XCTest
 
 final class RecipePresentationFormatterTests: XCTestCase {

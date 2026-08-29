@@ -4,7 +4,7 @@
 
 import Accessibility
 import Foundation
-import KitchenMemoryLogic
+import KitchenKit
 import SwiftUI
 
 struct RecipeURLImportView: View {

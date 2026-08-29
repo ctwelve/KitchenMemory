@@ -10,6 +10,11 @@ SPDX-License-Identifier: GPL-3.0-only
 - Status: Accepted
 - Date: 2026-08-10
 
+Amended by [ADR 0012](0012-consolidate-business-code-in-kitchenkit.md): the
+domain/persistence boundary remains, but it is now enforced by responsibility
+folders and interfaces inside `KitchenKit` rather than separate framework
+targets.
+
 ## Context
 
 Kitchen Memory needs a precise cooking model, local-first behavior, Apple-native

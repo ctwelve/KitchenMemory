@@ -4,7 +4,7 @@
 
 import Foundation
 @testable import KitchenMemory
-import KitchenMemoryDomain
+import KitchenKit
 
 /// Keeps older domain test scenarios readable while routing every presentation
 /// assertion through the application-owned, explicitly English formatter.

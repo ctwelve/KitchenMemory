@@ -65,7 +65,7 @@ app.
 ## Architectural aim
 
 The current SwiftUI application crosses durable product boundaries through
-`RecipeLibraryModel`, which delegates to the same `KitchenMemoryLogic` operations
+`RecipeLibraryModel`, which delegates to the same KitchenKit Logic operations
 that future automation and platform-specific interfaces will use:
 
 ```text
@@ -75,7 +75,7 @@ RecipeLibraryModel
    ├── RecipeLibrary ────────┐
    ├── RecipeEditor ────────├──→ RecipeRepository
    ├── KitchenResetService ──┘
-   └── RecipeImportService ───→ KitchenMemoryImport
+   └── RecipeImportService ───→ Import responsibility
 ```
 
 `RecipeLibraryModel` is application glue, not the only permitted client. A
@@ -85,9 +85,9 @@ values or structured results. Automation must not manipulate persistence
 objects or UI elements. This keeps every client independent of SwiftData,
 CloudKit, and a particular window layout.
 
-## Current module boundaries
+## KitchenKit responsibility seams
 
-### KitchenMemoryDomain
+### Domain
 
 Plain Swift domain values and rules:
 
@@ -100,7 +100,7 @@ Plain Swift domain values and rules:
 The domain should be usable from the app, extensions, tests, and a potential
 command-line companion.
 
-### KitchenMemoryImport
+### Import
 
 The deterministic and bounded web import pipeline:
 
@@ -114,13 +114,13 @@ Import produces a draft. Saving that draft is a separate product-logic decision.
 This distinction is essential for unattended batch processing: ambiguous cards
 can land in an inbox rather than being silently turned into bad recipes.
 
-### KitchenMemoryPersistence
+### Persistence
 
 Repository interfaces and mapping expressed in domain terms. The first
 implementation uses SwiftData, but callers do not receive storage-framework
 model objects. CloudKit integration remains behind the application boundary.
 
-### KitchenMemoryLogic
+### Logic
 
 Product operations and presentation-independent workflow state that coordinate
 the domain, importer, and store. The implemented boundary includes:
@@ -148,16 +148,17 @@ Platform-owned resources, entitlements, and future presentation code belong in
 See [implementation architecture](implementation-architecture.md) and
 [localization architecture](localization-architecture.md).
 
-An eventual tvOS target should consume `KitchenMemoryDomain` and the read/cook-oriented
+An eventual tvOS target should import `KitchenKit` and consume its read/cook-oriented
 Logic operations while supplying its own focused presentation layer. Its
 future existence must not force television interaction constraints into the
 Mac, iPhone, or iPad interface.
 
 ## Comprehension and modularity
 
-Keep modules aligned with durable responsibilities rather than creating one
-module per entity or feature screen. Within them, prefer small types, explicit
-data flow, domain vocabulary, and the fewest layers that preserve the accepted
+Keep compiler modules aligned with independently consumable products rather
+than creating one per entity or feature screen. Within KitchenKit, preserve its
+durable responsibilities through folders, interfaces, small types, explicit
+data flow, domain vocabulary, and the fewest layers that maintain the accepted
 boundaries.
 
 This application does not need speculative infrastructure for hypothetical
@@ -257,7 +258,7 @@ feature ships, even if scanning itself comes much later.
 
 Automator remains a useful integration point for existing Mac workflows, but a
 Shortcuts action and scriptable app are the more durable product surfaces. The
-shared `KitchenMemoryLogic` use cases allow all three to coexist:
+shared KitchenKit Logic operations allow all three to coexist:
 
 - AppleScript for rich Mac automation and querying.
 - Shortcuts/App Intents for approachable cross-device actions.
