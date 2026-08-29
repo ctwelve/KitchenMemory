@@ -13,17 +13,20 @@ localization, and starter content.
 
 ## Target organization
 
-Four root-level folders contain the internal frameworks. They enforce dependency
-direction inside the Xcode project; they are not separately distributed products.
+Four friendly root-level folders contain the internal frameworks. Their folder
+names describe the responsibility without repeating the product name; the Xcode
+targets, framework products, bundle identifiers, and Swift module names retain
+their full `KitchenMemory` identities.
 
-- `KitchenMemoryDomain` owns persistence-independent domain values.
-- `KitchenMemoryImport` owns deterministic Schema.org recipe discovery and
-  normalization.
-- `KitchenMemoryPersistence` owns SwiftData records, domain-facing
-  repositories, local/personal-cloud store configuration, and persistence
-  runtime signals.
-- `KitchenMemoryLogic` owns product operations and presentation-independent
-  workflow state.
+- `Domain/` contains `KitchenMemoryDomain` and owns persistence-independent
+  domain values.
+- `Import/` contains `KitchenMemoryImport` and owns deterministic Schema.org
+  recipe discovery and normalization.
+- `Persistence/` contains `KitchenMemoryPersistence` and owns SwiftData records,
+  domain-facing repositories, local/personal-cloud store configuration, and
+  persistence runtime signals.
+- `Logic/` contains `KitchenMemoryLogic` and owns product operations and
+  presentation-independent workflow state.
 
 Both application targets link all four frameworks because composition adapters
 exchange domain values, construct persistence and import implementations, and
@@ -378,7 +381,7 @@ the application-owned loader.
 Framework tests belong to four standalone, unhosted targets named for Domain,
 Import, Persistence, and Logic. `KitchenMemory Core Testing` and
 `KitchenMemoryCoreTesting.xctestplan` run that shared suite once on macOS.
-Property-test seeds and their generator live in `KitchenMemorySharedTestSupport`
+Property-test seeds and their generator live in `SharedTestSupport/`
 and are compiled directly into the three test targets that use them.
 
 Tests for starter content, presentation formatting, application composition,

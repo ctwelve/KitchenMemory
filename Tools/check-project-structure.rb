@@ -94,15 +94,15 @@ module KitchenMemory
       "KitchenMemoryMacOS" => ["KitchenMemory", "KitchenMemoryMac"],
       "KitchenMemoryIOSTests" => ["KitchenMemoryTests"],
       "KitchenMemoryMacTests" => ["KitchenMemoryTests"],
-      "KitchenMemoryDomainTests" => ["KitchenMemoryDomainTests", "KitchenMemorySharedTestSupport"],
-      "KitchenMemoryImportTests" => ["KitchenMemoryImportTests", "KitchenMemorySharedTestSupport"],
-      "KitchenMemoryLogicTests" => ["KitchenMemoryLogicTests", "KitchenMemorySharedTestSupport"],
-      "KitchenMemoryPersistenceTests" => ["KitchenMemoryPersistenceTests"],
+      "KitchenMemoryDomainTests" => ["DomainTests", "SharedTestSupport"],
+      "KitchenMemoryImportTests" => ["ImportTests", "SharedTestSupport"],
+      "KitchenMemoryLogicTests" => ["LogicTests", "SharedTestSupport"],
+      "KitchenMemoryPersistenceTests" => ["PersistenceTests"],
       "KitchenMemoryUITests" => ["KitchenMemoryUITests"],
-      "KitchenMemoryDomain" => ["KitchenMemoryDomain"],
-      "KitchenMemoryImport" => ["KitchenMemoryImport"],
-      "KitchenMemoryLogic" => ["KitchenMemoryLogic"],
-      "KitchenMemoryPersistence" => ["KitchenMemoryPersistence"]
+      "KitchenMemoryDomain" => ["Domain"],
+      "KitchenMemoryImport" => ["Import"],
+      "KitchenMemoryLogic" => ["Logic"],
+      "KitchenMemoryPersistence" => ["Persistence"]
     }.freeze
     PLATFORM_INFO_EXCEPTIONS = {
       "KitchenMemoryIOS" => "KitchenMemoryIOS",
