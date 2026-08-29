@@ -379,15 +379,18 @@ the application-owned loader.
 
 Framework tests belong to one standalone, unhosted `KitchenKitTests` target,
 organized into Domain, Import, Persistence, Logic, and Support folders. The
-minimal shared `KitchenKit` scheme associates that unhosted target, while Xcode
-creates its test plan automatically and runs the suite once on macOS.
+minimal shared `KitchenKit` scheme builds the framework and references the
+checked-in `KitchenKit.xctestplan`, which owns the unhosted test target and runs
+the suite once on macOS.
 Property-test seeds and their generator live in `KitchenKitTests/Support/`.
 
 Tests for starter content, presentation formatting, application composition,
 resources, and hosted runtime behavior live in `KitchenMemoryTests`; that
 folder belongs only to the platform-specific `KitchenMemoryIOSTests` and
-`KitchenMemoryMacTests` host targets. The checked-in
-`KitchenMemoryIOS.xctestplan` and `KitchenMemoryMacOS.xctestplan` each contain
+`KitchenMemoryMacTests` host targets. All three shared schemes build only their
+primary product and leave test-target membership solely to their referenced
+plan. The checked-in `KitchenMemoryIOS.xctestplan` and
+`KitchenMemoryMacOS.xctestplan` each contain
 their native hosted target and the shared `KitchenMemoryUITests` smoke target.
 Their schemes use `Testing` for Test so both kinds of test receive a
 least-privilege, disposable host. The exact coverage gate requires every

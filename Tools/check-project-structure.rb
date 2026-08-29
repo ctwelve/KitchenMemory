@@ -93,10 +93,14 @@ module KitchenMemory
       "KitchenMemoryMacTests" => "Embed Localization Catalog Contract"
     }.freeze
     PLANS = {
+      "KitchenKit.xctestplan" => %w[KitchenKitTests],
       "KitchenMemoryIOS.xctestplan" => %w[KitchenMemoryIOSTests KitchenMemoryUITests],
       "KitchenMemoryMacOS.xctestplan" => %w[KitchenMemoryMacTests KitchenMemoryUITests]
     }.freeze
     PLAN_POLICIES = {
+      "KitchenKit.xctestplan" => {
+        configuration: "Test Scheme Action"
+      },
       "KitchenMemoryIOS.xctestplan" => {
         configuration: "Test Scheme Action",
         variable_expansion_target: "KitchenMemoryIOS"
@@ -107,6 +111,13 @@ module KitchenMemory
       }
     }.freeze
     SCHEME_ACTION_CONFIGURATIONS = {
+      "KitchenKit" => {
+        "TestAction" => "Testing",
+        "LaunchAction" => "Debug",
+        "ProfileAction" => "Production",
+        "AnalyzeAction" => "Testing",
+        "ArchiveAction" => "Production"
+      },
       "KitchenMemoryIOS" => {
         "TestAction" => "Testing",
         "LaunchAction" => "Debug",
@@ -124,19 +135,19 @@ module KitchenMemory
     }.freeze
     SCHEMES = {
       "KitchenKit" => {
-        automatic_plan: true,
-        build_targets: %w[KitchenKit KitchenKitTests],
-        test_targets: %w[KitchenKitTests]
+        product: "KitchenKit",
+        plan: "KitchenKit.xctestplan",
+        runnable: false
       },
       "KitchenMemoryIOS" => {
-        app: "KitchenMemoryIOS",
+        product: "KitchenMemoryIOS",
         plan: "KitchenMemoryIOS.xctestplan",
-        scheme_test_targets: %w[KitchenMemoryIOSTests]
+        runnable: true
       },
       "KitchenMemoryMacOS" => {
-        app: "KitchenMemoryMacOS",
+        product: "KitchenMemoryMacOS",
         plan: "KitchenMemoryMacOS.xctestplan",
-        scheme_test_targets: %w[KitchenMemoryMacTests]
+        runnable: true
       }
     }.freeze
     OBJECT_HEADER = /\A([\t ]*)([0-9A-F]+) \/\* (.*?) \*\/ = \{[\t ]*\z/.freeze
@@ -532,19 +543,24 @@ module KitchenMemory
         unless plan_configurations.first["options"] == {}
           raise ContractError, "#{filename} configuration options must remain empty"
         end
-        expansion_target = targets.fetch(policy[:variable_expansion_target])
         expected_default_options = {
-          "performanceAntipatternCheckerEnabled" => true,
-          "targetForVariableExpansion" => {
+          "performanceAntipatternCheckerEnabled" => true
+        }
+        if policy[:variable_expansion_target]
+          expansion_target = targets.fetch(policy[:variable_expansion_target])
+          expected_default_options["targetForVariableExpansion"] = {
             "containerPath" => "container:KitchenMemory.xcodeproj",
             "identifier" => expansion_target[:id],
             "name" => expansion_target[:name]
           }
-        }
+        end
         unless plan.fetch("defaultOptions", {}) == expected_default_options
-          raise ContractError,
-                "#{filename} must retain Xcode's default diagnostics and expand variables " \
-                "against #{expansion_target[:name]}"
+          detail = if policy[:variable_expansion_target]
+                     " and expand variables against #{policy[:variable_expansion_target]}"
+                   else
+                     " without an application variable-expansion target"
+                   end
+          raise ContractError, "#{filename} must retain Xcode's default diagnostics#{detail}"
         end
 
         test_targets = plan.fetch("testTargets", [])
@@ -579,11 +595,6 @@ module KitchenMemory
 
       SCHEMES.each do |scheme_name, expected|
         document = parse_scheme(scheme_name, schemes.fetch(scheme_name))
-        if expected[:automatic_plan]
-          validate_automatic_test_scheme(scheme_name, document, expected, targets_by_id)
-          next
-        end
-
         references = REXML::XPath.match(
           document,
           "/Scheme/TestAction/TestPlans/TestPlanReference"
@@ -596,153 +607,40 @@ module KitchenMemory
                 "#{scheme_name} must use #{expected_reference} as its only default test plan"
         end
         raise ContractError, "#{scheme_name} references missing plan #{expected[:plan]}" unless plans.key?(expected[:plan])
+        test_action = REXML::XPath.first(document, "/Scheme/TestAction")
+        if test_action&.attributes&.[]("shouldAutocreateTestPlan") == "YES"
+          raise ContractError, "#{scheme_name} must not combine an explicit plan with automatic-plan creation"
+        end
 
         validate_scheme_buildables(scheme_name, document, targets_by_id)
         build_names = REXML::XPath.match(
           document,
           "/Scheme/BuildAction/BuildActionEntries/BuildActionEntry/BuildableReference"
         ).map { |element| element.attributes["BlueprintName"] }
-        expected_build_names = expected.fetch(:build_targets, [expected[:app]])
+        expected_build_names = [expected[:product]]
         unless build_names == expected_build_names
           raise ContractError,
                 "#{scheme_name} build action must contain only #{expected_build_names.join(', ')}; " \
                 "found #{build_names.inspect}"
         end
-        if expected[:core]
-          validate_core_scheme_actions(scheme_name, document)
+        validate_scheme_action_membership(scheme_name, document)
+        validate_scheme_action_configurations(scheme_name, document)
+        if expected[:runnable]
+          validate_scheme_runnable(scheme_name, document, "LaunchAction", expected[:product])
+          validate_scheme_runnable(scheme_name, document, "ProfileAction", expected[:product])
         else
-          validate_scheme_action_membership(scheme_name, document)
-          validate_scheme_action_configurations(scheme_name, document)
-          validate_scheme_runnable(scheme_name, document, "LaunchAction", expected[:app])
-          validate_scheme_runnable(scheme_name, document, "ProfileAction", expected[:app])
+          validate_scheme_has_no_runnable(scheme_name, document, "LaunchAction")
+          validate_scheme_has_no_runnable(scheme_name, document, "ProfileAction")
         end
 
-        expected_testables = expected.fetch(:scheme_test_targets, PLANS.fetch(expected[:plan]))
-        testable_names = REXML::XPath.match(
+        testable_references = REXML::XPath.match(
           document,
-          "/Scheme/TestAction/Testables/TestableReference/BuildableReference"
-        ).map { |element| element.attributes["BlueprintName"] }
-        assert_exact_names("#{scheme_name} testables", testable_names, expected_testables)
-      end
-    end
-
-    def validate_automatic_test_scheme(scheme_name, document, expected, targets_by_id)
-      plan_references = REXML::XPath.match(
-        document,
-        "/Scheme/TestAction/TestPlans/TestPlanReference"
-      )
-      unless plan_references.empty?
-        raise ContractError, "#{scheme_name} must use its automatic test plan"
-      end
-
-      validate_scheme_buildables(scheme_name, document, targets_by_id)
-      build_entries = REXML::XPath.match(
-        document,
-        "/Scheme/BuildAction/BuildActionEntries/BuildActionEntry"
-      )
-      build_names = build_entries.map do |entry|
-        REXML::XPath.first(entry, "BuildableReference")&.attributes&.[]("BlueprintName")
-      end
-      unless build_names == expected[:build_targets]
-        raise ContractError,
-              "#{scheme_name} build action must contain only #{expected[:build_targets].join(', ')}; " \
-              "found #{build_names.inspect}"
-      end
-
-      build_policies = {
-        "KitchenKit" => {
-          "buildForTesting" => "YES",
-          "buildForRunning" => "YES",
-          "buildForProfiling" => "YES",
-          "buildForArchiving" => "YES",
-          "buildForAnalyzing" => "YES"
-        },
-        "KitchenKitTests" => {
-          "buildForTesting" => "YES",
-          "buildForRunning" => "NO",
-          "buildForProfiling" => "NO",
-          "buildForArchiving" => "NO",
-          "buildForAnalyzing" => "YES"
-        }
-      }
-      build_entries.zip(build_names).each do |entry, target_name|
-        build_policies.fetch(target_name).each do |attribute, expected_value|
-          next if entry.attributes[attribute] == expected_value
-
-          raise ContractError, "#{scheme_name} #{target_name} must set #{attribute} to #{expected_value}"
-        end
-      end
-
-      test_actions = REXML::XPath.match(document, "/Scheme/TestAction")
-      unless test_actions.length == 1 &&
-             test_actions.first.attributes["buildConfiguration"] == "Testing" &&
-             test_actions.first.attributes["shouldAutocreateTestPlan"] == "YES"
-        raise ContractError,
-              "#{scheme_name} TestAction must use Testing and automatically create its test plan"
-      end
-      testable_names = REXML::XPath.match(
-        document,
-        "/Scheme/TestAction/Testables/TestableReference/BuildableReference"
-      ).map { |element| element.attributes["BlueprintName"] }
-      assert_exact_names("#{scheme_name} testables", testable_names, expected[:test_targets])
-
-      action_configurations = {
-        "AnalyzeAction" => "Testing",
-        "ArchiveAction" => "Production"
-      }
-      action_configurations.each do |action, configuration|
-        elements = REXML::XPath.match(document, "/Scheme/#{action}")
-        unless elements.length == 1 && elements.first.attributes["buildConfiguration"] == configuration
-          raise ContractError, "#{scheme_name} #{action} must use #{configuration}"
-        end
-      end
-      %w[LaunchAction ProfileAction].each do |action|
-        elements = REXML::XPath.match(document, "/Scheme/#{action}")
-        if elements.length > 1
-          raise ContractError, "#{scheme_name} must contain at most one #{action}"
-        end
-        runnables = REXML::XPath.match(
-          document,
-          "/Scheme/#{action}/BuildableProductRunnable/BuildableReference"
+          "/Scheme/TestAction/Testables/TestableReference"
         )
-        next if runnables.empty?
-
-        raise ContractError, "#{scheme_name} #{action} must not declare a runnable product"
-      end
-    end
-
-    def validate_core_scheme_actions(scheme_name, document)
-      entries = REXML::XPath.match(
-        document,
-        "/Scheme/BuildAction/BuildActionEntries/BuildActionEntry"
-      )
-      unless entries.length == UNHOSTED_TEST_TARGETS.length
-        raise ContractError, "#{scheme_name} must contain one build entry per core test target"
-      end
-      expected_attributes = {
-        "buildForTesting" => "YES",
-        "buildForRunning" => "NO",
-        "buildForProfiling" => "NO",
-        "buildForArchiving" => "NO",
-        "buildForAnalyzing" => "YES"
-      }
-      entries.each do |entry|
-        expected_attributes.each do |attribute, expected_value|
-          next if entry.attributes[attribute] == expected_value
-
-          raise ContractError, "#{scheme_name} must set #{attribute} to #{expected_value}"
+        unless testable_references.empty?
+          raise ContractError,
+                "#{scheme_name} must leave test-target membership exclusively to #{expected[:plan]}"
         end
-      end
-      { "TestAction" => "Testing", "AnalyzeAction" => "Testing" }.each do |action, configuration|
-        elements = REXML::XPath.match(document, "/Scheme/#{action}")
-        unless elements.length == 1 && elements.first.attributes["buildConfiguration"] == configuration
-          raise ContractError, "#{scheme_name} #{action} must use #{configuration}"
-        end
-      end
-      %w[LaunchAction ProfileAction ArchiveAction].each do |action|
-        next if REXML::XPath.match(document, "/Scheme/#{action}").empty?
-
-        raise ContractError, "#{scheme_name} must not contain #{action}"
       end
     end
 
@@ -794,6 +692,16 @@ module KitchenMemory
 
       raise ContractError,
             "#{scheme_name} #{action} must run only #{expected_app}; found #{names.inspect}"
+    end
+
+    def validate_scheme_has_no_runnable(scheme_name, document, action)
+      references = REXML::XPath.match(
+        document,
+        "/Scheme/#{action}/BuildableProductRunnable/BuildableReference"
+      )
+      return if references.empty?
+
+      raise ContractError, "#{scheme_name} #{action} must not declare a runnable product"
     end
 
     def validate_scheme_buildables(scheme_name, document, targets_by_id)

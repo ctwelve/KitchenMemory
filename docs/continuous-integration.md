@@ -9,25 +9,24 @@ SPDX-License-Identifier: GPL-3.0-only
 Xcode Cloud is Kitchen Memory's continuous-integration system. The repository
 checks in the default `KitchenMemoryIOS` and `KitchenMemoryMacOS` schemes and
 their platform plans so local and cloud Test actions select the same hosted and
-UI-smoke targets. It also checks in a minimal `KitchenKit` scheme because an
-unhosted framework test target needs an explicit scheme association; only that
-scheme continues to use an automatically created plan.
+UI-smoke targets. It also checks in a minimal `KitchenKit` scheme and plan for
+the unhosted framework suite. Every shared scheme references one explicit plan.
 
 ## Scheme, plan, and destination contract
 
-| Scheme and plan | Primary target | Native destination |
-| --- | --- | --- |
-| `KitchenKit` with automatic plan | `KitchenKit` and `KitchenKitTests` | native macOS for canonical coverage; iOS as needed |
-| `KitchenMemoryIOS` with `KitchenMemoryIOS.xctestplan` | iOS app, hosted tests, and shared UI smoke | iOS device or Simulator |
-| `KitchenMemoryMacOS` with `KitchenMemoryMacOS.xctestplan` | macOS app, hosted tests, and shared UI smoke | native macOS |
+| Scheme and plan | Scheme build product | Plan test targets | Native destination |
+| --- | --- | --- | --- |
+| `KitchenKit` with `KitchenKit.xctestplan` | `KitchenKit` | `KitchenKitTests` | native macOS for canonical coverage; iOS as needed |
+| `KitchenMemoryIOS` with `KitchenMemoryIOS.xctestplan` | `KitchenMemoryIOS` | `KitchenMemoryIOSTests`, `KitchenMemoryUITests` | iOS device or Simulator |
+| `KitchenMemoryMacOS` with `KitchenMemoryMacOS.xctestplan` | `KitchenMemoryMacOS` | `KitchenMemoryMacTests`, `KitchenMemoryUITests` | native macOS |
 
-Each saved platform scheme has one top-level app buildable; Xcode adds
-KitchenKit through ordinary dependency resolution. Its saved plan adds the
-native hosted-test target and the shared UI-smoke target. The shared KitchenKit
-scheme exists only to associate its one unhosted test bundle, and Xcode derives
-that plan automatically. The platform schemes default Test and Analyze to
-`Testing`; Xcode Cloud may still select a configuration and destination
-explicitly without introducing duplicate scheme names.
+Each shared scheme has one top-level product buildable; Xcode adds dependencies
+through ordinary resolution. Its saved plan is the sole owner of test-target
+membership: `KitchenKit.xctestplan` contains the unhosted framework target,
+while each platform plan contains its native hosted-test target and the shared
+UI-smoke target. The schemes default Test and Analyze to `Testing`; Xcode Cloud
+may still select a configuration and destination explicitly without introducing
+duplicate scheme names.
 
 The iOS schemes do not expose Mac Catalyst, Mac Designed for iPhone or iPad, or
 visionOS Designed for iPhone or iPad destinations. The macOS schemes expose
@@ -252,8 +251,8 @@ copy while the source checkout is available. This is necessary because Xcode
 Cloud may execute `test-without-building` on a different host that receives the
 test products but not the original repository path recorded by `#filePath`.
 
-The KitchenKit lane enables code coverage explicitly; the two automatic
-app-hosted plans do not. All three lanes are correctness gates. Evaluate durable
+The KitchenKit lane enables code coverage explicitly; the two app-hosted plans
+do not. All three lanes are correctness gates. Evaluate durable
 domain, import, persistence, and product-logic sources separately from SwiftUI
 views and test bundles; an app-wide percentage is not the business-logic
 metric. Use uncovered executable lines to find missing behavior and boundary
@@ -269,7 +268,7 @@ Tools/run-core-framework-coverage.sh
 ```
 
 The runner creates a unique evidence directory under `/private/tmp`, prints its
-location, runs the shared `KitchenKit` scheme and its automatic plan with
+location, runs the shared `KitchenKit` scheme and its explicit plan with
 explicit code coverage, and invokes the checker only after Xcode succeeds. This
 macOS result is the canonical exact line-coverage artifact for KitchenKit. It
 does not replace either app correctness lane or the separately selected UI
@@ -426,12 +425,12 @@ that same version.
 The structure contract also pins each project configuration to its matching
 xcconfig and automatic merged-binary mode; the development and production
 bundle namespaces; platform plist, entitlement, and synchronized-folder
-ownership; the three shared schemes and two platform plans; and KitchenKit's
-automatic-plan policy. It also requires each localization-catalog embedding
-phase to run first in its hosted-test target, preventing a dependency cycle
-between that test-bundle output and KitchenKit re-export signing. Treat a
-contract failure as a reviewable project change, not as a reason to weaken the
-checker until the project happens to pass.
+ownership; the three shared schemes and three explicit plans; and exclusive
+plan ownership of test-target membership. It also requires each
+localization-catalog embedding phase to run first in its hosted-test target,
+preventing a dependency cycle between that test-bundle output and KitchenKit
+re-export signing. Treat a contract failure as a reviewable project change, not
+as a reason to weaken the checker until the project happens to pass.
 
 Keep cloud scripts short, deterministic, and limited to environment preparation
 so build, test, Analyze, and Archive behavior remains visible in Xcode's schemes.

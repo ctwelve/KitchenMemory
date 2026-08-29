@@ -248,6 +248,17 @@ class CheckProjectStructureTest < Minitest::Test
     def build_plans
       KitchenMemory::ProjectStructure::PLANS.each_with_object({}) do |(filename, target_names), result|
         policy = KitchenMemory::ProjectStructure::PLAN_POLICIES.fetch(filename)
+        default_options = {
+          "performanceAntipatternCheckerEnabled" => true
+        }
+        if policy[:variable_expansion_target]
+          target_name = policy[:variable_expansion_target]
+          default_options["targetForVariableExpansion"] = {
+            "containerPath" => "container:KitchenMemory.xcodeproj",
+            "identifier" => @target_ids.fetch(target_name),
+            "name" => target_name
+          }
+        end
         result[filename] = JSON.pretty_generate(
           "configurations" => [
             {
@@ -256,14 +267,7 @@ class CheckProjectStructureTest < Minitest::Test
               "options" => {}
             }
           ],
-          "defaultOptions" => {
-            "performanceAntipatternCheckerEnabled" => true,
-            "targetForVariableExpansion" => {
-              "containerPath" => "container:KitchenMemory.xcodeproj",
-              "identifier" => @target_ids.fetch(policy[:variable_expansion_target]),
-              "name" => policy[:variable_expansion_target]
-            }
-          },
+          "defaultOptions" => default_options,
           "testTargets" => target_names.map do |target_name|
             {
               "parallelizable" => true,
@@ -281,134 +285,21 @@ class CheckProjectStructureTest < Minitest::Test
 
     def build_schemes
       KitchenMemory::ProjectStructure::SCHEMES.each_with_object({}) do |(name, expectation), result|
-        if expectation[:automatic_plan]
-          build_entries = expectation.fetch(:build_targets).map do |target_name|
-            product_attributes = if target_name == "KitchenKit"
-                                   {
-                                     "buildForTesting" => "YES",
-                                     "buildForRunning" => "YES",
-                                     "buildForProfiling" => "YES",
-                                     "buildForArchiving" => "YES",
-                                     "buildForAnalyzing" => "YES"
-                                   }
-                                 else
-                                   {
-                                     "buildForTesting" => "YES",
-                                     "buildForRunning" => "NO",
-                                     "buildForProfiling" => "NO",
-                                     "buildForArchiving" => "NO",
-                                     "buildForAnalyzing" => "YES"
-                                   }
-                                 end
-            attributes = product_attributes.map { |key, value| %(#{key}="#{value}") }.join("\n")
-            <<~ENTRY
-              <BuildActionEntry #{attributes}>
-                <BuildableReference
-                  BlueprintIdentifier="#{@target_ids.fetch(target_name)}"
-                  BlueprintName="#{target_name}"
-                  ReferencedContainer="container:KitchenMemory.xcodeproj"/>
-              </BuildActionEntry>
-            ENTRY
-          end.join
-          testables = expectation.fetch(:test_targets).map do |target_name|
-            <<~TESTABLE
-              <TestableReference skipped="NO">
-                <BuildableReference
-                  BlueprintIdentifier="#{@target_ids.fetch(target_name)}"
-                  BlueprintName="#{target_name}"
-                  ReferencedContainer="container:KitchenMemory.xcodeproj"/>
-              </TestableReference>
-            TESTABLE
-          end.join
-          result["#{name}.xcscheme"] = <<~SCHEME
-            <?xml version="1.0" encoding="UTF-8"?>
-            <Scheme>
-              <BuildAction>
-                <BuildActionEntries>
-                  #{build_entries}
-                </BuildActionEntries>
-              </BuildAction>
-              <TestAction buildConfiguration="Testing" shouldAutocreateTestPlan="YES">
-                <Testables>
-                  #{testables}
-                </Testables>
-              </TestAction>
-              <LaunchAction buildConfiguration="Debug"/>
-              <ProfileAction buildConfiguration="Release"/>
-              <AnalyzeAction buildConfiguration="Testing"/>
-              <ArchiveAction buildConfiguration="Production"/>
-            </Scheme>
-          SCHEME
-          next
-        end
-
-        if expectation[:core]
-          plan = expectation.fetch(:plan)
-          build_entries = expectation.fetch(:build_targets).map do |target_name|
-            <<~ENTRY
-              <BuildActionEntry
-                buildForTesting="YES"
-                buildForRunning="NO"
-                buildForProfiling="NO"
-                buildForArchiving="NO"
-                buildForAnalyzing="YES">
-                <BuildableReference
-                  BlueprintIdentifier="#{@target_ids.fetch(target_name)}"
-                  BlueprintName="#{target_name}"
-                  ReferencedContainer="container:KitchenMemory.xcodeproj"/>
-              </BuildActionEntry>
-            ENTRY
-          end.join
-          testables = KitchenMemory::ProjectStructure::PLANS.fetch(plan).map do |target_name|
-            <<~TESTABLE
-              <TestableReference skipped="NO">
-                <BuildableReference
-                  BlueprintIdentifier="#{@target_ids.fetch(target_name)}"
-                  BlueprintName="#{target_name}"
-                  ReferencedContainer="container:KitchenMemory.xcodeproj"/>
-              </TestableReference>
-            TESTABLE
-          end.join
-          result["#{name}.xcscheme"] = <<~SCHEME
-            <?xml version="1.0" encoding="UTF-8"?>
-            <Scheme>
-              <BuildAction>
-                <BuildActionEntries>
-                  #{build_entries}
-                </BuildActionEntries>
-              </BuildAction>
-              <TestAction buildConfiguration="Testing">
-                <TestPlans>
-                  <TestPlanReference reference="container:#{plan}" default="YES"/>
-                </TestPlans>
-                <Testables>
-                  #{testables}
-                </Testables>
-              </TestAction>
-              <AnalyzeAction buildConfiguration="Testing"/>
-            </Scheme>
-          SCHEME
-          next
-        end
-
-        app = expectation.fetch(:app)
+        product = expectation.fetch(:product)
         plan = expectation.fetch(:plan)
         action_configurations = KitchenMemory::ProjectStructure::SCHEME_ACTION_CONFIGURATIONS.fetch(name)
-        archive = "YES"
-        profile = "YES"
-        testables = expectation.fetch(
-          :scheme_test_targets,
-          KitchenMemory::ProjectStructure::PLANS.fetch(plan)
-        ).map do |target_name|
-          <<~TESTABLE
-            <TestableReference skipped="NO">
-              <BuildableReference
-                BlueprintIdentifier="#{@target_ids.fetch(target_name)}"
-                BlueprintName="#{target_name}"
-                ReferencedContainer="container:KitchenMemory.xcodeproj"/>
-            </TestableReference>
-          TESTABLE
-        end.join
+        runnable = if expectation[:runnable]
+                     <<~RUNNABLE
+                       <BuildableProductRunnable>
+                         <BuildableReference
+                           BlueprintIdentifier="#{@target_ids.fetch(product)}"
+                           BlueprintName="#{product}"
+                           ReferencedContainer="container:KitchenMemory.xcodeproj"/>
+                       </BuildableProductRunnable>
+                     RUNNABLE
+                   else
+                     ""
+                   end
         result["#{name}.xcscheme"] = <<~SCHEME
           <?xml version="1.0" encoding="UTF-8"?>
           <Scheme>
@@ -417,12 +308,12 @@ class CheckProjectStructureTest < Minitest::Test
                 <BuildActionEntry
                   buildForTesting="YES"
                   buildForRunning="YES"
-                  buildForProfiling="#{profile}"
-                  buildForArchiving="#{archive}"
+                  buildForProfiling="YES"
+                  buildForArchiving="YES"
                   buildForAnalyzing="YES">
                   <BuildableReference
-                    BlueprintIdentifier="#{@target_ids.fetch(app)}"
-                    BlueprintName="#{app}"
+                    BlueprintIdentifier="#{@target_ids.fetch(product)}"
+                    BlueprintName="#{product}"
                     ReferencedContainer="container:KitchenMemory.xcodeproj"/>
                 </BuildActionEntry>
               </BuildActionEntries>
@@ -431,25 +322,12 @@ class CheckProjectStructureTest < Minitest::Test
               <TestPlans>
                 <TestPlanReference reference="container:#{plan}" default="YES"/>
               </TestPlans>
-              <Testables>
-                #{testables}
-              </Testables>
             </TestAction>
             <LaunchAction buildConfiguration="#{action_configurations.fetch('LaunchAction')}">
-              <BuildableProductRunnable>
-                <BuildableReference
-                  BlueprintIdentifier="#{@target_ids.fetch(app)}"
-                  BlueprintName="#{app}"
-                  ReferencedContainer="container:KitchenMemory.xcodeproj"/>
-              </BuildableProductRunnable>
+              #{runnable}
             </LaunchAction>
             <ProfileAction buildConfiguration="#{action_configurations.fetch('ProfileAction')}">
-              <BuildableProductRunnable>
-                <BuildableReference
-                  BlueprintIdentifier="#{@target_ids.fetch(app)}"
-                  BlueprintName="#{app}"
-                  ReferencedContainer="container:KitchenMemory.xcodeproj"/>
-              </BuildableProductRunnable>
+              #{runnable}
             </ProfileAction>
             <AnalyzeAction buildConfiguration="#{action_configurations.fetch('AnalyzeAction')}"/>
             <ArchiveAction buildConfiguration="#{action_configurations.fetch('ArchiveAction')}"/>
@@ -466,7 +344,7 @@ class CheckProjectStructureTest < Minitest::Test
 
     assert_equal 7, result[:target_count]
     assert_equal 3, result[:scheme_count]
-    assert_equal 2, result[:plan_count]
+    assert_equal 3, result[:plan_count]
     expected_core_groups = {
       "KitchenKit" => ["KitchenKit"],
       "KitchenKitTests" => ["KitchenKitTests"]
@@ -718,28 +596,62 @@ class CheckProjectStructureTest < Minitest::Test
     assert_includes error.message, "KitchenMemoryMacOS TestAction must use Testing"
   end
 
-  def test_rejects_saved_plan_for_kitchenkit_scheme
+  def test_rejects_kitchenkit_plan_without_framework_test_target
     fixture = Fixture.new
-    fixture.schemes["KitchenKit.xcscheme"] = fixture.schemes.fetch("KitchenKit.xcscheme").sub(
-      '<Testables>',
-      '<TestPlans><TestPlanReference reference="container:KitchenKit.xctestplan"/></TestPlans><Testables>'
-    )
+    plan = JSON.parse(fixture.plans.fetch("KitchenKit.xctestplan"))
+    plan["testTargets"] = []
+    fixture.plans["KitchenKit.xctestplan"] = JSON.generate(plan)
 
     error = assert_contract_error { validate(fixture) }
 
-    assert_includes error.message, "automatic test plan"
+    assert_includes error.message, "KitchenKit.xctestplan test targets"
+    assert_includes error.message, "missing: KitchenKitTests"
   end
 
-  def test_rejects_disabled_automatic_kitchenkit_plan
+  def test_rejects_redundant_scheme_testable_when_plan_owns_membership
     fixture = Fixture.new
     fixture.schemes["KitchenKit.xcscheme"] = fixture.schemes.fetch("KitchenKit.xcscheme").sub(
-      'shouldAutocreateTestPlan="YES"',
-      'shouldAutocreateTestPlan="NO"'
+      "</TestPlans>",
+      <<~XML.chomp
+        </TestPlans>
+        <Testables>
+          <TestableReference skipped="NO">
+            <BuildableReference
+              BlueprintIdentifier="#{fixture.target_ids.fetch('KitchenKitTests')}"
+              BlueprintName="KitchenKitTests"
+              ReferencedContainer="container:KitchenMemory.xcodeproj"/>
+          </TestableReference>
+        </Testables>
+      XML
     )
 
     error = assert_contract_error { validate(fixture) }
 
-    assert_includes error.message, "automatically create its test plan"
+    assert_includes error.message, "leave test-target membership exclusively to KitchenKit.xctestplan"
+  end
+
+  def test_rejects_automatic_plan_creation_alongside_explicit_plan
+    fixture = Fixture.new
+    fixture.schemes["KitchenKit.xcscheme"] = fixture.schemes.fetch("KitchenKit.xcscheme").sub(
+      '<TestAction buildConfiguration="Testing">',
+      '<TestAction buildConfiguration="Testing" shouldAutocreateTestPlan="YES">'
+    )
+
+    error = assert_contract_error { validate(fixture) }
+
+    assert_includes error.message, "must not combine an explicit plan with automatic-plan creation"
+  end
+
+  def test_rejects_kitchenkit_profile_using_missing_release_configuration
+    fixture = Fixture.new
+    fixture.schemes["KitchenKit.xcscheme"] = fixture.schemes.fetch("KitchenKit.xcscheme").sub(
+      '<ProfileAction buildConfiguration="Production">',
+      '<ProfileAction buildConfiguration="Release">'
+    )
+
+    error = assert_contract_error { validate(fixture) }
+
+    assert_includes error.message, "KitchenKit ProfileAction must use Production"
   end
 
   def test_rejects_runnable_product_in_kitchenkit_launch_action
@@ -753,8 +665,8 @@ class CheckProjectStructureTest < Minitest::Test
       </BuildableProductRunnable>
     RUNNABLE
     fixture.schemes["KitchenKit.xcscheme"] = fixture.schemes.fetch("KitchenKit.xcscheme").sub(
-      '<LaunchAction buildConfiguration="Debug"/>',
-      %(<LaunchAction buildConfiguration="Debug">#{runnable}</LaunchAction>)
+      '<LaunchAction buildConfiguration="Debug">',
+      %(<LaunchAction buildConfiguration="Debug">#{runnable})
     )
 
     error = assert_contract_error { validate(fixture) }

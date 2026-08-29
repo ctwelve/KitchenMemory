@@ -96,6 +96,7 @@
 		A1C9A4883042896F00F1F13D /* KitchenKitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KitchenKitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1C9B4803042994500F1F13D /* KitchenMemoryMacOS.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = KitchenMemoryMacOS.xctestplan; sourceTree = "<group>"; };
 		A1C9B48130429B4600F1F13D /* KitchenMemoryIOS.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = KitchenMemoryIOS.xctestplan; sourceTree = "<group>"; };
+		A1F62A8E30434D9C0005E9A5 /* KitchenKit.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = KitchenKit.xctestplan; sourceTree = "<group>"; };
 		C10000000000000000000001 /* Base.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Base.xcconfig; sourceTree = "<group>"; };
 		C10000000000000000000002 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
 		C10000000000000000000003 /* Develop.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Develop.xcconfig; sourceTree = "<group>"; };
@@ -248,6 +249,7 @@
 				A1C4E7BA302A63B900E2C0DB /* KitchenMemoryUITests */,
 				A15E8F41303912A6009B0A22 /* .swiftlint.yml */,
 				A1C9A47F3042896F00F1F13D /* KitchenKit */,
+				A1F62A8E30434D9C0005E9A5 /* KitchenKit.xctestplan */,
 				A1C9A48C3042896F00F1F13D /* KitchenKitTests */,
 				A1C4E79F302A63B800E2C0DB /* Products */,
 			);
