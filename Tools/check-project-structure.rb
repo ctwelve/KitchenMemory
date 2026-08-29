@@ -57,21 +57,25 @@ module KitchenMemory
     APP_FILE_CONTRACTS = {
       "KitchenMemory" => {
         info_plist_settings: {
-          "GENERATE_INFOPLIST_FILE" => "NO",
+          "GENERATE_INFOPLIST_FILE" => "YES",
           "INFOPLIST_FILE[sdk=iphoneos*]" => "KitchenMemory/Info-iOS.plist",
           "INFOPLIST_FILE[sdk=iphonesimulator*]" => "KitchenMemory/Info-iOS.plist",
-          "INFOPLIST_FILE[sdk=macosx*]" => "KitchenMemory/Info-macOS.plist"
+          "INFOPLIST_FILE[sdk=macosx*]" => "KitchenMemory/Info-macOS.plist",
+          "INFOPLIST_KEY_CFBundleDisplayName" => "Kitchen Memory",
+          "INFOPLIST_KEY_LSApplicationCategoryType" => "public.app-category.food-and-drink",
+          "INFOPLIST_KEY_NSHumanReadableCopyright" =>
+            "Copyright © 2026 Kitchen Memory Project contributors."
+        },
+        capability_settings: {
+          "ENABLE_APP_SANDBOX[sdk=macosx*]" => "YES",
+          "ENABLE_OUTGOING_NETWORK_CONNECTIONS[sdk=macosx*]" => "YES"
         },
         production_entitlements: {
           "CODE_SIGN_ENTITLEMENTS[sdk=iphoneos*]" => "KitchenMemory/KitchenMemory-iOS.entitlements",
           "CODE_SIGN_ENTITLEMENTS[sdk=iphonesimulator*]" => "KitchenMemory/KitchenMemory-iOS.entitlements",
           "CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" => "KitchenMemory/KitchenMemory-macOS.entitlements"
         },
-        testing_entitlements: {
-          "CODE_SIGN_ENTITLEMENTS[sdk=iphoneos*]" => "KitchenMemory/KitchenMemory-iOS-Testing.entitlements",
-          "CODE_SIGN_ENTITLEMENTS[sdk=iphonesimulator*]" => "KitchenMemory/KitchenMemory-iOS-Testing.entitlements",
-          "CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" => "KitchenMemory/KitchenMemory-macOS-Testing.entitlements"
-        }
+        testing_entitlements: {}
       }
     }.freeze
     APP_BUNDLE_IDENTIFIERS = {
@@ -99,19 +103,8 @@ module KitchenMemory
       "KitchenMemoryIOS",
       "KitchenMemoryMacOS"
     ].freeze
-    SHARED_INFO_PLIST_KEYS = %w[
-      CFBundleDevelopmentRegion
-      CFBundleDisplayName
-      CFBundleExecutable
-      CFBundleIdentifier
-      CFBundleInfoDictionaryVersion
-      CFBundleName
-      CFBundlePackageType
-      CFBundleShortVersionString
-      CFBundleVersion
+    SHARED_SOURCE_INFO_PLIST_KEYS = %w[
       KitchenMemoryCloudKitContainerIdentifier
-      LSApplicationCategoryType
-      NSHumanReadableCopyright
     ].freeze
     IOS_INFO_PLIST_KEYS = %w[
       UIBackgroundModes
@@ -223,11 +216,11 @@ module KitchenMemory
     def validate_info_plist_sources(ios_contents:, macos_contents:)
       ios_values = info_plist_values(ios_contents, "iOS")
       mac_values = info_plist_values(macos_contents, "macOS")
-      assert_exact_names("source macOS Info.plist keys", mac_values.keys, SHARED_INFO_PLIST_KEYS)
+      assert_exact_names("source macOS Info.plist keys", mac_values.keys, SHARED_SOURCE_INFO_PLIST_KEYS)
       assert_exact_names(
         "source iOS Info.plist keys",
         ios_values.keys,
-        SHARED_INFO_PLIST_KEYS + IOS_INFO_PLIST_KEYS
+        SHARED_SOURCE_INFO_PLIST_KEYS + IOS_INFO_PLIST_KEYS
       )
       background_modes = ios_values.fetch("UIBackgroundModes").elements.to_a.map(&:text)
       return if background_modes == ["remote-notification"]
@@ -495,7 +488,17 @@ module KitchenMemory
           end
           unless actual_info_plist_settings == contract[:info_plist_settings]
             raise ContractError,
-                  "#{target_name} #{name} must select the editable platform Info.plists by SDK"
+                  "#{target_name} #{name} must generate common bundle metadata and select " \
+                  "the platform Info.plist adapters by SDK"
+          end
+
+          actual_capability_settings = settings.select do |setting, _value|
+            setting.start_with?("ENABLE_APP_SANDBOX") ||
+              setting.start_with?("ENABLE_OUTGOING_NETWORK_CONNECTIONS")
+          end
+          unless actual_capability_settings == contract[:capability_settings]
+            raise ContractError,
+                  "#{target_name} #{name} must express macOS sandbox capabilities in build settings"
           end
 
           expected_entitlements = if %w[Testing ProductionTesting].include?(name)

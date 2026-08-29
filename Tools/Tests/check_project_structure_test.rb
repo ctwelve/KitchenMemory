@@ -234,7 +234,11 @@ class CheckProjectStructureTest < Minitest::Test
       if contract
         contract[:info_plist_settings].each do |setting, value|
           rendered_setting = setting.include?("[") ? setting.inspect : setting
-          lines << "\t\t\t\t#{rendered_setting} = #{value};\n"
+          rendered_value = value.match?(/\s/) ? value.inspect : value
+          lines << "\t\t\t\t#{rendered_setting} = #{rendered_value};\n"
+        end
+        contract[:capability_settings].each do |setting, value|
+          lines << "\t\t\t\t#{setting.inspect} = #{value};\n"
         end
         entitlements = if %w[Testing ProductionTesting].include?(configuration_name)
                          contract[:testing_entitlements]
@@ -478,16 +482,16 @@ class CheckProjectStructureTest < Minitest::Test
 
     error = assert_contract_error { validate(fixture) }
 
-    assert_includes error.message, "KitchenMemory Debug must select the editable platform Info.plists by SDK"
+    assert_includes error.message, "KitchenMemory Debug must generate common bundle metadata"
   end
 
-  def test_rejects_generated_unified_info_plist
+  def test_rejects_disabled_info_plist_generation
     fixture = Fixture.new
-    fixture.project.sub!("GENERATE_INFOPLIST_FILE = NO;", "GENERATE_INFOPLIST_FILE = YES;")
+    fixture.project.sub!("GENERATE_INFOPLIST_FILE = YES;", "GENERATE_INFOPLIST_FILE = NO;")
 
     error = assert_contract_error { validate(fixture) }
 
-    assert_includes error.message, "KitchenMemory Debug must select the editable platform Info.plists by SDK"
+    assert_includes error.message, "KitchenMemory Debug must generate common bundle metadata"
   end
 
   def test_rejects_missing_ios_info_plist_selection
@@ -499,19 +503,31 @@ class CheckProjectStructureTest < Minitest::Test
 
     error = assert_contract_error { validate(fixture) }
 
-    assert_includes error.message, "KitchenMemory Debug must select the editable platform Info.plists by SDK"
+    assert_includes error.message, "KitchenMemory Debug must generate common bundle metadata"
   end
 
-  def test_rejects_wrong_testing_entitlements
+  def test_rejects_source_entitlements_in_testing_configuration
     fixture = Fixture.new
     fixture.project.sub!(
-      '"CODE_SIGN_ENTITLEMENTS[sdk=iphoneos*]" = "KitchenMemory/KitchenMemory-iOS-Testing.entitlements";',
-      '"CODE_SIGN_ENTITLEMENTS[sdk=iphoneos*]" = "KitchenMemory/KitchenMemory-iOS.entitlements";'
+      "\t\t\t\tPRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory;\n\t\t\t};\n\t\t\tname = Testing;",
+      "\t\t\t\t\"CODE_SIGN_ENTITLEMENTS[sdk=iphoneos*]\" = " \
+        "\"KitchenMemory/KitchenMemory-iOS.entitlements\";\n" \
+        "\t\t\t\tPRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory;\n" \
+        "\t\t\t};\n\t\t\tname = Testing;"
     )
 
     error = assert_contract_error { validate(fixture) }
 
     assert_includes error.message, "KitchenMemory Testing must select only"
+  end
+
+  def test_rejects_missing_project_owned_macos_sandbox_capability
+    fixture = Fixture.new
+    fixture.project.sub!("\t\t\t\t\"ENABLE_APP_SANDBOX[sdk=macosx*]\" = YES;\n", "")
+
+    error = assert_contract_error { validate(fixture) }
+
+    assert_includes error.message, "must express macOS sandbox capabilities in build settings"
   end
 
   def test_rejects_develop_configuration_using_production_bundle_identifier

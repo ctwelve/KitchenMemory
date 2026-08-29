@@ -135,9 +135,8 @@ The main settings that need deliberate qualification are:
 
 - `SDKROOT = auto` and `SUPPORTED_PLATFORMS = iphoneos iphonesimulator macosx`;
 - both `IPHONEOS_DEPLOYMENT_TARGET` and `MACOSX_DEPLOYMENT_TARGET`;
-- the iOS and macOS `INFOPLIST_FILE` values;
-- `UILaunchStoryboardName`, scene-manifest generation, orientations, and
-  indirect-input keys for iPhone device and simulator SDKs only;
+- generated common bundle metadata plus the iOS and macOS `INFOPLIST_FILE`
+  adapters;
 - `LD_RUNPATH_SEARCH_PATHS`, because native macOS embeds frameworks one bundle
   level above the iOS location;
 - macOS hardened-runtime and signing settings; and
@@ -160,18 +159,17 @@ may update the entitlements, property list, frameworks, and signing assets.
 [Entitlements](https://developer.apple.com/documentation/bundleresources/entitlements)
 · [Adding capabilities](https://developer.apple.com/documentation/xcode/adding-capabilities-to-your-app)
 
-Kitchen Memory must **not** flatten its entitlement files. The production iOS
-app uses `aps-environment`; native macOS uses
-`com.apple.developer.aps-environment` and additionally requires App Sandbox and
-outgoing network-client entitlements. The test hosts also differ: iOS is
-deliberately empty while macOS retains its least-privilege sandbox and network
-client. A unified target should select the existing files with
-SDK-qualified `CODE_SIGN_ENTITLEMENTS` values for each of `Debug`, `Develop`,
-`Testing`, `Production`, and `ProductionTesting`.
+Kitchen Memory must **not** flatten its production entitlement files. The iOS
+app uses `aps-environment`, while native macOS uses
+`com.apple.developer.aps-environment`. A unified target selects those files
+with SDK-qualified `CODE_SIGN_ENTITLEMENTS` values for production-capable
+configurations. App Sandbox and outbound network access are ordinary macOS
+target capabilities, so the project expresses them through SDK-qualified build
+settings. Testing configurations need no entitlement source file: Xcode
+synthesizes the macOS sandbox values from those settings, while the iOS test
+host requires no source entitlements.
 [iOS production entitlements](../../KitchenMemory/KitchenMemory-iOS.entitlements)
 · [macOS production entitlements](../../KitchenMemory/KitchenMemory-macOS.entitlements)
-· [iOS testing entitlements](../../KitchenMemory/KitchenMemory-iOS-Testing.entitlements)
-· [macOS testing entitlements](../../KitchenMemory/KitchenMemory-macOS-Testing.entitlements)
 
 The production targets already share `net.ctwelve.KitchenMemory`, and both
 development targets already share `net.ctwelve.dev.KitchenMemory`. A unified
