@@ -375,19 +375,20 @@ the application-owned loader.
 
 ## Tests
 
-Framework, application, and integration tests belong to both platform Testing
-schemes and the platform-specific `KitchenMemoryIOSTesting.xctestplan` and
-`KitchenMemoryMacTesting.xctestplan` plans. Tests for starter content
-and app composition live directly in `KitchenMemoryTests`; that shared source
-folder belongs to the platform-specific `KitchenMemoryIOSTests` and
-`KitchenMemoryMacTests` host targets. Framework tests remain grouped by their
-corresponding module, including
-`KitchenMemoryLogicTests` and the cloud-specific
-`KitchenMemoryPersistenceTests/Cloud` group. The exact coverage gate currently
-requires every executable line in the four internal frameworks to be covered by
-the canonical macOS non-UI result. The iOS and macOS application-test lanes are
-both correctness gates; using one platform's result for the shared-source metric
-does not make the other platform optional.
+Framework tests belong to four standalone, unhosted targets named for Domain,
+Import, Persistence, and Logic. `KitchenMemory Core Testing` and
+`KitchenMemoryCoreTesting.xctestplan` run that shared suite once on macOS.
+Property-test seeds and their generator live in `KitchenMemorySharedTestSupport`
+and are compiled directly into the three test targets that use them.
+
+Tests for starter content, presentation formatting, application composition,
+resources, and hosted runtime behavior live in `KitchenMemoryTests`; that
+folder belongs only to the platform-specific `KitchenMemoryIOSTests` and
+`KitchenMemoryMacTests` host targets. The platform Testing plans contain only
+their app target, while the Production plans add the existing UI smoke target.
+The exact coverage gate requires every executable line in the four internal
+frameworks to be covered by the core macOS result. Both app lanes remain
+correctness gates; the shared-source metric does not make either optional.
 
 The two platform Production schemes are the only schemes that reference
 the platform-specific production plans and the shared UI target. Their

@@ -33,88 +33,28 @@ final class DomainSkeletonTests: XCTestCase {
         XCTAssertEqual(try JSONDecoder().decode(Kitchen.self, from: data), kitchen)
     }
 
-    func testIngredientPresentationIsComputedFromStructuredFields() {
-        let ingredient = RecipeIngredient(
-            originalText: "two cups of flour",
-            quantity: QuantityExpression(
-                kind: .exact,
-                lowerBound: RationalQuantity(numerator: 2)
-            ),
-            unitText: "cups",
-            ingredientText: "flour",
-            preparation: "sifted"
+    func testCustomIngredientContentUsesEveryLosslessFallback() {
+        let custom = RecipeIngredient(
+            presentationMode: .custom,
+            customDisplayText: "Use the family wording"
         )
+        let structured = RecipeIngredient(
+            presentationMode: .custom,
+            ingredientText: "chickpeas"
+        )
+        let original = RecipeIngredient(
+            originalText: "one handful herbs",
+            presentationMode: .custom
+        )
+        let empty = RecipeIngredient(presentationMode: .custom)
 
-        XCTAssertEqual(ingredient.effectiveDisplayText, "2 cups flour, sifted")
+        XCTAssertTrue(custom.hasMeaningfulDisplayContent)
+        XCTAssertTrue(structured.hasMeaningfulDisplayContent)
+        XCTAssertTrue(original.hasMeaningfulDisplayContent)
+        XCTAssertFalse(empty.hasMeaningfulDisplayContent)
     }
 
-    func testIngredientCanPresentPreservedOriginalOrCustomText() {
-        var ingredient = RecipeIngredient(
-            originalText: "a couple glugs olive oil",
-            ingredientText: "olive oil"
-        )
-
-        ingredient.presentationMode = .original
-        XCTAssertEqual(ingredient.effectiveDisplayText, "a couple glugs olive oil")
-
-        ingredient.presentationMode = .custom
-        ingredient.customDisplayText = "Olive oil, as needed"
-        XCTAssertEqual(ingredient.effectiveDisplayText, "Olive oil, as needed")
-    }
-
-    func testIncompleteStructuredPresentationFallsBackToOriginalText() {
-        let ingredient = RecipeIngredient(originalText: "salt to taste")
-
-        XCTAssertEqual(ingredient.effectiveDisplayText, "salt to taste")
-    }
-
-    func testEveryQuantityKindRendersWithoutInventingPrecision() {
-        let exact = QuantityExpression(
-            kind: .exact,
-            lowerBound: RationalQuantity(numerator: 1, denominator: 2)
-        )
-        let range = QuantityExpression(
-            kind: .range,
-            lowerBound: RationalQuantity(numerator: 2),
-            upperBound: RationalQuantity(numerator: 3)
-        )
-        let approximate = QuantityExpression(
-            kind: .approximate,
-            lowerBound: RationalQuantity(numerator: 2)
-        )
-        let text = QuantityExpression(kind: .text, text: "to taste")
-
-        XCTAssertEqual(exact.renderedText, "1/2")
-        XCTAssertEqual(range.renderedText, "2–3")
-        XCTAssertEqual(approximate.renderedText, "about 2")
-        XCTAssertEqual(text.renderedText, "to taste")
-        XCTAssertNil(QuantityExpression(kind: .none).renderedText)
-    }
-
-    func testPackageQuantityParticipatesInComputedPresentation() {
-        let ingredient = RecipeIngredient(
-            quantity: QuantityExpression(
-                kind: .exact,
-                lowerBound: RationalQuantity(numerator: 4)
-            ),
-            unitText: "cans",
-            package: PackageDescription(
-                quantity: QuantityExpression(
-                    kind: .exact,
-                    lowerBound: RationalQuantity(numerator: 5)
-                ),
-                unitText: "ounces"
-            ),
-            ingredientText: "chunk light tuna"
-        )
-
-        XCTAssertEqual(
-            ingredient.effectiveDisplayText,
-            "4 (5 ounces) cans chunk light tuna"
-        )
-    }
-
-    func testRationalScalingReducesAndRendersMixedFractionsExactly() throws {
+    func testRationalScalingReducesExactly() throws {
         let scale = try XCTUnwrap(RecipeScale(
             baseYield: RationalQuantity(numerator: 8),
             workingYield: RationalQuantity(numerator: 6)
@@ -125,7 +65,6 @@ final class DomainSkeletonTests: XCTestCase {
             RationalQuantity(numerator: 2).multiplied(by: scale.multiplier),
             RationalQuantity(numerator: 3, denominator: 2)
         )
-        XCTAssertEqual(RationalQuantity(numerator: 6, denominator: 4).renderedText, "1 1/2")
     }
 
     func testExactAndRangedLinearQuantitiesScaleWithoutChangingPackageSize() throws {
@@ -159,9 +98,14 @@ final class DomainSkeletonTests: XCTestCase {
         ).scaled(using: scale)
 
         XCTAssertEqual(exact.status, .scaled)
-        XCTAssertEqual(exact.ingredient.effectiveDisplayText, "2 (5 ounces) cans tuna")
+        XCTAssertEqual(exact.ingredient.quantity?.lowerBound, RationalQuantity(numerator: 2))
+        XCTAssertEqual(exact.ingredient.package?.quantity.lowerBound, RationalQuantity(numerator: 5))
         XCTAssertEqual(range.status, .scaled)
-        XCTAssertEqual(range.ingredient.effectiveDisplayText, "1–1 1/2 cups stock")
+        XCTAssertEqual(range.ingredient.quantity?.lowerBound, RationalQuantity(numerator: 1))
+        XCTAssertEqual(
+            range.ingredient.quantity?.upperBound,
+            RationalQuantity(numerator: 3, denominator: 2)
+        )
     }
 
     func testNonlinearAndTextIngredientsRemainIntactWithExplicitStatuses() throws {
@@ -185,11 +129,11 @@ final class DomainSkeletonTests: XCTestCase {
         ).scaled(using: scale)
 
         XCTAssertEqual(fixed.status, .unchangedFixed)
-        XCTAssertEqual(fixed.ingredient.effectiveDisplayText, "oil for the pan")
+        XCTAssertEqual(fixed.ingredient.originalText, "oil for the pan")
         XCTAssertEqual(manual.status, .unchangedManualReview)
-        XCTAssertEqual(manual.ingredient.effectiveDisplayText, "salt")
+        XCTAssertEqual(manual.ingredient.ingredientText, "salt")
         XCTAssertEqual(text.status, .unchangedText)
-        XCTAssertEqual(text.ingredient.effectiveDisplayText, "a handful parsley")
+        XCTAssertEqual(text.ingredient.quantity?.text, "a handful")
     }
 
     func testOriginalPresentationUsesStructuredAmountOnlyForScaledCopy() throws {
@@ -211,9 +155,13 @@ final class DomainSkeletonTests: XCTestCase {
 
         let scaled = ingredient.scaled(using: scale)
 
-        XCTAssertEqual(ingredient.effectiveDisplayText, "1.3 lb ground beef")
+        XCTAssertEqual(ingredient.presentationMode, .original)
         XCTAssertEqual(scaled.status, .scaled)
-        XCTAssertEqual(scaled.ingredient.effectiveDisplayText, "2 3/5 pounds ground beef")
+        XCTAssertEqual(scaled.ingredient.presentationMode, .structured)
+        XCTAssertEqual(
+            scaled.ingredient.quantity?.lowerBound,
+            RationalQuantity(numerator: 13, denominator: 5)
+        )
     }
 
     func testRangedYieldExposesBothHonestScalingBases() {

@@ -58,6 +58,11 @@ UI-smoke target. The shared UI target chooses its native app host through
 SDK-conditional target settings. Platform and destination remain scheme or CI
 action choices rather than test-plan configurations.
 
+Keep reusable-framework validation outside those app-hosted plans. The
+standalone `KitchenMemory Core Testing` scheme uses a fifth plan containing the
+four unhosted framework test targets and has no runnable or archive action.
+This expresses one shared correctness lane without inventing a third app host.
+
 Support only the products Kitchen Memory intentionally ships. The iOS target
 does not advertise Mac Catalyst, Mac Designed for iPhone or iPad, or visionOS
 Designed for iPhone or iPad compatibility. A future Catalyst, visionOS, or tvOS
@@ -74,13 +79,14 @@ in [ADR 0007](0007-business-logic-coverage-and-ui-smoke-tests.md) continues to a
   inspectable platform owners.
 - The shared 0.1 application layer can continue unchanged while either 0.2
   presentation evolves independently.
-- Scheme and test-plan duplication is deliberate because the two native
-  products have different hosts and destinations.
+- Platform scheme and test-plan duplication is deliberate because the two
+  native products have different hosts and destinations; core tests are not
+  repeated through those hosts.
 - The app configuration matrix, scheme-to-plan references, supported
   destinations, and resource membership become project contracts that should
   be checked automatically.
-- Both platform application-test lanes remain correctness gates. One platform
-  may produce the canonical coverage artifact without making the other lane
-  optional.
+- Both platform application-test lanes remain correctness gates. The separate
+  core lane produces the canonical coverage artifact without making either app
+  lane optional.
 - A combined cross-platform scheme would add an alternate orchestration surface
   without replacing either native runnable or archive, so none is introduced.

@@ -237,10 +237,11 @@ final class RecipeEditorTests: XCTestCase {
     )
     let ingredients = stored.revision.ingredientSections.flatMap(\.ingredients)
 
-    XCTAssertEqual(ingredients[0].quantity?.renderedText, "2–3")
+    XCTAssertEqual(ingredients[0].quantity?.lowerBound, RationalQuantity(numerator: 2))
+    XCTAssertEqual(ingredients[0].quantity?.upperBound, RationalQuantity(numerator: 3))
     XCTAssertEqual(ingredients[0].unitText, "cups")
     XCTAssertEqual(ingredients[0].package?.unitText, "ounces")
-    XCTAssertEqual(ingredients[1].quantity?.renderedText, "to taste")
+    XCTAssertEqual(ingredients[1].quantity?.text, "to taste")
     XCTAssertNil(ingredients[1].unitText)
     XCTAssertNil(ingredients[1].package)
   }

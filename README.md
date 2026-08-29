@@ -111,13 +111,15 @@ platform-owned files live in `KitchenMemoryIOS` and `KitchenMemoryMac`. Durable
 domain, import, product-logic, and persistence code lives in root-level native
 framework targets.
 
-Business-logic, application, and persistence tests run through the committed
-platform Testing schemes. For example:
+Reusable-framework tests run once through the standalone core scheme; native
+composition and resource tests run through the platform Testing schemes. For
+example:
 
 ```sh
 xcodebuild test \
   -project KitchenMemory.xcodeproj \
-  -scheme 'KitchenMemory macOS Testing' \
+  -scheme 'KitchenMemory Core Testing' \
+  -testPlan KitchenMemoryCoreTesting \
   -destination 'platform=macOS'
 ```
 

@@ -24,6 +24,10 @@ module KitchenMemory
       "KitchenMemoryMacOS" => "com.apple.product-type.application",
       "KitchenMemoryIOSTests" => "com.apple.product-type.bundle.unit-test",
       "KitchenMemoryMacTests" => "com.apple.product-type.bundle.unit-test",
+      "KitchenMemoryDomainTests" => "com.apple.product-type.bundle.unit-test",
+      "KitchenMemoryImportTests" => "com.apple.product-type.bundle.unit-test",
+      "KitchenMemoryLogicTests" => "com.apple.product-type.bundle.unit-test",
+      "KitchenMemoryPersistenceTests" => "com.apple.product-type.bundle.unit-test",
       "KitchenMemoryUITests" => "com.apple.product-type.bundle.ui-testing",
       "KitchenMemoryDomain" => "com.apple.product-type.framework",
       "KitchenMemoryImport" => "com.apple.product-type.framework",
@@ -35,6 +39,10 @@ module KitchenMemory
       "KitchenMemoryMacOS" => %w[macosx],
       "KitchenMemoryIOSTests" => %w[iphoneos iphonesimulator],
       "KitchenMemoryMacTests" => %w[macosx],
+      "KitchenMemoryDomainTests" => %w[iphoneos iphonesimulator macosx],
+      "KitchenMemoryImportTests" => %w[iphoneos iphonesimulator macosx],
+      "KitchenMemoryLogicTests" => %w[iphoneos iphonesimulator macosx],
+      "KitchenMemoryPersistenceTests" => %w[iphoneos iphonesimulator macosx],
       "KitchenMemoryUITests" => %w[iphoneos iphonesimulator macosx],
       "KitchenMemoryDomain" => %w[iphoneos iphonesimulator macosx],
       "KitchenMemoryImport" => %w[iphoneos iphonesimulator macosx],
@@ -51,6 +59,12 @@ module KitchenMemory
       "TEST_TARGET_NAME[sdk=iphonesimulator*]" => "KitchenMemoryIOS",
       "TEST_TARGET_NAME[sdk=macosx*]" => "KitchenMemoryMacOS"
     }.freeze
+    UNHOSTED_TEST_TARGETS = %w[
+      KitchenMemoryDomainTests
+      KitchenMemoryImportTests
+      KitchenMemoryLogicTests
+      KitchenMemoryPersistenceTests
+    ].freeze
     PROJECT_CONFIGURATION_FILES = APP_CONFIGURATIONS.to_h do |configuration|
       [configuration, "#{configuration}.xcconfig"]
     end.freeze
@@ -80,6 +94,10 @@ module KitchenMemory
       "KitchenMemoryMacOS" => ["KitchenMemory", "KitchenMemoryMac"],
       "KitchenMemoryIOSTests" => ["KitchenMemoryTests"],
       "KitchenMemoryMacTests" => ["KitchenMemoryTests"],
+      "KitchenMemoryDomainTests" => ["KitchenMemoryDomainTests", "KitchenMemorySharedTestSupport"],
+      "KitchenMemoryImportTests" => ["KitchenMemoryImportTests", "KitchenMemorySharedTestSupport"],
+      "KitchenMemoryLogicTests" => ["KitchenMemoryLogicTests", "KitchenMemorySharedTestSupport"],
+      "KitchenMemoryPersistenceTests" => ["KitchenMemoryPersistenceTests"],
       "KitchenMemoryUITests" => ["KitchenMemoryUITests"],
       "KitchenMemoryDomain" => ["KitchenMemoryDomain"],
       "KitchenMemoryImport" => ["KitchenMemoryImport"],
@@ -91,6 +109,7 @@ module KitchenMemory
       "KitchenMemoryMac" => "KitchenMemoryMacOS"
     }.freeze
     PLANS = {
+      "KitchenMemoryCoreTesting.xctestplan" => UNHOSTED_TEST_TARGETS,
       "KitchenMemoryIOSTesting.xctestplan" => ["KitchenMemoryIOSTests"],
       "KitchenMemoryIOSProduction.xctestplan" => [
         "KitchenMemoryIOSTests",
@@ -103,17 +122,21 @@ module KitchenMemory
       ]
     }.freeze
     PLAN_POLICIES = {
-      "KitchenMemoryIOSTesting.xctestplan" => {
-        configuration: "Core and Application Tests",
+      "KitchenMemoryCoreTesting.xctestplan" => {
+        configuration: "Core Framework Tests",
         code_coverage: true
+      },
+      "KitchenMemoryIOSTesting.xctestplan" => {
+        configuration: "Application Tests",
+        code_coverage: false
       },
       "KitchenMemoryIOSProduction.xctestplan" => {
         configuration: "Production Validation",
         code_coverage: false
       },
       "KitchenMemoryMacTesting.xctestplan" => {
-        configuration: "Core and Application Tests",
-        code_coverage: true
+        configuration: "Application Tests",
+        code_coverage: false
       },
       "KitchenMemoryMacProduction.xctestplan" => {
         configuration: "Production Validation",
@@ -144,6 +167,11 @@ module KitchenMemory
       }
     }.freeze
     SCHEMES = {
+      "KitchenMemory Core Testing" => {
+        build_targets: UNHOSTED_TEST_TARGETS,
+        plan: "KitchenMemoryCoreTesting.xctestplan",
+        core: true
+      },
       "KitchenMemory iOS Development" => {
         app: "KitchenMemoryIOS",
         plan: "KitchenMemoryIOSTesting.xctestplan"
@@ -182,6 +210,7 @@ module KitchenMemory
       configurations = validate_configurations(objects, targets)
       validate_platforms(configurations)
       validate_ui_test_hosts(configurations.fetch("KitchenMemoryUITests"))
+      validate_unhosted_tests(configurations)
       validate_app_file_settings(configurations)
       validate_synchronized_groups(objects, targets)
 
@@ -382,6 +411,19 @@ module KitchenMemory
       end
     end
 
+    def validate_unhosted_tests(configurations)
+      UNHOSTED_TEST_TARGETS.each do |target_name|
+        configurations.fetch(target_name).each do |configuration|
+          hosted_settings = configuration[:settings].keys & %w[BUNDLE_LOADER TEST_HOST]
+          next if hosted_settings.empty?
+
+          raise ContractError,
+                "#{target_name} #{configuration[:name]} must remain unhosted; " \
+                "found #{hosted_settings.join(', ')}"
+        end
+      end
+    end
+
     def validate_app_file_settings(configurations)
       APP_FILE_CONTRACTS.each do |target_name, contract|
         configurations.fetch(target_name).each do |configuration|
@@ -572,14 +614,20 @@ module KitchenMemory
           document,
           "/Scheme/BuildAction/BuildActionEntries/BuildActionEntry/BuildableReference"
         ).map { |element| element.attributes["BlueprintName"] }
-        unless build_names == [expected[:app]]
+        expected_build_names = expected.fetch(:build_targets, [expected[:app]])
+        unless build_names == expected_build_names
           raise ContractError,
-                "#{scheme_name} build action must contain only #{expected[:app]}; found #{build_names.inspect}"
+                "#{scheme_name} build action must contain only #{expected_build_names.join(', ')}; " \
+                "found #{build_names.inspect}"
         end
-        validate_scheme_action_membership(scheme_name, document)
-        validate_scheme_action_configurations(scheme_name, document)
-        validate_scheme_runnable(scheme_name, document, "LaunchAction", expected[:app])
-        validate_scheme_runnable(scheme_name, document, "ProfileAction", expected[:app])
+        if expected[:core]
+          validate_core_scheme_actions(scheme_name, document)
+        else
+          validate_scheme_action_membership(scheme_name, document)
+          validate_scheme_action_configurations(scheme_name, document)
+          validate_scheme_runnable(scheme_name, document, "LaunchAction", expected[:app])
+          validate_scheme_runnable(scheme_name, document, "ProfileAction", expected[:app])
+        end
 
         expected_testables = PLANS.fetch(expected[:plan])
         testable_names = REXML::XPath.match(
@@ -587,6 +635,41 @@ module KitchenMemory
           "/Scheme/TestAction/Testables/TestableReference/BuildableReference"
         ).map { |element| element.attributes["BlueprintName"] }
         assert_exact_names("#{scheme_name} testables", testable_names, expected_testables)
+      end
+    end
+
+    def validate_core_scheme_actions(scheme_name, document)
+      entries = REXML::XPath.match(
+        document,
+        "/Scheme/BuildAction/BuildActionEntries/BuildActionEntry"
+      )
+      unless entries.length == UNHOSTED_TEST_TARGETS.length
+        raise ContractError, "#{scheme_name} must contain one build entry per core test target"
+      end
+      expected_attributes = {
+        "buildForTesting" => "YES",
+        "buildForRunning" => "NO",
+        "buildForProfiling" => "NO",
+        "buildForArchiving" => "NO",
+        "buildForAnalyzing" => "YES"
+      }
+      entries.each do |entry|
+        expected_attributes.each do |attribute, expected_value|
+          next if entry.attributes[attribute] == expected_value
+
+          raise ContractError, "#{scheme_name} must set #{attribute} to #{expected_value}"
+        end
+      end
+      { "TestAction" => "Testing", "AnalyzeAction" => "Testing" }.each do |action, configuration|
+        elements = REXML::XPath.match(document, "/Scheme/#{action}")
+        unless elements.length == 1 && elements.first.attributes["buildConfiguration"] == configuration
+          raise ContractError, "#{scheme_name} #{action} must use #{configuration}"
+        end
+      end
+      %w[LaunchAction ProfileAction ArchiveAction].each do |action|
+        next if REXML::XPath.match(document, "/Scheme/#{action}").empty?
+
+        raise ContractError, "#{scheme_name} must not contain #{action}"
       end
     end
 
