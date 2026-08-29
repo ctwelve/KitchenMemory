@@ -14,8 +14,8 @@ ruby "$repository_path/Tools/Tests/check_release_version_test.rb"
 ruby "$repository_path/Tools/Tests/check_project_structure_test.rb"
 ruby "$repository_path/Tools/Tests/check_software_inventory_test.rb"
 
-# Keep the native target split, schemes, test plans, destinations, and
-# cross-platform UI-test host selection synchronized as the project evolves.
+# Keep the native target split, automatic plans, minimal KitchenKit scheme,
+# destinations, and cross-platform UI-test host selection synchronized.
 ruby "$repository_path/Tools/check-project-structure.rb"
 
 # Keep the reviewed SPDX inventory synchronized with SwiftPM pins and the

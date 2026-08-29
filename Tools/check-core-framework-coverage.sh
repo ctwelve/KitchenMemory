@@ -14,10 +14,8 @@ fi
 RESULT_BUNDLE=$1
 SCRIPT_DIRECTORY=$(CDPATH= cd "$(dirname "$0")" && pwd)
 PROJECT_ROOT=$(dirname "$SCRIPT_DIRECTORY")
-DOMAIN_DIRECTORY="$PROJECT_ROOT/Domain"
-IMPORT_DIRECTORY="$PROJECT_ROOT/Import"
-LOGIC_DIRECTORY="$PROJECT_ROOT/Logic"
-PERSISTENCE_DIRECTORY="$PROJECT_ROOT/Persistence"
+KITCHEN_KIT_DIRECTORY="$PROJECT_ROOT/KitchenKit"
+PERSISTENCE_DIRECTORY="$KITCHEN_KIT_DIRECTORY/Persistence"
 PERSISTENCE_RUNTIME_ADAPTER="$PERSISTENCE_DIRECTORY/Cloud/PersonalCloudStatusMonitor.swift"
 
 if [ ! -r "$RESULT_BUNDLE" ]; then
@@ -45,20 +43,12 @@ fi
 # Include the test corpus and project membership metadata because either can
 # change what was built or exercised without changing a framework source file.
 if ! INPUT_TIMESTAMPS=$(find \
-  "$DOMAIN_DIRECTORY" \
-  "$IMPORT_DIRECTORY" \
-  "$LOGIC_DIRECTORY" \
-  "$PERSISTENCE_DIRECTORY" \
-  "$PROJECT_ROOT/DomainTests" \
-  "$PROJECT_ROOT/ImportTests" \
-  "$PROJECT_ROOT/LogicTests" \
-  "$PROJECT_ROOT/PersistenceTests" \
-  "$PROJECT_ROOT/SharedTestSupport" \
+  "$KITCHEN_KIT_DIRECTORY" \
+  "$PROJECT_ROOT/KitchenKitTests" \
   "$PROJECT_ROOT/Configurations" \
   "$PROJECT_ROOT/KitchenMemory.xcodeproj/project.pbxproj" \
-  "$PROJECT_ROOT/KitchenMemory.xcodeproj/xcshareddata/xcschemes/KitchenMemory Core Testing.xcscheme" \
+  "$PROJECT_ROOT/KitchenMemory.xcodeproj/xcshareddata/xcschemes/KitchenKit.xcscheme" \
   "$PROJECT_ROOT/KitchenMemory.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved" \
-  "$PROJECT_ROOT/KitchenMemoryCoreTesting.xctestplan" \
   -type f -exec stat -f '%Fm %N' {} +); then
   echo "Coverage gate error: could not inventory coverage inputs" >&2
   exit 2
@@ -97,7 +87,7 @@ while IFS='|' read -r TARGET MODULE_DIRECTORY; do
   fi
 
   EXCLUDED_SOURCE=
-  if [ "$TARGET" = "KitchenMemoryPersistence.framework" ]; then
+  if [ "$TARGET" = "KitchenKit.framework" ]; then
     # This file is the narrow Apple-runtime bridge: it calls CKContainer and
     # translates ObjC notifications whose event type has no public initializer.
     # Its deterministic status reducer lives in PersonalCloudStatus.swift and
@@ -186,13 +176,10 @@ while IFS='|' read -r TARGET MODULE_DIRECTORY; do
 $MODULE_SOURCES
 EOF
 done <<EOF
-KitchenMemoryDomain.framework|$DOMAIN_DIRECTORY
-KitchenMemoryImport.framework|$IMPORT_DIRECTORY
-KitchenMemoryLogic.framework|$LOGIC_DIRECTORY
-KitchenMemoryPersistence.framework|$PERSISTENCE_DIRECTORY
+KitchenKit.framework|$KITCHEN_KIT_DIRECTORY
 EOF
 
 if [ "$COVERAGE_FAILED" -ne 0 ]; then
   exit 1
 fi
-echo "Core framework business-logic coverage gate passed."
+echo "KitchenKit business-logic coverage gate passed."

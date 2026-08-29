@@ -9,7 +9,7 @@ import UIKit
 #endif
 import DeveloperToolsSupport
 import Foundation
-import KitchenMemoryDomain
+import KitchenKit
 
 /// The versioned index of a bundled recipe pack.
 public struct SampleRecipePackManifest: Codable, Equatable, Identifiable, Sendable {

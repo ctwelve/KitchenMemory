@@ -18,13 +18,13 @@ that meaning is stored; synchronization describes how stored changes move among
 devices and people.
 
 ```text
-KitchenMemoryDomain
+KitchenKit — Domain responsibility
         ↓
-KitchenMemoryLogic and domain-facing repository interfaces
+KitchenKit — Logic and domain-facing repository seams
         ↓
-SwiftData persistence records and mapping
+KitchenKit — Persistence adapters
         ↓
-CloudKit synchronization and sharing
+SwiftData and CloudKit
 ```
 
 Domain values never expose SwiftData object identity, `CKRecord.ID`, database
@@ -184,19 +184,20 @@ portable format.
 
 ## Module organization
 
-Use one `KitchenMemoryDomain` module, organized by feature. Separate modules for
-recipes, kitchens, pantry, planning, and sessions would create dependencies among
-concepts that intentionally share identities and rules. The app's internal
-modules are native Xcode framework targets in root-level folders; they
-are not separately distributed packages.
+Use one `KitchenKit` Swift module, organized into Domain, Import, Logic, and
+Persistence responsibility folders. Separate compiler modules for recipes,
+kitchens, pantry, planning, sessions, importing, and storage would expose
+dependencies among capabilities that every store client consumes together.
+Architectural seams remain explicit in interfaces and source organization
+without becoming separately linked products.
 
-The implemented `KitchenMemoryDomain` module begins with the
+The implemented Domain responsibility begins with the
 `Kitchen → Recipe → RecipeRevision` slice. The shared `KitchenMemory/`
 application layer owns deterministic starter resources and their loader, and
 both native app targets compile that layer. This keeps Apple resource APIs out
-of the domain module without creating a framework for app-specific data.
+of Domain without creating a framework for app-specific data.
 
-`KitchenMemoryPersistence` supplies SwiftData adapters behind that boundary.
+The Persistence responsibility supplies SwiftData adapters behind that seam.
 Recipe rows use application-owned UUID foreign keys and explicit ordering
 columns behind `RecipeRepository`. Cooking Sessions use a separate
 `CookingSessionRepository`: five immutable document-evidence record families,
@@ -215,8 +216,8 @@ adds Cooking Session evidence through a second lightweight stage. Production
 CloudKit evolution is additive: new feature aggregates may add types and fields,
 while published schema elements keep their original meaning.
 
-`KitchenMemoryLogic` supplies the product operations. `RecipeLibrary` is the
-Kitchen-scoped module for loading library content, creating and revising recipes,
+The Logic responsibility supplies the product operations. `RecipeLibrary` is the
+Kitchen-scoped service for loading library content, creating and revising recipes,
 interpreting imports, managing bundled samples, and performing an explicitly
 confirmed reset without exposing SwiftData records. Scaling state and bootstrap
 remain separate because they have different lifecycles. The app's observable

@@ -24,11 +24,11 @@ export DEVELOPER_DIR
 
 xcodebuild test \
   -project "$PROJECT_ROOT/KitchenMemory.xcodeproj" \
-  -scheme "KitchenMemory Core Testing" \
-  -testPlan KitchenMemoryCoreTesting \
+  -scheme KitchenKit \
   -destination 'platform=macOS' \
   -derivedDataPath "$DERIVED_DATA_PATH" \
   -resultBundlePath "$RESULT_BUNDLE" \
+  -enableCodeCoverage YES \
   CODE_SIGNING_ALLOWED=NO
 
 "$SCRIPT_DIRECTORY/check-core-framework-coverage.sh" "$RESULT_BUNDLE"

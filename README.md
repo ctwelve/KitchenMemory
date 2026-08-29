@@ -96,9 +96,12 @@ been flattened or silently rewritten.
 
 ## Building from source
 
-Open `KitchenMemory.xcodeproj` in Xcode. Run **KitchenMemory iOS Development**
-for an iOS Simulator or development device, or **KitchenMemory macOS
-Development** for My Mac.
+Open `KitchenMemory.xcodeproj` in Xcode. Run **KitchenMemoryIOS** for an iOS
+Simulator or development device, or **KitchenMemoryMacOS** for My Mac. Xcode
+maintains the application schemes and their test plans automatically from
+target membership. The repository's minimal shared **KitchenKit** scheme
+associates its unhosted test target; Xcode still creates that scheme's test plan
+automatically.
 
 Development builds use the `net.ctwelve.dev` application namespace and the
 separate `iCloud.net.ctwelve.dev.KitchenMemory` container. They cannot read or
@@ -108,18 +111,18 @@ use separate local application sandboxes.
 The repository contains separate native iOS and macOS app targets. Shared
 presentation, localization, and starter content live in `KitchenMemory`;
 platform-owned files live in `KitchenMemoryIOS` and `KitchenMemoryMac`. Durable
-domain, import, product-logic, and persistence code lives in root-level native
-framework targets.
+domain, import, product-logic, and persistence code lives in the native
+`KitchenKit` framework.
 
-Reusable-framework tests run once through the standalone core scheme; native
-composition and resource tests run through the platform Testing schemes. For
+KitchenKit tests run once through its shared scheme and automatic plan; native
+composition and resource tests run through each platform application's
+automatic scheme. For
 example:
 
 ```sh
 xcodebuild test \
   -project KitchenMemory.xcodeproj \
-  -scheme 'KitchenMemory Core Testing' \
-  -testPlan KitchenMemoryCoreTesting \
+  -scheme KitchenKit \
   -destination 'platform=macOS'
 ```
 

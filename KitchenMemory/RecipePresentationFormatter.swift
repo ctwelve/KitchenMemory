@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 import Foundation
-import KitchenMemoryDomain
+import KitchenKit
 
 /// Locale-aware rendering for semantic recipe values.
 ///
