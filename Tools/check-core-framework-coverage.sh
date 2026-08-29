@@ -49,12 +49,16 @@ if ! INPUT_TIMESTAMPS=$(find \
   "$IMPORT_DIRECTORY" \
   "$LOGIC_DIRECTORY" \
   "$PERSISTENCE_DIRECTORY" \
-  "$PROJECT_ROOT/KitchenMemoryTests" \
+  "$PROJECT_ROOT/KitchenMemoryDomainTests" \
+  "$PROJECT_ROOT/KitchenMemoryImportTests" \
+  "$PROJECT_ROOT/KitchenMemoryLogicTests" \
+  "$PROJECT_ROOT/KitchenMemoryPersistenceTests" \
+  "$PROJECT_ROOT/KitchenMemorySharedTestSupport" \
   "$PROJECT_ROOT/Configurations" \
   "$PROJECT_ROOT/KitchenMemory.xcodeproj/project.pbxproj" \
-  "$PROJECT_ROOT/KitchenMemory.xcodeproj/xcshareddata/xcschemes/KitchenMemory macOS Testing.xcscheme" \
+  "$PROJECT_ROOT/KitchenMemory.xcodeproj/xcshareddata/xcschemes/KitchenMemory Core Testing.xcscheme" \
   "$PROJECT_ROOT/KitchenMemory.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved" \
-  "$PROJECT_ROOT/KitchenMemoryMacTesting.xctestplan" \
+  "$PROJECT_ROOT/KitchenMemoryCoreTesting.xctestplan" \
   -type f -exec stat -f '%Fm %N' {} +); then
   echo "Coverage gate error: could not inventory coverage inputs" >&2
   exit 2
@@ -98,7 +102,9 @@ while IFS='|' read -r TARGET MODULE_DIRECTORY; do
     # translates ObjC notifications whose event type has no public initializer.
     # Its deterministic status reducer lives in PersonalCloudStatus.swift and
     # remains inside the exact business-logic gate.
-    EXCLUDED_SOURCE=$PERSISTENCE_RUNTIME_ADAPTER
+    # Xcode may canonicalize /private/tmp to /tmp in coverage paths, so compare
+    # the stable repository-relative suffix rather than the absolute spelling.
+    EXCLUDED_SOURCE=${PERSISTENCE_RUNTIME_ADAPTER#"$PROJECT_ROOT"}
   fi
 
   if TARGET_COVERAGE=$(printf '%s\n' "$TARGET_REPORT" | awk \

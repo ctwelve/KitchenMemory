@@ -6,7 +6,7 @@ Copyright © 2026 the Kitchen Memory contributors.
 SPDX-License-Identifier: GPL-3.0-only
 -->
 
-Xcode Cloud is Kitchen Memory's continuous-integration system. Six shared
+Xcode Cloud is Kitchen Memory's continuous-integration system. Seven shared
 schemes make both the platform and workflow boundary explicit. iOS and macOS
 each have `Development`, `Testing`, and `Production` schemes. Development owns
 ordinary developer runs, Testing owns deterministic non-UI validation, and
@@ -24,11 +24,13 @@ action using the `Production` configuration.
 | `KitchenMemory macOS Development` | `Develop` | `Testing` | `KitchenMemoryMacTesting`: `KitchenMemoryMacTests` | native macOS | `Production` / No |
 | `KitchenMemory macOS Testing` | `Testing` | `Testing` | `KitchenMemoryMacTesting`: `KitchenMemoryMacTests` | native macOS | No / No |
 | `KitchenMemory macOS Production` | `Production` | `ProductionTesting` | `KitchenMemoryMacProduction`: `KitchenMemoryMacTests` and shared UI smoke hosted by `KitchenMemoryMacOS` | native macOS | `Production` / `Production` |
+| `KitchenMemory Core Testing` | N/A / `Testing` | `Testing` | `KitchenMemoryCoreTesting`: Domain, Import, Logic, and Persistence standalone tests | native macOS | No / No |
 
-Each scheme has one top-level app buildable; Xcode adds the four linked
-framework targets through ordinary dependency resolution. Each plan currently
-has one plan configuration: `Core and Application Tests` for Testing or
-`Production Validation` for Production. Additional plan configurations would
+Each platform scheme has one top-level app buildable; Xcode adds the four linked
+framework targets through ordinary dependency resolution. The core scheme has
+four test buildables and no runnable or archive action. Each plan has one plan
+configuration: `Core Framework Tests`, `Application Tests`, or `Production
+Validation`. Additional plan configurations would
 alter arguments, environment, diagnostics, and repetition for the same target
 set. They would not select a platform, destination, or test host. Combining iOS
 and macOS into two configurations of one plan would still ask Xcode to assemble
@@ -47,9 +49,10 @@ and acceptance decision; they are not incidental CI coverage.
 The development workflow starts for meaningful project changes pushed to
 `slice/*` integration branches, `bugs/*` hardening branches, and
 `release-eng/*` release-infrastructure branches. All three governed lanes
-perform Build, Analyze, and Test actions using `KitchenMemory iOS Testing` and
-`KitchenMemory macOS Testing`, but never archive a product. Those actions use
-`Testing` and do not include UI automation. Local developer runs use the
+perform Build, Analyze, and Test actions using `KitchenMemory iOS Testing`,
+`KitchenMemory macOS Testing`, and the macOS-destination `KitchenMemory Core
+Testing` lane, but never archive a product. Those actions use `Testing` and do
+not include UI automation. Local developer runs use the
 corresponding platform's Development scheme, whose Run and Analyze actions use
 `Develop`. The distinct development bundle identifier keeps local stores,
 CloudKit metadata, and onboarding preferences out of the Production app
@@ -252,16 +255,16 @@ copy while the source checkout is available. This is necessary because Xcode
 Cloud may execute `test-without-building` on a different host that receives the
 test products but not the original repository path recorded by `#filePath`.
 
-Both committed non-UI test plans collect code coverage, and both platform lanes
-are correctness gates. Evaluate the durable domain, import, persistence, and
-product-logic sources separately from SwiftUI views and test bundles; an
-app-wide percentage is not the business-logic metric. Use uncovered executable
-lines to find missing behavior and boundary tests, not to justify exercising
-provisional views through UI automation.
+The core plan collects code coverage; the two app-hosted Testing plans do not.
+All three lanes are correctness gates. Evaluate durable domain, import,
+persistence, and product-logic sources separately from SwiftUI views and test
+bundles; an app-wide percentage is not the business-logic metric. Use uncovered
+executable lines to find missing behavior and boundary tests, not to justify
+exercising provisional views through UI automation.
 
 ### Core framework coverage gate
 
-Generate a fresh coverage bundle from the complete macOS non-UI suite and apply
+Generate a fresh coverage bundle from the complete standalone core suite and apply
 the gate in the same run:
 
 ```sh
@@ -269,13 +272,13 @@ Tools/run-core-framework-coverage.sh
 ```
 
 The runner creates a unique evidence directory under `/private/tmp`, prints its
-location, runs `KitchenMemory macOS Testing` with
-`KitchenMemoryMacTesting.xctestplan`, and invokes the checker only after Xcode
+location, runs `KitchenMemory Core Testing` with
+`KitchenMemoryCoreTesting.xctestplan`, and invokes the checker only after Xcode
 succeeds. This macOS result is the canonical exact line-coverage artifact for
 the four shared frameworks. It avoids reporting the same source lines twice;
-it does not replace the required iOS correctness lane. Both Testing plans
-exclude the UI target; both Production plans include the shared UI target with
-their native application-test target.
+it does not replace either app correctness lane. Both app Testing plans exclude
+the UI target; both Production plans include the shared UI target with their
+native application-test target.
 
 To check an existing result bundle directly, pass it to:
 
@@ -294,7 +297,7 @@ recorded build start.
 ### Deterministic property-test corpora
 
 Property tests load named entropy seeds from
-`KitchenMemoryTests/TestSupport/PropertyTestSeeds.json`. Failure messages record
+`KitchenMemorySharedTestSupport/PropertyTestSeeds.json`. Failure messages record
 the seed and case number so a generated input can be replayed exactly. The test
 harness verifies catalog integrity, proves that changed seeds produce different
 raw and derived corpora, and pins a known-answer vector so an accidental generator

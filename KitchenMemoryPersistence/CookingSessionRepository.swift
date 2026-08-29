@@ -230,8 +230,8 @@ extension CookingSessionTransaction {
 
 private extension SessionEvidence {
   var kitchenIDs: Set<Kitchen.ID> {
-    Set(roots.map(\.kitchenID))
-      .union(facts.map(\.kitchenID))
+    // `belongs(to:)` consults this aggregate only when root authority is absent.
+    Set(facts.map(\.kitchenID))
       .union(closures.map(\.kitchenID))
       .union(deletions.map(\.kitchenID))
       .union(restorations.map(\.kitchenID))

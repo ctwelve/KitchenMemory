@@ -2,7 +2,6 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: GPL-3.0-only
 
-@testable import KitchenMemory
 import KitchenMemoryDomain
 import KitchenMemoryPersistence
 import SwiftData
@@ -58,52 +57,44 @@ final class SwiftDataRecipeRepositoryTests: XCTestCase {
     XCTAssertNotNil(container.migrationPlan)
   }
 
-  func testTunaNoodleHotdishRoundTripsThroughSwiftData() throws {
-    let kitchen = Kitchen(name: "Test Kitchen")
-    let manifest = try SampleRecipeCatalog.loadManifest()
-    let family = try XCTUnwrap(manifest.recipes.first)
-    let reference = try XCTUnwrap(family.variant(preferredLanguages: ["en"]))
-    let document = try SampleRecipeCatalog.loadRecipe(reference)
-    let sample = try document.materialize(in: kitchen.id)
-    let repository = SwiftDataRecipeRepository(
-      modelContainer: try KitchenMemorySchema.makeContainer(inMemory: true)
-    )
-
-    try repository.save(kitchen)
-    try repository.save(recipe: sample.recipe, revision: sample.revision)
-
-    XCTAssertEqual(try repository.kitchen(id: kitchen.id), kitchen)
-    let stored = try XCTUnwrap(repository.recipe(id: sample.recipe.id))
-    XCTAssertEqual(stored.recipe, sample.recipe)
-    XCTAssertEqual(stored.revision, sample.revision)
-  }
-
   func testSavingTheSameRecipeUpdatesInsteadOfDuplicatingItsChildren() throws {
     let kitchen = Kitchen(name: "Test Kitchen")
-    let manifest = try SampleRecipeCatalog.loadManifest()
-    let family = try XCTUnwrap(manifest.recipes.first)
-    let reference = try XCTUnwrap(family.variant(preferredLanguages: ["en"]))
-    let document = try SampleRecipeCatalog.loadRecipe(reference)
-    let sample = try document.materialize(in: kitchen.id)
-    var editedRevision = sample.revision
+    let recipeID = Recipe.ID()
+    let revision = RecipeRevision(
+      recipeID: recipeID,
+      revisionNumber: 1,
+      title: "Tuna Noodle Hotdish",
+      media: [RecipeMedia(role: .hero, assetName: "TunaNoodleHotdishHero")],
+      equipment: [EquipmentItem(originalText: "1 casserole dish", name: "casserole dish")],
+      ingredientSections: [
+        IngredientSection(ingredients: [RecipeIngredient(originalText: "1 can tuna")]),
+      ],
+      instructionSections: [
+        InstructionSection(steps: [InstructionStep(text: "Bake until bubbling.")]),
+      ]
+    )
+    let recipe = Recipe(id: recipeID, kitchenID: kitchen.id, currentRevisionID: revision.id)
+    var editedRevision = revision
     editedRevision.title = "Leftover Tuna Noodle Hotdish"
+    editedRevision.equipment = []
     let repository = SwiftDataRecipeRepository(
       modelContainer: try KitchenMemorySchema.makeContainer(inMemory: true)
     )
 
     try repository.save(kitchen)
-    try repository.save(recipe: sample.recipe, revision: sample.revision)
+    try repository.save(recipe: recipe, revision: revision)
     XCTAssertEqual(
-      try repository.recipe(id: sample.recipe.id),
-      StoredRecipe(recipe: sample.recipe, revision: sample.revision)
+      try repository.recipe(id: recipe.id),
+      StoredRecipe(recipe: recipe, revision: revision)
     )
-    try repository.save(recipe: sample.recipe, revision: editedRevision)
+    try repository.save(recipe: recipe, revision: editedRevision)
 
-    let stored = try XCTUnwrap(repository.recipe(id: sample.recipe.id))
+    let stored = try XCTUnwrap(repository.recipe(id: recipe.id))
     XCTAssertEqual(stored.revision.title, "Leftover Tuna Noodle Hotdish")
-    XCTAssertEqual(stored.revision.media, sample.revision.media)
-    XCTAssertEqual(stored.revision.ingredientSections, sample.revision.ingredientSections)
-    XCTAssertEqual(stored.revision.instructionSections, sample.revision.instructionSections)
+    XCTAssertEqual(stored.revision.media, revision.media)
+    XCTAssertTrue(stored.revision.equipment.isEmpty)
+    XCTAssertEqual(stored.revision.ingredientSections, revision.ingredientSections)
+    XCTAssertEqual(stored.revision.instructionSections, revision.instructionSections)
     XCTAssertEqual(try repository.recipes(in: kitchen.id), [stored])
   }
 

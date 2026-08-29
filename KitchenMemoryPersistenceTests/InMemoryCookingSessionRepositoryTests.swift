@@ -11,6 +11,23 @@ import XCTest
 // The adapter matrix intentionally keeps every transaction case in one suite.
 // swiftlint:disable:next type_body_length
 final class InMemoryCookingSessionRepositoryTests: XCTestCase {
+  func testRootlessEvidenceRemainsClassifiableByItsOwnKitchen() throws {
+    let repository = InMemoryCookingSessionRepository()
+    let root = try makeRoot()
+    let fact = try makeFact(sessionID: root.id, kitchenID: root.kitchenID, kind: .stop)
+    let closure = try makeClosure(root: root)
+    let deletion = makeDeletion(root: root, closure: closure)
+    let restoration = makeRestoration(root: root, deletion: deletion)
+
+    try repository.append(.activity(fact))
+    try repository.append(.finish(closure))
+    try repository.append(.delete(deletion))
+    try repository.append(.restore([restoration]))
+
+    XCTAssertEqual(try repository.evidence(id: root.id)?.facts, [fact])
+    XCTAssertEqual(try repository.sessions(in: root.kitchenID).count, 1)
+  }
+
   func testStartAndActivityProjectThroughTheRepositorySeam() throws {
     let repository = InMemoryCookingSessionRepository()
     let root = try makeRoot()

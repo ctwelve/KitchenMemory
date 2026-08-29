@@ -242,6 +242,55 @@ class CheckProjectStructureTest < Minitest::Test
 
     def build_schemes
       KitchenMemory::ProjectStructure::SCHEMES.each_with_object({}) do |(name, expectation), result|
+        if expectation[:core]
+          plan = expectation.fetch(:plan)
+          build_entries = expectation.fetch(:build_targets).map do |target_name|
+            <<~ENTRY
+              <BuildActionEntry
+                buildForTesting="YES"
+                buildForRunning="NO"
+                buildForProfiling="NO"
+                buildForArchiving="NO"
+                buildForAnalyzing="YES">
+                <BuildableReference
+                  BlueprintIdentifier="#{@target_ids.fetch(target_name)}"
+                  BlueprintName="#{target_name}"
+                  ReferencedContainer="container:KitchenMemory.xcodeproj"/>
+              </BuildActionEntry>
+            ENTRY
+          end.join
+          testables = KitchenMemory::ProjectStructure::PLANS.fetch(plan).map do |target_name|
+            <<~TESTABLE
+              <TestableReference skipped="NO">
+                <BuildableReference
+                  BlueprintIdentifier="#{@target_ids.fetch(target_name)}"
+                  BlueprintName="#{target_name}"
+                  ReferencedContainer="container:KitchenMemory.xcodeproj"/>
+              </TestableReference>
+            TESTABLE
+          end.join
+          result["#{name}.xcscheme"] = <<~SCHEME
+            <?xml version="1.0" encoding="UTF-8"?>
+            <Scheme>
+              <BuildAction>
+                <BuildActionEntries>
+                  #{build_entries}
+                </BuildActionEntries>
+              </BuildAction>
+              <TestAction buildConfiguration="Testing">
+                <TestPlans>
+                  <TestPlanReference reference="container:#{plan}" default="YES"/>
+                </TestPlans>
+                <Testables>
+                  #{testables}
+                </Testables>
+              </TestAction>
+              <AnalyzeAction buildConfiguration="Testing"/>
+            </Scheme>
+          SCHEME
+          next
+        end
+
         app = expectation.fetch(:app)
         plan = expectation.fetch(:plan)
         flavor = name.split.last
@@ -313,9 +362,26 @@ class CheckProjectStructureTest < Minitest::Test
 
     result = validate(fixture)
 
-    assert_equal 9, result[:target_count]
-    assert_equal 6, result[:scheme_count]
-    assert_equal 4, result[:plan_count]
+    assert_equal 13, result[:target_count]
+    assert_equal 7, result[:scheme_count]
+    assert_equal 5, result[:plan_count]
+    assert_equal(
+      %w[
+        KitchenMemoryDomainTests
+        KitchenMemoryImportTests
+        KitchenMemoryLogicTests
+        KitchenMemoryPersistenceTests
+      ],
+      KitchenMemory::ProjectStructure::PLANS.fetch("KitchenMemoryCoreTesting.xctestplan")
+    )
+    assert_equal(
+      ["KitchenMemoryIOSTests"],
+      KitchenMemory::ProjectStructure::PLANS.fetch("KitchenMemoryIOSTesting.xctestplan")
+    )
+    assert_equal(
+      ["KitchenMemoryMacTests"],
+      KitchenMemory::ProjectStructure::PLANS.fetch("KitchenMemoryMacTesting.xctestplan")
+    )
   end
 
   def test_allows_synchronized_navigator_group_without_target_membership
@@ -329,7 +395,7 @@ class CheckProjectStructureTest < Minitest::Test
 
     result = validate(fixture)
 
-    assert_equal 9, result[:target_count]
+    assert_equal 13, result[:target_count]
   end
 
   def test_rejects_missing_or_unexpected_native_target
@@ -476,6 +542,19 @@ class CheckProjectStructureTest < Minitest::Test
     assert_includes error.message, "map native SDK hosts"
   end
 
+  def test_rejects_host_settings_on_a_core_test_target
+    fixture = Fixture.new
+    fixture.project.sub!(
+      'SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";',
+      "SUPPORTED_PLATFORMS = \"iphoneos iphonesimulator macosx\";\n" \
+      "\t\t\t\tTEST_HOST = KitchenMemory.app;"
+    )
+
+    error = assert_contract_error { validate(fixture) }
+
+    assert_includes error.message, "must remain unhosted"
+  end
+
   def test_rejects_missing_test_plan_file
     fixture = Fixture.new
     fixture.plans.delete("KitchenMemoryIOSTesting.xctestplan")
@@ -504,7 +583,7 @@ class CheckProjectStructureTest < Minitest::Test
 
   def test_rejects_wrong_test_plan_coverage_policy
     fixture = Fixture.new
-    filename = "KitchenMemoryMacTesting.xctestplan"
+    filename = "KitchenMemoryCoreTesting.xctestplan"
     plan = JSON.parse(fixture.plans.fetch(filename))
     plan.fetch("defaultOptions")["codeCoverage"] = false
     fixture.plans[filename] = JSON.generate(plan)

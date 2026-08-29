@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Scheme
+   LastUpgradeVersion = "2660"
+   version = "1.7">
+   <BuildAction
+      parallelizeBuildables = "YES"
+      buildImplicitDependencies = "YES"
+      buildArchitectures = "Automatic">
+      <BuildActionEntries>
+         <BuildActionEntry buildForTesting="YES" buildForRunning="NO" buildForProfiling="NO" buildForArchiving="NO" buildForAnalyzing="YES">
+            <BuildableReference BuildableIdentifier="primary" BlueprintIdentifier="E61000000000000000000021" BuildableName="KitchenMemoryDomainTests.xctest" BlueprintName="KitchenMemoryDomainTests" ReferencedContainer="container:KitchenMemory.xcodeproj"/>
+         </BuildActionEntry>
+         <BuildActionEntry buildForTesting="YES" buildForRunning="NO" buildForProfiling="NO" buildForArchiving="NO" buildForAnalyzing="YES">
+            <BuildableReference BuildableIdentifier="primary" BlueprintIdentifier="E61000000000000000000022" BuildableName="KitchenMemoryImportTests.xctest" BlueprintName="KitchenMemoryImportTests" ReferencedContainer="container:KitchenMemory.xcodeproj"/>
+         </BuildActionEntry>
+         <BuildActionEntry buildForTesting="YES" buildForRunning="NO" buildForProfiling="NO" buildForArchiving="NO" buildForAnalyzing="YES">
+            <BuildableReference BuildableIdentifier="primary" BlueprintIdentifier="E61000000000000000000023" BuildableName="KitchenMemoryLogicTests.xctest" BlueprintName="KitchenMemoryLogicTests" ReferencedContainer="container:KitchenMemory.xcodeproj"/>
+         </BuildActionEntry>
+         <BuildActionEntry buildForTesting="YES" buildForRunning="NO" buildForProfiling="NO" buildForArchiving="NO" buildForAnalyzing="YES">
+            <BuildableReference BuildableIdentifier="primary" BlueprintIdentifier="E61000000000000000000024" BuildableName="KitchenMemoryPersistenceTests.xctest" BlueprintName="KitchenMemoryPersistenceTests" ReferencedContainer="container:KitchenMemory.xcodeproj"/>
+         </BuildActionEntry>
+      </BuildActionEntries>
+   </BuildAction>
+   <TestAction
+      buildConfiguration = "Testing"
+      selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
+      selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
+      shouldUseLaunchSchemeArgsEnv = "YES">
+      <TestPlans>
+         <TestPlanReference reference="container:KitchenMemoryCoreTesting.xctestplan" default="YES"/>
+      </TestPlans>
+      <Testables>
+         <TestableReference skipped="NO" parallelizable="YES"><BuildableReference BuildableIdentifier="primary" BlueprintIdentifier="E61000000000000000000021" BuildableName="KitchenMemoryDomainTests.xctest" BlueprintName="KitchenMemoryDomainTests" ReferencedContainer="container:KitchenMemory.xcodeproj"/></TestableReference>
+         <TestableReference skipped="NO" parallelizable="YES"><BuildableReference BuildableIdentifier="primary" BlueprintIdentifier="E61000000000000000000022" BuildableName="KitchenMemoryImportTests.xctest" BlueprintName="KitchenMemoryImportTests" ReferencedContainer="container:KitchenMemory.xcodeproj"/></TestableReference>
+         <TestableReference skipped="NO" parallelizable="YES"><BuildableReference BuildableIdentifier="primary" BlueprintIdentifier="E61000000000000000000023" BuildableName="KitchenMemoryLogicTests.xctest" BlueprintName="KitchenMemoryLogicTests" ReferencedContainer="container:KitchenMemory.xcodeproj"/></TestableReference>
+         <TestableReference skipped="NO" parallelizable="YES"><BuildableReference BuildableIdentifier="primary" BlueprintIdentifier="E61000000000000000000024" BuildableName="KitchenMemoryPersistenceTests.xctest" BlueprintName="KitchenMemoryPersistenceTests" ReferencedContainer="container:KitchenMemory.xcodeproj"/></TestableReference>
+      </Testables>
+   </TestAction>
+   <AnalyzeAction buildConfiguration="Testing"/>
+</Scheme>

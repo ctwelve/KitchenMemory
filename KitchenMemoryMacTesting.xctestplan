@@ -2,14 +2,14 @@
   "configurations" : [
     {
       "id" : "B0CA75C0-62A1-48AF-839E-38567D54F494",
-      "name" : "Core and Application Tests",
+      "name" : "Application Tests",
       "options" : {
 
       }
     }
   ],
   "defaultOptions" : {
-    "codeCoverage" : true,
+    "codeCoverage" : false,
     "commandLineArgumentEntries" : [
       {
         "argument" : "--unit-testing"

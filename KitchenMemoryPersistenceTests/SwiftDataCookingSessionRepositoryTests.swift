@@ -15,6 +15,42 @@ import XCTest
 @MainActor
 // swiftlint:disable:next type_body_length
 final class SwiftDataCookingSessionRepositoryTests: XCTestCase {
+  func testEvidenceAndScopedQueriesCoverEmptyRootedAndRootlessStorage() throws {
+    let repository = SwiftDataCookingSessionRepository(
+      modelContainer: try KitchenMemorySchema.makeContainer(inMemory: true)
+    )
+    let root = try makeRoot()
+    let missingID = CookingSession.ID(rawValue: id(199))
+    XCTAssertNil(try repository.evidence(id: missingID))
+
+    try repository.append(.start(root))
+    let secondRoot = try makeRoot(id: CookingSession.ID(rawValue: id(196)))
+    try repository.append(.start(secondRoot))
+    XCTAssertEqual(try repository.evidence(id: root.id)?.roots, [root])
+    XCTAssertEqual(
+      try repository.sessions(for: root.recipeID, in: root.kitchenID).map(\.sessionID),
+      [root.id, secondRoot.id]
+    )
+    XCTAssertTrue(
+      try repository.sessions(
+        for: root.recipeID,
+        in: Kitchen.ID(rawValue: id(198))
+      ).isEmpty
+    )
+
+    let rootless = try makeRoot(id: CookingSession.ID(rawValue: id(197)))
+    let fact = try makeFact(root: rootless, kind: .stop)
+    let closure = try makeClosure(root: rootless)
+    let deletion = makeDeletion(root: rootless, closure: closure)
+    let restoration = makeRestoration(root: rootless, deletion: deletion)
+    try repository.append(.activity(fact))
+    try repository.append(.finish(closure))
+    try repository.append(.delete(deletion))
+    try repository.append(.restore([restoration]))
+    XCTAssertEqual(try repository.evidence(id: rootless.id)?.facts, [fact])
+    XCTAssertEqual(try repository.sessions(in: rootless.kitchenID).count, 3)
+  }
+
   func testStartAndActivityRemainClassifiedAfterLocalReopen() throws {
     let store = try TemporarySessionStore()
     defer { store.remove() }

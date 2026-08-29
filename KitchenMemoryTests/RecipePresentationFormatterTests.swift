@@ -64,6 +64,82 @@ final class RecipePresentationFormatterTests: XCTestCase {
     )
   }
 
+  func testIngredientPresentationIsComputedFromStructuredFields() {
+    let ingredient = RecipeIngredient(
+      originalText: "two cups of flour",
+      quantity: QuantityExpression(kind: .exact, lowerBound: RationalQuantity(numerator: 2)),
+      unitText: "cups",
+      ingredientText: "flour",
+      preparation: "sifted"
+    )
+
+    XCTAssertEqual(formatter("en-US").ingredient(ingredient), "2 cups flour, sifted")
+  }
+
+  func testIngredientPresentationHonorsPreservedOriginalAndCustomText() {
+    var ingredient = RecipeIngredient(
+      originalText: "a couple glugs olive oil",
+      ingredientText: "olive oil"
+    )
+    ingredient.presentationMode = .original
+    XCTAssertEqual(formatter("en-US").ingredient(ingredient), "a couple glugs olive oil")
+
+    ingredient.presentationMode = .custom
+    ingredient.customDisplayText = "Olive oil, as needed"
+    XCTAssertEqual(formatter("en-US").ingredient(ingredient), "Olive oil, as needed")
+  }
+
+  func testIncompleteStructuredPresentationFallsBackToOriginalText() {
+    let ingredient = RecipeIngredient(originalText: "salt to taste")
+
+    XCTAssertEqual(formatter("en-US").ingredient(ingredient), "salt to taste")
+  }
+
+  func testEveryQuantityKindRendersWithoutInventingPrecision() {
+    let exact = QuantityExpression(
+      kind: .exact,
+      lowerBound: RationalQuantity(numerator: 1, denominator: 2)
+    )
+    let range = QuantityExpression(
+      kind: .range,
+      lowerBound: RationalQuantity(numerator: 2),
+      upperBound: RationalQuantity(numerator: 3)
+    )
+    let approximate = QuantityExpression(
+      kind: .approximate,
+      lowerBound: RationalQuantity(numerator: 2)
+    )
+    let recipeFormatter = formatter("en-US")
+
+    XCTAssertEqual(recipeFormatter.quantity(exact), "1/2")
+    XCTAssertEqual(recipeFormatter.quantity(range), "2–3")
+    XCTAssertEqual(recipeFormatter.quantity(approximate), "about 2")
+    XCTAssertEqual(recipeFormatter.quantity(QuantityExpression(kind: .text, text: "to taste")), "to taste")
+    XCTAssertNil(recipeFormatter.quantity(QuantityExpression(kind: .none)))
+    XCTAssertEqual(recipeFormatter.rational(RationalQuantity(numerator: -1)), "-1")
+    XCTAssertEqual(
+      recipeFormatter.rational(RationalQuantity(numerator: -1, denominator: 2)),
+      "-1/2"
+    )
+  }
+
+  func testPackageQuantityParticipatesInComputedPresentation() {
+    let ingredient = RecipeIngredient(
+      quantity: QuantityExpression(kind: .exact, lowerBound: RationalQuantity(numerator: 4)),
+      unitText: "cans",
+      package: PackageDescription(
+        quantity: QuantityExpression(kind: .exact, lowerBound: RationalQuantity(numerator: 5)),
+        unitText: "ounces"
+      ),
+      ingredientText: "chunk light tuna"
+    )
+
+    XCTAssertEqual(
+      formatter("en-US").ingredient(ingredient),
+      "4 (5 ounces) cans chunk light tuna"
+    )
+  }
+
   private func formatter(_ localeIdentifier: String) -> RecipePresentationFormatter {
     RecipePresentationFormatter(locale: Locale(identifier: localeIdentifier))
   }

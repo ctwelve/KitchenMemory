@@ -1,0 +1,53 @@
+{
+  "configurations" : [
+    {
+      "id" : "61E00000-0000-4000-8000-000000000061",
+      "name" : "Core Framework Tests",
+      "options" : {
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "codeCoverage" : true,
+    "commandLineArgumentEntries" : [
+      {
+        "argument" : "--unit-testing"
+      }
+    ]
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:KitchenMemory.xcodeproj",
+        "identifier" : "E61000000000000000000021",
+        "name" : "KitchenMemoryDomainTests"
+      }
+    },
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:KitchenMemory.xcodeproj",
+        "identifier" : "E61000000000000000000022",
+        "name" : "KitchenMemoryImportTests"
+      }
+    },
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:KitchenMemory.xcodeproj",
+        "identifier" : "E61000000000000000000023",
+        "name" : "KitchenMemoryLogicTests"
+      }
+    },
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:KitchenMemory.xcodeproj",
+        "identifier" : "E61000000000000000000024",
+        "name" : "KitchenMemoryPersistenceTests"
+      }
+    }
+  ],
+  "version" : 1
+}
