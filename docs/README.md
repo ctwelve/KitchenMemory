@@ -79,3 +79,4 @@ products must share one presentation architecture.
 - [0011: Cooking Session document envelopes](adr/0011-use-document-envelopes-for-cooking-sessions.md)
 - [0012: Consolidate business code in KitchenKit](adr/0012-consolidate-business-code-in-kitchenkit.md)
 - [0013: Unified native multiplatform app target](adr/0013-unified-native-multiplatform-app-target.md)
+- [0014: Native capabilities and evidence-based dependencies](adr/0014-prefer-native-capabilities-and-evidence-based-dependencies.md)

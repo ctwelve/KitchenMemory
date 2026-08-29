@@ -6,10 +6,12 @@ Copyright © 2026 the Kitchen Memory contributors
 SPDX-License-Identifier: GPL-3.0-only
 -->
 
-**Status:** Research complete; no dependency adoption proposed
-**Survey date:** 2026-08-29
-**Scope:** Apple and Swift tooling that may become useful after the current
-implementation work establishes a concrete need
+- Status: Research complete; selection policy adopted by
+  [ADR 0014](../adr/0014-prefer-native-capabilities-and-evidence-based-dependencies.md);
+  no dependency adoption proposed
+- Survey date: 2026-08-29
+- Scope: Apple and Swift tooling that may become useful after the current
+  implementation work establishes a concrete need
 
 ## Recommendation
 
