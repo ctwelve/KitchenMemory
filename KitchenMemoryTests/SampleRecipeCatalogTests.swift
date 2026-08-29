@@ -5,10 +5,32 @@
 import Foundation
 @testable import KitchenMemory
 import KitchenMemoryDomain
+import KitchenMemoryPersistence
+import SwiftData
 import XCTest
 
 @MainActor
 final class SampleRecipeCatalogTests: XCTestCase {
+    func testTunaNoodleHotdishRoundTripsThroughSwiftData() throws {
+        let kitchen = Kitchen(name: "Test Kitchen")
+        let manifest = try SampleRecipeCatalog.loadManifest()
+        let family = try XCTUnwrap(manifest.recipes.first)
+        let reference = try XCTUnwrap(family.variant(preferredLanguages: ["en"]))
+        let document = try SampleRecipeCatalog.loadRecipe(reference)
+        let sample = try document.materialize(in: kitchen.id)
+        let repository = SwiftDataRecipeRepository(
+            modelContainer: try KitchenMemorySchema.makeContainer(inMemory: true)
+        )
+
+        try repository.save(kitchen)
+        try repository.save(recipe: sample.recipe, revision: sample.revision)
+
+        XCTAssertEqual(try repository.kitchen(id: kitchen.id), kitchen)
+        let stored = try XCTUnwrap(repository.recipe(id: sample.recipe.id))
+        XCTAssertEqual(stored.recipe, sample.recipe)
+        XCTAssertEqual(stored.revision, sample.revision)
+    }
+
     func testManifestLoadsFromAssetCatalog() throws {
         let manifest = try SampleRecipeCatalog.loadManifest()
 

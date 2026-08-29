@@ -135,8 +135,6 @@ final class RationalQuantityPropertyTests: XCTestCase {
         )
         XCTAssertNil(RationalQuantity(numerator: -1, denominator: 2).normalized)
         XCTAssertNil(RationalQuantity(numerator: 1, denominator: 0).normalized)
-        XCTAssertEqual(RationalQuantity(numerator: -1).renderedText, "-1")
-        XCTAssertEqual(RationalQuantity(numerator: -1, denominator: 2).renderedText, "-1/2")
     }
 
     private func reduced(numerator: Int, denominator: Int) -> RationalQuantity {

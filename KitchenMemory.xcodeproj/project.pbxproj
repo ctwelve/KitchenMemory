@@ -38,6 +38,15 @@
 		D20000000000000000000043 /* KitchenMemoryImport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000012 /* KitchenMemoryImport.framework */; };
 		D20000000000000000000044 /* KitchenMemoryPersistence.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000013 /* KitchenMemoryPersistence.framework */; };
 		D20000000000000000000045 /* KitchenMemoryLogic.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B30000000000000000000011 /* KitchenMemoryLogic.framework */; };
+		E61000000000000000000041 /* KitchenMemoryDomain.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000011 /* KitchenMemoryDomain.framework */; };
+		E61000000000000000000042 /* KitchenMemoryDomain.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000011 /* KitchenMemoryDomain.framework */; };
+		E61000000000000000000043 /* KitchenMemoryImport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000012 /* KitchenMemoryImport.framework */; };
+		E61000000000000000000044 /* KitchenMemoryDomain.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000011 /* KitchenMemoryDomain.framework */; };
+		E61000000000000000000045 /* KitchenMemoryPersistence.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000013 /* KitchenMemoryPersistence.framework */; };
+		E61000000000000000000046 /* KitchenMemoryDomain.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000011 /* KitchenMemoryDomain.framework */; };
+		E61000000000000000000047 /* KitchenMemoryImport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000012 /* KitchenMemoryImport.framework */; };
+		E61000000000000000000048 /* KitchenMemoryPersistence.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000013 /* KitchenMemoryPersistence.framework */; };
+		E61000000000000000000049 /* KitchenMemoryLogic.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B30000000000000000000011 /* KitchenMemoryLogic.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -160,6 +169,15 @@
 			remoteGlobalIDString = A1C4E79D302A63B800E2C0DB;
 			remoteInfo = "KitchenMemory iOS";
 		};
+		E61000000000000000000051 /* PBXContainerItemProxy */ = {isa = PBXContainerItemProxy; containerPortal = A1C4E796302A63B800E2C0DB /* Project object */; proxyType = 1; remoteGlobalIDString = B20000000000000000000021; remoteInfo = KitchenMemoryDomain; };
+		E61000000000000000000052 /* PBXContainerItemProxy */ = {isa = PBXContainerItemProxy; containerPortal = A1C4E796302A63B800E2C0DB /* Project object */; proxyType = 1; remoteGlobalIDString = B20000000000000000000021; remoteInfo = KitchenMemoryDomain; };
+		E61000000000000000000053 /* PBXContainerItemProxy */ = {isa = PBXContainerItemProxy; containerPortal = A1C4E796302A63B800E2C0DB /* Project object */; proxyType = 1; remoteGlobalIDString = B20000000000000000000022; remoteInfo = KitchenMemoryImport; };
+		E61000000000000000000054 /* PBXContainerItemProxy */ = {isa = PBXContainerItemProxy; containerPortal = A1C4E796302A63B800E2C0DB /* Project object */; proxyType = 1; remoteGlobalIDString = B20000000000000000000021; remoteInfo = KitchenMemoryDomain; };
+		E61000000000000000000055 /* PBXContainerItemProxy */ = {isa = PBXContainerItemProxy; containerPortal = A1C4E796302A63B800E2C0DB /* Project object */; proxyType = 1; remoteGlobalIDString = B20000000000000000000023; remoteInfo = KitchenMemoryPersistence; };
+		E61000000000000000000056 /* PBXContainerItemProxy */ = {isa = PBXContainerItemProxy; containerPortal = A1C4E796302A63B800E2C0DB /* Project object */; proxyType = 1; remoteGlobalIDString = B20000000000000000000021; remoteInfo = KitchenMemoryDomain; };
+		E61000000000000000000057 /* PBXContainerItemProxy */ = {isa = PBXContainerItemProxy; containerPortal = A1C4E796302A63B800E2C0DB /* Project object */; proxyType = 1; remoteGlobalIDString = B20000000000000000000022; remoteInfo = KitchenMemoryImport; };
+		E61000000000000000000058 /* PBXContainerItemProxy */ = {isa = PBXContainerItemProxy; containerPortal = A1C4E796302A63B800E2C0DB /* Project object */; proxyType = 1; remoteGlobalIDString = B20000000000000000000023; remoteInfo = KitchenMemoryPersistence; };
+		E61000000000000000000059 /* PBXContainerItemProxy */ = {isa = PBXContainerItemProxy; containerPortal = A1C4E796302A63B800E2C0DB /* Project object */; proxyType = 1; remoteGlobalIDString = B30000000000000000000021; remoteInfo = KitchenMemoryLogic; };
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -215,6 +233,11 @@
 		D20000000000000000000011 /* KitchenMemoryMacTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KitchenMemoryMacTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D20000000000000000000081 /* KitchenMemoryMacTesting.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = KitchenMemoryMacTesting.xctestplan; sourceTree = "<group>"; };
 		D20000000000000000000082 /* KitchenMemoryMacProduction.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = KitchenMemoryMacProduction.xctestplan; sourceTree = "<group>"; };
+		E61000000000000000000011 /* KitchenMemoryDomainTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KitchenMemoryDomainTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E61000000000000000000012 /* KitchenMemoryImportTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KitchenMemoryImportTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E61000000000000000000013 /* KitchenMemoryLogicTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KitchenMemoryLogicTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E61000000000000000000014 /* KitchenMemoryPersistenceTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KitchenMemoryPersistenceTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E61000000000000000000081 /* KitchenMemoryCoreTesting.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = KitchenMemoryCoreTesting.xctestplan; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -301,6 +324,31 @@
 			path = KitchenMemoryPersistence;
 			sourceTree = "<group>";
 		};
+		E61000000000000000000001 /* KitchenMemoryDomainTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = KitchenMemoryDomainTests;
+			sourceTree = "<group>";
+		};
+		E61000000000000000000002 /* KitchenMemoryImportTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = KitchenMemoryImportTests;
+			sourceTree = "<group>";
+		};
+		E61000000000000000000003 /* KitchenMemoryLogicTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = KitchenMemoryLogicTests;
+			sourceTree = "<group>";
+		};
+		E61000000000000000000004 /* KitchenMemoryPersistenceTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = KitchenMemoryPersistenceTests;
+			sourceTree = "<group>";
+		};
+		E61000000000000000000005 /* KitchenMemorySharedTestSupport */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = KitchenMemorySharedTestSupport;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -372,6 +420,10 @@
 				D20000000000000000000045 /* KitchenMemoryLogic.framework in Frameworks */,
 			);
 		};
+		E61000000000000000000035 /* Frameworks */ = {isa = PBXFrameworksBuildPhase; files = (E61000000000000000000041 /* KitchenMemoryDomain.framework in Frameworks */, ); };
+		E61000000000000000000036 /* Frameworks */ = {isa = PBXFrameworksBuildPhase; files = (E61000000000000000000042 /* KitchenMemoryDomain.framework in Frameworks */, E61000000000000000000043 /* KitchenMemoryImport.framework in Frameworks */, ); };
+		E61000000000000000000037 /* Frameworks */ = {isa = PBXFrameworksBuildPhase; files = (E61000000000000000000046 /* KitchenMemoryDomain.framework in Frameworks */, E61000000000000000000047 /* KitchenMemoryImport.framework in Frameworks */, E61000000000000000000048 /* KitchenMemoryPersistence.framework in Frameworks */, E61000000000000000000049 /* KitchenMemoryLogic.framework in Frameworks */, ); };
+		E61000000000000000000038 /* Frameworks */ = {isa = PBXFrameworksBuildPhase; files = (E61000000000000000000044 /* KitchenMemoryDomain.framework in Frameworks */, E61000000000000000000045 /* KitchenMemoryPersistence.framework in Frameworks */, ); };
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -394,6 +446,12 @@
 				D10000000000000000000014 /* KitchenMemoryImport */,
 				D10000000000000000000015 /* KitchenMemoryLogic */,
 				D10000000000000000000016 /* KitchenMemoryPersistence */,
+				E61000000000000000000001 /* KitchenMemoryDomainTests */,
+				E61000000000000000000002 /* KitchenMemoryImportTests */,
+				E61000000000000000000003 /* KitchenMemoryLogicTests */,
+				E61000000000000000000004 /* KitchenMemoryPersistenceTests */,
+				E61000000000000000000005 /* KitchenMemorySharedTestSupport */,
+				E61000000000000000000081 /* KitchenMemoryCoreTesting.xctestplan */,
 				A15962C5302BC01A00926925 /* KitchenMemoryIOSTesting.xctestplan */,
 				D20000000000000000000081 /* KitchenMemoryMacTesting.xctestplan */,
 				C10000000000000000000011 /* KitchenMemoryIOSProduction.xctestplan */,
@@ -411,6 +469,10 @@
 				A1C4E79E302A63B800E2C0DB /* KitchenMemory.app */,
 				A1C4E7AD302A63B900E2C0DB /* KitchenMemoryIOSTests.xctest */,
 				D20000000000000000000011 /* KitchenMemoryMacTests.xctest */,
+				E61000000000000000000011 /* KitchenMemoryDomainTests.xctest */,
+				E61000000000000000000012 /* KitchenMemoryImportTests.xctest */,
+				E61000000000000000000013 /* KitchenMemoryLogicTests.xctest */,
+				E61000000000000000000014 /* KitchenMemoryPersistenceTests.xctest */,
 				A1C4E7B7302A63B900E2C0DB /* KitchenMemoryUITests.xctest */,
 				B20000000000000000000011 /* KitchenMemoryDomain.framework */,
 				B20000000000000000000012 /* KitchenMemoryImport.framework */,
@@ -655,6 +717,102 @@
 			productReference = D20000000000000000000011 /* KitchenMemoryMacTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		E61000000000000000000021 /* KitchenMemoryDomainTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E61000000000000000000071 /* Build configuration list for PBXNativeTarget "KitchenMemoryDomainTests" */;
+			buildPhases = (
+				E61000000000000000000031 /* Sources */,
+				E61000000000000000000035 /* Frameworks */,
+				E61000000000000000000039 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E61000000000000000000061 /* PBXTargetDependency */,
+				E6100000000000000000006A /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				E61000000000000000000001 /* KitchenMemoryDomainTests */,
+				E61000000000000000000005 /* KitchenMemorySharedTestSupport */,
+			);
+			name = KitchenMemoryDomainTests;
+			productName = KitchenMemoryDomainTests;
+			productReference = E61000000000000000000011 /* KitchenMemoryDomainTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		E61000000000000000000022 /* KitchenMemoryImportTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E61000000000000000000072 /* Build configuration list for PBXNativeTarget "KitchenMemoryImportTests" */;
+			buildPhases = (
+				E61000000000000000000032 /* Sources */,
+				E61000000000000000000036 /* Frameworks */,
+				E6100000000000000000003A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E61000000000000000000062 /* PBXTargetDependency */,
+				E61000000000000000000063 /* PBXTargetDependency */,
+				E6100000000000000000006B /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				E61000000000000000000002 /* KitchenMemoryImportTests */,
+				E61000000000000000000005 /* KitchenMemorySharedTestSupport */,
+			);
+			name = KitchenMemoryImportTests;
+			productName = KitchenMemoryImportTests;
+			productReference = E61000000000000000000012 /* KitchenMemoryImportTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		E61000000000000000000023 /* KitchenMemoryLogicTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E61000000000000000000073 /* Build configuration list for PBXNativeTarget "KitchenMemoryLogicTests" */;
+			buildPhases = (
+				E61000000000000000000033 /* Sources */,
+				E61000000000000000000037 /* Frameworks */,
+				E6100000000000000000003B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E61000000000000000000064 /* PBXTargetDependency */,
+				E61000000000000000000065 /* PBXTargetDependency */,
+				E61000000000000000000066 /* PBXTargetDependency */,
+				E61000000000000000000067 /* PBXTargetDependency */,
+				E6100000000000000000006C /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				E61000000000000000000003 /* KitchenMemoryLogicTests */,
+				E61000000000000000000005 /* KitchenMemorySharedTestSupport */,
+			);
+			name = KitchenMemoryLogicTests;
+			productName = KitchenMemoryLogicTests;
+			productReference = E61000000000000000000013 /* KitchenMemoryLogicTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		E61000000000000000000024 /* KitchenMemoryPersistenceTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E61000000000000000000074 /* Build configuration list for PBXNativeTarget "KitchenMemoryPersistenceTests" */;
+			buildPhases = (
+				E61000000000000000000034 /* Sources */,
+				E61000000000000000000038 /* Frameworks */,
+				E6100000000000000000003C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E61000000000000000000068 /* PBXTargetDependency */,
+				E61000000000000000000069 /* PBXTargetDependency */,
+				E6100000000000000000006D /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				E61000000000000000000004 /* KitchenMemoryPersistenceTests */,
+			);
+			name = KitchenMemoryPersistenceTests;
+			productName = KitchenMemoryPersistenceTests;
+			productReference = E61000000000000000000014 /* KitchenMemoryPersistenceTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -712,6 +870,10 @@
 					D20000000000000000000021 = {
 						CreatedOnToolsVersion = 26.6;
 					};
+					E61000000000000000000021 = {CreatedOnToolsVersion = 26.6; };
+					E61000000000000000000022 = {CreatedOnToolsVersion = 26.6; };
+					E61000000000000000000023 = {CreatedOnToolsVersion = 26.6; };
+					E61000000000000000000024 = {CreatedOnToolsVersion = 26.6; };
 				};
 			};
 			buildConfigurationList = A1C4E799302A63B800E2C0DB /* Build configuration list for PBXProject "KitchenMemory" */;
@@ -738,6 +900,10 @@
 				A157AD4A303D0D6B0090A9CA /* KitchenMemoryMacOS */,
 				A1C4E7AC302A63B900E2C0DB /* KitchenMemoryIOSTests */,
 				D20000000000000000000021 /* KitchenMemoryMacTests */,
+				E61000000000000000000021 /* KitchenMemoryDomainTests */,
+				E61000000000000000000022 /* KitchenMemoryImportTests */,
+				E61000000000000000000023 /* KitchenMemoryLogicTests */,
+				E61000000000000000000024 /* KitchenMemoryPersistenceTests */,
 				A1C4E7B6302A63B900E2C0DB /* KitchenMemoryUITests */,
 				B20000000000000000000021 /* KitchenMemoryDomain */,
 				B20000000000000000000022 /* KitchenMemoryImport */,
@@ -793,6 +959,10 @@
 			files = (
 			);
 		};
+		E61000000000000000000039 /* Resources */ = {isa = PBXResourcesBuildPhase; files = ( ); };
+		E6100000000000000000003A /* Resources */ = {isa = PBXResourcesBuildPhase; files = ( ); };
+		E6100000000000000000003B /* Resources */ = {isa = PBXResourcesBuildPhase; files = ( ); };
+		E6100000000000000000003C /* Resources */ = {isa = PBXResourcesBuildPhase; files = ( ); };
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
@@ -876,6 +1046,10 @@
 			files = (
 			);
 		};
+		E61000000000000000000031 /* Sources */ = {isa = PBXSourcesBuildPhase; files = ( ); };
+		E61000000000000000000032 /* Sources */ = {isa = PBXSourcesBuildPhase; files = ( ); };
+		E61000000000000000000033 /* Sources */ = {isa = PBXSourcesBuildPhase; files = ( ); };
+		E61000000000000000000034 /* Sources */ = {isa = PBXSourcesBuildPhase; files = ( ); };
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -1000,6 +1174,19 @@
 			target = A1C4E79D302A63B800E2C0DB /* KitchenMemoryIOS */;
 			targetProxy = D20000000000000000000063 /* PBXContainerItemProxy */;
 		};
+		E61000000000000000000061 /* PBXTargetDependency */ = {isa = PBXTargetDependency; target = B20000000000000000000021 /* KitchenMemoryDomain */; targetProxy = E61000000000000000000051 /* PBXContainerItemProxy */; };
+		E61000000000000000000062 /* PBXTargetDependency */ = {isa = PBXTargetDependency; target = B20000000000000000000021 /* KitchenMemoryDomain */; targetProxy = E61000000000000000000052 /* PBXContainerItemProxy */; };
+		E61000000000000000000063 /* PBXTargetDependency */ = {isa = PBXTargetDependency; target = B20000000000000000000022 /* KitchenMemoryImport */; targetProxy = E61000000000000000000053 /* PBXContainerItemProxy */; };
+		E61000000000000000000064 /* PBXTargetDependency */ = {isa = PBXTargetDependency; target = B20000000000000000000021 /* KitchenMemoryDomain */; targetProxy = E61000000000000000000056 /* PBXContainerItemProxy */; };
+		E61000000000000000000065 /* PBXTargetDependency */ = {isa = PBXTargetDependency; target = B20000000000000000000022 /* KitchenMemoryImport */; targetProxy = E61000000000000000000057 /* PBXContainerItemProxy */; };
+		E61000000000000000000066 /* PBXTargetDependency */ = {isa = PBXTargetDependency; target = B20000000000000000000023 /* KitchenMemoryPersistence */; targetProxy = E61000000000000000000058 /* PBXContainerItemProxy */; };
+		E61000000000000000000067 /* PBXTargetDependency */ = {isa = PBXTargetDependency; target = B30000000000000000000021 /* KitchenMemoryLogic */; targetProxy = E61000000000000000000059 /* PBXContainerItemProxy */; };
+		E61000000000000000000068 /* PBXTargetDependency */ = {isa = PBXTargetDependency; target = B20000000000000000000021 /* KitchenMemoryDomain */; targetProxy = E61000000000000000000054 /* PBXContainerItemProxy */; };
+		E61000000000000000000069 /* PBXTargetDependency */ = {isa = PBXTargetDependency; target = B20000000000000000000023 /* KitchenMemoryPersistence */; targetProxy = E61000000000000000000055 /* PBXContainerItemProxy */; };
+		E6100000000000000000006A /* PBXTargetDependency */ = {isa = PBXTargetDependency; productRef = A12691A9302E7F04004E6195 /* SwiftLintBuildToolPlugin */; };
+		E6100000000000000000006B /* PBXTargetDependency */ = {isa = PBXTargetDependency; productRef = A12691A9302E7F04004E6195 /* SwiftLintBuildToolPlugin */; };
+		E6100000000000000000006C /* PBXTargetDependency */ = {isa = PBXTargetDependency; productRef = A12691A9302E7F04004E6195 /* SwiftLintBuildToolPlugin */; };
+		E6100000000000000000006D /* PBXTargetDependency */ = {isa = PBXTargetDependency; productRef = A12691A9302E7F04004E6195 /* SwiftLintBuildToolPlugin */; };
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
@@ -2699,6 +2886,506 @@
 			};
 			name = ProductionTesting;
 		};
+		E61000000000000000000100 /* Debug configuration for PBXNativeTarget "KitchenMemoryDomainTests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = FT9KDL728H;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory.DomainTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_ENABLE_EXPLICIT_MODULES = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		E61000000000000000000101 /* Develop configuration for PBXNativeTarget "KitchenMemoryDomainTests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = FT9KDL728H;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory.DomainTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_ENABLE_EXPLICIT_MODULES = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Develop;
+		};
+		E61000000000000000000102 /* Testing configuration for PBXNativeTarget "KitchenMemoryDomainTests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = FT9KDL728H;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory.DomainTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_ENABLE_EXPLICIT_MODULES = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Testing;
+		};
+		E61000000000000000000103 /* Production configuration for PBXNativeTarget "KitchenMemoryDomainTests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = FT9KDL728H;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory.DomainTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_ENABLE_EXPLICIT_MODULES = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Production;
+		};
+		E61000000000000000000104 /* ProductionTesting configuration for PBXNativeTarget "KitchenMemoryDomainTests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = FT9KDL728H;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory.DomainTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_ENABLE_EXPLICIT_MODULES = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = ProductionTesting;
+		};
+		E61000000000000000000105 /* Debug configuration for PBXNativeTarget "KitchenMemoryImportTests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = FT9KDL728H;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory.ImportTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_ENABLE_EXPLICIT_MODULES = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		E61000000000000000000106 /* Develop configuration for PBXNativeTarget "KitchenMemoryImportTests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = FT9KDL728H;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory.ImportTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_ENABLE_EXPLICIT_MODULES = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Develop;
+		};
+		E61000000000000000000107 /* Testing configuration for PBXNativeTarget "KitchenMemoryImportTests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = FT9KDL728H;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory.ImportTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_ENABLE_EXPLICIT_MODULES = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Testing;
+		};
+		E61000000000000000000108 /* Production configuration for PBXNativeTarget "KitchenMemoryImportTests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = FT9KDL728H;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory.ImportTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_ENABLE_EXPLICIT_MODULES = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Production;
+		};
+		E61000000000000000000109 /* ProductionTesting configuration for PBXNativeTarget "KitchenMemoryImportTests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = FT9KDL728H;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory.ImportTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_ENABLE_EXPLICIT_MODULES = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = ProductionTesting;
+		};
+		E6100000000000000000010A /* Debug configuration for PBXNativeTarget "KitchenMemoryLogicTests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = FT9KDL728H;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory.LogicTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_ENABLE_EXPLICIT_MODULES = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		E6100000000000000000010B /* Develop configuration for PBXNativeTarget "KitchenMemoryLogicTests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = FT9KDL728H;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory.LogicTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_ENABLE_EXPLICIT_MODULES = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Develop;
+		};
+		E6100000000000000000010C /* Testing configuration for PBXNativeTarget "KitchenMemoryLogicTests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = FT9KDL728H;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory.LogicTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_ENABLE_EXPLICIT_MODULES = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Testing;
+		};
+		E6100000000000000000010D /* Production configuration for PBXNativeTarget "KitchenMemoryLogicTests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = FT9KDL728H;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory.LogicTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_ENABLE_EXPLICIT_MODULES = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Production;
+		};
+		E6100000000000000000010E /* ProductionTesting configuration for PBXNativeTarget "KitchenMemoryLogicTests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = FT9KDL728H;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory.LogicTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_ENABLE_EXPLICIT_MODULES = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = ProductionTesting;
+		};
+		E6100000000000000000010F /* Debug configuration for PBXNativeTarget "KitchenMemoryPersistenceTests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = FT9KDL728H;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory.PersistenceTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_ENABLE_EXPLICIT_MODULES = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		E61000000000000000000110 /* Develop configuration for PBXNativeTarget "KitchenMemoryPersistenceTests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = FT9KDL728H;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory.PersistenceTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_ENABLE_EXPLICIT_MODULES = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Develop;
+		};
+		E61000000000000000000111 /* Testing configuration for PBXNativeTarget "KitchenMemoryPersistenceTests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = FT9KDL728H;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory.PersistenceTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_ENABLE_EXPLICIT_MODULES = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Testing;
+		};
+		E61000000000000000000112 /* Production configuration for PBXNativeTarget "KitchenMemoryPersistenceTests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = FT9KDL728H;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory.PersistenceTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_ENABLE_EXPLICIT_MODULES = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Production;
+		};
+		E61000000000000000000113 /* ProductionTesting configuration for PBXNativeTarget "KitchenMemoryPersistenceTests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = FT9KDL728H;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory.PersistenceTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_ENABLE_EXPLICIT_MODULES = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = ProductionTesting;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -2811,6 +3498,54 @@
 				D20000000000000000000076 /* ProductionTesting configuration for PBXNativeTarget "KitchenMemoryMacTests" */,
 			);
 			defaultConfigurationName = Production;
+		};
+		E61000000000000000000071 /* Build configuration list for PBXNativeTarget "KitchenMemoryDomainTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E61000000000000000000100 /* Debug configuration for PBXNativeTarget "KitchenMemoryDomainTests" */,
+				E61000000000000000000101 /* Develop configuration for PBXNativeTarget "KitchenMemoryDomainTests" */,
+				E61000000000000000000102 /* Testing configuration for PBXNativeTarget "KitchenMemoryDomainTests" */,
+				E61000000000000000000103 /* Production configuration for PBXNativeTarget "KitchenMemoryDomainTests" */,
+				E61000000000000000000104 /* ProductionTesting configuration for PBXNativeTarget "KitchenMemoryDomainTests" */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		E61000000000000000000072 /* Build configuration list for PBXNativeTarget "KitchenMemoryImportTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E61000000000000000000105 /* Debug configuration for PBXNativeTarget "KitchenMemoryImportTests" */,
+				E61000000000000000000106 /* Develop configuration for PBXNativeTarget "KitchenMemoryImportTests" */,
+				E61000000000000000000107 /* Testing configuration for PBXNativeTarget "KitchenMemoryImportTests" */,
+				E61000000000000000000108 /* Production configuration for PBXNativeTarget "KitchenMemoryImportTests" */,
+				E61000000000000000000109 /* ProductionTesting configuration for PBXNativeTarget "KitchenMemoryImportTests" */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		E61000000000000000000073 /* Build configuration list for PBXNativeTarget "KitchenMemoryLogicTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E6100000000000000000010A /* Debug configuration for PBXNativeTarget "KitchenMemoryLogicTests" */,
+				E6100000000000000000010B /* Develop configuration for PBXNativeTarget "KitchenMemoryLogicTests" */,
+				E6100000000000000000010C /* Testing configuration for PBXNativeTarget "KitchenMemoryLogicTests" */,
+				E6100000000000000000010D /* Production configuration for PBXNativeTarget "KitchenMemoryLogicTests" */,
+				E6100000000000000000010E /* ProductionTesting configuration for PBXNativeTarget "KitchenMemoryLogicTests" */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		E61000000000000000000074 /* Build configuration list for PBXNativeTarget "KitchenMemoryPersistenceTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E6100000000000000000010F /* Debug configuration for PBXNativeTarget "KitchenMemoryPersistenceTests" */,
+				E61000000000000000000110 /* Develop configuration for PBXNativeTarget "KitchenMemoryPersistenceTests" */,
+				E61000000000000000000111 /* Testing configuration for PBXNativeTarget "KitchenMemoryPersistenceTests" */,
+				E61000000000000000000112 /* Production configuration for PBXNativeTarget "KitchenMemoryPersistenceTests" */,
+				E61000000000000000000113 /* ProductionTesting configuration for PBXNativeTarget "KitchenMemoryPersistenceTests" */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
 

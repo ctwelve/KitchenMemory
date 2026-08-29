@@ -9,6 +9,10 @@ import KitchenMemoryImport
 import XCTest
 
 final class RecipeImportServiceBoundaryTests: XCTestCase {
+  func testDefaultInitializerBuildsTheProductionImporterBoundary() {
+    _ = RecipeImportService()
+  }
+
   func testImporterFailuresBecomeStableProductFailures() async {
     let mappings: [(Error, RecipeImportServiceError?)] = [
       (RecipeURLImportError.disallowedURL, .disallowedAddress),
