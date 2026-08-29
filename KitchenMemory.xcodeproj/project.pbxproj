@@ -11,9 +11,7 @@
 		A18D21BE303D64A000009405 /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = A18D21BD303D64A000009405 /* Defaults */; };
 		A1C9A4893042896F00F1F13D /* KitchenKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1C9A47E3042896F00F1F13D /* KitchenKit.framework */; };
 		A1C9E0013042896F00F1F13D /* KitchenKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1C9A47E3042896F00F1F13D /* KitchenKit.framework */; };
-		A1C9E0023042896F00F1F13D /* KitchenKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A1C9A47E3042896F00F1F13D /* KitchenKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		A1C9E0033042896F00F1F13D /* KitchenKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1C9A47E3042896F00F1F13D /* KitchenKit.framework */; };
-		A1C9E0043042896F00F1F13D /* KitchenKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A1C9A47E3042896F00F1F13D /* KitchenKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		A1C9E0053042896F00F1F13D /* KitchenKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1C9A47E3042896F00F1F13D /* KitchenKit.framework */; };
 		A1C9E0063042896F00F1F13D /* KitchenKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1C9A47E3042896F00F1F13D /* KitchenKit.framework */; };
 /* End PBXBuildFile section */
@@ -25,6 +23,7 @@
 			fileType = folder.documentationcatalog;
 			script = (
 				"# $(DOCC_EXEC)",
+				"",
 				"",
 			);
 		};
@@ -81,27 +80,6 @@
 			remoteInfo = "KitchenMemory iOS";
 		};
 /* End PBXContainerItemProxy section */
-
-/* Begin PBXCopyFilesBuildPhase section */
-		A157AD5B303D0D6B0090A9CA /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			dstPath = "";
-			dstSubfolder = Frameworks;
-			files = (
-				A1C9E0023042896F00F1F13D /* KitchenKit.framework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-		};
-		B20000000000000000000046 /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			dstPath = "";
-			dstSubfolder = Frameworks;
-			files = (
-				A1C9E0043042896F00F1F13D /* KitchenKit.framework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-		};
-/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		A157AD6B303D0D6B0090A9CA /* KitchenMemory.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KitchenMemory.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -319,7 +297,6 @@
 			buildPhases = (
 				A157AD54303D0D6B0090A9CA /* Sources */,
 				A157AD56303D0D6B0090A9CA /* Frameworks */,
-				A157AD5B303D0D6B0090A9CA /* Embed Frameworks */,
 				A157AD60303D0D6B0090A9CA /* Resources */,
 			);
 			buildRules = (
@@ -346,7 +323,6 @@
 			buildPhases = (
 				A1C4E79A302A63B800E2C0DB /* Sources */,
 				A1C4E79B302A63B800E2C0DB /* Frameworks */,
-				B20000000000000000000046 /* Embed Frameworks */,
 				A1C4E79C302A63B800E2C0DB /* Resources */,
 			);
 			buildRules = (
@@ -558,8 +534,8 @@
 			projectRoot = "";
 			targets = (
 				A1C4E79D302A63B800E2C0DB /* KitchenMemoryIOS */,
-				A157AD4A303D0D6B0090A9CA /* KitchenMemoryMacOS */,
 				A1C4E7AC302A63B900E2C0DB /* KitchenMemoryIOSTests */,
+				A157AD4A303D0D6B0090A9CA /* KitchenMemoryMacOS */,
 				D20000000000000000000021 /* KitchenMemoryMacTests */,
 				A1C4E7B6302A63B900E2C0DB /* KitchenMemoryUITests */,
 				A1C9A47D3042896F00F1F13D /* KitchenKit */,
