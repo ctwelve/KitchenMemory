@@ -26,5 +26,13 @@
 	<string>public.app-category.food-and-drink</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2026 Kitchen Memory Project contributors.</string>
+	<key>UIStatusBarStyle</key>
+	<string></string>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
 </dict>
 </plist>

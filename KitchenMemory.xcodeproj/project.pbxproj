@@ -23,6 +23,8 @@
 				"",
 				"",
 				"",
+				"",
+				"",
 			);
 		};
 /* End PBXBuildRule section */
@@ -84,8 +86,8 @@
 		A11789FE303D332A009F963D /* Exceptions for "KitchenMemory" folder in "KitchenMemory" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Info-iOS.plist,
-				Info-macOS.plist,
+				"Info-iOS.plist",
+				"Info-macOS.plist",
 			);
 			platformFiltersByRelativePath = {
 				"/Localized: LaunchScreen.storyboard" = (ios, );
@@ -356,6 +358,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
+				CLASSPREFIX = KM;
 				LastSwiftUpdateCheck = 2660;
 				LastUpgradeCheck = 2660;
 				ORGANIZATIONNAME = "Kitchen Memory Contributors";
@@ -680,11 +683,13 @@
 				"INFOPLIST_FILE[sdk=iphoneos*]" = "KitchenMemory/Info-iOS.plist";
 				"INFOPLIST_FILE[sdk=iphonesimulator*]" = "KitchenMemory/Info-iOS.plist";
 				"INFOPLIST_FILE[sdk=macosx*]" = "KitchenMemory/Info-macOS.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Kitchen Memory";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.food-and-drink";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 0.1.2;
+				MARKETING_VERSION = 0.1.4;
 				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory;
 				PRODUCT_NAME = KitchenMemory;
 				REGISTER_APP_GROUPS = YES;
@@ -724,11 +729,13 @@
 				"INFOPLIST_FILE[sdk=iphoneos*]" = "KitchenMemory/Info-iOS.plist";
 				"INFOPLIST_FILE[sdk=iphonesimulator*]" = "KitchenMemory/Info-iOS.plist";
 				"INFOPLIST_FILE[sdk=macosx*]" = "KitchenMemory/Info-macOS.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Kitchen Memory";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.food-and-drink";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 0.1.2;
+				MARKETING_VERSION = 0.1.4;
 				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory;
 				PRODUCT_NAME = KitchenMemory;
 				REGISTER_APP_GROUPS = YES;
@@ -1679,11 +1686,13 @@
 				"INFOPLIST_FILE[sdk=iphoneos*]" = "KitchenMemory/Info-iOS.plist";
 				"INFOPLIST_FILE[sdk=iphonesimulator*]" = "KitchenMemory/Info-iOS.plist";
 				"INFOPLIST_FILE[sdk=macosx*]" = "KitchenMemory/Info-macOS.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Kitchen Memory";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.food-and-drink";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 0.1.2;
+				MARKETING_VERSION = 0.1.4;
 				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.dev.KitchenMemory;
 				PRODUCT_NAME = KitchenMemory;
 				REGISTER_APP_GROUPS = YES;
@@ -1847,11 +1856,13 @@
 				"INFOPLIST_FILE[sdk=iphoneos*]" = "KitchenMemory/Info-iOS.plist";
 				"INFOPLIST_FILE[sdk=iphonesimulator*]" = "KitchenMemory/Info-iOS.plist";
 				"INFOPLIST_FILE[sdk=macosx*]" = "KitchenMemory/Info-macOS.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Kitchen Memory";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.food-and-drink";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 0.1.2;
+				MARKETING_VERSION = 0.1.4;
 				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory;
 				PRODUCT_NAME = KitchenMemory;
 				REGISTER_APP_GROUPS = YES;
@@ -2008,11 +2019,13 @@
 				"INFOPLIST_FILE[sdk=iphoneos*]" = "KitchenMemory/Info-iOS.plist";
 				"INFOPLIST_FILE[sdk=iphonesimulator*]" = "KitchenMemory/Info-iOS.plist";
 				"INFOPLIST_FILE[sdk=macosx*]" = "KitchenMemory/Info-macOS.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Kitchen Memory";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.food-and-drink";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 0.1.2;
+				MARKETING_VERSION = 0.1.4;
 				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory;
 				PRODUCT_NAME = KitchenMemory;
 				REGISTER_APP_GROUPS = YES;
