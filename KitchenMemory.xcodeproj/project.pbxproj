@@ -304,49 +304,49 @@
 			path = KitchenMemoryMac;
 			sourceTree = "<group>";
 		};
-		D10000000000000000000013 /* KitchenMemoryDomain */ = {
+		D10000000000000000000013 /* Domain */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = KitchenMemoryDomain;
+			path = Domain;
 			sourceTree = "<group>";
 		};
-		D10000000000000000000014 /* KitchenMemoryImport */ = {
+		D10000000000000000000014 /* Import */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = KitchenMemoryImport;
+			path = Import;
 			sourceTree = "<group>";
 		};
-		D10000000000000000000015 /* KitchenMemoryLogic */ = {
+		D10000000000000000000015 /* Logic */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = KitchenMemoryLogic;
+			path = Logic;
 			sourceTree = "<group>";
 		};
-		D10000000000000000000016 /* KitchenMemoryPersistence */ = {
+		D10000000000000000000016 /* Persistence */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = KitchenMemoryPersistence;
+			path = Persistence;
 			sourceTree = "<group>";
 		};
-		E61000000000000000000001 /* KitchenMemoryDomainTests */ = {
+		E61000000000000000000001 /* DomainTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = KitchenMemoryDomainTests;
+			path = DomainTests;
 			sourceTree = "<group>";
 		};
-		E61000000000000000000002 /* KitchenMemoryImportTests */ = {
+		E61000000000000000000002 /* ImportTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = KitchenMemoryImportTests;
+			path = ImportTests;
 			sourceTree = "<group>";
 		};
-		E61000000000000000000003 /* KitchenMemoryLogicTests */ = {
+		E61000000000000000000003 /* LogicTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = KitchenMemoryLogicTests;
+			path = LogicTests;
 			sourceTree = "<group>";
 		};
-		E61000000000000000000004 /* KitchenMemoryPersistenceTests */ = {
+		E61000000000000000000004 /* PersistenceTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = KitchenMemoryPersistenceTests;
+			path = PersistenceTests;
 			sourceTree = "<group>";
 		};
-		E61000000000000000000005 /* KitchenMemorySharedTestSupport */ = {
+		E61000000000000000000005 /* SharedTestSupport */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = KitchenMemorySharedTestSupport;
+			path = SharedTestSupport;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -442,15 +442,15 @@
 				A1C4E7A0302A63B800E2C0DB /* KitchenMemory */,
 				D10000000000000000000011 /* KitchenMemoryIOS */,
 				D10000000000000000000012 /* KitchenMemoryMac */,
-				D10000000000000000000013 /* KitchenMemoryDomain */,
-				D10000000000000000000014 /* KitchenMemoryImport */,
-				D10000000000000000000015 /* KitchenMemoryLogic */,
-				D10000000000000000000016 /* KitchenMemoryPersistence */,
-				E61000000000000000000001 /* KitchenMemoryDomainTests */,
-				E61000000000000000000002 /* KitchenMemoryImportTests */,
-				E61000000000000000000003 /* KitchenMemoryLogicTests */,
-				E61000000000000000000004 /* KitchenMemoryPersistenceTests */,
-				E61000000000000000000005 /* KitchenMemorySharedTestSupport */,
+				D10000000000000000000013 /* Domain */,
+				D10000000000000000000014 /* Import */,
+				D10000000000000000000015 /* Logic */,
+				D10000000000000000000016 /* Persistence */,
+				E61000000000000000000001 /* DomainTests */,
+				E61000000000000000000002 /* ImportTests */,
+				E61000000000000000000003 /* LogicTests */,
+				E61000000000000000000004 /* PersistenceTests */,
+				E61000000000000000000005 /* SharedTestSupport */,
 				E61000000000000000000081 /* KitchenMemoryCoreTesting.xctestplan */,
 				A15962C5302BC01A00926925 /* KitchenMemoryIOSTesting.xctestplan */,
 				D20000000000000000000081 /* KitchenMemoryMacTesting.xctestplan */,
@@ -618,7 +618,7 @@
 				B20000000000000000000403 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				D10000000000000000000013 /* KitchenMemoryDomain */,
+				D10000000000000000000013 /* Domain */,
 			);
 			name = KitchenMemoryDomain;
 			productName = KitchenMemoryDomain;
@@ -640,7 +640,7 @@
 				B20000000000000000000404 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				D10000000000000000000014 /* KitchenMemoryImport */,
+				D10000000000000000000014 /* Import */,
 			);
 			name = KitchenMemoryImport;
 			productName = KitchenMemoryImport;
@@ -662,7 +662,7 @@
 				B20000000000000000000405 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				D10000000000000000000016 /* KitchenMemoryPersistence */,
+				D10000000000000000000016 /* Persistence */,
 			);
 			name = KitchenMemoryPersistence;
 			productName = KitchenMemoryPersistence;
@@ -686,7 +686,7 @@
 				B30000000000000000000405 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				D10000000000000000000015 /* KitchenMemoryLogic */,
+				D10000000000000000000015 /* Logic */,
 			);
 			name = KitchenMemoryLogic;
 			productName = KitchenMemoryLogic;
@@ -732,8 +732,8 @@
 				E6100000000000000000006A /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				E61000000000000000000001 /* KitchenMemoryDomainTests */,
-				E61000000000000000000005 /* KitchenMemorySharedTestSupport */,
+				E61000000000000000000001 /* DomainTests */,
+				E61000000000000000000005 /* SharedTestSupport */,
 			);
 			name = KitchenMemoryDomainTests;
 			productName = KitchenMemoryDomainTests;
@@ -756,8 +756,8 @@
 				E6100000000000000000006B /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				E61000000000000000000002 /* KitchenMemoryImportTests */,
-				E61000000000000000000005 /* KitchenMemorySharedTestSupport */,
+				E61000000000000000000002 /* ImportTests */,
+				E61000000000000000000005 /* SharedTestSupport */,
 			);
 			name = KitchenMemoryImportTests;
 			productName = KitchenMemoryImportTests;
@@ -782,8 +782,8 @@
 				E6100000000000000000006C /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				E61000000000000000000003 /* KitchenMemoryLogicTests */,
-				E61000000000000000000005 /* KitchenMemorySharedTestSupport */,
+				E61000000000000000000003 /* LogicTests */,
+				E61000000000000000000005 /* SharedTestSupport */,
 			);
 			name = KitchenMemoryLogicTests;
 			productName = KitchenMemoryLogicTests;
@@ -806,7 +806,7 @@
 				E6100000000000000000006D /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				E61000000000000000000004 /* KitchenMemoryPersistenceTests */,
+				E61000000000000000000004 /* PersistenceTests */,
 			);
 			name = KitchenMemoryPersistenceTests;
 			productName = KitchenMemoryPersistenceTests;

@@ -244,7 +244,7 @@ unloads that store, and then lets the ordinary SwiftData container open it.
 The initializer builds the complete V3 managed model; it remains an explicit
 one-shot operation and does not imply Production promotion.
 The initializer lives with the rest of the store implementation in
-`KitchenMemoryPersistence/Cloud`. iOS, Debug, Testing, ProductionTesting, and
+`Persistence/Cloud`. iOS, Debug, Testing, ProductionTesting, and
 Production builds do not contain this switch. Ordinary Development and
 Production launches still create their initial local Kitchen without schema
 administration; the one-shot operation publishes server schema, not user data.

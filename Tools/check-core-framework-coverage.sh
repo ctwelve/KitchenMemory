@@ -14,10 +14,10 @@ fi
 RESULT_BUNDLE=$1
 SCRIPT_DIRECTORY=$(CDPATH= cd "$(dirname "$0")" && pwd)
 PROJECT_ROOT=$(dirname "$SCRIPT_DIRECTORY")
-DOMAIN_DIRECTORY="$PROJECT_ROOT/KitchenMemoryDomain"
-IMPORT_DIRECTORY="$PROJECT_ROOT/KitchenMemoryImport"
-LOGIC_DIRECTORY="$PROJECT_ROOT/KitchenMemoryLogic"
-PERSISTENCE_DIRECTORY="$PROJECT_ROOT/KitchenMemoryPersistence"
+DOMAIN_DIRECTORY="$PROJECT_ROOT/Domain"
+IMPORT_DIRECTORY="$PROJECT_ROOT/Import"
+LOGIC_DIRECTORY="$PROJECT_ROOT/Logic"
+PERSISTENCE_DIRECTORY="$PROJECT_ROOT/Persistence"
 PERSISTENCE_RUNTIME_ADAPTER="$PERSISTENCE_DIRECTORY/Cloud/PersonalCloudStatusMonitor.swift"
 
 if [ ! -r "$RESULT_BUNDLE" ]; then
@@ -49,11 +49,11 @@ if ! INPUT_TIMESTAMPS=$(find \
   "$IMPORT_DIRECTORY" \
   "$LOGIC_DIRECTORY" \
   "$PERSISTENCE_DIRECTORY" \
-  "$PROJECT_ROOT/KitchenMemoryDomainTests" \
-  "$PROJECT_ROOT/KitchenMemoryImportTests" \
-  "$PROJECT_ROOT/KitchenMemoryLogicTests" \
-  "$PROJECT_ROOT/KitchenMemoryPersistenceTests" \
-  "$PROJECT_ROOT/KitchenMemorySharedTestSupport" \
+  "$PROJECT_ROOT/DomainTests" \
+  "$PROJECT_ROOT/ImportTests" \
+  "$PROJECT_ROOT/LogicTests" \
+  "$PROJECT_ROOT/PersistenceTests" \
+  "$PROJECT_ROOT/SharedTestSupport" \
   "$PROJECT_ROOT/Configurations" \
   "$PROJECT_ROOT/KitchenMemory.xcodeproj/project.pbxproj" \
   "$PROJECT_ROOT/KitchenMemory.xcodeproj/xcshareddata/xcschemes/KitchenMemory Core Testing.xcscheme" \

@@ -297,7 +297,7 @@ recorded build start.
 ### Deterministic property-test corpora
 
 Property tests load named entropy seeds from
-`KitchenMemorySharedTestSupport/PropertyTestSeeds.json`. Failure messages record
+`SharedTestSupport/PropertyTestSeeds.json`. Failure messages record
 the seed and case number so a generated input can be replayed exactly. The test
 harness verifies catalog integrity, proves that changed seeds produce different
 raw and derived corpora, and pins a known-answer vector so an accidental generator
