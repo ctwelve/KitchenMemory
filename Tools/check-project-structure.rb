@@ -615,9 +615,17 @@ module KitchenMemory
         end
       end
       %w[LaunchAction ProfileAction].each do |action|
-        next if REXML::XPath.match(document, "/Scheme/#{action}").empty?
+        elements = REXML::XPath.match(document, "/Scheme/#{action}")
+        if elements.length > 1
+          raise ContractError, "#{scheme_name} must contain at most one #{action}"
+        end
+        runnables = REXML::XPath.match(
+          document,
+          "/Scheme/#{action}/BuildableProductRunnable/BuildableReference"
+        )
+        next if runnables.empty?
 
-        raise ContractError, "#{scheme_name} must not contain #{action}"
+        raise ContractError, "#{scheme_name} #{action} must not declare a runnable product"
       end
     end
 

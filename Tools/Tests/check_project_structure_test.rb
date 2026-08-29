@@ -294,6 +294,8 @@ class CheckProjectStructureTest < Minitest::Test
                   #{testables}
                 </Testables>
               </TestAction>
+              <LaunchAction buildConfiguration="Debug"/>
+              <ProfileAction buildConfiguration="Release"/>
               <AnalyzeAction buildConfiguration="Testing"/>
               <ArchiveAction buildConfiguration="Production"/>
             </Scheme>
@@ -638,6 +640,26 @@ class CheckProjectStructureTest < Minitest::Test
     error = assert_contract_error { validate(fixture) }
 
     assert_includes error.message, "automatically create its test plan"
+  end
+
+  def test_rejects_runnable_product_in_kitchenkit_launch_action
+    fixture = Fixture.new
+    runnable = <<~RUNNABLE.chomp
+      <BuildableProductRunnable>
+        <BuildableReference
+          BlueprintIdentifier="#{fixture.target_ids.fetch('KitchenKit')}"
+          BlueprintName="KitchenKit"
+          ReferencedContainer="container:KitchenMemory.xcodeproj"/>
+      </BuildableProductRunnable>
+    RUNNABLE
+    fixture.schemes["KitchenKit.xcscheme"] = fixture.schemes.fetch("KitchenKit.xcscheme").sub(
+      '<LaunchAction buildConfiguration="Debug"/>',
+      %(<LaunchAction buildConfiguration="Debug">#{runnable}</LaunchAction>)
+    )
+
+    error = assert_contract_error { validate(fixture) }
+
+    assert_includes error.message, "must not declare a runnable product"
   end
 
   private
