@@ -12,12 +12,13 @@ Accepted.
 
 Amended by [ADR 0012](0012-consolidate-business-code-in-kitchenkit.md): the
 coverage-versus-UI investment policy remains, but `KitchenKitTests` replaces the
-four framework test targets. One minimal shared `KitchenKit` scheme associates
-its unhosted test target and keeps that plan automatic. The two saved platform
-schemes and plans each run their native hosted tests plus the shared UI smoke
-target with `Testing` as the default Test configuration. The target and plan
-names below record the topology at the time of this decision rather than the
-current project contract.
+four framework test targets. Each shared scheme now builds only its primary
+product and references one checked-in test plan; the plan is the sole owner of
+test-target membership. The two platform plans each run their native hosted
+tests plus the shared UI smoke target, while `KitchenKit.xctestplan` runs the
+unhosted framework suite. All three use `Testing` as the default Test
+configuration. The target and plan names below record the topology at the time
+of this decision rather than the current project contract.
 
 ## Context
 

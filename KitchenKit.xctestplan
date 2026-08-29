@@ -1,0 +1,25 @@
+{
+  "configurations" : [
+    {
+      "id" : "15EE77BC-D00B-4802-87C7-C19E07D13F7F",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "performanceAntipatternCheckerEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:KitchenMemory.xcodeproj",
+        "identifier" : "A1C9A4873042896F00F1F13D",
+        "name" : "KitchenKitTests"
+      }
+    }
+  ],
+  "version" : 1
+}

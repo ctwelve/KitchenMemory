@@ -13,8 +13,10 @@ Accepted.
 Amended by [ADR 0012](0012-consolidate-business-code-in-kitchenkit.md): the two
 native application targets and their platform ownership remain. Each now has
 one saved default scheme and one saved plan containing its hosted tests and the
-shared UI smoke target; `KitchenKit` has one shared scheme and an automatic
-plan. The current Mac-owned folder is `KitchenMemoryMacOS/`. The
+shared UI smoke target; `KitchenKit` likewise has one shared scheme and one
+saved plan for its unhosted tests. Each scheme builds only its primary product,
+and each plan alone owns test-target membership. The current Mac-owned folder is
+`KitchenMemoryMacOS/`. The
 three-schemes-per-app, four-plan, and separate-framework topology below is
 retained as decision history, not current build instructions.
 

@@ -100,8 +100,9 @@ Open `KitchenMemory.xcodeproj` in Xcode. Run **KitchenMemoryIOS** for an iOS
 Simulator or development device, or **KitchenMemoryMacOS** for My Mac. The
 repository checks in those two default application schemes and their platform
 test plans so local and Xcode Cloud validation use the same targets. The
-minimal shared **KitchenKit** scheme associates its unhosted test target; Xcode
-creates only that scheme's test plan automatically.
+minimal shared **KitchenKit** scheme likewise references a checked-in plan for
+its unhosted test target. Each scheme builds only its primary product; its plan
+alone owns test-target membership.
 
 Development builds use the `net.ctwelve.dev` application namespace and the
 separate `iCloud.net.ctwelve.dev.KitchenMemory` container. They cannot read or
@@ -114,7 +115,7 @@ platform-owned files live in `KitchenMemoryIOS` and `KitchenMemoryMacOS`. Durabl
 domain, import, product-logic, and persistence code lives in the native
 `KitchenKit` framework.
 
-KitchenKit tests run once through its shared scheme and automatic plan. Each
+KitchenKit tests run once through its shared scheme and explicit plan. Each
 saved platform plan runs its native composition and resource tests plus the
 shared identifier-driven UI smoke suite. For example:
 

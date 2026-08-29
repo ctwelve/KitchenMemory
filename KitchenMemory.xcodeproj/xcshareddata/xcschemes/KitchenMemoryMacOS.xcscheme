@@ -34,19 +34,6 @@
             default = "YES">
          </TestPlanReference>
       </TestPlans>
-      <Testables>
-         <TestableReference
-            skipped = "NO"
-            parallelizable = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "D20000000000000000000021"
-               BuildableName = "KitchenMemoryMacTests.xctest"
-               BlueprintName = "KitchenMemoryMacTests"
-               ReferencedContainer = "container:KitchenMemory.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
-      </Testables>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"
