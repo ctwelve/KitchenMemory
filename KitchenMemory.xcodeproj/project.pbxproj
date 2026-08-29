@@ -25,6 +25,7 @@
 				"# $(DOCC_EXEC)",
 				"",
 				"",
+				"",
 			);
 		};
 /* End PBXBuildRule section */
