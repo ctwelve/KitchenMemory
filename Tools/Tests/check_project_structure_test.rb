@@ -382,6 +382,23 @@ class CheckProjectStructureTest < Minitest::Test
       ["KitchenMemoryMacTests"],
       KitchenMemory::ProjectStructure::PLANS.fetch("KitchenMemoryMacTesting.xctestplan")
     )
+    expected_core_groups = {
+      "KitchenMemoryDomainTests" => ["DomainTests", "SharedTestSupport"],
+      "KitchenMemoryImportTests" => ["ImportTests", "SharedTestSupport"],
+      "KitchenMemoryLogicTests" => ["LogicTests", "SharedTestSupport"],
+      "KitchenMemoryPersistenceTests" => ["PersistenceTests"],
+      "KitchenMemoryDomain" => ["Domain"],
+      "KitchenMemoryImport" => ["Import"],
+      "KitchenMemoryLogic" => ["Logic"],
+      "KitchenMemoryPersistence" => ["Persistence"]
+    }
+    actual_core_groups = expected_core_groups.keys.to_h do |target_name|
+      [
+        target_name,
+        KitchenMemory::ProjectStructure::SYNCHRONIZED_GROUPS.fetch(target_name)
+      ]
+    end
+    assert_equal expected_core_groups, actual_core_groups
   end
 
   def test_allows_synchronized_navigator_group_without_target_membership

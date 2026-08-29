@@ -155,8 +155,8 @@ The core source is currently Swift. These folders include several `NSObject`
 subclasses and notification selectors bridged with `@objc`, but no Objective-C
 source or category implementation files. That avoids today's classic static
 archive category trap while making the hosted-test runtime-identity check
-important. [Import URL-session delegate](../../KitchenMemoryImport/RecipeURLRedirectController.swift)
-· [Persistence runtime observers](../../KitchenMemoryPersistence/Cloud/PersistentStoreChangeObserver.swift)
+important. [Import URL-session delegate](../../Import/RecipeURLRedirectController.swift)
+· [Persistence runtime observers](../../Persistence/Cloud/PersistentStoreChangeObserver.swift)
 
 If categories are introduced later, Apple documents that the linker
 may not pull their object files because calling a category method does not
