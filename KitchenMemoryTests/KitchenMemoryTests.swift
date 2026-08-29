@@ -52,13 +52,13 @@ final class KitchenMemoryTests: XCTestCase {
     )
   }
 
-  func testCurrentRuntimeUsesTheAutomaticHostedTestEnvironment() throws {
+  func testCurrentRuntimeUsesTheHostedTestEnvironment() throws {
     let preparedApp = try XCTUnwrap(AppRuntime.prepare().preparedApp)
 
     preparedApp.libraryModel.loadIfNeeded()
 
     XCTAssertEqual(preparedApp.libraryModel.recipes.count, 3)
-    XCTAssertNil(preparedApp.cloudSyncSettings)
+    XCTAssertNotNil(preparedApp.cloudSyncSettings)
     XCTAssertNil(preparedApp.persistentStoreChangeObserver)
     XCTAssertNil(preparedApp.personalCloudStatusMonitor)
   }
@@ -147,6 +147,12 @@ final class AppLaunchPlanTests: XCTestCase {
     XCTAssertFalse(AppBuildEnvironment.testing.synchronizesWithPersonalCloud)
     XCTAssertTrue(AppBuildEnvironment.production.synchronizesWithPersonalCloud)
     XCTAssertFalse(AppBuildEnvironment.productionTesting.synchronizesWithPersonalCloud)
+
+    XCTAssertFalse(AppBuildEnvironment.debug.offersCloudSyncSetting)
+    XCTAssertTrue(AppBuildEnvironment.develop.offersCloudSyncSetting)
+    XCTAssertTrue(AppBuildEnvironment.testing.offersCloudSyncSetting)
+    XCTAssertTrue(AppBuildEnvironment.production.offersCloudSyncSetting)
+    XCTAssertTrue(AppBuildEnvironment.productionTesting.offersCloudSyncSetting)
 
     XCTAssertFalse(AppBuildEnvironment.debug.permitsUITestHarness)
     XCTAssertFalse(AppBuildEnvironment.develop.permitsUITestHarness)
@@ -252,7 +258,7 @@ final class AppLaunchPlanTests: XCTestCase {
     XCTAssertEqual(developHosted.store, .local)
   }
 
-  func testAutomaticPlanExposesTheHostedXCTestEnvironment() throws {
+  func testSavedPlanExposesTheHostedXCTestEnvironment() throws {
     XCTAssertNotNil(ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"])
     XCTAssertEqual(
       try AppLaunchPlan.resolve(

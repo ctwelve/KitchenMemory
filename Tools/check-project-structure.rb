@@ -51,6 +51,9 @@ module KitchenMemory
     PROJECT_CONFIGURATION_FILES = APP_CONFIGURATIONS.to_h do |configuration|
       [configuration, "#{configuration}.xcconfig"]
     end.freeze
+    PROJECT_BUILD_SETTINGS = {
+      "MERGED_BINARY_TYPE" => "automatic"
+    }.freeze
     APP_FILE_CONTRACTS = {
       "KitchenMemoryIOS" => {
         info_plist: "KitchenMemoryIOS/Info.plist",
@@ -62,10 +65,10 @@ module KitchenMemory
         testing_entitlements: "KitchenMemoryIOS/KitchenMemory-Testing.entitlements"
       },
       "KitchenMemoryMacOS" => {
-        info_plist: "KitchenMemoryMac/Info.plist",
+        info_plist: "KitchenMemoryMacOS/Info.plist",
         entitlement_keys: ["CODE_SIGN_ENTITLEMENTS"],
-        production_entitlements: "KitchenMemoryMac/KitchenMemory.entitlements",
-        testing_entitlements: "KitchenMemoryMac/KitchenMemory-Testing.entitlements"
+        production_entitlements: "KitchenMemoryMacOS/KitchenMemory.entitlements",
+        testing_entitlements: "KitchenMemoryMacOS/KitchenMemory-Testing.entitlements"
       }
     }.freeze
     APP_BUNDLE_IDENTIFIERS = {
@@ -74,7 +77,7 @@ module KitchenMemory
     PRODUCTION_BUNDLE_IDENTIFIER = "net.ctwelve.KitchenMemory"
     SYNCHRONIZED_GROUPS = {
       "KitchenMemoryIOS" => ["KitchenMemory", "KitchenMemoryIOS"],
-      "KitchenMemoryMacOS" => ["KitchenMemory", "KitchenMemoryMac"],
+      "KitchenMemoryMacOS" => ["KitchenMemory", "KitchenMemoryMacOS"],
       "KitchenMemoryIOSTests" => ["KitchenMemoryTests"],
       "KitchenMemoryMacTests" => ["KitchenMemoryTests"],
       "KitchenMemoryUITests" => ["KitchenMemoryUITests"],
@@ -83,19 +86,57 @@ module KitchenMemory
     }.freeze
     PLATFORM_INFO_EXCEPTIONS = {
       "KitchenMemoryIOS" => "KitchenMemoryIOS",
-      "KitchenMemoryMac" => "KitchenMemoryMacOS"
+      "KitchenMemoryMacOS" => "KitchenMemoryMacOS"
     }.freeze
-    # Xcode's automatic schemes and test plans are the project contract. The
-    # one minimal shared scheme associates the unhosted KitchenKitTests bundle
-    # with KitchenKit; its test plan remains automatic.
-    PLANS = {}.freeze
-    PLAN_POLICIES = {}.freeze
-    SCHEME_ACTION_CONFIGURATIONS = {}.freeze
+    TEST_PREBUILD_PHASES = {
+      "KitchenMemoryIOSTests" => "Embed Localization Catalog Contract",
+      "KitchenMemoryMacTests" => "Embed Localization Catalog Contract"
+    }.freeze
+    PLANS = {
+      "KitchenMemoryIOS.xctestplan" => %w[KitchenMemoryIOSTests KitchenMemoryUITests],
+      "KitchenMemoryMacOS.xctestplan" => %w[KitchenMemoryMacTests KitchenMemoryUITests]
+    }.freeze
+    PLAN_POLICIES = {
+      "KitchenMemoryIOS.xctestplan" => {
+        configuration: "Test Scheme Action",
+        variable_expansion_target: "KitchenMemoryIOS"
+      },
+      "KitchenMemoryMacOS.xctestplan" => {
+        configuration: "Test Scheme Action",
+        variable_expansion_target: "KitchenMemoryMacOS"
+      }
+    }.freeze
+    SCHEME_ACTION_CONFIGURATIONS = {
+      "KitchenMemoryIOS" => {
+        "TestAction" => "Testing",
+        "LaunchAction" => "Debug",
+        "ProfileAction" => "Production",
+        "AnalyzeAction" => "Testing",
+        "ArchiveAction" => "Production"
+      },
+      "KitchenMemoryMacOS" => {
+        "TestAction" => "Testing",
+        "LaunchAction" => "Debug",
+        "ProfileAction" => "Production",
+        "AnalyzeAction" => "Testing",
+        "ArchiveAction" => "Production"
+      }
+    }.freeze
     SCHEMES = {
       "KitchenKit" => {
         automatic_plan: true,
         build_targets: %w[KitchenKit KitchenKitTests],
         test_targets: %w[KitchenKitTests]
+      },
+      "KitchenMemoryIOS" => {
+        app: "KitchenMemoryIOS",
+        plan: "KitchenMemoryIOS.xctestplan",
+        scheme_test_targets: %w[KitchenMemoryIOSTests]
+      },
+      "KitchenMemoryMacOS" => {
+        app: "KitchenMemoryMacOS",
+        plan: "KitchenMemoryMacOS.xctestplan",
+        scheme_test_targets: %w[KitchenMemoryMacTests]
       }
     }.freeze
     OBJECT_HEADER = /\A([\t ]*)([0-9A-F]+) \/\* (.*?) \*\/ = \{[\t ]*\z/.freeze
@@ -108,6 +149,7 @@ module KitchenMemory
       objects = parse_objects(project_contents)
       validate_project_configurations(objects, parse_file_references(project_contents))
       targets = validate_targets(objects)
+      validate_test_prebuild_phases(objects, targets)
       configurations = validate_configurations(objects, targets)
       validate_platforms(configurations)
       validate_ui_test_hosts(configurations.fetch("KitchenMemoryUITests"))
@@ -222,6 +264,36 @@ module KitchenMemory
 
         raise ContractError,
               "project #{record[:name]} must use #{expected_path}; found #{actual_path.inspect}"
+      end
+
+      records.each do |record|
+        PROJECT_BUILD_SETTINGS.each do |setting, expected_value|
+          actual_value = record[:settings][setting]
+          next if actual_value == expected_value
+
+          raise ContractError,
+                "project #{record[:name]} must set #{setting} to #{expected_value}; " \
+                "found #{actual_value.inspect}"
+        end
+      end
+    end
+
+    def validate_test_prebuild_phases(objects, targets)
+      TEST_PREBUILD_PHASES.each do |target_name, expected_name|
+        phase_ids = reference_ids(targets.fetch(target_name)[:body], "buildPhases")
+        matching_phase_ids = phase_ids.select do |identifier|
+          phase = objects[identifier]
+          phase && phase[:isa] == "PBXShellScriptBuildPhase" &&
+            property(phase[:body], "name") == expected_name
+        end
+        unless matching_phase_ids.length == 1
+          raise ContractError,
+                "#{target_name} must contain exactly one #{expected_name.inspect} shell phase"
+        end
+        next if phase_ids.first == matching_phase_ids.first
+
+        raise ContractError,
+              "#{target_name} must run #{expected_name.inspect} before every product build phase"
       end
     end
 
@@ -460,14 +532,19 @@ module KitchenMemory
         unless plan_configurations.first["options"] == {}
           raise ContractError, "#{filename} configuration options must remain empty"
         end
-        default_options = plan.fetch("defaultOptions", {})
-        unless default_options["codeCoverage"] == policy[:code_coverage]
+        expansion_target = targets.fetch(policy[:variable_expansion_target])
+        expected_default_options = {
+          "performanceAntipatternCheckerEnabled" => true,
+          "targetForVariableExpansion" => {
+            "containerPath" => "container:KitchenMemory.xcodeproj",
+            "identifier" => expansion_target[:id],
+            "name" => expansion_target[:name]
+          }
+        }
+        unless plan.fetch("defaultOptions", {}) == expected_default_options
           raise ContractError,
-                "#{filename} codeCoverage must be #{policy[:code_coverage]}"
-        end
-        expected_arguments = [{ "argument" => "--unit-testing" }]
-        unless default_options["commandLineArgumentEntries"] == expected_arguments
-          raise ContractError, "#{filename} must pass only --unit-testing by default"
+                "#{filename} must retain Xcode's default diagnostics and expand variables " \
+                "against #{expansion_target[:name]}"
         end
 
         test_targets = plan.fetch("testTargets", [])
@@ -475,6 +552,9 @@ module KitchenMemory
         assert_exact_names("#{filename} test targets", actual_target_names, expected_target_names)
 
         test_targets.each do |entry|
+          unless entry["parallelizable"] == true
+            raise ContractError, "#{filename} test targets must remain parallelizable"
+          end
           reference = entry.fetch("target", {})
           identifier = reference["identifier"]
           name = reference["name"]
@@ -507,11 +587,13 @@ module KitchenMemory
         references = REXML::XPath.match(
           document,
           "/Scheme/TestAction/TestPlans/TestPlanReference"
-        ).map { |element| element.attributes["reference"] }
+        )
         expected_reference = "container:#{expected[:plan]}"
-        unless references == [expected_reference]
+        unless references.length == 1 &&
+               references.first.attributes["reference"] == expected_reference &&
+               references.first.attributes["default"] == "YES"
           raise ContractError,
-                "#{scheme_name} must reference only #{expected_reference}; found #{references.inspect}"
+                "#{scheme_name} must use #{expected_reference} as its only default test plan"
         end
         raise ContractError, "#{scheme_name} references missing plan #{expected[:plan]}" unless plans.key?(expected[:plan])
 
@@ -535,7 +617,7 @@ module KitchenMemory
           validate_scheme_runnable(scheme_name, document, "ProfileAction", expected[:app])
         end
 
-        expected_testables = PLANS.fetch(expected[:plan])
+        expected_testables = expected.fetch(:scheme_test_targets, PLANS.fetch(expected[:plan]))
         testable_names = REXML::XPath.match(
           document,
           "/Scheme/TestAction/Testables/TestableReference/BuildableReference"
@@ -671,12 +753,11 @@ module KitchenMemory
       )
       raise ContractError, "#{scheme_name} must contain one build action entry" unless entries.length == 1
 
-      flavor = scheme_name.split.last
       expected_attributes = {
         "buildForTesting" => "YES",
         "buildForRunning" => "YES",
         "buildForProfiling" => "YES",
-        "buildForArchiving" => flavor == "Production" ? "YES" : "NO",
+        "buildForArchiving" => "YES",
         "buildForAnalyzing" => "YES"
       }
       expected_attributes.each do |attribute, expected_value|
@@ -689,8 +770,7 @@ module KitchenMemory
     end
 
     def validate_scheme_action_configurations(scheme_name, document)
-      flavor = scheme_name.split.last
-      SCHEME_ACTION_CONFIGURATIONS.fetch(flavor).each do |action, expected_configuration|
+      SCHEME_ACTION_CONFIGURATIONS.fetch(scheme_name).each do |action, expected_configuration|
         elements = REXML::XPath.match(document, "/Scheme/#{action}")
         unless elements.length == 1
           raise ContractError, "#{scheme_name} must contain exactly one #{action}"

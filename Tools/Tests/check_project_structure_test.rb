@@ -10,7 +10,7 @@ require_relative "../check-project-structure"
 
 class CheckProjectStructureTest < Minitest::Test
   class Fixture
-    attr_reader :plans, :project, :schemes, :target_ids
+    attr_reader :plans, :prebuild_phase_ids, :project, :schemes, :source_phase_ids, :target_ids
 
     def initialize(configuration_overrides = {})
       target_names = KitchenMemory::ProjectStructure::TARGET_TYPES.keys
@@ -20,8 +20,16 @@ class CheckProjectStructureTest < Minitest::Test
       @group_ids = identifier_map(group_paths, 300)
       @exception_ids = {
         "KitchenMemoryIOS" => format("%024X", 400),
-        "KitchenMemoryMac" => format("%024X", 401)
+        "KitchenMemoryMacOS" => format("%024X", 401)
       }
+      @prebuild_phase_ids = identifier_map(
+        KitchenMemory::ProjectStructure::TEST_PREBUILD_PHASES.keys,
+        500
+      )
+      @source_phase_ids = identifier_map(
+        KitchenMemory::ProjectStructure::TEST_PREBUILD_PHASES.keys,
+        510
+      )
       @project_configuration_list_id = format("%024X", 1_100)
       @project_configuration_ids = identifier_map(
         KitchenMemory::ProjectStructure::APP_CONFIGURATIONS,
@@ -57,10 +65,20 @@ class CheckProjectStructureTest < Minitest::Test
         group_references = KitchenMemory::ProjectStructure::SYNCHRONIZED_GROUPS.fetch(name).map do |path|
           "\t\t\t\t#{@group_ids.fetch(path)} /* #{path} */,\n"
         end.join
+        phase_references = if @prebuild_phase_ids.key?(name)
+                             <<~PHASES
+				#{@prebuild_phase_ids.fetch(name)} /* Embed Localization Catalog Contract */,
+				#{@source_phase_ids.fetch(name)} /* Sources */,
+                             PHASES
+                           else
+                             ""
+                           end
         <<~TARGET
 		#{@target_ids.fetch(name)} /* #{name} */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = #{@configuration_list_ids.fetch(name)} /* Build configuration list for PBXNativeTarget "#{name}" */;
+			buildPhases = (
+#{phase_references}			);
 			fileSystemSynchronizedGroups = (
 #{group_references}			);
 			name = "#{name}";
@@ -99,6 +117,22 @@ class CheckProjectStructureTest < Minitest::Test
 			target = #{@target_ids.fetch(target_name)} /* #{target_name} */;
 		};
         EXCEPTION
+      end
+
+      prebuild_phase_objects = @prebuild_phase_ids.map do |target_name, identifier|
+        <<~PHASE
+		#{identifier} /* Embed Localization Catalog Contract */ = {
+			isa = PBXShellScriptBuildPhase;
+			name = "#{KitchenMemory::ProjectStructure::TEST_PREBUILD_PHASES.fetch(target_name)}";
+		};
+        PHASE
+      end
+      source_phase_objects = @source_phase_ids.map do |_target_name, identifier|
+        <<~PHASE
+		#{identifier} /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+		};
+        PHASE
       end
 
       configuration_objects = []
@@ -143,6 +177,7 @@ class CheckProjectStructureTest < Minitest::Test
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = #{file_identifier} /* #{name}.xcconfig */;
 			buildSettings = {
+				MERGED_BINARY_TYPE = automatic;
 			};
 			name = #{name};
 		};
@@ -170,7 +205,8 @@ class CheckProjectStructureTest < Minitest::Test
       end
 
       (
-        target_objects + group_objects + exception_objects + configuration_objects +
+        target_objects + group_objects + exception_objects + prebuild_phase_objects +
+          source_phase_objects + configuration_objects +
           configuration_list_objects + project_configuration_objects +
           [project_configuration_list, project_object] + file_references
       ).join
@@ -221,13 +257,16 @@ class CheckProjectStructureTest < Minitest::Test
             }
           ],
           "defaultOptions" => {
-            "codeCoverage" => policy[:code_coverage],
-            "commandLineArgumentEntries" => [
-              { "argument" => "--unit-testing" }
-            ]
+            "performanceAntipatternCheckerEnabled" => true,
+            "targetForVariableExpansion" => {
+              "containerPath" => "container:KitchenMemory.xcodeproj",
+              "identifier" => @target_ids.fetch(policy[:variable_expansion_target]),
+              "name" => policy[:variable_expansion_target]
+            }
           },
           "testTargets" => target_names.map do |target_name|
             {
+              "parallelizable" => true,
               "target" => {
                 "containerPath" => "container:KitchenMemory.xcodeproj",
                 "identifier" => @target_ids.fetch(target_name),
@@ -354,11 +393,13 @@ class CheckProjectStructureTest < Minitest::Test
 
         app = expectation.fetch(:app)
         plan = expectation.fetch(:plan)
-        flavor = name.split.last
-        action_configurations = KitchenMemory::ProjectStructure::SCHEME_ACTION_CONFIGURATIONS.fetch(flavor)
-        archive = flavor == "Production" ? "YES" : "NO"
+        action_configurations = KitchenMemory::ProjectStructure::SCHEME_ACTION_CONFIGURATIONS.fetch(name)
+        archive = "YES"
         profile = "YES"
-        testables = KitchenMemory::ProjectStructure::PLANS.fetch(plan).map do |target_name|
+        testables = expectation.fetch(
+          :scheme_test_targets,
+          KitchenMemory::ProjectStructure::PLANS.fetch(plan)
+        ).map do |target_name|
           <<~TESTABLE
             <TestableReference skipped="NO">
               <BuildableReference
@@ -424,8 +465,8 @@ class CheckProjectStructureTest < Minitest::Test
     result = validate(fixture)
 
     assert_equal 7, result[:target_count]
-    assert_equal 1, result[:scheme_count]
-    assert_equal 0, result[:plan_count]
+    assert_equal 3, result[:scheme_count]
+    assert_equal 2, result[:plan_count]
     expected_core_groups = {
       "KitchenKit" => ["KitchenKit"],
       "KitchenKitTests" => ["KitchenKitTests"]
@@ -508,11 +549,34 @@ class CheckProjectStructureTest < Minitest::Test
     assert_includes error.message, "project Develop must use Develop.xcconfig"
   end
 
+  def test_rejects_project_configuration_without_automatic_merged_binaries
+    fixture = Fixture.new
+    fixture.project.sub!("MERGED_BINARY_TYPE = automatic;", "MERGED_BINARY_TYPE = none;")
+
+    error = assert_contract_error { validate(fixture) }
+
+    assert_includes error.message, "project Debug must set MERGED_BINARY_TYPE to automatic"
+  end
+
+  def test_rejects_localization_contract_phase_after_product_build_phase
+    fixture = Fixture.new
+    target_name = "KitchenMemoryIOSTests"
+    prebuild = "#{fixture.prebuild_phase_ids.fetch(target_name)} " \
+      "/* Embed Localization Catalog Contract */"
+    sources = "#{fixture.source_phase_ids.fetch(target_name)} /* Sources */"
+    fixture.project.sub!("#{prebuild},\n#{sources},", "#{sources},\n#{prebuild},")
+
+    error = assert_contract_error { validate(fixture) }
+
+    assert_includes error.message, "KitchenMemoryIOSTests must run"
+    assert_includes error.message, "before every product build phase"
+  end
+
   def test_rejects_wrong_platform_info_plist
     fixture = Fixture.new
     fixture.project.sub!(
       "INFOPLIST_FILE = KitchenMemoryIOS/Info.plist;",
-      "INFOPLIST_FILE = KitchenMemoryMac/Info.plist;"
+      "INFOPLIST_FILE = KitchenMemoryMacOS/Info.plist;"
     )
 
     error = assert_contract_error { validate(fixture) }
@@ -616,6 +680,42 @@ class CheckProjectStructureTest < Minitest::Test
 
     assert_includes error.message, "shared schemes"
     assert_includes error.message, "unexpected: Obsolete"
+  end
+
+  def test_rejects_platform_plan_without_ui_smoke_target
+    fixture = Fixture.new
+    plan = JSON.parse(fixture.plans.fetch("KitchenMemoryMacOS.xctestplan"))
+    plan["testTargets"].reject! do |entry|
+      entry.dig("target", "name") == "KitchenMemoryUITests"
+    end
+    fixture.plans["KitchenMemoryMacOS.xctestplan"] = JSON.generate(plan)
+
+    error = assert_contract_error { validate(fixture) }
+
+    assert_includes error.message, "KitchenMemoryMacOS.xctestplan test targets"
+    assert_includes error.message, "missing: KitchenMemoryUITests"
+  end
+
+  def test_rejects_platform_plan_with_wrong_variable_expansion_target
+    fixture = Fixture.new
+    plan = JSON.parse(fixture.plans.fetch("KitchenMemoryIOS.xctestplan"))
+    plan["defaultOptions"]["targetForVariableExpansion"]["name"] = "KitchenMemoryMacOS"
+    fixture.plans["KitchenMemoryIOS.xctestplan"] = JSON.generate(plan)
+
+    error = assert_contract_error { validate(fixture) }
+
+    assert_includes error.message, "expand variables against KitchenMemoryIOS"
+  end
+
+  def test_rejects_platform_scheme_using_debug_for_tests
+    fixture = Fixture.new
+    fixture.schemes["KitchenMemoryMacOS.xcscheme"] = fixture.schemes.fetch(
+      "KitchenMemoryMacOS.xcscheme"
+    ).sub('TestAction buildConfiguration="Testing"', 'TestAction buildConfiguration="Debug"')
+
+    error = assert_contract_error { validate(fixture) }
+
+    assert_includes error.message, "KitchenMemoryMacOS TestAction must use Testing"
   end
 
   def test_rejects_saved_plan_for_kitchenkit_scheme

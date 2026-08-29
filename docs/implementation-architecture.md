@@ -42,7 +42,7 @@ This structure keeps technical responsibilities explicit without turning source
 organization into independently linked products.
 
 `KitchenMemory/` is the shared application layer. `KitchenMemoryIOS/` and
-`KitchenMemoryMac/` contain resources and entitlements owned by only one app
+`KitchenMemoryMacOS/` contain resources and entitlements owned by only one app
 target. `KitchenKit/` belongs only to the KitchenKit target. This direct target
 membership replaces filename conventions and per-file platform filters.
 
@@ -66,11 +66,19 @@ target implementation details:
 
 `ProductionTesting` is deliberately non-distributable. It retains production
 compiler behavior while admitting disposable automated-test storage that is
-disabled in the actual `Production` application. Hosted unit tests and UI-test
-launches use that storage only in a testing configuration. The automatic
-`KitchenMemoryIOS` and `KitchenMemoryMacOS` schemes select `Develop`, `Testing`,
-or `Production` at invocation time instead of duplicating schemes by
-configuration. UI smoke runs select a `ProductionTesting` host explicitly.
+disabled in the actual `Production` application. The saved `KitchenMemoryIOS`
+and `KitchenMemoryMacOS` schemes use `Testing` for their default Test and
+Analyze actions, `Debug` for Run, and `Production` for Profile and Archive.
+Their platform plans run hosted tests and UI smoke together; the UI harness
+selects disposable storage through its launch arguments. A release-equivalent
+UI smoke run may select `ProductionTesting` explicitly.
+
+The project keeps `MERGED_BINARY_TYPE` at `automatic` so Xcode can optimize
+framework linkage for the selected build. Because hosted test products may
+then re-export `KitchenKit`, each test target's localization-catalog embedding
+script must run before Sources, Frameworks, and Resources. Running it later can
+make the script's test-bundle output and Xcode's re-export signing step depend
+on one another. The project-structure checker freezes this ordering.
 
 Production retains automatic signing but does not pin an Apple Development
 identity. Xcode therefore remains responsible for selecting the appropriate
@@ -378,10 +386,13 @@ Property-test seeds and their generator live in `KitchenKitTests/Support/`.
 Tests for starter content, presentation formatting, application composition,
 resources, and hosted runtime behavior live in `KitchenMemoryTests`; that
 folder belongs only to the platform-specific `KitchenMemoryIOSTests` and
-`KitchenMemoryMacTests` host targets. Xcode's automatic plans derive their test
-membership from those targets. The exact coverage gate requires every
+`KitchenMemoryMacTests` host targets. The checked-in
+`KitchenMemoryIOS.xctestplan` and `KitchenMemoryMacOS.xctestplan` each contain
+their native hosted target and the shared `KitchenMemoryUITests` smoke target.
+Their schemes use `Testing` for Test so both kinds of test receive a
+least-privilege, disposable host. The exact coverage gate requires every
 executable business-logic line in KitchenKit to be covered by the core macOS
-result. Both app lanes remain correctness gates; the shared-source metric does
-not make either optional. See
+result. Both complete app plans remain correctness gates; the shared-source
+metric does not make either optional. See
 [ADR 0007](adr/0007-business-logic-coverage-and-ui-smoke-tests.md) for the
 business-logic-versus-UI testing investment boundary.

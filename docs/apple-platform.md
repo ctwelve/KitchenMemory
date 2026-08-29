@@ -144,7 +144,7 @@ The shared `KitchenMemory/` layer contains the SwiftUI interface,
 `RecipeLibraryModel` composition glue, bundled sample resources, and
 localization catalogs, with membership in both native app targets.
 Platform-owned resources, entitlements, and future presentation code belong in
-`KitchenMemoryIOS/` or `KitchenMemoryMac/`; reusable recipe behavior does not.
+`KitchenMemoryIOS/` or `KitchenMemoryMacOS/`; reusable recipe behavior does not.
 See [implementation architecture](implementation-architecture.md) and
 [localization architecture](localization-architecture.md).
 

@@ -14,7 +14,9 @@ This supersedes the separate-target portions of ADRs 0003, 0007, and 0009, but
 not their domain/persistence separation, testing-investment policy, or native
 application split. One `KitchenKitTests` target preserves responsibility-based
 test folders and exact business-logic coverage through a minimal shared scheme
-whose test plan remains automatic.
+whose test plan remains automatic. The two native applications keep saved
+platform plans containing their hosted correctness targets and the shared UI
+smoke target; their default Test actions use the disposable `Testing` hosts.
 
 Keeping four compiler-enforced modules was rejected because their public
 interfaces and dependency order leaked one business implementation as four

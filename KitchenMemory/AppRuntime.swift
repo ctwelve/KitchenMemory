@@ -88,9 +88,9 @@ struct AppLaunchPlan: Equatable {
     durableCloudSyncIsEnabled: Bool
   ) throws -> Self {
     let usesTestHarness = inputs.buildEnvironment.permitsUITestHarness
-    // Automatic Xcode plans do not inject the former --unit-testing argument.
-    // A hosted XCTest process does provide this path, so testing builds can
-    // still select disposable storage without a checked-in plan.
+    // The saved platform plans do not inject the former --unit-testing
+    // argument. A hosted XCTest process does provide this path, so testing
+    // builds still select disposable storage without plan-specific arguments.
     let usesHostedUnitTests = inputs.environment["XCTestConfigurationFilePath"] != nil
     let usesInMemoryStore = usesTestHarness
       && (inputs.arguments.contains("--ui-testing")

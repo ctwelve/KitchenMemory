@@ -6,27 +6,28 @@ Copyright © 2026 the Kitchen Memory contributors.
 SPDX-License-Identifier: GPL-3.0-only
 -->
 
-Xcode Cloud is Kitchen Memory's continuous-integration system. Xcode maintains
-the application schemes and every test plan automatically from target
-membership. The repository checks in only a minimal `KitchenKit` scheme because
-an unhosted framework test target needs an explicit scheme association; it does
-not check in a parallel test plan.
+Xcode Cloud is Kitchen Memory's continuous-integration system. The repository
+checks in the default `KitchenMemoryIOS` and `KitchenMemoryMacOS` schemes and
+their platform plans so local and cloud Test actions select the same hosted and
+UI-smoke targets. It also checks in a minimal `KitchenKit` scheme because an
+unhosted framework test target needs an explicit scheme association; only that
+scheme continues to use an automatically created plan.
 
 ## Scheme, plan, and destination contract
 
-| Scheme and automatic plan | Primary target | Native destination |
+| Scheme and plan | Primary target | Native destination |
 | --- | --- | --- |
-| `KitchenKit` | `KitchenKit` and `KitchenKitTests` | native macOS for canonical coverage; iOS as needed |
-| `KitchenMemoryIOS` | `KitchenMemoryIOS` and its hosted tests | iOS device or Simulator |
-| `KitchenMemoryMacOS` | `KitchenMemoryMacOS` and its hosted tests | native macOS |
-| `KitchenMemoryUITests` | shared application-shell smoke target | destination selects the native host |
+| `KitchenKit` with automatic plan | `KitchenKit` and `KitchenKitTests` | native macOS for canonical coverage; iOS as needed |
+| `KitchenMemoryIOS` with `KitchenMemoryIOS.xctestplan` | iOS app, hosted tests, and shared UI smoke | iOS device or Simulator |
+| `KitchenMemoryMacOS` with `KitchenMemoryMacOS.xctestplan` | macOS app, hosted tests, and shared UI smoke | native macOS |
 
-Each automatic platform scheme has one top-level app buildable; Xcode adds
-KitchenKit through ordinary dependency resolution. The shared KitchenKit scheme
-exists only to associate its one unhosted test bundle, and Xcode derives the
-plan automatically. Build configuration and destination remain explicit command
-or Xcode Cloud action choices rather than being encoded in duplicate scheme
-names.
+Each saved platform scheme has one top-level app buildable; Xcode adds
+KitchenKit through ordinary dependency resolution. Its saved plan adds the
+native hosted-test target and the shared UI-smoke target. The shared KitchenKit
+scheme exists only to associate its one unhosted test bundle, and Xcode derives
+that plan automatically. The platform schemes default Test and Analyze to
+`Testing`; Xcode Cloud may still select a configuration and destination
+explicitly without introducing duplicate scheme names.
 
 The iOS schemes do not expose Mac Catalyst, Mac Designed for iPhone or iPad, or
 visionOS Designed for iPhone or iPad destinations. The macOS schemes expose
@@ -42,8 +43,9 @@ The development workflow starts for meaningful project changes pushed to
 `release-eng/*` release-infrastructure branches. All three governed lanes
 perform Build, Analyze, and Test actions using `KitchenMemoryIOS`,
 `KitchenMemoryMacOS`, and the macOS-destination `KitchenKit` lane, but never
-archive a product. Those actions use `Testing` and do
-not include UI automation. Local developer runs use the
+archive a product. Those actions use `Testing`; each platform Test action runs
+its hosted correctness target and the bounded shared UI smoke suite. Local
+developer runs use the
 corresponding platform scheme with the `Develop` configuration. The distinct
 development bundle identifier keeps local stores,
 CloudKit metadata, and onboarding preferences out of the Production app
@@ -63,9 +65,9 @@ validation, packaging, signing, notarization, and distribution automation. It
 is not a second feature lane. User-visible defects remain `bugs/*`, while new
 product capability remains `slice/*`.
 
-Build, Analyze, and the non-UI Test action are required to pass. The KitchenKit
-coverage gate has reached exact complete line coverage; a failing logic test or
-coverage check is a product defect.
+Build, Analyze, and the complete platform Test actions are required to pass.
+The KitchenKit coverage gate has reached exact complete line coverage; a
+failing logic test or coverage check is a product defect.
 
 ### Main production
 
@@ -231,8 +233,11 @@ the testing exception does not alter a shipped application.
 
 Application-hosted XCTest processes also select an in-memory store in those two
 testing configurations by detecting Xcode's hosted-test environment. This keeps
-automatic plans disposable without relying on a saved launch argument. Ordinary
-development and production launches continue to use durable storage.
+the saved platform plans disposable without relying on a plan-level launch
+argument. UI smoke tests pass their own harness argument and use the same
+disposable `Testing` host by default. Ordinary development and production
+launches continue to use durable storage; `ProductionTesting` remains available
+for an explicitly selected release-optimized smoke run.
 
 UI smoke launches also ignore persisted application-window restoration state.
 On macOS, XCUITest can nevertheless relaunch a live `WindowGroup` application
@@ -331,7 +336,7 @@ inside a test body as an ordinary test failure requiring investigation.
 
 ## Static analysis
 
-The automatic application schemes remain buildable for Analyze. Project build
+The saved application schemes use `Testing` for Analyze. Project build
 settings select Xcode's `deep` static-analyzer mode specifically for the Analyze
 action, while the invocation selects the desired configuration. The analyzer
 does not run during every ordinary build, avoiding a slower duplicate pass
@@ -419,11 +424,14 @@ project marketing version and root `RELEASE` marker have both been advanced to
 that same version.
 
 The structure contract also pins each project configuration to its matching
-xcconfig; the development and production bundle namespaces; platform plist,
-entitlement, and synchronized-folder ownership; and the minimal KitchenKit
-scheme's build membership, action configurations, and automatic-plan policy.
-Treat a contract failure as a reviewable project change, not as a reason to
-weaken the checker until the project happens to pass.
+xcconfig and automatic merged-binary mode; the development and production
+bundle namespaces; platform plist, entitlement, and synchronized-folder
+ownership; the three shared schemes and two platform plans; and KitchenKit's
+automatic-plan policy. It also requires each localization-catalog embedding
+phase to run first in its hosted-test target, preventing a dependency cycle
+between that test-bundle output and KitchenKit re-export signing. Treat a
+contract failure as a reviewable project change, not as a reason to weaken the
+checker until the project happens to pass.
 
 Keep cloud scripts short, deterministic, and limited to environment preparation
 so build, test, Analyze, and Archive behavior remains visible in Xcode's schemes.
