@@ -44,7 +44,10 @@ The UI suite verifies only that:
 - the Cooking Session lifecycle shell can Start, Stop, Resume, Finish, leave,
   and reopen retained work; and
 - one representative Cooking Session path can account for an ingredient,
-  complete an instruction, and change a working yield when available.
+  complete an instruction, and change a working yield when available; and
+- the first-class Sessions destination exposes Current, Recent, and Finished
+  history, deliberate Session switching, and one representative continuation
+  path with inspectable lineage.
 
 The tests use stable identifiers instead of visible English copy so they remain
 useful through String Catalog adoption and localization. Hosted tests separately

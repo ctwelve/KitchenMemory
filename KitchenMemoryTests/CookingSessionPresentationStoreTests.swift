@@ -126,4 +126,22 @@ final class CookingSessionPresentationStoreTests: XCTestCase {
     XCTAssertEqual(reopened.entryDrafts, [draft])
     XCTAssertTrue(reopened.pendingCommands.isEmpty)
   }
+
+  func testDeviceLocalSessionVisitSurvivesStoreRecreation() throws {
+    let suiteName = "CookingSessionPresentationStoreTests-\(UUID().uuidString)"
+    let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
+    defer { defaults.removePersistentDomain(forName: suiteName) }
+    let visit = CookingSessionVisit(
+      sessionID: CookingSession.ID(),
+      lastVisitedAt: Date(timeIntervalSince1970: 1_800_000_400),
+      dismissedStaleNudge: true
+    )
+
+    DefaultsCookingSessionPresentationStore(defaults: defaults).sessionVisits = [visit]
+
+    XCTAssertEqual(
+      DefaultsCookingSessionPresentationStore(defaults: defaults).sessionVisits,
+      [visit]
+    )
+  }
 }

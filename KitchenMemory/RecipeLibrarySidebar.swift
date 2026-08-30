@@ -9,44 +9,46 @@ struct RecipeLibrarySidebar: View {
   @Bindable var model: RecipeLibraryModel
   @Bindable var sessionModel: CookingSessionPresentationModel
   let locale: Locale
+  let showSessionHistory: () -> Void
 
   var body: some View {
-    if sessionModel.sessions.isEmpty, let issue = model.issue {
-      unavailableLibrary(issue)
-    } else if sessionModel.sessions.isEmpty, model.hasLoaded, model.recipes.isEmpty {
-      emptyLibrary
-    } else {
-      List(selection: $model.selectedRecipeID) {
-        sessionSection
-        recipeSection
-      }
-      // This identifier is also our launch-complete signal in UI tests. It is
-      // applied to the List itself so it survives row reuse and empty states.
-      .accessibilityIdentifier("recipe-library")
-      .accessibilityLabel(Text(.libraryAccessibilityLabel))
-      .listStyle(.sidebar)
-      .overlay {
-        if !model.hasLoaded { ProgressView(.libraryLoading) }
-      }
+    List(selection: $model.selectedRecipeID) {
+      sessionSection
+      recipeSection
+    }
+    // This identifier is also our launch-complete signal in UI tests. It is
+    // applied to the List itself so it survives row reuse and empty states.
+    .accessibilityIdentifier("recipe-library")
+    .accessibilityLabel(Text(.libraryAccessibilityLabel))
+    .listStyle(.sidebar)
+    .overlay {
+      if !model.hasLoaded { ProgressView(.libraryLoading) }
     }
   }
 
-  @ViewBuilder
   private var sessionSection: some View {
-    if !sessionModel.sessions.isEmpty {
-      Section {
-        ForEach(sessionModel.sessions, id: \.id) { session in
-          Button {
-            sessionModel.selectSession(session.id)
-          } label: {
-            CookingSessionRow(session: session)
-          }
-          .buttonStyle(.borderless)
-          .accessibilityIdentifier("session-row-\(session.id.rawValue.uuidString)")
-        }
-      } header: {
-        Text(.sessionDiscoveryTitle)
+    Section {
+      NavigationLink {
+        CookingSessionHistoryDestinationView(
+          model: sessionModel,
+          prepare: showSessionHistory
+        )
+      } label: {
+        Label(.sessionHistoryTitle, systemImage: "clock.arrow.circlepath")
       }
+      .accessibilityIdentifier("sessions-destination")
+
+      ForEach(sessionModel.sidebarSessions, id: \.id) { session in
+        Button {
+          sessionModel.selectSession(session.id)
+        } label: {
+          CookingSessionRow(session: session)
+        }
+        .buttonStyle(.borderless)
+        .accessibilityIdentifier("session-row-\(session.id.rawValue.uuidString)")
+      }
+    } header: {
+      Text(.sessionDiscoveryTitle)
     }
   }
 
@@ -89,7 +91,7 @@ struct RecipeLibrarySidebar: View {
   }
 }
 
-private struct CookingSessionRow: View {
+struct CookingSessionRow: View {
   let session: CookingSessionProjection
 
   var body: some View {

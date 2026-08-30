@@ -478,6 +478,15 @@
         "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Arrêter" } }
       }
     },
+    "session.action.continue" : {
+      "comment" : "Action that creates a new Active continuation from an immutable Finished Session.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Continue Cooking" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Continuar cocinando" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Continuer à cuisiner" } }
+      }
+    },
     "session.discovery.recipes" : {
       "comment" : "Sidebar section containing maintained recipes.",
       "extractionState" : "manual",
@@ -494,6 +503,177 @@
         "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Cooking Sessions" } },
         "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Sesiones de cocina" } },
         "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Séances de cuisine" } }
+      }
+    },
+    "session.history.back" : {
+      "comment" : "Action that returns from one observed Finished Session to Session history.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Back to Sessions" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Volver a sesiones" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Retour aux séances" } }
+      }
+    },
+    "session.history.current" : {
+      "comment" : "Heading for the device-local current Cooking Session convenience.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Current" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Actual" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "En cours" } }
+      }
+    },
+    "session.history.empty.message" : {
+      "comment" : "Explains that Session history appears after cooking begins.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Start cooking from a Recipe to create independent Session history." } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Comienza a cocinar desde una receta para crear un historial de sesiones independiente." } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Commencez à cuisiner à partir d’une recette pour créer un historique de séances indépendant." } }
+      }
+    },
+    "session.history.empty.title" : {
+      "comment" : "Title for empty Cooking Session history.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "No Cooking Sessions Yet" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Aún no hay sesiones de cocina" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Aucune séance de cuisine pour l’instant" } }
+      }
+    },
+    "session.history.entries.empty" : {
+      "comment" : "Observational value when a Finished Session has no Entries.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "No Entries were recorded." } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "No se registraron entradas." } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Aucune entrée n’a été enregistrée." } }
+      }
+    },
+    "session.history.finished" : {
+      "comment" : "Heading for immutable Finished Session history.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "History" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Historial" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Historique" } }
+      }
+    },
+    "session.history.immutable.message" : {
+      "comment" : "Explains that observed Finished Session evidence cannot be edited.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "This is an immutable record of what happened. Continue Cooking creates a new Session." } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Este es un registro inmutable de lo ocurrido. Continuar cocinando crea una sesión nueva." } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Ceci est un registre immuable de ce qui s’est passé. Continuer à cuisiner crée une nouvelle séance." } }
+      }
+    },
+    "session.history.lineage" : {
+      "comment" : "Heading for immediate Session continuation lineage.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Continuation Lineage" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Linaje de continuación" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Lignée de continuation" } }
+      }
+    },
+    "session.history.lineage.closure" : {
+      "comment" : "Label for the exact source Closure of a continuation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Source Finish" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Finalización de origen" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Fin d’origine" } }
+      }
+    },
+    "session.history.lineage.continuation" : {
+      "comment" : "Label for an immediate continuation created from this Session.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Continued as Session" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Continuada como sesión" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Continuée comme séance" } }
+      }
+    },
+    "session.history.lineage.original" : {
+      "comment" : "Value for a Session that was not itself a continuation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "This Session has no continuation source." } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Esta sesión no tiene un origen de continuación." } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Cette séance n’a aucune source de continuation." } }
+      }
+    },
+    "session.history.lineage.source" : {
+      "comment" : "Label for the immediate source Session of a continuation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Continued from Session" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Continuada desde la sesión" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Continuée depuis la séance" } }
+      }
+    },
+    "session.history.recent" : {
+      "comment" : "Heading for other Active and Stopped Sessions.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Recent" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Recientes" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Récentes" } }
+      }
+    },
+    "session.history.recipe.title" : {
+      "comment" : "Title and action for Cooking Session history associated with one Recipe provenance.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Recipe Sessions" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Sesiones de la receta" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Séances de la recette" } }
+      }
+    },
+    "session.history.title" : {
+      "comment" : "Primary Sessions navigation destination and history title.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Sessions" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Sesiones" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Séances" } }
+      }
+    },
+    "session.stale.action.dismiss" : {
+      "comment" : "Dismisses a device-local stale-Session nudge without changing Session evidence.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Dismiss" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Descartar" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Ignorer" } }
+      }
+    },
+    "session.stale.action.new" : {
+      "comment" : "Leaves an old Session unchanged and returns to Recipes to start another Session.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Start Another" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Comenzar otra" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "En commencer une autre" } }
+      }
+    },
+    "session.stale.message" : {
+      "comment" : "Explains that an old Session remains unchanged until the person acts.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "It has been a while since this Session was opened. Nothing changed automatically." } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Ha pasado un tiempo desde que se abrió esta sesión. Nada cambió automáticamente." } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Cette séance n’a pas été ouverte depuis un moment. Rien n’a changé automatiquement." } }
+      }
+    },
+    "session.stale.title" : {
+      "comment" : "Title for a subtle device-local stale-Session nudge.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Still cooking this?" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "¿Aún estás cocinando esto?" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Vous cuisinez toujours ceci?" } }
       }
     },
     "session.finish.confirmation.action" : {

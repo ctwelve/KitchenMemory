@@ -157,8 +157,17 @@ final class KitchenMemoryUITests: XCTestCase {
 
     let recipeLibrary = app.descendants(matching: .any)["recipe-library"]
     ensurePrimaryWindow(in: app, exposing: recipeLibrary)
+    revealSidebar(in: app, exposing: recipeLibrary)
+    XCTAssertTrue(recipeLibrary.waitForExistence(timeout: 5))
+    return app
+  }
+
+  // Shared by focused smoke-test extensions in synchronized source files.
+  // swiftlint:disable:next test_case_accessibility
+  @MainActor
+  func revealSidebar(in app: XCUIApplication, exposing element: XCUIElement) {
 #if os(iOS)
-    if !recipeLibrary.waitForExistence(timeout: 2) {
+    if !element.waitForExistence(timeout: 2) {
       // A compact split view may present the selected recipe first. Return to
       // the durable sidebar before exercising either application-shell smoke.
       let backButton = app.buttons["BackButton"]
@@ -167,7 +176,7 @@ final class KitchenMemoryUITests: XCTestCase {
       }
     }
 #else
-    if !recipeLibrary.waitForExistence(timeout: 2) {
+    if !element.waitForExistence(timeout: 2) {
       // macOS may restore a previous split-view selection between launches.
       let toggle = app.buttons["toggle-sidebar"]
       if toggle.waitForExistence(timeout: 3) {
@@ -175,8 +184,6 @@ final class KitchenMemoryUITests: XCTestCase {
       }
     }
 #endif
-    XCTAssertTrue(recipeLibrary.waitForExistence(timeout: 5))
-    return app
   }
 
   // Shared by focused smoke-test extensions in synchronized source files.
@@ -349,14 +356,14 @@ extension KitchenMemoryUITests {
     activate(confirmation)
     XCTAssertFalse(app.buttons["finish-session"].waitForExistence(timeout: 3))
 
-    startAndLeaveStoppedSession(in: app)
+    let continuation = app.buttons["continue-session"]
+    XCTAssertTrue(continuation.waitForExistence(timeout: 5))
+    activate(continuation)
+    leaveStoppedSession(in: app)
   }
 
   @MainActor
-  private func startAndLeaveStoppedSession(in app: XCUIApplication) {
-    let start = app.buttons["start-cooking"]
-    XCTAssertTrue(start.waitForExistence(timeout: 5))
-    activate(start)
+  private func leaveStoppedSession(in app: XCUIApplication) {
     let stop = app.buttons["stop-session"]
     XCTAssertTrue(stop.waitForExistence(timeout: 5))
     activate(stop)
@@ -373,14 +380,7 @@ extension KitchenMemoryUITests {
     let sessionRow = app.descendants(matching: .any)
       .matching(NSPredicate(format: "identifier BEGINSWITH %@", "session-row-"))
       .firstMatch
-#if os(iOS)
-    if !sessionRow.waitForExistence(timeout: 2) {
-      let backButton = app.buttons["BackButton"]
-      if backButton.waitForExistence(timeout: 3) {
-        activate(backButton)
-      }
-    }
-#endif
+    revealSidebar(in: app, exposing: sessionRow)
     XCTAssertTrue(sessionRow.waitForExistence(timeout: 5))
     activate(sessionRow)
   }

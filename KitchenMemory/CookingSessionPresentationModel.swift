@@ -9,12 +9,35 @@ import Observation
 @MainActor
 protocol CookingSessionServing {
   func sessions() throws -> [SessionProjectionResult]
+  func sessions(for recipeID: Recipe.ID) throws -> [SessionProjectionResult]
+  func finishedSessions(limit: Int) throws -> [SessionProjectionResult]
   func start(_ intention: StartCookingSessionIntention) throws -> CookingSessionCommandResult
   func perform(_ intention: CookingSessionIntention) throws -> CookingSessionCommandResult
 }
 
 @MainActor
 extension CookingSessions: CookingSessionServing {}
+
+@MainActor
+extension CookingSessionServing {
+  func sessions(for recipeID: Recipe.ID) throws -> [SessionProjectionResult] {
+    _ = recipeID
+    return []
+  }
+
+  func finishedSessions(limit: Int) throws -> [SessionProjectionResult] {
+    guard limit > 0 else { return [] }
+    return Array(try sessions().filter { result in
+      guard case let .session(session) = result else { return false }
+      return session.lifecycle == .finished
+    }.prefix(limit))
+  }
+}
+
+enum CookingSessionHistoryScope: Equatable {
+  case all
+  case recipe(Recipe.ID)
+}
 
 enum CookingSessionPresentationIssue: Equatable {
   case read
@@ -38,14 +61,18 @@ enum CookingSessionPresentationIssue: Equatable {
 @MainActor
 @Observable
 final class CookingSessionPresentationModel {
+  static let staleSessionInterval: TimeInterval = 60 * 60 * 24 * 3
+
   let service: any CookingSessionServing
   let store: any CookingSessionPresentationStoring
+  let now: () -> Date
 
   var sessions: [CookingSessionProjection] = []
+  var finishedSessions: [CookingSessionProjection] = []
   private(set) var currentSessionID: CookingSession.ID?
   var finishedSessionCount = 0
-  private(set) var unavailableSessionCount = 0
-  private(set) var recoverySessionCount = 0
+  var unavailableSessionCount = 0
+  var recoverySessionCount = 0
   var issue: CookingSessionPresentationIssue?
   var isShowingIssue = false
   private(set) var hasLoaded = false
@@ -53,27 +80,37 @@ final class CookingSessionPresentationModel {
   var entryDrafts: [CookingSessionEntryDraft]
   var detachedEntryDraft: CookingSessionEntryDraft?
   var finishedSessionIDs: Set<CookingSession.ID> = []
+  var historyScope: CookingSessionHistoryScope?
+  var recipeHistorySessions: [CookingSessionProjection] = []
+  var observedFinishedSessionID: CookingSession.ID?
+  var sessionVisits: [CookingSessionVisit]
 
   init(
     sessions: CookingSessions,
-    store: any CookingSessionPresentationStoring
+    store: any CookingSessionPresentationStoring,
+    now: @escaping () -> Date = Date.init
   ) {
     service = sessions
     self.store = store
+    self.now = now
     currentSessionID = store.currentSessionID
     pendingCommands = store.pendingCommands
     entryDrafts = store.entryDrafts
+    sessionVisits = store.sessionVisits
   }
 
   init(
     sessions: any CookingSessionServing,
-    store: any CookingSessionPresentationStoring
+    store: any CookingSessionPresentationStoring,
+    now: @escaping () -> Date = Date.init
   ) {
     service = sessions
     self.store = store
+    self.now = now
     currentSessionID = store.currentSessionID
     pendingCommands = store.pendingCommands
     entryDrafts = store.entryDrafts
+    sessionVisits = store.sessionVisits
   }
 
   var currentSession: CookingSessionProjection? {
@@ -107,20 +144,6 @@ final class CookingSessionPresentationModel {
     reload()
   }
 
-  @discardableResult
-  func selectSession(_ id: CookingSession.ID) -> Bool {
-    guard sessions.contains(where: { $0.id == id }) else { return false }
-    select(id)
-    return true
-  }
-
-  @discardableResult
-  func leaveCurrentSession() -> Bool {
-    guard currentSessionID != nil else { return false }
-    select(nil)
-    return true
-  }
-
   func retryCurrentIssue() {
     if !pendingCommands.isEmpty {
       retryPendingCommands()
@@ -133,45 +156,6 @@ final class CookingSessionPresentationModel {
     isShowingIssue = false
   }
 
-  private func reload() {
-    do {
-      var ordinary: [CookingSessionProjection] = []
-      var finishedCount = 0
-      var finishedIDs: Set<CookingSession.ID> = []
-      var unavailableCount = 0
-      var recoveryCount = 0
-      for result in try service.sessions() {
-        switch result {
-        case let .session(session):
-          guard session.disposition == .ordinary else { continue }
-          if session.lifecycle == .finished {
-            finishedCount += 1
-            finishedIDs.insert(session.id)
-          } else {
-            ordinary.append(session)
-          }
-        case .unavailable:
-          unavailableCount += 1
-        case .recovery:
-          recoveryCount += 1
-        }
-      }
-      sessions = ordinary.sorted(by: sessionOrder)
-      finishedSessionCount = finishedCount
-      unavailableSessionCount = unavailableCount
-      recoverySessionCount = recoveryCount
-      finishedSessionIDs = finishedIDs
-      refreshDetachedEntryDraft()
-      if let currentSessionID, finishedIDs.contains(currentSessionID) { select(nil) }
-      if pendingCommands.isEmpty {
-        issue = nil
-        isShowingIssue = false
-      }
-    } catch {
-      present(.read)
-    }
-  }
-
   func present(_ issue: CookingSessionPresentationIssue) {
     self.issue = issue
     isShowingIssue = true
@@ -179,15 +163,21 @@ final class CookingSessionPresentationModel {
 
   func upsert(_ session: CookingSessionProjection) {
     sessions.removeAll { $0.id == session.id }
+    finishedSessions.removeAll { $0.id == session.id }
     if session.lifecycle != .finished, session.disposition == .ordinary {
       sessions.append(session)
       sessions.sort(by: sessionOrder)
+    } else if session.lifecycle == .finished, session.disposition == .ordinary {
+      finishedSessions.insert(session, at: 0)
+      finishedSessionCount = finishedSessions.count
+      finishedSessionIDs.insert(session.id)
     }
   }
 
-  func select(_ id: CookingSession.ID?) {
+  func select(_ id: CookingSession.ID?, recordsVisit: Bool = true) {
     currentSessionID = id
     store.currentSessionID = id
+    if let id, recordsVisit { recordVisit(to: id) }
   }
 
   func replaceDraft(_ draft: CookingSessionEntryDraft) {
@@ -230,7 +220,7 @@ final class CookingSessionPresentationModel {
     store.entryDrafts = entryDrafts
   }
 
-  private func sessionOrder(
+  func sessionOrder(
     _ lhs: CookingSessionProjection,
     _ rhs: CookingSessionProjection
   ) -> Bool {

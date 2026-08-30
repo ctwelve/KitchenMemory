@@ -47,7 +47,10 @@ Use UI automation only for smoke coverage of the durable application shell:
 - the application launches into its durable recipe shell and can reach its sidebar;
 - the sidebar presents recipes and opens a recipe;
 - the sidebar's basic visibility control works where present; and
-- Settings opens and guards destructive reset behind confirmation.
+- Settings opens and guards destructive reset behind confirmation; and
+- the durable Sessions destination reaches Current, Recent, and Finished
+  history, supports deliberate switching, and completes one representative
+  immutable continuation path.
 
 Do not add UI tests for provisional editor layout, scrolling, disclosure state,
 exact visible strings, or detailed accessibility-tree behavior. A feature whose

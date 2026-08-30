@@ -208,6 +208,7 @@ final class CookingSessionPresentationTests: XCTestCase {
     model.loadIfNeeded()
 
     XCTAssertEqual(model.sessions, [active])
+    XCTAssertEqual(model.finishedSessions, [finished])
     XCTAssertEqual(model.finishedSessionCount, 1)
     XCTAssertEqual(model.unavailableSessionCount, 1)
     XCTAssertEqual(model.recoverySessionCount, 1)

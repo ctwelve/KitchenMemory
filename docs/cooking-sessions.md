@@ -157,6 +157,27 @@ is deleted, or is temporarily absent. Finished history opens observationally
 from its self-contained evidence and may later source a deliberate Recipe
 workflow only because it is immutable.
 
+The 0.2.0 history interaction gives Sessions their own navigation destination
+and a Recipe-context route. It keeps a device-local current convenience first,
+shows other Active and Stopped work as recent Sessions, and lists Finished
+history from retained Session evidence rather than from the Recipe Library.
+Several live Sessions remain independently selectable; selecting one does not
+Stop, Resume, Finish, or transfer ownership of another.
+
+Finished detail is observational. Continue Cooking submits one explicit
+continuation intention and opens the resulting Active Session only after its
+self-contained root is locally durable. The source remains unchanged; the new
+root exposes its immediate source Session and Closure identities, inherits the
+closed scale, progress, and Entries through newly minted Session-owned
+identities, and starts with no Outcome. Those lineage identities explain
+history but are not dependencies for reconstruction or deletion.
+
+The application may offer a stale-Session nudge after three days since the
+device last opened that Session. Its visit and dismissal state stay in ordinary
+device-local preferences. The nudge can propose Resume, Stop, or returning to
+Recipes to start another Session, but time and dismissal never create evidence
+or change lifecycle.
+
 Session Deletion is reversible disposition, separate from lifecycle. Any state
 may be deleted, deletion never cascades, and causal Restore resolves only the
 deletion evidence actually observed. Deleted Items and Recovery remain separate
