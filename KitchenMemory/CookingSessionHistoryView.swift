@@ -41,7 +41,7 @@ struct CookingSessionHistoryView: View {
   }
 
   private var recentSessions: [CookingSessionProjection] {
-    ordinarySessions.filter { $0.id != currentSession?.id }
+    model.recentHistorySessions(from: ordinarySessions, excluding: currentSession?.id)
   }
 
   private var finishedSessions: [CookingSessionProjection] {

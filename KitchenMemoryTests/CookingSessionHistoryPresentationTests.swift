@@ -54,6 +54,34 @@ final class CookingSessionHistoryPresentationTests: XCTestCase {
     XCTAssertFalse(preparedApp.sessionModel.displayedHistorySessions.contains { $0.id == secondID })
   }
 
+  func testRecentHistoryIsVisitOrderedAndBounded() {
+    let sessions = (0...6).map { index in
+      CookingSessionProjection(
+        id: CookingSession.ID(),
+        snapshot: ExecutionSnapshot(title: "Session \(index)")
+      )
+    }
+    let now = Date(timeIntervalSince1970: 2_000_000_000)
+    let service = HistorySessionService(results: sessions.map(SessionProjectionResult.session))
+    let store = VolatileCookingSessionPresentationStore()
+    store.sessionVisits = sessions.enumerated().map { index, session in
+      CookingSessionVisit(
+        sessionID: session.id,
+        lastVisitedAt: now.addingTimeInterval(TimeInterval(index)),
+        dismissedStaleNudge: false
+      )
+    }
+    let model = CookingSessionPresentationModel(sessions: service, store: store, now: { now })
+    model.loadIfNeeded()
+
+    let current = sessions[6]
+    XCTAssertEqual(model.currentHistorySession?.id, current.id)
+    XCTAssertEqual(
+      model.recentHistorySessions(from: model.sessions, excluding: current.id).map(\.id),
+      sessions[1...5].reversed().map(\.id)
+    )
+  }
+
   func testFinishedContinuationCreatesNewActiveRootAndLeavesSourceImmutable() throws {
     let preparedApp = try AppRuntime.testing()
     preparedApp.libraryModel.loadIfNeeded()

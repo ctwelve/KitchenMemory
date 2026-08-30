@@ -7,6 +7,8 @@ import KitchenKit
 
 @MainActor
 extension CookingSessionPresentationModel {
+  static let recentSessionLimit = 5
+
   var isShowingSessionHistory: Bool {
     historyScope != nil
   }
@@ -42,8 +44,28 @@ extension CookingSessionPresentationModel {
 
   var sidebarSessions: [CookingSessionProjection] {
     let currentID = currentHistorySession?.id
-    let ordered = sessions.filter { $0.id != currentID }
-    return Array(([currentHistorySession].compactMap { $0 } + ordered).prefix(3))
+    let recent = recentHistorySessions(from: sessions, excluding: currentID)
+    return Array(([currentHistorySession].compactMap { $0 } + recent).prefix(3))
+  }
+
+  func recentHistorySessions(
+    from candidates: [CookingSessionProjection],
+    excluding currentID: CookingSession.ID?
+  ) -> [CookingSessionProjection] {
+    var visitBySession: [CookingSession.ID: Date] = [:]
+    for visit in sessionVisits {
+      visitBySession[visit.sessionID] = max(
+        visitBySession[visit.sessionID] ?? .distantPast,
+        visit.lastVisitedAt
+      )
+    }
+    let ordered = candidates.filter { $0.id != currentID }.sorted { lhs, rhs in
+      let lhsDate = visitBySession[lhs.id] ?? .distantPast
+      let rhsDate = visitBySession[rhs.id] ?? .distantPast
+      if lhsDate != rhsDate { return lhsDate > rhsDate }
+      return sessionOrder(lhs, rhs)
+    }
+    return Array(ordered.prefix(Self.recentSessionLimit))
   }
 
   var currentSessionNeedsStaleNudge: Bool {
