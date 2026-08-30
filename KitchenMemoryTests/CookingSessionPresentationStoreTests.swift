@@ -51,4 +51,55 @@ final class CookingSessionPresentationStoreTests: XCTestCase {
     XCTAssertNil(reopened.currentSessionID)
     XCTAssertNil(reopened.pendingCommand)
   }
+
+  func testOrderedOutboxSurvivesStoreRecreation() throws {
+    let suiteName = "CookingSessionPresentationStoreTests-\(UUID().uuidString)"
+    let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
+    defer { defaults.removePersistentDomain(forName: suiteName) }
+    let sessionID = CookingSession.ID()
+    let first = PendingCookingSessionCommand.progress(
+      factID: SessionFact.ID(),
+      sessionID: sessionID,
+      authoredAt: Date(timeIntervalSince1970: 1_800_000_200),
+      progress: SessionProgress(
+        target: .ingredient(SessionIngredient.ID()),
+        state: .ingredient(.accounted)
+      )
+    )
+    let second = PendingCookingSessionCommand.progress(
+      factID: SessionFact.ID(),
+      sessionID: sessionID,
+      authoredAt: Date(timeIntervalSince1970: 1_800_000_201),
+      progress: SessionProgress(
+        target: .instruction(SessionInstruction.ID()),
+        state: .instruction(.completed)
+      )
+    )
+    DefaultsCookingSessionPresentationStore(defaults: defaults).pendingCommands = [first, second]
+
+    XCTAssertEqual(
+      DefaultsCookingSessionPresentationStore(defaults: defaults).pendingCommands,
+      [first, second]
+    )
+  }
+
+  func testSlice14SingleCommandDecodesAsOneItemOutbox() throws {
+    let suiteName = "CookingSessionPresentationStoreTests-\(UUID().uuidString)"
+    let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
+    defer { defaults.removePersistentDomain(forName: suiteName) }
+    let legacy = PendingCookingSessionCommand.stop(
+      factID: SessionFact.ID(),
+      sessionID: CookingSession.ID(),
+      authoredAt: Date(timeIntervalSince1970: 1_800_000_300)
+    )
+    defaults.set(
+      try PropertyListEncoder().encode(legacy),
+      forKey: DefaultsCookingSessionPresentationStore.pendingCommandKey
+    )
+
+    XCTAssertEqual(
+      DefaultsCookingSessionPresentationStore(defaults: defaults).pendingCommands,
+      [legacy]
+    )
+  }
 }

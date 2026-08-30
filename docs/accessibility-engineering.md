@@ -40,10 +40,22 @@ The UI suite verifies only that:
 - the application launches into the recipe library;
 - a recipe can be selected from the sidebar;
 - the sidebar can be hidden and restored where that control is present; and
-- Settings presents confirmation before destructive reset.
+- Settings presents confirmation before destructive reset;
+- the Cooking Session lifecycle shell can Start, Stop, Resume, Finish, leave,
+  and reopen retained work; and
+- one representative Cooking Session path can account for an ingredient,
+  complete an instruction, and change a working yield when available.
 
 The tests use stable identifiers instead of visible English copy so they remain
-useful through String Catalog adoption and localization.
+useful through String Catalog adoption and localization. Hosted tests separately
+prove container-width composition boundaries, accessibility-size reading order,
+ordered retry, and relaunch-safe state restoration without coupling automation
+to the provisional SwiftUI tree.
+
+Slice 15 uses native buttons, menus, headings, selection traits, state values,
+and Dynamic Type. A physical iPhone/iPad and Mac pass with keyboard and
+VoiceOver remains deliberate feature-acceptance work rather than evidence
+claimed by the hosted smoke suite.
 
 ## Stabilization gate
 

@@ -204,13 +204,23 @@ production graph through loosely related booleans and optionals.
 the deep `CookingSessions` interface. It exposes ordinary Active and Stopped
 Sessions for discovery, keeps unavailable and recovery classifications out of
 ordinary presentation, and translates typed command results without changing
-`RecipeLibrary` or `RecipeRepository`. The selected Session pointer and one
-accepted-but-not-yet-confirmed command live in an application-owned,
-device-local store. A command is written there with its final stable identities
-before Logic is called and is removed only after Logic returns the locally
-durable accepted projection. Relaunch and remote-store refresh therefore reread
-retained evidence; process or framework events never manufacture lifecycle
-Facts or prove global synchronization.
+`RecipeLibrary` or `RecipeRepository`. The selected Session pointer and an
+ordered accepted-but-not-yet-confirmed command outbox live in an
+application-owned, device-local store. Commands are written there with their
+final stable identities before Logic is called and are removed in order only
+after Logic returns each locally durable accepted projection. The store
+migrates Slice 14's single pending-command representation as a one-item outbox.
+Progress and complete working-scale replacements project optimistically from
+that queue while preserving the immutable snapshot as their base. Relaunch and
+remote-store refresh therefore retry stable intentions and reread retained
+evidence; process or framework events never manufacture lifecycle Facts or
+prove global synchronization.
+
+`CookingSessionView` is one semantic SwiftUI interaction that selects Compact,
+Regular, or Wide composition from its container width. Platform identity does
+not choose the content model. Snapshot-owned row IDs remain the target and
+automation identity across recomposition, while native controls supply keyboard,
+pointer, touch, Dynamic Type, and accessibility behavior.
 
 `RecipeLibrary` is the deep Logic module for one Kitchen's recipe-library
 intentions. Its interface loads durable content with current sample presence,

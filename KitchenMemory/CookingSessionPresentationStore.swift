@@ -16,6 +16,18 @@ enum PendingCookingSessionCommand: Codable, Equatable {
   )
   case stop(factID: SessionFact.ID, sessionID: CookingSession.ID, authoredAt: Date)
   case resume(factID: SessionFact.ID, sessionID: CookingSession.ID, authoredAt: Date)
+  case progress(
+    factID: SessionFact.ID,
+    sessionID: CookingSession.ID,
+    authoredAt: Date,
+    progress: SessionProgress
+  )
+  case replaceWorkingScale(
+    factID: SessionFact.ID,
+    sessionID: CookingSession.ID,
+    authoredAt: Date,
+    scale: SessionWorkingScale
+  )
   case finish(closureID: SessionClosure.ID, sessionID: CookingSession.ID, finishedAt: Date)
 
   var sessionID: CookingSession.ID {
@@ -23,8 +35,20 @@ enum PendingCookingSessionCommand: Codable, Equatable {
     case let .start(sessionID, _, _, _),
          let .stop(_, sessionID, _),
          let .resume(_, sessionID, _),
+         let .progress(_, sessionID, _, _),
+         let .replaceWorkingScale(_, sessionID, _, _),
          let .finish(_, sessionID, _):
       sessionID
+    }
+  }
+
+  func isIndependentActivity(for sessionID: CookingSession.ID) -> Bool {
+    guard self.sessionID == sessionID else { return false }
+    switch self {
+    case .progress, .replaceWorkingScale:
+      return true
+    case .start, .stop, .resume, .finish:
+      return false
     }
   }
 }
@@ -32,7 +56,14 @@ enum PendingCookingSessionCommand: Codable, Equatable {
 @MainActor
 protocol CookingSessionPresentationStoring: AnyObject {
   var currentSessionID: CookingSession.ID? { get set }
-  var pendingCommand: PendingCookingSessionCommand? { get set }
+  var pendingCommands: [PendingCookingSessionCommand] { get set }
+}
+
+extension CookingSessionPresentationStoring {
+  var pendingCommand: PendingCookingSessionCommand? {
+    get { pendingCommands.first }
+    set { pendingCommands = newValue.map { [$0] } ?? [] }
+  }
 }
 
 /// Device-local presentation state. These values deliberately use ordinary
@@ -61,13 +92,20 @@ final class DefaultsCookingSessionPresentationStore: CookingSessionPresentationS
     }
   }
 
-  var pendingCommand: PendingCookingSessionCommand? {
+  var pendingCommands: [PendingCookingSessionCommand] {
     get {
-      guard let data = defaults.data(forKey: Self.pendingCommandKey) else { return nil }
-      return try? decoder.decode(PendingCookingSessionCommand.self, from: data)
+      guard let data = defaults.data(forKey: Self.pendingCommandKey) else { return [] }
+      if let commands = try? decoder.decode([PendingCookingSessionCommand].self, from: data) {
+        return commands
+      }
+      // Slice 14 stored one enum value at this key. Decode it as a one-item
+      // outbox so an accepted intention is not lost during the Slice 15 upgrade.
+      return (try? decoder.decode(PendingCookingSessionCommand.self, from: data)).map {
+        [$0]
+      } ?? []
     }
     set {
-      guard let newValue else {
+      guard !newValue.isEmpty else {
         defaults.removeObject(forKey: Self.pendingCommandKey)
         return
       }
@@ -82,5 +120,5 @@ final class DefaultsCookingSessionPresentationStore: CookingSessionPresentationS
 @MainActor
 final class VolatileCookingSessionPresentationStore: CookingSessionPresentationStoring {
   var currentSessionID: CookingSession.ID?
-  var pendingCommand: PendingCookingSessionCommand?
+  var pendingCommands: [PendingCookingSessionCommand] = []
 }

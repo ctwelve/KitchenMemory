@@ -134,13 +134,16 @@ coexist, and neither a device nor its clock owns one.
 ### Slice 15 — 0.1.4 adaptive cooking progress
 
 [Build the adaptive Cooking Session progress experience](https://github.com/ctwelve/KitchenMemory/issues/53)
-presents the captured snapshot, resulting-state ingredient and instruction
+now presents the captured snapshot, resulting-state ingredient and instruction
 progress, and complete working-scale changes. One semantic interaction
 recomposes as Compact, Regular, or Wide from available container space rather
-than platform identity.
+than platform identity, with Compact reading order retained for accessibility
+text sizes.
 
-Rapid intentions remain responsive and retryable through the outbox. Progress
-targets Session-owned row identities and never edits the Recipe or claims pantry
+Rapid intentions remain responsive and retryable through the ordered durable
+outbox, including migration from Slice 14's one-item representation. Progress
+targets Session-owned row identities, working scale always recalculates from the
+snapshot base, and neither interaction edits the Recipe or claims pantry
 consumption.
 
 ### Slice 16 — 0.1.5 cooking reality
