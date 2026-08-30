@@ -85,8 +85,13 @@ extension CookingSessionPresentationModel {
   @discardableResult
   func finishCurrentSession() -> Bool {
     guard let session = currentSession,
-          session.lifecycle == .active || session.lifecycle == .stopped,
-          prepareForNewCommand() else { return false }
+          session.lifecycle == .active || session.lifecycle == .stopped else { return false }
+    if currentEntryDraft?.isMeaningful == true {
+      present(.attention(.meaningfulDraft))
+      return false
+    }
+    discardCurrentEntryDraft()
+    guard prepareForNewCommand() else { return false }
     return stageAndPerform(.finish(
       closureID: SessionClosure.ID(),
       sessionID: session.id,
@@ -134,6 +139,9 @@ extension CookingSessionPresentationModel {
     return !pendingCommands.contains(pending)
   }
 
+  // This exhaustive retry router keeps every durable command identity adjacent
+  // to its matching Logic intention so new enum cases cannot be silently lost.
+  // swiftlint:disable:next cyclomatic_complexity function_body_length
   func perform(_ pending: PendingCookingSessionCommand) throws -> CookingSessionCommandResult {
     switch pending {
     case let .start(sessionID, recipeID, revisionID, startedAt):
@@ -151,12 +159,39 @@ extension CookingSessionPresentationModel {
       try service.perform(.progress(fact(factID, sessionID, authoredAt), progress))
     case let .replaceWorkingScale(factID, sessionID, authoredAt, scale):
       try service.perform(.replaceWorkingScale(fact(factID, sessionID, authoredAt), scale))
+    case let .submitEntry(factID, sessionID, authoredAt, text, target):
+      try service.perform(.submitEntry(fact(factID, sessionID, authoredAt), text: text, target: target))
+    case let .reviseEntry(factID, sessionID, authoredAt, entryID, text, target):
+      try service.perform(.reviseEntry(
+        fact(factID, sessionID, authoredAt),
+        entryID: entryID,
+        text: text,
+        target: target
+      ))
+    case let .retargetEntry(factID, sessionID, authoredAt, entryID, target):
+      try service.perform(.retargetEntry(
+        fact(factID, sessionID, authoredAt),
+        entryID: entryID,
+        target: target
+      ))
+    case let .withdrawEntry(factID, sessionID, authoredAt, entryID):
+      try service.perform(.withdrawEntry(fact(factID, sessionID, authoredAt), entryID: entryID))
+    case let .setOutcome(factID, sessionID, authoredAt, outcome):
+      try service.perform(.setOutcome(fact(factID, sessionID, authoredAt), outcome))
+    case let .clearOutcome(factID, sessionID, authoredAt):
+      try service.perform(.clearOutcome(fact(factID, sessionID, authoredAt)))
     case let .finish(closureID, sessionID, finishedAt):
       try service.perform(.finish(FinishCookingSessionIntention(
         closureID: closureID,
         sessionID: sessionID,
         finishedAt: finishedAt,
         hasMeaningfulDraft: false
+      )))
+    case let .continueSession(sessionID, sourceSessionID, startedAt):
+      try service.perform(.continueSession(ContinueCookingSessionIntention(
+        sessionID: sessionID,
+        sourceSessionID: sourceSessionID,
+        startedAt: startedAt
       )))
     }
   }
@@ -181,6 +216,7 @@ extension CookingSessionPresentationModel {
       issue = nil
       isShowingIssue = false
       upsert(session)
+      applyDraftAcceptance(for: pending, session: session)
       applySelection(for: session, pending: pending)
       return true
     case let .attention(attention):
@@ -193,7 +229,9 @@ extension CookingSessionPresentationModel {
     for session: CookingSessionProjection,
     pending: PendingCookingSessionCommand
   ) {
-    if session.lifecycle == .finished {
+    if case .continueSession = pending {
+      select(session.id)
+    } else if session.lifecycle == .finished {
       sessions.removeAll { $0.id == session.id }
       finishedSessionCount += 1
       if currentSessionID == session.id { select(nil) }
@@ -211,6 +249,8 @@ extension CookingSessionPresentationModel {
   ) -> CookingSessionProjection {
     var progress = session.progress
     var workingScale = session.workingScale
+    var entries = session.entries
+    var outcome = session.outcome
     for pending in pendingCommands where pending.sessionID == session.id {
       switch pending {
       case let .progress(_, _, _, value):
@@ -218,11 +258,66 @@ extension CookingSessionPresentationModel {
         progress.append(value)
       case let .replaceWorkingScale(_, _, _, scale):
         workingScale = scale
-      case .start, .stop, .resume, .finish:
+      case let .submitEntry(factID, _, _, text, target):
+        entries.removeAll { $0.id.rawValue == factID.rawValue }
+        entries.append(SessionEntry(
+          id: .init(rawValue: factID.rawValue),
+          target: target,
+          text: text
+        ))
+      case let .reviseEntry(_, _, _, entryID, text, target):
+        entries = entries.map {
+          $0.id == entryID ? SessionEntry(id: entryID, target: target, text: text) : $0
+        }
+      case let .retargetEntry(_, _, _, entryID, target):
+        entries = entries.map {
+          $0.id == entryID ? SessionEntry(id: entryID, target: target, text: $0.text) : $0
+        }
+      case let .withdrawEntry(_, _, _, entryID):
+        entries.removeAll { $0.id == entryID }
+      case let .setOutcome(_, _, _, value):
+        outcome = value
+      case .clearOutcome:
+        outcome = nil
+      case .start, .stop, .resume, .finish, .continueSession:
         break
       }
     }
-    return session.replacing(progress: progress, workingScale: workingScale)
+    return session.replacing(
+      progress: progress,
+      workingScale: workingScale,
+      entries: entries,
+      outcome: outcome
+    )
+  }
+
+  func applyDraftAcceptance(
+    for pending: PendingCookingSessionCommand,
+    session: CookingSessionProjection
+  ) {
+    switch pending {
+    case .submitEntry:
+      removeDraft(for: pending.sessionID)
+    case let .continueSession(newSessionID, sourceSessionID, _):
+      guard let draft = entryDrafts.first(where: { $0.sessionID == sourceSessionID }) else {
+        return
+      }
+      let mappedTarget = draft.target.flatMap { sourceTarget in
+        session.snapshot.continuationBaseline?.targetMappings.first(where: {
+          $0.sourceTarget == sourceTarget
+        })?.target
+      }
+      removeDraft(for: sourceSessionID)
+      replaceDraft(CookingSessionEntryDraft(
+        sessionID: newSessionID,
+        text: draft.text,
+        target: mappedTarget
+      ))
+      refreshDetachedEntryDraft()
+    case .start, .stop, .resume, .progress, .replaceWorkingScale, .reviseEntry,
+         .retargetEntry, .withdrawEntry, .setOutcome, .clearOutcome, .finish:
+      break
+    }
   }
 
   func workingScale(
@@ -257,7 +352,9 @@ extension CookingSessionPresentationModel {
 private extension CookingSessionProjection {
   func replacing(
     progress: [SessionProgress],
-    workingScale: SessionWorkingScale?
+    workingScale: SessionWorkingScale?,
+    entries: [SessionEntry],
+    outcome: SessionOutcome?
   ) -> Self {
     CookingSessionProjection(
       id: id,

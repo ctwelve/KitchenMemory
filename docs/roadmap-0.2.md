@@ -158,6 +158,11 @@ Finish and remote Finish must surface explicit submit, copy, continuation,
 discard, cancel, or other applicable choices. The app never manufactures
 structure, meaning, or Recipe edits from input modality or absence of notes.
 
+Implemented at the 0.1.5 checkpoint: the shared interaction now captures,
+revises, retargets, and withdraws exact text; keeps drafts device-local until
+accepted; records the optional coarse Outcome independently; and resolves local
+drafts explicitly across Finish and remote Finish.
+
 ### Slice 17 — 0.2.0 history and continuation
 
 [Add Cooking Session history and immutable continuation](https://github.com/ctwelve/KitchenMemory/issues/55)

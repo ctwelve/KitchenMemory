@@ -52,6 +52,24 @@ struct ContentView: View {
         Text(issue.message)
       }
     }
+    .confirmationDialog(
+      .sessionEntryDetachedTitle,
+      isPresented: detachedDraftIsPresented,
+      titleVisibility: .visible
+    ) {
+      Button(.sessionEntryDetachedContinue) {
+        sessionModel.continueDetachedEntryDraft()
+      }
+      Button(.sessionEntryDetachedCopy) {
+        copyAndDiscardDetachedDraft()
+      }
+      Button(.sessionEntryDetachedDiscard, role: .destructive) {
+        sessionModel.discardDetachedEntryDraft()
+      }
+      Button(.actionCancel, role: .cancel) {}
+    } message: {
+      Text(.sessionEntryDetachedMessage)
+    }
   }
 
   private var sessionIssueIsPresented: Binding<Bool> {
@@ -61,6 +79,19 @@ struct ContentView: View {
         if !isPresented { sessionModel.dismissIssuePresentation() }
       }
     )
+  }
+
+  private var detachedDraftIsPresented: Binding<Bool> {
+    Binding(
+      get: { sessionModel.detachedEntryDraft != nil },
+      set: { _ in }
+    )
+  }
+
+  private func copyAndDiscardDetachedDraft() {
+    guard let text = sessionModel.detachedEntryDraft?.text else { return }
+    CookingSessionClipboard.copy(text)
+    sessionModel.discardDetachedEntryDraft()
   }
 
   private var recipeLibrary: some View {

@@ -145,6 +145,240 @@
         "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Cela modifie seulement cette séance de cuisine. La recette enregistrée reste inchangée." } }
       }
     },
+    "session.entry.action.edit" : {
+      "comment" : "Action that begins a causal revision of a submitted Session Entry.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Edit" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Editar" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Modifier" } }
+      }
+    },
+    "session.entry.action.retarget" : {
+      "comment" : "Action that changes a submitted Session Entry target without changing its text.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Change target" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Cambiar objetivo" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Changer la cible" } }
+      }
+    },
+    "session.entry.action.save" : {
+      "comment" : "Action that submits a causal revision of a Session Entry.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Save change" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Guardar cambio" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Enregistrer la modification" } }
+      }
+    },
+    "session.entry.action.submit" : {
+      "comment" : "Action that turns the exact local draft text into immutable Session evidence.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Add entry" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Agregar entrada" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Ajouter l’entrée" } }
+      }
+    },
+    "session.entry.action.withdraw" : {
+      "comment" : "Action that causally withdraws a submitted Session Entry.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Withdraw" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Retirar" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Retirer" } }
+      }
+    },
+    "session.entry.detached.continue" : {
+      "comment" : "Action that continues a remotely Finished Session and moves its local draft there.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Continue in a new Session" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Continuar en una sesión nueva" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Continuer dans une nouvelle séance" } }
+      }
+    },
+    "session.entry.detached.copy" : {
+      "comment" : "Action that copies a detached draft before removing its local retained state.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Copy and remove draft" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Copiar y eliminar borrador" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Copier et retirer le brouillon" } }
+      }
+    },
+    "session.entry.detached.discard" : {
+      "comment" : "Destructive action that removes a draft belonging to a remotely Finished Session.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Discard draft" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Descartar borrador" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Jeter le brouillon" } }
+      }
+    },
+    "session.entry.detached.message" : {
+      "comment" : "Explains explicit choices when remote evidence Finishes a Session that still has a local draft.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "This Session was Finished elsewhere. Continue it to keep writing, copy the draft, or discard it. A continued draft keeps its matching target when one exists; otherwise it becomes a whole-Session draft." } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Esta sesión se finalizó en otro lugar. Continúala para seguir escribiendo, copia el borrador o descártalo. Un borrador continuado conserva su objetivo correspondiente cuando existe; de lo contrario, se convierte en un borrador de toda la sesión." } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Cette séance a été terminée ailleurs. Continuez-la pour écrire, copiez le brouillon ou jetez-le. Un brouillon continué conserve sa cible correspondante lorsqu’elle existe; sinon, il devient un brouillon pour toute la séance." } }
+      }
+    },
+    "session.entry.detached.title" : {
+      "comment" : "Title for resolving a local draft after remote Finish evidence arrives.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "A local draft still needs a home" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Un borrador local aún necesita un lugar" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Un brouillon local a encore besoin d’un endroit" } }
+      }
+    },
+    "session.entry.draft.note" : {
+      "comment" : "Explains the device-local and unsubmitted nature of a Session Entry draft.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "This draft stays on this device and is not Session evidence until you add it." } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Este borrador permanece en este dispositivo y no es evidencia de la sesión hasta que lo agregues." } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Ce brouillon reste sur cet appareil et ne constitue pas une preuve de séance avant son ajout." } }
+      }
+    },
+    "session.entry.draft.placeholder" : {
+      "comment" : "Placeholder inviting text-first observation capture during a Cooking Session.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "What happened while cooking?" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "¿Qué pasó mientras cocinabas?" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Que s’est-il passé pendant la cuisson?" } }
+      }
+    },
+    "session.entry.section" : {
+      "comment" : "Heading for authored Session Entries and the device-local draft.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Session notes" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Notas de la sesión" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Notes de séance" } }
+      }
+    },
+    "session.entry.target.label" : {
+      "comment" : "Label for an optional ingredient or instruction target on a Session Entry.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Related step" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Paso relacionado" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Étape associée" } }
+      }
+    },
+    "session.entry.target.none" : {
+      "comment" : "Choice for a Session Entry that is not targeted to an ingredient or instruction.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Whole Session" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Toda la sesión" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Toute la séance" } }
+      }
+    },
+    "session.entry.target.unavailable" : {
+      "comment" : "Fallback label when a retained Session Entry target cannot be displayed.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Unavailable step" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Paso no disponible" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Étape indisponible" } }
+      }
+    },
+    "session.finish.draft.copy" : {
+      "comment" : "Action that copies a meaningful local draft and then Finishes the Session.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Copy draft and Finish" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Copiar borrador y finalizar" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Copier le brouillon et terminer" } }
+      }
+    },
+    "session.finish.draft.discard" : {
+      "comment" : "Destructive action that discards a meaningful local draft and Finishes the Session.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Discard draft and Finish" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Descartar borrador y finalizar" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Jeter le brouillon et terminer" } }
+      }
+    },
+    "session.finish.draft.message" : {
+      "comment" : "Explains that a meaningful local draft must be handled before Finish.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Your draft is still local. Add it as Session evidence, copy it, discard it, or cancel Finish." } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Tu borrador todavía es local. Agrégalo como evidencia de la sesión, cópialo, descártalo o cancela la finalización." } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Votre brouillon est encore local. Ajoutez-le comme preuve de séance, copiez-le, jetez-le ou annulez la fin." } }
+      }
+    },
+    "session.finish.draft.submit" : {
+      "comment" : "Action that submits a meaningful local draft and then Finishes the Session.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Add entry and Finish" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Agregar entrada y finalizar" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Ajouter l’entrée et terminer" } }
+      }
+    },
+    "session.finish.draft.title" : {
+      "comment" : "Title for explicit meaningful-draft choices before Finish.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Handle this draft before Finishing" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Resuelve este borrador antes de finalizar" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Traitez ce brouillon avant de terminer" } }
+      }
+    },
+    "session.outcome.great" : {
+      "comment" : "Coarse Session Outcome meaning the cook went great.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Great" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Excelente" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Excellent" } }
+      }
+    },
+    "session.outcome.none" : {
+      "comment" : "Choice that leaves the optional Session Outcome unset.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Not set" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Sin definir" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Non défini" } }
+      }
+    },
+    "session.outcome.okay" : {
+      "comment" : "Coarse Session Outcome meaning the cook went okay.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Okay" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Bien" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Correct" } }
+      }
+    },
+    "session.outcome.section" : {
+      "comment" : "Heading and accessible label for the optional coarse Session Outcome.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "How did it go?" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "¿Cómo salió?" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Comment ça s’est passé?" } }
+      }
+    },
+    "session.outcome.unsuccessful" : {
+      "comment" : "Coarse Session Outcome meaning the cook was unsuccessful.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Unsuccessful" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Sin éxito" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Sans succès" } }
+      }
+    },
     "session.action.finish" : {
       "comment" : "Action that asks to finish the current Cooking Session.",
       "extractionState" : "manual",

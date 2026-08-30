@@ -29,6 +29,7 @@ struct CookingSessionView: View {
   let session: CookingSessionProjection
 
   @State private var isShowingFinishConfirmation = false
+  @State private var isShowingDraftFinishOptions = false
   @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
   var body: some View {
@@ -51,6 +52,8 @@ struct CookingSessionView: View {
                   .foregroundStyle(.secondary)
                   .accessibilityIdentifier("session-lifecycle")
               }
+
+              CookingSessionEntriesView(model: model, session: session)
 
               CookingSessionProgressView(
                 model: model,
@@ -76,11 +79,33 @@ struct CookingSessionView: View {
       ) {
         Button(.actionCancel, role: .cancel) {}
         Button(.sessionFinishConfirmationAction, role: .destructive) {
-          model.finishCurrentSession()
+          if model.currentEntryDraft?.isMeaningful == true {
+            isShowingDraftFinishOptions = true
+          } else {
+            model.finishCurrentSession()
+          }
         }
         .accessibilityIdentifier("confirm-finish-session")
       } message: {
         Text(.sessionFinishConfirmationMessage)
+      }
+      .confirmationDialog(
+        .sessionFinishDraftTitle,
+        isPresented: $isShowingDraftFinishOptions,
+        titleVisibility: .visible
+      ) {
+        Button(.sessionFinishDraftSubmit) {
+          model.submitCurrentEntryDraftAndFinish()
+        }
+        Button(.sessionFinishDraftCopy) {
+          copyDraftThenFinish()
+        }
+        Button(.sessionFinishDraftDiscard, role: .destructive) {
+          model.finishDiscardingCurrentEntryDraft()
+        }
+        Button(.actionCancel, role: .cancel) {}
+      } message: {
+        Text(.sessionFinishDraftMessage)
       }
     }
   }
@@ -112,5 +137,11 @@ struct CookingSessionView: View {
       }
       .accessibilityIdentifier("finish-session")
     }
+  }
+
+  private func copyDraftThenFinish() {
+    guard let text = model.currentEntryDraft?.text else { return }
+    CookingSessionClipboard.copy(text)
+    model.finishDiscardingCurrentEntryDraft()
   }
 }

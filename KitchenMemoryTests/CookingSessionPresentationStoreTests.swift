@@ -106,4 +106,24 @@ final class CookingSessionPresentationStoreTests: XCTestCase {
       [legacy]
     )
   }
+
+  func testEntryDraftSurvivesStoreRecreationWithoutEnteringTheCommandOutbox() throws {
+    let suiteName = "CookingSessionPresentationStoreTests-\(UUID().uuidString)"
+    let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
+    defer { defaults.removePersistentDomain(forName: suiteName) }
+    let sessionID = CookingSession.ID()
+    let target = SessionProgressTarget.instruction(SessionInstruction.ID())
+    let draft = CookingSessionEntryDraft(
+      sessionID: sessionID,
+      text: "  Needs more lime 🍋  ",
+      target: target
+    )
+    let store = DefaultsCookingSessionPresentationStore(defaults: defaults)
+
+    store.entryDrafts = [draft]
+    let reopened = DefaultsCookingSessionPresentationStore(defaults: defaults)
+
+    XCTAssertEqual(reopened.entryDrafts, [draft])
+    XCTAssertTrue(reopened.pendingCommands.isEmpty)
+  }
 }

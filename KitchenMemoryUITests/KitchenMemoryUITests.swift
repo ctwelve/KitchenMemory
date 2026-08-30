@@ -138,8 +138,10 @@ final class KitchenMemoryUITests: XCTestCase {
     app.terminate()
   }
 
+  // Shared by focused smoke-test extensions in synchronized source files.
+  // swiftlint:disable:next test_case_accessibility
   @MainActor
-  private func launchApp(additionalArguments: [String] = []) -> XCUIApplication {
+  func launchApp(additionalArguments: [String] = []) -> XCUIApplication {
 #if os(iOS)
     XCUIDevice.shared.orientation = .portrait
 #endif
@@ -177,8 +179,10 @@ final class KitchenMemoryUITests: XCTestCase {
     return app
   }
 
+  // Shared by focused smoke-test extensions in synchronized source files.
+  // swiftlint:disable:next test_case_accessibility
   @MainActor
-  private func activate(_ element: XCUIElement) {
+  func activate(_ element: XCUIElement) {
 #if os(macOS)
     element.click()
 #else

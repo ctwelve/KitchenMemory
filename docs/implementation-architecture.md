@@ -216,6 +216,13 @@ remote-store refresh therefore retry stable intentions and reread retained
 evidence; process or framework events never manufacture lifecycle Facts or
 prove global synchronization.
 
+Unsubmitted Session Entry text uses a second device-local collection rather
+than the accepted-intention outbox. It retains exact text and an optional
+Session-owned target across navigation, Stop, and relaunch, but it does not
+become synchronized evidence until the presentation layer submits a stable Fact
+identity and Logic confirms local durability. Remote Finish keeps an ineligible
+draft visible for explicit continuation, copy, or discard resolution.
+
 `CookingSessionView` is one semantic SwiftUI interaction that selects Compact,
 Regular, or Wide composition from its container width. Platform identity does
 not choose the content model. Snapshot-owned row IDs remain the target and

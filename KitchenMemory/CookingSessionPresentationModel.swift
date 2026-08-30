@@ -48,6 +48,9 @@ final class CookingSessionPresentationModel {
   var isShowingIssue = false
   private(set) var hasLoaded = false
   var pendingCommands: [PendingCookingSessionCommand]
+  var entryDrafts: [CookingSessionEntryDraft]
+  var detachedEntryDraft: CookingSessionEntryDraft?
+  var finishedSessionIDs: Set<CookingSession.ID> = []
 
   init(
     sessions: CookingSessions,
@@ -57,6 +60,7 @@ final class CookingSessionPresentationModel {
     self.store = store
     currentSessionID = store.currentSessionID
     pendingCommands = store.pendingCommands
+    entryDrafts = store.entryDrafts
   }
 
   init(
@@ -67,6 +71,7 @@ final class CookingSessionPresentationModel {
     self.store = store
     currentSessionID = store.currentSessionID
     pendingCommands = store.pendingCommands
+    entryDrafts = store.entryDrafts
   }
 
   var currentSession: CookingSessionProjection? {
@@ -76,6 +81,11 @@ final class CookingSessionPresentationModel {
 
   var hasPendingCommand: Bool {
     !pendingCommands.isEmpty
+  }
+
+  var currentEntryDraft: CookingSessionEntryDraft? {
+    guard let currentSessionID else { return nil }
+    return entryDrafts.first { $0.sessionID == currentSessionID }
   }
 
   func loadIfNeeded() {
@@ -148,6 +158,8 @@ final class CookingSessionPresentationModel {
       finishedSessionCount = finishedCount
       unavailableSessionCount = unavailableCount
       recoverySessionCount = recoveryCount
+      finishedSessionIDs = finishedIDs
+      refreshDetachedEntryDraft()
       if let currentSessionID, finishedIDs.contains(currentSessionID) { select(nil) }
       if pendingCommands.isEmpty {
         issue = nil
@@ -174,6 +186,26 @@ final class CookingSessionPresentationModel {
   func select(_ id: CookingSession.ID?) {
     currentSessionID = id
     store.currentSessionID = id
+  }
+
+  func replaceDraft(_ draft: CookingSessionEntryDraft) {
+    entryDrafts.removeAll { $0.sessionID == draft.sessionID }
+    entryDrafts.append(draft)
+    persistEntryDrafts()
+  }
+
+  func removeDraft(for sessionID: CookingSession.ID) {
+    entryDrafts.removeAll { $0.sessionID == sessionID }
+    persistEntryDrafts()
+    refreshDetachedEntryDraft()
+  }
+
+  func refreshDetachedEntryDraft() {
+    detachedEntryDraft = entryDrafts.first { finishedSessionIDs.contains($0.sessionID) }
+  }
+
+  private func persistEntryDrafts() {
+    store.entryDrafts = entryDrafts
   }
 
   private func sessionOrder(

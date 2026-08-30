@@ -5,6 +5,18 @@
 import Foundation
 import KitchenKit
 
+/// Device-local, unsubmitted Session Entry text. A draft is presentation state,
+/// not Cooking Session evidence, and therefore never enters the command outbox.
+struct CookingSessionEntryDraft: Codable, Equatable {
+  let sessionID: CookingSession.ID
+  var text: String
+  var target: SessionProgressTarget?
+
+  var isMeaningful: Bool {
+    !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+  }
+}
+
 /// One presentation-accepted Session intention retained until Logic confirms
 /// that its evidence is locally durable.
 enum PendingCookingSessionCommand: Codable, Equatable {
@@ -28,7 +40,47 @@ enum PendingCookingSessionCommand: Codable, Equatable {
     authoredAt: Date,
     scale: SessionWorkingScale
   )
+  case submitEntry(
+    factID: SessionFact.ID,
+    sessionID: CookingSession.ID,
+    authoredAt: Date,
+    text: String,
+    target: SessionProgressTarget?
+  )
+  case reviseEntry(
+    factID: SessionFact.ID,
+    sessionID: CookingSession.ID,
+    authoredAt: Date,
+    entryID: SessionEntry.ID,
+    text: String,
+    target: SessionProgressTarget?
+  )
+  case retargetEntry(
+    factID: SessionFact.ID,
+    sessionID: CookingSession.ID,
+    authoredAt: Date,
+    entryID: SessionEntry.ID,
+    target: SessionProgressTarget?
+  )
+  case withdrawEntry(
+    factID: SessionFact.ID,
+    sessionID: CookingSession.ID,
+    authoredAt: Date,
+    entryID: SessionEntry.ID
+  )
+  case setOutcome(
+    factID: SessionFact.ID,
+    sessionID: CookingSession.ID,
+    authoredAt: Date,
+    outcome: SessionOutcome
+  )
+  case clearOutcome(factID: SessionFact.ID, sessionID: CookingSession.ID, authoredAt: Date)
   case finish(closureID: SessionClosure.ID, sessionID: CookingSession.ID, finishedAt: Date)
+  case continueSession(
+    sessionID: CookingSession.ID,
+    sourceSessionID: CookingSession.ID,
+    startedAt: Date
+  )
 
   var sessionID: CookingSession.ID {
     switch self {
@@ -37,7 +89,14 @@ enum PendingCookingSessionCommand: Codable, Equatable {
          let .resume(_, sessionID, _),
          let .progress(_, sessionID, _, _),
          let .replaceWorkingScale(_, sessionID, _, _),
-         let .finish(_, sessionID, _):
+         let .submitEntry(_, sessionID, _, _, _),
+         let .reviseEntry(_, sessionID, _, _, _, _),
+         let .retargetEntry(_, sessionID, _, _, _),
+         let .withdrawEntry(_, sessionID, _, _),
+         let .setOutcome(_, sessionID, _, _),
+         let .clearOutcome(_, sessionID, _),
+         let .finish(_, sessionID, _),
+         let .continueSession(sessionID, _, _):
       sessionID
     }
   }
@@ -47,7 +106,8 @@ enum PendingCookingSessionCommand: Codable, Equatable {
     switch self {
     case .progress, .replaceWorkingScale:
       return true
-    case .start, .stop, .resume, .finish:
+    case .start, .stop, .resume, .submitEntry, .reviseEntry, .retargetEntry,
+         .withdrawEntry, .setOutcome, .clearOutcome, .finish, .continueSession:
       return false
     }
   }
@@ -57,6 +117,7 @@ enum PendingCookingSessionCommand: Codable, Equatable {
 protocol CookingSessionPresentationStoring: AnyObject {
   var currentSessionID: CookingSession.ID? { get set }
   var pendingCommands: [PendingCookingSessionCommand] { get set }
+  var entryDrafts: [CookingSessionEntryDraft] { get set }
 }
 
 /// Device-local presentation state. These values deliberately use ordinary
@@ -65,6 +126,7 @@ protocol CookingSessionPresentationStoring: AnyObject {
 final class DefaultsCookingSessionPresentationStore: CookingSessionPresentationStoring {
   static let currentSessionIDKey = "cookingSessions.currentSessionID"
   static let pendingCommandKey = "cookingSessions.pendingCommand"
+  static let entryDraftsKey = "cookingSessions.entryDrafts"
 
   private let defaults: UserDefaults
   private let encoder = PropertyListEncoder()
@@ -108,10 +170,28 @@ final class DefaultsCookingSessionPresentationStore: CookingSessionPresentationS
       defaults.set(data, forKey: Self.pendingCommandKey)
     }
   }
+
+  var entryDrafts: [CookingSessionEntryDraft] {
+    get {
+      guard let data = defaults.data(forKey: Self.entryDraftsKey) else { return [] }
+      return (try? decoder.decode([CookingSessionEntryDraft].self, from: data)) ?? []
+    }
+    set {
+      guard !newValue.isEmpty else {
+        defaults.removeObject(forKey: Self.entryDraftsKey)
+        return
+      }
+      guard let data = try? encoder.encode(newValue) else {
+        preconditionFailure("Cooking Session Entry drafts must remain encodable")
+      }
+      defaults.set(data, forKey: Self.entryDraftsKey)
+    }
+  }
 }
 
 @MainActor
 final class VolatileCookingSessionPresentationStore: CookingSessionPresentationStoring {
   var currentSessionID: CookingSession.ID?
   var pendingCommands: [PendingCookingSessionCommand] = []
+  var entryDrafts: [CookingSessionEntryDraft] = []
 }
