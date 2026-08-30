@@ -5,6 +5,25 @@
 import KitchenKit
 import SwiftUI
 
+struct CookingSessionLifecyclePresentation {
+  let title: LocalizedStringResource
+  let symbol: String
+
+  init(_ lifecycle: SessionLifecycle) {
+    switch lifecycle {
+    case .active:
+      title = .sessionLifecycleActive
+      symbol = "flame"
+    case .stopped:
+      title = .sessionLifecycleStopped
+      symbol = "pause.circle"
+    case .finished:
+      title = .sessionLifecycleFinished
+      symbol = "checkmark.seal"
+    }
+  }
+}
+
 struct CookingSessionView: View {
   @Bindable var model: CookingSessionPresentationModel
   let session: CookingSessionProjection
@@ -12,6 +31,7 @@ struct CookingSessionView: View {
   @State private var isShowingFinishConfirmation = false
 
   var body: some View {
+    let lifecycle = CookingSessionLifecyclePresentation(session.lifecycle)
     NavigationStack {
       VStack(alignment: .leading, spacing: 24) {
         VStack(alignment: .leading, spacing: 8) {
@@ -19,21 +39,21 @@ struct CookingSessionView: View {
             .font(.largeTitle.bold())
             .accessibilityHeading(.h1)
             .accessibilityIdentifier("cooking-session-shell")
-          Label(lifecycleKey, systemImage: lifecycleSymbol)
+          Label(lifecycle.title, systemImage: lifecycle.symbol)
             .foregroundStyle(.secondary)
             .accessibilityIdentifier("session-lifecycle")
         }
 
         ContentUnavailableView {
-          Label("session.shell.foundation.title", systemImage: "frying.pan")
+          Label(.sessionShellFoundationTitle, systemImage: "frying.pan")
         } description: {
-          Text("session.shell.foundation.message")
+          Text(.sessionShellFoundationMessage)
         }
 
         Spacer()
 
         HStack {
-          Button("session.action.leave") {
+          Button(.sessionActionLeave) {
             model.leaveCurrentSession()
           }
           .accessibilityIdentifier("leave-session")
@@ -41,19 +61,19 @@ struct CookingSessionView: View {
           Spacer()
 
           if session.lifecycle == .active {
-            Button("session.action.stop") {
+            Button(.sessionActionStop) {
               model.stopCurrentSession()
             }
             .accessibilityIdentifier("stop-session")
           } else if session.lifecycle == .stopped {
-            Button("session.action.resume") {
+            Button(.sessionActionResume) {
               model.resumeCurrentSession()
             }
             .buttonStyle(.borderedProminent)
             .accessibilityIdentifier("resume-session")
           }
 
-          Button("session.action.finish", role: .destructive) {
+          Button(.sessionActionFinish, role: .destructive) {
             isShowingFinishConfirmation = true
           }
           .accessibilityIdentifier("finish-session")
@@ -63,35 +83,19 @@ struct CookingSessionView: View {
       .padding(28)
       .frame(maxWidth: .infinity, maxHeight: .infinity)
       .background(Color("AppBackground"))
-      .navigationTitle("session.navigation.title")
+      .navigationTitle(.sessionNavigationTitle)
       .alert(
-        "session.finish.confirmation.title",
+        .sessionFinishConfirmationTitle,
         isPresented: $isShowingFinishConfirmation
       ) {
-        Button("action.cancel", role: .cancel) {}
-        Button("session.finish.confirmation.action", role: .destructive) {
+        Button(.actionCancel, role: .cancel) {}
+        Button(.sessionFinishConfirmationAction, role: .destructive) {
           model.finishCurrentSession()
         }
         .accessibilityIdentifier("confirm-finish-session")
       } message: {
-        Text("session.finish.confirmation.message")
+        Text(.sessionFinishConfirmationMessage)
       }
-    }
-  }
-
-  private var lifecycleKey: LocalizedStringKey {
-    switch session.lifecycle {
-    case .active: "session.lifecycle.active"
-    case .stopped: "session.lifecycle.stopped"
-    case .finished: "session.lifecycle.finished"
-    }
-  }
-
-  private var lifecycleSymbol: String {
-    switch session.lifecycle {
-    case .active: "flame"
-    case .stopped: "pause.circle"
-    case .finished: "checkmark.seal"
     }
   }
 }

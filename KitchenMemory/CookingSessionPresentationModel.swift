@@ -7,37 +7,27 @@ import KitchenKit
 import Observation
 
 @MainActor
-protocol CookingSessionServing: AnyObject {
+protocol CookingSessionServing {
   func sessions() throws -> [SessionProjectionResult]
   func start(_ intention: StartCookingSessionIntention) throws -> CookingSessionCommandResult
   func perform(_ intention: CookingSessionIntention) throws -> CookingSessionCommandResult
 }
 
 @MainActor
-private final class CookingSessionsService: CookingSessionServing {
-  let sessionsLogic: CookingSessions
-
-  init(_ sessionsLogic: CookingSessions) {
-    self.sessionsLogic = sessionsLogic
-  }
-
-  func sessions() throws -> [SessionProjectionResult] {
-    try sessionsLogic.sessions()
-  }
-
-  func start(_ intention: StartCookingSessionIntention) throws -> CookingSessionCommandResult {
-    try sessionsLogic.start(intention)
-  }
-
-  func perform(_ intention: CookingSessionIntention) throws -> CookingSessionCommandResult {
-    try sessionsLogic.perform(intention)
-  }
-}
+extension CookingSessions: CookingSessionServing {}
 
 enum CookingSessionPresentationIssue: Equatable {
   case read
   case command(CookingSessionLogicError)
   case attention(CookingSessionAttention)
+
+  var message: LocalizedStringResource {
+    switch self {
+    case .read: .sessionIssueRead
+    case .command: .sessionIssueCommand
+    case .attention: .sessionIssueAttention
+    }
+  }
 }
 
 /// Replaceable presentation projection over retained Cooking Session evidence.
@@ -55,13 +45,14 @@ final class CookingSessionPresentationModel {
   private(set) var unavailableSessionCount = 0
   private(set) var recoverySessionCount = 0
   private(set) var issue: CookingSessionPresentationIssue?
+  private(set) var isShowingIssue = false
   private(set) var hasLoaded = false
 
   init(
     sessions: CookingSessions,
     store: any CookingSessionPresentationStoring
   ) {
-    service = CookingSessionsService(sessions)
+    service = sessions
     self.store = store
     currentSessionID = store.currentSessionID
   }
@@ -166,10 +157,22 @@ final class CookingSessionPresentationModel {
       let result = try perform(pending)
       apply(result, for: pending)
     } catch let logicError as CookingSessionLogicError {
-      issue = .command(logicError)
+      present(.command(logicError))
     } catch {
-      issue = .read
+      present(.read)
     }
+  }
+
+  func retryCurrentIssue() {
+    if store.pendingCommand != nil {
+      retryPendingCommand()
+    } else {
+      reload()
+    }
+  }
+
+  func dismissIssuePresentation() {
+    isShowingIssue = false
   }
 
   private func prepareForNewCommand() -> Bool {
@@ -225,6 +228,7 @@ final class CookingSessionPresentationModel {
     case let .accepted(session):
       store.pendingCommand = nil
       issue = nil
+      isShowingIssue = false
       upsert(session)
       if session.lifecycle == .finished {
         sessions.removeAll { $0.id == session.id }
@@ -234,7 +238,7 @@ final class CookingSessionPresentationModel {
         select(pending.sessionID)
       }
     case let .attention(attention):
-      issue = .attention(attention)
+      present(.attention(attention))
     }
   }
 
@@ -242,6 +246,7 @@ final class CookingSessionPresentationModel {
     do {
       var ordinary: [CookingSessionProjection] = []
       var finishedCount = 0
+      var finishedIDs: Set<CookingSession.ID> = []
       var unavailableCount = 0
       var recoveryCount = 0
       for result in try service.sessions() {
@@ -250,6 +255,7 @@ final class CookingSessionPresentationModel {
           guard session.disposition == .ordinary else { continue }
           if session.lifecycle == .finished {
             finishedCount += 1
+            finishedIDs.insert(session.id)
           } else {
             ordinary.append(session)
           }
@@ -263,11 +269,19 @@ final class CookingSessionPresentationModel {
       finishedSessionCount = finishedCount
       unavailableSessionCount = unavailableCount
       recoverySessionCount = recoveryCount
-      if currentSession?.lifecycle == .finished { select(nil) }
-      if store.pendingCommand == nil { issue = nil }
+      if let currentSessionID, finishedIDs.contains(currentSessionID) { select(nil) }
+      if store.pendingCommand == nil {
+        issue = nil
+        isShowingIssue = false
+      }
     } catch {
-      issue = .read
+      present(.read)
     }
+  }
+
+  private func present(_ issue: CookingSessionPresentationIssue) {
+    self.issue = issue
+    isShowingIssue = true
   }
 
   private func upsert(_ session: CookingSessionProjection) {

@@ -41,6 +41,26 @@ struct ContentView: View {
       sessionModel.loadIfNeeded()
     }
     .tint(Color("AccentColor"))
+    .alert(
+      .sessionIssueTitle,
+      isPresented: sessionIssueIsPresented
+    ) {
+      Button(.actionTryAgain) { sessionModel.retryCurrentIssue() }
+      Button(.actionCancel, role: .cancel) {}
+    } message: {
+      if let issue = sessionModel.issue {
+        Text(issue.message)
+      }
+    }
+  }
+
+  private var sessionIssueIsPresented: Binding<Bool> {
+    Binding(
+      get: { sessionModel.isShowingIssue },
+      set: { isPresented in
+        if !isPresented { sessionModel.dismissIssuePresentation() }
+      }
+    )
   }
 
   private var recipeLibrary: some View {
@@ -149,59 +169,7 @@ struct ContentView: View {
 
   @ViewBuilder
   private var recipeList: some View {
-    if let issue = model.issue {
-      ContentUnavailableView {
-        Label(.libraryUnavailableTitle, systemImage: "exclamationmark.triangle")
-      } description: {
-        Text(issue.message(locale: locale))
-      } actions: {
-        Button(.actionTryAgain) { model.retryCurrentIssue() }
-      }
-    } else if model.hasLoaded && model.recipes.isEmpty {
-      ContentUnavailableView(
-        .libraryEmptyTitle,
-        systemImage: "book.closed",
-        description: Text(.libraryEmptyMessage)
-      )
-    } else {
-      List(selection: $model.selectedRecipeID) {
-        if !sessionModel.sessions.isEmpty {
-          Section("session.discovery.title") {
-            ForEach(sessionModel.sessions, id: \.id) { session in
-              Button {
-                sessionModel.selectSession(session.id)
-              } label: {
-                CookingSessionRow(session: session)
-              }
-              .buttonStyle(.borderless)
-              .accessibilityIdentifier("session-row-\(session.id.rawValue.uuidString)")
-            }
-          }
-        }
-
-        Section("session.discovery.recipes") {
-          ForEach(model.recipes, id: \.recipe.id) { storedRecipe in
-            NavigationLink(value: storedRecipe.recipe.id) {
-              RecipeRow(storedRecipe: storedRecipe)
-            }
-            // Keep the stable identity on the interactive NavigationLink, not on
-            // RecipeRow's visual children. UI tests and assistive technologies
-            // must activate the same element a person clicks to open the recipe.
-            .accessibilityIdentifier("recipe-row-\(storedRecipe.recipe.id.rawValue.uuidString)")
-          }
-        }
-      }
-      // This identifier is also our launch-complete signal in UI tests. It is
-      // applied to the List itself so it survives row reuse and empty states.
-      .accessibilityIdentifier("recipe-library")
-      .accessibilityLabel(Text(.libraryAccessibilityLabel))
-      .listStyle(.sidebar)
-      .overlay {
-        if !model.hasLoaded {
-          ProgressView(.libraryLoading)
-        }
-      }
-    }
+    RecipeLibrarySidebar(model: model, sessionModel: sessionModel, locale: locale)
   }
 
   @ViewBuilder
@@ -217,7 +185,7 @@ struct ContentView: View {
             Button {
               sessionModel.start(from: selectedRecipe)
             } label: {
-              Label("session.action.start", systemImage: "flame")
+              Label(.sessionActionStart, systemImage: "flame")
             }
             .accessibilityIdentifier("start-cooking")
           }
@@ -267,27 +235,6 @@ struct ContentView: View {
   }
 }
 
-private struct CookingSessionRow: View {
-  let session: CookingSessionProjection
-
-  var body: some View {
-    HStack {
-      VStack(alignment: .leading, spacing: 3) {
-        Text(session.snapshot.title)
-          .font(.headline)
-        Text(session.lifecycle == .active
-          ? "session.lifecycle.active"
-          : "session.lifecycle.stopped")
-          .font(.caption)
-          .foregroundStyle(.secondary)
-      }
-      Spacer()
-      Image(systemName: session.lifecycle == .active ? "flame" : "pause.circle")
-        .accessibilityHidden(true)
-    }
-  }
-}
-
 private struct ToolbarIconLabel: View {
   let title: LocalizedStringResource
   let systemImage: String
@@ -324,7 +271,7 @@ private enum ActiveRecipeSheet: Identifiable {
   }
 }
 
-private struct RecipeRow: View {
+struct RecipeRow: View {
   let storedRecipe: StoredRecipe
 
   var body: some View {

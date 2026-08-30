@@ -28,6 +28,7 @@
 				"",
 				"",
 				"",
+				"",
 			);
 		};
 /* End PBXBuildRule section */

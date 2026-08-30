@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 @testable import KitchenMemory
+import Foundation
 import KitchenKit
 import XCTest
 
@@ -106,6 +107,33 @@ final class CookingSessionPresentationTests: XCTestCase {
 
     XCTAssertEqual(observerProjection.sessions.count, 1)
     XCTAssertEqual(observerProjection.sessions.first?.lifecycle, .active)
+  }
+
+  func testExternalFinishClearsDurableCurrentSessionPointer() {
+    let sessionID = CookingSession.ID()
+    let active = CookingSessionProjection(
+      id: sessionID,
+      snapshot: ExecutionSnapshot(title: "Soup")
+    )
+    let service = ClassifiedSessionService(results: [.session(active)])
+    let store = VolatileCookingSessionPresentationStore()
+    store.currentSessionID = sessionID
+    let model = CookingSessionPresentationModel(sessions: service, store: store)
+    model.loadIfNeeded()
+    service.results = [
+      .session(CookingSessionProjection(
+        id: sessionID,
+        snapshot: active.snapshot,
+        lifecycle: .finished,
+        lifecycleBeforeFinish: .active
+      )),
+    ]
+
+    model.reloadAfterExternalStoreChange()
+
+    XCTAssertNil(model.currentSessionID)
+    XCTAssertNil(store.currentSessionID)
+    XCTAssertEqual(model.finishedSessionCount, 1)
   }
 
   func testOutboxRetainsOneIdentityUntilLogicReportsLocalDurability() throws {
@@ -216,6 +244,74 @@ final class CookingSessionPresentationTests: XCTestCase {
   }
 }
 
+extension CookingSessionPresentationTests {
+  func testPendingStartSurvivesDurableStoreReopenAndUsesOriginalIdentity() throws {
+    let directory = FileManager.default.temporaryDirectory
+      .appending(path: "KitchenMemory-Slice14-\(UUID().uuidString)")
+    try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+    defer { try? FileManager.default.removeItem(at: directory) }
+    let defaultsName = "KitchenMemory.Slice14.\(UUID().uuidString)"
+    let defaults = try XCTUnwrap(UserDefaults(suiteName: defaultsName))
+    defer { defaults.removePersistentDomain(forName: defaultsName) }
+    let storeURL = directory.appending(path: "KitchenMemory.store")
+    let sessionID = CookingSession.ID()
+    try stageInterruptedStart(sessionID, storeURL: storeURL, defaults: defaults)
+
+    let container = try KitchenMemorySchema.makeContainer(storeURL: storeURL)
+    let recipeRepository = SwiftDataRecipeRepository(modelContainer: container)
+    let kitchen = try KitchenBootstrapService(repository: recipeRepository)
+      .prepareInitialKitchenWithStatus().kitchen
+    let sessionRepository = SwiftDataCookingSessionRepository(modelContainer: container)
+    let store = DefaultsCookingSessionPresentationStore(defaults: defaults)
+    let model = CookingSessionPresentationModel(
+      sessions: CookingSessions(
+        kitchenID: kitchen.id,
+        recipeRepository: recipeRepository,
+        sessionRepository: sessionRepository
+      ),
+      store: store
+    )
+
+    model.loadIfNeeded()
+
+    XCTAssertEqual(model.currentSession?.id, sessionID)
+    XCTAssertNil(store.pendingCommand)
+    guard case let .session(persisted) = try XCTUnwrap(
+      sessionRepository.session(id: sessionID)
+    ) else {
+      XCTFail("Expected the retried Start to be locally durable")
+      return
+    }
+    XCTAssertEqual(persisted.id, sessionID)
+  }
+}
+
+@MainActor
+private func stageInterruptedStart(
+  _ sessionID: CookingSession.ID,
+  storeURL: URL,
+  defaults: UserDefaults
+) throws {
+  let container = try KitchenMemorySchema.makeContainer(storeURL: storeURL)
+  let recipeRepository = SwiftDataRecipeRepository(modelContainer: container)
+  let kitchen = try KitchenBootstrapService(repository: recipeRepository)
+    .prepareInitialKitchenWithStatus().kitchen
+  let library = RecipeLibrary(
+    kitchenID: kitchen.id,
+    repository: recipeRepository,
+    samples: BundledSampleRecipeProvider(preferredLanguages: ["en-US"]),
+    importer: RecipeImportService()
+  )
+  try library.installSamples()
+  let recipe = try XCTUnwrap(library.load().recipes.first)
+  DefaultsCookingSessionPresentationStore(defaults: defaults).pendingCommand = .start(
+    sessionID: sessionID,
+    recipeID: recipe.recipe.id,
+    revisionID: recipe.revision.id,
+    startedAt: Date(timeIntervalSince1970: 1_800_000_000)
+  )
+}
+
 @MainActor
 private final class AmbiguousStartService: CookingSessionServing {
   let accepted: CookingSessionProjection
@@ -246,7 +342,7 @@ private final class AmbiguousStartService: CookingSessionServing {
 
 @MainActor
 private final class ClassifiedSessionService: CookingSessionServing {
-  let results: [SessionProjectionResult]
+  var results: [SessionProjectionResult]
 
   init(results: [SessionProjectionResult]) {
     self.results = results

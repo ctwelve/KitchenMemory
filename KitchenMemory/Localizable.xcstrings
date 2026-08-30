@@ -118,6 +118,42 @@
         "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Arrêtée" } }
       }
     },
+    "session.issue.attention" : {
+      "comment" : "Explains that retained Cooking Session evidence needs explicit attention and the pending action remains available to retry.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "This Cooking Session needs attention before that change can be accepted. The same action remains available to retry." } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Esta sesión de cocina necesita atención antes de aceptar ese cambio. La misma acción sigue disponible para volver a intentarla." } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Cette séance de cuisine demande votre attention avant que ce changement puisse être accepté. La même action demeure disponible pour une nouvelle tentative." } }
+      }
+    },
+    "session.issue.command" : {
+      "comment" : "Explains a local Cooking Session command failure while preserving the stable retry identity.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "The change could not be saved locally. Try again; Kitchen Memory will retry the same action." } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "El cambio no se pudo guardar localmente. Inténtalo de nuevo; Kitchen Memory volverá a intentar la misma acción." } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Le changement n’a pas pu être enregistré localement. Réessayez; Kitchen Memory tentera de nouveau la même action." } }
+      }
+    },
+    "session.issue.read" : {
+      "comment" : "Explains that retained Cooking Session evidence could not be loaded.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Cooking Sessions could not be updated from their retained evidence. Try again." } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Las sesiones de cocina no se pudieron actualizar con la evidencia conservada. Inténtalo de nuevo." } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Les séances de cuisine n’ont pas pu être mises à jour à partir des preuves conservées. Réessayez." } }
+      }
+    },
+    "session.issue.title" : {
+      "comment" : "Title for a Cooking Session read, command, or retained-evidence attention alert.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Cooking Session Needs Attention" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "La sesión de cocina necesita atención" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "La séance de cuisine demande votre attention" } }
+      }
+    },
     "session.navigation.title" : {
       "comment" : "Navigation title for the bounded Cooking Session shell.",
       "extractionState" : "manual",
