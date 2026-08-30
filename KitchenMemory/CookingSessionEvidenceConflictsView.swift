@@ -2,12 +2,14 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
+import Foundation
 import KitchenKit
 import SwiftUI
 
 struct CookingSessionEvidenceConflictsView: View {
   let model: CookingSessionPresentationModel
   let session: CookingSessionProjection
+  @Environment(\.locale) private var locale
 
   var body: some View {
     if !evidenceConflicts.isEmpty {
@@ -99,7 +101,10 @@ struct CookingSessionEvidenceConflictsView: View {
   }
 
   private func targetLabel(_ target: SessionProgressTarget?) -> String {
-    guard let target else { return String(localized: .sessionEntryTargetNone) }
-    return SessionEntryTargetPresentation(snapshot: session.snapshot).label(for: target)
+    guard let target else {
+      return LocalizedStringResource.sessionEntryTargetNone.localized(for: locale)
+    }
+    return SessionEntryTargetPresentation(snapshot: session.snapshot, locale: locale)
+      .label(for: target)
   }
 }

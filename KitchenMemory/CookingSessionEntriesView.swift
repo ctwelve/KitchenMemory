@@ -2,6 +2,7 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
+import Foundation
 import KitchenKit
 import SwiftUI
 
@@ -12,6 +13,7 @@ struct CookingSessionEntriesView: View {
   @State private var editingEntryID: SessionEntry.ID?
   @State private var editingText = ""
   @State private var editingTarget: SessionProgressTarget?
+  @Environment(\.locale) private var locale
 
   var body: some View {
     VStack(alignment: .leading, spacing: 16) {
@@ -183,7 +185,7 @@ struct CookingSessionEntriesView: View {
   }
 
   private var targetPresentation: SessionEntryTargetPresentation {
-    SessionEntryTargetPresentation(snapshot: session.snapshot)
+    SessionEntryTargetPresentation(snapshot: session.snapshot, locale: locale)
   }
 
   private func targetLabel(_ target: SessionProgressTarget) -> String {
@@ -193,6 +195,7 @@ struct CookingSessionEntriesView: View {
 
 struct SessionEntryTargetPresentation {
   let snapshot: ExecutionSnapshot
+  let locale: Locale
 
   var options: [SessionEntryTargetOption] {
     let ingredients = snapshot.ingredientSections.enumerated().flatMap { sectionPair in
@@ -201,11 +204,11 @@ struct SessionEntryTargetPresentation {
         let (ingredientIndex, ingredient) = ingredientPair
         return SessionEntryTargetOption(
           target: .ingredient(ingredient.id),
-          label: String(localized: .sessionEntryTargetIngredient(
+          label: LocalizedStringResource.sessionEntryTargetIngredient(
             section: sectionIndex + 1,
             position: ingredientIndex + 1,
             label: ingredient.value.originalText
-          ))
+          ).localized(for: locale)
         )
       }
     }
@@ -215,11 +218,11 @@ struct SessionEntryTargetPresentation {
         let (instructionIndex, instruction) = instructionPair
         return SessionEntryTargetOption(
           target: .instruction(instruction.id),
-          label: String(localized: .sessionEntryTargetInstruction(
+          label: LocalizedStringResource.sessionEntryTargetInstruction(
             section: sectionIndex + 1,
             position: instructionIndex + 1,
             label: instruction.value.name ?? instruction.value.text
-          ))
+          ).localized(for: locale)
         )
       }
     }
@@ -228,7 +231,7 @@ struct SessionEntryTargetPresentation {
 
   func label(for target: SessionProgressTarget) -> String {
     options.first(where: { $0.target == target })?.label ??
-      String(localized: .sessionEntryTargetUnavailable)
+      LocalizedStringResource.sessionEntryTargetUnavailable.localized(for: locale)
   }
 }
 

@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 @testable import KitchenMemory
+import Foundation
 import KitchenKit
 import XCTest
 
@@ -47,24 +48,43 @@ extension CookingSessionEntryPresentationTests {
         ]),
       ],
     )
-    let presentation = SessionEntryTargetPresentation(snapshot: snapshot)
+    let expectations = [
+      (
+        "en-US",
+        [
+          "Ingredient 1.1 — 1 lime",
+          "Ingredient 2.1 — 1 lime",
+          "Instruction 1.1 — Stir",
+          "Instruction 1.2 — Stir",
+        ]
+      ),
+      (
+        "fr-CA",
+        [
+          "Ingrédient 1.1 — 1 lime",
+          "Ingrédient 2.1 — 1 lime",
+          "Instruction 1.1 — Stir",
+          "Instruction 1.2 — Stir",
+        ]
+      ),
+      (
+        "es-MX",
+        [
+          "Ingrediente 1.1 — 1 lime",
+          "Ingrediente 2.1 — 1 lime",
+          "Instrucción 1.1 — Stir",
+          "Instrucción 1.2 — Stir",
+        ]
+      ),
+    ]
 
-    XCTAssertEqual(
-      presentation.label(for: .ingredient(firstIngredient)),
-      "Ingredient 1.1 — 1 lime"
-    )
-    XCTAssertEqual(
-      presentation.label(for: .ingredient(secondIngredient)),
-      "Ingredient 2.1 — 1 lime"
-    )
-    XCTAssertEqual(
-      presentation.label(for: .instruction(firstInstruction)),
-      "Instruction 1.1 — Stir"
-    )
-    XCTAssertEqual(
-      presentation.label(for: .instruction(secondInstruction)),
-      "Instruction 1.2 — Stir"
-    )
+    for (localeIdentifier, expectedLabels) in expectations {
+      let presentation = SessionEntryTargetPresentation(
+        snapshot: snapshot,
+        locale: Locale(identifier: localeIdentifier)
+      )
+      XCTAssertEqual(presentation.options.map(\.label), expectedLabels)
+    }
   }
 
   // Exercises the real evidence repository, projector, Logic command path, and
