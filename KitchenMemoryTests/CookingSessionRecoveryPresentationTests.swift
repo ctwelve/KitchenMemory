@@ -154,9 +154,11 @@ final class CookingSessionRecoveryPresentationTests: XCTestCase {
       .deleted(needsAttention: true),
     )
     XCTAssertTrue(relaunched.restoreSession(sessionID))
+    XCTAssertEqual(service.restoreFrontiers.count, 2)
+    XCTAssertEqual(service.restoreFrontiers[0], [originalDeletionID])
     XCTAssertEqual(
-      service.restoreFrontiers,
-      [[originalDeletionID], [originalDeletionID, concurrentDeletionID]]
+      Set(service.restoreFrontiers[1]),
+      Set([originalDeletionID, concurrentDeletionID]),
     )
     XCTAssertTrue(store.pendingCommands.isEmpty)
   }
@@ -186,6 +188,49 @@ final class CookingSessionRecoveryPresentationTests: XCTestCase {
     XCTAssertNil(relaunched.issue)
     XCTAssertEqual(relaunched.sessions.map(\.id), [sessionID])
     XCTAssertTrue(relaunched.deletedSessions.isEmpty)
+  }
+
+  func testRelaunchedClosureSelectionRetiresStaleCandidatesAndRequiresFreshChoice() throws {
+    let sessionID = CookingSession.ID()
+    let first = closure(sessionID: sessionID, finishedAt: 10)
+    let second = closure(sessionID: sessionID, finishedAt: 20)
+    let third = closure(sessionID: sessionID, finishedAt: 30)
+    let updatedRecovery = SessionRecovery(
+      evidence: SessionEvidence(sessionID: sessionID, closures: [first, second, third]),
+      reasons: [.competingClosures]
+    )
+    let service = ClosureInterruptionSessionService(
+      results: [.recovery(updatedRecovery)],
+      commandResults: [
+        .attention(.recovery(updatedRecovery)),
+        .accepted(projection(id: sessionID, disposition: .ordinary)),
+      ]
+    )
+    let store = VolatileCookingSessionPresentationStore()
+    store.pendingCommands = [
+      .resolveClosure(
+        factID: SessionFact.ID(),
+        sessionID: sessionID,
+        authoredAt: Date(timeIntervalSince1970: 100),
+        selectedClosureID: first.id,
+        observedClosureIDs: [first.id, second.id],
+      ),
+    ]
+    let relaunched = CookingSessionPresentationModel(sessions: service, store: store)
+
+    relaunched.loadIfNeeded()
+
+    XCTAssertTrue(store.pendingCommands.isEmpty)
+    let visibleRecovery = try XCTUnwrap(relaunched.recoverySessions.first)
+    XCTAssertEqual(visibleRecovery.evidence.closures, [first, second, third])
+    XCTAssertTrue(relaunched.selectClosure(third.id, for: visibleRecovery))
+    XCTAssertEqual(service.observedCandidateSets.count, 2)
+    XCTAssertEqual(service.observedCandidateSets[0], [first.id, second.id])
+    XCTAssertEqual(
+      Set(service.observedCandidateSets[1]),
+      Set([first.id, second.id, third.id]),
+    )
+    XCTAssertTrue(store.pendingCommands.isEmpty)
   }
 
   private func closure(
@@ -277,6 +322,36 @@ private final class RestoreInterruptionSessionService: CookingSessionServing {
       throw CookingSessionLogicError.invalidIntention
     }
     restoreFrontiers.append(restore.observedDeletionIDs)
+    return commandResults.removeFirst()
+  }
+}
+
+@MainActor
+private final class ClosureInterruptionSessionService: CookingSessionServing {
+  let results: [SessionProjectionResult]
+  var commandResults: [CookingSessionCommandResult]
+  var observedCandidateSets: [[SessionClosure.ID]] = []
+
+  init(
+    results: [SessionProjectionResult],
+    commandResults: [CookingSessionCommandResult]
+  ) {
+    self.results = results
+    self.commandResults = commandResults
+  }
+
+  func sessions() throws -> [SessionProjectionResult] { results }
+
+  func start(_ intention: StartCookingSessionIntention) throws -> CookingSessionCommandResult {
+    _ = intention
+    throw CookingSessionLogicError.invalidIntention
+  }
+
+  func perform(_ intention: CookingSessionIntention) throws -> CookingSessionCommandResult {
+    guard case let .resolveClosure(selection) = intention, !commandResults.isEmpty else {
+      throw CookingSessionLogicError.invalidIntention
+    }
+    observedCandidateSets.append(selection.observedClosureIDs)
     return commandResults.removeFirst()
   }
 }

@@ -133,6 +133,9 @@ extension CookingSessionPresentationModel {
     return !pendingCommands.contains(pending)
   }
 
+  // Exhaustive durable terminal-state routing keeps every outbox retirement
+  // adjacent to its persistence boundary and prevents a new case being lost.
+  // swiftlint:disable:next cyclomatic_complexity
   func apply(
     _ result: CookingSessionCommandResult,
     for pending: PendingCookingSessionCommand
@@ -182,6 +185,16 @@ extension CookingSessionPresentationModel {
       issue = nil
       isShowingIssue = false
       reload()
+      return true
+    case let .retiredStaleClosureSelection(attention):
+      guard pendingCommands.first == pending else { return false }
+      // A Closure choice is consent over one observed candidate set. Newly
+      // imported evidence must force a fresh explicit choice, not wedge the
+      // durable outbox on an obsolete selection or silently broaden it.
+      pendingCommands.removeFirst()
+      persistPendingCommands()
+      reload()
+      present(.attention(attention))
       return true
     case let .attention(attention):
       present(.attention(attention))
@@ -332,32 +345,6 @@ private extension PendingCookingSessionCommand {
     switch self {
     case .delete, .restore, .resolveClosure: true
     default: false
-    }
-  }
-}
-
-private enum PendingCookingSessionResolution {
-  case accepted(CookingSessionProjection)
-  case rejectedByFinishedSource
-  case retiredStaleRestore(CookingSessionAttention)
-  case retiredCompletedRestore
-  case attention(CookingSessionAttention)
-
-  init(
-    result: CookingSessionCommandResult,
-    pending: PendingCookingSessionCommand
-  ) {
-    switch (result, pending) {
-    case let (.accepted(session), _):
-      self = .accepted(session)
-    case (.attention(.commandNotAllowed(lifecycle: .finished)), _):
-      self = .rejectedByFinishedSource
-    case let (.attention(.competingDeletions(deletionIDs)), .restore):
-      self = .retiredStaleRestore(.competingDeletions(deletionIDs))
-    case (.attention(.restoreNotNeeded), .restore):
-      self = .retiredCompletedRestore
-    case let (.attention(attention), _):
-      self = .attention(attention)
     }
   }
 }
