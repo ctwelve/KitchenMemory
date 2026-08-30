@@ -87,6 +87,7 @@ extension CookingSessionPresentationModel {
   func showSessionHistory() {
     select(nil, recordsVisit: false)
     historyScope = .all
+    libraryDestination = nil
     observedFinishedSessionID = nil
   }
 
@@ -102,6 +103,7 @@ extension CookingSessionPresentationModel {
         + finishedSessions.filter { matchingIDs.contains($0.id) }
       select(nil, recordsVisit: false)
       historyScope = .recipe(recipeID)
+      libraryDestination = nil
       observedFinishedSessionID = nil
     } catch {
       present(.read)
@@ -110,6 +112,7 @@ extension CookingSessionPresentationModel {
 
   func showRecipes() {
     historyScope = nil
+    libraryDestination = nil
     observedFinishedSessionID = nil
   }
 
@@ -173,9 +176,13 @@ extension CookingSessionPresentationModel {
     let finishedIDs = Set(finished.map(\.id))
     sessions = classified.ordinary.sorted(by: sessionOrder)
     finishedSessions = finished
+    deletedSessions = classified.deleted.sorted(by: sessionOrder)
+    waitingDeletedSessions = classified.waitingDeleted
+    waitingSessions = classified.waiting
+    recoverySessions = classified.recovery
     finishedSessionCount = finished.count
-    unavailableSessionCount = classified.unavailableCount
-    recoverySessionCount = classified.recoveryCount
+    unavailableSessionCount = classified.waiting.count + classified.waitingDeleted.count
+    recoverySessionCount = classified.recovery.count
     finishedSessionIDs = finishedIDs
     refreshDetachedEntryDraft()
     if let currentSessionID, finishedIDs.contains(currentSessionID) {
@@ -216,20 +223,28 @@ extension CookingSessionPresentationModel {
 
 private struct SessionHistoryClassification {
   var ordinary: [CookingSessionProjection] = []
-  var unavailableCount = 0
-  var recoveryCount = 0
+  var deleted: [CookingSessionProjection] = []
+  var waitingDeleted: [UnavailableSession] = []
+  var waiting: [UnavailableSession] = []
+  var recovery: [SessionRecovery] = []
 
   init(_ results: [SessionProjectionResult]) {
     for result in results {
       switch result {
       case let .session(session):
-        if session.disposition == .ordinary, session.lifecycle != .finished {
+        if case .deleted = session.disposition {
+          deleted.append(session)
+        } else if session.lifecycle != .finished {
           ordinary.append(session)
         }
-      case .unavailable:
-        unavailableCount += 1
-      case .recovery:
-        recoveryCount += 1
+      case let .unavailable(unavailable):
+        if unavailable.evidence.deletions.isEmpty {
+          waiting.append(unavailable)
+        } else {
+          waitingDeleted.append(unavailable)
+        }
+      case let .recovery(item):
+        recovery.append(item)
       }
     }
   }

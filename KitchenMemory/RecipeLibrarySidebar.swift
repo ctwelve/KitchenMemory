@@ -10,6 +10,8 @@ struct RecipeLibrarySidebar: View {
   @Bindable var sessionModel: CookingSessionPresentationModel
   let locale: Locale
   let showSessionHistory: () -> Void
+  let showDeletedItems: () -> Void
+  let showRecovery: () -> Void
 
   var body: some View {
     List(selection: $model.selectedRecipeID) {
@@ -37,6 +39,28 @@ struct RecipeLibrarySidebar: View {
         Label(.sessionHistoryTitle, systemImage: "clock.arrow.circlepath")
       }
       .accessibilityIdentifier("sessions-destination")
+
+      NavigationLink {
+        DeletedItemsDestinationView(
+          model: sessionModel,
+          prepare: showDeletedItems
+        )
+      } label: {
+        Label(.deletedItemsTitle, systemImage: "trash")
+          .badge(sessionModel.deletedItemCount)
+      }
+      .accessibilityIdentifier("deleted-items-destination")
+
+      NavigationLink {
+        CookingSessionRecoveryDestinationView(
+          model: sessionModel,
+          prepare: showRecovery
+        )
+      } label: {
+        Label(.recoveryTitle, systemImage: "wrench.and.screwdriver")
+          .badge(sessionModel.recoveryItemCount)
+      }
+      .accessibilityIdentifier("recovery-destination")
 
       ForEach(sessionModel.sidebarSessions, id: \.id) { session in
         Button {

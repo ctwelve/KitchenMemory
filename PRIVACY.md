@@ -26,6 +26,15 @@ recipe library through your iCloud account only while that setting is enabled.
 Private iCloud synchronization is a feature you direct, not a way for this
 project to observe you, and it will never be repurposed for analytics.
 
+In Kitchen Memory 0.2, deleting a Cooking Session is reversible. The app keeps
+the Session's evidence together with its Delete and Restore history on your
+device and, when you enable private iCloud synchronization, in your private
+iCloud database. This prevents an offline device from silently bringing deleted
+work back and lets the app show incomplete or conflicting evidence honestly.
+Deleted Items does not expire or permanently erase Sessions in 0.2. This feature
+does not send data to Kitchen Memory or add analytics, telemetry, or another
+data recipient.
+
 ## Debugging and support
 
 Debugging information is the only category of data the project might have a

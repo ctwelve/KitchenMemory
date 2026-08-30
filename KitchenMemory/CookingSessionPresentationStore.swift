@@ -88,6 +88,24 @@ enum PendingCookingSessionCommand: Codable, Equatable {
   )
   case clearOutcome(factID: SessionFact.ID, sessionID: CookingSession.ID, authoredAt: Date)
   case finish(closureID: SessionClosure.ID, sessionID: CookingSession.ID, finishedAt: Date)
+  case delete(
+    deletionID: SessionDeletion.ID,
+    sessionID: CookingSession.ID,
+    deletedAt: Date
+  )
+  case restore(
+    commandID: RestoreCookingSessionIntention.ID,
+    sessionID: CookingSession.ID,
+    restoredAt: Date,
+    observedDeletionIDs: [SessionDeletion.ID]
+  )
+  case resolveClosure(
+    factID: SessionFact.ID,
+    sessionID: CookingSession.ID,
+    authoredAt: Date,
+    selectedClosureID: SessionClosure.ID,
+    observedClosureIDs: [SessionClosure.ID]
+  )
   case continueSession(
     sessionID: CookingSession.ID,
     sourceSessionID: CookingSession.ID,
@@ -108,6 +126,9 @@ enum PendingCookingSessionCommand: Codable, Equatable {
          let .setOutcome(_, sessionID, _, _),
          let .clearOutcome(_, sessionID, _),
          let .finish(_, sessionID, _),
+         let .delete(_, sessionID, _),
+         let .restore(_, sessionID, _, _),
+         let .resolveClosure(_, sessionID, _, _, _),
          let .continueSession(sessionID, _, _):
       sessionID
     }
@@ -119,7 +140,8 @@ enum PendingCookingSessionCommand: Codable, Equatable {
     case .progress, .replaceWorkingScale:
       return true
     case .start, .stop, .resume, .submitEntry, .reviseEntry, .retargetEntry,
-         .withdrawEntry, .setOutcome, .clearOutcome, .finish, .continueSession:
+         .withdrawEntry, .setOutcome, .clearOutcome, .finish, .delete, .restore,
+         .resolveClosure, .continueSession:
       return false
     }
   }

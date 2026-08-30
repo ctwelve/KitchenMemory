@@ -192,6 +192,15 @@ Physical erasure, Empty Deleted Items, expiry, and pruning remain later work.
 Destructive classification receives the acceptance contract's mandatory abuse
 and fuzz evidence.
 
+Implemented at the 0.2.0 checkpoint: Active, Stopped, and Finished Sessions can
+be deleted with descendant-aware confirmation; Deleted Items preserves their
+lifecycle and distinguishes Needs Attention from Waiting for Session Data;
+Restore resolves only observed markers; and Recovery exposes complete competing
+Closure choices without discarding evidence. The deterministic Gate B suite
+replays duplicated and reordered delivery, partial arrival, retry, concurrent
+Delete/Restore, missing roots, and logical-identity collision against retained
+evidence and rebuild invariants.
+
 ### Slice 19 — managed CloudKit convergence
 
 [Harden managed CloudKit Session convergence](https://github.com/ctwelve/KitchenMemory/issues/57)

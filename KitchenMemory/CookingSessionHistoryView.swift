@@ -170,6 +170,7 @@ struct FinishedCookingSessionView: View {
   @Bindable var model: CookingSessionPresentationModel
   let session: CookingSessionProjection
   @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+  @State private var isShowingDeleteConfirmation = false
 
   var body: some View {
     GeometryReader { geometry in
@@ -195,6 +196,11 @@ struct FinishedCookingSessionView: View {
           .background(.bar)
       }
       .background(Color("AppBackground"))
+      .cookingSessionDeletionConfirmation(
+        isPresented: $isShowingDeleteConfirmation,
+        model: model,
+        sessionID: session.id
+      )
     }
   }
 
@@ -242,6 +248,10 @@ struct FinishedCookingSessionView: View {
       }
       .buttonStyle(.borderedProminent)
       .accessibilityIdentifier("continue-session")
+      Button(.sessionDeleteAction, role: .destructive) {
+        isShowingDeleteConfirmation = true
+      }
+      .accessibilityIdentifier("delete-session")
     }
   }
 

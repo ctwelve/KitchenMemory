@@ -133,71 +133,8 @@ extension CookingSessionPresentationModel {
     return !pendingCommands.contains(pending)
   }
 
-  // This exhaustive retry router keeps every durable command identity adjacent
-  // to its matching Logic intention so new enum cases cannot be silently lost.
-  // swiftlint:disable:next cyclomatic_complexity function_body_length
-  func perform(_ pending: PendingCookingSessionCommand) throws -> CookingSessionCommandResult {
-    switch pending {
-    case let .start(sessionID, recipeID, revisionID, startedAt):
-      try service.start(StartCookingSessionIntention(
-        sessionID: sessionID,
-        recipeID: recipeID,
-        recipeRevisionID: revisionID,
-        startedAt: startedAt
-      ))
-    case let .stop(factID, sessionID, authoredAt):
-      try service.perform(.stop(fact(factID, sessionID, authoredAt)))
-    case let .resume(factID, sessionID, authoredAt):
-      try service.perform(.resume(fact(factID, sessionID, authoredAt)))
-    case let .progress(factID, sessionID, authoredAt, progress):
-      try service.perform(.progress(fact(factID, sessionID, authoredAt), progress))
-    case let .replaceWorkingScale(factID, sessionID, authoredAt, scale):
-      try service.perform(.replaceWorkingScale(fact(factID, sessionID, authoredAt), scale))
-    case let .submitEntry(factID, sessionID, authoredAt, text, target):
-      try service.perform(.submitEntry(fact(factID, sessionID, authoredAt), text: text, target: target))
-    case let .reviseEntry(factID, sessionID, authoredAt, entryID, text, target):
-      try service.perform(.reviseEntry(
-        fact(factID, sessionID, authoredAt),
-        entryID: entryID,
-        text: text,
-        target: target
-      ))
-    case let .retargetEntry(factID, sessionID, authoredAt, entryID, target):
-      try service.perform(.retargetEntry(
-        fact(factID, sessionID, authoredAt),
-        entryID: entryID,
-        target: target
-      ))
-    case let .withdrawEntry(factID, sessionID, authoredAt, entryID):
-      try service.perform(.withdrawEntry(fact(factID, sessionID, authoredAt), entryID: entryID))
-    case let .setOutcome(factID, sessionID, authoredAt, outcome):
-      try service.perform(.setOutcome(fact(factID, sessionID, authoredAt), outcome))
-    case let .clearOutcome(factID, sessionID, authoredAt):
-      try service.perform(.clearOutcome(fact(factID, sessionID, authoredAt)))
-    case let .finish(closureID, sessionID, finishedAt):
-      try service.perform(.finish(FinishCookingSessionIntention(
-        closureID: closureID,
-        sessionID: sessionID,
-        finishedAt: finishedAt,
-        hasMeaningfulDraft: false
-      )))
-    case let .continueSession(sessionID, sourceSessionID, startedAt):
-      try service.perform(.continueSession(ContinueCookingSessionIntention(
-        sessionID: sessionID,
-        sourceSessionID: sourceSessionID,
-        startedAt: startedAt
-      )))
-    }
-  }
-
-  func fact(
-    _ id: SessionFact.ID,
-    _ sessionID: CookingSession.ID,
-    _ authoredAt: Date
-  ) -> SessionFactIntention {
-    SessionFactIntention(id: id, sessionID: sessionID, authoredAt: authoredAt)
-  }
-
+  // Exhaustive durable terminal-state routing keeps every outbox retirement
+  // adjacent to its persistence boundary and prevents a new case being lost.
   func apply(
     _ result: CookingSessionCommandResult,
     for pending: PendingCookingSessionCommand
@@ -215,6 +152,7 @@ extension CookingSessionPresentationModel {
       isShowingIssue = false
       upsert(session)
       applySelection(for: session, pending: pending)
+      if pending.refreshesClassification { reload() }
       return true
     case .rejectedByFinishedSource:
       guard pendingCommands.first == pending else { return false }
@@ -227,6 +165,25 @@ extension CookingSessionPresentationModel {
       issue = nil
       isShowingIssue = false
       return true
+    case let .retiredStaleConsent(attention):
+      guard pendingCommands.first == pending else { return false }
+      // Consent to resolve retained evidence is bounded to what the user saw.
+      // A changed frontier or candidate set requires a fresh explicit choice.
+      pendingCommands.removeFirst()
+      persistPendingCommands()
+      reload()
+      present(.attention(attention))
+      return true
+    case .retiredCompletedRestore:
+      guard pendingCommands.first == pending else { return false }
+      // Another replica may already have restored the observed frontier. The
+      // local intention is then complete and safe to retire idempotently.
+      pendingCommands.removeFirst()
+      persistPendingCommands()
+      issue = nil
+      isShowingIssue = false
+      reload()
+      return true
     case let .attention(attention):
       present(.attention(attention))
       return false
@@ -237,14 +194,31 @@ extension CookingSessionPresentationModel {
     for session: CookingSessionProjection,
     pending: PendingCookingSessionCommand
   ) {
-    if case .continueSession = pending {
+    if case .delete = pending {
+      if currentSessionID == session.id { select(nil, recordsVisit: false) }
+      historyScope = nil
+      observedFinishedSessionID = nil
+      libraryDestination = .deletedItems
+    } else if case .restore = pending {
+      select(nil, recordsVisit: false)
+      historyScope = nil
+      observedFinishedSessionID = nil
+      libraryDestination = .deletedItems
+    } else if case .resolveClosure = pending {
+      select(nil, recordsVisit: false)
+      historyScope = nil
+      observedFinishedSessionID = nil
+      libraryDestination = .recovery
+    } else if case .continueSession = pending {
       select(session.id)
       historyScope = nil
+      libraryDestination = nil
       observedFinishedSessionID = nil
     } else if session.lifecycle == .finished {
       sessions.removeAll { $0.id == session.id }
       if currentSessionID == session.id { select(nil, recordsVisit: false) }
       historyScope = .all
+      libraryDestination = nil
       observedFinishedSessionID = session.id
     } else {
       select(pending.sessionID)
@@ -290,7 +264,8 @@ extension CookingSessionPresentationModel {
         outcome = value
       case .clearOutcome:
         outcome = nil
-      case .start, .stop, .resume, .finish, .continueSession:
+      case .start, .stop, .resume, .finish, .delete, .restore, .resolveClosure,
+           .continueSession:
         break
       }
     }
@@ -318,7 +293,8 @@ extension CookingSessionPresentationModel {
       }
       moveDraft(from: sourceSessionID, to: newSessionID, target: mappedTarget)
     case .start, .stop, .resume, .progress, .replaceWorkingScale, .reviseEntry,
-         .retargetEntry, .withdrawEntry, .setOutcome, .clearOutcome, .finish:
+         .retargetEntry, .withdrawEntry, .setOutcome, .clearOutcome, .finish,
+         .delete, .restore, .resolveClosure:
       break
     }
   }
@@ -352,22 +328,11 @@ extension CookingSessionPresentationModel {
   }
 }
 
-private enum PendingCookingSessionResolution {
-  case accepted(CookingSessionProjection)
-  case rejectedByFinishedSource
-  case attention(CookingSessionAttention)
-
-  init(
-    result: CookingSessionCommandResult,
-    pending: PendingCookingSessionCommand
-  ) {
-    switch (result, pending) {
-    case let (.accepted(session), _):
-      self = .accepted(session)
-    case (.attention(.commandNotAllowed(lifecycle: .finished)), _):
-      self = .rejectedByFinishedSource
-    case let (.attention(attention), _):
-      self = .attention(attention)
+private extension PendingCookingSessionCommand {
+  var refreshesClassification: Bool {
+    switch self {
+    case .delete, .restore, .resolveClosure: true
+    default: false
     }
   }
 }

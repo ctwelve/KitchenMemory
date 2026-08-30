@@ -185,6 +185,10 @@ struct ContentView: View {
   private var detail: some View {
     if let finishedSession = sessionModel.observedFinishedSession {
       FinishedCookingSessionView(model: sessionModel, session: finishedSession)
+    } else if sessionModel.isShowingDeletedItems {
+      CookingSessionDeletedItemsView(model: sessionModel)
+    } else if sessionModel.isShowingRecovery {
+      CookingSessionRecoveryView(model: sessionModel)
     } else if sessionModel.isShowingSessionHistory {
       CookingSessionHistoryView(model: sessionModel)
     } else if let selectedRecipe = model.selectedRecipe {
@@ -271,6 +275,16 @@ private extension ContentView {
       showSessionHistory: {
         model.selectedRecipeID = nil
         sessionModel.showSessionHistory()
+        columnVisibility = .detailOnly
+      },
+      showDeletedItems: {
+        model.selectedRecipeID = nil
+        sessionModel.showDeletedItems()
+        columnVisibility = .detailOnly
+      },
+      showRecovery: {
+        model.selectedRecipeID = nil
+        sessionModel.showRecovery()
         columnVisibility = .detailOnly
       }
     )

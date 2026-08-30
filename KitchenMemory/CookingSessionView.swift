@@ -30,6 +30,7 @@ struct CookingSessionView: View {
 
   @State private var isShowingFinishConfirmation = false
   @State private var isShowingDraftFinishOptions = false
+  @State private var isShowingDeleteConfirmation = false
   @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
   var body: some View {
@@ -111,6 +112,11 @@ struct CookingSessionView: View {
       } message: {
         Text(.sessionFinishDraftMessage)
       }
+      .cookingSessionDeletionConfirmation(
+        isPresented: $isShowingDeleteConfirmation,
+        model: model,
+        sessionID: session.id
+      )
     }
   }
 
@@ -140,6 +146,11 @@ struct CookingSessionView: View {
         isShowingFinishConfirmation = true
       }
       .accessibilityIdentifier("finish-session")
+
+      Button(.sessionDeleteAction, role: .destructive) {
+        isShowingDeleteConfirmation = true
+      }
+      .accessibilityIdentifier("delete-session")
     }
   }
 
