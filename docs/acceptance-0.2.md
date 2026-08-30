@@ -211,6 +211,17 @@ installed Development harness imports server truth and rebuilds the same
 ordinary, Deleted Items, and Recovery projections. No tester's ordinary
 Kitchen Memory data is reset for acceptance.
 
+Slice 18's deterministic Gate B runs 128 seeded delivery shapes over a complete
+Delete, observed Restore, and later Delete frontier. Each shape duplicates and
+reorders physical records, retries projection, and must rebuild the identical
+deleted result. Scripted hostile cases separately cover concurrent Delete and
+Restore, an orphan Restore, a Delete arriving before its root, and two different
+payloads sharing one deletion identity. The oracle requires complete evidence
+retention and either deterministic deletion, Waiting for Session Data, Needs
+Attention, or Recovery—never silent ordinary presentation. All fixtures use
+synthetic UUIDs and content; no person's Kitchen or private diagnostic artifact
+is read, reset, or retained.
+
 ## Product interaction evidence
 
 ### Automated UI smoke

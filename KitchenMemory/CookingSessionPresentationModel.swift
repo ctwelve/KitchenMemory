@@ -11,6 +11,7 @@ protocol CookingSessionServing {
   func sessions() throws -> [SessionProjectionResult]
   func sessions(for recipeID: Recipe.ID) throws -> [SessionProjectionResult]
   func finishedSessions(limit: Int) throws -> [SessionProjectionResult]
+  func unresolvedDeletionIDs(for sessionID: CookingSession.ID) throws -> [SessionDeletion.ID]
   func start(_ intention: StartCookingSessionIntention) throws -> CookingSessionCommandResult
   func perform(_ intention: CookingSessionIntention) throws -> CookingSessionCommandResult
 }
@@ -20,6 +21,10 @@ extension CookingSessions: CookingSessionServing {}
 
 @MainActor
 extension CookingSessionServing {
+  func unresolvedDeletionIDs(for sessionID: CookingSession.ID) throws -> [SessionDeletion.ID] {
+    _ = sessionID
+    return []
+  }
   func sessions(for recipeID: Recipe.ID) throws -> [SessionProjectionResult] {
     _ = recipeID
     return []
@@ -37,6 +42,11 @@ extension CookingSessionServing {
 enum CookingSessionHistoryScope: Equatable {
   case all
   case recipe(Recipe.ID)
+}
+
+enum CookingSessionLibraryDestination: Equatable {
+  case deletedItems
+  case recovery
 }
 
 enum CookingSessionPresentationIssue: Equatable {
@@ -69,6 +79,10 @@ final class CookingSessionPresentationModel {
 
   var sessions: [CookingSessionProjection] = []
   var finishedSessions: [CookingSessionProjection] = []
+  var deletedSessions: [CookingSessionProjection] = []
+  var waitingDeletedSessions: [UnavailableSession] = []
+  var waitingSessions: [UnavailableSession] = []
+  var recoverySessions: [SessionRecovery] = []
   private(set) var currentSessionID: CookingSession.ID?
   var finishedSessionCount = 0
   var unavailableSessionCount = 0
@@ -81,6 +95,7 @@ final class CookingSessionPresentationModel {
   var detachedEntryDraft: CookingSessionEntryDraft?
   var finishedSessionIDs: Set<CookingSession.ID> = []
   var historyScope: CookingSessionHistoryScope?
+  var libraryDestination: CookingSessionLibraryDestination?
   var recipeHistorySessions: [CookingSessionProjection] = []
   var observedFinishedSessionID: CookingSession.ID?
   var sessionVisits: [CookingSessionVisit]

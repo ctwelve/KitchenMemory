@@ -23,6 +23,15 @@ synchronization choice must not travel to another device. Private iCloud
 synchronization is a person-directed product function, not telemetry, and must
 never be repurposed as an analytics channel.
 
+Cooking Session Delete in 0.2 is reversible. The app retains the Session's
+authoritative evidence, deletion markers, and later Restore evidence in the
+person's local store and, when private iCloud synchronization is enabled, their
+private iCloud database. That retention is necessary to prevent a disconnected
+device from silently resurrecting deleted work and to keep Recovery honest.
+There is no automatic expiry, pruning, or Empty Deleted Items action in 0.2.
+The feature adds no analytics, telemetry, diagnostic upload, or third-party
+data recipient and does not change the no-collected-data privacy declaration.
+
 ## Diagnostic boundary
 
 Operational diagnostics are the one category the project may have a legitimate

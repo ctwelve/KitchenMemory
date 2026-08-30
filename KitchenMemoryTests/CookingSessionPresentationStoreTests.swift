@@ -87,6 +87,42 @@ final class CookingSessionPresentationStoreTests: XCTestCase {
     )
   }
 
+  func testRecoveryCommandsSurviveStoreRecreationWithoutLosingObservedFrontiers() throws {
+    let suiteName = "CookingSessionPresentationStoreTests-\(UUID().uuidString)"
+    let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
+    defer { defaults.removePersistentDomain(forName: suiteName) }
+    let sessionID = CookingSession.ID()
+    let deletionIDs = [SessionDeletion.ID(), SessionDeletion.ID()]
+    let closureIDs = [SessionClosure.ID(), SessionClosure.ID()]
+    let commands = [
+      PendingCookingSessionCommand.delete(
+        deletionID: SessionDeletion.ID(),
+        sessionID: sessionID,
+        deletedAt: Date(timeIntervalSince1970: 1_800_000_250)
+      ),
+      .restore(
+        commandID: RestoreCookingSessionIntention.ID(),
+        sessionID: sessionID,
+        restoredAt: Date(timeIntervalSince1970: 1_800_000_251),
+        observedDeletionIDs: deletionIDs
+      ),
+      .resolveClosure(
+        factID: SessionFact.ID(),
+        sessionID: sessionID,
+        authoredAt: Date(timeIntervalSince1970: 1_800_000_252),
+        selectedClosureID: closureIDs[1],
+        observedClosureIDs: closureIDs
+      ),
+    ]
+
+    DefaultsCookingSessionPresentationStore(defaults: defaults).pendingCommands = commands
+
+    XCTAssertEqual(
+      DefaultsCookingSessionPresentationStore(defaults: defaults).pendingCommands,
+      commands
+    )
+  }
+
   func testSlice14SingleCommandDecodesAsOneItemOutbox() throws {
     let suiteName = "CookingSessionPresentationStoreTests-\(UUID().uuidString)"
     let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))

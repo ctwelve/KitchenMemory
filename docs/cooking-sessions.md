@@ -184,6 +184,20 @@ deletion evidence actually observed. Deleted Items and Recovery remain separate
 surfaces. Physical pruning, Empty Deleted Items, expiry, and permanent erasure
 require a later dependency-aware contract.
 
+In the application, the ordinary action is named **Delete**. It asks for
+confirmation, warns when known later Sessions descend from the selected Session,
+and leaves those descendants, their Recipes, Entries, Closure, snapshot, and
+Facts intact. Deleted Items preserves whether a Session was Active, Stopped, or
+Finished. A concurrent Delete and Restore stays there as **Needs Attention**;
+incomplete deletion evidence appears as **Waiting for Session Data** and can be
+retried after synchronization brings more evidence.
+
+Recovery is reserved for evidence that cannot safely become an ordinary or
+deleted Session: logical-identity collisions, malformed or cross-Session
+evidence, and competing Closures. Competing Closure resolution is offered only
+when every observed candidate is complete. Selecting one records another
+immutable piece of evidence; it does not rewrite or discard the alternatives.
+
 ## Deferred work
 
 The following do not belong to the 0.2 flow:

@@ -1,6 +1,249 @@
 {
   "sourceLanguage" : "en-US",
   "strings" : {
+    "deleted.items.empty-message" : {
+      "comment" : "Deleted Items empty-state explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Deleted cooking sessions will appear here until you restore them." } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Las sesiones de cocina eliminadas aparecerán aquí hasta que las restaures." } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Les séances de cuisine supprimées apparaîtront ici jusqu’à leur restauration." } }
+      }
+    },
+    "deleted.items.empty-title" : {
+      "comment" : "Deleted Items empty-state title.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "No Deleted Items" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "No hay elementos eliminados" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Aucun élément supprimé" } }
+      }
+    },
+    "deleted.items.needs-attention" : {
+      "comment" : "Status for concurrent delete and restore evidence.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Needs Attention" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Requiere atención" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Attention requise" } }
+      }
+    },
+    "deleted.items.retention-message" : {
+      "comment" : "Explains reversible deletion without storage vocabulary.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Deleted items stay recoverable and keep their original cooking state. Emptying Deleted Items is not available yet." } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Los elementos eliminados se pueden recuperar y conservan su estado de cocina original. Aún no es posible vaciar Elementos eliminados." } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Les éléments supprimés restent récupérables et conservent leur état de cuisine. Il n’est pas encore possible de vider les éléments supprimés." } }
+      }
+    },
+    "deleted.items.session-fallback" : {
+      "comment" : "Fallback title when a deleted session snapshot has not arrived.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Cooking Session" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Sesión de cocina" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Séance de cuisine" } }
+      }
+    },
+    "deleted.items.title" : {
+      "comment" : "Title for reversible deleted items.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Deleted Items" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Elementos eliminados" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Éléments supprimés" } }
+      }
+    },
+    "deleted.items.waiting" : {
+      "comment" : "Status for deleted evidence awaiting dependencies.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Waiting for Session Data" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Esperando datos de la sesión" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "En attente des données de la séance" } }
+      }
+    },
+    "recovery.closure-confirmation-message" : {
+      "comment" : "Explains that Closure selection preserves evidence.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Kitchen Memory will keep every observed finish record and use this selection when rebuilding the session." } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Kitchen Memory conservará cada registro de finalización observado y usará esta selección al reconstruir la sesión." } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Kitchen Memory conservera chaque fin observée et utilisera ce choix pour reconstruire la séance." } }
+      }
+    },
+    "recovery.closure-confirmation-title" : {
+      "comment" : "Confirmation title for choosing among competing session Closures.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Use This Finish?" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "¿Usar esta finalización?" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Utiliser cette fin?" } }
+      }
+    },
+    "recovery.closure-selection-action" : {
+      "comment" : "Action confirming a competing Closure selection.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Use This Finish" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Usar esta finalización" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Utiliser cette fin" } }
+      }
+    },
+    "recovery.closure-selection-title" : {
+      "comment" : "Heading above complete competing Closure choices.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Choose the finish that matches what happened" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Elige la finalización que coincida con lo que ocurrió" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Choisissez la fin qui correspond à ce qui s’est passé" } }
+      }
+    },
+    "recovery.competing-closures-message" : {
+      "comment" : "Explains competing finish evidence.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "This session has more than one complete finish. Choose one only if it matches what happened." } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Esta sesión tiene más de una finalización completa. Elige una solo si coincide con lo que ocurrió." } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Cette séance a plusieurs fins complètes. Choisissez-en une seulement si elle correspond à ce qui s’est passé." } }
+      }
+    },
+    "recovery.empty-message" : {
+      "comment" : "Recovery empty-state explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Sessions that need more data or a careful choice will appear here." } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Las sesiones que necesiten más datos o una decisión cuidadosa aparecerán aquí." } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Les séances qui nécessitent plus de données ou un choix attentif apparaîtront ici." } }
+      }
+    },
+    "recovery.empty-title" : {
+      "comment" : "Recovery empty-state title.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Nothing Needs Recovery" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Nada necesita recuperación" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Aucune récupération requise" } }
+      }
+    },
+    "recovery.evidence-title" : {
+      "comment" : "Title for a session with positive evidence invariant violations.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Session Needs Recovery" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "La sesión necesita recuperación" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "La séance doit être récupérée" } }
+      }
+    },
+    "recovery.invariant-message" : {
+      "comment" : "Safe next action for malformed or conflicting evidence.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "The available session evidence does not safely agree. Nothing was discarded. Try again after synchronization brings any remaining data." } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "La evidencia disponible de la sesión no concuerda de forma segura. No se descartó nada. Inténtalo de nuevo después de que la sincronización aporte los datos restantes." } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Les éléments disponibles de la séance ne concordent pas de façon sûre. Rien n’a été supprimé. Réessayez après la synchronisation des données restantes." } }
+      }
+    },
+    "recovery.message" : {
+      "comment" : "Recovery destination introduction.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "These sessions are kept out of ordinary history until their evidence is complete and safe to rebuild." } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Estas sesiones se mantienen fuera del historial normal hasta que su evidencia esté completa y sea seguro reconstruirlas." } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Ces séances restent hors de l’historique ordinaire jusqu’à ce que leurs éléments soient complets et sûrs à reconstruire." } }
+      }
+    },
+    "recovery.title" : {
+      "comment" : "Title for Cooking Session recovery.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Recovery" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Recuperación" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Récupération" } }
+      }
+    },
+    "recovery.waiting-message" : {
+      "comment" : "Explanation for an unavailable non-deleted session.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Some required session data has not arrived yet. Retry after synchronization; do not recreate or edit this session." } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Aún no han llegado algunos datos necesarios de la sesión. Vuelve a intentarlo después de sincronizar; no recrees ni edites esta sesión." } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Certaines données requises ne sont pas encore arrivées. Réessayez après la synchronisation; ne recréez ni ne modifiez cette séance." } }
+      }
+    },
+    "recovery.waiting-title" : {
+      "comment" : "Title for a session waiting for dependencies.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Waiting for Session Data" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Esperando datos de la sesión" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "En attente des données de la séance" } }
+      }
+    },
+    "session.delete-action" : {
+      "comment" : "User-facing reversible deletion action; do not use storage vocabulary.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Delete" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Eliminar" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Supprimer" } }
+      }
+    },
+    "session.delete-confirmation-message" : {
+      "comment" : "Standard reversible session deletion warning.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "This session will move to Deleted Items without changing whether it is Active, Stopped, or Finished. Its cooking record stays recoverable." } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Esta sesión se moverá a Elementos eliminados sin cambiar si está activa, detenida o finalizada. Su registro de cocina se podrá recuperar." } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Cette séance sera placée dans les éléments supprimés sans changer son état actif, arrêté ou terminé. Son historique restera récupérable." } }
+      }
+    },
+    "session.delete-confirmation-title" : {
+      "comment" : "Confirmation title for reversible session deletion.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Delete This Session?" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "¿Eliminar esta sesión?" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Supprimer cette séance?" } }
+      }
+    },
+    "session.delete-descendant-message" : {
+      "comment" : "Deletion warning when later sessions continue from this one.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Later cooking sessions continue from this one. They, their notes, and their captured recipes will stay intact. Only this session moves to Deleted Items, where it remains recoverable." } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Hay sesiones de cocina posteriores que continúan desde esta. Ellas, sus notas y sus recetas capturadas permanecerán intactas. Solo esta sesión se moverá a Elementos eliminados, donde seguirá disponible para recuperar." } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Des séances ultérieures continuent à partir de celle-ci. Elles, leurs notes et leurs recettes capturées resteront intactes. Seule cette séance sera placée dans les éléments supprimés, où elle restera récupérable." } }
+      }
+    },
+    "session.restore-action" : {
+      "comment" : "Action to causally restore observed deletion markers.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Restore" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Restaurar" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Restaurer" } }
+      }
+    },
+    "session.restore-confirmation-message" : {
+      "comment" : "Explains observed-only causal restoration.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Restore will resolve every deletion currently visible on this device. If another deletion arrives later, the session will remain in Deleted Items for your attention." } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Restaurar resolverá todas las eliminaciones visibles actualmente en este dispositivo. Si llega otra eliminación después, la sesión permanecerá en Elementos eliminados para que la revises." } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "La restauration résoudra toutes les suppressions actuellement visibles sur cet appareil. Si une autre suppression arrive plus tard, la séance restera dans les éléments supprimés afin d’être examinée." } }
+      }
+    },
+    "session.restore-confirmation-title" : {
+      "comment" : "Restore confirmation title.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Restore This Session?" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "¿Restaurar esta sesión?" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Restaurer cette séance?" } }
+      }
+    },
     "session.progress.ingredients" : {
       "comment" : "Heading for ingredient progress in a Cooking Session.",
       "extractionState" : "manual",

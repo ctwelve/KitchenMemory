@@ -72,6 +72,25 @@ public struct CookingSessions {
     }
   }
 
+  /// The complete locally observed deletion frontier that an explicit Restore
+  /// must resolve. The subsequent command revalidates this plan so evidence
+  /// arriving between presentation and acceptance cannot be silently ignored.
+  public func unresolvedDeletionIDs(
+    for sessionID: CookingSession.ID
+  ) throws -> [SessionDeletion.ID] {
+    let evidence = try requiredEvidence(id: sessionID)
+    let projected = SessionEvidenceProjector.project(evidence)
+    guard case let .session(session) = projected,
+          case .deleted = session.disposition
+    else { return [] }
+    let resolved = Set(evidence.restorations.map(\.deletionID))
+    return Dictionary(grouping: evidence.deletions, by: \SessionDeletionEvidence.id)
+      .compactMap { $0.value.first }
+      .filter { !resolved.contains($0.id) }
+      .map(\.id)
+      .sorted { $0.rawValue.uuidString < $1.rawValue.uuidString }
+  }
+
   public func start(
     _ intention: StartCookingSessionIntention
   ) throws -> CookingSessionCommandResult {

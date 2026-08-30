@@ -170,6 +170,7 @@ struct FinishedCookingSessionView: View {
   @Bindable var model: CookingSessionPresentationModel
   let session: CookingSessionProjection
   @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+  @State private var isShowingDeleteConfirmation = false
 
   var body: some View {
     GeometryReader { geometry in
@@ -195,6 +196,19 @@ struct FinishedCookingSessionView: View {
           .background(.bar)
       }
       .background(Color("AppBackground"))
+      .confirmationDialog(
+        .sessionDeleteConfirmationTitle,
+        isPresented: $isShowingDeleteConfirmation,
+        titleVisibility: .visible
+      ) {
+        Button(.sessionDeleteAction, role: .destructive) {
+          model.deleteSession(session.id)
+        }
+        .accessibilityIdentifier("confirm-delete-session")
+        Button(.actionCancel, role: .cancel) {}
+      } message: {
+        Text(deleteConfirmationMessage)
+      }
     }
   }
 
@@ -242,7 +256,17 @@ struct FinishedCookingSessionView: View {
       }
       .buttonStyle(.borderedProminent)
       .accessibilityIdentifier("continue-session")
+      Button(.sessionDeleteAction, role: .destructive) {
+        isShowingDeleteConfirmation = true
+      }
+      .accessibilityIdentifier("delete-session")
     }
+  }
+
+  private var deleteConfirmationMessage: LocalizedStringResource {
+    model.knownDescendantCount(of: session.id) > 0
+      ? .sessionDeleteDescendantMessage
+      : .sessionDeleteConfirmationMessage
   }
 
   private func lineageIdentifier(_ title: LocalizedStringResource, id: UUID) -> some View {

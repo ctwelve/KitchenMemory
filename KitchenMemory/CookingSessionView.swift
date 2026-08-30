@@ -30,6 +30,7 @@ struct CookingSessionView: View {
 
   @State private var isShowingFinishConfirmation = false
   @State private var isShowingDraftFinishOptions = false
+  @State private var isShowingDeleteConfirmation = false
   @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
   var body: some View {
@@ -111,6 +112,19 @@ struct CookingSessionView: View {
       } message: {
         Text(.sessionFinishDraftMessage)
       }
+      .confirmationDialog(
+        .sessionDeleteConfirmationTitle,
+        isPresented: $isShowingDeleteConfirmation,
+        titleVisibility: .visible
+      ) {
+        Button(.sessionDeleteAction, role: .destructive) {
+          model.deleteSession(session.id)
+        }
+        .accessibilityIdentifier("confirm-delete-session")
+        Button(.actionCancel, role: .cancel) {}
+      } message: {
+        Text(deleteConfirmationMessage)
+      }
     }
   }
 
@@ -140,7 +154,18 @@ struct CookingSessionView: View {
         isShowingFinishConfirmation = true
       }
       .accessibilityIdentifier("finish-session")
+
+      Button(.sessionDeleteAction, role: .destructive) {
+        isShowingDeleteConfirmation = true
+      }
+      .accessibilityIdentifier("delete-session")
     }
+  }
+
+  private var deleteConfirmationMessage: LocalizedStringResource {
+    model.knownDescendantCount(of: session.id) > 0
+      ? .sessionDeleteDescendantMessage
+      : .sessionDeleteConfirmationMessage
   }
 
   private func copyDraftThenFinish() {

@@ -191,6 +191,22 @@ ordinary inline `Data`, and no relationships, uniqueness constraints, or local
 indexes. Repository validation prevents placeholders or partial evidence from
 becoming ordinary state. V1 and V2 model definitions remain unchanged.
 
+V3 Session deletion uses the same explicit causal principle without reusing the
+Recipe-reset mechanism. Delete appends a `SessionDeletionRecord`; Restore appends
+one `SessionDeletionResolutionRecord` for each unresolved deletion marker the
+device has actually observed. CloudKit may deliver roots, Facts, Closures,
+deletions, and resolutions in any order. Missing dependencies therefore wait
+for more Session data, while collisions and invariant violations remain in the
+separate Recovery destination. Neither a successful CloudKit event nor absence
+of a row authorizes restoration, and no relationship cascade removes a Recipe,
+source Session, continuation, Fact, Closure, or snapshot.
+
+Deleted Session evidence has no automatic expiry or pruning in 0.2. It remains
+in the person's private local store and, when enabled, private iCloud database
+so Restore and deterministic reconstruction remain possible. Empty Deleted
+Items and permanent erasure require a later contract that can prove dependency
+safety across asynchronously participating devices.
+
 ## Migration authority
 
 Kitchen Memory does not infer whether a migration ran by repeatedly examining
