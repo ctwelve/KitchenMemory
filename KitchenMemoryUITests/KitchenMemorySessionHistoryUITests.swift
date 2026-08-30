@@ -58,6 +58,8 @@ extension KitchenMemoryUITests {
     let recipeRow = app.descendants(matching: .any)
       .matching(NSPredicate(format: "identifier BEGINSWITH %@", "recipe-row-"))
       .firstMatch
+    revealSidebar(in: app, exposing: recipeRow)
+    XCTAssertTrue(recipeRow.waitForExistence(timeout: 5))
     activate(recipeRow)
     XCTAssertTrue(app.buttons["recipe-session-history"].waitForExistence(timeout: 5))
     activate(app.buttons["recipe-session-history"])
@@ -67,23 +69,28 @@ extension KitchenMemoryUITests {
   @MainActor
   private func openSessionHistory(in app: XCUIApplication) {
     let destination = app.descendants(matching: .any)["sessions-destination"]
+    revealSidebar(in: app, exposing: destination)
+    XCTAssertTrue(destination.waitForExistence(timeout: 5))
+    activate(destination)
+  }
+
+  @MainActor
+  private func revealSidebar(in app: XCUIApplication, exposing element: XCUIElement) {
 #if os(iOS)
-    if !destination.waitForExistence(timeout: 2) {
+    if !element.waitForExistence(timeout: 2) {
       let backButton = app.buttons["BackButton"]
       if backButton.waitForExistence(timeout: 3) {
         activate(backButton)
       }
     }
 #else
-    if !destination.waitForExistence(timeout: 2) {
+    if !element.waitForExistence(timeout: 2) {
       let toggle = app.buttons["toggle-sidebar"]
       if toggle.waitForExistence(timeout: 3) {
         activate(toggle)
       }
     }
 #endif
-    XCTAssertTrue(destination.waitForExistence(timeout: 5))
-    activate(destination)
   }
 
   @MainActor
