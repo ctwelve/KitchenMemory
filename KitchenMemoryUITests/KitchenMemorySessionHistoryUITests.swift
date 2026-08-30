@@ -75,25 +75,6 @@ extension KitchenMemoryUITests {
   }
 
   @MainActor
-  private func revealSidebar(in app: XCUIApplication, exposing element: XCUIElement) {
-#if os(iOS)
-    if !element.waitForExistence(timeout: 2) {
-      let backButton = app.buttons["BackButton"]
-      if backButton.waitForExistence(timeout: 3) {
-        activate(backButton)
-      }
-    }
-#else
-    if !element.waitForExistence(timeout: 2) {
-      let toggle = app.buttons["toggle-sidebar"]
-      if toggle.waitForExistence(timeout: 3) {
-        activate(toggle)
-      }
-    }
-#endif
-  }
-
-  @MainActor
   private func openFirstRecipeAndStart(in app: XCUIApplication) {
     let recipeRow = app.descendants(matching: .any)
       .matching(NSPredicate(format: "identifier BEGINSWITH %@", "recipe-row-"))
