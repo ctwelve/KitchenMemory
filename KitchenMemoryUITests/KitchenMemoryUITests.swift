@@ -294,7 +294,9 @@ extension KitchenMemoryUITests {
     let finish = app.buttons["finish-session"]
     XCTAssertTrue(finish.waitForExistence(timeout: 5))
     activate(finish)
-    let confirmation = app.buttons["confirm-finish-session"]
+    // iOS exposes the SwiftUI alert action through nested button wrappers that
+    // share one identifier; either wrapper activates the same native action.
+    let confirmation = app.buttons["confirm-finish-session"].firstMatch
     XCTAssertTrue(confirmation.waitForExistence(timeout: 3))
     activate(confirmation)
     XCTAssertFalse(app.buttons["finish-session"].waitForExistence(timeout: 3))
