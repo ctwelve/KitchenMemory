@@ -9,6 +9,15 @@ require "minitest/autorun"
 require_relative "../check-project-structure"
 
 class CheckProjectStructureTest < Minitest::Test
+  def test_application_launch_action_uses_develop_configuration
+    assert_equal(
+      "Develop",
+      KitchenMemory::ProjectStructure::SCHEME_ACTION_CONFIGURATIONS
+        .fetch("KitchenMemory")
+        .fetch("LaunchAction")
+    )
+  end
+
   class Fixture
     attr_reader :plans, :prebuild_phase_ids, :project, :schemes, :source_phase_ids, :target_ids
 
