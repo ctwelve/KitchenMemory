@@ -69,11 +69,11 @@ before they cross Logic. Independent progress and scale actions may accumulate
 without replacing one another. Retries preserve order and reuse the same
 Session, Fact, or Closure identity after an interruption or ambiguous failure;
 each item normally clears only when Logic returns its locally durable accepted
-projection. The typed terminal exception is a submitted Entry that Logic
-definitively rejects because its source Session is already Finished: only that
-identity clears, while the exact draft remains local for explicit continuation,
-confirmed copy, or discard. The outbox is not synchronized and does not imply
-that another device has received the evidence.
+projection. The typed terminal exception is a command that Logic definitively
+rejects because its source Session is already Finished: only that now-impossible
+identity clears. Any exact Entry draft remains separately local for explicit
+continuation, confirmed copy, or discard. The outbox is not synchronized and
+does not imply that another device has received the evidence.
 
 ## Cooking interaction
 

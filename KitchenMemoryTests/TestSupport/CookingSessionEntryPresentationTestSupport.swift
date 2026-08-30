@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 @testable import KitchenMemory
+import Foundation
 import KitchenKit
 
 enum AmbiguousEntryError: Error {
@@ -106,7 +107,7 @@ final class RemoteFinishDuringSubmitService: CookingSessionServing {
 
   func perform(_ intention: CookingSessionIntention) throws -> CookingSessionCommandResult {
     switch intention {
-    case .submitEntry:
+    case .submitEntry, .progress:
       if isRemotelyFinished {
         return .attention(.commandNotAllowed(lifecycle: .finished))
       }
@@ -119,27 +120,6 @@ final class RemoteFinishDuringSubmitService: CookingSessionServing {
     default:
       throw AmbiguousEntryError.unexpectedCommand
     }
-  }
-}
-
-@MainActor
-final class ConflictResolutionService: CookingSessionServing {
-  var session: CookingSessionProjection
-  private(set) var intentions: [CookingSessionIntention] = []
-
-  init(session: CookingSessionProjection) {
-    self.session = session
-  }
-
-  func sessions() -> [SessionProjectionResult] { [.session(session)] }
-
-  func start(_ intention: StartCookingSessionIntention) throws -> CookingSessionCommandResult {
-    throw AmbiguousEntryError.unexpectedCommand
-  }
-
-  func perform(_ intention: CookingSessionIntention) throws -> CookingSessionCommandResult {
-    intentions.append(intention)
-    return .accepted(CookingSessionProjection(id: session.id, snapshot: session.snapshot))
   }
 }
 
@@ -160,93 +140,46 @@ final class RecordingEntryStore: CookingSessionPresentationStoring {
   var events: [Event] = []
 }
 
-struct ConflictedEntryFixture {
-  let sessionID = CookingSession.ID()
-  let entryID = SessionEntry.ID()
-  let ingredientID = SessionIngredient.ID()
-  let instructionID = SessionInstruction.ID()
-  let snapshot: ExecutionSnapshot
-  let projection: CookingSessionProjection
-
-  init() {
-    snapshot = conflictedEntrySnapshot(
-      ingredientID: ingredientID,
-      instructionID: instructionID
-    )
-    projection = conflictedEntryProjection(
-      sessionID: sessionID,
-      entryID: entryID,
-      ingredientID: ingredientID,
-      instructionID: instructionID,
-      snapshot: snapshot
-    )
-  }
-}
-
-private func conflictedEntrySnapshot(
-  ingredientID: SessionIngredient.ID,
-  instructionID: SessionInstruction.ID
-) -> ExecutionSnapshot {
-  ExecutionSnapshot(
-    title: "Soup",
-    ingredientSections: [
-      SessionIngredientSection(
-        title: nil,
-        ingredients: [
-          SessionIngredient(
-            id: ingredientID,
-            sourceIngredientID: RecipeIngredient.ID(),
-            value: RecipeIngredient(originalText: "1 lime")
-          ),
-        ]
-      ),
-    ],
-    instructionSections: [
-      SessionInstructionSection(
-        title: nil,
-        steps: [
-          SessionInstruction(
-            id: instructionID,
-            sourceInstructionID: InstructionStep.ID(),
-            value: InstructionStep(text: "Simmer")
-          ),
-        ]
-      ),
-    ]
-  )
-}
-
-private func conflictedEntryProjection(
+func concurrentSessionFact(
+  id: SessionFact.ID = SessionFact.ID(),
   sessionID: CookingSession.ID,
-  entryID: SessionEntry.ID,
-  ingredientID: SessionIngredient.ID,
-  instructionID: SessionInstruction.ID,
-  snapshot: ExecutionSnapshot
-) -> CookingSessionProjection {
-  CookingSessionProjection(
-    id: sessionID,
-    snapshot: snapshot,
-    conflicts: [
-      .entry(
-        entryID: entryID,
-        factIDs: [SessionFact.ID(), SessionFact.ID()],
-        values: [
-          .present(SessionEntry(
-            id: entryID,
-            target: .ingredient(ingredientID),
-            text: "More lime"
-          )),
-          .present(SessionEntry(
-            id: entryID,
-            target: .instruction(instructionID),
-            text: "More lime"
-          )),
-        ]
-      ),
-      .outcome(
-        factIDs: [SessionFact.ID(), SessionFact.ID()],
-        values: [.value(.coarse(.great)), .cleared]
-      ),
-    ]
+  kitchenID: Kitchen.ID,
+  head: SessionFact.ID,
+  kind: SessionFact.Kind,
+  target: SessionProgressTarget? = nil,
+  payload: SessionFactPayload
+) throws -> SessionFactEvidence {
+  let encodedHeads = CausalHeadsCodec.encode([head.rawValue])
+  let encodedPayload = try SessionFactPayloadCodec.encode(payload)
+  return SessionFactEvidence(
+    id: id,
+    sessionID: sessionID,
+    kitchenID: kitchenID,
+    kind: kind.rawValue,
+    targetSnapshotElementID: target.map(targetIdentifier),
+    authoredAt: Date(),
+    causalHeadsFormatVersion: encodedHeads.formatVersion,
+    causalHeadsData: encodedHeads.data,
+    payloadFormatVersion: encodedPayload.formatVersion,
+    payloadData: encodedPayload.data,
+    payloadDigest: encodedPayload.digest
   )
+}
+
+func decodedPayload(
+  in evidence: SessionEvidence,
+  factID: SessionFact.ID
+) throws -> SessionFactPayload? {
+  guard let fact = evidence.facts.first(where: { $0.id == factID }) else { return nil }
+  return try SessionFactPayloadCodec.decode(
+    formatVersion: fact.payloadFormatVersion,
+    data: fact.payloadData
+  )
+}
+
+private func targetIdentifier(_ target: SessionProgressTarget) -> UUID {
+  switch target {
+  case let .ingredient(id): id.rawValue
+  case let .instruction(id): id.rawValue
+  }
 }

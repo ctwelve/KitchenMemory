@@ -195,17 +195,33 @@ struct SessionEntryTargetPresentation {
   let snapshot: ExecutionSnapshot
 
   var options: [SessionEntryTargetOption] {
-    let ingredients = snapshot.ingredientSections.flatMap(\.ingredients).map {
-      SessionEntryTargetOption(
-        target: .ingredient($0.id),
-        label: $0.value.originalText
-      )
+    let ingredients = snapshot.ingredientSections.enumerated().flatMap { sectionPair in
+      let (sectionIndex, section) = sectionPair
+      return section.ingredients.enumerated().map { ingredientPair in
+        let (ingredientIndex, ingredient) = ingredientPair
+        return SessionEntryTargetOption(
+          target: .ingredient(ingredient.id),
+          label: String(localized: .sessionEntryTargetIngredient(
+            section: sectionIndex + 1,
+            position: ingredientIndex + 1,
+            label: ingredient.value.originalText
+          ))
+        )
+      }
     }
-    let instructions = snapshot.instructionSections.flatMap(\.steps).map {
-      SessionEntryTargetOption(
-        target: .instruction($0.id),
-        label: $0.value.name ?? $0.value.text
-      )
+    let instructions = snapshot.instructionSections.enumerated().flatMap { sectionPair in
+      let (sectionIndex, section) = sectionPair
+      return section.steps.enumerated().map { instructionPair in
+        let (instructionIndex, instruction) = instructionPair
+        return SessionEntryTargetOption(
+          target: .instruction(instruction.id),
+          label: String(localized: .sessionEntryTargetInstruction(
+            section: sectionIndex + 1,
+            position: instructionIndex + 1,
+            label: instruction.value.name ?? instruction.value.text
+          ))
+        )
+      }
     }
     return ingredients + instructions
   }

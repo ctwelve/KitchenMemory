@@ -307,6 +307,24 @@
         "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Étape associée" } }
       }
     },
+    "session.entry.target.ingredient" : {
+      "comment" : "Stable Session Entry target label with snapshot section and ingredient position.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Ingredient %1$(section)lld.%2$(position)lld — %3$(label)@" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Ingrediente %1$(section)lld.%2$(position)lld — %3$(label)@" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Ingrédient %1$(section)lld.%2$(position)lld — %3$(label)@" } }
+      }
+    },
+    "session.entry.target.instruction" : {
+      "comment" : "Stable Session Entry target label with snapshot section and instruction position.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Instruction %1$(section)lld.%2$(position)lld — %3$(label)@" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Instrucción %1$(section)lld.%2$(position)lld — %3$(label)@" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Instruction %1$(section)lld.%2$(position)lld — %3$(label)@" } }
+      }
+    },
     "session.entry.target.none" : {
       "comment" : "Choice for a Session Entry that is not targeted to an ingredient or instruction.",
       "extractionState" : "manual",

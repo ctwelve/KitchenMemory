@@ -209,10 +209,10 @@ ordered accepted-but-not-yet-confirmed command outbox live in an
 application-owned, device-local store. Commands are written there with their
 final stable identities before Logic is called and are normally removed in
 order only after Logic returns each locally durable accepted projection. One
-typed terminal exception applies when Logic definitively rejects a submitted
-Entry because its source Session is already Finished: that submitted identity
-clears while the exact draft remains local for explicit continuation, copy, or
-discard. The store
+typed terminal exception applies when Logic definitively rejects a command
+because its source Session is already Finished: that now-impossible identity
+clears while any exact Entry draft remains separately local for explicit
+continuation, copy, or discard. The store
 migrates Slice 14's single pending-command representation as a one-item outbox.
 Progress and complete working-scale replacements project optimistically from
 that queue while preserving the immutable snapshot as their base. Relaunch and

@@ -253,37 +253,39 @@ extension CookingSessionEntryPresentationTests {
     XCTAssertNil(model.detachedEntryDraft)
   }
 
-  func testEntryAndOutcomeConflictsCanBeResolvedWithCausalCommands() throws {
-    let fixture = ConflictedEntryFixture()
-    let service = ConflictResolutionService(session: fixture.projection)
+  func testRemoteFinishRetiresOtherIneligibleCommandsBeforeDraftContinuation() {
+    let sessionID = CookingSession.ID()
+    let service = RemoteFinishDuringSubmitService(sessionID: sessionID)
     let store = VolatileCookingSessionPresentationStore()
-    store.currentSessionID = fixture.sessionID
+    store.currentSessionID = sessionID
+    store.entryDrafts = [
+      CookingSessionEntryDraft(
+        sessionID: sessionID,
+        text: "Continue after progress retry",
+        target: nil
+      ),
+    ]
+    store.pendingCommands = [
+      .progress(
+        factID: SessionFact.ID(),
+        sessionID: sessionID,
+        authoredAt: Date(),
+        progress: SessionProgress(
+          target: .ingredient(SessionIngredient.ID()),
+          state: .ingredient(.accounted)
+        )
+      ),
+    ]
     let model = CookingSessionPresentationModel(sessions: service, store: store)
     model.loadIfNeeded()
 
-    let targetPresentation = SessionEntryTargetPresentation(snapshot: fixture.snapshot)
-    XCTAssertEqual(targetPresentation.label(for: .ingredient(fixture.ingredientID)), "1 lime")
-    XCTAssertEqual(targetPresentation.label(for: .instruction(fixture.instructionID)), "Simmer")
-    XCTAssertTrue(model.reviseEntry(
-      fixture.entryID,
-      text: "More lime",
-      target: .instruction(fixture.instructionID)
-    ))
-    service.session = fixture.projection
+    XCTAssertEqual(store.pendingCommands.count, 1)
+    service.isRemotelyFinished = true
     model.reloadAfterExternalStoreChange()
-    XCTAssertTrue(model.clearOutcome())
 
-    XCTAssertEqual(service.intentions.count, 2)
-    guard case let .reviseEntry(_, revisedID, text, target) = service.intentions[0] else {
-      XCTFail("Expected entry conflict resolution")
-      return
-    }
-    XCTAssertEqual(revisedID, fixture.entryID)
-    XCTAssertEqual(text, "More lime")
-    XCTAssertEqual(target, .instruction(fixture.instructionID))
-    guard case .clearOutcome = service.intentions[1] else {
-      XCTFail("Expected outcome conflict resolution")
-      return
-    }
+    XCTAssertTrue(store.pendingCommands.isEmpty)
+    XCTAssertEqual(model.detachedEntryDraft?.text, "Continue after progress retry")
+    XCTAssertTrue(model.continueDetachedEntryDraft())
+    XCTAssertEqual(model.currentEntryDraft?.text, "Continue after progress retry")
   }
 }

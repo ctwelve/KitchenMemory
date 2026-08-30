@@ -222,11 +222,12 @@ extension CookingSessionPresentationModel {
       upsert(session)
       applySelection(for: session, pending: pending)
       return true
-    case .entryRejectedByFinishedSource:
+    case .rejectedByFinishedSource:
       guard pendingCommands.first == pending else { return false }
-      // Logic has definitively rejected this one submitted identity because
-      // its source Session is already Finished. Clear only that terminal
-      // command; the exact draft remains local for explicit resolution.
+      // Logic has definitively rejected this specific identity because its
+      // source Session is already Finished. The command can never become
+      // eligible on retry, while any exact local draft remains separately
+      // durable for explicit continuation, copy, or discard.
       pendingCommands.removeFirst()
       persistPendingCommands()
       issue = nil
@@ -356,7 +357,7 @@ extension CookingSessionPresentationModel {
 
 private enum PendingCookingSessionResolution {
   case accepted(CookingSessionProjection)
-  case entryRejectedByFinishedSource
+  case rejectedByFinishedSource
   case attention(CookingSessionAttention)
 
   init(
@@ -366,8 +367,8 @@ private enum PendingCookingSessionResolution {
     switch (result, pending) {
     case let (.accepted(session), _):
       self = .accepted(session)
-    case (.attention(.commandNotAllowed(lifecycle: .finished)), .submitEntry):
-      self = .entryRejectedByFinishedSource
+    case (.attention(.commandNotAllowed(lifecycle: .finished)), _):
+      self = .rejectedByFinishedSource
     case let (.attention(attention), _):
       self = .attention(attention)
     }
