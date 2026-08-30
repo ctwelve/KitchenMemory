@@ -166,7 +166,7 @@ final class CookingSessionsStartTests: XCTestCase {
         sessionID: sessionID,
         authoredAt: Date(timeIntervalSince1970: 125)
       ),
-      SessionWorkingScale(exactScale: RationalQuantity(numerator: 2))
+      SessionWorkingScale(workingYield: RecipeYield(originalText: "3 bowls"))
     ))) {
       XCTAssertEqual($0 as? CookingSessionLogicError, .invalidIntention)
     }

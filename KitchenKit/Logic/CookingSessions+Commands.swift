@@ -382,7 +382,8 @@ extension CookingSessions {
       let exactIsValid = scale.exactScale.map {
         $0.normalized != nil && $0.numerator > 0
       } ?? true
-      return scale.workingYield != nil || scale.exactScale != nil
+      let hasScaleValue = scale.workingYield != nil || scale.exactScale != nil
+      return hasScaleValue
         && Set(quantityIDs).count == quantityIDs.count
         && Set(quantityIDs) == expectedQuantityIDs
         && exactIsValid

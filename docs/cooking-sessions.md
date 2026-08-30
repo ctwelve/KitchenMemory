@@ -64,11 +64,13 @@ sleeping, terminating, and relaunching only change or restore presentation
 selection. Stop, Resume, and confirmed Finish are the only shell actions that
 submit lifecycle intentions.
 
-The shell retains one accepted intention in a device-local outbox before it
-crosses Logic. Retries reuse the same Session, Fact, or Closure identity after
-an interruption or ambiguous failure, and the outbox clears only when Logic
-returns the locally durable accepted projection. It is not synchronized and it
-does not imply that another device has received the evidence.
+The presentation retains accepted intentions in an ordered device-local outbox
+before they cross Logic. Independent progress and scale actions may accumulate
+without replacing one another. Retries preserve order and reuse the same
+Session, Fact, or Closure identity after an interruption or ambiguous failure;
+each item clears only when Logic returns its locally durable accepted
+projection. The outbox is not synchronized and does not imply that another
+device has received the evidence.
 
 ## Cooking interaction
 
@@ -87,10 +89,20 @@ check means “accounted for during this cook,” not precise pantry consumption
 Conflicting progress uses a nonhiding ordinary presentation until the person
 resolves it.
 
-The representative interface recomposes for available container space rather
-than platform identity. It favors what to do next, rapid independent intentions,
-large readable content, native accessibility semantics, and recoverable local
-drafts without turning the cooking surface into Recipe editing.
+The 0.1.4 interface reads only the retained Execution Snapshot and Session
+projection. It preserves authored section and row order, marks the first open
+instruction as what is up next, and leaves every completed or skipped step
+available to reopen. Ingredient progress remains the intentionally modest
+accounted/open distinction. Working-yield changes produce a complete
+Session-owned scale replacement by recalculating from the immutable snapshot,
+never from a previously scaled value or the current Recipe.
+
+The same semantic content recomposes for available container space rather than
+platform identity: Compact below 540 points, Regular from 540 points, and Wide
+from 900 points. Accessibility Dynamic Type sizes retain Compact reading order
+at every width. Buttons, menus, headings, state values, and stable
+Session-owned identifiers provide native keyboard and assistive-technology
+semantics without creating a parallel platform-specific interaction.
 
 ## Session Entries and Outcome
 

@@ -1,6 +1,150 @@
 {
   "sourceLanguage" : "en-US",
   "strings" : {
+    "session.progress.ingredients" : {
+      "comment" : "Heading for ingredient progress in a Cooking Session.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Ingredients" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Ingredientes" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Ingrédients" } }
+      }
+    },
+    "session.progress.instructions" : {
+      "comment" : "Heading for instruction progress in a Cooking Session.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Instructions" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Instrucciones" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Instructions" } }
+      }
+    },
+    "session.progress.up-next" : {
+      "comment" : "Label on the first open instruction in authored order.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Up next" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "A continuación" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "À suivre" } }
+      }
+    },
+    "session.progress.ingredient.accounted" : {
+      "comment" : "Accessibility value for an accounted-for session ingredient.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Accounted for" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Contabilizado" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Pris en compte" } }
+      }
+    },
+    "session.progress.ingredient.open" : {
+      "comment" : "Accessibility value for an open session ingredient.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Open" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Pendiente" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "À faire" } }
+      }
+    },
+    "session.progress.instruction.completed" : {
+      "comment" : "Accessibility value for a completed session instruction.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Completed" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Completado" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Terminée" } }
+      }
+    },
+    "session.progress.instruction.skipped" : {
+      "comment" : "Accessibility value and action label for a skipped session instruction.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Skipped" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Omitido" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Passée" } }
+      }
+    },
+    "session.progress.instruction.open" : {
+      "comment" : "Accessibility value for an open session instruction.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Open" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Pendiente" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "À faire" } }
+      }
+    },
+    "session.progress.instruction.complete" : {
+      "comment" : "Action that marks an open session instruction complete.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Complete" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Completar" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Terminer" } }
+      }
+    },
+    "session.progress.instruction.skip" : {
+      "comment" : "Action that marks an open session instruction skipped.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Skip" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Omitir" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Passer" } }
+      }
+    },
+    "session.progress.instruction.reopen" : {
+      "comment" : "Action that returns a completed or skipped instruction to open.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Reopen" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Reabrir" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Rouvrir" } }
+      }
+    },
+    "session.progress.instruction.more-actions" : {
+      "comment" : "Accessibility label for the menu of instruction progress actions.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "More instruction actions" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Más acciones de instrucción" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Autres actions pour l’instruction" } }
+      }
+    },
+    "session.progress.empty.ingredients" : {
+      "comment" : "Message when a Cooking Session snapshot has no ingredients.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "No ingredients in this snapshot." } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "No hay ingredientes en esta captura." } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Aucun ingrédient dans cet instantané." } }
+      }
+    },
+    "session.progress.empty.instructions" : {
+      "comment" : "Message when a Cooking Session snapshot has no instructions.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "No instructions in this snapshot." } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "No hay instrucciones en esta captura." } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Aucune instruction dans cet instantané." } }
+      }
+    },
+    "session.scale.section" : {
+      "comment" : "Heading for the working scale retained by a Cooking Session.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Cooking yield" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Rendimiento de cocción" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Rendement de cuisson" } }
+      }
+    },
+    "session.scale.note" : {
+      "comment" : "Explains that session scaling does not edit the maintained recipe.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "This changes only this Cooking Session. The saved recipe stays unchanged." } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Esto cambia solo esta sesión de cocina. La receta guardada permanece sin cambios." } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Cela modifie seulement cette séance de cuisine. La recette enregistrée reste inchangée." } }
+      }
+    },
     "session.action.finish" : {
       "comment" : "Action that asks to finish the current Cooking Session.",
       "extractionState" : "manual",

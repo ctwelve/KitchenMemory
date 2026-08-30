@@ -13,6 +13,24 @@ public struct RecipeScalingState: Equatable, Sendable {
     workingYield = recipeYield?.scalingBases.first?.quantity
   }
 
+  /// Restores the complete, explicit scale retained by a Cooking Session.
+  /// The exact multiplier selects the authored basis when a range has more
+  /// than one valid base; mismatched state safely falls back to the snapshot.
+  public init(
+    recipeYield: RecipeYield?,
+    workingYield: RationalQuantity?,
+    exactScale: RationalQuantity?
+  ) {
+    self.init(recipeYield: recipeYield)
+    guard let workingYield, let exactScale,
+          let index = bases.firstIndex(where: { basis in
+            RecipeScale(baseYield: basis.quantity, workingYield: workingYield)?.multiplier
+              == exactScale
+          }) else { return }
+    selectedBasisIndex = index
+    self.workingYield = workingYield
+  }
+
   public var bases: [RecipeYieldBasis] { recipeYield?.scalingBases ?? [] }
 
   public var selectedBasis: RecipeYieldBasis? {

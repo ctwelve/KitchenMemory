@@ -18,17 +18,19 @@ final class CookingSessionPresentationStoreTests: XCTestCase {
     let store = DefaultsCookingSessionPresentationStore(defaults: defaults)
 
     store.currentSessionID = sessionID
-    store.pendingCommand = .stop(
-      factID: factID,
-      sessionID: sessionID,
-      authoredAt: authoredAt
-    )
+    store.pendingCommands = [
+      .stop(
+        factID: factID,
+        sessionID: sessionID,
+        authoredAt: authoredAt
+      ),
+    ]
     let reopened = DefaultsCookingSessionPresentationStore(defaults: defaults)
 
     XCTAssertEqual(reopened.currentSessionID, sessionID)
     XCTAssertEqual(
-      reopened.pendingCommand,
-      .stop(factID: factID, sessionID: sessionID, authoredAt: authoredAt)
+      reopened.pendingCommands,
+      [.stop(factID: factID, sessionID: sessionID, authoredAt: authoredAt)]
     )
   }
 
@@ -38,17 +40,70 @@ final class CookingSessionPresentationStoreTests: XCTestCase {
     defer { defaults.removePersistentDomain(forName: suiteName) }
     let store = DefaultsCookingSessionPresentationStore(defaults: defaults)
     store.currentSessionID = CookingSession.ID()
-    store.pendingCommand = .finish(
-      closureID: SessionClosure.ID(),
-      sessionID: CookingSession.ID(),
-      finishedAt: Date(timeIntervalSince1970: 1_800_000_100)
-    )
+    store.pendingCommands = [
+      .finish(
+        closureID: SessionClosure.ID(),
+        sessionID: CookingSession.ID(),
+        finishedAt: Date(timeIntervalSince1970: 1_800_000_100)
+      ),
+    ]
 
     store.currentSessionID = nil
-    store.pendingCommand = nil
+    store.pendingCommands = []
     let reopened = DefaultsCookingSessionPresentationStore(defaults: defaults)
 
     XCTAssertNil(reopened.currentSessionID)
-    XCTAssertNil(reopened.pendingCommand)
+    XCTAssertTrue(reopened.pendingCommands.isEmpty)
+  }
+
+  func testOrderedOutboxSurvivesStoreRecreation() throws {
+    let suiteName = "CookingSessionPresentationStoreTests-\(UUID().uuidString)"
+    let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
+    defer { defaults.removePersistentDomain(forName: suiteName) }
+    let sessionID = CookingSession.ID()
+    let first = PendingCookingSessionCommand.progress(
+      factID: SessionFact.ID(),
+      sessionID: sessionID,
+      authoredAt: Date(timeIntervalSince1970: 1_800_000_200),
+      progress: SessionProgress(
+        target: .ingredient(SessionIngredient.ID()),
+        state: .ingredient(.accounted)
+      )
+    )
+    let second = PendingCookingSessionCommand.progress(
+      factID: SessionFact.ID(),
+      sessionID: sessionID,
+      authoredAt: Date(timeIntervalSince1970: 1_800_000_201),
+      progress: SessionProgress(
+        target: .instruction(SessionInstruction.ID()),
+        state: .instruction(.completed)
+      )
+    )
+    DefaultsCookingSessionPresentationStore(defaults: defaults).pendingCommands = [first, second]
+
+    XCTAssertEqual(
+      DefaultsCookingSessionPresentationStore(defaults: defaults).pendingCommands,
+      [first, second]
+    )
+  }
+
+  func testSlice14SingleCommandDecodesAsOneItemOutbox() throws {
+    let suiteName = "CookingSessionPresentationStoreTests-\(UUID().uuidString)"
+    let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
+    defer { defaults.removePersistentDomain(forName: suiteName) }
+    let legacy = PendingCookingSessionCommand.stop(
+      factID: SessionFact.ID(),
+      sessionID: CookingSession.ID(),
+      authoredAt: Date(timeIntervalSince1970: 1_800_000_300)
+    )
+    defaults.set(
+      try PropertyListEncoder().encode(legacy),
+      forKey: DefaultsCookingSessionPresentationStore.pendingCommandKey
+    )
+
+    XCTAssertEqual(
+      DefaultsCookingSessionPresentationStore(defaults: defaults).pendingCommands,
+      [legacy]
+    )
   }
 }

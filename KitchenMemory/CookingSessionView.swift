@@ -29,60 +29,46 @@ struct CookingSessionView: View {
   let session: CookingSessionProjection
 
   @State private var isShowingFinishConfirmation = false
+  @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
   var body: some View {
     let lifecycle = CookingSessionLifecyclePresentation(session.lifecycle)
     NavigationStack {
-      VStack(alignment: .leading, spacing: 24) {
-        VStack(alignment: .leading, spacing: 8) {
-          Text(session.snapshot.title)
-            .font(.largeTitle.bold())
-            .accessibilityHeading(.h1)
-            .accessibilityIdentifier("cooking-session-shell")
-          Label(lifecycle.title, systemImage: lifecycle.symbol)
-            .foregroundStyle(.secondary)
-            .accessibilityIdentifier("session-lifecycle")
-        }
+      GeometryReader { geometry in
+        let layoutMode = CookingSessionLayoutMode.resolve(
+          width: geometry.size.width,
+          usesAccessibilityTextSize: dynamicTypeSize.isAccessibilitySize
+        )
+        VStack(spacing: 0) {
+          ScrollView {
+            VStack(alignment: .leading, spacing: 24) {
+              VStack(alignment: .leading, spacing: 8) {
+                Text(session.snapshot.title)
+                  .font(.largeTitle.bold())
+                  .accessibilityHeading(.h1)
+                  .accessibilityIdentifier("cooking-session-shell")
+                Label(lifecycle.title, systemImage: lifecycle.symbol)
+                  .foregroundStyle(.secondary)
+                  .accessibilityIdentifier("session-lifecycle")
+              }
 
-        ContentUnavailableView {
-          Label(.sessionShellFoundationTitle, systemImage: "frying.pan")
-        } description: {
-          Text(.sessionShellFoundationMessage)
-        }
-
-        Spacer()
-
-        HStack {
-          Button(.sessionActionLeave) {
-            model.leaveCurrentSession()
-          }
-          .accessibilityIdentifier("leave-session")
-
-          Spacer()
-
-          if session.lifecycle == .active {
-            Button(.sessionActionStop) {
-              model.stopCurrentSession()
+              CookingSessionProgressView(
+                model: model,
+                session: session,
+                layoutMode: layoutMode
+              )
             }
-            .accessibilityIdentifier("stop-session")
-          } else if session.lifecycle == .stopped {
-            Button(.sessionActionResume) {
-              model.resumeCurrentSession()
-            }
-            .buttonStyle(.borderedProminent)
-            .accessibilityIdentifier("resume-session")
+            .frame(maxWidth: layoutMode == .wide ? 1_220 : 900, alignment: .leading)
+            .padding(28)
+            .frame(maxWidth: .infinity, alignment: .center)
           }
-
-          Button(.sessionActionFinish, role: .destructive) {
-            isShowingFinishConfirmation = true
-          }
-          .accessibilityIdentifier("finish-session")
+          lifecycleControls
+            .padding(.horizontal, 28)
+            .padding(.vertical, 16)
+            .background(.bar)
         }
+        .background(Color("AppBackground"))
       }
-      .frame(maxWidth: 760, maxHeight: .infinity, alignment: .leading)
-      .padding(28)
-      .frame(maxWidth: .infinity, maxHeight: .infinity)
-      .background(Color("AppBackground"))
       .navigationTitle(.sessionNavigationTitle)
       .alert(
         .sessionFinishConfirmationTitle,
@@ -96,6 +82,35 @@ struct CookingSessionView: View {
       } message: {
         Text(.sessionFinishConfirmationMessage)
       }
+    }
+  }
+
+  private var lifecycleControls: some View {
+    HStack {
+      Button(.sessionActionLeave) {
+        model.leaveCurrentSession()
+      }
+      .accessibilityIdentifier("leave-session")
+
+      Spacer()
+
+      if session.lifecycle == .active {
+        Button(.sessionActionStop) {
+          model.stopCurrentSession()
+        }
+        .accessibilityIdentifier("stop-session")
+      } else if session.lifecycle == .stopped {
+        Button(.sessionActionResume) {
+          model.resumeCurrentSession()
+        }
+        .buttonStyle(.borderedProminent)
+        .accessibilityIdentifier("resume-session")
+      }
+
+      Button(.sessionActionFinish, role: .destructive) {
+        isShowingFinishConfirmation = true
+      }
+      .accessibilityIdentifier("finish-session")
     }
   }
 }

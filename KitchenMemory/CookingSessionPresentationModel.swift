@@ -36,17 +36,18 @@ enum CookingSessionPresentationIssue: Equatable {
 @MainActor
 @Observable
 final class CookingSessionPresentationModel {
-  private let service: any CookingSessionServing
-  private let store: any CookingSessionPresentationStoring
+  let service: any CookingSessionServing
+  let store: any CookingSessionPresentationStoring
 
-  private(set) var sessions: [CookingSessionProjection] = []
+  var sessions: [CookingSessionProjection] = []
   private(set) var currentSessionID: CookingSession.ID?
-  private(set) var finishedSessionCount = 0
+  var finishedSessionCount = 0
   private(set) var unavailableSessionCount = 0
   private(set) var recoverySessionCount = 0
-  private(set) var issue: CookingSessionPresentationIssue?
-  private(set) var isShowingIssue = false
+  var issue: CookingSessionPresentationIssue?
+  var isShowingIssue = false
   private(set) var hasLoaded = false
+  var pendingCommands: [PendingCookingSessionCommand]
 
   init(
     sessions: CookingSessions,
@@ -55,6 +56,7 @@ final class CookingSessionPresentationModel {
     service = sessions
     self.store = store
     currentSessionID = store.currentSessionID
+    pendingCommands = store.pendingCommands
   }
 
   init(
@@ -64,20 +66,22 @@ final class CookingSessionPresentationModel {
     service = sessions
     self.store = store
     currentSessionID = store.currentSessionID
+    pendingCommands = store.pendingCommands
   }
 
   var currentSession: CookingSessionProjection? {
-    sessions.first { $0.id == currentSessionID }
+    guard let session = sessions.first(where: { $0.id == currentSessionID }) else { return nil }
+    return applyingPendingCommands(to: session)
   }
 
   var hasPendingCommand: Bool {
-    store.pendingCommand != nil
+    !pendingCommands.isEmpty
   }
 
   func loadIfNeeded() {
     guard !hasLoaded else { return }
-    if store.pendingCommand != nil {
-      retryPendingCommand()
+    if !pendingCommands.isEmpty {
+      retryPendingCommands()
     }
     reload()
     hasLoaded = true
@@ -85,56 +89,10 @@ final class CookingSessionPresentationModel {
 
   func reloadAfterExternalStoreChange() {
     guard hasLoaded else { return }
-    if store.pendingCommand != nil {
-      retryPendingCommand()
+    if !pendingCommands.isEmpty {
+      retryPendingCommands()
     }
     reload()
-  }
-
-  @discardableResult
-  func start(from recipe: StoredRecipe) -> Bool {
-    guard prepareForNewCommand() else { return false }
-    let pending = PendingCookingSessionCommand.start(
-      sessionID: CookingSession.ID(),
-      recipeID: recipe.recipe.id,
-      revisionID: recipe.revision.id,
-      startedAt: Date()
-    )
-    return stageAndPerform(pending)
-  }
-
-  @discardableResult
-  func stopCurrentSession() -> Bool {
-    guard let session = currentSession, session.lifecycle == .active,
-          prepareForNewCommand() else { return false }
-    return stageAndPerform(.stop(
-      factID: SessionFact.ID(),
-      sessionID: session.id,
-      authoredAt: Date()
-    ))
-  }
-
-  @discardableResult
-  func resumeCurrentSession() -> Bool {
-    guard let session = currentSession, session.lifecycle == .stopped,
-          prepareForNewCommand() else { return false }
-    return stageAndPerform(.resume(
-      factID: SessionFact.ID(),
-      sessionID: session.id,
-      authoredAt: Date()
-    ))
-  }
-
-  @discardableResult
-  func finishCurrentSession() -> Bool {
-    guard let session = currentSession,
-          session.lifecycle == .active || session.lifecycle == .stopped,
-          prepareForNewCommand() else { return false }
-    return stageAndPerform(.finish(
-      closureID: SessionClosure.ID(),
-      sessionID: session.id,
-      finishedAt: Date()
-    ))
   }
 
   @discardableResult
@@ -151,21 +109,9 @@ final class CookingSessionPresentationModel {
     return true
   }
 
-  func retryPendingCommand() {
-    guard let pending = store.pendingCommand else { return }
-    do {
-      let result = try perform(pending)
-      apply(result, for: pending)
-    } catch let logicError as CookingSessionLogicError {
-      present(.command(logicError))
-    } catch {
-      present(.read)
-    }
-  }
-
   func retryCurrentIssue() {
-    if store.pendingCommand != nil {
-      retryPendingCommand()
+    if !pendingCommands.isEmpty {
+      retryPendingCommands()
     } else {
       reload()
     }
@@ -173,73 +119,6 @@ final class CookingSessionPresentationModel {
 
   func dismissIssuePresentation() {
     isShowingIssue = false
-  }
-
-  private func prepareForNewCommand() -> Bool {
-    guard store.pendingCommand != nil else { return true }
-    retryPendingCommand()
-    return store.pendingCommand == nil
-  }
-
-  private func stageAndPerform(_ pending: PendingCookingSessionCommand) -> Bool {
-    store.pendingCommand = pending
-    retryPendingCommand()
-    return store.pendingCommand == nil
-  }
-
-  private func perform(
-    _ pending: PendingCookingSessionCommand
-  ) throws -> CookingSessionCommandResult {
-    switch pending {
-    case let .start(sessionID, recipeID, revisionID, startedAt):
-      try service.start(StartCookingSessionIntention(
-        sessionID: sessionID,
-        recipeID: recipeID,
-        recipeRevisionID: revisionID,
-        startedAt: startedAt
-      ))
-    case let .stop(factID, sessionID, authoredAt):
-      try service.perform(.stop(SessionFactIntention(
-        id: factID,
-        sessionID: sessionID,
-        authoredAt: authoredAt
-      )))
-    case let .resume(factID, sessionID, authoredAt):
-      try service.perform(.resume(SessionFactIntention(
-        id: factID,
-        sessionID: sessionID,
-        authoredAt: authoredAt
-      )))
-    case let .finish(closureID, sessionID, finishedAt):
-      try service.perform(.finish(FinishCookingSessionIntention(
-        closureID: closureID,
-        sessionID: sessionID,
-        finishedAt: finishedAt,
-        hasMeaningfulDraft: false
-      )))
-    }
-  }
-
-  private func apply(
-    _ result: CookingSessionCommandResult,
-    for pending: PendingCookingSessionCommand
-  ) {
-    switch result {
-    case let .accepted(session):
-      store.pendingCommand = nil
-      issue = nil
-      isShowingIssue = false
-      upsert(session)
-      if session.lifecycle == .finished {
-        sessions.removeAll { $0.id == session.id }
-        finishedSessionCount += 1
-        if currentSessionID == session.id { select(nil) }
-      } else {
-        select(pending.sessionID)
-      }
-    case let .attention(attention):
-      present(.attention(attention))
-    }
   }
 
   private func reload() {
@@ -270,7 +149,7 @@ final class CookingSessionPresentationModel {
       unavailableSessionCount = unavailableCount
       recoverySessionCount = recoveryCount
       if let currentSessionID, finishedIDs.contains(currentSessionID) { select(nil) }
-      if store.pendingCommand == nil {
+      if pendingCommands.isEmpty {
         issue = nil
         isShowingIssue = false
       }
@@ -279,12 +158,12 @@ final class CookingSessionPresentationModel {
     }
   }
 
-  private func present(_ issue: CookingSessionPresentationIssue) {
+  func present(_ issue: CookingSessionPresentationIssue) {
     self.issue = issue
     isShowingIssue = true
   }
 
-  private func upsert(_ session: CookingSessionProjection) {
+  func upsert(_ session: CookingSessionProjection) {
     sessions.removeAll { $0.id == session.id }
     if session.lifecycle != .finished, session.disposition == .ordinary {
       sessions.append(session)
@@ -292,7 +171,7 @@ final class CookingSessionPresentationModel {
     }
   }
 
-  private func select(_ id: CookingSession.ID?) {
+  func select(_ id: CookingSession.ID?) {
     currentSessionID = id
     store.currentSessionID = id
   }
