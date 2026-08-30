@@ -21,6 +21,14 @@ struct CookingSessionEntryDraft: Codable, Equatable {
   }
 }
 
+/// Device-local timing used only to offer a stale-Session presentation nudge.
+/// It is never synchronized and never contributes Cooking Session evidence.
+struct CookingSessionVisit: Codable, Equatable {
+  let sessionID: CookingSession.ID
+  var lastVisitedAt: Date
+  var dismissedStaleNudge: Bool
+}
+
 /// One presentation-accepted Session intention retained until Logic confirms
 /// that its evidence is locally durable.
 enum PendingCookingSessionCommand: Codable, Equatable {
@@ -122,6 +130,7 @@ protocol CookingSessionPresentationStoring: AnyObject {
   var currentSessionID: CookingSession.ID? { get set }
   var pendingCommands: [PendingCookingSessionCommand] { get set }
   var entryDrafts: [CookingSessionEntryDraft] { get set }
+  var sessionVisits: [CookingSessionVisit] { get set }
 }
 
 /// Device-local presentation state. These values deliberately use ordinary
@@ -131,6 +140,7 @@ final class DefaultsCookingSessionPresentationStore: CookingSessionPresentationS
   static let currentSessionIDKey = "cookingSessions.currentSessionID"
   static let pendingCommandKey = "cookingSessions.pendingCommand"
   static let entryDraftsKey = "cookingSessions.entryDrafts"
+  static let sessionVisitsKey = "cookingSessions.sessionVisits"
 
   private let defaults: UserDefaults
   private let encoder = PropertyListEncoder()
@@ -191,6 +201,23 @@ final class DefaultsCookingSessionPresentationStore: CookingSessionPresentationS
       defaults.set(data, forKey: Self.entryDraftsKey)
     }
   }
+
+  var sessionVisits: [CookingSessionVisit] {
+    get {
+      guard let data = defaults.data(forKey: Self.sessionVisitsKey) else { return [] }
+      return (try? decoder.decode([CookingSessionVisit].self, from: data)) ?? []
+    }
+    set {
+      guard !newValue.isEmpty else {
+        defaults.removeObject(forKey: Self.sessionVisitsKey)
+        return
+      }
+      guard let data = try? encoder.encode(newValue) else {
+        preconditionFailure("Cooking Session visits must remain encodable")
+      }
+      defaults.set(data, forKey: Self.sessionVisitsKey)
+    }
+  }
 }
 
 @MainActor
@@ -198,4 +225,5 @@ final class VolatileCookingSessionPresentationStore: CookingSessionPresentationS
   var currentSessionID: CookingSession.ID?
   var pendingCommands: [PendingCookingSessionCommand] = []
   var entryDrafts: [CookingSessionEntryDraft] = []
+  var sessionVisits: [CookingSessionVisit] = []
 }

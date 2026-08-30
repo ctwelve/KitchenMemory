@@ -174,6 +174,12 @@ The navigation leaves room for future search, folders, and tags without adding
 their schema. A long-idle nudge is device-local presentation and never changes
 authoritative state.
 
+Implemented at the 0.2.0 checkpoint: Sessions now has an independent destination
+and Recipe-context history; Active and Stopped work remains deliberately
+switchable; Finished projections open observationally; continuation creates a
+new self-contained Active root with inspectable immediate lineage; and the
+three-day stale nudge retains only device-local visit and dismissal state.
+
 ### Slice 18 — Deleted Items and Recovery
 
 [Add Deleted Items and Cooking Session Recovery](https://github.com/ctwelve/KitchenMemory/issues/56)

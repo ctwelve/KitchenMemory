@@ -40,6 +40,23 @@ the result, the platforms continue to share the product core rather than a
 compromised interface. See
 [ADR 0006](adr/0006-shared-ui-for-foundation-slices.md).
 
+## Current navigation model
+
+The shared sidebar has two first-class destinations: Sessions and Recipes.
+Sessions is always reachable, including when no Recipe is selected. Its sidebar
+preview is intentionally short, while the destination itself exposes the
+device-local current convenience, every other ordinary Active or Stopped
+Session, and immutable Finished history. A Recipe detail also links to Sessions
+whose retained root names that Recipe provenance; this is a contextual filter,
+not ownership by the current Recipe object.
+
+Opening Active or Stopped work enters the cooking interaction. Opening Finished
+history enters an observational detail with explicit continuation and immediate
+lineage. The structure reserves a durable Sessions destination for later search,
+folders, and tags without adding those schemas or presenting them as 0.2
+features. Stable automation identifiers cover the destination, current/recent/
+history groups, switching, Finished detail, lineage, and continuation.
+
 ## Native product targets and destinations
 
 `KitchenMemory` is one native multiplatform target supporting iPhone, iPad, iOS

@@ -268,6 +268,8 @@ public enum SessionConflict: Equatable, Sendable {
 public struct CookingSessionProjection: Equatable, Sendable {
     public let id: CookingSession.ID
     public let snapshot: ExecutionSnapshot
+    public let sourceSessionID: CookingSession.ID?
+    public let sourceClosureID: SessionClosure.ID?
     public let lifecycle: SessionLifecycle
     public let lifecycleBeforeFinish: SessionLifecycle
     public let disposition: SessionDisposition
@@ -282,6 +284,8 @@ public struct CookingSessionProjection: Equatable, Sendable {
     public init(
         id: CookingSession.ID,
         snapshot: ExecutionSnapshot,
+        sourceSessionID: CookingSession.ID? = nil,
+        sourceClosureID: SessionClosure.ID? = nil,
         lifecycle: SessionLifecycle = .active,
         lifecycleBeforeFinish: SessionLifecycle? = nil,
         disposition: SessionDisposition = .ordinary,
@@ -295,6 +299,8 @@ public struct CookingSessionProjection: Equatable, Sendable {
     ) {
         self.id = id
         self.snapshot = snapshot
+        self.sourceSessionID = sourceSessionID
+        self.sourceClosureID = sourceClosureID
         self.lifecycle = lifecycle
         self.lifecycleBeforeFinish = lifecycleBeforeFinish ?? lifecycle
         self.disposition = disposition

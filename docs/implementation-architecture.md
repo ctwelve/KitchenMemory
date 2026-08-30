@@ -202,9 +202,12 @@ production graph through loosely related booleans and optionals.
 
 `CookingSessionPresentationModel` is a replaceable main-actor projection over
 the deep `CookingSessions` interface. It exposes ordinary Active and Stopped
-Sessions for discovery, keeps unavailable and recovery classifications out of
-ordinary presentation, and translates typed command results without changing
-`RecipeLibrary` or `RecipeRepository`. The selected Session pointer and an
+Sessions for interaction plus ordinary Finished projections for observational
+history, keeps unavailable and recovery classifications out of ordinary
+presentation, and translates typed command results without changing
+`RecipeLibrary` or `RecipeRepository`. Kitchen-wide, Finished-history, and
+Recipe-provenance reads stay behind the same Logic interface; the application
+does not join Session history through visible Recipe objects. The selected Session pointer and an
 ordered accepted-but-not-yet-confirmed command outbox live in an
 application-owned, device-local store. Commands are written there with their
 final stable identities before Logic is called and are normally removed in
@@ -227,6 +230,14 @@ become synchronized evidence until the presentation layer submits a stable Fact
 identity and Logic confirms local durability. Remote Finish keeps an ineligible
 draft visible for explicit continuation, successfully confirmed copy, or
 discard resolution.
+
+The same device-local store retains the last presentation visit and stale-nudge
+dismissal for each Session. That timing orders a current convenience and offers
+the long-idle prompt only; it is not synchronized, is not an evidence clock, and
+cannot authorize lifecycle. Finished observation reads the closed projection.
+Continuation reuses the durable command outbox, exposes immediate source
+Session and Closure identities from the projected root, and selects the new
+Active Session only after Logic confirms its root is locally durable.
 
 `CookingSessionView` is one semantic SwiftUI interaction that selects Compact,
 Regular, or Wide composition from its container width. Platform identity does

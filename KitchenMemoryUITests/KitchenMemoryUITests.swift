@@ -349,14 +349,14 @@ extension KitchenMemoryUITests {
     activate(confirmation)
     XCTAssertFalse(app.buttons["finish-session"].waitForExistence(timeout: 3))
 
-    startAndLeaveStoppedSession(in: app)
+    let continuation = app.buttons["continue-session"]
+    XCTAssertTrue(continuation.waitForExistence(timeout: 5))
+    activate(continuation)
+    leaveStoppedSession(in: app)
   }
 
   @MainActor
-  private func startAndLeaveStoppedSession(in app: XCUIApplication) {
-    let start = app.buttons["start-cooking"]
-    XCTAssertTrue(start.waitForExistence(timeout: 5))
-    activate(start)
+  private func leaveStoppedSession(in app: XCUIApplication) {
     let stop = app.buttons["stop-session"]
     XCTAssertTrue(stop.waitForExistence(timeout: 5))
     activate(stop)

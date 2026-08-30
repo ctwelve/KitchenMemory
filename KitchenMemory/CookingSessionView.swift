@@ -53,6 +53,10 @@ struct CookingSessionView: View {
                   .accessibilityIdentifier("session-lifecycle")
               }
 
+              if model.currentSessionNeedsStaleNudge {
+                CookingSessionStaleNudge(model: model, session: session)
+              }
+
               CookingSessionEntriesView(model: model, session: session)
 
               CookingSessionProgressView(
@@ -141,5 +145,46 @@ struct CookingSessionView: View {
 
   private func copyDraftThenFinish() {
     model.copyCurrentEntryDraftAndFinish(using: CookingSessionClipboard.copy)
+  }
+}
+
+private struct CookingSessionStaleNudge: View {
+  let model: CookingSessionPresentationModel
+  let session: CookingSessionProjection
+
+  var body: some View {
+    VStack(alignment: .leading, spacing: 12) {
+      Label(.sessionStaleTitle, systemImage: "clock.badge.questionmark")
+        .font(.headline)
+      Text(.sessionStaleMessage)
+        .font(.callout)
+        .foregroundStyle(.secondary)
+      HStack {
+        if session.lifecycle == .active {
+          Button(.sessionActionStop) { model.stopCurrentSession() }
+            .accessibilityIdentifier("stale-stop-session")
+        } else {
+          Button(.sessionActionResume) { model.resumeCurrentSession() }
+            .accessibilityIdentifier("stale-resume-session")
+        }
+        Button(.sessionStaleActionNew) {
+          model.leaveCurrentSession()
+          model.showRecipes()
+        }
+        .accessibilityIdentifier("stale-new-session")
+        Spacer()
+        Button(.sessionStaleActionDismiss) { model.dismissStaleSessionNudge() }
+          .accessibilityIdentifier("dismiss-stale-session")
+      }
+      .buttonStyle(.borderless)
+    }
+    .padding(16)
+    .background(Color("ContentSurface"), in: .rect(cornerRadius: 12))
+    .overlay {
+      RoundedRectangle(cornerRadius: 12)
+        .stroke(Color("SubtleBorder"), lineWidth: 1)
+    }
+    .accessibilityElement(children: .contain)
+    .accessibilityIdentifier("stale-session-nudge")
   }
 }

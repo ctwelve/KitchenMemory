@@ -72,26 +72,9 @@ struct ContentView: View {
     } message: {
       Text(.sessionEntryDetachedMessage)
     }
-  }
-
-  private var sessionIssueIsPresented: Binding<Bool> {
-    Binding(
-      get: { sessionModel.isShowingIssue },
-      set: { isPresented in
-        if !isPresented { sessionModel.dismissIssuePresentation() }
-      }
-    )
-  }
-
-  private var detachedDraftIsPresented: Binding<Bool> {
-    Binding(
-      get: { sessionModel.detachedEntryDraft != nil },
-      set: { _ in }
-    )
-  }
-
-  private func copyAndDiscardDetachedDraft() {
-    sessionModel.copyAndDiscardDetachedEntryDraft(using: CookingSessionClipboard.copy)
+    .onChange(of: model.selectedRecipeID) { _, recipeID in
+      if recipeID != nil { sessionModel.showRecipes() }
+    }
   }
 
   private var recipeLibrary: some View {
@@ -199,19 +182,31 @@ struct ContentView: View {
   }
 
   @ViewBuilder
-  private var recipeList: some View {
-    RecipeLibrarySidebar(model: model, sessionModel: sessionModel, locale: locale)
-  }
-
-  @ViewBuilder
   private var detail: some View {
-    if let selectedRecipe = model.selectedRecipe {
+    if let finishedSession = sessionModel.observedFinishedSession {
+      FinishedCookingSessionView(model: sessionModel, session: finishedSession)
+    } else if sessionModel.isShowingSessionHistory {
+      CookingSessionHistoryView(model: sessionModel)
+    } else if let selectedRecipe = model.selectedRecipe {
       RecipeDetailView(storedRecipe: selectedRecipe)
         // A revision is immutable, but this view owns reading-only state such
         // as the selected scaling basis. Give each new revision fresh state so
         // a just-saved yield is reflected immediately.
         .id(selectedRecipe.revision.id)
         .toolbar {
+          ToolbarItem(placement: .primaryAction) {
+            NavigationLink {
+              CookingSessionHistoryDestinationView(
+                model: sessionModel,
+                prepare: {
+                  sessionModel.showRecipeSessionHistory(for: selectedRecipe.recipe.id)
+                }
+              )
+            } label: {
+              Label(.sessionHistoryRecipeTitle, systemImage: "clock.arrow.circlepath")
+            }
+            .accessibilityIdentifier("recipe-session-history")
+          }
           ToolbarItem(placement: .primaryAction) {
             Button {
               sessionModel.start(from: selectedRecipe)
@@ -263,6 +258,42 @@ struct ContentView: View {
         model.createRecipe(from: draft)
       }
     }
+  }
+}
+
+private extension ContentView {
+  @ViewBuilder
+  var recipeList: some View {
+    RecipeLibrarySidebar(
+      model: model,
+      sessionModel: sessionModel,
+      locale: locale,
+      showSessionHistory: {
+        model.selectedRecipeID = nil
+        sessionModel.showSessionHistory()
+        columnVisibility = .detailOnly
+      }
+    )
+  }
+
+  var sessionIssueIsPresented: Binding<Bool> {
+    Binding(
+      get: { sessionModel.isShowingIssue },
+      set: { isPresented in
+        if !isPresented { sessionModel.dismissIssuePresentation() }
+      }
+    )
+  }
+
+  var detachedDraftIsPresented: Binding<Bool> {
+    Binding(
+      get: { sessionModel.detachedEntryDraft != nil },
+      set: { _ in }
+    )
+  }
+
+  func copyAndDiscardDetachedDraft() {
+    sessionModel.copyAndDiscardDetachedEntryDraft(using: CookingSessionClipboard.copy)
   }
 }
 

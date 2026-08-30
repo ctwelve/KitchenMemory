@@ -137,6 +137,7 @@ final class RecordingEntryStore: CookingSessionPresentationStoring {
   var entryDrafts: [CookingSessionEntryDraft] = [] {
     didSet { events.append(.draftSession(entryDrafts.first?.sessionID)) }
   }
+  var sessionVisits: [CookingSessionVisit] = []
   var events: [Event] = []
 }
 

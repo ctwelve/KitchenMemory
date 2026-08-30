@@ -4,7 +4,6 @@
 
 import Foundation
 import KitchenKit
-
 @MainActor
 extension CookingSessionPresentationModel {
   @discardableResult
@@ -17,7 +16,6 @@ extension CookingSessionPresentationModel {
       startedAt: Date()
     ))
   }
-
   @discardableResult
   func stopCurrentSession() -> Bool {
     guard let session = currentSession, session.lifecycle == .active,
@@ -28,7 +26,6 @@ extension CookingSessionPresentationModel {
       authoredAt: Date()
     ))
   }
-
   @discardableResult
   func resumeCurrentSession() -> Bool {
     guard let session = currentSession, session.lifecycle == .stopped,
@@ -39,7 +36,6 @@ extension CookingSessionPresentationModel {
       authoredAt: Date()
     ))
   }
-
   @discardableResult
   func setIngredient(_ id: SessionIngredient.ID, to state: SessionIngredientProgress) -> Bool {
     guard let session = currentSession, session.lifecycle == .active,
@@ -53,7 +49,6 @@ extension CookingSessionPresentationModel {
       progress: SessionProgress(target: .ingredient(id), state: .ingredient(state))
     ))
   }
-
   @discardableResult
   func setInstruction(_ id: SessionInstruction.ID, to state: SessionInstructionProgress) -> Bool {
     guard let session = currentSession, session.lifecycle == .active,
@@ -67,7 +62,6 @@ extension CookingSessionPresentationModel {
       progress: SessionProgress(target: .instruction(id), state: .instruction(state))
     ))
   }
-
   @discardableResult
   func replaceWorkingScale(with scale: RecipeScale) -> Bool {
     guard let session = currentSession, session.lifecycle == .active,
@@ -245,10 +239,13 @@ extension CookingSessionPresentationModel {
   ) {
     if case .continueSession = pending {
       select(session.id)
+      historyScope = nil
+      observedFinishedSessionID = nil
     } else if session.lifecycle == .finished {
       sessions.removeAll { $0.id == session.id }
-      finishedSessionCount += 1
-      if currentSessionID == session.id { select(nil) }
+      if currentSessionID == session.id { select(nil, recordsVisit: false) }
+      historyScope = .all
+      observedFinishedSessionID = session.id
     } else {
       select(pending.sessionID)
     }
@@ -385,6 +382,8 @@ private extension CookingSessionProjection {
     CookingSessionProjection(
       id: id,
       snapshot: snapshot,
+      sourceSessionID: sourceSessionID,
+      sourceClosureID: sourceClosureID,
       lifecycle: lifecycle,
       lifecycleBeforeFinish: lifecycleBeforeFinish,
       disposition: disposition,
