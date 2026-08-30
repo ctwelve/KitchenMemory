@@ -27,6 +27,7 @@
 				"",
 				"",
 				"",
+				"",
 			);
 		};
 /* End PBXBuildRule section */
@@ -181,20 +182,20 @@
 		A1C4E795302A63B800E2C0DB = {
 			isa = PBXGroup;
 			children = (
+				A15E8F41303912A6009B0A22 /* .swiftlint.yml */,
 				A1BC7A50303F76CE0082EE96 /* AGENTS.md */,
 				A1BC7A51303F76CE0082EE96 /* AI.md */,
 				A1BC7A52303F76CE0082EE96 /* DEPENDENCIES.md */,
 				A1BC7A53303F76CE0082EE96 /* PRIVACY.md */,
 				A1BC7A54303F76CE0082EE96 /* README.md */,
+				A1BC7A45303F76700082EE96 /* docs */,
 				A1BC7B05303F76CE0082EE96 /* skills */,
 				A1BC7A4F303F76990082EE96 /* Tools */,
-				A1BC7A45303F76700082EE96 /* docs */,
 				C10000000000000000000010 /* Configurations */,
 				A1C4E7A0302A63B800E2C0DB /* KitchenMemory */,
 				A1C9B48130429B4600F1F13D /* KitchenMemory.xctestplan */,
 				A1C4E7B0302A63B900E2C0DB /* KitchenMemoryTests */,
 				A1C4E7BA302A63B900E2C0DB /* KitchenMemoryUITests */,
-				A15E8F41303912A6009B0A22 /* .swiftlint.yml */,
 				A1C9A47F3042896F00F1F13D /* KitchenKit */,
 				A1F62A8E30434D9C0005E9A5 /* KitchenKit.xctestplan */,
 				A1C9A48C3042896F00F1F13D /* KitchenKitTests */,
