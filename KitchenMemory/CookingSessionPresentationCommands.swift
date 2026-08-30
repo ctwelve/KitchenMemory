@@ -163,6 +163,26 @@ extension CookingSessionPresentationModel {
       issue = nil
       isShowingIssue = false
       return true
+    case let .retiredStaleRestore(attention):
+      guard pendingCommands.first == pending else { return false }
+      // Restore is consent to resolve one observed frontier. If concurrent
+      // evidence changes that frontier, this durable command must not retry
+      // forever or silently expand the user's original confirmation.
+      pendingCommands.removeFirst()
+      persistPendingCommands()
+      reload()
+      present(.attention(attention))
+      return true
+    case .retiredCompletedRestore:
+      guard pendingCommands.first == pending else { return false }
+      // Another replica may already have restored the observed frontier. The
+      // local intention is then complete and safe to retire idempotently.
+      pendingCommands.removeFirst()
+      persistPendingCommands()
+      issue = nil
+      isShowingIssue = false
+      reload()
+      return true
     case let .attention(attention):
       present(.attention(attention))
       return false
@@ -319,6 +339,8 @@ private extension PendingCookingSessionCommand {
 private enum PendingCookingSessionResolution {
   case accepted(CookingSessionProjection)
   case rejectedByFinishedSource
+  case retiredStaleRestore(CookingSessionAttention)
+  case retiredCompletedRestore
   case attention(CookingSessionAttention)
 
   init(
@@ -330,6 +352,10 @@ private enum PendingCookingSessionResolution {
       self = .accepted(session)
     case (.attention(.commandNotAllowed(lifecycle: .finished)), _):
       self = .rejectedByFinishedSource
+    case let (.attention(.competingDeletions(deletionIDs)), .restore):
+      self = .retiredStaleRestore(.competingDeletions(deletionIDs))
+    case (.attention(.restoreNotNeeded), .restore):
+      self = .retiredCompletedRestore
     case let (.attention(attention), _):
       self = .attention(attention)
     }

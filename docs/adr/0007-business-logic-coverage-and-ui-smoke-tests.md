@@ -50,7 +50,9 @@ Use UI automation only for smoke coverage of the durable application shell:
 - Settings opens and guards destructive reset behind confirmation; and
 - the durable Sessions destination reaches Current, Recent, and Finished
   history, supports deliberate switching, and completes one representative
-  immutable continuation path.
+  immutable continuation path; and
+- the durable recovery shell completes one representative Delete and Restore
+  path and reaches the separate Deleted Items and Recovery destinations.
 
 Do not add UI tests for provisional editor layout, scrolling, disclosure state,
 exact visible strings, or detailed accessibility-tree behavior. A feature whose

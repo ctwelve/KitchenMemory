@@ -117,6 +117,77 @@ final class CookingSessionRecoveryPresentationTests: XCTestCase {
     XCTAssertTrue(model.closureCandidates(for: malformed).isEmpty)
   }
 
+  func testRelaunchedRestoreRetiresStaleFrontierAndRequiresFreshConfirmation() throws {
+    let sessionID = CookingSession.ID()
+    let originalDeletionID = SessionDeletion.ID()
+    let concurrentDeletionID = SessionDeletion.ID()
+    let service = RestoreInterruptionSessionService(
+      results: [
+        .session(projection(
+          id: sessionID,
+          disposition: .deleted(needsAttention: true),
+        )),
+      ],
+      unresolvedDeletionIDs: [originalDeletionID, concurrentDeletionID],
+      commandResults: [
+        .attention(.competingDeletions([originalDeletionID, concurrentDeletionID])),
+        .accepted(projection(id: sessionID, disposition: .ordinary)),
+      ]
+    )
+    let store = VolatileCookingSessionPresentationStore()
+    store.pendingCommands = [
+      .restore(
+        commandID: RestoreCookingSessionIntention.ID(),
+        sessionID: sessionID,
+        restoredAt: Date(timeIntervalSince1970: 100),
+        observedDeletionIDs: [originalDeletionID],
+      ),
+    ]
+    let relaunched = CookingSessionPresentationModel(sessions: service, store: store)
+
+    relaunched.loadIfNeeded()
+
+    XCTAssertTrue(store.pendingCommands.isEmpty)
+    XCTAssertEqual(relaunched.deletedSessions.map(\.id), [sessionID])
+    XCTAssertEqual(
+      relaunched.deletedSessions.first?.disposition,
+      .deleted(needsAttention: true),
+    )
+    XCTAssertTrue(relaunched.restoreSession(sessionID))
+    XCTAssertEqual(
+      service.restoreFrontiers,
+      [[originalDeletionID], [originalDeletionID, concurrentDeletionID]]
+    )
+    XCTAssertTrue(store.pendingCommands.isEmpty)
+  }
+
+  func testRelaunchedRestoreRetiresWhenAnotherReplicaAlreadyRestored() {
+    let sessionID = CookingSession.ID()
+    let deletionID = SessionDeletion.ID()
+    let service = RestoreInterruptionSessionService(
+      results: [.session(projection(id: sessionID, disposition: .ordinary))],
+      unresolvedDeletionIDs: [],
+      commandResults: [.attention(.restoreNotNeeded)]
+    )
+    let store = VolatileCookingSessionPresentationStore()
+    store.pendingCommands = [
+      .restore(
+        commandID: RestoreCookingSessionIntention.ID(),
+        sessionID: sessionID,
+        restoredAt: Date(timeIntervalSince1970: 100),
+        observedDeletionIDs: [deletionID],
+      ),
+    ]
+    let relaunched = CookingSessionPresentationModel(sessions: service, store: store)
+
+    relaunched.loadIfNeeded()
+
+    XCTAssertTrue(store.pendingCommands.isEmpty)
+    XCTAssertNil(relaunched.issue)
+    XCTAssertEqual(relaunched.sessions.map(\.id), [sessionID])
+    XCTAssertTrue(relaunched.deletedSessions.isEmpty)
+  }
+
   private func closure(
     sessionID: CookingSession.ID,
     finishedAt: TimeInterval
@@ -134,6 +205,17 @@ final class CookingSessionRecoveryPresentationTests: XCTestCase {
       projectionDigest: Data(),
       outcomeFormatVersion: nil,
       outcomeData: nil
+    )
+  }
+
+  private func projection(
+    id: CookingSession.ID,
+    disposition: SessionDisposition
+  ) -> CookingSessionProjection {
+    CookingSessionProjection(
+      id: id,
+      snapshot: ExecutionSnapshot(title: "Soup"),
+      disposition: disposition
     )
   }
 }
@@ -156,5 +238,45 @@ private final class RecoverySessionService: CookingSessionServing {
   func perform(_ intention: CookingSessionIntention) throws -> CookingSessionCommandResult {
     _ = intention
     throw CookingSessionLogicError.invalidIntention
+  }
+}
+
+@MainActor
+private final class RestoreInterruptionSessionService: CookingSessionServing {
+  let results: [SessionProjectionResult]
+  let unresolved: [SessionDeletion.ID]
+  var commandResults: [CookingSessionCommandResult]
+  var restoreFrontiers: [[SessionDeletion.ID]] = []
+
+  init(
+    results: [SessionProjectionResult],
+    unresolvedDeletionIDs: [SessionDeletion.ID],
+    commandResults: [CookingSessionCommandResult]
+  ) {
+    self.results = results
+    unresolved = unresolvedDeletionIDs
+    self.commandResults = commandResults
+  }
+
+  func sessions() throws -> [SessionProjectionResult] { results }
+
+  func unresolvedDeletionIDs(
+    for sessionID: CookingSession.ID
+  ) throws -> [SessionDeletion.ID] {
+    _ = sessionID
+    return unresolved
+  }
+
+  func start(_ intention: StartCookingSessionIntention) throws -> CookingSessionCommandResult {
+    _ = intention
+    throw CookingSessionLogicError.invalidIntention
+  }
+
+  func perform(_ intention: CookingSessionIntention) throws -> CookingSessionCommandResult {
+    guard case let .restore(restore) = intention, !commandResults.isEmpty else {
+      throw CookingSessionLogicError.invalidIntention
+    }
+    restoreFrontiers.append(restore.observedDeletionIDs)
+    return commandResults.removeFirst()
   }
 }

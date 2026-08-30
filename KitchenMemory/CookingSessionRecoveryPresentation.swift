@@ -92,35 +92,17 @@ extension CookingSessionPresentationModel {
   }
 
   func closureCandidates(for recovery: SessionRecovery) -> [SessionClosureEvidence] {
-    guard recovery.reasons == [.competingClosures] else { return [] }
-    let grouped = Dictionary(grouping: recovery.evidence.closures, by: \.id)
-    guard grouped.values.allSatisfy({ values in
-      guard let first = values.first else { return false }
-      return values.allSatisfy { $0 == first }
-    }) else { return [] }
-    return grouped.values.compactMap(\.first).sorted {
-      if $0.finishedAt != $1.finishedAt { return $0.finishedAt < $1.finishedAt }
-      return $0.id.rawValue.uuidString < $1.id.rawValue.uuidString
-    }
+    CookingSessions.closureCandidates(for: recovery)
   }
 
   func knownDescendantCount(of sessionID: CookingSession.ID) -> Int {
-    let complete = sessions + finishedSessions + deletedSessions
-    let incompleteRoots = (waitingSessions + waitingDeletedSessions)
-      .flatMap(\.evidence.roots)
-    let recoveryRoots = recoverySessions.flatMap(\.evidence.roots)
-    let edges = complete.compactMap { session in
-      session.sourceSessionID.map { (session.id, $0) }
-    } + (incompleteRoots + recoveryRoots).compactMap { root in
-      root.sourceSessionID.map { (root.id, $0) }
+    let classified = (sessions + finishedSessions + deletedSessions).map {
+      SessionProjectionResult.session($0)
+    } + (waitingSessions + waitingDeletedSessions).map {
+      SessionProjectionResult.unavailable($0)
+    } + recoverySessions.map {
+      SessionProjectionResult.recovery($0)
     }
-    var frontier = [sessionID]
-    var descendants = Set<CookingSession.ID>()
-    while let source = frontier.popLast() {
-      for (candidate, parent) in edges where parent == source {
-        if descendants.insert(candidate).inserted { frontier.append(candidate) }
-      }
-    }
-    return descendants.count
+    return CookingSessions.knownDescendantCount(of: sessionID, among: classified)
   }
 }

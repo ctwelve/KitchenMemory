@@ -196,19 +196,11 @@ struct FinishedCookingSessionView: View {
           .background(.bar)
       }
       .background(Color("AppBackground"))
-      .confirmationDialog(
-        .sessionDeleteConfirmationTitle,
+      .cookingSessionDeletionConfirmation(
         isPresented: $isShowingDeleteConfirmation,
-        titleVisibility: .visible
-      ) {
-        Button(.sessionDeleteAction, role: .destructive) {
-          model.deleteSession(session.id)
-        }
-        .accessibilityIdentifier("confirm-delete-session")
-        Button(.actionCancel, role: .cancel) {}
-      } message: {
-        Text(deleteConfirmationMessage)
-      }
+        model: model,
+        sessionID: session.id
+      )
     }
   }
 
@@ -261,12 +253,6 @@ struct FinishedCookingSessionView: View {
       }
       .accessibilityIdentifier("delete-session")
     }
-  }
-
-  private var deleteConfirmationMessage: LocalizedStringResource {
-    model.knownDescendantCount(of: session.id) > 0
-      ? .sessionDeleteDescendantMessage
-      : .sessionDeleteConfirmationMessage
   }
 
   private func lineageIdentifier(_ title: LocalizedStringResource, id: UUID) -> some View {

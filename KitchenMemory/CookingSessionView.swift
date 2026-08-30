@@ -112,19 +112,11 @@ struct CookingSessionView: View {
       } message: {
         Text(.sessionFinishDraftMessage)
       }
-      .confirmationDialog(
-        .sessionDeleteConfirmationTitle,
+      .cookingSessionDeletionConfirmation(
         isPresented: $isShowingDeleteConfirmation,
-        titleVisibility: .visible
-      ) {
-        Button(.sessionDeleteAction, role: .destructive) {
-          model.deleteSession(session.id)
-        }
-        .accessibilityIdentifier("confirm-delete-session")
-        Button(.actionCancel, role: .cancel) {}
-      } message: {
-        Text(deleteConfirmationMessage)
-      }
+        model: model,
+        sessionID: session.id
+      )
     }
   }
 
@@ -160,12 +152,6 @@ struct CookingSessionView: View {
       }
       .accessibilityIdentifier("delete-session")
     }
-  }
-
-  private var deleteConfirmationMessage: LocalizedStringResource {
-    model.knownDescendantCount(of: session.id) > 0
-      ? .sessionDeleteDescendantMessage
-      : .sessionDeleteConfirmationMessage
   }
 
   private func copyDraftThenFinish() {

@@ -12,7 +12,8 @@ final class SessionDeletionPropertyTests: XCTestCase {
     // swiftlint:disable:next function_body_length
     func testGateBFuzzNeverLosesEvidenceOrSilentlyResurrects() throws {
         let fixture = try FactFixture()
-        var generator = try generator()
+        let seed = try PropertyTestSeeds.bundled().seed(named: .domainSessionEvidence)
+        var generator = SeededGenerator(seed: seed.value)
         let firstDelete = deletion(fixture: fixture, id: id(201), dispositionHeads: [])
         let restore = restoration(
             fixture: fixture,
@@ -38,7 +39,8 @@ final class SessionDeletionPropertyTests: XCTestCase {
         }
         XCTAssertEqual(deleted.disposition, .deleted(needsAttention: false))
 
-        for _ in 0..<128 {
+        for caseIndex in 0..<128 {
+            let replay = "seed=\(seed.hexadecimal), case=\(caseIndex)"
             let delivered = SessionEvidence(
                 sessionID: fixture.sessionID,
                 roots: shuffled(retried(complete.roots, using: &generator), using: &generator),
@@ -51,8 +53,8 @@ final class SessionDeletionPropertyTests: XCTestCase {
                     using: &generator
                 )
             )
-            XCTAssertEqual(SessionEvidenceProjector.project(delivered), expected)
-            XCTAssertEqual(SessionEvidenceProjector.project(delivered), expected)
+            XCTAssertEqual(SessionEvidenceProjector.project(delivered), expected, replay)
+            XCTAssertEqual(SessionEvidenceProjector.project(delivered), expected, replay)
         }
 
         let concurrentDelete = deletion(fixture: fixture, id: id(204), dispositionHeads: [])
@@ -141,11 +143,6 @@ final class SessionDeletionPropertyTests: XCTestCase {
             dispositionHeadsFormatVersion: CausalHeadsCodec.formatVersion,
             dispositionHeadsData: CausalHeadsCodec.encode(dispositionHeads).data
         )
-    }
-
-    private func generator() throws -> SeededGenerator {
-        let seed = try PropertyTestSeeds.bundled().seed(named: .domainSessionEvidence)
-        return SeededGenerator(seed: seed.value)
     }
 
     private func shuffled<Value>(
