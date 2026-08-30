@@ -7,6 +7,7 @@ import SwiftUI
 
 struct ContentView: View {
   @Bindable var model: RecipeLibraryModel
+  @Bindable var sessionModel: CookingSessionPresentationModel
   let cloudSyncSettings: CloudSyncSettings?
   @Environment(\.horizontalSizeClass) private var horizontalSizeClass
   @Environment(\.locale) private var locale
@@ -28,13 +29,38 @@ struct ContentView: View {
           decline: model.declineSampleRecipes
         )
       case .ready:
-        recipeLibrary
+        if let currentSession = sessionModel.currentSession {
+          CookingSessionView(model: sessionModel, session: currentSession)
+        } else {
+          recipeLibrary
+        }
       }
     }
     .task {
       model.loadIfNeeded()
+      sessionModel.loadIfNeeded()
     }
     .tint(Color("AccentColor"))
+    .alert(
+      .sessionIssueTitle,
+      isPresented: sessionIssueIsPresented
+    ) {
+      Button(.actionTryAgain) { sessionModel.retryCurrentIssue() }
+      Button(.actionCancel, role: .cancel) {}
+    } message: {
+      if let issue = sessionModel.issue {
+        Text(issue.message)
+      }
+    }
+  }
+
+  private var sessionIssueIsPresented: Binding<Bool> {
+    Binding(
+      get: { sessionModel.isShowingIssue },
+      set: { isPresented in
+        if !isPresented { sessionModel.dismissIssuePresentation() }
+      }
+    )
   }
 
   private var recipeLibrary: some View {
@@ -143,41 +169,7 @@ struct ContentView: View {
 
   @ViewBuilder
   private var recipeList: some View {
-    if let issue = model.issue {
-      ContentUnavailableView {
-        Label(.libraryUnavailableTitle, systemImage: "exclamationmark.triangle")
-      } description: {
-        Text(issue.message(locale: locale))
-      } actions: {
-        Button(.actionTryAgain) { model.retryCurrentIssue() }
-      }
-    } else if model.hasLoaded && model.recipes.isEmpty {
-      ContentUnavailableView(
-        .libraryEmptyTitle,
-        systemImage: "book.closed",
-        description: Text(.libraryEmptyMessage)
-      )
-    } else {
-      List(model.recipes, id: \.recipe.id, selection: $model.selectedRecipeID) { storedRecipe in
-        NavigationLink(value: storedRecipe.recipe.id) {
-          RecipeRow(storedRecipe: storedRecipe)
-        }
-        // Keep the stable identity on the interactive NavigationLink, not on
-        // RecipeRow's visual children. UI tests and assistive technologies
-        // must activate the same element a person clicks to open the recipe.
-        .accessibilityIdentifier("recipe-row-\(storedRecipe.recipe.id.rawValue.uuidString)")
-      }
-      // This identifier is also our launch-complete signal in UI tests. It is
-      // applied to the List itself so it survives row reuse and empty states.
-      .accessibilityIdentifier("recipe-library")
-      .accessibilityLabel(Text(.libraryAccessibilityLabel))
-      .listStyle(.sidebar)
-      .overlay {
-        if !model.hasLoaded {
-          ProgressView(.libraryLoading)
-        }
-      }
-    }
+    RecipeLibrarySidebar(model: model, sessionModel: sessionModel, locale: locale)
   }
 
   @ViewBuilder
@@ -189,6 +181,14 @@ struct ContentView: View {
         // a just-saved yield is reflected immediately.
         .id(selectedRecipe.revision.id)
         .toolbar {
+          ToolbarItem(placement: .primaryAction) {
+            Button {
+              sessionModel.start(from: selectedRecipe)
+            } label: {
+              Label(.sessionActionStart, systemImage: "flame")
+            }
+            .accessibilityIdentifier("start-cooking")
+          }
           ToolbarItem(placement: .primaryAction) {
             Button { activeSheet = .edit(selectedRecipe) } label: {
               Label(.recipeActionEdit, systemImage: "pencil")
@@ -271,7 +271,7 @@ private enum ActiveRecipeSheet: Identifiable {
   }
 }
 
-private struct RecipeRow: View {
+struct RecipeRow: View {
   let storedRecipe: StoredRecipe
 
   var body: some View {
@@ -305,6 +305,7 @@ private struct RecipeRow: View {
 #Preview {
   ContentView(
     model: PreparedApp.preview.libraryModel,
+    sessionModel: PreparedApp.preview.sessionModel,
     cloudSyncSettings: nil
   )
 }

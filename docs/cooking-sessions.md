@@ -57,6 +57,19 @@ Several Sessions may be Active at once. Presentation may recommend one current
 Session locally, but devices, clocks, and view state are never lifecycle
 authority.
 
+The 0.1.3 lifecycle shell implements this boundary directly. Start captures the
+exact selected Recipe Revision, and the library exposes every ordinary Active
+or Stopped Session as a distinct device-local discovery row. Entering, leaving,
+sleeping, terminating, and relaunching only change or restore presentation
+selection. Stop, Resume, and confirmed Finish are the only shell actions that
+submit lifecycle intentions.
+
+The shell retains one accepted intention in a device-local outbox before it
+crosses Logic. Retries reuse the same Session, Fact, or Closure identity after
+an interruption or ambiguous failure, and the outbox clears only when Logic
+returns the locally durable accepted projection. It is not synchronized and it
+does not imply that another device has received the evidence.
+
 ## Cooking interaction
 
 During an Active Session, the cook may:

@@ -167,12 +167,16 @@ KitchenMemoryApp
         │   └── CloudSyncPreferenceStoring
         ├── PersistentStoreChangeObserver
         ├── PersonalCloudStatusMonitor
-        └── RecipeLibraryModel
-            └── RecipeLibrary
-                ├── RecipeEditor
-                ├── RecipeImportService
-                ├── SampleRecipeInstallService
-                └── KitchenResetService
+        ├── RecipeLibraryModel
+        │   └── RecipeLibrary
+        │       ├── RecipeEditor
+        │       ├── RecipeImportService
+        │       ├── SampleRecipeInstallService
+        │       └── KitchenResetService
+        ├── SwiftDataCookingSessionRepository
+        ├── CookingSessions
+        └── CookingSessionPresentationModel
+            └── CookingSessionPresentationStoring
 ```
 
 `AppRuntime` is the composition root. It translates process arguments, build
@@ -183,16 +187,30 @@ request, and privacy-safe failure simulation together rather than exposing
 independent flags to callers.
 
 The runtime then creates `PreparedApp`, which retains the model container,
-observable library projection, remote-change observer, personal-cloud status
+observable library and Cooking Session projections, both concrete SwiftData
+repositories, `CookingSessions`, remote-change observer, personal-cloud status
 monitor, and optional sync settings for their complete lifetimes. Its
 implementation creates the concrete SwiftData repository and asset-backed
 sample provider, asks the bootstrap operation for the initial empty Kitchen,
 selects durable or disposable preferences, and prepares the Recipe Library.
 For a personal-cloud store it also starts and retains the persistence adapters
-that feed external changes and account status back into the library projection.
+that feed external changes back into both evidence projections and account
+status into the library projection.
 `KitchenMemoryApp` sees only prepared or unavailable state and retry; tests use
 one explicit disposable runtime configuration rather than constructing the
 production graph through loosely related booleans and optionals.
+
+`CookingSessionPresentationModel` is a replaceable main-actor projection over
+the deep `CookingSessions` interface. It exposes ordinary Active and Stopped
+Sessions for discovery, keeps unavailable and recovery classifications out of
+ordinary presentation, and translates typed command results without changing
+`RecipeLibrary` or `RecipeRepository`. The selected Session pointer and one
+accepted-but-not-yet-confirmed command live in an application-owned,
+device-local store. A command is written there with its final stable identities
+before Logic is called and is removed only after Logic returns the locally
+durable accepted projection. Relaunch and remote-store refresh therefore reread
+retained evidence; process or framework events never manufacture lifecycle
+Facts or prove global synchronization.
 
 `RecipeLibrary` is the deep Logic module for one Kitchen's recipe-library
 intentions. Its interface loads durable content with current sample presence,

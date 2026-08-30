@@ -1,6 +1,186 @@
 {
   "sourceLanguage" : "en-US",
   "strings" : {
+    "session.action.finish" : {
+      "comment" : "Action that asks to finish the current Cooking Session.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Finish" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Finalizar" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Terminer" } }
+      }
+    },
+    "session.action.leave" : {
+      "comment" : "Action that leaves the Session presentation without changing lifecycle.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Back to Recipes" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Volver a recetas" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Retour aux recettes" } }
+      }
+    },
+    "session.action.resume" : {
+      "comment" : "Action that explicitly resumes a Stopped Session.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Resume" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Reanudar" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Reprendre" } }
+      }
+    },
+    "session.action.start" : {
+      "comment" : "Action that starts a Cooking Session from the exact visible Recipe Revision.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Start Cooking" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Comenzar a cocinar" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Commencer à cuisiner" } }
+      }
+    },
+    "session.action.stop" : {
+      "comment" : "Action that explicitly makes an Active Session dormant.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Stop" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Detener" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Arrêter" } }
+      }
+    },
+    "session.discovery.recipes" : {
+      "comment" : "Sidebar section containing maintained recipes.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Recipes" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Recetas" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Recettes" } }
+      }
+    },
+    "session.discovery.title" : {
+      "comment" : "Sidebar section containing Active and Stopped Cooking Sessions.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Cooking Sessions" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Sesiones de cocina" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Séances de cuisine" } }
+      }
+    },
+    "session.finish.confirmation.action" : {
+      "comment" : "Destructive confirmation action that immutably Finishes a Cooking Session.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Finish Session" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Finalizar sesión" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Terminer la séance" } }
+      }
+    },
+    "session.finish.confirmation.message" : {
+      "comment" : "Warning that a Finished Session is immutable.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "A Finished Session cannot be resumed or reopened." } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Una sesión finalizada no se puede reanudar ni volver a abrir." } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Une séance terminée ne peut pas être reprise ni rouverte." } }
+      }
+    },
+    "session.finish.confirmation.title" : {
+      "comment" : "Title for the careful Finish confirmation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Finish this Cooking Session?" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "¿Finalizar esta sesión de cocina?" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Terminer cette séance de cuisine?" } }
+      }
+    },
+    "session.lifecycle.active" : {
+      "comment" : "Visible lifecycle value for an Active Session.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Active" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Activa" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Active" } }
+      }
+    },
+    "session.lifecycle.finished" : {
+      "comment" : "Visible lifecycle value for a Finished Session.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Finished" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Finalizada" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Terminée" } }
+      }
+    },
+    "session.lifecycle.stopped" : {
+      "comment" : "Visible lifecycle value for a Stopped Session.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Stopped" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Detenida" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Arrêtée" } }
+      }
+    },
+    "session.issue.attention" : {
+      "comment" : "Explains that retained Cooking Session evidence needs explicit attention and the pending action remains available to retry.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "This Cooking Session needs attention before that change can be accepted. The same action remains available to retry." } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Esta sesión de cocina necesita atención antes de aceptar ese cambio. La misma acción sigue disponible para volver a intentarla." } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Cette séance de cuisine demande votre attention avant que ce changement puisse être accepté. La même action demeure disponible pour une nouvelle tentative." } }
+      }
+    },
+    "session.issue.command" : {
+      "comment" : "Explains a local Cooking Session command failure while preserving the stable retry identity.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "The change could not be saved locally. Try again; Kitchen Memory will retry the same action." } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "El cambio no se pudo guardar localmente. Inténtalo de nuevo; Kitchen Memory volverá a intentar la misma acción." } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Le changement n’a pas pu être enregistré localement. Réessayez; Kitchen Memory tentera de nouveau la même action." } }
+      }
+    },
+    "session.issue.read" : {
+      "comment" : "Explains that retained Cooking Session evidence could not be loaded.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Cooking Sessions could not be updated from their retained evidence. Try again." } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Las sesiones de cocina no se pudieron actualizar con la evidencia conservada. Inténtalo de nuevo." } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Les séances de cuisine n’ont pas pu être mises à jour à partir des preuves conservées. Réessayez." } }
+      }
+    },
+    "session.issue.title" : {
+      "comment" : "Title for a Cooking Session read, command, or retained-evidence attention alert.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Cooking Session Needs Attention" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "La sesión de cocina necesita atención" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "La séance de cuisine demande votre attention" } }
+      }
+    },
+    "session.navigation.title" : {
+      "comment" : "Navigation title for the bounded Cooking Session shell.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Cooking" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Cocinando" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Cuisine" } }
+      }
+    },
+    "session.shell.foundation.message" : {
+      "comment" : "Explains the deliberately bounded 0.1.3 lifecycle shell.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Progress and cooking notes arrive in the next slices." } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "El progreso y las notas de cocina llegarán en las próximas etapas." } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "La progression et les notes de cuisine arriveront dans les prochaines étapes." } }
+      }
+    },
+    "session.shell.foundation.title" : {
+      "comment" : "Title for the deliberately bounded 0.1.3 lifecycle shell.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Cooking Session" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Sesión de cocina" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Séance de cuisine" } }
+      }
+    },
     "privacy.title" : {
       "comment" : "Navigation title and Settings row label for the app privacy summary.",
       "extractionState" : "manual",

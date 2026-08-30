@@ -39,6 +39,12 @@ same store. It reconstructs and classifies immutable V3 evidence before Logic
 sees a Session; managed CloudKit delivery order and physical identity never
 cross the seam.
 
+`AppRuntime` retains that repository, the Kitchen-scoped `CookingSessions`
+Logic module, and its observable application projection beside the Recipe
+Library for the process lifetime. Cooking Session composition remains separate
+from `RecipeLibrary` and `RecipeRepository`; they share the configured model
+container without collapsing their responsibility seams.
+
 This preserves two independent identities:
 
 - `Kitchen.ID` is the durable product identity used by recipes and future
@@ -93,12 +99,23 @@ that the Kitchen is established and suppresses an inapplicable first-run prompt.
 The answer remains authorization for one requested sample installation; it is
 not authority to restore or download samples automatically on another device.
 
+The current Cooking Session pointer and the single pending lifecycle-command
+outbox use ordinary device-local `UserDefaults`. They are never mirrored into
+`NSUbiquitousKeyValueStore`: selection is not shared lifecycle authority, and a
+stable intention must remain on the device that accepted it until local
+durability is confirmed. CloudKit synchronizes only retained Cooking Session
+evidence in the SwiftData store.
+
 Managed CloudKit imports post a persistent-store remote-change notification.
 KitchenKit's Persistence responsibility converts that callback into a concurrency-safe
 refresh signal; the application composition root connects it to
-`RecipeLibraryModel` after the model has completed its initial load. This keeps
-Core Data and CloudKit callback mechanics out of Domain and Logic while avoiding
-an early notification bypassing sample-onboarding state.
+`RecipeLibraryModel` and `CookingSessionPresentationModel` after each model has
+completed its initial load. Each projection then reloads retained repository
+evidence and lets Domain and Logic classify it. This keeps Core Data and
+CloudKit callback mechanics out of Domain and Logic while avoiding an early
+notification bypassing sample-onboarding state. A notification, account state,
+or successful framework event requests a refresh; none proves that a Session
+Fact arrived or that synchronization is globally complete.
 
 Settings reports the current iCloud account availability and the public managed
 CloudKit setup, import, and export event state. It never equates “account
