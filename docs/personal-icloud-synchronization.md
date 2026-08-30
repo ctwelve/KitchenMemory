@@ -20,13 +20,13 @@ make them SwiftData concerns.
 
 The application composition root asks `KitchenMemorySchema` for either a local
 store or a private-CloudKit store. The choice and container identifier live in
-`KitchenMemoryPersistence`. `KitchenMemoryDomain`, `KitchenMemoryLogic`,
+KitchenKit's Persistence responsibility. Its Domain and Logic responsibilities,
 `RecipeRepository`, and `CookingSessionRepository` expose no CloudKit types.
 
 ```text
 RecipeLibraryModel
         │
-KitchenMemoryLogic
+KitchenKit Logic
         │ domain-facing RecipeRepository
         ▼
 SwiftDataRecipeRepository
@@ -61,11 +61,11 @@ does not need to be rewritten merely because the transport scope changes.
 `Develop` launches use the private database in
 `iCloud.net.ctwelve.dev.KitchenMemory`; `Production` uses
 `iCloud.net.ctwelve.KitchenMemory`. They select the Development and Production
-CloudKit environments respectively. `KitchenMemoryIOS` and
-`KitchenMemoryMacOS` own separate entitlement files while selecting those
-environment-specific containers. The iOS target owns its
-remote-notification background declaration; that iOS-only bundle setting does
-not cross into the macOS product. `Debug`, `Testing`, and the non-distributable
+CloudKit environments respectively. The multiplatform `KitchenMemory` target
+selects separate iOS and macOS entitlement files while retaining those
+environment-specific containers. SDK-qualified settings select separate iOS
+and macOS property lists, so the iOS remote-notification background declaration
+is not carried into the Mac product. `Debug`, `Testing`, and the non-distributable
 `ProductionTesting` UI-smoke hosts use explicit local or in-memory stores and
 never require an iCloud account.
 
@@ -94,7 +94,7 @@ The answer remains authorization for one requested sample installation; it is
 not authority to restore or download samples automatically on another device.
 
 Managed CloudKit imports post a persistent-store remote-change notification.
-`KitchenMemoryPersistence` converts that callback into a concurrency-safe
+KitchenKit's Persistence responsibility converts that callback into a concurrency-safe
 refresh signal; the application composition root connects it to
 `RecipeLibraryModel` after the model has completed its initial load. This keeps
 Core Data and CloudKit callback mechanics out of Domain and Logic while avoiding
@@ -226,9 +226,10 @@ matrix in [0.1 release evidence](release-evidence-0.1.md).
 Schema administration is an explicit development operation, not application
 startup behavior.
 
-1. Build and sign `KitchenMemory macOS Development` for My Mac. Its distinct app
-   identifier gives the Development store its own sandbox, while its entitlements
-   select the separate `iCloud.net.ctwelve.dev.KitchenMemory` container.
+1. Build and sign the `KitchenMemory` scheme with the `Develop` configuration
+   for My Mac. Its distinct app identifier gives the Development store its own sandbox,
+   while its entitlements select the separate
+   `iCloud.net.ctwelve.dev.KitchenMemory` container.
 2. Launch that Mac app once with `--initialize-cloudkit-schema`.
 3. Inspect record types, indexes, and security roles in CloudKit Console.
 4. Exercise create, edit, delete, offline, reconnect, and concurrent-edit paths

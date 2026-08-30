@@ -9,6 +9,11 @@ SPDX-License-Identifier: GPL-3.0-only
 - Status: Accepted
 - Date: 2026-08-26
 
+Amended by [ADR 0012](0012-consolidate-business-code-in-kitchenkit.md): the
+distinct Cooking Sessions interface and persistence seam remain, but they now
+live in `KitchenKit/Logic` and `KitchenKit/Persistence` rather than a separately
+imported `KitchenMemoryLogic` module.
+
 `CookingSession` is a top-level aggregate with lifecycle, snapshot, progress,
 terminal-action, and convergence rules that differ from maintained recipes.
 Kitchen Memory will therefore place those rules behind a distinct

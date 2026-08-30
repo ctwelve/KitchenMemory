@@ -4,8 +4,7 @@
 
 import Foundation
 @testable import KitchenMemory
-import KitchenMemoryDomain
-import KitchenMemoryPersistence
+import KitchenKit
 import SwiftData
 import XCTest
 

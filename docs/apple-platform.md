@@ -7,8 +7,8 @@ SPDX-License-Identifier: GPL-3.0-only
 -->
 
 
-The product uses separate native SwiftUI application targets for iPhone and
-iPad, and for Mac, with a display-centric tvOS client planned for a later phase.
+The product uses one native multiplatform SwiftUI application target for iPhone,
+iPad, and Mac, with a display-centric tvOS client planned for a later phase.
 The Mac application is not merely an enlarged phone interface: it should grow
 into a powerful library-management and automation environment while sharing the
 same recipe domain and import engine.
@@ -42,19 +42,19 @@ compromised interface. See
 
 ## Native product targets and destinations
 
-`KitchenMemoryIOS` is the native iPhone and iPad product.
-`KitchenMemoryMacOS` is the native Mac product. Their shared 0.1 source layer
-does not make them one runnable, archive, entitlement surface, or launch-screen
-contract.
+`KitchenMemory` is one native multiplatform target supporting iPhone, iPad, iOS
+Simulator, and native Mac destinations. Destination selection still produces
+separate platform binaries, bundles, entitlement surfaces, archives, and launch
+behavior. SDK-conditional settings select four platform/configuration-specific
+entitlement files; platform filters keep the localized launch storyboard and
+launch asset catalog in iOS products only.
 
-The iOS target supports iOS devices and iOS Simulator only. Mac Catalyst, Mac
-Designed for iPhone or iPad, and visionOS Designed for iPhone or iPad are
-explicitly unsupported. The macOS target supports native macOS destinations
-only. This keeps Xcode and Xcode Cloud destination lists aligned with products
-the project actually builds and accepts. A future Catalyst, visionOS, or tvOS
-target must be an explicit product decision with its own interaction,
-capability, testing, and release contract. See
-[ADR 0009](adr/0009-separate-native-app-targets.md).
+Mac Catalyst, Mac Designed for iPhone or iPad, and visionOS Designed for iPhone
+or iPad are explicitly unsupported. This keeps Xcode and Xcode Cloud destination
+lists aligned with products the project actually builds and accepts. A future
+Catalyst, visionOS, or tvOS product requires an explicit decision with its own
+interaction, capability, testing, and release contract. See
+[ADR 0013](adr/0013-unified-native-multiplatform-app-target.md).
 
 The tvOS client should emphasize legibility at kitchen distance, simple remote
 navigation, clear progress through instructions, timers, and reliable access to
@@ -65,7 +65,7 @@ app.
 ## Architectural aim
 
 The current SwiftUI application crosses durable product boundaries through
-`RecipeLibraryModel`, which delegates to the same `KitchenMemoryLogic` operations
+`RecipeLibraryModel`, which delegates to the same KitchenKit Logic operations
 that future automation and platform-specific interfaces will use:
 
 ```text
@@ -75,7 +75,7 @@ RecipeLibraryModel
    ├── RecipeLibrary ────────┐
    ├── RecipeEditor ────────├──→ RecipeRepository
    ├── KitchenResetService ──┘
-   └── RecipeImportService ───→ KitchenMemoryImport
+   └── RecipeImportService ───→ Import responsibility
 ```
 
 `RecipeLibraryModel` is application glue, not the only permitted client. A
@@ -85,9 +85,9 @@ values or structured results. Automation must not manipulate persistence
 objects or UI elements. This keeps every client independent of SwiftData,
 CloudKit, and a particular window layout.
 
-## Current module boundaries
+## KitchenKit responsibility seams
 
-### KitchenMemoryDomain
+### Domain
 
 Plain Swift domain values and rules:
 
@@ -100,7 +100,7 @@ Plain Swift domain values and rules:
 The domain should be usable from the app, extensions, tests, and a potential
 command-line companion.
 
-### KitchenMemoryImport
+### Import
 
 The deterministic and bounded web import pipeline:
 
@@ -114,13 +114,13 @@ Import produces a draft. Saving that draft is a separate product-logic decision.
 This distinction is essential for unattended batch processing: ambiguous cards
 can land in an inbox rather than being silently turned into bad recipes.
 
-### KitchenMemoryPersistence
+### Persistence
 
 Repository interfaces and mapping expressed in domain terms. The first
 implementation uses SwiftData, but callers do not receive storage-framework
 model objects. CloudKit integration remains behind the application boundary.
 
-### KitchenMemoryLogic
+### Logic
 
 Product operations and presentation-independent workflow state that coordinate
 the domain, importer, and store. The implemented boundary includes:
@@ -138,26 +138,29 @@ RecipeScalingState     transient working-yield selection
 File import, search, export, batch work, and cooking sessions will extend this
 same boundary when their slices arrive.
 
-### KitchenMemory application layer and native targets
+### KitchenMemory application layer and native target
 
-The shared `KitchenMemory/` layer contains the SwiftUI interface,
-`RecipeLibraryModel` composition glue, bundled sample resources, and
-localization catalogs, with membership in both native app targets.
-Platform-owned resources, entitlements, and future presentation code belong in
-`KitchenMemoryIOS/` or `KitchenMemoryMac/`; reusable recipe behavior does not.
+The `KitchenMemory/` layer contains the SwiftUI interface,
+`RecipeLibraryModel` composition glue, bundled sample resources, localization
+catalogs, separate editor-friendly iOS and macOS property lists, four
+entitlement files, and the iOS-only launch resources. All belong to the native
+multiplatform app target; SDK-qualified settings and file-level platform
+filters preserve native differences. Reusable recipe behavior belongs in
+`KitchenKit`.
 See [implementation architecture](implementation-architecture.md) and
 [localization architecture](localization-architecture.md).
 
-An eventual tvOS target should consume `KitchenMemoryDomain` and the read/cook-oriented
+An eventual tvOS target should import `KitchenKit` and consume its read/cook-oriented
 Logic operations while supplying its own focused presentation layer. Its
 future existence must not force television interaction constraints into the
 Mac, iPhone, or iPad interface.
 
 ## Comprehension and modularity
 
-Keep modules aligned with durable responsibilities rather than creating one
-module per entity or feature screen. Within them, prefer small types, explicit
-data flow, domain vocabulary, and the fewest layers that preserve the accepted
+Keep compiler modules aligned with independently consumable products rather
+than creating one per entity or feature screen. Within KitchenKit, preserve its
+durable responsibilities through folders, interfaces, small types, explicit
+data flow, domain vocabulary, and the fewest layers that maintain the accepted
 boundaries.
 
 This application does not need speculative infrastructure for hypothetical
@@ -257,7 +260,7 @@ feature ships, even if scanning itself comes much later.
 
 Automator remains a useful integration point for existing Mac workflows, but a
 Shortcuts action and scriptable app are the more durable product surfaces. The
-shared `KitchenMemoryLogic` use cases allow all three to coexist:
+shared KitchenKit Logic operations allow all three to coexist:
 
 - AppleScript for rich Mac automation and querying.
 - Shortcuts/App Intents for approachable cross-device actions.

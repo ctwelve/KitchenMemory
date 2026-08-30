@@ -65,8 +65,8 @@ transient construction memory.
 
 ## Deterministic import boundary
 
-`KitchenMemoryImport` implements the pipeline from captured HTML or JSON-LD
-through reviewable candidates. `SchemaOrgRecipeImporter` has no networking or
+KitchenKit's Import responsibility implements the pipeline from captured HTML
+or JSON-LD through reviewable candidates. `SchemaOrgRecipeImporter` has no networking or
 persistence dependency. Its result retains a source-faithful UTF-8 transcription
 of the containing JSON-LD block plus the selected candidate coordinates, so
 later parsing improvements can be applied without fetching the page again or
@@ -74,8 +74,8 @@ relying on today's interpretation.
 
 Missing titles and malformed sibling blocks are diagnostics rather than reasons
 to discard other meaningful recipe content. Candidate selection, URL fetching,
-and concern classification are coordinated by `KitchenMemoryLogic` rather than
-the deterministic parser. SwiftUI presents the resulting import session and
+and concern classification are coordinated by KitchenKit's Logic responsibility
+rather than the deterministic parser. SwiftUI presents the resulting import session and
 routes an accepted draft through the same `RecipeEditor` used by manual entry.
 
 When a reviewed candidate is saved, the revision retains one bounded JSON-LD

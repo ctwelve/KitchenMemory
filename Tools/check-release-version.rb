@@ -11,7 +11,7 @@ module KitchenMemory
   module ReleaseVersion
     VERSION_PATTERN = /\A(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\z/.freeze
     TAG_PATTERN = /\Arelease\/((?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*))\z/.freeze
-    APP_TARGETS = ["KitchenMemoryIOS", "KitchenMemoryMacOS"].freeze
+    APP_TARGETS = ["KitchenMemory"].freeze
     APP_CONFIGURATIONS = [
       "Debug",
       "Develop",
@@ -21,7 +21,7 @@ module KitchenMemory
     ].freeze
     APP_CONFIGURATION_PATTERN = %r{
       ^[\t ]*[0-9A-F]+\s+/\*\s+([^\r\n]*?)\s+configuration\s+for\s+PBXNativeTarget\s+
-      "(KitchenMemory(?:IOS|MacOS))"\s+\*/\s+=\s+\{\n
+      "(KitchenMemory)"\s+\*/\s+=\s+\{\n
       (.*?)
       ^[\t ]*\};$
     }mx.freeze
@@ -41,7 +41,7 @@ module KitchenMemory
 
       discovered_targets = matches.map { |match| match[1] }.uniq.sort
       unless discovered_targets == APP_TARGETS.sort
-        raise ContractError, "both KitchenMemoryIOS and KitchenMemoryMacOS must define versions"
+        raise ContractError, "KitchenMemory must define application versions"
       end
 
       APP_TARGETS.each do |target|

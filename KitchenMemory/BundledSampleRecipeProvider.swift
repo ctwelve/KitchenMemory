@@ -3,9 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 import Foundation
-import KitchenMemoryDomain
-import KitchenMemoryLogic
-import KitchenMemoryPersistence
+import KitchenKit
 
 /// Adapts the application-owned asset catalog to UI-independent Kitchen logic.
 @MainActor

@@ -10,6 +10,17 @@ SPDX-License-Identifier: GPL-3.0-only
 
 Accepted.
 
+Amended by [ADR 0012](0012-consolidate-business-code-in-kitchenkit.md) and
+[ADR 0013](0013-unified-native-multiplatform-app-target.md): the
+coverage-versus-UI investment policy remains, but `KitchenKitTests` is now one
+unhosted target and `KitchenMemoryTests` is one multiplatform hosted target.
+Each shared scheme builds only its primary product and references one checked-in
+test plan; the plan is the sole owner of test-target membership.
+`KitchenMemory.xctestplan` runs hosted tests plus the shared UI smoke target on
+both native destinations, while `KitchenKit.xctestplan` runs the unhosted
+framework suite. Both use `Testing` as the default Test configuration. Names
+below record historical topology where applicable, not the live project contract.
+
 ## Context
 
 Kitchen Memory's domain rules, product operations, import behavior, and
@@ -42,24 +53,20 @@ Do not add UI tests for provisional editor layout, scrolling, disclosure state,
 exact visible strings, or detailed accessibility-tree behavior. A feature whose
 behavior can be verified below the view layer must be tested there.
 
-Keep `KitchenMemory iOS Testing` and `KitchenMemory macOS Testing`, their
-platform application-test targets, and the `Testing` configuration non-UI. The
-platform-specific `KitchenMemoryIOSTesting.xctestplan` and
-`KitchenMemoryMacTesting.xctestplan` plans are both application correctness
-gates, but contain only their native app-hosted test target. Run the shared UI
-target only from the two platform Production plans, using each
-release-optimized but non-distributable `ProductionTesting` host. The actual
-`Production` applications must not contain the disposable UI-test storage
-switch.
+Keep the multiplatform `KitchenMemoryTests` target and the `Testing`
+configuration non-UI. `KitchenMemory.xctestplan` contains that hosted target and
+the bounded `KitchenMemoryUITests` smoke target; the same saved plan is an
+application correctness gate on iOS Simulator and native macOS. Both use the
+least-privilege disposable `Testing` host by default. The actual `Production`
+application must not contain the disposable UI-test storage switch.
 
-Give Domain, Import, Persistence, and Logic one standalone, unhosted XCTest
-target each. The `KitchenMemory Core Testing` scheme and
-`KitchenMemoryCoreTesting.xctestplan` run those four targets once on the
-canonical macOS destination and generate the exact line-coverage artifact.
-Shared property-test support is compiled directly into the test targets that
-need it rather than becoming another production module. The iOS and macOS app
-lanes remain required because native composition, resources, build settings,
-and runtime behavior can fail independently of the shared source metric.
+`KitchenKitTests` is one standalone, unhosted XCTest target. The `KitchenKit`
+scheme and `KitchenKit.xctestplan` run it once on the canonical macOS
+destination and generate the exact line-coverage artifact. Shared property-test
+support is compiled directly into that target rather than becoming another
+production module. Both application destinations remain required because
+native composition, resources, build settings, and runtime behavior can fail
+independently of the shared source metric.
 
 Continue to use native controls, semantic structure, and sensible accessibility
 labels during prototyping. Defer exhaustive accessibility audits, localized-copy
@@ -85,7 +92,7 @@ exercise notification delivery, concurrency hops, and stale-result rejection.
   and preservation behavior is covered below the UI.
 - UI tests remain fast, few, identifier-driven, and resilient to localization.
 - The standalone core lane supplies the canonical exact framework coverage
-  artifact; both native application-test lanes remain correctness gates.
+  artifact; both destination-level application-test runs remain correctness gates.
 - Provisional UI can be redesigned without repairing tests that encode obsolete
   presentation choices.
 - Accessibility remains a product requirement, but comprehensive proof becomes
@@ -94,6 +101,6 @@ exercise notification delivery, concurrency hops, and stale-result rejection.
   behavior before tests treat user-facing copy as a stable contract.
 - ADR 0005 still governs test frameworks and code comprehension; this decision
   narrows where each kind of test should be invested.
-- [ADR 0009](0009-separate-native-app-targets.md) defines the two native app
-  targets and their platform plans without changing this division between
-  durable logic coverage and application-shell smoke coverage.
+- [ADR 0013](0013-unified-native-multiplatform-app-target.md) defines the native
+  multiplatform app target and shared application plan without changing this
+  division between durable logic coverage and application-shell smoke coverage.

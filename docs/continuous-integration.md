@@ -6,41 +6,36 @@ Copyright © 2026 the Kitchen Memory contributors.
 SPDX-License-Identifier: GPL-3.0-only
 -->
 
-Xcode Cloud is Kitchen Memory's continuous-integration system. Seven shared
-schemes make both the platform and workflow boundary explicit. iOS and macOS
-each have `Development`, `Testing`, and `Production` schemes. Development owns
-ordinary developer runs, Testing owns deterministic non-UI validation, and
-Production owns production UI smoke tests and archives. CI-only replacements
-for those actions should be avoided. Development also retains a local Profile
-action using the `Production` configuration.
+Xcode Cloud is Kitchen Memory's continuous-integration system. The repository
+checks in one `KitchenMemory` scheme and plan so local and cloud Test actions
+select the same hosted and UI-smoke targets on iOS and macOS destinations. It
+also checks in a minimal `KitchenKit` scheme and plan for the unhosted framework
+suite. Every shared scheme references one explicit plan.
 
 ## Scheme, plan, and destination contract
 
-| Shared scheme | Run / Analyze | Test build | Test plan and targets | Native destination | Profile / Archive |
-| --- | --- | --- | --- | --- | --- |
-| `KitchenMemory iOS Development` | `Develop` | `Testing` | `KitchenMemoryIOSTesting`: `KitchenMemoryIOSTests` | iOS device or Simulator | `Production` / No |
-| `KitchenMemory iOS Testing` | `Testing` | `Testing` | `KitchenMemoryIOSTesting`: `KitchenMemoryIOSTests` | iOS device or Simulator | No / No |
-| `KitchenMemory iOS Production` | `Production` | `ProductionTesting` | `KitchenMemoryIOSProduction`: `KitchenMemoryIOSTests` and shared UI smoke hosted by `KitchenMemoryIOS` | iOS device or Simulator | `Production` / `Production` |
-| `KitchenMemory macOS Development` | `Develop` | `Testing` | `KitchenMemoryMacTesting`: `KitchenMemoryMacTests` | native macOS | `Production` / No |
-| `KitchenMemory macOS Testing` | `Testing` | `Testing` | `KitchenMemoryMacTesting`: `KitchenMemoryMacTests` | native macOS | No / No |
-| `KitchenMemory macOS Production` | `Production` | `ProductionTesting` | `KitchenMemoryMacProduction`: `KitchenMemoryMacTests` and shared UI smoke hosted by `KitchenMemoryMacOS` | native macOS | `Production` / `Production` |
-| `KitchenMemory Core Testing` | N/A / `Testing` | `Testing` | `KitchenMemoryCoreTesting`: Domain, Import, Logic, and Persistence standalone tests | native macOS | No / No |
+| Scheme and plan | Scheme build product | Plan test targets | Native destination |
+| --- | --- | --- | --- |
+| `KitchenKit` with `KitchenKit.xctestplan` | `KitchenKit` | `KitchenKitTests` | native macOS for canonical coverage; iOS as needed |
+| `KitchenMemory` with `KitchenMemory.xctestplan` | `KitchenMemory` | `KitchenMemoryTests`, `KitchenMemoryUITests` | iOS device, Simulator, or native macOS |
 
-Each platform scheme has one top-level app buildable; Xcode adds the four linked
-framework targets through ordinary dependency resolution. The core scheme has
-four test buildables and no runnable or archive action. Each plan has one plan
-configuration: `Core Framework Tests`, `Application Tests`, or `Production
-Validation`. Additional plan configurations would
-alter arguments, environment, diagnostics, and repetition for the same target
-set. They would not select a platform, destination, or test host. Combining iOS
-and macOS into two configurations of one plan would still ask Xcode to assemble
-both target graphs. The separate platform plans and Cloud actions therefore
-express an actual build boundary, not cosmetic duplication.
+Each shared scheme has one top-level product buildable; Xcode adds dependencies
+through ordinary resolution. Its saved plan is the sole owner of test-target
+membership: `KitchenKit.xctestplan` contains the unhosted framework target,
+while the application plan contains its multiplatform hosted-test target and the shared
+UI-smoke target. The schemes default Test and Analyze to `Testing`; Xcode Cloud
+may still select a configuration and destination explicitly without introducing
+duplicate scheme names.
 
-The iOS schemes do not expose Mac Catalyst, Mac Designed for iPhone or iPad, or
-visionOS Designed for iPhone or iPad destinations. The macOS schemes expose
-native Mac destinations only. Compatibility products require an explicit target
-and acceptance decision; they are not incidental CI coverage.
+The application scheme does not expose Mac Catalyst, Mac Designed for iPhone
+or iPad, or visionOS Designed for iPhone or iPad destinations. Compatibility
+products require an explicit target and acceptance decision; they are not
+incidental CI coverage.
+
+Xcode Cloud workflow metadata lives outside this repository. Before this target
+consolidation is pushed or merged, every cloud Build, Analyze, Test, and Archive
+action that names `KitchenMemoryIOS` or `KitchenMemoryMacOS` must be migrated to
+`KitchenMemory` while retaining its existing iOS or macOS destination.
 
 ## Workflow policy
 
@@ -49,12 +44,13 @@ and acceptance decision; they are not incidental CI coverage.
 The development workflow starts for meaningful project changes pushed to
 `slice/*` integration branches, `bugs/*` hardening branches, and
 `release-eng/*` release-infrastructure branches. All three governed lanes
-perform Build, Analyze, and Test actions using `KitchenMemory iOS Testing`,
-`KitchenMemory macOS Testing`, and the macOS-destination `KitchenMemory Core
-Testing` lane, but never archive a product. Those actions use `Testing` and do
-not include UI automation. Local developer runs use the
-corresponding platform's Development scheme, whose Run and Analyze actions use
-`Develop`. The distinct development bundle identifier keeps local stores,
+perform separate iOS and macOS Build, Analyze, and Test actions using the same
+`KitchenMemory` scheme, plus the macOS-destination `KitchenKit` lane, but never
+archive a product. Those actions use `Testing`; each destination Test action runs
+its hosted correctness target and the bounded shared UI smoke suite. Local
+developer runs use the
+same application scheme with the `Develop` configuration. The distinct
+development bundle identifier keeps local stores,
 CloudKit metadata, and onboarding preferences out of the Production app
 sandbox. Its separate
 CloudKit container also keeps development records and schema administration
@@ -72,18 +68,18 @@ validation, packaging, signing, notarization, and distribution automation. It
 is not a second feature lane. User-visible defects remain `bugs/*`, while new
 product capability remains `slice/*`.
 
-Build, Analyze, and the non-UI Test action are required to pass. The core
-framework coverage gate has reached exact complete line coverage; a failing
-logic test or coverage check is a product defect.
+Build, Analyze, and the complete platform Test actions are required to pass.
+The KitchenKit coverage gate has reached exact complete line coverage; a
+failing logic test or coverage check is a product defect.
 
 ### Main production
 
 The `Merge to main` workflow starts for selected project changes merged or
 pushed to `main`. It currently contains an iOS Build action for Any iOS Device
-using `KitchenMemory iOS Production` and a macOS Build action for Any Mac using
-`KitchenMemory macOS Production`. It does not contain Test, Analyze, Archive,
-or post-actions. Signed distribution
-archives therefore remain an explicit release-tag operation.
+and a macOS Build action for Any Mac, both using `KitchenMemory` with
+`Production`. It does not contain Test, Analyze,
+Archive, or post-actions. Signed distribution archives therefore remain an
+explicit release-tag operation.
 
 This division is intentional. Test and Analyze are handled by the development
 and pull-request workflows under their respective gates; `Merge to main`
@@ -100,7 +96,8 @@ on `main` whose required production evidence has passed. The trigger accepts any
 file change and does not auto-cancel an older release build.
 
 The workflow runs an iOS Archive action for Any iOS Device and a macOS Archive
-action for Any Mac, using the corresponding platform's Production scheme. Both
+action for Any Mac, using the same `KitchenMemory` scheme with the `Production`
+configuration. Both
 archives select App Store Connect distribution preparation. The
 `Notarize - macOS` post-action is attached specifically to the macOS archive.
 Creating the tag is a release operation, not an exploratory build shortcut.
@@ -238,9 +235,12 @@ Development and production configurations retain the complete entitlement set;
 the testing exception does not alter a shipped application.
 
 Application-hosted XCTest processes also select an in-memory store in those two
-testing configurations through the committed test plans' `--unit-testing`
-launch argument. Ordinary development and production launches continue to use
-durable storage.
+testing configurations by detecting Xcode's hosted-test environment. This keeps
+the saved application plan disposable without relying on a plan-level launch
+argument. UI smoke tests pass their own harness argument and use the same
+disposable `Testing` host by default. Ordinary development and production
+launches continue to use durable storage; `ProductionTesting` remains available
+for an explicitly selected release-optimized smoke run.
 
 UI smoke launches also ignore persisted application-window restoration state.
 On macOS, XCUITest can nevertheless relaunch a live `WindowGroup` application
@@ -255,30 +255,28 @@ copy while the source checkout is available. This is necessary because Xcode
 Cloud may execute `test-without-building` on a different host that receives the
 test products but not the original repository path recorded by `#filePath`.
 
-The core plan collects code coverage; the two app-hosted Testing plans do not.
-All three lanes are correctness gates. Evaluate durable domain, import,
-persistence, and product-logic sources separately from SwiftUI views and test
-bundles; an app-wide percentage is not the business-logic metric. Use uncovered
-executable lines to find missing behavior and boundary tests, not to justify
-exercising provisional views through UI automation.
+The KitchenKit lane enables code coverage explicitly; the two app-hosted plans
+do not. All three lanes are correctness gates. Evaluate durable
+domain, import, persistence, and product-logic sources separately from SwiftUI
+views and test bundles; an app-wide percentage is not the business-logic
+metric. Use uncovered executable lines to find missing behavior and boundary
+tests, not to justify exercising provisional views through UI automation.
 
-### Core framework coverage gate
+### KitchenKit coverage gate
 
-Generate a fresh coverage bundle from the complete standalone core suite and apply
-the gate in the same run:
+Generate a fresh coverage bundle from the complete standalone KitchenKit suite
+and apply the gate in the same run:
 
 ```sh
 Tools/run-core-framework-coverage.sh
 ```
 
 The runner creates a unique evidence directory under `/private/tmp`, prints its
-location, runs `KitchenMemory Core Testing` with
-`KitchenMemoryCoreTesting.xctestplan`, and invokes the checker only after Xcode
-succeeds. This macOS result is the canonical exact line-coverage artifact for
-the four shared frameworks. It avoids reporting the same source lines twice;
-it does not replace either app correctness lane. Both app Testing plans exclude
-the UI target; both Production plans include the shared UI target with their
-native application-test target.
+location, runs the shared `KitchenKit` scheme and its explicit plan with
+explicit code coverage, and invokes the checker only after Xcode succeeds. This
+macOS result is the canonical exact line-coverage artifact for KitchenKit. It
+does not replace either app correctness lane or the separately selected UI
+smoke target.
 
 To check an existing result bundle directly, pass it to:
 
@@ -287,17 +285,15 @@ Tools/check-core-framework-coverage.sh /path/to/Tests.xcresult
 ```
 
 The script reads Xcode's integer covered and executable line counts rather than
-its rounded percentage. It prints evidence for the domain, import, logic, and
-persistence frameworks and
-fails when a target or current framework source is missing, when even one
-executable line is uncovered, or when source, tests, the test plan, or project
-membership, scheme behavior, or resolved dependencies changed after the bundle's
-recorded build start.
+its rounded percentage. It prints evidence for KitchenKit and fails when the
+target or current source is missing, when even one executable line is uncovered,
+or when source, tests, project membership, or resolved dependencies changed
+after the bundle's recorded build start.
 
 ### Deterministic property-test corpora
 
 Property tests load named entropy seeds from
-`SharedTestSupport/PropertyTestSeeds.json`. Failure messages record
+`KitchenKitTests/Support/PropertyTestSeeds.json`. Failure messages record
 the seed and case number so a generated input can be replayed exactly. The test
 harness verifies catalog integrity, proves that changed seeds produce different
 raw and derived corpora, and pins a known-answer vector so an accidental generator
@@ -343,10 +339,11 @@ inside a test body as an ordinary test failure requiring investigation.
 
 ## Static analysis
 
-The Development and Testing schemes mark the application as buildable for Analyze. Project build
+The saved application schemes use `Testing` for Analyze. Project build
 settings select Xcode's `deep` static-analyzer mode specifically for the Analyze
-action. The analyzer does not run during every ordinary build, avoiding a slower
-duplicate pass during day-to-day development.
+action, while the invocation selects the desired configuration. The analyzer
+does not run during every ordinary build, avoiding a slower duplicate pass
+during day-to-day development.
 
 Run the same action locally with:
 
@@ -354,7 +351,8 @@ Run the same action locally with:
 DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer \
   xcodebuild -skipPackagePluginValidation analyze \
   -project KitchenMemory.xcodeproj \
-  -scheme 'KitchenMemory macOS Development' \
+  -scheme KitchenMemory \
+  -configuration Develop \
   -destination 'platform=macOS' \
   -derivedDataPath /private/tmp/KitchenMemoryAnalyze \
   CODE_SIGNING_ALLOWED=NO
@@ -362,8 +360,8 @@ DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer \
 
 ## SwiftLint
 
-SwiftLint is a pinned Swift package build-tool plugin attached to the application,
-internal frameworks, and test targets. Consequently, linting runs for the source
+SwiftLint is a pinned Swift package build-tool plugin attached to the applications,
+KitchenKit, and test targets. Consequently, linting runs for the source
 files Xcode is already building, both locally and in Xcode Cloud. There is no
 separate cloud lint installation or script.
 
@@ -372,7 +370,7 @@ configured severities instead of being promoted globally. File length warns
 above 400 lines and becomes an error above 1,000 lines. The goal remains a
 warning-free tree, but an ordinary maintenance warning does not block local,
 slice, or bug work. Strict warning promotion may later be attached explicitly
-to the production scheme rather than inherited by every build.
+to the `Production` configuration rather than inherited by every build.
 
 The opt-in rules are deliberately limited to product safety and lifecycle
 mistakes, collection correctness and avoidable work, SwiftUI accessibility
@@ -381,8 +379,8 @@ mechanical churn are not CI policy.
 
 When adding an opt-in rule:
 
-1. audit it across both applications, the frameworks, both application-test
-   targets, and the shared UI-test target;
+1. audit it across the application, KitchenKit, the hosted application-test
+   target, and the shared UI-test target;
 2. confirm that its findings represent defects or an agreed maintenance cost;
 3. bring the current tree to zero violations before making it required; and
 4. avoid a baseline unless an incremental migration has been explicitly chosen.
@@ -406,7 +404,7 @@ external beta when failures can inform supported-user risk rather than block
 early development on a fixed platform defect.
 
 Treat every environment or alias change as a deliberate migration: run the
-Testing and Production schemes locally with that Xcode version, review new
+Testing and Production configurations locally with that Xcode version, review new
 analyzer and linter diagnostics, and then update all applicable workflows.
 
 Custom scripts in `ci_scripts` run for every cloud action. The post-clone script
@@ -429,12 +427,14 @@ project marketing version and root `RELEASE` marker have both been advanced to
 that same version.
 
 The structure contract also pins each project configuration to its matching
-xcconfig; the development and production bundle namespaces; platform plist,
-entitlement, and synchronized-folder ownership; scheme action configurations,
-eligibility, and runnable products; and each test plan's coverage and launch-
-argument policy. Treat a contract failure as a reviewable project change, not
+xcconfig and automatic merged-binary mode; the development and production
+bundle namespaces; platform plist, entitlement, and synchronized-folder
+ownership; the two shared schemes and two explicit plans; and exclusive
+plan ownership of test-target membership. It also requires each
+localization-catalog embedding phase to run first in its hosted-test target,
+preventing a dependency cycle between that test-bundle output and KitchenKit
+re-export signing. Treat a contract failure as a reviewable project change, not
 as a reason to weaken the checker until the project happens to pass.
 
 Keep cloud scripts short, deterministic, and limited to environment preparation
-so build, test, Analyze, and Archive behavior remains visible in the shared
-schemes.
+so build, test, Analyze, and Archive behavior remains visible in Xcode's schemes.

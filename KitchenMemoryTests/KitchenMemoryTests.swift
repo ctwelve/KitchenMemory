@@ -3,9 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 @testable import KitchenMemory
-import KitchenMemoryDomain
-import KitchenMemoryLogic
-import KitchenMemoryPersistence
+import KitchenKit
 import XCTest
 
 @MainActor
@@ -54,13 +52,13 @@ final class KitchenMemoryTests: XCTestCase {
     )
   }
 
-  func testCurrentRuntimeUsesTheCommittedHostedTestPlan() throws {
+  func testCurrentRuntimeUsesTheHostedTestEnvironment() throws {
     let preparedApp = try XCTUnwrap(AppRuntime.prepare().preparedApp)
 
     preparedApp.libraryModel.loadIfNeeded()
 
     XCTAssertEqual(preparedApp.libraryModel.recipes.count, 3)
-    XCTAssertNil(preparedApp.cloudSyncSettings)
+    XCTAssertNotNil(preparedApp.cloudSyncSettings)
     XCTAssertNil(preparedApp.persistentStoreChangeObserver)
     XCTAssertNil(preparedApp.personalCloudStatusMonitor)
   }
@@ -150,6 +148,12 @@ final class AppLaunchPlanTests: XCTestCase {
     XCTAssertTrue(AppBuildEnvironment.production.synchronizesWithPersonalCloud)
     XCTAssertFalse(AppBuildEnvironment.productionTesting.synchronizesWithPersonalCloud)
 
+    XCTAssertFalse(AppBuildEnvironment.debug.offersCloudSyncSetting)
+    XCTAssertTrue(AppBuildEnvironment.develop.offersCloudSyncSetting)
+    XCTAssertTrue(AppBuildEnvironment.testing.offersCloudSyncSetting)
+    XCTAssertTrue(AppBuildEnvironment.production.offersCloudSyncSetting)
+    XCTAssertTrue(AppBuildEnvironment.productionTesting.offersCloudSyncSetting)
+
     XCTAssertFalse(AppBuildEnvironment.debug.permitsUITestHarness)
     XCTAssertFalse(AppBuildEnvironment.develop.permitsUITestHarness)
     XCTAssertTrue(AppBuildEnvironment.testing.permitsUITestHarness)
@@ -227,11 +231,16 @@ final class AppLaunchPlanTests: XCTestCase {
     XCTAssertEqual(production.sampleFixture, .empty)
   }
 
-  func testHostedUnitTestPlanUsesDisposableStorageAndNeverPersonalCloud() throws {
+  func testHostedUnitTestsUseDisposableStorageAndNeverPersonalCloud() throws {
     for buildEnvironment in [AppBuildEnvironment.testing, .productionTesting] {
-      let hosted = try plan(
-        arguments: ["KitchenMemory", "--unit-testing"],
-        buildEnvironment: buildEnvironment
+      let hosted = try AppLaunchPlan.resolve(
+        inputs: inputs(
+          environment: [
+            "XCTestConfigurationFilePath": "/tmp/KitchenMemory.xctestconfiguration",
+          ],
+          buildEnvironment: buildEnvironment
+        ),
+        durableCloudSyncIsEnabled: true
       )
       XCTAssertEqual(hosted.store, .inMemory)
       XCTAssertEqual(hosted.sampleFixture, .installed)
@@ -249,8 +258,15 @@ final class AppLaunchPlanTests: XCTestCase {
     XCTAssertEqual(developHosted.store, .local)
   }
 
-  func testCommittedTestPlanRequestsDisposableHostedStorage() {
-    XCTAssertTrue(ProcessInfo.processInfo.arguments.contains("--unit-testing"))
+  func testSavedPlanExposesTheHostedXCTestEnvironment() throws {
+    XCTAssertNotNil(ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"])
+    XCTAssertEqual(
+      try AppLaunchPlan.resolve(
+        inputs: .current,
+        durableCloudSyncIsEnabled: true
+      ).store,
+      .inMemory
+    )
   }
 
   func testDisabledCloudPreferenceSelectsTheLocalDurableStore() throws {

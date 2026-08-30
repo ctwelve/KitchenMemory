@@ -1,0 +1,38 @@
+{
+  "configurations" : [
+    {
+      "id" : "5A4506CB-9866-4741-829E-304F8E9679C5",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "performanceAntipatternCheckerEnabled" : true,
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:KitchenMemory.xcodeproj",
+      "identifier" : "A1C4E79D302A63B800E2C0DB",
+      "name" : "KitchenMemory"
+    }
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:KitchenMemory.xcodeproj",
+        "identifier" : "A1C4E7AC302A63B900E2C0DB",
+        "name" : "KitchenMemoryTests"
+      }
+    },
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:KitchenMemory.xcodeproj",
+        "identifier" : "A1C4E7B6302A63B900E2C0DB",
+        "name" : "KitchenMemoryUITests"
+      }
+    }
+  ],
+  "version" : 1
+}

@@ -4,7 +4,7 @@
 
 @testable import KitchenMemory
 import Foundation
-import KitchenMemoryLogic
+import KitchenKit
 import XCTest
 
 @MainActor

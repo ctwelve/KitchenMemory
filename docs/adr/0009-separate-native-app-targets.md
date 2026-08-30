@@ -8,7 +8,17 @@ SPDX-License-Identifier: GPL-3.0-only
 
 ## Status
 
-Accepted.
+Superseded by [ADR 0013](0013-unified-native-multiplatform-app-target.md).
+
+[ADR 0012](0012-consolidate-business-code-in-kitchenkit.md) previously amended
+this decision while the two native application targets still existed. At that
+time, each app target had one saved default scheme and one saved plan containing
+its hosted tests and the shared UI smoke target; `KitchenKit` likewise had one
+shared scheme and one saved plan for its unhosted tests. Each scheme built only
+its primary product, each plan alone owned test-target membership, and
+`KitchenMemoryMacOS/` was the Mac-owned folder. The three-schemes-per-app,
+four-plan, and separate-framework topology below is retained as decision
+history, not current build instructions.
 
 ## Context
 

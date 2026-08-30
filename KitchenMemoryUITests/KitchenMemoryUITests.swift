@@ -51,6 +51,7 @@ final class KitchenMemoryUITests: XCTestCase {
     openSettings(in: app)
 
     let reset = app.buttons["settings-reset-kitchen"]
+    revealSettingsRow(reset, in: app)
     XCTAssertTrue(reset.waitForExistence(timeout: 5))
     activate(reset)
     XCTAssertTrue(app.buttons["confirm-reset-kitchen"].waitForExistence(timeout: 3))
@@ -62,6 +63,7 @@ final class KitchenMemoryUITests: XCTestCase {
     openSettings(in: app)
 
     let privacy = app.descendants(matching: .any)["settings-privacy"]
+    revealSettingsRow(privacy, in: app)
     XCTAssertTrue(privacy.waitForExistence(timeout: 5))
     activate(privacy)
     XCTAssertTrue(
@@ -227,11 +229,7 @@ final class KitchenMemoryUITests: XCTestCase {
     openSettings(in: app)
 
     let privacy = app.descendants(matching: .any)["settings-privacy"]
-#if !os(macOS)
-    if !privacy.waitForExistence(timeout: 2) {
-      app.swipeUp()
-    }
-#endif
+    revealSettingsRow(privacy, in: app)
     XCTAssertTrue(
       privacy.waitForExistence(timeout: 5),
       "Missing localized Privacy row for \(localeIdentifier)"
@@ -241,6 +239,15 @@ final class KitchenMemoryUITests: XCTestCase {
       app.descendants(matching: .any)["privacy-display"].waitForExistence(timeout: 3),
       "Missing localized Privacy display for \(localeIdentifier)"
     )
+  }
+
+  @MainActor
+  private func revealSettingsRow(_ row: XCUIElement, in app: XCUIApplication) {
+#if !os(macOS)
+    if !row.waitForExistence(timeout: 2) {
+      app.swipeUp()
+    }
+#endif
   }
 
   @MainActor

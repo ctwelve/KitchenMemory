@@ -11,6 +11,11 @@ SPDX-License-Identifier: GPL-3.0-only
 - Baseline completed: 2026-08-23
 - Alpha artifact accepted: 2026-08-25
 
+The framework and test-target names in this completed roadmap describe the 0.1
+implementation at the time. [ADR 0012](adr/0012-consolidate-business-code-in-kitchenkit.md)
+subsequently consolidated them into `KitchenKit` and `KitchenKitTests`, with
+an automatic KitchenKit plan and saved platform application plans.
+
 This roadmap records the feature slices that produced the 0.1 baseline and the
 boundary between feature development and release engineering. Slices 1 through
 10 and the deliberately reduced public-alpha acceptance exercise are complete.

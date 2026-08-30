@@ -4,12 +4,8 @@ strict: false
 
 included:
   - KitchenMemory
-  - KitchenMemoryIOS
-  - KitchenMemoryMac
-  - KitchenMemoryDomain
-  - KitchenMemoryImport
-  - KitchenMemoryLogic
-  - KitchenMemoryPersistence
+  - KitchenKit
+  - KitchenKitTests
   - KitchenMemoryTests
   - KitchenMemoryUITests
 

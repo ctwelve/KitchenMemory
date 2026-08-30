@@ -4,7 +4,7 @@
 
 import Defaults
 import Foundation
-import KitchenMemoryLogic
+import KitchenKit
 
 private enum StoredSampleRecipeOnboardingResponse: String, Defaults.Serializable {
   case undecided

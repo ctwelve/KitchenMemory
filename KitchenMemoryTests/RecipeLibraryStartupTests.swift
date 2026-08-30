@@ -3,9 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 @testable import KitchenMemory
-import KitchenMemoryDomain
-import KitchenMemoryLogic
-import KitchenMemoryPersistence
+import KitchenKit
 import XCTest
 
 @MainActor

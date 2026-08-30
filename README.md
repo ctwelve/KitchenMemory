@@ -96,30 +96,32 @@ been flattened or silently rewritten.
 
 ## Building from source
 
-Open `KitchenMemory.xcodeproj` in Xcode. Run **KitchenMemory iOS Development**
-for an iOS Simulator or development device, or **KitchenMemory macOS
-Development** for My Mac.
+Open `KitchenMemory.xcodeproj` in Xcode. Run the **KitchenMemory** scheme and
+choose an iPhone, iPad, iOS Simulator, or My Mac destination. The same checked-in
+application scheme and plan run the hosted and UI-smoke tests on either native
+platform. The minimal **KitchenKit** scheme likewise references a checked-in
+plan for its unhosted test target. Each scheme builds only its primary product;
+its plan alone owns test-target membership.
 
 Development builds use the `net.ctwelve.dev` application namespace and the
 separate `iCloud.net.ctwelve.dev.KitchenMemory` container. They cannot read or
 administer the production app's iCloud data. Production and Development also
 use separate local application sandboxes.
 
-The repository contains separate native iOS and macOS app targets. Shared
-presentation, localization, and starter content live in `KitchenMemory`;
-platform-owned files live in `KitchenMemoryIOS` and `KitchenMemoryMac`. Durable
-domain, import, product-logic, and persistence code lives in root-level native
-framework targets.
+The repository contains one native multiplatform `KitchenMemory` app target.
+Shared presentation, localization, starter content, platform-specific
+entitlements, and iOS-only launch resources live in `KitchenMemory/`; Xcode
+selects the applicable files for the chosen SDK. Durable domain, import,
+product-logic, and persistence code lives in the native `KitchenKit` framework.
 
-Reusable-framework tests run once through the standalone core scheme; native
-composition and resource tests run through the platform Testing schemes. For
-example:
+KitchenKit tests run once through its shared scheme and explicit plan. The
+application plan runs the multiplatform composition and resource tests plus the
+shared identifier-driven UI smoke suite on each selected destination. For example:
 
 ```sh
 xcodebuild test \
   -project KitchenMemory.xcodeproj \
-  -scheme 'KitchenMemory Core Testing' \
-  -testPlan KitchenMemoryCoreTesting \
+  -scheme KitchenKit \
   -destination 'platform=macOS'
 ```
 

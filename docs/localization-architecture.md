@@ -27,15 +27,14 @@ table of sentence fragments.
 ## Interface language
 
 Application-shell labels, actions, settings, validation messages, and formatted
-counts belong in String Catalogs in the shared `KitchenMemory/` application
-layer. Explicit target membership compiles those catalogs into both
-`KitchenMemoryIOS` and `KitchenMemoryMacOS`. The catalogs carry the plural
+counts belong in String Catalogs in the `KitchenMemory/` application layer.
+The native multiplatform target compiles those catalogs into both iOS and Mac
+products. The catalogs carry the plural
 variants required by each supported locale. As interface copy stabilizes,
 ambiguous terms, placeholders, tone, and screen context receive translator
 comments at their extraction sites. Views and presentation adapters request
-localized values; `KitchenMemoryDomain`, `KitchenMemoryImport`,
-`KitchenMemoryPersistence`, and `KitchenMemoryLogic` do not look up interface
-strings.
+localized values; KitchenKit's Domain, Import, Persistence, and Logic
+responsibilities do not look up interface strings.
 
 ### Localization-key lifecycle
 
@@ -73,7 +72,7 @@ Semantic predicates identify meaningful and structured ingredient content;
 Authored source wording remains in the domain; generated interface wording does
 not.
 
-The reusable frameworks continue to return semantic values such as quantities,
+KitchenKit continues to return semantic values such as quantities,
 counts, workflow states, and typed failures. For example,
 `RecipeImportConcern.unparsedIngredients(count:)` remains a count-bearing value;
 the application decides how that concern is phrased and pluralized. This keeps

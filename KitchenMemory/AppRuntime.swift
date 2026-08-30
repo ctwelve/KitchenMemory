@@ -3,9 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 import Foundation
-import KitchenMemoryDomain
-import KitchenMemoryLogic
-import KitchenMemoryPersistence
+import KitchenKit
 import SwiftData
 
 enum AppStartupState {
@@ -90,16 +88,21 @@ struct AppLaunchPlan: Equatable {
     durableCloudSyncIsEnabled: Bool
   ) throws -> Self {
     let usesTestHarness = inputs.buildEnvironment.permitsUITestHarness
+    // The saved platform plans do not inject the former --unit-testing
+    // argument. A hosted XCTest process does provide this path, so testing
+    // builds still select disposable storage without plan-specific arguments.
+    let usesHostedUnitTests = inputs.environment["XCTestConfigurationFilePath"] != nil
     let usesInMemoryStore = usesTestHarness
       && (inputs.arguments.contains("--ui-testing")
-        || inputs.arguments.contains("--unit-testing"))
+        || inputs.arguments.contains("--unit-testing")
+        || usesHostedUnitTests)
     let disablesCloudForUITest = usesTestHarness
       && inputs.arguments.contains("--ui-testing")
       && inputs.arguments.contains("--ui-testing-cloud-sync-disabled")
     let cloudSyncIsEnabled = disablesCloudForUITest ? false : durableCloudSyncIsEnabled
     let synchronizesWithPersonalCloud = cloudSyncIsEnabled
       && inputs.buildEnvironment.synchronizesWithPersonalCloud
-      && inputs.environment["XCTestConfigurationFilePath"] == nil
+      && !usesHostedUnitTests
 
     let store: Store
     if usesInMemoryStore {
