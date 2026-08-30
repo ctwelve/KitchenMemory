@@ -214,7 +214,7 @@ extension CookingSessionEntryPresentationTests {
     XCTAssertEqual(model.currentEntryDraft?.text, "Survive every interruption")
   }
 
-  func testRemoteFinishCancelsStrandedSubmissionBeforeDraftContinuation() throws {
+  func testRemoteFinishDefinitivelyRejectsSubmissionBeforeDraftContinuation() throws {
     let sessionID = CookingSession.ID()
     let service = RemoteFinishDuringSubmitService(sessionID: sessionID)
     let store = VolatileCookingSessionPresentationStore()
@@ -254,34 +254,22 @@ extension CookingSessionEntryPresentationTests {
   }
 
   func testEntryAndOutcomeConflictsCanBeResolvedWithCausalCommands() throws {
-    let sessionID = CookingSession.ID()
-    let entryID = SessionEntry.ID()
-    let conflicted = CookingSessionProjection(
-      id: sessionID,
-      snapshot: ExecutionSnapshot(title: "Soup"),
-      conflicts: [
-        .entry(
-          entryID: entryID,
-          factIDs: [SessionFact.ID(), SessionFact.ID()],
-          values: [
-            .present(SessionEntry(id: entryID, target: nil, text: "More lime")),
-            .withdrawn,
-          ]
-        ),
-        .outcome(
-          factIDs: [SessionFact.ID(), SessionFact.ID()],
-          values: [.value(.coarse(.great)), .cleared]
-        ),
-      ]
-    )
-    let service = ConflictResolutionService(session: conflicted)
+    let fixture = ConflictedEntryFixture()
+    let service = ConflictResolutionService(session: fixture.projection)
     let store = VolatileCookingSessionPresentationStore()
-    store.currentSessionID = sessionID
+    store.currentSessionID = fixture.sessionID
     let model = CookingSessionPresentationModel(sessions: service, store: store)
     model.loadIfNeeded()
 
-    XCTAssertTrue(model.reviseEntry(entryID, text: "More lime", target: nil))
-    service.session = conflicted
+    let targetPresentation = SessionEntryTargetPresentation(snapshot: fixture.snapshot)
+    XCTAssertEqual(targetPresentation.label(for: .ingredient(fixture.ingredientID)), "1 lime")
+    XCTAssertEqual(targetPresentation.label(for: .instruction(fixture.instructionID)), "Simmer")
+    XCTAssertTrue(model.reviseEntry(
+      fixture.entryID,
+      text: "More lime",
+      target: .instruction(fixture.instructionID)
+    ))
+    service.session = fixture.projection
     model.reloadAfterExternalStoreChange()
     XCTAssertTrue(model.clearOutcome())
 
@@ -290,9 +278,9 @@ extension CookingSessionEntryPresentationTests {
       XCTFail("Expected entry conflict resolution")
       return
     }
-    XCTAssertEqual(revisedID, entryID)
+    XCTAssertEqual(revisedID, fixture.entryID)
     XCTAssertEqual(text, "More lime")
-    XCTAssertNil(target)
+    XCTAssertEqual(target, .instruction(fixture.instructionID))
     guard case .clearOutcome = service.intentions[1] else {
       XCTFail("Expected outcome conflict resolution")
       return

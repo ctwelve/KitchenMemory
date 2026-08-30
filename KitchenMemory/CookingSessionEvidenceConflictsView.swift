@@ -53,8 +53,16 @@ struct CookingSessionEvidenceConflictsView: View {
       ForEach(Array(values.enumerated()), id: \.offset) { _, value in
         switch value {
         case let .present(entry):
-          Button(entry.text) {
+          Button {
             model.reviseEntry(entryID, text: entry.text, target: entry.target)
+          } label: {
+            VStack(alignment: .leading, spacing: 2) {
+              Text(entry.text)
+              Label(targetLabel(entry.target), systemImage: "scope")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
           }
         case .withdrawn:
           Button(.sessionEntryConflictWithdrawn, role: .destructive) {
@@ -88,5 +96,10 @@ struct CookingSessionEvidenceConflictsView: View {
     case .coarse(.okay): .sessionOutcomeOkay
     case .coarse(.unsuccessful): .sessionOutcomeUnsuccessful
     }
+  }
+
+  private func targetLabel(_ target: SessionProgressTarget?) -> String {
+    guard let target else { return String(localized: .sessionEntryTargetNone) }
+    return SessionEntryTargetPresentation(snapshot: session.snapshot).label(for: target)
   }
 }

@@ -208,7 +208,7 @@ extension CookingSessionPresentationModel {
     _ result: CookingSessionCommandResult,
     for pending: PendingCookingSessionCommand
   ) -> Bool {
-    switch result {
+    switch PendingCookingSessionResolution(result: result, pending: pending) {
     case let .accepted(session):
       guard pendingCommands.first == pending else { return false }
       // Draft state crosses its local durability boundary before the outbox
@@ -221,6 +221,16 @@ extension CookingSessionPresentationModel {
       isShowingIssue = false
       upsert(session)
       applySelection(for: session, pending: pending)
+      return true
+    case .entryRejectedByFinishedSource:
+      guard pendingCommands.first == pending else { return false }
+      // Logic has definitively rejected this one submitted identity because
+      // its source Session is already Finished. Clear only that terminal
+      // command; the exact draft remains local for explicit resolution.
+      pendingCommands.removeFirst()
+      persistPendingCommands()
+      issue = nil
+      isShowingIssue = false
       return true
     case let .attention(attention):
       present(.attention(attention))
@@ -341,6 +351,26 @@ extension CookingSessionPresentationModel {
       exactScale: scale.multiplier,
       quantities: quantities
     )
+  }
+}
+
+private enum PendingCookingSessionResolution {
+  case accepted(CookingSessionProjection)
+  case entryRejectedByFinishedSource
+  case attention(CookingSessionAttention)
+
+  init(
+    result: CookingSessionCommandResult,
+    pending: PendingCookingSessionCommand
+  ) {
+    switch (result, pending) {
+    case let (.accepted(session), _):
+      self = .accepted(session)
+    case (.attention(.commandNotAllowed(lifecycle: .finished)), .submitEntry):
+      self = .entryRejectedByFinishedSource
+    case let (.attention(attention), _):
+      self = .attention(attention)
+    }
   }
 }
 

@@ -550,6 +550,15 @@
         "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Le changement n’a pas pu être enregistré localement. Réessayez; Kitchen Memory tentera de nouveau la même action." } }
       }
     },
+    "session.issue.clipboard" : {
+      "comment" : "Explains that a Session Entry draft could not be copied and remains local.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "The Entry could not be copied. Your draft is still local; try copying it again or choose another option." } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "La entrada no se pudo copiar. Tu borrador sigue siendo local; intenta copiarlo de nuevo o elige otra opción." } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "L’entrée n’a pas pu être copiée. Votre brouillon demeure local; essayez de le copier de nouveau ou choisissez une autre option." } }
+      }
+    },
     "session.issue.read" : {
       "comment" : "Explains that retained Cooking Session evidence could not be loaded.",
       "extractionState" : "manual",
@@ -560,7 +569,7 @@
       }
     },
     "session.issue.title" : {
-      "comment" : "Title for a Cooking Session read, command, or retained-evidence attention alert.",
+      "comment" : "Title for a Cooking Session read, clipboard, command, or retained-evidence attention alert.",
       "extractionState" : "manual",
       "localizations" : {
         "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Cooking Session Needs Attention" } },

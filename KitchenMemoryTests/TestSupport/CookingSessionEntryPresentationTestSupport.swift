@@ -107,6 +107,9 @@ final class RemoteFinishDuringSubmitService: CookingSessionServing {
   func perform(_ intention: CookingSessionIntention) throws -> CookingSessionCommandResult {
     switch intention {
     case .submitEntry:
+      if isRemotelyFinished {
+        return .attention(.commandNotAllowed(lifecycle: .finished))
+      }
       throw AmbiguousEntryError.interrupted
     case let .continueSession(value):
       return .accepted(CookingSessionProjection(
@@ -155,4 +158,95 @@ final class RecordingEntryStore: CookingSessionPresentationStoring {
     didSet { events.append(.draftSession(entryDrafts.first?.sessionID)) }
   }
   var events: [Event] = []
+}
+
+struct ConflictedEntryFixture {
+  let sessionID = CookingSession.ID()
+  let entryID = SessionEntry.ID()
+  let ingredientID = SessionIngredient.ID()
+  let instructionID = SessionInstruction.ID()
+  let snapshot: ExecutionSnapshot
+  let projection: CookingSessionProjection
+
+  init() {
+    snapshot = conflictedEntrySnapshot(
+      ingredientID: ingredientID,
+      instructionID: instructionID
+    )
+    projection = conflictedEntryProjection(
+      sessionID: sessionID,
+      entryID: entryID,
+      ingredientID: ingredientID,
+      instructionID: instructionID,
+      snapshot: snapshot
+    )
+  }
+}
+
+private func conflictedEntrySnapshot(
+  ingredientID: SessionIngredient.ID,
+  instructionID: SessionInstruction.ID
+) -> ExecutionSnapshot {
+  ExecutionSnapshot(
+    title: "Soup",
+    ingredientSections: [
+      SessionIngredientSection(
+        title: nil,
+        ingredients: [
+          SessionIngredient(
+            id: ingredientID,
+            sourceIngredientID: RecipeIngredient.ID(),
+            value: RecipeIngredient(originalText: "1 lime")
+          ),
+        ]
+      ),
+    ],
+    instructionSections: [
+      SessionInstructionSection(
+        title: nil,
+        steps: [
+          SessionInstruction(
+            id: instructionID,
+            sourceInstructionID: InstructionStep.ID(),
+            value: InstructionStep(text: "Simmer")
+          ),
+        ]
+      ),
+    ]
+  )
+}
+
+private func conflictedEntryProjection(
+  sessionID: CookingSession.ID,
+  entryID: SessionEntry.ID,
+  ingredientID: SessionIngredient.ID,
+  instructionID: SessionInstruction.ID,
+  snapshot: ExecutionSnapshot
+) -> CookingSessionProjection {
+  CookingSessionProjection(
+    id: sessionID,
+    snapshot: snapshot,
+    conflicts: [
+      .entry(
+        entryID: entryID,
+        factIDs: [SessionFact.ID(), SessionFact.ID()],
+        values: [
+          .present(SessionEntry(
+            id: entryID,
+            target: .ingredient(ingredientID),
+            text: "More lime"
+          )),
+          .present(SessionEntry(
+            id: entryID,
+            target: .instruction(instructionID),
+            text: "More lime"
+          )),
+        ]
+      ),
+      .outcome(
+        factIDs: [SessionFact.ID(), SessionFact.ID()],
+        values: [.value(.coarse(.great)), .cleared]
+      ),
+    ]
+  )
 }

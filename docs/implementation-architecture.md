@@ -207,8 +207,12 @@ ordinary presentation, and translates typed command results without changing
 `RecipeLibrary` or `RecipeRepository`. The selected Session pointer and an
 ordered accepted-but-not-yet-confirmed command outbox live in an
 application-owned, device-local store. Commands are written there with their
-final stable identities before Logic is called and are removed in order only
-after Logic returns each locally durable accepted projection. The store
+final stable identities before Logic is called and are normally removed in
+order only after Logic returns each locally durable accepted projection. One
+typed terminal exception applies when Logic definitively rejects a submitted
+Entry because its source Session is already Finished: that submitted identity
+clears while the exact draft remains local for explicit continuation, copy, or
+discard. The store
 migrates Slice 14's single pending-command representation as a one-item outbox.
 Progress and complete working-scale replacements project optimistically from
 that queue while preserving the immutable snapshot as their base. Relaunch and
@@ -221,7 +225,8 @@ than the accepted-intention outbox. It retains exact text and an optional
 Session-owned target across navigation, Stop, and relaunch, but it does not
 become synchronized evidence until the presentation layer submits a stable Fact
 identity and Logic confirms local durability. Remote Finish keeps an ineligible
-draft visible for explicit continuation, copy, or discard resolution.
+draft visible for explicit continuation, successfully confirmed copy, or
+discard resolution.
 
 `CookingSessionView` is one semantic SwiftUI interaction that selects Compact,
 Regular, or Wide composition from its container width. Platform identity does

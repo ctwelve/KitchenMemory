@@ -18,12 +18,14 @@ extension CookingSessions: CookingSessionServing {}
 
 enum CookingSessionPresentationIssue: Equatable {
   case read
+  case clipboard
   case command(CookingSessionLogicError)
   case attention(CookingSessionAttention)
 
   var message: LocalizedStringResource {
     switch self {
     case .read: .sessionIssueRead
+    case .clipboard: .sessionIssueClipboard
     case .command: .sessionIssueCommand
     case .attention: .sessionIssueAttention
     }
@@ -159,7 +161,6 @@ final class CookingSessionPresentationModel {
       unavailableSessionCount = unavailableCount
       recoverySessionCount = recoveryCount
       finishedSessionIDs = finishedIDs
-      cancelPendingCommands(for: finishedIDs)
       refreshDetachedEntryDraft()
       if let currentSessionID, finishedIDs.contains(currentSessionID) { select(nil) }
       if pendingCommands.isEmpty {
@@ -227,13 +228,6 @@ final class CookingSessionPresentationModel {
 
   private func persistEntryDrafts() {
     store.entryDrafts = entryDrafts
-  }
-
-  func cancelPendingCommands(for sessionIDs: Set<CookingSession.ID>) {
-    let retained = pendingCommands.filter { !sessionIDs.contains($0.sessionID) }
-    guard retained != pendingCommands else { return }
-    pendingCommands = retained
-    persistPendingCommands()
   }
 
   private func sessionOrder(

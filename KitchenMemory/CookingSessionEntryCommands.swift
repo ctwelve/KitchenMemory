@@ -114,16 +114,33 @@ extension CookingSessionPresentationModel {
     return finishCurrentSession()
   }
 
+  @discardableResult
+  func copyCurrentEntryDraftAndFinish(using copy: (String) -> Bool) -> Bool {
+    guard let draft = currentEntryDraft, copy(draft.text) else {
+      present(.clipboard)
+      return false
+    }
+    return finishDiscardingCurrentEntryDraft()
+  }
+
   func discardDetachedEntryDraft() {
     guard let detachedEntryDraft else { return }
-    cancelPendingCommands(for: [detachedEntryDraft.sessionID])
     removeDraft(for: detachedEntryDraft.sessionID)
+  }
+
+  @discardableResult
+  func copyAndDiscardDetachedEntryDraft(using copy: (String) -> Bool) -> Bool {
+    guard let draft = detachedEntryDraft, copy(draft.text) else {
+      present(.clipboard)
+      return false
+    }
+    discardDetachedEntryDraft()
+    return true
   }
 
   @discardableResult
   func continueDetachedEntryDraft() -> Bool {
     guard let draft = detachedEntryDraft else { return false }
-    cancelPendingCommands(for: [draft.sessionID])
     guard prepareForNewCommand() else { return false }
     return stageAndPerform(.continueSession(
       sessionID: CookingSession.ID(),

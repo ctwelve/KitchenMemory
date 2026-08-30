@@ -45,7 +45,9 @@ struct ContentView: View {
       .sessionIssueTitle,
       isPresented: sessionIssueIsPresented
     ) {
-      Button(.actionTryAgain) { sessionModel.retryCurrentIssue() }
+      if sessionModel.issue != .clipboard {
+        Button(.actionTryAgain) { sessionModel.retryCurrentIssue() }
+      }
       Button(.actionCancel, role: .cancel) {}
     } message: {
       if let issue = sessionModel.issue {
@@ -89,9 +91,7 @@ struct ContentView: View {
   }
 
   private func copyAndDiscardDetachedDraft() {
-    guard let text = sessionModel.detachedEntryDraft?.text else { return }
-    CookingSessionClipboard.copy(text)
-    sessionModel.discardDetachedEntryDraft()
+    sessionModel.copyAndDiscardDetachedEntryDraft(using: CookingSessionClipboard.copy)
   }
 
   private var recipeLibrary: some View {

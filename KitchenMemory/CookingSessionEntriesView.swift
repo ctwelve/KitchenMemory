@@ -165,7 +165,7 @@ struct CookingSessionEntriesView: View {
   private func targetPicker(selection: Binding<SessionProgressTarget?>) -> some View {
     Picker(.sessionEntryTargetLabel, selection: selection) {
       Text(.sessionEntryTargetNone).tag(nil as SessionProgressTarget?)
-      ForEach(targetOptions) { option in
+      ForEach(targetPresentation.options) { option in
         Text(option.label).tag(option.target as SessionProgressTarget?)
       }
     }
@@ -176,20 +176,32 @@ struct CookingSessionEntriesView: View {
   private func targetMenu(entryID: SessionEntry.ID) -> some View {
     Menu(.sessionEntryActionRetarget) {
       Button(.sessionEntryTargetNone) { model.retargetEntry(entryID, to: nil) }
-      ForEach(targetOptions) { option in
+      ForEach(targetPresentation.options) { option in
         Button(option.label) { model.retargetEntry(entryID, to: option.target) }
       }
     }
   }
 
-  private var targetOptions: [SessionEntryTargetOption] {
-    let ingredients = session.snapshot.ingredientSections.flatMap(\.ingredients).map {
+  private var targetPresentation: SessionEntryTargetPresentation {
+    SessionEntryTargetPresentation(snapshot: session.snapshot)
+  }
+
+  private func targetLabel(_ target: SessionProgressTarget) -> String {
+    targetPresentation.label(for: target)
+  }
+}
+
+struct SessionEntryTargetPresentation {
+  let snapshot: ExecutionSnapshot
+
+  var options: [SessionEntryTargetOption] {
+    let ingredients = snapshot.ingredientSections.flatMap(\.ingredients).map {
       SessionEntryTargetOption(
         target: .ingredient($0.id),
         label: $0.value.originalText
       )
     }
-    let instructions = session.snapshot.instructionSections.flatMap(\.steps).map {
+    let instructions = snapshot.instructionSections.flatMap(\.steps).map {
       SessionEntryTargetOption(
         target: .instruction($0.id),
         label: $0.value.name ?? $0.value.text
@@ -198,14 +210,13 @@ struct CookingSessionEntriesView: View {
     return ingredients + instructions
   }
 
-  private func targetLabel(_ target: SessionProgressTarget) -> String {
-    targetOptions.first(where: { $0.target == target })?.label ??
+  func label(for target: SessionProgressTarget) -> String {
+    options.first(where: { $0.target == target })?.label ??
       String(localized: .sessionEntryTargetUnavailable)
   }
-
 }
 
-private struct SessionEntryTargetOption: Identifiable {
+struct SessionEntryTargetOption: Identifiable {
   let target: SessionProgressTarget
   let label: String
 

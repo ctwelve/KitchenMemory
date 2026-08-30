@@ -140,8 +140,6 @@ struct CookingSessionView: View {
   }
 
   private func copyDraftThenFinish() {
-    guard let text = model.currentEntryDraft?.text else { return }
-    CookingSessionClipboard.copy(text)
-    model.finishDiscardingCurrentEntryDraft()
+    model.copyCurrentEntryDraftAndFinish(using: CookingSessionClipboard.copy)
   }
 }
