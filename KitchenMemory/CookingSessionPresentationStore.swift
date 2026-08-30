@@ -5,7 +5,7 @@
 import Foundation
 import KitchenKit
 
-/// One presentation-accepted lifecycle intention retained until Logic confirms
+/// One presentation-accepted Session intention retained until Logic confirms
 /// that its evidence is locally durable.
 enum PendingCookingSessionCommand: Codable, Equatable {
   case start(
@@ -57,13 +57,6 @@ enum PendingCookingSessionCommand: Codable, Equatable {
 protocol CookingSessionPresentationStoring: AnyObject {
   var currentSessionID: CookingSession.ID? { get set }
   var pendingCommands: [PendingCookingSessionCommand] { get set }
-}
-
-extension CookingSessionPresentationStoring {
-  var pendingCommand: PendingCookingSessionCommand? {
-    get { pendingCommands.first }
-    set { pendingCommands = newValue.map { [$0] } ?? [] }
-  }
 }
 
 /// Device-local presentation state. These values deliberately use ordinary

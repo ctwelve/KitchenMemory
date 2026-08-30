@@ -141,6 +141,36 @@ final class CookingSessionProgressPresentationTests: XCTestCase {
       ]
     )
   }
+
+  func testArithmeticFailureDoesNotStageAPartialWorkingScale() throws {
+    let fixture = WorkingScalePresentationFixture(
+      ingredientQuantity: exactQuantity(Int.max)
+    )
+    let requested = try XCTUnwrap(RecipeScale(
+      baseYield: RationalQuantity(numerator: 2),
+      workingYield: RationalQuantity(numerator: 4)
+    ))
+
+    XCTAssertFalse(fixture.model.replaceWorkingScale(with: requested))
+    XCTAssertTrue(fixture.service.intentions.isEmpty)
+    XCTAssertTrue(fixture.model.pendingCommands.isEmpty)
+  }
+
+  func testChangedSessionQuantityUsesStructuredPresentationInsteadOfOriginalText() throws {
+    let fixture = WorkingScalePresentationFixture()
+    let session = try XCTUnwrap(fixture.model.currentSession)
+    let ingredient = try XCTUnwrap(
+      session.snapshot.ingredientSections.first?.ingredients.first
+    )
+
+    let displayed = cookingSessionIngredientValue(ingredient, in: session)
+
+    XCTAssertEqual(displayed.presentationMode, .structured)
+    XCTAssertEqual(
+      RecipePresentationFormatter(locale: Locale(identifier: "en_US")).ingredient(displayed),
+      "2 cup broth"
+    )
+  }
 }
 
 @MainActor
@@ -148,7 +178,7 @@ private struct WorkingScalePresentationFixture {
   let service: WorkingScaleSessionService
   let model: CookingSessionPresentationModel
 
-  init() {
+  init(ingredientQuantity: QuantityExpression = exactQuantity(1)) {
     let sessionID = CookingSession.ID()
     let ingredientID = SessionIngredient.ID()
     let ingredient = SessionIngredient(
@@ -156,7 +186,7 @@ private struct WorkingScalePresentationFixture {
       sourceIngredientID: RecipeIngredient.ID(),
       value: RecipeIngredient(
         originalText: "1 cup broth",
-        quantity: exactQuantity(1),
+        quantity: ingredientQuantity,
         unitText: "cup",
         ingredientText: "broth",
         parseState: .reviewed

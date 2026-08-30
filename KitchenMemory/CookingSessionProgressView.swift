@@ -26,7 +26,10 @@ struct CookingSessionProgressView: View {
   var body: some View {
     VStack(alignment: .leading, spacing: 20) {
       if !scaleSelection.bases.isEmpty {
-        CookingSessionScaleControls(selection: $scaleSelection, isEnabled: session.lifecycle == .active)
+        RecipeScalingControls(
+          selection: $scaleSelection,
+          context: .cookingSession(isEnabled: session.lifecycle == .active)
+        )
       }
       progressContent
     }
@@ -75,79 +78,6 @@ struct CookingSessionProgressView: View {
       recipeYield: session.snapshot.baseYield,
       workingYield: session.workingScale?.workingYield?.quantity?.lowerBound,
       exactScale: session.workingScale?.exactScale
-    )
-  }
-}
-
-private struct CookingSessionScaleControls: View {
-  @Binding var selection: RecipeScalingState
-  let isEnabled: Bool
-  @Environment(\.locale) private var locale
-
-  var body: some View {
-    CookingSessionCard(title: .sessionScaleSection, symbol: "arrow.up.left.and.arrow.down.right") {
-      if selection.bases.count > 1 {
-        Picker(LocalizedStringResource.recipeScalingBaseYield, selection: basisBinding) {
-          ForEach(selection.bases.indices, id: \.self) { index in
-            Text(selection.basisLabel(selection.bases[index], locale: locale)).tag(index)
-          }
-        }
-        .disabled(!isEnabled)
-        .accessibilityIdentifier("session-scaling-basis")
-      }
-      HStack(spacing: 12) {
-        VStack(alignment: .leading, spacing: 3) {
-          Text(.recipeScalingWorkingYield)
-            .font(.headline)
-          Text(selection.workingYieldLabel(locale: locale))
-            .font(.title3.monospacedDigit())
-            .foregroundStyle(Color("IconMark"))
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel(Text(.recipeScalingWorkingYield))
-        .accessibilityValue(selection.workingYieldLabel(locale: locale))
-        .accessibilityIdentifier("session-working-yield")
-
-        Button {
-          selection.adjustWorkingYield(by: -1)
-        } label: {
-          Image(systemName: "minus")
-        }
-        .disabled(!isEnabled || !selection.canDecreaseWorkingYield)
-        .accessibilityLabel(Text(.recipeScalingActionDecrease))
-        .accessibilityIdentifier("session-working-yield-decrement")
-
-        Button {
-          selection.adjustWorkingYield(by: 1)
-        } label: {
-          Image(systemName: "plus")
-        }
-        .disabled(!isEnabled || !selection.canIncreaseWorkingYield)
-        .accessibilityLabel(Text(.recipeScalingActionIncrease))
-        .accessibilityIdentifier("session-working-yield-increment")
-      }
-      HStack(alignment: .firstTextBaseline) {
-        Text(.sessionScaleNote)
-          .font(.caption)
-          .foregroundStyle(.secondary)
-        Spacer(minLength: 12)
-        if selection.workingYield != selection.selectedBasis?.quantity {
-          Button(.actionReset) {
-            selection.resetWorkingYield()
-          }
-          .disabled(!isEnabled)
-          .accessibilityLabel(Text(.recipeScalingActionResetAccessibilityLabel))
-          .accessibilityIdentifier("session-scaling-reset")
-        }
-      }
-    }
-  }
-
-  private var basisBinding: Binding<Int> {
-    Binding(
-      get: { selection.selectedBasisIndex },
-      set: { selection.selectBasis($0) }
     )
   }
 }

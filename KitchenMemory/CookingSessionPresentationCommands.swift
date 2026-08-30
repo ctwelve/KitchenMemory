@@ -94,10 +94,6 @@ extension CookingSessionPresentationModel {
     ))
   }
 
-  func retryPendingCommand() {
-    retryPendingCommands()
-  }
-
   func retryPendingCommands() {
     while let pending = pendingCommands.first {
       do {
@@ -239,11 +235,16 @@ extension CookingSessionPresentationModel {
     var workingYield = snapshot.baseYield
     workingYield?.quantity = QuantityExpression(kind: .exact, lowerBound: scale.workingYield)
     let ingredients = snapshot.ingredientSections.flatMap(\.ingredients)
-    let quantities = ingredients.compactMap { ingredient -> SessionIngredientQuantity? in
-      guard let quantity = ingredient.value.scaled(using: scale).ingredient.quantity else {
-        return nil
-      }
-      return SessionIngredientQuantity(ingredientID: ingredient.id, quantity: quantity)
+    var quantities: [SessionIngredientQuantity] = []
+    for ingredient in ingredients where ingredient.value.quantity != nil {
+      let scaled = ingredient.value.scaled(using: scale)
+      guard scaled.status != .unchangedArithmeticFailure,
+            let quantity = scaled.ingredient.quantity
+      else { return nil }
+      quantities.append(SessionIngredientQuantity(
+        ingredientID: ingredient.id,
+        quantity: quantity
+      ))
     }
     return SessionWorkingScale(
       workingYield: workingYield,

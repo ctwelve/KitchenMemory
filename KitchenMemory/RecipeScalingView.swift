@@ -48,8 +48,50 @@ extension RecipeScalingState {
 }
 
 struct RecipeScalingControls: View {
+  enum Context {
+    case recipe
+    case cookingSession(isEnabled: Bool)
+
+    var isEnabled: Bool {
+      switch self {
+      case .recipe: true
+      case let .cookingSession(isEnabled): isEnabled
+      }
+    }
+
+    var identifierPrefix: String {
+      switch self {
+      case .recipe: "recipe"
+      case .cookingSession: "session"
+      }
+    }
+
+    var title: LocalizedStringResource {
+      switch self {
+      case .recipe: .recipeScalingSection
+      case .cookingSession: .sessionScaleSection
+      }
+    }
+
+    var note: LocalizedStringResource {
+      switch self {
+      case .recipe: .recipeScalingReadingOnlyNote
+      case .cookingSession: .sessionScaleNote
+      }
+    }
+  }
+
   @Binding var selection: RecipeScalingState
+  let context: Context
   @Environment(\.locale) private var locale
+
+  init(
+    selection: Binding<RecipeScalingState>,
+    context: Context = .recipe
+  ) {
+    _selection = selection
+    self.context = context
+  }
 
   @ViewBuilder
   var body: some View {
@@ -63,7 +105,8 @@ struct RecipeScalingControls: View {
                 Text(selection.basisLabel(selection.bases[index], locale: locale)).tag(index)
               }
             }
-            .accessibilityIdentifier("recipe-scaling-basis")
+            .disabled(!context.isEnabled)
+            .accessibilityIdentifier("\(context.identifierPrefix)-scaling-basis")
           }
           workingYieldStepper
           footer
@@ -84,9 +127,9 @@ struct RecipeScalingControls: View {
     HStack(spacing: 8) {
       Image(systemName: "arrow.up.left.and.arrow.down.right")
         .accessibilityHidden(true)
-      Text(.recipeScalingSection)
+      Text(context.title)
         .accessibilityHeading(.h2)
-        .accessibilityIdentifier("recipe-scaling-section")
+        .accessibilityIdentifier("\(context.identifierPrefix)-scaling-section")
     }
     .font(.title2.bold())
     .foregroundStyle(Color("IconMark"))
@@ -105,31 +148,31 @@ struct RecipeScalingControls: View {
       .accessibilityElement(children: .combine)
       .accessibilityLabel(Text(.recipeScalingWorkingYield))
       .accessibilityValue(selection.workingYieldLabel(locale: locale))
-      .accessibilityIdentifier("recipe-working-yield")
+      .accessibilityIdentifier("\(context.identifierPrefix)-working-yield")
 
       Button {
         selection.adjustWorkingYield(by: -1)
       } label: {
         Image(systemName: "minus")
       }
-      .disabled(!selection.canDecreaseWorkingYield)
+      .disabled(!context.isEnabled || !selection.canDecreaseWorkingYield)
       .accessibilityLabel(Text(.recipeScalingActionDecrease))
-      .accessibilityIdentifier("recipe-working-yield-decrement")
+      .accessibilityIdentifier("\(context.identifierPrefix)-working-yield-decrement")
 
       Button {
         selection.adjustWorkingYield(by: 1)
       } label: {
         Image(systemName: "plus")
       }
-      .disabled(!selection.canIncreaseWorkingYield)
+      .disabled(!context.isEnabled || !selection.canIncreaseWorkingYield)
       .accessibilityLabel(Text(.recipeScalingActionIncrease))
-      .accessibilityIdentifier("recipe-working-yield-increment")
+      .accessibilityIdentifier("\(context.identifierPrefix)-working-yield-increment")
     }
   }
 
   private var footer: some View {
     HStack(alignment: .firstTextBaseline) {
-      Text(.recipeScalingReadingOnlyNote)
+      Text(context.note)
         .font(.caption)
         .foregroundStyle(.secondary)
       Spacer(minLength: 12)
@@ -137,8 +180,9 @@ struct RecipeScalingControls: View {
         Button(.actionReset) {
           selection.resetWorkingYield()
         }
+        .disabled(!context.isEnabled)
         .accessibilityLabel(Text(.recipeScalingActionResetAccessibilityLabel))
-        .accessibilityIdentifier("recipe-scaling-reset")
+        .accessibilityIdentifier("\(context.identifierPrefix)-scaling-reset")
       }
     }
   }

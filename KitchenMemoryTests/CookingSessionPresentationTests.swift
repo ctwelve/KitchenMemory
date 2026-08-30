@@ -26,7 +26,7 @@ final class CookingSessionPresentationTests: XCTestCase {
     XCTAssertEqual(session.snapshot.title, recipe.revision.title)
     XCTAssertEqual(preparedApp.libraryModel.recipes.first, recipe)
     XCTAssertEqual(store.currentSessionID, session.id)
-    XCTAssertNil(store.pendingCommand)
+    XCTAssertTrue(store.pendingCommands.isEmpty)
     XCTAssertNotNil(preparedApp.cookingSessionRepository)
   }
 
@@ -68,7 +68,7 @@ final class CookingSessionPresentationTests: XCTestCase {
 
     XCTAssertEqual(relaunched.currentSession, active)
     XCTAssertEqual(relaunched.currentSession?.lifecycle, .active)
-    XCTAssertNil(store.pendingCommand)
+    XCTAssertTrue(store.pendingCommands.isEmpty)
   }
 
   func testSeveralActiveSessionsRemainDistinctAndSelectable() throws {
@@ -162,18 +162,18 @@ final class CookingSessionPresentationTests: XCTestCase {
     )
 
     XCTAssertFalse(model.start(from: recipe))
-    let pending = try XCTUnwrap(store.pendingCommand)
+    let pending = try XCTUnwrap(store.pendingCommands.first)
     guard case let .start(firstSessionID, _, _, _) = pending else {
       XCTFail("Expected a pending Start intention")
       return
     }
     XCTAssertNil(model.currentSession)
 
-    model.retryPendingCommand()
+    model.retryPendingCommands()
 
     XCTAssertEqual(service.attemptedSessionIDs, [firstSessionID, firstSessionID])
     XCTAssertEqual(model.currentSession?.id, firstSessionID)
-    XCTAssertNil(store.pendingCommand)
+    XCTAssertTrue(store.pendingCommands.isEmpty)
   }
 
   func testReloadSeparatesFinishedUnavailableAndRecoveryFromOrdinaryDiscovery() {
@@ -234,12 +234,12 @@ final class CookingSessionPresentationTests: XCTestCase {
     )
 
     XCTAssertFalse(model.start(from: recipe))
-    let pending = try XCTUnwrap(store.pendingCommand)
+    let pending = try XCTUnwrap(store.pendingCommands.first)
     XCTAssertEqual(model.issue, .attention(.commandNotAllowed(lifecycle: .active)))
 
-    model.retryPendingCommand()
+    model.retryPendingCommands()
 
-    XCTAssertEqual(store.pendingCommand, pending)
+    XCTAssertEqual(store.pendingCommands, [pending])
     XCTAssertEqual(service.attemptedSessionIDs, [pending.sessionID, pending.sessionID])
   }
 }
@@ -275,7 +275,7 @@ extension CookingSessionPresentationTests {
     model.loadIfNeeded()
 
     XCTAssertEqual(model.currentSession?.id, sessionID)
-    XCTAssertNil(store.pendingCommand)
+    XCTAssertTrue(store.pendingCommands.isEmpty)
     guard case let .session(persisted) = try XCTUnwrap(
       sessionRepository.session(id: sessionID)
     ) else {
@@ -304,12 +304,14 @@ private func stageInterruptedStart(
   )
   try library.installSamples()
   let recipe = try XCTUnwrap(library.load().recipes.first)
-  DefaultsCookingSessionPresentationStore(defaults: defaults).pendingCommand = .start(
-    sessionID: sessionID,
-    recipeID: recipe.recipe.id,
-    revisionID: recipe.revision.id,
-    startedAt: Date(timeIntervalSince1970: 1_800_000_000)
-  )
+  DefaultsCookingSessionPresentationStore(defaults: defaults).pendingCommands = [
+    .start(
+      sessionID: sessionID,
+      recipeID: recipe.recipe.id,
+      revisionID: recipe.revision.id,
+      startedAt: Date(timeIntervalSince1970: 1_800_000_000)
+    ),
+  ]
 }
 
 @MainActor

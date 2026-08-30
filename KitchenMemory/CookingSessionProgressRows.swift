@@ -40,7 +40,9 @@ struct CookingSessionIngredientList: View {
         Image(systemName: isAccounted ? "checkmark.circle.fill" : "circle")
           .foregroundStyle(isAccounted ? Color.accentColor : .secondary)
           .accessibilityHidden(true)
-        Text(displayedIngredient(ingredient))
+        Text(RecipePresentationFormatter(locale: locale).ingredient(
+          cookingSessionIngredientValue(ingredient, in: session)
+        ))
           .strikethrough(isAccounted)
           .frame(maxWidth: .infinity, alignment: .leading)
           .multilineTextAlignment(.leading)
@@ -55,16 +57,24 @@ struct CookingSessionIngredientList: View {
       : .sessionProgressIngredientOpen))
     .accessibilityIdentifier("session-ingredient-\(ingredient.id.rawValue.uuidString)")
   }
+}
 
-  private func displayedIngredient(_ ingredient: SessionIngredient) -> String {
-    var value = ingredient.value
-    if let quantity = session.workingScale?.quantities.first(where: {
-      $0.ingredientID == ingredient.id
-    })?.quantity {
-      value.quantity = quantity
-    }
-    return RecipePresentationFormatter(locale: locale).ingredient(value)
+func cookingSessionIngredientValue(
+  _ ingredient: SessionIngredient,
+  in session: CookingSessionProjection
+) -> RecipeIngredient {
+  guard let quantity = session.workingScale?.quantities.first(where: {
+    $0.ingredientID == ingredient.id
+  })?.quantity else { return ingredient.value }
+  var value = ingredient.value
+  let quantityChanged = value.quantity != quantity
+  value.quantity = quantity
+  if quantityChanged, value.presentationMode == .original {
+    // The immutable original wording remains in the snapshot. A transient
+    // structured presentation is required so a changed amount is not hidden.
+    value.presentationMode = .structured
   }
+  return value
 }
 
 struct CookingSessionInstructionList: View {
