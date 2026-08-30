@@ -325,33 +325,3 @@ private final class RestoreInterruptionSessionService: CookingSessionServing {
     return commandResults.removeFirst()
   }
 }
-
-@MainActor
-private final class ClosureInterruptionSessionService: CookingSessionServing {
-  let results: [SessionProjectionResult]
-  var commandResults: [CookingSessionCommandResult]
-  var observedCandidateSets: [[SessionClosure.ID]] = []
-
-  init(
-    results: [SessionProjectionResult],
-    commandResults: [CookingSessionCommandResult]
-  ) {
-    self.results = results
-    self.commandResults = commandResults
-  }
-
-  func sessions() throws -> [SessionProjectionResult] { results }
-
-  func start(_ intention: StartCookingSessionIntention) throws -> CookingSessionCommandResult {
-    _ = intention
-    throw CookingSessionLogicError.invalidIntention
-  }
-
-  func perform(_ intention: CookingSessionIntention) throws -> CookingSessionCommandResult {
-    guard case let .resolveClosure(selection) = intention, !commandResults.isEmpty else {
-      throw CookingSessionLogicError.invalidIntention
-    }
-    observedCandidateSets.append(selection.observedClosureIDs)
-    return commandResults.removeFirst()
-  }
-}
