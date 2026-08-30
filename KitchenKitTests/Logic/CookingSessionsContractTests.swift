@@ -151,6 +151,7 @@ final class CookingSessionsContractTests: XCTestCase {
     }
   }
 
+  // swiftlint:disable:next function_body_length
   func testClassifiedQueriesRemainKitchenAndRecipeScoped() throws {
     let stored = recipe(seed: 80)
     let foreign = recipe(seed: 180)

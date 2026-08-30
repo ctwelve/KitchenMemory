@@ -95,8 +95,7 @@ public final class SwiftDataCookingSessionRepository: CookingSessionRepository {
     limit: Int
   ) throws -> [SessionProjectionResult] {
     guard limit > 0 else { return [] }
-    return try storedEvidence(in: kitchenID).compactMap {
-      stored -> (StoredSessionEvidence, Date)? in
+    return try storedEvidence(in: kitchenID).compactMap { stored -> (StoredSessionEvidence, Date)? in
       guard let finishedAt = stored.evidence.closures.map(\.finishedAt).max()
       else { return nil }
       return (stored, finishedAt)
