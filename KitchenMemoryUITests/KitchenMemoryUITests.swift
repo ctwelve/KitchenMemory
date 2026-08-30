@@ -270,3 +270,63 @@ final class KitchenMemoryUITests: XCTestCase {
 #endif
   }
 }
+
+extension KitchenMemoryUITests {
+  @MainActor
+  func testCookingSessionLifecycleShell() {
+    let app = launchApp()
+    let recipeRow = app.descendants(matching: .any)
+      .matching(NSPredicate(format: "identifier BEGINSWITH %@", "recipe-row-"))
+      .firstMatch
+    XCTAssertTrue(recipeRow.waitForExistence(timeout: 5))
+    activate(recipeRow)
+
+    let start = app.buttons["start-cooking"]
+    XCTAssertTrue(start.waitForExistence(timeout: 5))
+    activate(start)
+    let stop = app.buttons["stop-session"]
+    XCTAssertTrue(stop.waitForExistence(timeout: 5))
+    activate(stop)
+    let resume = app.buttons["resume-session"]
+    XCTAssertTrue(resume.waitForExistence(timeout: 5))
+    activate(resume)
+
+    let finish = app.buttons["finish-session"]
+    XCTAssertTrue(finish.waitForExistence(timeout: 5))
+    activate(finish)
+    let confirmation = app.buttons["confirm-finish-session"]
+    XCTAssertTrue(confirmation.waitForExistence(timeout: 3))
+    activate(confirmation)
+    XCTAssertFalse(app.buttons["finish-session"].waitForExistence(timeout: 3))
+
+    startAndLeaveStoppedSession(in: app)
+  }
+
+  @MainActor
+  private func startAndLeaveStoppedSession(in app: XCUIApplication) {
+    let start = app.buttons["start-cooking"]
+    XCTAssertTrue(start.waitForExistence(timeout: 5))
+    activate(start)
+    let stop = app.buttons["stop-session"]
+    XCTAssertTrue(stop.waitForExistence(timeout: 5))
+    activate(stop)
+    let leave = app.buttons["leave-session"]
+    XCTAssertTrue(leave.waitForExistence(timeout: 5))
+    activate(leave)
+
+    let sessionRow = app.descendants(matching: .any)
+      .matching(NSPredicate(format: "identifier BEGINSWITH %@", "session-row-"))
+      .firstMatch
+#if os(iOS)
+    if !sessionRow.waitForExistence(timeout: 2) {
+      let backButton = app.buttons["BackButton"]
+      if backButton.waitForExistence(timeout: 3) {
+        activate(backButton)
+      }
+    }
+#endif
+    XCTAssertTrue(sessionRow.waitForExistence(timeout: 5))
+    activate(sessionRow)
+    XCTAssertTrue(app.buttons["resume-session"].waitForExistence(timeout: 5))
+  }
+}

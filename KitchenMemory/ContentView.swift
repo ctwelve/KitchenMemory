@@ -7,6 +7,7 @@ import SwiftUI
 
 struct ContentView: View {
   @Bindable var model: RecipeLibraryModel
+  @Bindable var sessionModel: CookingSessionPresentationModel
   let cloudSyncSettings: CloudSyncSettings?
   @Environment(\.horizontalSizeClass) private var horizontalSizeClass
   @Environment(\.locale) private var locale
@@ -28,11 +29,16 @@ struct ContentView: View {
           decline: model.declineSampleRecipes
         )
       case .ready:
-        recipeLibrary
+        if let currentSession = sessionModel.currentSession {
+          CookingSessionView(model: sessionModel, session: currentSession)
+        } else {
+          recipeLibrary
+        }
       }
     }
     .task {
       model.loadIfNeeded()
+      sessionModel.loadIfNeeded()
     }
     .tint(Color("AccentColor"))
   }
@@ -158,14 +164,32 @@ struct ContentView: View {
         description: Text(.libraryEmptyMessage)
       )
     } else {
-      List(model.recipes, id: \.recipe.id, selection: $model.selectedRecipeID) { storedRecipe in
-        NavigationLink(value: storedRecipe.recipe.id) {
-          RecipeRow(storedRecipe: storedRecipe)
+      List(selection: $model.selectedRecipeID) {
+        if !sessionModel.sessions.isEmpty {
+          Section("session.discovery.title") {
+            ForEach(sessionModel.sessions, id: \.id) { session in
+              Button {
+                sessionModel.selectSession(session.id)
+              } label: {
+                CookingSessionRow(session: session)
+              }
+              .buttonStyle(.borderless)
+              .accessibilityIdentifier("session-row-\(session.id.rawValue.uuidString)")
+            }
+          }
         }
-        // Keep the stable identity on the interactive NavigationLink, not on
-        // RecipeRow's visual children. UI tests and assistive technologies
-        // must activate the same element a person clicks to open the recipe.
-        .accessibilityIdentifier("recipe-row-\(storedRecipe.recipe.id.rawValue.uuidString)")
+
+        Section("session.discovery.recipes") {
+          ForEach(model.recipes, id: \.recipe.id) { storedRecipe in
+            NavigationLink(value: storedRecipe.recipe.id) {
+              RecipeRow(storedRecipe: storedRecipe)
+            }
+            // Keep the stable identity on the interactive NavigationLink, not on
+            // RecipeRow's visual children. UI tests and assistive technologies
+            // must activate the same element a person clicks to open the recipe.
+            .accessibilityIdentifier("recipe-row-\(storedRecipe.recipe.id.rawValue.uuidString)")
+          }
+        }
       }
       // This identifier is also our launch-complete signal in UI tests. It is
       // applied to the List itself so it survives row reuse and empty states.
@@ -189,6 +213,14 @@ struct ContentView: View {
         // a just-saved yield is reflected immediately.
         .id(selectedRecipe.revision.id)
         .toolbar {
+          ToolbarItem(placement: .primaryAction) {
+            Button {
+              sessionModel.start(from: selectedRecipe)
+            } label: {
+              Label("session.action.start", systemImage: "flame")
+            }
+            .accessibilityIdentifier("start-cooking")
+          }
           ToolbarItem(placement: .primaryAction) {
             Button { activeSheet = .edit(selectedRecipe) } label: {
               Label(.recipeActionEdit, systemImage: "pencil")
@@ -231,6 +263,27 @@ struct ContentView: View {
       ) { draft in
         model.createRecipe(from: draft)
       }
+    }
+  }
+}
+
+private struct CookingSessionRow: View {
+  let session: CookingSessionProjection
+
+  var body: some View {
+    HStack {
+      VStack(alignment: .leading, spacing: 3) {
+        Text(session.snapshot.title)
+          .font(.headline)
+        Text(session.lifecycle == .active
+          ? "session.lifecycle.active"
+          : "session.lifecycle.stopped")
+          .font(.caption)
+          .foregroundStyle(.secondary)
+      }
+      Spacer()
+      Image(systemName: session.lifecycle == .active ? "flame" : "pause.circle")
+        .accessibilityHidden(true)
     }
   }
 }
@@ -305,6 +358,7 @@ private struct RecipeRow: View {
 #Preview {
   ContentView(
     model: PreparedApp.preview.libraryModel,
+    sessionModel: PreparedApp.preview.sessionModel,
     cloudSyncSettings: nil
   )
 }
