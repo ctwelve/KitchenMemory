@@ -1,6 +1,6 @@
 // Kitchen Memory
 // Copyright © 2026 the Kitchen Memory contributors.
-// SPDX-License-Identifier: GPL-3.0-only
+// SPDX-License-Identifier: MIT
 
 /// The ownership and collaboration boundary for Kitchen Memory content.
 public struct Kitchen: Codable, Equatable, Identifiable, Sendable {

@@ -1,7 +1,7 @@
 <!--
 Kitchen Memory
 Copyright © 2026 the Kitchen Memory contributors.
-SPDX-License-Identifier: GPL-3.0-only
+SPDX-License-Identifier: MIT
 -->
 
 # Kitchen Memory
@@ -138,8 +138,8 @@ Copyright © 2026 the Kitchen Memory contributors. See [COPYRIGHT](COPYRIGHT)
 for the repository-wide notice and [AI.md](AI.md) for the project's statement
 on AI-assisted development.
 
-Kitchen Memory is free software licensed under the
-[GNU General Public License, version 3 only](LICENSE) (`GPL-3.0-only`).
+Kitchen Memory is open-source software licensed under the
+[MIT License](LICENSE) (`MIT`).
 The reviewed third-party package and build-tool inventory is available in
 [DEPENDENCIES.md](DEPENDENCIES.md), with its machine-readable SPDX record in
 [SBOM.spdx.json](SBOM.spdx.json).

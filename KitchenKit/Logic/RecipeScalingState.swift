@@ -1,6 +1,6 @@
 // Kitchen Memory
 // Copyright © 2026 the Kitchen Memory contributors.
-// SPDX-License-Identifier: GPL-3.0-only
+// SPDX-License-Identifier: MIT
 
 /// Reading-only yield selection and arithmetic, independent of presentation.
 public struct RecipeScalingState: Equatable, Sendable {

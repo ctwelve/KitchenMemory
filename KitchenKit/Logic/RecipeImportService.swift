@@ -1,6 +1,6 @@
 // Kitchen Memory
 // Copyright © 2026 the Kitchen Memory contributors.
-// SPDX-License-Identifier: GPL-3.0-only
+// SPDX-License-Identifier: MIT
 
 // Import interpretation is product logic; networking and JSON-LD discovery
 // remain behind KitchenKit's Import responsibility.

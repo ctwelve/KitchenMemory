@@ -3,7 +3,7 @@
 
 # Kitchen Memory
 # Copyright © 2026 the Kitchen Memory contributors.
-# SPDX-License-Identifier: GPL-3.0-only
+# SPDX-License-Identifier: MIT
 
 require "minitest/autorun"
 require_relative "../check-software-inventory"
@@ -58,7 +58,7 @@ class CheckSoftwareInventoryTest < Minitest::Test
           "name" => "Kitchen Memory",
           "SPDXID" => "SPDXRef-Package-KitchenMemory",
           "versionInfo" => version,
-          "licenseDeclared" => "GPL-3.0-only",
+          "licenseDeclared" => "MIT",
           "externalRefs" => [
             {
               "referenceType" => "purl",

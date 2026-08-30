@@ -3,7 +3,7 @@
 <!--
 Kitchen Memory
 Copyright © 2026 the Kitchen Memory contributors.
-SPDX-License-Identifier: GPL-3.0-only
+SPDX-License-Identifier: MIT
 -->
 
 This inventory covers third-party source packages and executable build tools
@@ -53,8 +53,9 @@ For every dependency change:
 
 1. review the upstream source, changelog, license, privacy manifest, products,
    transitive graph, and executable artifacts;
-2. confirm that runtime behavior remains compatible with `GPL-3.0-only` and
-   Kitchen Memory's no-collection privacy stance;
+2. confirm that the dependency's terms permit its intended distribution with
+   the MIT-licensed application, preserve every required notice, and remain
+   compatible with Kitchen Memory's no-collection privacy stance;
 3. update `Package.resolved`, `SBOM.spdx.json`, and this human explanation in the
    same change;
 4. run `ruby Tools/Tests/check_software_inventory_test.rb` and

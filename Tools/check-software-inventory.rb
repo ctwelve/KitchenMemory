@@ -3,7 +3,7 @@
 
 # Kitchen Memory
 # Copyright © 2026 the Kitchen Memory contributors.
-# SPDX-License-Identifier: GPL-3.0-only
+# SPDX-License-Identifier: MIT
 
 require "json"
 require_relative "check-release-version"
@@ -44,7 +44,7 @@ module KitchenMemory
 
       app = packages_by_id.fetch(APP_PACKAGE_ID)
       assert_equal("Kitchen Memory SBOM version", app["versionInfo"], marketing_version)
-      assert_equal("Kitchen Memory declared license", app["licenseDeclared"], "GPL-3.0-only")
+      assert_equal("Kitchen Memory declared license", app["licenseDeclared"], "MIT")
       app_package_url = app.fetch("externalRefs", []).find do |entry|
         entry["referenceType"] == "purl"
       end&.fetch("referenceLocator")

@@ -3,7 +3,7 @@
 <!--
 Kitchen Memory
 Copyright © 2026 the Kitchen Memory contributors.
-SPDX-License-Identifier: GPL-3.0-only
+SPDX-License-Identifier: MIT
 -->
 
 - Status: Adopted and validated by [ADR 0013](../adr/0013-unified-native-multiplatform-app-target.md)

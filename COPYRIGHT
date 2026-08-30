@@ -6,9 +6,11 @@ design assets in this repository unless a file or component carries a different
 notice. It also covers original material in generated or structured files that
 cannot safely contain an inline copyright comment.
 
-Kitchen Memory is free software distributed under the GNU General Public
-License, version 3 only (GPL-3.0-only). See LICENSE for the complete license
-terms.
+Kitchen Memory is distributed under the MIT License. See LICENSE for the
+complete license terms.
+
+Public release 0.1.0 was conveyed under GPL-3.0-only. Those grants remain valid;
+the current repository and future releases are offered under MIT.
 
 Individual contributors retain copyright in their contributions unless they
 explicitly agree otherwise. The collective notice above does not erase or

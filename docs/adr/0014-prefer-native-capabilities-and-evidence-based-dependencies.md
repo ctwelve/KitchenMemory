@@ -3,7 +3,7 @@
 <!--
 Kitchen Memory
 Copyright © 2026 the Kitchen Memory contributors.
-SPDX-License-Identifier: GPL-3.0-only
+SPDX-License-Identifier: MIT
 -->
 
 - Status: Accepted
@@ -51,7 +51,7 @@ subject to the repository's dependency inventory and release review. Review its
 license and notices, privacy manifest and behavior, products, transitive graph,
 plugins and executable or binary artifacts, supported platforms and toolchain,
 maintenance evidence, and final application embedding. Preferred provenance
-does not waive GPL-3.0-only compatibility, SBOM, privacy, or signed-product
+does not waive license and notice review, SBOM, privacy, or signed-product
 validation.
 
 Do not let a dependency's types redefine Domain concepts or spread through the

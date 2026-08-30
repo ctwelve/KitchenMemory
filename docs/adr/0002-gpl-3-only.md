@@ -3,11 +3,11 @@
 <!--
 Kitchen Memory
 Copyright © 2026 the Kitchen Memory contributors.
-SPDX-License-Identifier: GPL-3.0-only
+SPDX-License-Identifier: MIT
 -->
 
 
-- Status: Accepted
+- Status: Superseded by [ADR 0015](0015-adopt-mit-license.md)
 - Date: 2026-08-09
 
 ## Context

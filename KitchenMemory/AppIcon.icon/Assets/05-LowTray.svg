@@ -1,4 +1,4 @@
-<!-- Copyright © 2026 the Kitchen Memory contributors. SPDX-License-Identifier: GPL-3.0-only -->
+<!-- Copyright © 2026 the Kitchen Memory contributors. SPDX-License-Identifier: MIT -->
 <svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
   <path fill="#51362B" d="M110 650c0-29 23-52 52-52h700c29 0 52 23 52 52v154c0 39-31 70-70 70H180c-39 0-70-31-70-70V650Z"/>
 
