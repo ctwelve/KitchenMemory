@@ -145,6 +145,33 @@
         "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Cela modifie seulement cette séance de cuisine. La recette enregistrée reste inchangée." } }
       }
     },
+    "session.evidence.conflict.entry" : {
+      "comment" : "Explains that concurrent Session Entry evidence needs an explicit retained choice.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Choose the entry version to keep as Session evidence." } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Elige la versión de la entrada que se conservará como evidencia de la sesión." } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Choisissez la version de l’entrée à conserver comme preuve de séance." } }
+      }
+    },
+    "session.evidence.conflict.outcome" : {
+      "comment" : "Explains that concurrent Session Outcome evidence needs an explicit retained choice.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Choose the outcome to keep as Session evidence." } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Elige el resultado que se conservará como evidencia de la sesión." } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Choisissez le résultat à conserver comme preuve de séance." } }
+      }
+    },
+    "session.evidence.conflict.title" : {
+      "comment" : "Heading for explicit resolution of concurrent Session Entry or Outcome evidence.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Session evidence needs attention" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "La evidencia de la sesión necesita atención" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "La preuve de séance demande votre attention" } }
+      }
+    },
     "session.entry.action.edit" : {
       "comment" : "Action that begins a causal revision of a submitted Session Entry.",
       "extractionState" : "manual",
@@ -188,6 +215,15 @@
         "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Withdraw" } },
         "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Retirar" } },
         "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Retirer" } }
+      }
+    },
+    "session.entry.conflict.withdrawn" : {
+      "comment" : "Choice that resolves concurrent Session Entry evidence in favor of withdrawal.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Keep withdrawn" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Mantener retirada" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Conserver le retrait" } }
       }
     },
     "session.entry.detached.continue" : {

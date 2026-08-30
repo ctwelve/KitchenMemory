@@ -159,6 +159,7 @@ final class CookingSessionPresentationModel {
       unavailableSessionCount = unavailableCount
       recoverySessionCount = recoveryCount
       finishedSessionIDs = finishedIDs
+      cancelPendingCommands(for: finishedIDs)
       refreshDetachedEntryDraft()
       if let currentSessionID, finishedIDs.contains(currentSessionID) { select(nil) }
       if pendingCommands.isEmpty {
@@ -200,12 +201,39 @@ final class CookingSessionPresentationModel {
     refreshDetachedEntryDraft()
   }
 
+  func moveDraft(
+    from sourceSessionID: CookingSession.ID,
+    to destinationSessionID: CookingSession.ID,
+    target: SessionProgressTarget?
+  ) {
+    guard let sourceDraft = entryDrafts.first(where: { $0.sessionID == sourceSessionID }) else {
+      return
+    }
+    entryDrafts.removeAll {
+      $0.sessionID == sourceSessionID || $0.sessionID == destinationSessionID
+    }
+    entryDrafts.append(CookingSessionEntryDraft(
+      sessionID: destinationSessionID,
+      text: sourceDraft.text,
+      target: target
+    ))
+    persistEntryDrafts()
+    refreshDetachedEntryDraft()
+  }
+
   func refreshDetachedEntryDraft() {
     detachedEntryDraft = entryDrafts.first { finishedSessionIDs.contains($0.sessionID) }
   }
 
   private func persistEntryDrafts() {
     store.entryDrafts = entryDrafts
+  }
+
+  func cancelPendingCommands(for sessionIDs: Set<CookingSession.ID>) {
+    let retained = pendingCommands.filter { !sessionIDs.contains($0.sessionID) }
+    guard retained != pendingCommands else { return }
+    pendingCommands = retained
+    persistPendingCommands()
   }
 
   private func sessionOrder(

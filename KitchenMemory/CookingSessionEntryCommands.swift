@@ -38,8 +38,8 @@ extension CookingSessionPresentationModel {
     target: SessionProgressTarget?
   ) -> Bool {
     guard let session = currentSession, session.lifecycle == .active,
-          !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
-          session.entries.contains(where: { $0.id == entryID }),
+          CookingSessionEntryDraft.isMeaningful(text),
+          session.knowsEntry(entryID),
           prepareForNewCommand() else { return false }
     return stageAndPerform(.reviseEntry(
       factID: SessionFact.ID(),
@@ -68,7 +68,7 @@ extension CookingSessionPresentationModel {
   @discardableResult
   func withdrawEntry(_ entryID: SessionEntry.ID) -> Bool {
     guard let session = currentSession, session.lifecycle == .active,
-          session.entries.contains(where: { $0.id == entryID }),
+          session.knowsEntry(entryID),
           prepareForNewCommand() else { return false }
     return stageAndPerform(.withdrawEntry(
       factID: SessionFact.ID(),
@@ -93,7 +93,8 @@ extension CookingSessionPresentationModel {
   @discardableResult
   func clearOutcome() -> Bool {
     guard let session = currentSession, session.lifecycle == .active,
-          session.outcome != nil, prepareForNewCommand() else { return false }
+          session.outcome != nil || session.hasOutcomeConflict,
+          prepareForNewCommand() else { return false }
     return stageAndPerform(.clearOutcome(
       factID: SessionFact.ID(),
       sessionID: session.id,
@@ -115,16 +116,35 @@ extension CookingSessionPresentationModel {
 
   func discardDetachedEntryDraft() {
     guard let detachedEntryDraft else { return }
+    cancelPendingCommands(for: [detachedEntryDraft.sessionID])
     removeDraft(for: detachedEntryDraft.sessionID)
   }
 
   @discardableResult
   func continueDetachedEntryDraft() -> Bool {
-    guard let draft = detachedEntryDraft, prepareForNewCommand() else { return false }
+    guard let draft = detachedEntryDraft else { return false }
+    cancelPendingCommands(for: [draft.sessionID])
+    guard prepareForNewCommand() else { return false }
     return stageAndPerform(.continueSession(
       sessionID: CookingSession.ID(),
       sourceSessionID: draft.sessionID,
       startedAt: Date()
     ))
+  }
+}
+
+private extension CookingSessionProjection {
+  func knowsEntry(_ entryID: SessionEntry.ID) -> Bool {
+    entries.contains(where: { $0.id == entryID }) || conflicts.contains { conflict in
+      guard case let .entry(conflictedID, _, _) = conflict else { return false }
+      return conflictedID == entryID
+    }
+  }
+
+  var hasOutcomeConflict: Bool {
+    conflicts.contains { conflict in
+      if case .outcome = conflict { return true }
+      return false
+    }
   }
 }

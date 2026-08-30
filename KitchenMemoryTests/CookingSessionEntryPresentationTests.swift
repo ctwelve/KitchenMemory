@@ -180,51 +180,122 @@ final class CookingSessionEntryPresentationTests: XCTestCase {
   }
 }
 
-@MainActor
-private final class AmbiguousEntryService: CookingSessionServing {
-  let active: CookingSessionProjection
-  var attempts: [PendingCookingSessionCommand] = []
+extension CookingSessionEntryPresentationTests {
+  func testAcceptedContinuationPersistsMovedDraftBeforeClearingCommand() throws {
+    let sourceID = CookingSession.ID()
+    let destinationID = CookingSession.ID()
+    let service = ContinuationAcceptanceService(sourceID: sourceID)
+    let store = RecordingEntryStore()
+    store.entryDrafts = [
+      CookingSessionEntryDraft(
+        sessionID: sourceID,
+        text: "Survive every interruption",
+        target: nil
+      ),
+    ]
+    store.pendingCommands = [
+      .continueSession(
+        sessionID: destinationID,
+        sourceSessionID: sourceID,
+        startedAt: Date()
+      ),
+    ]
+    store.events.removeAll()
+    let model = CookingSessionPresentationModel(sessions: service, store: store)
+    model.loadIfNeeded()
 
-  init(active: CookingSessionProjection) {
-    self.active = active
-  }
-
-  func sessions() -> [SessionProjectionResult] {
-    [.session(active)]
-  }
-
-  func start(_ intention: StartCookingSessionIntention) throws -> CookingSessionCommandResult {
-    throw AmbiguousEntryError.unexpectedCommand
-  }
-
-  func perform(_ intention: CookingSessionIntention) throws -> CookingSessionCommandResult {
-    guard case let .submitEntry(fact, text, target) = intention else {
-      throw AmbiguousEntryError.unexpectedCommand
-    }
-    let pending = PendingCookingSessionCommand.submitEntry(
-      factID: fact.id,
-      sessionID: fact.sessionID,
-      authoredAt: fact.authoredAt,
-      text: text,
-      target: target
+    XCTAssertEqual(
+      store.events,
+      [
+        .draftSession(destinationID),
+        .pending(0),
+      ]
     )
-    attempts.append(pending)
-    guard attempts.count > 1 else { throw AmbiguousEntryError.interrupted }
-    return .accepted(CookingSessionProjection(
-      id: active.id,
-      snapshot: active.snapshot,
-      entries: [
-        SessionEntry(
-          id: .init(rawValue: fact.id.rawValue),
-          target: target,
-          text: text
+    XCTAssertEqual(model.currentEntryDraft?.text, "Survive every interruption")
+  }
+
+  func testRemoteFinishCancelsStrandedSubmissionBeforeDraftContinuation() throws {
+    let sessionID = CookingSession.ID()
+    let service = RemoteFinishDuringSubmitService(sessionID: sessionID)
+    let store = VolatileCookingSessionPresentationStore()
+    store.currentSessionID = sessionID
+    let model = CookingSessionPresentationModel(sessions: service, store: store)
+    model.loadIfNeeded()
+    model.updateCurrentEntryDraft(text: "Still only a draft", target: nil)
+
+    XCTAssertFalse(model.submitCurrentEntryDraft())
+    XCTAssertEqual(store.pendingCommands.count, 1)
+    service.isRemotelyFinished = true
+    model.reloadAfterExternalStoreChange()
+
+    XCTAssertTrue(store.pendingCommands.isEmpty)
+    XCTAssertEqual(model.detachedEntryDraft?.text, "Still only a draft")
+    XCTAssertTrue(model.continueDetachedEntryDraft())
+    XCTAssertEqual(model.currentEntryDraft?.text, "Still only a draft")
+  }
+
+  func testRemoteFinishAllowsDetachedDraftToBeExplicitlyDiscarded() throws {
+    let sessionID = CookingSession.ID()
+    let service = RemoteFinishDuringSubmitService(sessionID: sessionID)
+    let store = VolatileCookingSessionPresentationStore()
+    store.currentSessionID = sessionID
+    let model = CookingSessionPresentationModel(sessions: service, store: store)
+    model.loadIfNeeded()
+    model.updateCurrentEntryDraft(text: "Discard only when asked", target: nil)
+    XCTAssertFalse(model.submitCurrentEntryDraft())
+
+    service.isRemotelyFinished = true
+    model.reloadAfterExternalStoreChange()
+    model.discardDetachedEntryDraft()
+
+    XCTAssertTrue(store.pendingCommands.isEmpty)
+    XCTAssertTrue(store.entryDrafts.isEmpty)
+    XCTAssertNil(model.detachedEntryDraft)
+  }
+
+  func testEntryAndOutcomeConflictsCanBeResolvedWithCausalCommands() throws {
+    let sessionID = CookingSession.ID()
+    let entryID = SessionEntry.ID()
+    let conflicted = CookingSessionProjection(
+      id: sessionID,
+      snapshot: ExecutionSnapshot(title: "Soup"),
+      conflicts: [
+        .entry(
+          entryID: entryID,
+          factIDs: [SessionFact.ID(), SessionFact.ID()],
+          values: [
+            .present(SessionEntry(id: entryID, target: nil, text: "More lime")),
+            .withdrawn,
+          ]
+        ),
+        .outcome(
+          factIDs: [SessionFact.ID(), SessionFact.ID()],
+          values: [.value(.coarse(.great)), .cleared]
         ),
       ]
-    ))
-  }
-}
+    )
+    let service = ConflictResolutionService(session: conflicted)
+    let store = VolatileCookingSessionPresentationStore()
+    store.currentSessionID = sessionID
+    let model = CookingSessionPresentationModel(sessions: service, store: store)
+    model.loadIfNeeded()
 
-private enum AmbiguousEntryError: Error {
-  case interrupted
-  case unexpectedCommand
+    XCTAssertTrue(model.reviseEntry(entryID, text: "More lime", target: nil))
+    service.session = conflicted
+    model.reloadAfterExternalStoreChange()
+    XCTAssertTrue(model.clearOutcome())
+
+    XCTAssertEqual(service.intentions.count, 2)
+    guard case let .reviseEntry(_, revisedID, text, target) = service.intentions[0] else {
+      XCTFail("Expected entry conflict resolution")
+      return
+    }
+    XCTAssertEqual(revisedID, entryID)
+    XCTAssertEqual(text, "More lime")
+    XCTAssertNil(target)
+    guard case .clearOutcome = service.intentions[1] else {
+      XCTFail("Expected outcome conflict resolution")
+      return
+    }
+  }
 }

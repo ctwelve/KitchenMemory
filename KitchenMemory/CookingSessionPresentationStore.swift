@@ -13,6 +13,10 @@ struct CookingSessionEntryDraft: Codable, Equatable {
   var target: SessionProgressTarget?
 
   var isMeaningful: Bool {
+    Self.isMeaningful(text)
+  }
+
+  static func isMeaningful(_ text: String) -> Bool {
     !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
   }
 }

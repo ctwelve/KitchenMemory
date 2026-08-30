@@ -19,6 +19,8 @@ struct CookingSessionEntriesView: View {
         .font(.title2.bold())
         .accessibilityHeading(.h2)
 
+      CookingSessionEvidenceConflictsView(model: model, session: session)
+
       draftEditor
 
       if !session.entries.isEmpty {
@@ -80,7 +82,7 @@ struct CookingSessionEntriesView: View {
             }
           }
           .buttonStyle(.borderedProminent)
-          .disabled(!isMeaningful(editingText))
+          .disabled(!CookingSessionEntryDraft.isMeaningful(editingText))
         }
       } else {
         Text(entry.text)
@@ -201,9 +203,6 @@ struct CookingSessionEntriesView: View {
       String(localized: .sessionEntryTargetUnavailable)
   }
 
-  private func isMeaningful(_ text: String) -> Bool {
-    !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-  }
 }
 
 private struct SessionEntryTargetOption: Identifiable {

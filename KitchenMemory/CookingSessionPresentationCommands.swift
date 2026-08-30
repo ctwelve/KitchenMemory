@@ -211,12 +211,15 @@ extension CookingSessionPresentationModel {
     switch result {
     case let .accepted(session):
       guard pendingCommands.first == pending else { return false }
+      // Draft state crosses its local durability boundary before the outbox
+      // identity is cleared. A process interruption can therefore replay the
+      // accepted command, but can never strand or lose the user's text.
+      applyDraftAcceptance(for: pending, session: session)
       pendingCommands.removeFirst()
       persistPendingCommands()
       issue = nil
       isShowingIssue = false
       upsert(session)
-      applyDraftAcceptance(for: pending, session: session)
       applySelection(for: session, pending: pending)
       return true
     case let .attention(attention):
@@ -299,21 +302,13 @@ extension CookingSessionPresentationModel {
     case .submitEntry:
       removeDraft(for: pending.sessionID)
     case let .continueSession(newSessionID, sourceSessionID, _):
-      guard let draft = entryDrafts.first(where: { $0.sessionID == sourceSessionID }) else {
-        return
-      }
+      guard let draft = entryDrafts.first(where: { $0.sessionID == sourceSessionID }) else { return }
       let mappedTarget = draft.target.flatMap { sourceTarget in
         session.snapshot.continuationBaseline?.targetMappings.first(where: {
           $0.sourceTarget == sourceTarget
         })?.target
       }
-      removeDraft(for: sourceSessionID)
-      replaceDraft(CookingSessionEntryDraft(
-        sessionID: newSessionID,
-        text: draft.text,
-        target: mappedTarget
-      ))
-      refreshDetachedEntryDraft()
+      moveDraft(from: sourceSessionID, to: newSessionID, target: mappedTarget)
     case .start, .stop, .resume, .progress, .replaceWorkingScale, .reviseEntry,
          .retargetEntry, .withdrawEntry, .setOutcome, .clearOutcome, .finish:
       break
