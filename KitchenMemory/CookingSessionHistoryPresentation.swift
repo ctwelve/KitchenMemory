@@ -27,13 +27,7 @@ extension CookingSessionPresentationModel {
   }
 
   var currentHistorySession: CookingSessionProjection? {
-    var visitBySession: [CookingSession.ID: Date] = [:]
-    for visit in sessionVisits {
-      visitBySession[visit.sessionID] = max(
-        visitBySession[visit.sessionID] ?? .distantPast,
-        visit.lastVisitedAt
-      )
-    }
+    let visitBySession = latestVisitBySession
     return sessions.filter { visitBySession[$0.id] != nil }.max { lhs, rhs in
       guard let lhsDate = visitBySession[lhs.id], let rhsDate = visitBySession[rhs.id]
       else { return false }
@@ -52,13 +46,7 @@ extension CookingSessionPresentationModel {
     from candidates: [CookingSessionProjection],
     excluding currentID: CookingSession.ID?
   ) -> [CookingSessionProjection] {
-    var visitBySession: [CookingSession.ID: Date] = [:]
-    for visit in sessionVisits {
-      visitBySession[visit.sessionID] = max(
-        visitBySession[visit.sessionID] ?? .distantPast,
-        visit.lastVisitedAt
-      )
-    }
+    let visitBySession = latestVisitBySession
     let ordered = candidates.filter { $0.id != currentID }.sorted { lhs, rhs in
       let lhsDate = visitBySession[lhs.id] ?? .distantPast
       let rhsDate = visitBySession[rhs.id] ?? .distantPast
@@ -214,6 +202,15 @@ extension CookingSessionPresentationModel {
 
   private func persistSessionVisits() {
     store.sessionVisits = sessionVisits
+  }
+
+  private var latestVisitBySession: [CookingSession.ID: Date] {
+    sessionVisits.reduce(into: [:]) { latestVisits, visit in
+      latestVisits[visit.sessionID] = max(
+        latestVisits[visit.sessionID] ?? .distantPast,
+        visit.lastVisitedAt
+      )
+    }
   }
 }
 
