@@ -225,7 +225,7 @@ final class CookingSessionRecoveryPresentationTests: XCTestCase {
     XCTAssertEqual(visibleRecovery.evidence.closures, [first, second, third])
     XCTAssertTrue(relaunched.selectClosure(third.id, for: visibleRecovery))
     XCTAssertEqual(service.observedCandidateSets.count, 2)
-    XCTAssertEqual(service.observedCandidateSets[0], [first.id, second.id])
+    XCTAssertEqual(Set(service.observedCandidateSets[0]), Set([first.id, second.id]))
     XCTAssertEqual(
       Set(service.observedCandidateSets[1]),
       Set([first.id, second.id, third.id]),

@@ -7,9 +7,8 @@ import KitchenKit
 enum PendingCookingSessionResolution {
   case accepted(CookingSessionProjection)
   case rejectedByFinishedSource
-  case retiredStaleRestore(CookingSessionAttention)
+  case retiredStaleConsent(CookingSessionAttention)
   case retiredCompletedRestore
-  case retiredStaleClosureSelection(CookingSessionAttention)
   case attention(CookingSessionAttention)
 
   init(
@@ -22,11 +21,16 @@ enum PendingCookingSessionResolution {
     case (.attention(.commandNotAllowed(lifecycle: .finished)), _):
       self = .rejectedByFinishedSource
     case let (.attention(.competingDeletions(deletionIDs)), .restore):
-      self = .retiredStaleRestore(.competingDeletions(deletionIDs))
+      // Restore consent covers exactly one observed deletion frontier.
+      self = .retiredStaleConsent(.competingDeletions(deletionIDs))
     case (.attention(.restoreNotNeeded), .restore):
       self = .retiredCompletedRestore
     case let (.attention(.recovery(recovery)), .resolveClosure):
-      self = .retiredStaleClosureSelection(.recovery(recovery))
+      // Closure consent covers exactly one complete observed candidate set.
+      self = .retiredStaleConsent(.recovery(recovery))
+    case let (.attention(.unavailable(unavailable)), .resolveClosure):
+      // Partial evidence invalidates the old complete candidate set too.
+      self = .retiredStaleConsent(.unavailable(unavailable))
     case let (.attention(attention), _):
       self = .attention(attention)
     }

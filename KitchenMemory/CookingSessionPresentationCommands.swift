@@ -135,7 +135,6 @@ extension CookingSessionPresentationModel {
 
   // Exhaustive durable terminal-state routing keeps every outbox retirement
   // adjacent to its persistence boundary and prevents a new case being lost.
-  // swiftlint:disable:next cyclomatic_complexity
   func apply(
     _ result: CookingSessionCommandResult,
     for pending: PendingCookingSessionCommand
@@ -166,11 +165,10 @@ extension CookingSessionPresentationModel {
       issue = nil
       isShowingIssue = false
       return true
-    case let .retiredStaleRestore(attention):
+    case let .retiredStaleConsent(attention):
       guard pendingCommands.first == pending else { return false }
-      // Restore is consent to resolve one observed frontier. If concurrent
-      // evidence changes that frontier, this durable command must not retry
-      // forever or silently expand the user's original confirmation.
+      // Consent to resolve retained evidence is bounded to what the user saw.
+      // A changed frontier or candidate set requires a fresh explicit choice.
       pendingCommands.removeFirst()
       persistPendingCommands()
       reload()
@@ -185,16 +183,6 @@ extension CookingSessionPresentationModel {
       issue = nil
       isShowingIssue = false
       reload()
-      return true
-    case let .retiredStaleClosureSelection(attention):
-      guard pendingCommands.first == pending else { return false }
-      // A Closure choice is consent over one observed candidate set. Newly
-      // imported evidence must force a fresh explicit choice, not wedge the
-      // durable outbox on an obsolete selection or silently broaden it.
-      pendingCommands.removeFirst()
-      persistPendingCommands()
-      reload()
-      present(.attention(attention))
       return true
     case let .attention(attention):
       present(.attention(attention))
