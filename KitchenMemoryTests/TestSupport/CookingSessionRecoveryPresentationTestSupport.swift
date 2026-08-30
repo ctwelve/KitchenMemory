@@ -6,6 +6,26 @@
 import Foundation
 import KitchenKit
 
+func recoveryClosureEvidence(
+  sessionID: CookingSession.ID,
+  finishedAt: TimeInterval
+) -> SessionClosureEvidence {
+  SessionClosureEvidence(
+    id: SessionClosure.ID(),
+    sessionID: sessionID,
+    kitchenID: Kitchen.ID(),
+    finishedAt: Date(timeIntervalSince1970: finishedAt),
+    causalHeadsFormatVersion: 1,
+    causalHeadsData: Data(),
+    snapshotFormatVersion: 1,
+    snapshotDigest: Data(),
+    projectionFormatVersion: 1,
+    projectionDigest: Data(),
+    outcomeFormatVersion: nil,
+    outcomeData: nil
+  )
+}
+
 @MainActor
 final class ClosureInterruptionSessionService: CookingSessionServing {
   var results: [SessionProjectionResult]

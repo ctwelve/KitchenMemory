@@ -104,8 +104,8 @@ final class CookingSessionRecoveryPresentationTests: XCTestCase {
       store: VolatileCookingSessionPresentationStore()
     )
     let sessionID = CookingSession.ID()
-    let first = closure(sessionID: sessionID, finishedAt: 20)
-    let second = closure(sessionID: sessionID, finishedAt: 10)
+    let first = recoveryClosureEvidence(sessionID: sessionID, finishedAt: 20)
+    let second = recoveryClosureEvidence(sessionID: sessionID, finishedAt: 10)
     let evidence = SessionEvidence(
       sessionID: sessionID,
       closures: [first, second, first]
@@ -192,9 +192,9 @@ final class CookingSessionRecoveryPresentationTests: XCTestCase {
 
   func testRelaunchedClosureSelectionRetiresStaleCandidatesAndRequiresFreshChoice() throws {
     let sessionID = CookingSession.ID()
-    let first = closure(sessionID: sessionID, finishedAt: 10)
-    let second = closure(sessionID: sessionID, finishedAt: 20)
-    let third = closure(sessionID: sessionID, finishedAt: 30)
+    let first = recoveryClosureEvidence(sessionID: sessionID, finishedAt: 10)
+    let second = recoveryClosureEvidence(sessionID: sessionID, finishedAt: 20)
+    let third = recoveryClosureEvidence(sessionID: sessionID, finishedAt: 30)
     let updatedRecovery = SessionRecovery(
       evidence: SessionEvidence(sessionID: sessionID, closures: [first, second, third]),
       reasons: [.competingClosures]
@@ -231,26 +231,6 @@ final class CookingSessionRecoveryPresentationTests: XCTestCase {
       Set([first.id, second.id, third.id]),
     )
     XCTAssertTrue(store.pendingCommands.isEmpty)
-  }
-
-  private func closure(
-    sessionID: CookingSession.ID,
-    finishedAt: TimeInterval
-  ) -> SessionClosureEvidence {
-    SessionClosureEvidence(
-      id: SessionClosure.ID(),
-      sessionID: sessionID,
-      kitchenID: Kitchen.ID(),
-      finishedAt: Date(timeIntervalSince1970: finishedAt),
-      causalHeadsFormatVersion: 1,
-      causalHeadsData: Data(),
-      snapshotFormatVersion: 1,
-      snapshotDigest: Data(),
-      projectionFormatVersion: 1,
-      projectionDigest: Data(),
-      outcomeFormatVersion: nil,
-      outcomeData: nil
-    )
   }
 
   private func projection(
