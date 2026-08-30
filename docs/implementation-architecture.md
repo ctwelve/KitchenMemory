@@ -69,7 +69,7 @@ target implementation details:
 `ProductionTesting` is deliberately non-distributable. It retains production
 compiler behavior while admitting disposable automated-test storage that is
 disabled in the actual `Production` application. The saved `KitchenMemory`
-scheme uses `Testing` for its default Test and Analyze actions, `Debug` for Run,
+scheme uses `Testing` for its default Test and Analyze actions, `Develop` for Run,
 and `Production` for Profile and Archive. Its plan runs hosted tests and UI
 smoke together on either native destination; the UI harness selects disposable
 storage through its launch arguments. A release-equivalent UI smoke run may

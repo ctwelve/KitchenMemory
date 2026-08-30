@@ -140,7 +140,7 @@ module KitchenMemory
       },
       "KitchenMemory" => {
         "TestAction" => "Testing",
-        "LaunchAction" => "Debug",
+        "LaunchAction" => "Develop",
         "ProfileAction" => "Production",
         "AnalyzeAction" => "Testing",
         "ArchiveAction" => "Production"
