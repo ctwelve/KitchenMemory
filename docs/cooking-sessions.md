@@ -68,9 +68,12 @@ The presentation retains accepted intentions in an ordered device-local outbox
 before they cross Logic. Independent progress and scale actions may accumulate
 without replacing one another. Retries preserve order and reuse the same
 Session, Fact, or Closure identity after an interruption or ambiguous failure;
-each item clears only when Logic returns its locally durable accepted
-projection. The outbox is not synchronized and does not imply that another
-device has received the evidence.
+each item normally clears only when Logic returns its locally durable accepted
+projection. The typed terminal exception is a command that Logic definitively
+rejects because its source Session is already Finished: only that now-impossible
+identity clears. Any exact Entry draft remains separately local for explicit
+continuation, confirmed copy, or discard. The outbox is not synchronized and
+does not imply that another device has received the evidence.
 
 ## Cooking interaction
 
@@ -115,6 +118,15 @@ Entries may be causally revised, retargeted, or withdrawn without deleting
 earlier evidence. A local meaningful draft survives navigation, Stop, and
 process relaunch. Finish and remote Finish must offer explicit handling for that
 draft; no path silently loses or misassigns it.
+
+The 0.1.5 interaction keeps that draft in application-owned device-local
+storage, separate from the synchronized accepted-intention outbox. Submission
+preserves the exact authored Unicode text and clears the draft only after Logic
+confirms local durability. Finish offers add, copy, discard, and cancel choices.
+If remote Finish arrives first, the person may continue into a new immutable
+Session, copy the draft, discard it, or leave it unresolved; continuation maps
+the target through the captured continuation baseline instead of silently
+retargeting it.
 
 Session Outcome is optional and distinct from lifecycle. Its initial coarse
 values are great, okay, and unsuccessful. Finishing with no Entries or Outcome
