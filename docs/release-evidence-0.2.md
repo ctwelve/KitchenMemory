@@ -6,10 +6,14 @@ Copyright © 2026 the Kitchen Memory contributors.
 SPDX-License-Identifier: MIT
 -->
 
-- Status: 0.2 feature acceptance complete
+- Status: 0.2 release complete
 - Candidate version: 0.2.0
 - Evidence opened: 2026-08-30
 - Evidence finalized: 2026-08-31
+- Accepted release source:
+  `7d2bc92917a25e94384240847c36ac859f24166f`
+- Immutable release tag: `release/0.2.0`
+- Xcode Cloud tagged release: build 137
 - Accepted product source:
   `479b3608f42448821a61727e45c15ce234207e2a`
 - Xcode Cloud candidate: build 128
@@ -201,3 +205,21 @@ TestFlight, and App Store submission remain separate publication decisions. A
 later product-code change reruns affected acceptance and archive evidence;
 documentation-only recording does not invalidate the accepted product
 behavior.
+
+## 0.2 publication conclusion
+
+| Evidence | Source state | Result | Record |
+| --- | --- | --- | --- |
+| Release-engineering development workflow | `6f91e6d` | Passed | Xcode Cloud build 133 completed the governed release-engineering workflow successfully. |
+| Governed release pull request | PR #73 | Passed | Build 134 and the repository source-policy check passed before the normal merge to `main`. |
+| Production build | `7d2bc92` | Passed | The exact merge commit passed the required `KitchenMemory | Merge to main` result before tag creation. |
+| Immutable release tag | tag object `29ed012` | Passed | The signed annotated `release/0.2.0` tag peels to `7d2bc92`; GitHub reports its SSH signature valid and verified. |
+| Tagged archive workflow | `7d2bc92`; build 137 | Passed | The tag triggered Xcode Cloud without the 0.1 synchronization exception. The iOS and macOS archives completed, the builds reached App Store Connect, and the Mac product was notarized. |
+| Installed tagged product | build 137 | Passed | The release operator confirmed that the notarized application launches locally and that both builds are available in App Store Connect. |
+| GitHub source release | [`release/0.2.0`](https://github.com/ctwelve/KitchenMemory/releases/tag/release/0.2.0) | Passed | The second public-alpha prerelease identifies the immutable source, hosted-build availability, highlights, privacy posture, verification, and explicit alpha boundaries without claiming a public binary download. |
+
+Kitchen Memory 0.2.0 is released as an early alpha. The exact tagged source,
+hosted archives, notarization, Production schema, representative physical-device
+exercise, and bounded acceptance reductions are recorded above. Availability in
+App Store Connect does not imply App Review approval, public storefront
+availability, or membership in a public TestFlight group.
