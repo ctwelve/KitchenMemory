@@ -129,7 +129,9 @@ struct SessionCloudKitAcceptance {
 
   private static func stage(_ arguments: HarnessArguments) async throws {
     let fixture = try makeFixture(arguments)
-    let actor = try arguments.required("actor")
+    guard let actor = AcceptanceActor(argument: try arguments.required("actor")) else {
+      throw AcceptanceHarnessError.unsupportedActor
+    }
     let wait = try arguments.integer("wait", default: 30)
     let store = try makeStore(arguments)
     let recorder = CloudEventRecorder()
@@ -141,7 +143,7 @@ struct SessionCloudKitAcceptance {
       "event": "stage",
       "scenario": fixture.scenario.rawValue,
       "run": fixture.runID.uuidString,
-      "actor": actor,
+      "actor": actor.rawValue,
       "transactions": transactions.count,
       "store": store.rawValue,
       "result": "locally-durable",
@@ -246,39 +248,35 @@ struct SessionCloudKitAcceptance {
   }
 
   private static func runLocalMatrix() throws {
-    let container = try KitchenMemorySchema.makeContainer(inMemory: true)
-    let repository = SwiftDataCookingSessionRepository(modelContainer: container)
     for (offset, scenario) in AcceptanceScenario.allCases.enumerated() {
       let runID = UUID(uuid: (
         0x90, 0, 0, 0, 0, 0, 0x40, UInt8(offset),
         0x80, 0, 0, 0, 0, 0, 0, UInt8(offset + 1)
       ))
       let fixture = AcceptanceFixture(runID: runID, scenario: scenario)
-      let actors: [String]
-      switch scenario {
-      case .e1, .e2b, .e4a, .e4b: actors = ["A", "B"]
-      case .e3: actors = ["A"]
-      case .e5: actors = ["A", "B", "R"]
-      case .e7: actors = ["A1", "A2"]
-      }
-      for actor in actors {
-        for transaction in try fixture.transactions(for: actor) {
-          try repository.append(transaction)
+      for checkpointPlan in scenario.plan.checkpoints {
+        let container = try KitchenMemorySchema.makeContainer(inMemory: true)
+        let repository = SwiftDataCookingSessionRepository(modelContainer: container)
+        for actor in checkpointPlan.actors {
+          for transaction in try fixture.transactions(for: actor) {
+            try repository.append(transaction)
+          }
         }
+        let observations = try fixture.observedSessionIDs().compactMap {
+          try AcceptanceObservation.read(sessionID: $0, repository: repository)
+        }
+        let expectation = try fixture.expectation(at: checkpointPlan.checkpoint)
+        guard expectation.isSatisfied(by: observations) else {
+          throw AcceptanceHarnessError.invalidFixture
+        }
+        AcceptanceOutput.emit([
+          "event": "local-matrix",
+          "scenario": scenario.rawValue,
+          "checkpoint": checkpointPlan.checkpoint.rawValue,
+          "result": "pass",
+          "sessions": observations.map(\.output),
+        ])
       }
-      let observations = try fixture.observedSessionIDs().compactMap {
-        try AcceptanceObservation.read(sessionID: $0, repository: repository)
-      }
-      let expectation = try fixture.expectation(at: .final)
-      guard expectation.isSatisfied(by: observations) else {
-        throw AcceptanceHarnessError.invalidFixture
-      }
-      AcceptanceOutput.emit([
-        "event": "local-matrix",
-        "scenario": scenario.rawValue,
-        "result": "pass",
-        "sessions": observations.map(\.output),
-      ])
     }
   }
 

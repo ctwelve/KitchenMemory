@@ -16,6 +16,90 @@ enum AcceptanceScenario: String, CaseIterable {
   case e7 = "E7"
 }
 
+enum AcceptanceActor: String {
+  case a = "A"
+  case a1 = "A1"
+  case a2 = "A2"
+  case b = "B"
+  case restoration = "R"
+
+  init?(argument: String) {
+    self.init(rawValue: argument.uppercased())
+  }
+}
+
+struct AcceptanceCheckpointPlan {
+  let checkpoint: AcceptanceCheckpoint
+  let actors: [AcceptanceActor]
+}
+
+struct AcceptanceScenarioPlan {
+  let sessionLabels: [String]
+  let checkpoints: [AcceptanceCheckpointPlan]
+
+  func actors(at checkpoint: AcceptanceCheckpoint) throws -> [AcceptanceActor] {
+    guard let plan = checkpoints.first(where: { $0.checkpoint == checkpoint }) else {
+      throw AcceptanceHarnessError.invalidArguments
+    }
+    return plan.actors
+  }
+}
+
+extension AcceptanceScenario {
+  var plan: AcceptanceScenarioPlan {
+    switch self {
+    case .e1:
+      AcceptanceScenarioPlan(
+        sessionLabels: ["duplicate", "collision"],
+        checkpoints: [
+          AcceptanceCheckpointPlan(checkpoint: .final, actors: [.a, .b]),
+        ]
+      )
+    case .e2b, .e4b:
+      AcceptanceScenarioPlan(
+        sessionLabels: ["primary"],
+        checkpoints: [
+          AcceptanceCheckpointPlan(checkpoint: .final, actors: [.a, .b]),
+        ]
+      )
+    case .e3:
+      AcceptanceScenarioPlan(
+        sessionLabels: ["primary"],
+        checkpoints: [
+          AcceptanceCheckpointPlan(checkpoint: .final, actors: [.a]),
+        ]
+      )
+    case .e4a:
+      AcceptanceScenarioPlan(
+        sessionLabels: ["primary"],
+        checkpoints: [
+          AcceptanceCheckpointPlan(checkpoint: .partial, actors: [.a]),
+          AcceptanceCheckpointPlan(checkpoint: .final, actors: [.a, .b]),
+        ]
+      )
+    case .e5:
+      AcceptanceScenarioPlan(
+        sessionLabels: ["primary"],
+        checkpoints: [
+          AcceptanceCheckpointPlan(checkpoint: .deleted, actors: [.a, .b]),
+          AcceptanceCheckpointPlan(
+            checkpoint: .final,
+            actors: [.a, .b, .restoration]
+          ),
+        ]
+      )
+    case .e7:
+      AcceptanceScenarioPlan(
+        sessionLabels: ["first", "second"],
+        checkpoints: [
+          AcceptanceCheckpointPlan(checkpoint: .first, actors: [.a1]),
+          AcceptanceCheckpointPlan(checkpoint: .final, actors: [.a1, .a2]),
+        ]
+      )
+    }
+  }
+}
+
 @MainActor
 struct AcceptanceFixture {
   let runID: UUID
@@ -23,53 +107,53 @@ struct AcceptanceFixture {
 
   var kitchenID: Kitchen.ID { KitchenBootstrapService.personalKitchenID }
 
-  func transactions(for actor: String) throws -> [CookingSessionTransaction] {
-    switch (scenario, actor.uppercased()) {
-    case (.e1, "A"):
+  func transactions(for actor: AcceptanceActor) throws -> [CookingSessionTransaction] {
+    switch (scenario, actor) {
+    case (.e1, .a):
       return [.start(try root("duplicate")), .start(try root("collision"))]
-    case (.e1, "B"):
+    case (.e1, .b):
       return [
         .start(try root("duplicate")),
         .start(try root("collision", startedAtOffset: 1)),
       ]
-    case (.e2b, "A"):
+    case (.e2b, .a):
       let value = try root("primary")
       return [.start(value), .activity(try fact(root: value, label: "fact-a"))]
-    case (.e2b, "B"):
+    case (.e2b, .b):
       let value = try root("primary")
       return [.start(value), .activity(try fact(root: value, label: "fact-b"))]
-    case (.e3, "A"):
+    case (.e3, .a):
       return [.start(try root("primary"))]
-    case (.e4a, "A"):
+    case (.e4a, .a):
       let values = try completeEvidence()
       return [.finish(values.closure), .restore([values.restoration])]
-    case (.e4a, "B"):
+    case (.e4a, .b):
       let values = try completeEvidence()
       return [
         .start(values.root), .activity(values.fact), .delete(values.deletion),
       ]
-    case (.e4b, "A"):
+    case (.e4b, .a):
       let value = try root("primary")
       return [.start(value), .activity(try fact(root: value, label: "fact-a"))]
-    case (.e4b, "B"):
+    case (.e4b, .b):
       let value = try root("primary")
       return [.start(value), .activity(try fact(root: value, label: "fact-b"))]
-    case (.e5, "A"):
+    case (.e5, .a):
       let value = try root("primary")
       return [
         .start(value),
         .delete(deletion(root: value, sessionHeads: [value.id.rawValue])),
       ]
-    case (.e5, "B"):
+    case (.e5, .b):
       let value = try root("primary")
       return [.start(value), .activity(try fact(root: value, label: "offline-fact"))]
-    case (.e5, "R"):
+    case (.e5, .restoration):
       let value = try root("primary")
       let marker = deletion(root: value, sessionHeads: [value.id.rawValue])
       return [.restore([restoration(root: value, deletion: marker)])]
-    case (.e7, "A1"):
+    case (.e7, .a1):
       return [.start(try root("first"))]
-    case (.e7, "A2"):
+    case (.e7, .a2):
       return [.start(try root("second"))]
     default:
       throw AcceptanceHarnessError.unsupportedActor
@@ -77,21 +161,14 @@ struct AcceptanceFixture {
   }
 
   func observedSessionIDs() -> [CookingSession.ID] {
-    switch scenario {
-    case .e1:
-      [sessionID("duplicate"), sessionID("collision")]
-    case .e7:
-      [sessionID("first"), sessionID("second")]
-    default:
-      [sessionID("primary")]
-    }
+    scenario.plan.sessionLabels.map(sessionID)
   }
 
   func expectation(
     at checkpoint: AcceptanceCheckpoint
   ) throws -> AcceptanceExpectation {
     let repository = InMemoryCookingSessionRepository()
-    for actor in try expectedActors(at: checkpoint) {
+    for actor in try scenario.plan.actors(at: checkpoint) {
       for transaction in try transactions(for: actor) {
         try repository.append(transaction)
       }
@@ -100,22 +177,6 @@ struct AcceptanceFixture {
       try AcceptanceObservation.read(sessionID: $0, repository: repository)
     }
     return AcceptanceExpectation(observations: observations)
-  }
-
-  private func expectedActors(
-    at checkpoint: AcceptanceCheckpoint
-  ) throws -> [String] {
-    switch (scenario, checkpoint) {
-    case (.e1, .final), (.e2b, .final), (.e4b, .final): ["A", "B"]
-    case (.e3, .final): ["A"]
-    case (.e4a, .partial): ["A"]
-    case (.e4a, .final): ["A", "B"]
-    case (.e5, .deleted): ["A", "B"]
-    case (.e5, .final): ["A", "B", "R"]
-    case (.e7, .first): ["A1"]
-    case (.e7, .final): ["A1", "A2"]
-    default: throw AcceptanceHarnessError.invalidArguments
-    }
   }
 
   private func completeEvidence() throws -> (

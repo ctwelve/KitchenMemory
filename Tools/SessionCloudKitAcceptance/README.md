@@ -78,7 +78,7 @@ counts, identifiers, or operation status.
 | E1 | A and B, both reconnect orders | Identical roots coalesce; conflicting roots classify as Recovery. |
 | E2b | A and B, both orders | Both immutable Facts survive in ordinary projection. |
 | E3 | foreground, background, and terminated-then-relaunch phases | Foreground and background require a remote-store notification before exact receiving-store evidence; relaunch rebuilds from retained evidence without requiring a new notification. |
-| E4a | B, partial observe, then A, both orders | A prefix is Unavailable; full root, Fact, Closure, Delete, and Restore evidence rebuilds a restored Finished Session. |
+| E4a | A, partial observe, then B; reverse full delivery order too | A's Closure and Restore prefix is Unavailable; full root, Fact, Closure, Delete, and Restore evidence rebuilds a restored Finished Session. |
 | E4b | One local-only replica plus one cloud replica, both reconnect orders | Both retained Facts converge; neither copy is treated as an authoritative backup. |
 | E5 | Delete, independent offline Fact, deleted checkpoint, Restore, both orders | Deleted and restored checkpoints retain the Fact and all disposition evidence without cascade or silent resurrection. |
 | E7 | A1, successful operation window, A2, clean receiver | A later export is possible and only receiver content proves receipt. |
