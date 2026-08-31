@@ -21,7 +21,8 @@ SPDX-License-Identifier: MIT
   `ea1b13fad07d955fe954b9590220b291cf26942d`
 - CloudKit evidence environments: acceptance Development container and the
   release container's Development environment
-- Production environment: Untouched; additive deployment preview reviewed
+- Production environment: V3 additive schema deployed and verified on
+  2026-08-31 at 12:46 AM CDT
 
 This ledger records the signed managed-CloudKit evidence for Slice 19 and the
 final 0.2 feature acceptance. A **Passed** transport result means the named receiving
@@ -121,7 +122,8 @@ product walkthrough defined by [the 0.2 acceptance contract](acceptance-0.2.md).
 ## Production publication preparation
 
 These operations are release publication evidence, not retroactive Slice 19
-implementation evidence. None of them deployed or wrote records to Production.
+implementation evidence. Initialization and preview did not touch Production;
+the explicitly authorized deployment copied schema only and wrote no records.
 
 | Evidence | Source state | Result | Record |
 | --- | --- | --- | --- |
@@ -129,7 +131,8 @@ implementation evidence. None of them deployed or wrote records to Production.
 | Release-container Development initialization | product `479b360`; administrator `1e33d2e` | Passed | The frozen V3 managed model initialized successfully in the Development environment of the Production container and explicitly performed no Production deployment. |
 | Release-container Development server audit | product `479b360` | Passed | The five V3 types contain every expected domain field plus normal managed-store metadata and asset companions. Index totals are Cooking Session 31, Fact 32, Closure 32, Deletion 24, and Deletion Resolution 23. All five use only `_world` Read, `_icloud` Create, and `_creator` Write; no V3 field is encrypted. |
 | Production deployment preview | product `479b360` | Passed additive review | The preview creates the five V3 types and their 142 indexes. On nine published recipe types it also adds 50 framework-managed fields: 18 move-receipt fields and companions plus 32 variable-length asset companions documented by Core Data. The only 18 indexes added to published types are Queryable and Sortable on their move-receipt fields. The role delta admits only the five new types under the standard grants. No existing type or field is removed, renamed, retyped, repurposed, or encrypted; no existing grant changes. |
-| Production deployment | — | Awaiting explicit authorization | The reviewed preview remains unconfirmed. Production still contains the published recipe schema and no V3 Session type. |
+| Production deployment | product `479b360` | Passed | The release operator explicitly authorized the reviewed preview. CloudKit Console reported that the schema was deployed to Production, and Production history records the five types, 142 V3 indexes, 18 managed move-receipt indexes, 50 companion fields, and three standard-role updates at 12:46 AM CDT. |
+| Production post-deployment audit | product `479b360` | Passed | Production contains the exact V3 field sets, index totals of 31/32/32/24/23, two move-receipt indexes on each affected published type, and only `_world` Read, `_icloud` Create, and `_creator` Write on every V3 type. A fresh deployment preview reports zero record-type, index, and role changes. |
 
 ## Final automated candidate
 
@@ -191,9 +194,10 @@ action accessibility failure blocks the bounded early-alpha flow. The explicit
 reductions above narrow human stress, provenance, localization, and accessibility
 claims without waiving a known data or state failure.
 
-Slice 20 feature acceptance is complete for `479b360`. Production CloudKit
-promotion, changing `RELEASE`, creating the immutable `release/0.2.0` tag,
-exporting an IPA, publishing a notarized Mac artifact, TestFlight, and App Store
-submission remain separate publication decisions. A later product-code change
-reruns affected acceptance and archive evidence; documentation-only recording
-does not invalidate the accepted product behavior.
+Slice 20 feature acceptance is complete for `479b360`, and its Production
+CloudKit schema is deployed. Changing `RELEASE`, creating the immutable
+`release/0.2.0` tag, exporting an IPA, publishing a notarized Mac artifact,
+TestFlight, and App Store submission remain separate publication decisions. A
+later product-code change reruns affected acceptance and archive evidence;
+documentation-only recording does not invalidate the accepted product
+behavior.
