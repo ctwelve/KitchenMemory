@@ -11,7 +11,7 @@ SPDX-License-Identifier: MIT
 - Evidence opened: 2026-08-31
 - Accepted release source: pending
 - Immutable release tag: `release/0.2.1` pending
-- Production environment: V4 deployment pending
+- Production environment: V4 deployed 2026-08-31
 
 This patch release repairs the 0.2.0 production-library collision in which a
 legacy Kitchen and the deterministic personal Kitchen could retain physical
@@ -28,7 +28,7 @@ wrong physical owner.
 | V1/V2/V3 to V4 migration | Passed locally | All historical stores remain readable; V3-to-V4 preserves content without inventing an owner, and V4 adds only Kitchen ownership evidence. |
 | Exact KitchenKit coverage | Passed locally | Complete KitchenKit suite passed with 8,433/8,433 executable business-logic lines covered; 118 live Apple-runtime adapter lines are explicitly excluded. |
 | iOS and macOS application validation | Passed locally | macOS 26.6.2: 134/134 tests, including 17 UI smokes. iPhone 17 Pro simulator on iOS 26.5: 133/133 tests, including 16 UI smokes. |
-| V4 Production schema preview and deployment | Preview passed; deployment pending | Development initialization succeeded for candidate `a3e96fd`. Apple's deployment diff contains one additive `CD_KitchenOwnershipRecord` type, its generated 14 indexes, and the standard `_creator`, `_icloud`, and `_world` grants; no existing type or field changes. |
+| V4 Production schema preview and deployment | Passed | Development initialization succeeded for candidate `a3e96fd`. Apple's deployment diff contained one additive `CD_KitchenOwnershipRecord` type, its generated 14 indexes, and the standard `_creator`, `_icloud`, and `_world` grants; no existing type or field changes. CloudKit Console confirmed deployment and recorded the five expected Production history entries on 2026-08-31. |
 | Physical 0.2.0 production-store repair | Pending | The installed candidate must converge the diagnosed store, reset successfully, and start a Cooking Session. |
 | Notarized macOS artifact | Pending | The tagged artifact must pass signing, Gatekeeper, stapling, extraction, install, and launch checks. |
 | GitHub release attachment | Pending | The verified notarized ZIP and checksum must be attached to the 0.2.1 prerelease. |
