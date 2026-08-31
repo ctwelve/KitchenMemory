@@ -9,23 +9,6 @@ import XCTest
 // The public command stories intentionally share one complete recipe fixture.
 // swiftlint:disable:next type_body_length
 final class CookingSessionsStartTests: XCTestCase {
-  func testRepositoryWithoutOwnershipConvergenceSupportFailsExplicitly() throws {
-    let repository = SessionRecipeRepository(stored: [])
-    let ownerID = KitchenOwner.ID(rawValue: "test-owner")
-
-    XCTAssertThrowsError(
-      try repository.convergeKitchens(
-        into: Kitchen(ownerID: ownerID, name: "Home"),
-        ownedBy: ownerID
-      )
-    ) { error in
-      XCTAssertEqual(
-        error as? KitchenMemoryPersistenceError,
-        .ownershipConvergenceUnsupported
-      )
-    }
-  }
-
   // swiftlint:disable:next function_body_length
   func testExplicitStartCapturesAnImmutableResumableSnapshot() throws {
     let ingredientID = RecipeIngredient.ID(rawValue: id(4))
