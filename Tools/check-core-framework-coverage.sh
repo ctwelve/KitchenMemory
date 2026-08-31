@@ -16,7 +16,8 @@ SCRIPT_DIRECTORY=$(CDPATH= cd "$(dirname "$0")" && pwd)
 PROJECT_ROOT=$(dirname "$SCRIPT_DIRECTORY")
 KITCHEN_KIT_DIRECTORY="$PROJECT_ROOT/KitchenKit"
 PERSISTENCE_DIRECTORY="$KITCHEN_KIT_DIRECTORY/Persistence"
-PERSISTENCE_RUNTIME_ADAPTER="$PERSISTENCE_DIRECTORY/Cloud/PersonalCloudStatusMonitor.swift"
+PERSISTENCE_STATUS_ADAPTER="$PERSISTENCE_DIRECTORY/Cloud/PersonalCloudStatusMonitor.swift"
+PERSISTENCE_OWNER_ADAPTER="$PERSISTENCE_DIRECTORY/Cloud/CloudKitKitchenOwnerIDResolver.swift"
 
 if [ ! -r "$RESULT_BUNDLE" ]; then
   echo "Coverage gate error: result bundle is not readable: $RESULT_BUNDLE" >&2
@@ -94,7 +95,7 @@ while IFS='|' read -r TARGET MODULE_DIRECTORY; do
     # remains inside the exact business-logic gate.
     # Xcode may canonicalize /private/tmp to /tmp in coverage paths, so compare
     # the stable repository-relative suffix rather than the absolute spelling.
-    EXCLUDED_SOURCE=${PERSISTENCE_RUNTIME_ADAPTER#"$PROJECT_ROOT"}
+    EXCLUDED_SOURCE="${PERSISTENCE_STATUS_ADAPTER#"$PROJECT_ROOT"}|${PERSISTENCE_OWNER_ADAPTER#"$PROJECT_ROOT"}"
   fi
 
   if TARGET_COVERAGE=$(printf '%s\n' "$TARGET_REPORT" | awk \
@@ -108,9 +109,14 @@ while IFS='|' read -r TARGET MODULE_DIRECTORY; do
           malformed = $NF
           next
         }
-        if (excluded != "" && index($0, excluded)) {
-          excludedLines += parts[2]
-          next
+        if (excluded != "") {
+          excludedCount = split(excluded, excludedParts, "|")
+          for (excludedIndex = 1; excludedIndex <= excludedCount; excludedIndex++) {
+            if (index($0, excludedParts[excludedIndex])) {
+              excludedLines += parts[2]
+              next
+            }
+          }
         }
         fileCount++
         covered += parts[1]

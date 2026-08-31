@@ -34,9 +34,9 @@ private enum CloudKitProductionSchemaAdmin {
   }
 
   private static func initialize(candidate: String) throws {
-    let schema = Schema(versionedSchema: KitchenMemorySchemaV3.self)
+    let schema = Schema(versionedSchema: KitchenMemorySchemaV4.self)
     guard let model = NSManagedObjectModel.makeManagedObjectModel(
-      for: KitchenMemorySchemaV3.models
+      for: KitchenMemorySchemaV4.models
     ) else {
       throw SchemaAdministrationError.managedObjectModelUnavailable
     }
@@ -80,7 +80,7 @@ private enum CloudKitProductionSchemaAdmin {
 
     let output = "{\"candidate\":\"\(candidate)\","
       + "\"container\":\"production-container\",\"environment\":\"development\","
-      + "\"schema\":\"V3\",\"result\":\"operation-succeeded\","
+      + "\"schema\":\"V4\",\"result\":\"operation-succeeded\","
       + "\"productionDeployed\":false}"
     print(output)
   }

@@ -84,11 +84,13 @@ code, declarations without executable behavior, and unreachable defensive paths
 must not motivate artificial tests. Any exclusion from the business-logic
 coverage target should be narrow and documented.
 
-The direct Apple-runtime bridge in `PersonalCloudStatusMonitor.swift` is one
-such exclusion. It performs a real `CKContainer` account query and receives a
-Core Data CloudKit event object that Apple does not expose a public initializer
-for. Its deterministic status reducer is isolated in `PersonalCloudStatus.swift`
-and remains subject to the exact coverage gate; focused adapter tests still
+The direct Apple-runtime bridges in `PersonalCloudStatusMonitor.swift` and
+`CloudKitKitchenOwnerIDResolver.swift` are such exclusions. They perform real
+`CKContainer` account queries, and the status monitor receives a Core Data
+CloudKit event object that Apple does not expose a public initializer for. The
+deterministic status reducer is isolated in `PersonalCloudStatus.swift`, and the
+owner resolver's opaque container-scoped mapping is isolated from its account
+query; both remain subject to focused deterministic tests. Adapter tests still
 exercise notification delivery, concurrency hops, and stale-result rejection.
 
 ## Consequences

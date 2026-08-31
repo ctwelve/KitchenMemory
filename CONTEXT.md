@@ -2,6 +2,12 @@
 
 Kitchen Memory preserves the distinct human truths of maintained recipes and what actually happened during cooking without manufacturing precision or silently rewriting history.
 
+## Kitchen ownership
+
+**Kitchen Owner**:
+The account-scoped identity permitted to own and reconcile one Kitchen. The identity is opaque and carries no person-facing name or contact information.
+_Avoid_: User account, Apple ID, member
+
 ## Cooking sessions
 
 **Cooking Session**:

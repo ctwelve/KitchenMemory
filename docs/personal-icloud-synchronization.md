@@ -193,6 +193,20 @@ ordinary inline `Data`, and no relationships, uniqueness constraints, or local
 indexes. Repository validation prevents placeholders or partial evidence from
 becoming ordinary state. V1 and V2 model definitions remain unchanged.
 
+Kitchen Memory 0.2.1 adds `KitchenMemorySchemaV4` and the additive
+`KitchenOwnershipRecord`. Its owner value comes from CloudKit's opaque current-
+user record ID for the selected container; it contains no name, email address,
+or Apple ID. Startup may claim unowned V1–V3 alpha Kitchens for that current
+owner and converge their Kitchen-scoped records into the deterministic personal
+Kitchen. A Kitchen carrying a different explicit owner makes convergence fail
+without mutation. Remote-store refresh repeats the same guarded reconciliation
+so a late legacy row cannot recreate the 0.2.0 collision.
+
+This one-time legacy claim is permitted by the alpha data contract in
+[ADR 0016](adr/0016-alpha-data-contract-and-beta-stabilization.md). It is not a
+general account-transfer mechanism. Beta begins with a deliberate hard reset
+and stabilization of local and Production CloudKit data.
+
 V3 Session deletion uses the same explicit causal principle without reusing the
 Recipe-reset mechanism. Delete appends a `SessionDeletionRecord`; Restore appends
 one `SessionDeletionResolutionRecord` for each unresolved deletion marker the
@@ -277,7 +291,7 @@ The Develop-and-macOS-only argument temporarily hands the Development app's
 default store to
 `NSPersistentCloudKitContainer`, asks it to initialize the development schema,
 unloads that store, and then lets the ordinary SwiftData container open it.
-The initializer builds the complete V3 managed model; it remains an explicit
+The initializer builds the complete V4 managed model; it remains an explicit
 one-shot operation and does not imply Production promotion.
 The initializer lives with the rest of the store implementation in
 `Persistence/Cloud`. iOS, Debug, Testing, ProductionTesting, and
@@ -303,15 +317,15 @@ product binaries; uses a disposable store; and cannot deploy Production. The
 project checker rejects either schema harness if its name enters the project.
 CloudKit Console remains the deliberate Production deployment surface.
 
-## Future V3 Production deployment runbook
+## V4 Production deployment runbook
 
-V3 Production promotion is a later publication operation, not part of Slice 19.
-Run it only for an identified 0.2 release candidate after its automated,
-physical-device, migration, privacy, and Development transport evidence passes.
+V4 Production promotion is part of the identified 0.2.1 repair release. Run it
+only after that candidate's automated, migration, privacy, and Development
+schema evidence passes.
 
 1. Record the exact candidate commit, Xcode version, macOS version, and operator
-   in `release-evidence-0.2.md`. Confirm the working tree is clean and the
-   candidate contains only additive V3 record types and fields.
+   in `release-evidence-0.2.1.md`. Confirm the working tree is clean and the
+   candidate contains only the additive V4 ownership record type and fields.
 2. Build the separately reviewed Mac-only administration tool documented in
    `Tools/CloudKitProductionSchemaAdmin/README.md` from the accepted source
    tree, using the reviewed macOS acceptance archive's provisioning profile.
@@ -323,11 +337,11 @@ physical-device, migration, privacy, and Development transport evidence passes.
    In CloudKit Console, explicitly verify the container name and **Dev** badge
    before inspecting record types, fields, indexes, standard security roles,
    and encryption state.
-4. Compare the server schema with the accepted V3 model and the existing V1
-   Production baseline. The preview must contain the five new Session types and
-   their fields without removing, renaming, retyping, repurposing, or changing
-   encryption on any published type or field. Abort on any unexplained role or
-   index change.
+4. Compare the server schema with the accepted V4 model and the existing V3
+   Production baseline. The preview must add exactly
+   `CD_KitchenOwnershipRecord` and its generated fields and indexes without
+   removing, renaming, retyping, repurposing, or changing encryption on any
+   published type or field. Abort on any unexplained role or index change.
 5. Open the deployment preview without confirming it. Record its bounded
    additive conclusion in the evidence ledger; never commit account data, raw
    schema exports, private records, or screenshots containing them.

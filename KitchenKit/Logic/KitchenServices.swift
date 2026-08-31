@@ -45,9 +45,9 @@ public struct KitchenBootstrapService {
   ///
   /// Reusing this identity lets independently launched installations converge.
   /// Account isolation and transport remain persistence-adapter responsibilities.
-  public static let personalKitchenID = Kitchen.ID(
-    rawValue: UUID(uuidString: "5D4167A0-7027-4A3D-A170-0B73E86DCE8D")!
-  )
+  public static var personalKitchenID: Kitchen.ID {
+    Kitchen.ID(rawValue: UUID(uuidString: "5D4167A0-7027-4A3D-A170-0B73E86DCE8D")!)
+  }
 
   private let repository: any RecipeRepository
 
@@ -61,8 +61,23 @@ public struct KitchenBootstrapService {
 
   /// Distinguishes a truly new local Kitchen from one already present in the store.
   public func prepareInitialKitchenWithStatus(
-    named name: String = "Home Kitchen"
+    named name: String = "Home Kitchen",
+    ownerID: KitchenOwner.ID? = nil
   ) throws -> PreparedKitchen {
+    if let ownerID {
+      let kitchens = try repository.kitchens()
+      let wasCreated = kitchens.isEmpty
+      let resolvedName = kitchens.first(where: { $0.id == Self.personalKitchenID })?.name
+        ?? kitchens.first?.name
+        ?? name
+      let personalKitchen = Kitchen(
+        id: Self.personalKitchenID,
+        ownerID: ownerID,
+        name: resolvedName
+      )
+      try repository.convergeKitchens(into: personalKitchen, ownedBy: ownerID)
+      return PreparedKitchen(kitchen: personalKitchen, wasCreated: wasCreated)
+    }
     if let personalKitchen = try repository.kitchen(id: Self.personalKitchenID) {
       return PreparedKitchen(kitchen: personalKitchen, wasCreated: false)
     }

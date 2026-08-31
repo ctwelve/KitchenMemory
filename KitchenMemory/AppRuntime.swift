@@ -7,9 +7,9 @@ import KitchenKit
 import SwiftData
 
 enum AppStartupState {
+  case preparing
   case ready(PreparedApp)
   case unavailable
-
   static func prepare(using makePreparedApp: () throws -> PreparedApp) -> Self {
     do {
       return .ready(try makePreparedApp())
@@ -20,7 +20,13 @@ enum AppStartupState {
       return .unavailable
     }
   }
-
+  static func prepare(using makePreparedApp: () async throws -> PreparedApp) async -> Self {
+    do {
+      return .ready(try await makePreparedApp())
+    } catch {
+      return .unavailable
+    }
+  }
   var preparedApp: PreparedApp? {
     guard case .ready(let preparedApp) = self else { return nil }
     return preparedApp
@@ -103,7 +109,6 @@ struct AppLaunchPlan: Equatable {
     let synchronizesWithPersonalCloud = cloudSyncIsEnabled
       && inputs.buildEnvironment.synchronizesWithPersonalCloud
       && !usesHostedUnitTests
-
     let store: Store
     if usesInMemoryStore {
       store = .inMemory
@@ -149,8 +154,8 @@ enum AppRuntime {
     var sessionPresentationStore: (any CookingSessionPresentationStoring)?
   }
 
-  static func prepare() -> AppStartupState {
-    AppStartupState.prepare {
+  static func prepare() async -> AppStartupState {
+    await AppStartupState.prepare {
       let inputs = AppLaunchInputs.current
       let durablePreferences = DefaultsKitchenPreferencesStore(
         permitsPersonalPreferencesICloud:
@@ -171,8 +176,10 @@ enum AppRuntime {
         )
         : durablePreferences
       try initializeCloudKitSchemaIfRequested(plan: plan)
+      let ownerID = try await KitchenOwnerIdentity.resolve(plan: plan, inputs: inputs)
       return try PreparedApp(
         plan: plan,
+        ownerID: ownerID,
         preferences: preferences,
         samples: BundledSampleRecipeProvider(),
         sessionPresentationStore: plan.store.isInMemory
@@ -197,6 +204,7 @@ enum AppRuntime {
     )
     return try PreparedApp(
       plan: plan,
+      ownerID: KitchenOwner.ID(rawValue: "testing:personal-kitchen-owner"),
       preferences: preferences,
       samples: configuration.sampleProvider ?? BundledSampleRecipeProvider(),
       initialKitchenWasCreatedOverride:
@@ -219,17 +227,21 @@ enum AppRuntime {
     )
 #endif
   }
+
 }
 
 @MainActor
-private struct PreparedCore {
+struct PreparedCore {
   let modelContainer: ModelContainer
   let libraryModel: RecipeLibraryModel
   let cookingSessionRepository: SwiftDataCookingSessionRepository
   let cookingSessions: CookingSessions
+  let recipeRepository: SwiftDataRecipeRepository
+  let ownerID: KitchenOwner.ID
 
   init(
     plan: AppLaunchPlan,
+    ownerID: KitchenOwner.ID,
     preferences: any KitchenPreferencesStoring,
     samples: any SampleRecipeProviding,
     initialKitchenWasCreatedOverride: Bool?
@@ -238,9 +250,10 @@ private struct PreparedCore {
       inMemory: plan.store.isInMemory,
       synchronization: plan.store.synchronization
     )
-    let recipeRepository = SwiftDataRecipeRepository(modelContainer: modelContainer)
+    recipeRepository = SwiftDataRecipeRepository(modelContainer: modelContainer)
+    self.ownerID = ownerID
     let preparedKitchen = try KitchenBootstrapService(repository: recipeRepository)
-      .prepareInitialKitchenWithStatus()
+      .prepareInitialKitchenWithStatus(ownerID: ownerID)
     let library = RecipeLibrary(
       kitchenID: preparedKitchen.kitchen.id,
       repository: recipeRepository,
@@ -270,6 +283,8 @@ struct PreparedApp {
   let libraryModel: RecipeLibraryModel
   let cookingSessionRepository: SwiftDataCookingSessionRepository
   let cookingSessions: CookingSessions
+  let recipeRepository: SwiftDataRecipeRepository
+  let ownerID: KitchenOwner.ID
   let sessionModel: CookingSessionPresentationModel
   let persistentStoreChangeObserver: PersistentStoreChangeObserver?
   let personalCloudStatusMonitor: PersonalCloudStatusMonitor?
@@ -277,6 +292,7 @@ struct PreparedApp {
 
   init(
     plan: AppLaunchPlan,
+    ownerID: KitchenOwner.ID,
     preferences: any KitchenPreferencesStoring,
     samples: any SampleRecipeProviding,
     initialKitchenWasCreatedOverride: Bool? = nil,
@@ -284,6 +300,7 @@ struct PreparedApp {
   ) throws {
     let core = try PreparedCore(
       plan: plan,
+      ownerID: ownerID,
       preferences: preferences,
       samples: samples,
       initialKitchenWasCreatedOverride: initialKitchenWasCreatedOverride
@@ -296,6 +313,8 @@ struct PreparedApp {
     libraryModel = core.libraryModel
     cookingSessionRepository = core.cookingSessionRepository
     cookingSessions = core.cookingSessions
+    recipeRepository = core.recipeRepository
+    self.ownerID = core.ownerID
     self.sessionModel = sessionModel
     cloudSyncSettings = plan.offersCloudSyncSetting
       ? CloudSyncSettings(
@@ -303,15 +322,11 @@ struct PreparedApp {
         isEnabledAtLaunch: plan.cloudSyncIsEnabledAtLaunch
       )
       : nil
-    persistentStoreChangeObserver = plan.store.personalCloudContainerIdentifier != nil
-      ? PersistentStoreChangeObserver {
-        performExternalStoreRefresh(
-          libraryModel: core.libraryModel,
-          sessionRepository: core.cookingSessionRepository,
-          sessionModel: sessionModel
-        )
-      }
-      : nil
+    persistentStoreChangeObserver = makePersistentStoreChangeObserver(
+      plan: plan,
+      core: core,
+      sessionModel: sessionModel
+    )
     let personalCloudStatusMonitor = plan.store.personalCloudContainerIdentifier.map { containerIdentifier in
       PersonalCloudStatusMonitor(
         accountChecker: CloudKitAccountChecker(
@@ -326,6 +341,9 @@ struct PreparedApp {
   }
 
   func reloadAfterExternalStoreChange() {
+    guard (try? reconcileKitchenOwnership(repository: recipeRepository, ownerID: ownerID)) != nil else {
+      return
+    }
     performExternalStoreRefresh(
       libraryModel: libraryModel,
       sessionRepository: cookingSessionRepository,
@@ -340,15 +358,4 @@ struct PreparedApp {
       fatalError("Could not prepare the Kitchen Memory preview: \(error)")
     }
   }
-}
-
-@MainActor
-private func performExternalStoreRefresh(
-  libraryModel: RecipeLibraryModel,
-  sessionRepository: SwiftDataCookingSessionRepository,
-  sessionModel: CookingSessionPresentationModel
-) {
-  libraryModel.reloadAfterExternalStoreChange()
-  sessionRepository.refreshFromPersistentStore()
-  sessionModel.reloadAfterExternalStoreChange()
 }
