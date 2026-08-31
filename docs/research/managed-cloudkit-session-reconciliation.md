@@ -75,6 +75,37 @@ Cooking Session implementation.
    Apple has not documented remains version-specific evidence and must be
    rerun before final 0.2 release acceptance.
 
+## Slice 19 Development result
+
+The separate signed harness under `/Tools/SessionCloudKitAcceptance` ran the
+content-convergence portion of E1, E2b, E3, E4a, E4b, E5, and E7 against the
+Development container. Each replica
+used its own explicit store URL; an earlier attempt that changed only
+`CFFIXED_USER_HOME` was discarded after app sandboxing caused two names to
+address one store. The corrected local-only probe first showed only its own
+root and Fact, falsifiably confirming store independence before transport runs
+continued.
+
+E1, E2b, E4a, E4b, and E5 passed in both reconnect orders. E3 passed through a
+clean receiving store. E4a retained an Unavailable prefix and later rebuilt the
+restored Finished Session from root, Fact, Closure, Delete, and Restore rows.
+E5 retained independently authored activity through Deleted and restored
+checkpoints. E7 observed a successful bounded operation window, staged another
+change, and required a clean receiver to contain both Sessions. Event and
+remote-change counts were diagnostic only; every pass authority was
+receiving-store domain evidence. The post-review oracle compares the complete
+expected evidence multiset and row content, so a matching classification cannot
+hide a missing Fact, deletion, restoration, collision payload, or duplicate.
+
+The harness also initialized the additive V3 Development schema and inspected
+the five generated Session entities, required defaults, optional semantic
+pairs, and absence of relationships, uniqueness constraints, local indexes,
+external storage, or requested optional encryption. The subsequent read-only
+CloudKit Console review confirmed the five managed record types, their domain
+fields and generated indexes, standard managed security roles, and no encrypted
+field types. Production was not initialized, promoted, or otherwise changed.
+These are version-specific results and remain subject to the final 0.2 rerun.
+
 ## Decision gates unlocked by this research
 
 The next design ticket can compare candidate session convergence models with

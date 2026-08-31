@@ -222,6 +222,16 @@ Attention, or Recovery—never silent ordinary presentation. All fixtures use
 synthetic UUIDs and content; no person's Kitchen or private diagnostic artifact
 is read, reset, or retained.
 
+Slice 19's separate signed Development harness completed the Mac content-
+convergence portion of E1, E2b, E3, E4a, E4b, E5, and E7 with genuinely
+independent stores. E1, E2b, E4a, E4b, and E5 passed in both reconnect orders.
+E4a first classified a scrambled prefix as Unavailable before reconstructing
+the restored Finished Session; E5 retained its independent Fact through Deleted
+and restored checkpoints; and E7 demonstrated that a later export operation can
+follow an earlier successful one. The tightened oracle compares the complete
+expected evidence multiset and row content. Phase-aware E3 and signed iPhone
+conclusions belong in the evidence ledger before the slice closes.
+
 ## Product interaction evidence
 
 ### Automated UI smoke

@@ -104,6 +104,59 @@ final class SwiftDataCookingSessionRepositoryTests: XCTestCase {
     XCTAssertEqual(recovery.evidence.roots.count, 3)
   }
 
+  func testRefreshReadsEveryClassificationFromAnExternalWriter() throws {
+    let container = try KitchenMemorySchema.makeContainer(inMemory: true)
+    let receiver = SwiftDataCookingSessionRepository(modelContainer: container)
+    let writer = SwiftDataCookingSessionRepository(modelContainer: container)
+    XCTAssertTrue(try receiver.sessions(in: Kitchen.ID(rawValue: id(101))).isEmpty)
+
+    let ordinary = try makeRoot(id: CookingSession.ID(rawValue: id(150)))
+    let deleted = try makeRoot(id: CookingSession.ID(rawValue: id(151)))
+    let waiting = try makeRoot(id: CookingSession.ID(rawValue: id(152)))
+    let collided = try makeRoot(id: CookingSession.ID(rawValue: id(153)))
+    let conflictingRoot = CookingSessionRootEvidence(
+      id: collided.id,
+      kitchenID: collided.kitchenID,
+      recipeID: collided.recipeID,
+      recipeRevisionID: collided.recipeRevisionID,
+      startedAt: collided.startedAt.addingTimeInterval(1),
+      snapshotFormatVersion: collided.snapshotFormatVersion,
+      snapshotData: collided.snapshotData,
+      snapshotDigest: collided.snapshotDigest
+    )
+    try writer.append(.start(ordinary))
+    try writer.append(.start(deleted))
+    try writer.append(.delete(makeDeletion(
+      root: deleted,
+      sessionHead: deleted.id.rawValue
+    )))
+    try writer.append(.activity(try makeFact(root: waiting, kind: .stop)))
+    try writer.append(.start(collided))
+    try writer.append(.start(conflictingRoot))
+
+    receiver.refreshFromPersistentStore()
+
+    let results = try receiver.sessions(in: ordinary.kitchenID)
+    XCTAssertEqual(results.count, 4)
+    XCTAssertTrue(results.contains { result in
+      guard case let .session(session) = result else { return false }
+      return session.id == ordinary.id && session.disposition == .ordinary
+    })
+    XCTAssertTrue(results.contains { result in
+      guard case let .session(session) = result else { return false }
+      return session.id == deleted.id && session.disposition != .ordinary
+    })
+    XCTAssertTrue(results.contains { result in
+      guard case let .unavailable(unavailable) = result else { return false }
+      return unavailable.evidence.sessionID == waiting.id
+    })
+    XCTAssertTrue(results.contains { result in
+      guard case let .recovery(recovery) = result else { return false }
+      return recovery.evidence.sessionID == collided.id
+        && recovery.reasons == [.rootCollision]
+    })
+  }
+
   func testRootAuthorityExcludesForeignAggregateWithLocalChildren() throws {
     let repository = SwiftDataCookingSessionRepository(
       modelContainer: try KitchenMemorySchema.makeContainer(inMemory: true)
