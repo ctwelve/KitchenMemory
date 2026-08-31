@@ -61,7 +61,7 @@ module KitchenMemory
           "INFOPLIST_FILE[sdk=iphoneos*]" => "KitchenMemory/Info-iOS.plist",
           "INFOPLIST_FILE[sdk=iphonesimulator*]" => "KitchenMemory/Info-iOS.plist",
           "INFOPLIST_FILE[sdk=macosx*]" => "KitchenMemory/Info-macOS.plist",
-          "INFOPLIST_KEY_CFBundleDisplayName" => "Kitchen Memory",
+          "INFOPLIST_KEY_CFBundleDisplayName" => "KitchenMemory",
           "INFOPLIST_KEY_LSApplicationCategoryType" => "public.app-category.food-and-drink",
           "INFOPLIST_KEY_NSHumanReadableCopyright" =>
             "Copyright © 2026 Kitchen Memory Project contributors."

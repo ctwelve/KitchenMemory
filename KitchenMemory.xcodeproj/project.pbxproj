@@ -460,15 +460,18 @@
 			isa = PBXShellScriptBuildPhase;
 			inputPaths = (
 				"$(SRCROOT)/KitchenMemory/Localizable.xcstrings",
+				"$(SRCROOT)/KitchenMemory/InfoPlist.xcstrings",
 			);
 			name = "Embed Localization Catalog Contract";
 			outputPaths = (
 				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/LocalizationCatalog.json",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/InfoPlistLocalizationCatalog.json",
 			);
 			shellPath = /bin/sh;
 			shellScript = (
 				"set -eu",
 				"/bin/cp \"$SCRIPT_INPUT_FILE_0\" \"$SCRIPT_OUTPUT_FILE_0\"",
+				"/bin/cp \"$SCRIPT_INPUT_FILE_1\" \"$SCRIPT_OUTPUT_FILE_1\"",
 				"",
 			);
 		};
@@ -690,7 +693,7 @@
 				"INFOPLIST_FILE[sdk=iphoneos*]" = "KitchenMemory/Info-iOS.plist";
 				"INFOPLIST_FILE[sdk=iphonesimulator*]" = "KitchenMemory/Info-iOS.plist";
 				"INFOPLIST_FILE[sdk=macosx*]" = "KitchenMemory/Info-macOS.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "Kitchen Memory";
+				INFOPLIST_KEY_CFBundleDisplayName = KitchenMemory;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.food-and-drink";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Kitchen Memory Project contributors.";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
@@ -739,7 +742,7 @@
 				"INFOPLIST_FILE[sdk=iphoneos*]" = "KitchenMemory/Info-iOS.plist";
 				"INFOPLIST_FILE[sdk=iphonesimulator*]" = "KitchenMemory/Info-iOS.plist";
 				"INFOPLIST_FILE[sdk=macosx*]" = "KitchenMemory/Info-macOS.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "Kitchen Memory";
+				INFOPLIST_KEY_CFBundleDisplayName = KitchenMemory;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.food-and-drink";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Kitchen Memory Project contributors.";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
@@ -1699,7 +1702,7 @@
 				"INFOPLIST_FILE[sdk=iphoneos*]" = "KitchenMemory/Info-iOS.plist";
 				"INFOPLIST_FILE[sdk=iphonesimulator*]" = "KitchenMemory/Info-iOS.plist";
 				"INFOPLIST_FILE[sdk=macosx*]" = "KitchenMemory/Info-macOS.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "Kitchen Memory";
+				INFOPLIST_KEY_CFBundleDisplayName = KitchenMemory;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.food-and-drink";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Kitchen Memory Project contributors.";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
@@ -1869,7 +1872,7 @@
 				"INFOPLIST_FILE[sdk=iphoneos*]" = "KitchenMemory/Info-iOS.plist";
 				"INFOPLIST_FILE[sdk=iphonesimulator*]" = "KitchenMemory/Info-iOS.plist";
 				"INFOPLIST_FILE[sdk=macosx*]" = "KitchenMemory/Info-macOS.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "Kitchen Memory";
+				INFOPLIST_KEY_CFBundleDisplayName = KitchenMemory;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.food-and-drink";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Kitchen Memory Project contributors.";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
@@ -2032,7 +2035,7 @@
 				"INFOPLIST_FILE[sdk=iphoneos*]" = "KitchenMemory/Info-iOS.plist";
 				"INFOPLIST_FILE[sdk=iphonesimulator*]" = "KitchenMemory/Info-iOS.plist";
 				"INFOPLIST_FILE[sdk=macosx*]" = "KitchenMemory/Info-macOS.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "Kitchen Memory";
+				INFOPLIST_KEY_CFBundleDisplayName = KitchenMemory;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.food-and-drink";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Kitchen Memory Project contributors.";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;

@@ -1,0 +1,78 @@
+{
+  "sourceLanguage" : "en-US",
+  "strings" : {
+    "CFBundleDisplayName" : {
+      "comment" : "The localized product name shown by the system.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kitchen Memory"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Memoria de cocina"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mémoire de cuisine"
+          }
+        }
+      }
+    },
+    "CFBundleName" : {
+      "comment" : "The localized short product name shown by the system.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kitchen Memory"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Memoria de cocina"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mémoire de cuisine"
+          }
+        }
+      }
+    },
+    "NSHumanReadableCopyright" : {
+      "comment" : "The localized copyright shown by the system.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copyright © 2026 Kitchen Memory Project contributors."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copyright © 2026 Colaboradores del proyecto Memoria de cocina."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copyright © 2026 Équipe du projet Mémoire de cuisine."
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

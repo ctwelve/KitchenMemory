@@ -69,8 +69,8 @@
       "extractionState" : "manual",
       "localizations" : {
         "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Kitchen Memory will keep every observed finish record and use this selection when rebuilding the session." } },
-        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Kitchen Memory conservará cada registro de finalización observado y usará esta selección al reconstruir la sesión." } },
-        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Kitchen Memory conservera chaque fin observée et utilisera ce choix pour reconstruire la séance." } }
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Memoria de cocina conservará cada registro de finalización observado y usará esta selección al reconstruir la sesión." } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Mémoire de cuisine conservera chaque fin observée et utilisera ce choix pour reconstruire la séance." } }
       }
     },
     "recovery.closure-confirmation-title" : {
@@ -987,8 +987,8 @@
       "extractionState" : "manual",
       "localizations" : {
         "en-US" : { "stringUnit" : { "state" : "translated", "value" : "The change could not be saved locally. Try again; Kitchen Memory will retry the same action." } },
-        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "El cambio no se pudo guardar localmente. Inténtalo de nuevo; Kitchen Memory volverá a intentar la misma acción." } },
-        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Le changement n’a pas pu être enregistré localement. Réessayez; Kitchen Memory tentera de nouveau la même action." } }
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "El cambio no se pudo guardar localmente. Inténtalo de nuevo; Memoria de cocina volverá a intentar la misma acción." } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Le changement n’a pas pu être enregistré localement. Réessayez; Mémoire de cuisine tentera de nouveau la même action." } }
       }
     },
     "session.issue.clipboard" : {
@@ -1434,13 +1434,13 @@
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No se pudo abrir Kitchen Memory"
+            "value" : "No se pudo abrir Memoria de cocina"
           }
         },
         "fr-CA" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Impossible d’ouvrir Kitchen Memory"
+            "value" : "Impossible d’ouvrir Mémoire de cuisine"
           }
         },
         "en-US" : {
@@ -1530,13 +1530,13 @@
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kitchen Memory incluye una pequeña colección de recetas de ejemplo. ¿Quieres agregarlas a tu recetario?"
+            "value" : "Memoria de cocina incluye una pequeña colección de recetas de ejemplo. ¿Quieres agregarlas a tu recetario?"
           }
         },
         "fr-CA" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kitchen Memory comprend une petite collection de recettes d’exemple. Voulez-vous les ajouter à votre bibliothèque de recettes?"
+            "value" : "Mémoire de cuisine comprend une petite collection de recettes d’exemple. Voulez-vous les ajouter à votre bibliothèque de recettes?"
           }
         },
         "en-US" : {
@@ -1650,13 +1650,13 @@
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Se eliminarán permanentemente todas las recetas, ediciones, historiales de revisión, capturas de origen importadas y metadatos de recetas de esta cocina. Kitchen Memory restaurará únicamente las recetas de muestra incluidas en esta versión. Esta acción no se puede deshacer."
+            "value" : "Se eliminarán permanentemente todas las recetas, ediciones, historiales de revisión, capturas de origen importadas y metadatos de recetas de esta cocina. Memoria de cocina restaurará únicamente las recetas de muestra incluidas en esta versión. Esta acción no se puede deshacer."
           }
         },
         "fr-CA" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Toutes les recettes, modifications, historiques de révision, captures de sources importées et métadonnées de recettes de cette cuisine seront supprimés définitivement. Kitchen Memory restaurera uniquement les exemples de recettes inclus dans cette version. Cette action est irréversible."
+            "value" : "Toutes les recettes, modifications, historiques de révision, captures de sources importées et métadonnées de recettes de cette cuisine seront supprimés définitivement. Mémoire de cuisine restaurera uniquement les exemples de recettes inclus dans cette version. Cette action est irréversible."
           }
         },
         "en-US" : {
@@ -1770,13 +1770,13 @@
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mantiene la biblioteca de recetas de este dispositivo en tu base de datos privada de iCloud y disponible en Kitchen Memory en tus otros dispositivos."
+            "value" : "Mantiene la biblioteca de recetas de este dispositivo en tu base de datos privada de iCloud y disponible en Memoria de cocina en tus otros dispositivos."
           }
         },
         "fr-CA" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Conserve la bibliothèque de recettes de cet appareil dans votre base de données iCloud privée et la rend accessible dans Kitchen Memory sur vos autres appareils."
+            "value" : "Conserve la bibliothèque de recettes de cet appareil dans votre base de données iCloud privée et la rend accessible dans Mémoire de cuisine sur vos autres appareils."
           }
         },
         "en-US" : {
@@ -1794,13 +1794,13 @@
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "La sincronización se activará la próxima vez que abras Kitchen Memory."
+            "value" : "La sincronización se activará la próxima vez que abras Memoria de cocina."
           }
         },
         "fr-CA" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "La synchronisation sera activée la prochaine fois que vous ouvrirez Kitchen Memory."
+            "value" : "La synchronisation sera activée la prochaine fois que vous ouvrirez Mémoire de cuisine."
           }
         },
         "en-US" : {
@@ -1818,13 +1818,13 @@
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "La sincronización se desactivará la próxima vez que abras Kitchen Memory. Las recetas que ya están en este dispositivo permanecerán aquí."
+            "value" : "La sincronización se desactivará la próxima vez que abras Memoria de cocina. Las recetas que ya están en este dispositivo permanecerán aquí."
           }
         },
         "fr-CA" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "La synchronisation sera désactivée la prochaine fois que vous ouvrirez Kitchen Memory. Les recettes déjà sur cet appareil y resteront."
+            "value" : "La synchronisation sera désactivée la prochaine fois que vous ouvrirez Mémoire de cuisine. Les recettes déjà sur cet appareil y resteront."
           }
         },
         "en-US" : {
@@ -1866,13 +1866,13 @@
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "La próxima vez que abras Kitchen Memory, las recetas y el historial de revisiones de este dispositivo se combinarán con iCloud. Los cambios o eliminaciones realizados en cualquiera de las bibliotecas mientras estuvieron desconectadas pueden afectar la biblioteca combinada. Revísala cuando termine la sincronización."
+            "value" : "La próxima vez que abras Memoria de cocina, las recetas y el historial de revisiones de este dispositivo se combinarán con iCloud. Los cambios o eliminaciones realizados en cualquiera de las bibliotecas mientras estuvieron desconectadas pueden afectar la biblioteca combinada. Revísala cuando termine la sincronización."
           }
         },
         "fr-CA" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "La prochaine fois que vous ouvrirez Kitchen Memory, les recettes et l’historique des révisions de cet appareil seront fusionnés avec iCloud. Les modifications ou suppressions apportées dans l’une ou l’autre bibliothèque pendant la déconnexion peuvent affecter la bibliothèque fusionnée. Vérifiez-la une fois la synchronisation terminée."
+            "value" : "La prochaine fois que vous ouvrirez Mémoire de cuisine, les recettes et l’historique des révisions de cet appareil seront fusionnés avec iCloud. Les modifications ou suppressions apportées dans l’une ou l’autre bibliothèque pendant la déconnexion peuvent affecter la bibliothèque fusionnée. Vérifiez-la une fois la synchronisation terminée."
           }
         },
         "en-US" : {
@@ -2083,13 +2083,13 @@
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Restaura esta cocina con las recetas de muestra incluidas en la versión actual de Kitchen Memory."
+            "value" : "Restaura esta cocina con las recetas de muestra incluidas en la versión actual de Memoria de cocina."
           }
         },
         "fr-CA" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Restaurez cette cuisine avec les exemples de recettes inclus dans la version actuelle de Kitchen Memory."
+            "value" : "Restaurez cette cuisine avec les exemples de recettes inclus dans la version actuelle de Mémoire de cuisine."
           }
         },
         "en-US" : {
@@ -2203,13 +2203,13 @@
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kitchen Memory se está sincronizando con iCloud."
+            "value" : "Memoria de cocina se está sincronizando con iCloud."
           }
         },
         "fr-CA" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kitchen Memory se synchronise avec iCloud."
+            "value" : "Mémoire de cuisine se synchronise avec iCloud."
           }
         },
         "en-US" : {
@@ -2491,13 +2491,13 @@
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kitchen Memory no recopila datos de esta app."
+            "value" : "Memoria de cocina no recopila datos de esta app."
           }
         },
         "fr-CA" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kitchen Memory ne recueille aucune donnée provenant de cette app."
+            "value" : "Mémoire de cuisine ne recueille aucune donnée provenant de cette app."
           }
         },
         "en-US" : {
@@ -2587,13 +2587,13 @@
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Esta pantalla refleja el manifiesto de privacidad incluido con esta versión de Kitchen Memory."
+            "value" : "Esta pantalla refleja el manifiesto de privacidad incluido con esta versión de Memoria de cocina."
           }
         },
         "fr-CA" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cet écran reflète le manifeste de confidentialité inclus avec cette version de Kitchen Memory."
+            "value" : "Cet écran reflète le manifeste de confidentialité inclus avec cette version de Mémoire de cuisine."
           }
         },
         "en-US" : {
@@ -6703,13 +6703,13 @@
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kitchen Memory sigue las redirecciones y descarga el HTML resultante mediante una solicitud efímera que no proporciona cookies ni credenciales de la app. No ejecuta scripts de la página ni descarga imágenes durante la revisión."
+            "value" : "Memoria de cocina sigue las redirecciones y descarga el HTML resultante mediante una solicitud efímera que no proporciona cookies ni credenciales de la app. No ejecuta scripts de la página ni descarga imágenes durante la revisión."
           }
         },
         "fr-CA" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kitchen Memory suit les redirections et télécharge le HTML résultant au moyen d’une requête éphémère qui ne fournit aucun témoin ni identifiant de l’app. Aucun script de page n’est exécuté et aucune image n’est téléchargée pendant la révision."
+            "value" : "Mémoire de cuisine suit les redirections et télécharge le HTML résultant au moyen d’une requête éphémère qui ne fournit aucun témoin ni identifiant de l’app. Aucun script de page n’est exécuté et aucune image n’est téléchargée pendant la révision."
           }
         },
         "en-US" : {
@@ -6727,13 +6727,13 @@
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Si guardas una receta, Kitchen Memory conserva localmente la URL final de origen y un bloque limitado de metadatos JSON-LD de la receta, incluso los campos de origen que no se muestran en el editor de revisión."
+            "value" : "Si guardas una receta, Memoria de cocina conserva localmente la URL final de origen y un bloque limitado de metadatos JSON-LD de la receta, incluso los campos de origen que no se muestran en el editor de revisión."
           }
         },
         "fr-CA" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Si vous enregistrez une recette, Kitchen Memory conserve localement l’URL source finale et un bloc limité de métadonnées JSON-LD de la recette, y compris les champs sources non affichés dans l’éditeur de révision."
+            "value" : "Si vous enregistrez une recette, Mémoire de cuisine conserve localement l’URL source finale et un bloc limité de métadonnées JSON-LD de la recette, y compris les champs sources non affichés dans l’éditeur de révision."
           }
         },
         "en-US" : {
@@ -6871,13 +6871,13 @@
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Por seguridad, Kitchen Memory no puede acceder a esta dirección ni redirección."
+            "value" : "Por seguridad, Memoria de cocina no puede acceder a esta dirección ni redirección."
           }
         },
         "fr-CA" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Par mesure de sécurité, Kitchen Memory ne peut pas accéder à cette adresse ni à cette redirection."
+            "value" : "Par mesure de sécurité, Mémoire de cuisine ne peut pas accéder à cette adresse ni à cette redirection."
           }
         },
         "en-US" : {
@@ -6967,13 +6967,13 @@
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kitchen Memory no pudo importar esta página web. Revisa la URL e inténtalo de nuevo."
+            "value" : "Memoria de cocina no pudo importar esta página web. Revisa la URL e inténtalo de nuevo."
           }
         },
         "fr-CA" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kitchen Memory n’a pas pu importer cette page Web. Vérifiez l’URL et réessayez."
+            "value" : "Mémoire de cuisine n’a pas pu importer cette page Web. Vérifiez l’URL et réessayez."
           }
         },
         "en-US" : {
@@ -6991,13 +6991,13 @@
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kitchen Memory no pudo leer esta biblioteca de recetas."
+            "value" : "Memoria de cocina no pudo leer esta biblioteca de recetas."
           }
         },
         "fr-CA" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kitchen Memory n’a pas pu lire cette bibliothèque de recettes."
+            "value" : "Mémoire de cuisine n’a pas pu lire cette bibliothèque de recettes."
           }
         },
         "en-US" : {
@@ -7015,13 +7015,13 @@
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kitchen Memory no pudo guardar esta receta."
+            "value" : "Memoria de cocina no pudo guardar esta receta."
           }
         },
         "fr-CA" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kitchen Memory n’a pas pu enregistrer cette recette."
+            "value" : "Mémoire de cuisine n’a pas pu enregistrer cette recette."
           }
         },
         "en-US" : {
@@ -7039,13 +7039,13 @@
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kitchen Memory no pudo restablecer esta cocina. No se realizó ningún cambio."
+            "value" : "Memoria de cocina no pudo restablecer esta cocina. No se realizó ningún cambio."
           }
         },
         "fr-CA" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kitchen Memory n’a pas pu réinitialiser cette cuisine. Aucune réinitialisation n’a été effectuée."
+            "value" : "Mémoire de cuisine n’a pas pu réinitialiser cette cuisine. Aucune réinitialisation n’a été effectuée."
           }
         },
         "en-US" : {
@@ -7063,13 +7063,13 @@
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kitchen Memory no pudo agregar las recetas de ejemplo. Tus recetas existentes no se modificaron."
+            "value" : "Memoria de cocina no pudo agregar las recetas de ejemplo. Tus recetas existentes no se modificaron."
           }
         },
         "fr-CA" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kitchen Memory n’a pas pu ajouter les recettes d’exemple. Vos recettes existantes n’ont pas été modifiées."
+            "value" : "Mémoire de cuisine n’a pas pu ajouter les recettes d’exemple. Vos recettes existantes n’ont pas été modifiées."
           }
         },
         "en-US" : {

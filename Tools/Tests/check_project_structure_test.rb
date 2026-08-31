@@ -494,6 +494,18 @@ class CheckProjectStructureTest < Minitest::Test
     assert_includes error.message, "KitchenMemory Debug must generate common bundle metadata"
   end
 
+  def test_rejects_base_bundle_name_that_does_not_match_product_filename
+    fixture = Fixture.new
+    fixture.project.sub!(
+      "INFOPLIST_KEY_CFBundleDisplayName = KitchenMemory;",
+      'INFOPLIST_KEY_CFBundleDisplayName = "Kitchen Memory";'
+    )
+
+    error = assert_contract_error { validate(fixture) }
+
+    assert_includes error.message, "generate common bundle metadata"
+  end
+
   def test_rejects_disabled_info_plist_generation
     fixture = Fixture.new
     fixture.project.sub!("GENERATE_INFOPLIST_FILE = YES;", "GENERATE_INFOPLIST_FILE = NO;")
