@@ -24,11 +24,19 @@ extension KitchenMemoryUITests {
     let recipeRow = app.descendants(matching: .any)[
       "recipe-row-95781805-F5D3-46B0-B685-A660F8AC69F2"
     ]
-    XCTAssertTrue(recipeRow.waitForExistence(timeout: 5))
+    revealRecipeRow(recipeRow, in: app)
+    XCTAssertTrue(
+      recipeRow.waitForExistence(timeout: 5),
+      "Expected the scalable sample recipe before starting a Cooking Session."
+    )
     activate(recipeRow)
     let start = app.buttons["start-cooking"]
     XCTAssertTrue(start.waitForExistence(timeout: 5))
     activate(start)
+
+#if os(iOS)
+    let adjustedWorkingYield = adjustWorkingYield(in: app)
+#endif
 
     let ingredient = firstSessionElement(in: app, identifierPrefix: "session-ingredient-")
     XCTAssertTrue(
@@ -49,10 +57,14 @@ extension KitchenMemoryUITests {
     activate(instruction)
     XCTAssertTrue(instruction.isSelected, "Instruction progress was not recorded.")
 
+#if os(macOS)
+    let adjustedWorkingYield = adjustWorkingYield(in: app)
+#endif
+
     return RecordedSessionProgress(
       ingredientIdentifier: ingredient.identifier,
       instructionIdentifier: instruction.identifier,
-      adjustedWorkingYield: adjustWorkingYield(in: app)
+      adjustedWorkingYield: adjustedWorkingYield
     )
   }
 
@@ -80,10 +92,23 @@ extension KitchenMemoryUITests {
   }
 
   @MainActor
+  private func revealRecipeRow(_ recipeRow: XCUIElement, in app: XCUIApplication) {
+#if os(iOS)
+    if !recipeRow.waitForExistence(timeout: 2) {
+      app.descendants(matching: .any)["recipe-library"].swipeUp()
+    }
+#endif
+  }
+
+  @MainActor
   private func assertSessionProgress(
     _ progress: RecordedSessionProgress,
     survivesIn app: XCUIApplication
   ) {
+#if os(iOS)
+    assertWorkingYield(progress.adjustedWorkingYield, survivesIn: app)
+#endif
+
     let restoredIngredient = app.descendants(matching: .any)[progress.ingredientIdentifier]
     XCTAssertTrue(
       restoredIngredient.waitForExistence(timeout: 5),
@@ -102,6 +127,17 @@ extension KitchenMemoryUITests {
       restoredInstruction.isSelected,
       "Instruction progress did not survive reopening."
     )
+
+#if os(macOS)
+    assertWorkingYield(progress.adjustedWorkingYield, survivesIn: app)
+#endif
+  }
+
+  @MainActor
+  private func assertWorkingYield(
+    _ expectedWorkingYield: String?,
+    survivesIn app: XCUIApplication
+  ) {
     let restoredWorkingYield = app.descendants(matching: .any)["session-working-yield"]
     XCTAssertTrue(
       restoredWorkingYield.waitForExistence(timeout: 5),
@@ -109,7 +145,7 @@ extension KitchenMemoryUITests {
     )
     XCTAssertEqual(
       restoredWorkingYield.value as? String,
-      progress.adjustedWorkingYield,
+      expectedWorkingYield,
       "The adjusted working yield did not survive reopening."
     )
   }
