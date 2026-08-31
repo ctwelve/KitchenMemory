@@ -103,6 +103,10 @@ module KitchenMemory
       "KitchenMemoryIOS",
       "KitchenMemoryMacOS"
     ].freeze
+    NON_PRODUCT_TOOLS = %w[
+      CloudKitProductionSchemaAdmin
+      SessionCloudKitAcceptance
+    ].freeze
     SHARED_SOURCE_INFO_PLIST_KEYS = %w[
       KitchenMemoryCloudKitContainerIdentifier
     ].freeze
@@ -168,6 +172,7 @@ module KitchenMemory
 
     def validate(project_contents:, schemes:, plans:)
       validate_obsolete_project_metadata(project_contents)
+      validate_non_product_tool_exclusion(project_contents)
       objects = parse_objects(project_contents)
       validate_project_configurations(objects, parse_file_references(project_contents))
       targets = validate_targets(objects)
@@ -199,6 +204,13 @@ module KitchenMemory
       return unless obsolete_name
 
       raise ContractError, "obsolete Xcode target metadata remains: #{obsolete_name}"
+    end
+
+    def validate_non_product_tool_exclusion(project_contents)
+      included_tool = NON_PRODUCT_TOOLS.find { |tool| project_contents.include?(tool) }
+      return unless included_tool
+
+      raise ContractError, "non-product tool must remain outside the Xcode project: #{included_tool}"
     end
 
     def validate_repository(root)

@@ -391,6 +391,18 @@ class CheckProjectStructureTest < Minitest::Test
     assert_includes error.message, "KitchenMemory iOS"
   end
 
+  def test_rejects_non_product_schema_tool_in_xcode_project
+    KitchenMemory::ProjectStructure::NON_PRODUCT_TOOLS.each do |tool|
+      fixture = Fixture.new
+      fixture.project << "path = Tools/#{tool};\n"
+
+      error = assert_contract_error { validate(fixture) }
+
+      assert_includes error.message, "non-product tool must remain outside the Xcode project"
+      assert_includes error.message, tool
+    end
+  end
+
   def test_allows_synchronized_navigator_group_without_target_membership
     fixture = Fixture.new
     fixture.project << <<~GROUP

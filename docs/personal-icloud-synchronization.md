@@ -295,10 +295,13 @@ container's Development environment, then deliberately deployed to that
 container's Production environment. The ordinary Development app never receives
 the production container entitlement.
 
-No current shared scheme performs that production-container administration.
-Adding one is release-engineering work: it must use an explicitly reviewed,
-Mac-only configuration and must not turn schema initialization or deployment
-into an ordinary build, archive, or application-launch side effect.
+No shared scheme performs that production-container administration. The
+separately reviewed, Mac-only tool in `Tools/CloudKitProductionSchemaAdmin`
+initializes the frozen model only in the Production container's Development
+environment. It is absent from the Xcode project, schemes, plans, archives, and
+product binaries; uses a disposable store; and cannot deploy Production. The
+project checker rejects either schema harness if its name enters the project.
+CloudKit Console remains the deliberate Production deployment surface.
 
 ## Future V3 Production deployment runbook
 
@@ -309,10 +312,13 @@ physical-device, migration, privacy, and Development transport evidence passes.
 1. Record the exact candidate commit, Xcode version, macOS version, and operator
    in `release-evidence-0.2.md`. Confirm the working tree is clean and the
    candidate contains only additive V3 record types and fields.
-2. Build a separately reviewed, Mac-only administration configuration whose
-   entitlements select `iCloud.net.ctwelve.KitchenMemory`. Do not reuse the
-   ordinary Development harness, add the switch to a shared scheme, or alter an
-   ordinary Production launch.
+2. Build the separately reviewed Mac-only administration tool documented in
+   `Tools/CloudKitProductionSchemaAdmin/README.md` from the accepted source
+   tree, using the reviewed macOS acceptance archive's provisioning profile.
+   Confirm its signed entitlements select `iCloud.net.ctwelve.KitchenMemory`
+   and the Development environment. Do not reuse the ordinary Development
+   harness, add the switch to a shared scheme, or alter an ordinary Production
+   launch.
 3. Initialize only that Production container's **Development** environment.
    In CloudKit Console, explicitly verify the container name and **Dev** badge
    before inspecting record types, fields, indexes, standard security roles,
