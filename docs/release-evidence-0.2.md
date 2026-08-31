@@ -19,8 +19,9 @@ SPDX-License-Identifier: MIT
   `6056a425505c78827415ea282c7e586369c9fbab`
 - Slice 19 reviewed harness source:
   `ea1b13fad07d955fe954b9590220b291cf26942d`
-- CloudKit environment: Development only
-- Production environment: Untouched
+- CloudKit evidence environments: acceptance Development container and the
+  release container's Development environment
+- Production environment: Untouched; additive deployment preview reviewed
 
 This ledger records the signed managed-CloudKit evidence for Slice 19 and the
 final 0.2 feature acceptance. A **Passed** transport result means the named receiving
@@ -117,6 +118,19 @@ remain deliberately outside this slice.
 No iPad claim belongs to Slice 19. The iPad remains part of the final physical
 product walkthrough defined by [the 0.2 acceptance contract](acceptance-0.2.md).
 
+## Production publication preparation
+
+These operations are release publication evidence, not retroactive Slice 19
+implementation evidence. None of them deployed or wrote records to Production.
+
+| Evidence | Source state | Result | Record |
+| --- | --- | --- | --- |
+| Bounded administration tool | `1e33d2e` | Passed | The separately signed Mac tool is absent from the Xcode project and product, uses a disposable store, and selects only `iCloud.net.ctwelve.KitchenMemory` in its Development environment. The project checker permanently rejects either schema harness if its name enters the project. |
+| Release-container Development initialization | product `479b360`; administrator `1e33d2e` | Passed | The frozen V3 managed model initialized successfully in the Development environment of the Production container and explicitly performed no Production deployment. |
+| Release-container Development server audit | product `479b360` | Passed | The five V3 types contain every expected domain field plus normal managed-store metadata and asset companions. Index totals are Cooking Session 31, Fact 32, Closure 32, Deletion 24, and Deletion Resolution 23. All five use only `_world` Read, `_icloud` Create, and `_creator` Write; no V3 field is encrypted. |
+| Production deployment preview | product `479b360` | Passed additive review | The preview creates the five V3 types and their 142 indexes. On nine published recipe types it also adds 50 framework-managed fields: 18 move-receipt fields and companions plus 32 variable-length asset companions documented by Core Data. The only 18 indexes added to published types are Queryable and Sortable on their move-receipt fields. The role delta admits only the five new types under the standard grants. No existing type or field is removed, renamed, retyped, repurposed, or encrypted; no existing grant changes. |
+| Production deployment | — | Awaiting explicit authorization | The reviewed preview remains unconfirmed. Production still contains the published recipe schema and no V3 Session type. |
+
 ## Final automated candidate
 
 | Evidence | Source state | Result | Record |
@@ -163,10 +177,11 @@ artifacts and do not authorize distribution.
 | iOS arm64 archive | Passed | Xcode Organizer completed App Store validation without errors or warnings. The archive is suitable for an explicitly authorized ad hoc IPA export, contains the committed privacy manifest byte-for-byte, and selects the Production iCloud container. |
 | Universal macOS archive | Passed | The x86_64/arm64 Developer ID submission is valid on disk, satisfies its designated requirement, uses the hardened runtime, and has a secure timestamp. Gatekeeper accepts it as Notarized Developer ID, its stapled ticket validates, its privacy manifest matches the committed source byte-for-byte, and it selects the Production iCloud container. |
 
-The generated V3 schema, Development server schema, indexes, roles, encryption
-choice, and bounded Production deployment runbook are reviewed and ready. The
-archives prove signing and Production-entitlement composition; they do not prove
-or imply that the still-untouched Production server schema has been promoted.
+The generated V3 schema, both Development server schemas, indexes, roles,
+encryption choice, and bounded Production deployment preview are reviewed and
+ready. The archives prove signing and Production-entitlement composition; they
+do not prove or imply that the still-untouched Production server schema has
+been promoted.
 
 ## 0.2 feature-acceptance conclusion
 
