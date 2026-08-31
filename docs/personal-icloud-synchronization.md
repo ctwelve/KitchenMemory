@@ -325,12 +325,17 @@ physical-device, migration, privacy, and Development transport evidence passes.
 5. Open the deployment preview without confirming it. Record its bounded
    additive conclusion in the evidence ledger; never commit account data, raw
    schema exports, private records, or screenshots containing them.
-6. A separately authorized publication task may confirm deployment. Afterward,
-   inspect the Production environment directly and record that every expected
-   type, field, index, security grant, and encryption choice is present.
-7. Only after that verification may the release task archive, sign, tag, or
-   distribute the candidate. A failed or ambiguous preview stops publication;
-   it is never repaired by resetting Production or deleting published schema.
+6. Produce and verify the signed acceptance archives from that exact candidate
+   commit before any irreversible promotion. Record signing, archive, privacy,
+   entitlement, installation, and launch conclusions in the evidence ledger.
+   An archive failure returns to source correction and invalidates the preview.
+7. A separately authorized publication task may then confirm deployment.
+   Afterward, inspect the Production environment directly and record that every
+   expected type, field, index, security grant, and encryption choice is present.
+8. Only after that verification may the publication task create the immutable
+   release tag, produce any required final tag-driven archives, or distribute
+   the candidate. A failed or ambiguous preview stops publication; it is never
+   repaired by resetting Production or deleting published schema.
 
 The runbook does not authorize deployment. The release operator must make that
 irreversible choice deliberately for the named candidate.
