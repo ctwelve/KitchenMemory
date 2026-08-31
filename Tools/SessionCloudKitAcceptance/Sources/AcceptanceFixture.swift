@@ -87,6 +87,37 @@ struct AcceptanceFixture {
     }
   }
 
+  func expectation(
+    at checkpoint: AcceptanceCheckpoint
+  ) throws -> AcceptanceExpectation {
+    let repository = InMemoryCookingSessionRepository()
+    for actor in try expectedActors(at: checkpoint) {
+      for transaction in try transactions(for: actor) {
+        try repository.append(transaction)
+      }
+    }
+    let observations = try observedSessionIDs().compactMap {
+      try AcceptanceObservation.read(sessionID: $0, repository: repository)
+    }
+    return AcceptanceExpectation(observations: observations)
+  }
+
+  private func expectedActors(
+    at checkpoint: AcceptanceCheckpoint
+  ) throws -> [String] {
+    switch (scenario, checkpoint) {
+    case (.e1, .final), (.e2b, .final), (.e4b, .final): ["A", "B"]
+    case (.e3, .final): ["A"]
+    case (.e4a, .partial): ["A"]
+    case (.e4a, .final): ["A", "B"]
+    case (.e5, .deleted): ["A", "B"]
+    case (.e5, .final): ["A", "B", "R"]
+    case (.e7, .first): ["A1"]
+    case (.e7, .final): ["A1", "A2"]
+    default: throw AcceptanceHarnessError.invalidArguments
+    }
+  }
+
   private func completeEvidence() throws -> (
     root: CookingSessionRootEvidence,
     fact: SessionFactEvidence,

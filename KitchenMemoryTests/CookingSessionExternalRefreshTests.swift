@@ -3,11 +3,41 @@
 // SPDX-License-Identifier: MIT
 
 @testable import KitchenMemory
+import Foundation
 import KitchenKit
 import XCTest
 
 @MainActor
 final class CookingSessionExternalRefreshTests: XCTestCase {
+  func testPreparedAppRefreshesImportedEvidenceThroughTheCompositionRoot() throws {
+    let preparedApp = try AppRuntime.testing()
+    preparedApp.libraryModel.loadIfNeeded()
+    preparedApp.sessionModel.loadIfNeeded()
+    let recipe = try XCTUnwrap(preparedApp.libraryModel.recipes.first)
+    let snapshot = try ExecutionSnapshotCodec.encode(
+      ExecutionSnapshot(title: "Imported Session")
+    )
+    let root = CookingSessionRootEvidence(
+      id: CookingSession.ID(),
+      kitchenID: KitchenBootstrapService.personalKitchenID,
+      recipeID: recipe.recipe.id,
+      recipeRevisionID: recipe.revision.id,
+      startedAt: Date(timeIntervalSinceReferenceDate: 800_000_000),
+      snapshotFormatVersion: snapshot.formatVersion,
+      snapshotData: snapshot.data,
+      snapshotDigest: snapshot.digest
+    )
+    let externalWriter = SwiftDataCookingSessionRepository(
+      modelContainer: preparedApp.modelContainer
+    )
+    try externalWriter.append(.start(root))
+
+    XCTAssertTrue(preparedApp.sessionModel.sessions.isEmpty)
+    preparedApp.reloadAfterExternalStoreChange()
+
+    XCTAssertEqual(preparedApp.sessionModel.sessions.map(\.id), [root.id])
+  }
+
   func testRefreshReclassifiesOrdinaryDeletedWaitingAndRecoveryEvidence() {
     let ordinary = CookingSessionProjection(
       id: CookingSession.ID(),

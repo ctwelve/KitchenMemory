@@ -77,8 +77,9 @@ Cooking Session implementation.
 
 ## Slice 19 Development result
 
-The separate signed harness under `/Tools/SessionCloudKitAcceptance` ran E1,
-E2b, E3, E4a, E4b, E5, and E7 against the Development container. Each replica
+The separate signed harness under `/Tools/SessionCloudKitAcceptance` ran the
+content-convergence portion of E1, E2b, E3, E4a, E4b, E5, and E7 against the
+Development container. Each replica
 used its own explicit store URL; an earlier attempt that changed only
 `CFFIXED_USER_HOME` was discarded after app sandboxing caused two names to
 address one store. The corrected local-only probe first showed only its own
@@ -92,7 +93,9 @@ E5 retained independently authored activity through Deleted and restored
 checkpoints. E7 observed a successful bounded operation window, staged another
 change, and required a clean receiver to contain both Sessions. Event and
 remote-change counts were diagnostic only; every pass authority was
-receiving-store domain evidence.
+receiving-store domain evidence. The post-review oracle compares the complete
+expected evidence multiset and row content, so a matching classification cannot
+hide a missing Fact, deletion, restoration, collision payload, or duplicate.
 
 The harness also initialized the additive V3 Development schema and inspected
 the five generated Session entities, required defaults, optional semantic

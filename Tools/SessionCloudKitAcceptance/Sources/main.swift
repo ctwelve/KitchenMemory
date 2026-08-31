@@ -6,6 +6,9 @@ import Darwin
 import Foundation
 import KitchenKit
 import SwiftData
+#if os(macOS)
+import AppKit
+#endif
 
 enum AcceptanceHarnessError: Error {
   case developmentContainerRequired
@@ -20,6 +23,12 @@ enum AcceptanceHarnessError: Error {
 private enum AcceptanceStore: String {
   case local
   case cloud
+}
+
+private enum AcceptancePhase: String {
+  case background
+  case foreground
+  case relaunch
 }
 
 private struct HarnessArguments {
@@ -150,7 +159,12 @@ struct SessionCloudKitAcceptance {
 
   private static func observe(_ arguments: HarnessArguments) async throws {
     let fixture = try makeFixture(arguments)
-    let checkpoint = arguments.values["checkpoint"] ?? "final"
+    guard let checkpoint = AcceptanceCheckpoint(
+      rawValue: arguments.values["checkpoint"] ?? AcceptanceCheckpoint.final.rawValue
+    ) else { throw AcceptanceHarnessError.invalidArguments }
+    let phase = try acceptancePhase(arguments, scenario: fixture.scenario)
+    configureApplication(for: phase)
+    let expectation = try fixture.expectation(at: checkpoint)
     let timeout = try arguments.integer("timeout", default: 300)
     let store = try makeStore(arguments)
     let recorder = CloudEventRecorder()
@@ -163,34 +177,38 @@ struct SessionCloudKitAcceptance {
       let observations = try fixture.observedSessionIDs().compactMap {
         try AcceptanceObservation.read(sessionID: $0, repository: repository)
       }
-      let signature = observations.map { "\($0.classification):\($0.digest)" }
+      let signature = observations.map { "\($0.classification.rawValue):\($0.digest)" }
         .joined(separator: "|")
       if signature != lastSignature {
-        AcceptanceOutput.emit([
+        var output: [String: Any] = [
           "event": "receiving-store-observation",
           "scenario": fixture.scenario.rawValue,
           "run": fixture.runID.uuidString,
-          "checkpoint": checkpoint,
+          "checkpoint": checkpoint.rawValue,
           "sessions": observations.map(\.output),
           "source": "domain-evidence",
-        ])
+        ]
+        output["phase"] = phase?.rawValue
+        AcceptanceOutput.emit(output)
         lastSignature = signature
       }
-      if AcceptanceExpectation.isSatisfied(
-        scenario: fixture.scenario,
-        checkpoint: checkpoint,
-        observations: observations
-      ) {
-        AcceptanceOutput.emit([
+      let receivedRequiredNotification = phase == nil
+        || phase == .relaunch
+        || recorder.remoteChangeCount > 0
+      if expectation.isSatisfied(by: observations), receivedRequiredNotification {
+        var output: [String: Any] = [
           "event": "conclusion",
           "scenario": fixture.scenario.rawValue,
           "run": fixture.runID.uuidString,
-          "checkpoint": checkpoint,
+          "checkpoint": checkpoint.rawValue,
           "result": "pass",
           "completedOperations": recorder.completedEventCount,
           "remoteChanges": recorder.remoteChangeCount,
           "authority": "receiving-store-domain-evidence",
-        ])
+          "expectedEvidence": "exact-multiset-and-content",
+        ]
+        output["phase"] = phase?.rawValue
+        AcceptanceOutput.emit(output)
         _ = container
         return
       }
@@ -251,11 +269,10 @@ struct SessionCloudKitAcceptance {
       let observations = try fixture.observedSessionIDs().compactMap {
         try AcceptanceObservation.read(sessionID: $0, repository: repository)
       }
-      guard AcceptanceExpectation.isSatisfied(
-        scenario: scenario,
-        checkpoint: "final",
-        observations: observations
-      ) else { throw AcceptanceHarnessError.invalidFixture }
+      let expectation = try fixture.expectation(at: .final)
+      guard expectation.isSatisfied(by: observations) else {
+        throw AcceptanceHarnessError.invalidFixture
+      }
       AcceptanceOutput.emit([
         "event": "local-matrix",
         "scenario": scenario.rawValue,
@@ -281,6 +298,34 @@ struct SessionCloudKitAcceptance {
       throw AcceptanceHarnessError.invalidArguments
     }
     return store
+  }
+
+  private static func acceptancePhase(
+    _ arguments: HarnessArguments,
+    scenario: AcceptanceScenario
+  ) throws -> AcceptancePhase? {
+    guard scenario == .e3 else {
+      guard arguments.values["phase"] == nil else {
+        throw AcceptanceHarnessError.invalidArguments
+      }
+      return nil
+    }
+    guard let rawValue = arguments.values["phase"],
+          let phase = AcceptancePhase(rawValue: rawValue)
+    else { throw AcceptanceHarnessError.invalidArguments }
+    return phase
+  }
+
+  private static func configureApplication(for phase: AcceptancePhase?) {
+#if os(macOS)
+    guard let phase else { return }
+    let application = NSApplication.shared
+    application.setActivationPolicy(phase == .foreground ? .regular : .accessory)
+    application.finishLaunching()
+    if phase == .foreground {
+      application.activate(ignoringOtherApps: true)
+    }
+#endif
   }
 
   private static func makeContainer(

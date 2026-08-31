@@ -305,9 +305,11 @@ struct PreparedApp {
       : nil
     persistentStoreChangeObserver = plan.store.personalCloudContainerIdentifier != nil
       ? PersistentStoreChangeObserver {
-        core.libraryModel.reloadAfterExternalStoreChange()
-        core.cookingSessionRepository.refreshFromPersistentStore()
-        sessionModel.reloadAfterExternalStoreChange()
+        performExternalStoreRefresh(
+          libraryModel: core.libraryModel,
+          sessionRepository: core.cookingSessionRepository,
+          sessionModel: sessionModel
+        )
       }
       : nil
     let personalCloudStatusMonitor = plan.store.personalCloudContainerIdentifier.map { containerIdentifier in
@@ -323,6 +325,14 @@ struct PreparedApp {
     personalCloudStatusMonitor?.start()
   }
 
+  func reloadAfterExternalStoreChange() {
+    performExternalStoreRefresh(
+      libraryModel: libraryModel,
+      sessionRepository: cookingSessionRepository,
+      sessionModel: sessionModel
+    )
+  }
+
   static var preview: PreparedApp {
     do {
       return try AppRuntime.testing()
@@ -330,4 +340,15 @@ struct PreparedApp {
       fatalError("Could not prepare the Kitchen Memory preview: \(error)")
     }
   }
+}
+
+@MainActor
+private func performExternalStoreRefresh(
+  libraryModel: RecipeLibraryModel,
+  sessionRepository: SwiftDataCookingSessionRepository,
+  sessionModel: CookingSessionPresentationModel
+) {
+  libraryModel.reloadAfterExternalStoreChange()
+  sessionRepository.refreshFromPersistentStore()
+  sessionModel.reloadAfterExternalStoreChange()
 }
