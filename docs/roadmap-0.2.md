@@ -222,6 +222,13 @@ proportional accessibility, privacy review, production builds, archive, and
 signing. It records conclusions in `release-evidence-0.2.md` against the exact
 intended commit.
 
+Accepted at the 0.2.0 checkpoint: build 128 passed every iOS and macOS Xcode
+Cloud action; the signed archives, physical products, representative migration,
+managed-CloudKit transport, localization, proportional accessibility, privacy,
+and explicit alpha reductions are recorded in the release-evidence ledger.
+Production schema promotion, tagging, and distribution remain separately
+authorized release operations.
+
 The final walkthrough remains:
 
 1. Start a scaled cook from a known immutable Recipe Revision.
