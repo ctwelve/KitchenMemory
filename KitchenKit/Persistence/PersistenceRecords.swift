@@ -27,6 +27,19 @@ import SwiftData
   }
 }
 
+/// Additive V4 ownership evidence for a published Kitchen record.
+@Model final class KitchenOwnershipRecord {
+  var id: UUID = UUID()
+  var kitchenID: UUID = UUID()
+  var ownerID: String = ""
+
+  init(id: UUID, kitchenID: UUID, ownerID: String) {
+    self.id = id
+    self.kitchenID = kitchenID
+    self.ownerID = ownerID
+  }
+}
+
 @Model final class RecipeRecord {
   var id: UUID = UUID()
   var kitchenID: UUID = UUID()

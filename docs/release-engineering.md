@@ -171,6 +171,9 @@ fix, test, diagnostic, or documentation change; it should not expand this loop.
   Xcode Cloud validates the version after the protected tag starts the release.
 - Verify the notarized Mac artifact installs and launches outside Xcode before
   treating the workflow result as release evidence.
+- Attach that exact verified, notarized macOS artifact and its checksum to the
+  corresponding GitHub release. Every public release from 0.2.1 onward carries
+  the downloadable Mac product; a source-only GitHub release is incomplete.
 - Record the production-schema promotion, archive, and submission steps so they
   are repeatable rather than dependent on memory.
 
