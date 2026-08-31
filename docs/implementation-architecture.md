@@ -308,7 +308,11 @@ can later become queryable records without changing the domain API.
 is an actor-bound unit of work. Background import will use a separate context
 rather than moving SwiftData records between actors. The repository enforces the
 Kitchen ownership boundary when saving and exposes Kitchen-scoped recipe lists
-already reconstructed as domain values.
+already reconstructed as domain values. V4 stores the selected CloudKit
+container's opaque current-user identity as separate ownership evidence. On
+startup, legacy unowned alpha Kitchens may be converged into the deterministic
+personal Kitchen; an explicitly different owner stops that operation before
+mutation.
 
 `SwiftDataCookingSessionRepository` is a separate main-actor adapter over the
 same container. Its public transaction vocabulary encodes the smallest complete
@@ -345,11 +349,12 @@ record. V3 adds exactly `CookingSessionRecord`, `SessionFactRecord`,
 `SessionClosureRecord`, `SessionDeletionRecord`, and
 `SessionDeletionResolutionRecord`, with scalar UUID links and no relationships,
 uniqueness constraints, external storage, or mutable projections. The complete
-local chain is V1 to V2 to V3 through two lightweight stages; preserved fixture
-stores prove Recipe history and V2 disposition evidence survive. The production
-CloudKit schema follows the corresponding additive rule: later features may
-introduce record types and fields but must not remove or redefine published
-elements.
+local chain continues through V4 with a third lightweight stage that adds only
+`KitchenOwnershipRecord`; preserved fixture stores prove earlier Recipe,
+disposition, and Session evidence survives without inventing an owner. The
+production CloudKit schema follows the corresponding additive rule: later
+features may introduce record types and fields but must not remove or redefine
+published elements.
 
 ## Localization resources
 

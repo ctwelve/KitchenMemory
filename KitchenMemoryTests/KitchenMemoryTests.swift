@@ -52,8 +52,9 @@ final class KitchenMemoryTests: XCTestCase {
     )
   }
 
-  func testCurrentRuntimeUsesTheHostedTestEnvironment() throws {
-    let preparedApp = try XCTUnwrap(AppRuntime.prepare().preparedApp)
+  func testCurrentRuntimeUsesTheHostedTestEnvironment() async throws {
+    let startupState = await AppRuntime.prepare()
+    let preparedApp = try XCTUnwrap(startupState.preparedApp)
 
     preparedApp.libraryModel.loadIfNeeded()
 
@@ -61,6 +62,28 @@ final class KitchenMemoryTests: XCTestCase {
     XCTAssertNotNil(preparedApp.cloudSyncSettings)
     XCTAssertNil(preparedApp.persistentStoreChangeObserver)
     XCTAssertNil(preparedApp.personalCloudStatusMonitor)
+  }
+
+  func testStartupCoordinatorRetainsPreparationAcrossViewLifecycle() async {
+    var continuations: [CheckedContinuation<AppStartupState, Never>] = []
+    let coordinator = AppStartupCoordinator {
+      await withCheckedContinuation { continuations.append($0) }
+    }
+
+    coordinator.prepareIfNeeded()
+    coordinator.prepareIfNeeded()
+    await Task.yield()
+
+    XCTAssertEqual(continuations.count, 1)
+    continuations[0].resume(returning: .unavailable)
+    await Task.yield()
+
+    if case .unavailable = coordinator.state {
+      // Expected: the coordinator, rather than a transient window task, owns
+      // and publishes the completed startup attempt.
+    } else {
+      XCTFail("Expected the completed startup state.")
+    }
   }
 
   func testReloadingDoesNotDuplicateStarterContent() throws {
