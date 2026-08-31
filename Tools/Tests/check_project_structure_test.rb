@@ -9,6 +9,15 @@ require "minitest/autorun"
 require_relative "../check-project-structure"
 
 class CheckProjectStructureTest < Minitest::Test
+  def test_application_launch_action_uses_develop_configuration
+    assert_equal(
+      "Develop",
+      KitchenMemory::ProjectStructure::SCHEME_ACTION_CONFIGURATIONS
+        .fetch("KitchenMemory")
+        .fetch("LaunchAction")
+    )
+  end
+
   class Fixture
     attr_reader :plans, :prebuild_phase_ids, :project, :schemes, :source_phase_ids, :target_ids
 
@@ -281,14 +290,15 @@ class CheckProjectStructureTest < Minitest::Test
           ],
           "defaultOptions" => default_options,
           "testTargets" => target_names.map do |target_name|
-            {
-              "parallelizable" => true,
+            entry = {
               "target" => {
                 "containerPath" => "container:KitchenMemory.xcodeproj",
                 "identifier" => @target_ids.fetch(target_name),
                 "name" => target_name
               }
             }
+            entry["parallelizable"] = true if policy.fetch(:parallel_targets).include?(target_name)
+            entry
           end,
           "version" => 1
         )
@@ -379,6 +389,18 @@ class CheckProjectStructureTest < Minitest::Test
 
     assert_includes error.message, "obsolete Xcode target metadata"
     assert_includes error.message, "KitchenMemory iOS"
+  end
+
+  def test_rejects_non_product_schema_tool_in_xcode_project
+    KitchenMemory::ProjectStructure::NON_PRODUCT_TOOLS.each do |tool|
+      fixture = Fixture.new
+      fixture.project << "path = Tools/#{tool};\n"
+
+      error = assert_contract_error { validate(fixture) }
+
+      assert_includes error.message, "non-product tool must remain outside the Xcode project"
+      assert_includes error.message, tool
+    end
   end
 
   def test_allows_synchronized_navigator_group_without_target_membership
@@ -483,6 +505,18 @@ class CheckProjectStructureTest < Minitest::Test
     error = assert_contract_error { validate(fixture) }
 
     assert_includes error.message, "KitchenMemory Debug must generate common bundle metadata"
+  end
+
+  def test_rejects_base_bundle_name_that_does_not_match_product_filename
+    fixture = Fixture.new
+    fixture.project.sub!(
+      "INFOPLIST_KEY_CFBundleDisplayName = KitchenMemory;",
+      'INFOPLIST_KEY_CFBundleDisplayName = "Kitchen Memory";'
+    )
+
+    error = assert_contract_error { validate(fixture) }
+
+    assert_includes error.message, "generate common bundle metadata"
   end
 
   def test_rejects_disabled_info_plist_generation
@@ -698,6 +732,34 @@ class CheckProjectStructureTest < Minitest::Test
 
     assert_includes error.message, "KitchenMemory.xctestplan test targets"
     assert_includes error.message, "missing: KitchenMemoryUITests"
+  end
+
+  def test_rejects_parallel_ui_smoke_target
+    fixture = Fixture.new
+    plan = JSON.parse(fixture.plans.fetch("KitchenMemory.xctestplan"))
+    ui_target = plan.fetch("testTargets").find do |entry|
+      entry.dig("target", "name") == "KitchenMemoryUITests"
+    end
+    ui_target["parallelizable"] = true
+    fixture.plans["KitchenMemory.xctestplan"] = JSON.generate(plan)
+
+    error = assert_contract_error { validate(fixture) }
+
+    assert_includes error.message, "KitchenMemoryUITests must remain serial"
+  end
+
+  def test_rejects_serial_hosted_application_test_target
+    fixture = Fixture.new
+    plan = JSON.parse(fixture.plans.fetch("KitchenMemory.xctestplan"))
+    hosted_target = plan.fetch("testTargets").find do |entry|
+      entry.dig("target", "name") == "KitchenMemoryTests"
+    end
+    hosted_target.delete("parallelizable")
+    fixture.plans["KitchenMemory.xctestplan"] = JSON.generate(plan)
+
+    error = assert_contract_error { validate(fixture) }
+
+    assert_includes error.message, "KitchenMemoryTests must remain parallel"
   end
 
   def test_rejects_platform_plan_with_wrong_variable_expansion_target

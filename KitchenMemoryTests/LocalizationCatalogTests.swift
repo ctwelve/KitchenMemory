@@ -7,6 +7,11 @@ import XCTest
 
 final class LocalizationCatalogTests: XCTestCase {
   private let supportedLocales = ["en-US", "es-MX", "fr-CA"]
+  private let localizedProductNames = [
+    "en-US": "Kitchen Memory",
+    "es-MX": "Memoria de cocina",
+    "fr-CA": "Mémoire de cuisine",
+  ]
 
   func testStableInterfaceCatalogIsCompleteAndTranslatorReady() throws {
     let catalog = try loadCatalog()
@@ -30,6 +35,66 @@ final class LocalizationCatalogTests: XCTestCase {
       )
       XCTAssertEqual(Set(localizations.keys), Set(supportedLocales), "Locale mismatch for \(key)")
       try assertCompleteLocalizations(localizations, key: key)
+    }
+  }
+
+  func testStableInterfaceLocalizesEveryProductNameMention() throws {
+    let catalog = try loadCatalog()
+    let strings = try XCTUnwrap(catalog["strings"] as? [String: Any])
+
+    for (key, rawEntry) in strings {
+      let entry = try XCTUnwrap(rawEntry as? [String: Any])
+      let localizations = try XCTUnwrap(entry["localizations"] as? [String: Any])
+      let english = try XCTUnwrap(localizations["en-US"])
+      let englishMentionsProduct = stringUnits(in: english).contains { unit in
+        (unit["value"] as? String)?.contains("Kitchen Memory") == true
+      }
+      guard englishMentionsProduct else { continue }
+
+      for locale in supportedLocales {
+        let localization = try XCTUnwrap(localizations[locale])
+        let expectedName = try XCTUnwrap(localizedProductNames[locale])
+        XCTAssertTrue(
+          stringUnits(in: localization).contains { unit in
+            (unit["value"] as? String)?.contains(expectedName) == true
+          },
+          "Product name is not localized for \(key) in \(locale)"
+        )
+      }
+    }
+  }
+
+  func testSystemProductNameCatalogMatchesFilesystemAndLocalizedNames() throws {
+    let catalog = try loadCatalog(named: "InfoPlistLocalizationCatalog")
+    XCTAssertEqual(catalog["sourceLanguage"] as? String, "en-US")
+    let strings = try XCTUnwrap(catalog["strings"] as? [String: Any])
+    XCTAssertEqual(
+      Set(strings.keys),
+      Set(["CFBundleDisplayName", "CFBundleName", "NSHumanReadableCopyright"])
+    )
+
+    for key in ["CFBundleDisplayName", "CFBundleName"] {
+      let entry = try XCTUnwrap(strings[key] as? [String: Any])
+      let localizations = try XCTUnwrap(entry["localizations"] as? [String: Any])
+      XCTAssertEqual(Set(localizations.keys), Set(supportedLocales))
+
+      for locale in supportedLocales {
+        let localization = try XCTUnwrap(localizations[locale])
+        let unit = try XCTUnwrap(stringUnits(in: localization).first)
+        XCTAssertEqual(unit["state"] as? String, "translated")
+        XCTAssertEqual(unit["value"] as? String, localizedProductNames[locale])
+      }
+    }
+
+    let copyright = try XCTUnwrap(strings["NSHumanReadableCopyright"] as? [String: Any])
+    let copyrightLocalizations = try XCTUnwrap(
+      copyright["localizations"] as? [String: Any]
+    )
+    for locale in supportedLocales {
+      let localization = try XCTUnwrap(copyrightLocalizations[locale])
+      let unit = try XCTUnwrap(stringUnits(in: localization).first)
+      let expectedName = try XCTUnwrap(localizedProductNames[locale])
+      XCTAssertEqual((unit["value"] as? String)?.contains(expectedName), true)
     }
   }
 
@@ -69,10 +134,10 @@ final class LocalizationCatalogTests: XCTestCase {
     }
   }
 
-  private func loadCatalog() throws -> [String: Any] {
+  private func loadCatalog(named resource: String = "LocalizationCatalog") throws -> [String: Any] {
     let catalogURL = try XCTUnwrap(
       Bundle(for: Self.self).url(
-        forResource: "LocalizationCatalog",
+        forResource: resource,
         withExtension: "json"
       ),
       "The raw String Catalog contract was not embedded in the test bundle."

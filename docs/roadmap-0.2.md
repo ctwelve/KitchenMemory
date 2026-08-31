@@ -134,13 +134,16 @@ coexist, and neither a device nor its clock owns one.
 ### Slice 15 — 0.1.4 adaptive cooking progress
 
 [Build the adaptive Cooking Session progress experience](https://github.com/ctwelve/KitchenMemory/issues/53)
-presents the captured snapshot, resulting-state ingredient and instruction
+now presents the captured snapshot, resulting-state ingredient and instruction
 progress, and complete working-scale changes. One semantic interaction
 recomposes as Compact, Regular, or Wide from available container space rather
-than platform identity.
+than platform identity, with Compact reading order retained for accessibility
+text sizes.
 
-Rapid intentions remain responsive and retryable through the outbox. Progress
-targets Session-owned row identities and never edits the Recipe or claims pantry
+Rapid intentions remain responsive and retryable through the ordered durable
+outbox, including migration from Slice 14's one-item representation. Progress
+targets Session-owned row identities, working scale always recalculates from the
+snapshot base, and neither interaction edits the Recipe or claims pantry
 consumption.
 
 ### Slice 16 — 0.1.5 cooking reality
@@ -155,6 +158,11 @@ Finish and remote Finish must surface explicit submit, copy, continuation,
 discard, cancel, or other applicable choices. The app never manufactures
 structure, meaning, or Recipe edits from input modality or absence of notes.
 
+Implemented at the 0.1.5 checkpoint: the shared interaction now captures,
+revises, retargets, and withdraws exact text; keeps drafts device-local until
+accepted; records the optional coarse Outcome independently; and resolves local
+drafts explicitly across Finish and remote Finish.
+
 ### Slice 17 — 0.2.0 history and continuation
 
 [Add Cooking Session history and immutable continuation](https://github.com/ctwelve/KitchenMemory/issues/55)
@@ -165,6 +173,12 @@ self-contained continuation rather than reopening its source.
 The navigation leaves room for future search, folders, and tags without adding
 their schema. A long-idle nudge is device-local presentation and never changes
 authoritative state.
+
+Implemented at the 0.2.0 checkpoint: Sessions now has an independent destination
+and Recipe-context history; Active and Stopped work remains deliberately
+switchable; Finished projections open observationally; continuation creates a
+new self-contained Active root with inspectable immediate lineage; and the
+three-day stale nudge retains only device-local visit and dismissal state.
 
 ### Slice 18 — Deleted Items and Recovery
 
@@ -177,6 +191,15 @@ Recipe or Session history.
 Physical erasure, Empty Deleted Items, expiry, and pruning remain later work.
 Destructive classification receives the acceptance contract's mandatory abuse
 and fuzz evidence.
+
+Implemented at the 0.2.0 checkpoint: Active, Stopped, and Finished Sessions can
+be deleted with descendant-aware confirmation; Deleted Items preserves their
+lifecycle and distinguishes Needs Attention from Waiting for Session Data;
+Restore resolves only observed markers; and Recovery exposes complete competing
+Closure choices without discarding evidence. The deterministic Gate B suite
+replays duplicated and reordered delivery, partial arrival, retry, concurrent
+Delete/Restore, missing roots, and logical-identity collision against retained
+evidence and rebuild invariants.
 
 ### Slice 19 — managed CloudKit convergence
 
@@ -198,6 +221,13 @@ physical iPhone/iPad/Mac walkthrough, two-pass human brief, stable localization,
 proportional accessibility, privacy review, production builds, archive, and
 signing. It records conclusions in `release-evidence-0.2.md` against the exact
 intended commit.
+
+Accepted at the 0.2.0 checkpoint: build 128 passed every iOS and macOS Xcode
+Cloud action; the signed archives, physical products, representative migration,
+managed-CloudKit transport, localization, proportional accessibility, privacy,
+and explicit alpha reductions are recorded in the release-evidence ledger.
+Production schema promotion, tagging, and distribution remain separately
+authorized release operations.
 
 The final walkthrough remains:
 

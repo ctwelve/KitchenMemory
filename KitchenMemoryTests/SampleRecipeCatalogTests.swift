@@ -95,6 +95,24 @@ final class SampleRecipeCatalogTests: XCTestCase {
         }
     }
 
+    func testTunaNoodleHotdishLocalizesContributorProductName() throws {
+        let reference = try XCTUnwrap(SampleRecipeCatalog.loadManifest().recipes.first)
+        let expectedAuthors = [
+            "en-US": "Kitchen Memory contributors",
+            "es-MX": "Colaboradores de Memoria de cocina",
+            "fr-CA": "Contributeurs de Mémoire de cuisine",
+        ]
+
+        for (localeIdentifier, expectedAuthor) in expectedAuthors {
+            let variant = try XCTUnwrap(
+                reference.variant(preferredLanguages: [localeIdentifier])
+            )
+            let revision = try SampleRecipeCatalog.loadRecipe(variant).revision
+
+            XCTAssertEqual(revision.authorName, expectedAuthor)
+        }
+    }
+
     func testDirtyFriedRicePreservesFuzzyAmountsSourceAndThermalTechnique() throws {
         let manifest = try SampleRecipeCatalog.loadManifest()
         let reference = try XCTUnwrap(

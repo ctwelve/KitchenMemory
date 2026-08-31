@@ -57,6 +57,24 @@ Several Sessions may be Active at once. Presentation may recommend one current
 Session locally, but devices, clocks, and view state are never lifecycle
 authority.
 
+The 0.1.3 lifecycle shell implements this boundary directly. Start captures the
+exact selected Recipe Revision, and the library exposes every ordinary Active
+or Stopped Session as a distinct device-local discovery row. Entering, leaving,
+sleeping, terminating, and relaunching only change or restore presentation
+selection. Stop, Resume, and confirmed Finish are the only shell actions that
+submit lifecycle intentions.
+
+The presentation retains accepted intentions in an ordered device-local outbox
+before they cross Logic. Independent progress and scale actions may accumulate
+without replacing one another. Retries preserve order and reuse the same
+Session, Fact, or Closure identity after an interruption or ambiguous failure;
+each item normally clears only when Logic returns its locally durable accepted
+projection. The typed terminal exception is a command that Logic definitively
+rejects because its source Session is already Finished: only that now-impossible
+identity clears. Any exact Entry draft remains separately local for explicit
+continuation, confirmed copy, or discard. The outbox is not synchronized and
+does not imply that another device has received the evidence.
+
 ## Cooking interaction
 
 During an Active Session, the cook may:
@@ -74,10 +92,20 @@ check means “accounted for during this cook,” not precise pantry consumption
 Conflicting progress uses a nonhiding ordinary presentation until the person
 resolves it.
 
-The representative interface recomposes for available container space rather
-than platform identity. It favors what to do next, rapid independent intentions,
-large readable content, native accessibility semantics, and recoverable local
-drafts without turning the cooking surface into Recipe editing.
+The 0.1.4 interface reads only the retained Execution Snapshot and Session
+projection. It preserves authored section and row order, marks the first open
+instruction as what is up next, and leaves every completed or skipped step
+available to reopen. Ingredient progress remains the intentionally modest
+accounted/open distinction. Working-yield changes produce a complete
+Session-owned scale replacement by recalculating from the immutable snapshot,
+never from a previously scaled value or the current Recipe.
+
+The same semantic content recomposes for available container space rather than
+platform identity: Compact below 540 points, Regular from 540 points, and Wide
+from 900 points. Accessibility Dynamic Type sizes retain Compact reading order
+at every width. Buttons, menus, headings, state values, and stable
+Session-owned identifiers provide native keyboard and assistive-technology
+semantics without creating a parallel platform-specific interaction.
 
 ## Session Entries and Outcome
 
@@ -90,6 +118,15 @@ Entries may be causally revised, retargeted, or withdrawn without deleting
 earlier evidence. A local meaningful draft survives navigation, Stop, and
 process relaunch. Finish and remote Finish must offer explicit handling for that
 draft; no path silently loses or misassigns it.
+
+The 0.1.5 interaction keeps that draft in application-owned device-local
+storage, separate from the synchronized accepted-intention outbox. Submission
+preserves the exact authored Unicode text and clears the draft only after Logic
+confirms local durability. Finish offers add, copy, discard, and cancel choices.
+If remote Finish arrives first, the person may continue into a new immutable
+Session, copy the draft, discard it, or leave it unresolved; continuation maps
+the target through the captured continuation baseline instead of silently
+retargeting it.
 
 Session Outcome is optional and distinct from lifecycle. Its initial coarse
 values are great, okay, and unsuccessful. Finishing with no Entries or Outcome
@@ -120,11 +157,46 @@ is deleted, or is temporarily absent. Finished history opens observationally
 from its self-contained evidence and may later source a deliberate Recipe
 workflow only because it is immutable.
 
+The 0.2.0 history interaction gives Sessions their own navigation destination
+and a Recipe-context route. It keeps a device-local current convenience first,
+shows other Active and Stopped work as recent Sessions, and lists Finished
+history from retained Session evidence rather than from the Recipe Library.
+Several live Sessions remain independently selectable; selecting one does not
+Stop, Resume, Finish, or transfer ownership of another.
+
+Finished detail is observational. Continue Cooking submits one explicit
+continuation intention and opens the resulting Active Session only after its
+self-contained root is locally durable. The source remains unchanged; the new
+root exposes its immediate source Session and Closure identities, inherits the
+closed scale, progress, and Entries through newly minted Session-owned
+identities, and starts with no Outcome. Those lineage identities explain
+history but are not dependencies for reconstruction or deletion.
+
+The application may offer a stale-Session nudge after three days since the
+device last opened that Session. Its visit and dismissal state stay in ordinary
+device-local preferences. The nudge can propose Resume, Stop, or returning to
+Recipes to start another Session, but time and dismissal never create evidence
+or change lifecycle.
+
 Session Deletion is reversible disposition, separate from lifecycle. Any state
 may be deleted, deletion never cascades, and causal Restore resolves only the
 deletion evidence actually observed. Deleted Items and Recovery remain separate
 surfaces. Physical pruning, Empty Deleted Items, expiry, and permanent erasure
 require a later dependency-aware contract.
+
+In the application, the ordinary action is named **Delete**. It asks for
+confirmation, warns when known later Sessions descend from the selected Session,
+and leaves those descendants, their Recipes, Entries, Closure, snapshot, and
+Facts intact. Deleted Items preserves whether a Session was Active, Stopped, or
+Finished. A concurrent Delete and Restore stays there as **Needs Attention**;
+incomplete deletion evidence appears as **Waiting for Session Data** and can be
+retried after synchronization brings more evidence.
+
+Recovery is reserved for evidence that cannot safely become an ordinary or
+deleted Session: logical-identity collisions, malformed or cross-Session
+evidence, and competing Closures. Competing Closure resolution is offered only
+when every observed candidate is complete. Selecting one records another
+immutable piece of evidence; it does not rewrite or discard the alternatives.
 
 ## Deferred work
 

@@ -39,6 +39,12 @@ same store. It reconstructs and classifies immutable V3 evidence before Logic
 sees a Session; managed CloudKit delivery order and physical identity never
 cross the seam.
 
+`AppRuntime` retains that repository, the Kitchen-scoped `CookingSessions`
+Logic module, and its observable application projection beside the Recipe
+Library for the process lifetime. Cooking Session composition remains separate
+from `RecipeLibrary` and `RecipeRepository`; they share the configured model
+container without collapsing their responsibility seams.
+
 This preserves two independent identities:
 
 - `Kitchen.ID` is the durable product identity used by recipes and future
@@ -93,12 +99,25 @@ that the Kitchen is established and suppresses an inapplicable first-run prompt.
 The answer remains authorization for one requested sample installation; it is
 not authority to restore or download samples automatically on another device.
 
+The current Cooking Session pointer and the single pending lifecycle-command
+outbox use ordinary device-local `UserDefaults`. They are never mirrored into
+`NSUbiquitousKeyValueStore`: selection is not shared lifecycle authority, and a
+stable intention must remain on the device that accepted it until local
+durability is confirmed. CloudKit synchronizes only retained Cooking Session
+evidence in the SwiftData store.
+
 Managed CloudKit imports post a persistent-store remote-change notification.
-KitchenKit's Persistence responsibility converts that callback into a concurrency-safe
-refresh signal; the application composition root connects it to
-`RecipeLibraryModel` after the model has completed its initial load. This keeps
-Core Data and CloudKit callback mechanics out of Domain and Logic while avoiding
-an early notification bypassing sample-onboarding state.
+KitchenKit's Persistence responsibility converts that callback into a
+concurrency-safe refresh signal; the application composition root connects it to
+`RecipeLibraryModel` and `CookingSessionPresentationModel` after each model has
+completed its initial load. Each projection then reloads retained repository
+evidence and lets Domain and Logic classify it. The Session repository replaces
+its read context before that reload so an imported row, deletion, or restoration
+cannot remain hidden behind a stale SwiftData registration. This keeps Core Data
+and CloudKit callback mechanics out of Domain and Logic while avoiding an early
+notification bypassing sample-onboarding state. A notification, account state,
+or successful framework event requests a refresh; none proves that a Session
+Fact arrived or that synchronization is globally complete.
 
 Settings reports the current iCloud account availability and the public managed
 CloudKit setup, import, and export event state. It never equates “account
@@ -173,6 +192,22 @@ contract. They use scalar UUID attributes, schema-compatible placeholders,
 ordinary inline `Data`, and no relationships, uniqueness constraints, or local
 indexes. Repository validation prevents placeholders or partial evidence from
 becoming ordinary state. V1 and V2 model definitions remain unchanged.
+
+V3 Session deletion uses the same explicit causal principle without reusing the
+Recipe-reset mechanism. Delete appends a `SessionDeletionRecord`; Restore appends
+one `SessionDeletionResolutionRecord` for each unresolved deletion marker the
+device has actually observed. CloudKit may deliver roots, Facts, Closures,
+deletions, and resolutions in any order. Missing dependencies therefore wait
+for more Session data, while collisions and invariant violations remain in the
+separate Recovery destination. Neither a successful CloudKit event nor absence
+of a row authorizes restoration, and no relationship cascade removes a Recipe,
+source Session, continuation, Fact, Closure, or snapshot.
+
+Deleted Session evidence has no automatic expiry or pruning in 0.2. It remains
+in the person's private local store and, when enabled, private iCloud database
+so Restore and deterministic reconstruction remain possible. Empty Deleted
+Items and permanent erasure require a later contract that can prove dependency
+safety across asynchronously participating devices.
 
 ## Migration authority
 
@@ -260,10 +295,56 @@ container's Development environment, then deliberately deployed to that
 container's Production environment. The ordinary Development app never receives
 the production container entitlement.
 
-No current shared scheme performs that production-container administration.
-Adding one is release-engineering work: it must use an explicitly reviewed,
-Mac-only configuration and must not turn schema initialization or deployment
-into an ordinary build, archive, or application-launch side effect.
+No shared scheme performs that production-container administration. The
+separately reviewed, Mac-only tool in `Tools/CloudKitProductionSchemaAdmin`
+initializes the frozen model only in the Production container's Development
+environment. It is absent from the Xcode project, schemes, plans, archives, and
+product binaries; uses a disposable store; and cannot deploy Production. The
+project checker rejects either schema harness if its name enters the project.
+CloudKit Console remains the deliberate Production deployment surface.
+
+## Future V3 Production deployment runbook
+
+V3 Production promotion is a later publication operation, not part of Slice 19.
+Run it only for an identified 0.2 release candidate after its automated,
+physical-device, migration, privacy, and Development transport evidence passes.
+
+1. Record the exact candidate commit, Xcode version, macOS version, and operator
+   in `release-evidence-0.2.md`. Confirm the working tree is clean and the
+   candidate contains only additive V3 record types and fields.
+2. Build the separately reviewed Mac-only administration tool documented in
+   `Tools/CloudKitProductionSchemaAdmin/README.md` from the accepted source
+   tree, using the reviewed macOS acceptance archive's provisioning profile.
+   Confirm its signed entitlements select `iCloud.net.ctwelve.KitchenMemory`
+   and the Development environment. Do not reuse the ordinary Development
+   harness, add the switch to a shared scheme, or alter an ordinary Production
+   launch.
+3. Initialize only that Production container's **Development** environment.
+   In CloudKit Console, explicitly verify the container name and **Dev** badge
+   before inspecting record types, fields, indexes, standard security roles,
+   and encryption state.
+4. Compare the server schema with the accepted V3 model and the existing V1
+   Production baseline. The preview must contain the five new Session types and
+   their fields without removing, renaming, retyping, repurposing, or changing
+   encryption on any published type or field. Abort on any unexplained role or
+   index change.
+5. Open the deployment preview without confirming it. Record its bounded
+   additive conclusion in the evidence ledger; never commit account data, raw
+   schema exports, private records, or screenshots containing them.
+6. Produce and verify the signed acceptance archives from that exact candidate
+   commit before any irreversible promotion. Record signing, archive, privacy,
+   entitlement, installation, and launch conclusions in the evidence ledger.
+   An archive failure returns to source correction and invalidates the preview.
+7. A separately authorized publication task may then confirm deployment.
+   Afterward, inspect the Production environment directly and record that every
+   expected type, field, index, security grant, and encryption choice is present.
+8. Only after that verification may the publication task create the immutable
+   release tag, produce any required final tag-driven archives, or distribute
+   the candidate. A failed or ambiguous preview stops publication; it is never
+   repaired by resetting Production or deleting published schema.
+
+The runbook does not authorize deployment. The release operator must make that
+irreversible choice deliberately for the named candidate.
 
 ## 1.0 validation boundary
 

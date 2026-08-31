@@ -193,20 +193,7 @@ extension CookingSessions {
       payload: .closureResolution(selection),
       target: nil
     )
-    if let existing = evidence.facts.first(where: { $0.id == intention.fact.id }) {
-      guard existing.sessionID == intention.fact.sessionID,
-            existing.kitchenID == kitchenID,
-            existing.kind == SessionFact.Kind.conflictResolution.rawValue,
-            existing.targetSnapshotElementID == nil,
-            existing.authoredAt == intention.fact.authoredAt,
-            let payload = try? SessionFactPayloadCodec.decode(
-              formatVersion: existing.payloadFormatVersion,
-              data: existing.payloadData
-            ),
-            case let .closureResolution(stored) = payload,
-            stored.selectedClosureID == intention.selectedClosureID,
-            stored.observedClosureIDs == intention.observedClosureIDs
-      else { throw CookingSessionLogicError.intentionIdentityCollision }
+    if try closureResolutionAlreadyExists(intention, in: evidence) {
       return try classifiedResult(id: intention.fact.sessionID)
     }
     let projected = SessionEvidenceProjector.project(evidence)
@@ -230,6 +217,28 @@ extension CookingSessions {
       throw CookingSessionLogicError.sessionWriteFailed
     }
     return try classifiedResult(id: intention.fact.sessionID)
+  }
+
+  private func closureResolutionAlreadyExists(
+    _ intention: ResolveCookingSessionClosureIntention,
+    in evidence: SessionEvidence
+  ) throws -> Bool {
+    guard let existing = evidence.facts.first(where: { $0.id == intention.fact.id })
+    else { return false }
+    guard existing.sessionID == intention.fact.sessionID,
+          existing.kitchenID == kitchenID,
+          existing.kind == SessionFact.Kind.conflictResolution.rawValue,
+          existing.targetSnapshotElementID == nil,
+          existing.authoredAt == intention.fact.authoredAt,
+          let payload = try? SessionFactPayloadCodec.decode(
+            formatVersion: existing.payloadFormatVersion,
+            data: existing.payloadData
+          ),
+          case let .closureResolution(stored) = payload,
+          stored.selectedClosureID == intention.selectedClosureID,
+          stored.observedClosureIDs == intention.observedClosureIDs
+    else { throw CookingSessionLogicError.intentionIdentityCollision }
+    return true
   }
 
   private func performContinuation(
@@ -382,7 +391,8 @@ extension CookingSessions {
       let exactIsValid = scale.exactScale.map {
         $0.normalized != nil && $0.numerator > 0
       } ?? true
-      return scale.workingYield != nil || scale.exactScale != nil
+      let hasScaleValue = scale.workingYield != nil || scale.exactScale != nil
+      return hasScaleValue
         && Set(quantityIDs).count == quantityIDs.count
         && Set(quantityIDs) == expectedQuantityIDs
         && exactIsValid

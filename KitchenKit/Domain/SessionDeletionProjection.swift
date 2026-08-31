@@ -217,6 +217,8 @@ private extension CookingSessionProjection {
         Self(
             id: id,
             snapshot: snapshot,
+            sourceSessionID: sourceSessionID,
+            sourceClosureID: sourceClosureID,
             lifecycle: lifecycle,
             lifecycleBeforeFinish: lifecycleBeforeFinish,
             disposition: disposition,

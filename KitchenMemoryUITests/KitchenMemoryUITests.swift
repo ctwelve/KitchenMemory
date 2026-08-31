@@ -121,6 +121,7 @@ final class KitchenMemoryUITests: XCTestCase {
   @MainActor
   func testStartupFailureOffersAStableRecoverySurface() {
     let app = XCUIApplication()
+    terminateRetainedApplicationIfNeeded(app)
     app.launchArguments = [
       "-ApplePersistenceIgnoreState", "YES",
       "--ui-testing", "--simulate-startup-failure",
@@ -138,13 +139,16 @@ final class KitchenMemoryUITests: XCTestCase {
     app.terminate()
   }
 
+  // Shared by focused smoke-test extensions in synchronized source files.
+  // swiftlint:disable:next test_case_accessibility
   @MainActor
-  private func launchApp(additionalArguments: [String] = []) -> XCUIApplication {
+  func launchApp(additionalArguments: [String] = []) -> XCUIApplication {
 #if os(iOS)
     XCUIDevice.shared.orientation = .portrait
 #endif
 
     let app = XCUIApplication()
+    terminateRetainedApplicationIfNeeded(app)
     // UI automation always uses disposable sample data and must never touch a
     // developer's local Kitchen. Ignoring persisted window state also makes a
     // macOS launch deterministic after somebody quits with no windows open.
@@ -155,8 +159,32 @@ final class KitchenMemoryUITests: XCTestCase {
 
     let recipeLibrary = app.descendants(matching: .any)["recipe-library"]
     ensurePrimaryWindow(in: app, exposing: recipeLibrary)
+    revealSidebar(in: app, exposing: recipeLibrary)
+    XCTAssertTrue(recipeLibrary.waitForExistence(timeout: 5))
+    return app
+  }
+
+  @MainActor
+  private func terminateRetainedApplicationIfNeeded(_ app: XCUIApplication) {
+#if os(macOS)
+    guard app.state != .notRunning else { return }
+    // Application-hosted tests can leave the shared executable running in the
+    // background. Reusing that process would retain the hosted-test launch plan
+    // instead of the disposable UI-testing plan assembled below.
+    app.terminate()
+    XCTAssertTrue(
+      app.wait(for: .notRunning, timeout: 5),
+      "The retained hosted-test application did not terminate before UI automation."
+    )
+#endif
+  }
+
+  // Shared by focused smoke-test extensions in synchronized source files.
+  // swiftlint:disable:next test_case_accessibility
+  @MainActor
+  func revealSidebar(in app: XCUIApplication, exposing element: XCUIElement) {
 #if os(iOS)
-    if !recipeLibrary.waitForExistence(timeout: 2) {
+    if !element.waitForExistence(timeout: 2) {
       // A compact split view may present the selected recipe first. Return to
       // the durable sidebar before exercising either application-shell smoke.
       let backButton = app.buttons["BackButton"]
@@ -165,7 +193,7 @@ final class KitchenMemoryUITests: XCTestCase {
       }
     }
 #else
-    if !recipeLibrary.waitForExistence(timeout: 2) {
+    if !element.waitForExistence(timeout: 2) {
       // macOS may restore a previous split-view selection between launches.
       let toggle = app.buttons["toggle-sidebar"]
       if toggle.waitForExistence(timeout: 3) {
@@ -173,12 +201,12 @@ final class KitchenMemoryUITests: XCTestCase {
       }
     }
 #endif
-    XCTAssertTrue(recipeLibrary.waitForExistence(timeout: 5))
-    return app
   }
 
+  // Shared by focused smoke-test extensions in synchronized source files.
+  // swiftlint:disable:next test_case_accessibility
   @MainActor
-  private func activate(_ element: XCUIElement) {
+  func activate(_ element: XCUIElement) {
 #if os(macOS)
     element.click()
 #else
@@ -268,5 +296,66 @@ final class KitchenMemoryUITests: XCTestCase {
     XCTAssertTrue(openSettings.waitForExistence(timeout: 2))
     activate(openSettings)
 #endif
+  }
+}
+
+extension KitchenMemoryUITests {
+  @MainActor
+  func testCookingSessionLifecycleShell() {
+    let app = launchApp()
+    let recipeRow = app.descendants(matching: .any)
+      .matching(NSPredicate(format: "identifier BEGINSWITH %@", "recipe-row-"))
+      .firstMatch
+    XCTAssertTrue(recipeRow.waitForExistence(timeout: 5))
+    activate(recipeRow)
+
+    let start = app.buttons["start-cooking"]
+    XCTAssertTrue(start.waitForExistence(timeout: 5))
+    activate(start)
+    let stop = app.buttons["stop-session"]
+    XCTAssertTrue(stop.waitForExistence(timeout: 5))
+    activate(stop)
+    let resume = app.buttons["resume-session"]
+    XCTAssertTrue(resume.waitForExistence(timeout: 5))
+    activate(resume)
+
+    let finish = app.buttons["finish-session"]
+    XCTAssertTrue(finish.waitForExistence(timeout: 5))
+    activate(finish)
+    // iOS exposes the SwiftUI alert action through nested button wrappers that
+    // share one identifier; either wrapper activates the same native action.
+    let confirmation = app.buttons["confirm-finish-session"].firstMatch
+    XCTAssertTrue(confirmation.waitForExistence(timeout: 3))
+    activate(confirmation)
+    XCTAssertFalse(app.buttons["finish-session"].waitForExistence(timeout: 3))
+
+    let continuation = app.buttons["continue-session"]
+    XCTAssertTrue(continuation.waitForExistence(timeout: 5))
+    activate(continuation)
+    leaveStoppedSession(in: app)
+  }
+
+  @MainActor
+  private func leaveStoppedSession(in app: XCUIApplication) {
+    let stop = app.buttons["stop-session"]
+    XCTAssertTrue(stop.waitForExistence(timeout: 5))
+    activate(stop)
+    let leave = app.buttons["leave-session"]
+    XCTAssertTrue(leave.waitForExistence(timeout: 5))
+    activate(leave)
+
+    reopenFirstSession(in: app)
+    XCTAssertTrue(app.buttons["resume-session"].waitForExistence(timeout: 5))
+  }
+
+  // Shared by focused smoke-test extensions in synchronized source files.
+  @MainActor
+  func reopenFirstSession(in app: XCUIApplication) {
+    let sessionRow = app.descendants(matching: .any)
+      .matching(NSPredicate(format: "identifier BEGINSWITH %@", "session-row-"))
+      .firstMatch
+    revealSidebar(in: app, exposing: sessionRow)
+    XCTAssertTrue(sessionRow.waitForExistence(timeout: 5))
+    activate(sessionRow)
   }
 }

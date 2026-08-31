@@ -27,6 +27,14 @@ UI-smoke target. The schemes default Test and Analyze to `Testing`; Xcode Cloud
 may still select a configuration and destination explicitly without introducing
 duplicate scheme names.
 
+The hosted `KitchenMemoryTests` target remains parallelizable. The
+`KitchenMemoryUITests` target is deliberately serial: its methods share one
+application lifecycle, and native macOS runners cannot safely foreground that
+application while another UI runner or retained hosted-test process owns it.
+The UI launch harness terminates a retained macOS host before applying the
+disposable UI-testing launch plan. The project-structure contract enforces this
+parallel-hosted, serial-UI boundary.
+
 The application scheme does not expose Mac Catalyst, Mac Designed for iPhone
 or iPad, or visionOS Designed for iPhone or iPad destinations. Compatibility
 products require an explicit target and acceptance decision; they are not
@@ -60,13 +68,20 @@ The completed feature baseline was collected on `slice/completion` before its
 merge to `main`. Release engineering begins from that `main` baseline and uses
 focused reviewed fixes rather than extending the integration branch as an
 indefinite parallel trunk. A future batch of feature slices may establish a new
-temporary `slice/*` integration branch.
+`slice/*` integration record branch.
 
 `release-eng/*` owns repeatable release plumbing and its directly supporting
 hardening: CI contracts, dependency inventory, SBOM maintenance, version and tag
 validation, packaging, signing, notarization, and distribution automation. It
 is not a second feature lane. User-visible defects remain `bugs/*`, while new
 product capability remains `slice/*`.
+
+Published `slice/*`, `bugs/*`, and `release-eng/*` branches are governed record
+branches. Retain them after they merge so the repository preserves the feature
+integration, hardening, and release-engineering lineage that produced each
+accepted `main` state. Short-lived working branches, including `codex/*`, are
+not record branches. Prune them after their work has merged into the appropriate
+governed record branch.
 
 Build, Analyze, and the complete platform Test actions are required to pass.
 The KitchenKit coverage gate has reached exact complete line coverage; a

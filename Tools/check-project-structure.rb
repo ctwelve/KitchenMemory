@@ -61,7 +61,7 @@ module KitchenMemory
           "INFOPLIST_FILE[sdk=iphoneos*]" => "KitchenMemory/Info-iOS.plist",
           "INFOPLIST_FILE[sdk=iphonesimulator*]" => "KitchenMemory/Info-iOS.plist",
           "INFOPLIST_FILE[sdk=macosx*]" => "KitchenMemory/Info-macOS.plist",
-          "INFOPLIST_KEY_CFBundleDisplayName" => "Kitchen Memory",
+          "INFOPLIST_KEY_CFBundleDisplayName" => "KitchenMemory",
           "INFOPLIST_KEY_LSApplicationCategoryType" => "public.app-category.food-and-drink",
           "INFOPLIST_KEY_NSHumanReadableCopyright" =>
             "Copyright © 2026 Kitchen Memory Project contributors."
@@ -103,6 +103,10 @@ module KitchenMemory
       "KitchenMemoryIOS",
       "KitchenMemoryMacOS"
     ].freeze
+    NON_PRODUCT_TOOLS = %w[
+      CloudKitProductionSchemaAdmin
+      SessionCloudKitAcceptance
+    ].freeze
     SHARED_SOURCE_INFO_PLIST_KEYS = %w[
       KitchenMemoryCloudKitContainerIdentifier
     ].freeze
@@ -123,10 +127,12 @@ module KitchenMemory
     }.freeze
     PLAN_POLICIES = {
       "KitchenKit.xctestplan" => {
-        configuration: "Test Scheme Action"
+        configuration: "Test Scheme Action",
+        parallel_targets: %w[KitchenKitTests]
       },
       "KitchenMemory.xctestplan" => {
         configuration: "Test Scheme Action",
+        parallel_targets: %w[KitchenMemoryTests],
         variable_expansion_target: "KitchenMemory"
       }
     }.freeze
@@ -140,7 +146,7 @@ module KitchenMemory
       },
       "KitchenMemory" => {
         "TestAction" => "Testing",
-        "LaunchAction" => "Debug",
+        "LaunchAction" => "Develop",
         "ProfileAction" => "Production",
         "AnalyzeAction" => "Testing",
         "ArchiveAction" => "Production"
@@ -166,6 +172,7 @@ module KitchenMemory
 
     def validate(project_contents:, schemes:, plans:)
       validate_obsolete_project_metadata(project_contents)
+      validate_non_product_tool_exclusion(project_contents)
       objects = parse_objects(project_contents)
       validate_project_configurations(objects, parse_file_references(project_contents))
       targets = validate_targets(objects)
@@ -197,6 +204,13 @@ module KitchenMemory
       return unless obsolete_name
 
       raise ContractError, "obsolete Xcode target metadata remains: #{obsolete_name}"
+    end
+
+    def validate_non_product_tool_exclusion(project_contents)
+      included_tool = NON_PRODUCT_TOOLS.find { |tool| project_contents.include?(tool) }
+      return unless included_tool
+
+      raise ContractError, "non-product tool must remain outside the Xcode project: #{included_tool}"
     end
 
     def validate_repository(root)
@@ -669,13 +683,17 @@ module KitchenMemory
         actual_target_names = test_targets.map { |entry| entry.dig("target", "name") }
         assert_exact_names("#{filename} test targets", actual_target_names, expected_target_names)
 
+        parallel_targets = policy.fetch(:parallel_targets)
         test_targets.each do |entry|
-          unless entry["parallelizable"] == true
-            raise ContractError, "#{filename} test targets must remain parallelizable"
-          end
           reference = entry.fetch("target", {})
           identifier = reference["identifier"]
           name = reference["name"]
+          executes_in_parallel = entry["parallelizable"] == true
+          expected_parallel = parallel_targets.include?(name)
+          unless executes_in_parallel == expected_parallel
+            expectation = expected_parallel ? "parallel" : "serial"
+            raise ContractError, "#{filename} target #{name} must remain #{expectation}"
+          end
           target = targets_by_id[identifier]
           raise ContractError, "#{filename} references missing target identifier #{identifier.inspect}" unless target
           unless target[:name] == name

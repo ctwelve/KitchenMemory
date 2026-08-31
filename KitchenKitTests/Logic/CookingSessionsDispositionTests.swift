@@ -34,8 +34,10 @@ final class CookingSessionsDispositionTests: XCTestCase {
     )
 
     let deleted = try logic.perform(.delete(deletion))
+    XCTAssertEqual(try logic.unresolvedDeletionIDs(for: sessionID), [deletion.deletionID])
     let deleteRetry = try logic.perform(.delete(deletion))
     let restored = try logic.perform(.restore(restore))
+    XCTAssertTrue(try logic.unresolvedDeletionIDs(for: sessionID).isEmpty)
     let restoreRetry = try logic.perform(.restore(restore))
 
     XCTAssertEqual(accepted(deleted)?.disposition, .deleted(needsAttention: false))
@@ -77,6 +79,10 @@ final class CookingSessionsDispositionTests: XCTestCase {
         deletedAt: Date(timeIntervalSince1970: TimeInterval(100 + value))
       )))
     }
+    XCTAssertEqual(
+      try logic.unresolvedDeletionIDs(for: sessionID),
+      [15, 16].map { .init(rawValue: id($0)) }
+    )
     let restored = try logic.perform(.restore(RestoreCookingSessionIntention(
       id: .init(rawValue: id(17)),
       sessionID: sessionID,
@@ -88,6 +94,10 @@ final class CookingSessionsDispositionTests: XCTestCase {
       sessionID: sessionID,
       deletedAt: Date(timeIntervalSince1970: 140)
     )))
+    XCTAssertEqual(
+      try logic.unresolvedDeletionIDs(for: sessionID),
+      [.init(rawValue: id(18))]
+    )
     let restoredAgain = try logic.perform(.restore(RestoreCookingSessionIntention(
       id: .init(rawValue: id(19)),
       sessionID: sessionID,

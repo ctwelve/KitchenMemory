@@ -133,6 +133,7 @@ final class CookingSessionsAdvancedCommandsTests: XCTestCase {
     }
   }
 
+  // swiftlint:disable:next function_body_length
   func testContinuationCopiesFinishedStateIntoNewSelfContainedRoot() throws {
     let fixture = try SessionLogicFixture(seed: 300, withTargets: true)
     let started = try XCTUnwrap(accepted(fixture.started))

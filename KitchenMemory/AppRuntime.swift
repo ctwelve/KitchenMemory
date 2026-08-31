@@ -146,6 +146,7 @@ enum AppRuntime {
     var preferencesStore: (any KitchenPreferencesStoring)?
     var sampleProvider: (any SampleRecipeProviding)?
     var initialKitchenWasCreatedOverride: Bool?
+    var sessionPresentationStore: (any CookingSessionPresentationStoring)?
   }
 
   static func prepare() -> AppStartupState {
@@ -173,7 +174,10 @@ enum AppRuntime {
       return try PreparedApp(
         plan: plan,
         preferences: preferences,
-        samples: BundledSampleRecipeProvider()
+        samples: BundledSampleRecipeProvider(),
+        sessionPresentationStore: plan.store.isInMemory
+          ? VolatileCookingSessionPresentationStore()
+          : DefaultsCookingSessionPresentationStore()
       )
     }
   }
@@ -196,7 +200,9 @@ enum AppRuntime {
       preferences: preferences,
       samples: configuration.sampleProvider ?? BundledSampleRecipeProvider(),
       initialKitchenWasCreatedOverride:
-        configuration.initialKitchenWasCreatedOverride
+        configuration.initialKitchenWasCreatedOverride,
+      sessionPresentationStore: configuration.sessionPresentationStore
+        ?? VolatileCookingSessionPresentationStore()
     )
   }
 
@@ -216,9 +222,55 @@ enum AppRuntime {
 }
 
 @MainActor
+private struct PreparedCore {
+  let modelContainer: ModelContainer
+  let libraryModel: RecipeLibraryModel
+  let cookingSessionRepository: SwiftDataCookingSessionRepository
+  let cookingSessions: CookingSessions
+
+  init(
+    plan: AppLaunchPlan,
+    preferences: any KitchenPreferencesStoring,
+    samples: any SampleRecipeProviding,
+    initialKitchenWasCreatedOverride: Bool?
+  ) throws {
+    modelContainer = try KitchenMemorySchema.makeContainer(
+      inMemory: plan.store.isInMemory,
+      synchronization: plan.store.synchronization
+    )
+    let recipeRepository = SwiftDataRecipeRepository(modelContainer: modelContainer)
+    let preparedKitchen = try KitchenBootstrapService(repository: recipeRepository)
+      .prepareInitialKitchenWithStatus()
+    let library = RecipeLibrary(
+      kitchenID: preparedKitchen.kitchen.id,
+      repository: recipeRepository,
+      samples: samples,
+      importer: RecipeImportService()
+    )
+    if plan.sampleFixture == .installed { try library.installSamples() }
+    libraryModel = RecipeLibraryModel(
+      library: library,
+      samplePreferences: preferences,
+      kitchenWasCreated: initialKitchenWasCreatedOverride ?? preparedKitchen.wasCreated
+    )
+    cookingSessionRepository = SwiftDataCookingSessionRepository(
+      modelContainer: modelContainer
+    )
+    cookingSessions = CookingSessions(
+      kitchenID: preparedKitchen.kitchen.id,
+      recipeRepository: recipeRepository,
+      sessionRepository: cookingSessionRepository
+    )
+  }
+}
+
+@MainActor
 struct PreparedApp {
   let modelContainer: ModelContainer
   let libraryModel: RecipeLibraryModel
+  let cookingSessionRepository: SwiftDataCookingSessionRepository
+  let cookingSessions: CookingSessions
+  let sessionModel: CookingSessionPresentationModel
   let persistentStoreChangeObserver: PersistentStoreChangeObserver?
   let personalCloudStatusMonitor: PersonalCloudStatusMonitor?
   let cloudSyncSettings: CloudSyncSettings?
@@ -227,34 +279,24 @@ struct PreparedApp {
     plan: AppLaunchPlan,
     preferences: any KitchenPreferencesStoring,
     samples: any SampleRecipeProviding,
-    initialKitchenWasCreatedOverride: Bool? = nil
+    initialKitchenWasCreatedOverride: Bool? = nil,
+    sessionPresentationStore: any CookingSessionPresentationStoring
   ) throws {
-    let modelContainer = try KitchenMemorySchema.makeContainer(
-      inMemory: plan.store.isInMemory,
-      synchronization: plan.store.synchronization
-    )
-    let repository = SwiftDataRecipeRepository(modelContainer: modelContainer)
-    let preparedKitchen = try KitchenBootstrapService(repository: repository)
-      .prepareInitialKitchenWithStatus()
-    let kitchen = preparedKitchen.kitchen
-    let library = RecipeLibrary(
-      kitchenID: kitchen.id,
-      repository: repository,
+    let core = try PreparedCore(
+      plan: plan,
+      preferences: preferences,
       samples: samples,
-      importer: RecipeImportService()
+      initialKitchenWasCreatedOverride: initialKitchenWasCreatedOverride
     )
-
-    if plan.sampleFixture == .installed {
-      try library.installSamples()
-    }
-
-    let libraryModel = RecipeLibraryModel(
-      library: library,
-      samplePreferences: preferences,
-      kitchenWasCreated: initialKitchenWasCreatedOverride ?? preparedKitchen.wasCreated
+    let sessionModel = CookingSessionPresentationModel(
+      sessions: core.cookingSessions,
+      store: sessionPresentationStore
     )
-    self.modelContainer = modelContainer
-    self.libraryModel = libraryModel
+    modelContainer = core.modelContainer
+    libraryModel = core.libraryModel
+    cookingSessionRepository = core.cookingSessionRepository
+    cookingSessions = core.cookingSessions
+    self.sessionModel = sessionModel
     cloudSyncSettings = plan.offersCloudSyncSetting
       ? CloudSyncSettings(
         preference: preferences,
@@ -263,7 +305,11 @@ struct PreparedApp {
       : nil
     persistentStoreChangeObserver = plan.store.personalCloudContainerIdentifier != nil
       ? PersistentStoreChangeObserver {
-        libraryModel.reloadAfterExternalStoreChange()
+        performExternalStoreRefresh(
+          libraryModel: core.libraryModel,
+          sessionRepository: core.cookingSessionRepository,
+          sessionModel: sessionModel
+        )
       }
       : nil
     let personalCloudStatusMonitor = plan.store.personalCloudContainerIdentifier.map { containerIdentifier in
@@ -272,11 +318,19 @@ struct PreparedApp {
           containerIdentifier: containerIdentifier
         )
       ) { status in
-        libraryModel.updatePersonalCloudStatus(status)
+        core.libraryModel.updatePersonalCloudStatus(status)
       }
     }
     self.personalCloudStatusMonitor = personalCloudStatusMonitor
     personalCloudStatusMonitor?.start()
+  }
+
+  func reloadAfterExternalStoreChange() {
+    performExternalStoreRefresh(
+      libraryModel: libraryModel,
+      sessionRepository: cookingSessionRepository,
+      sessionModel: sessionModel
+    )
   }
 
   static var preview: PreparedApp {
@@ -286,4 +340,15 @@ struct PreparedApp {
       fatalError("Could not prepare the Kitchen Memory preview: \(error)")
     }
   }
+}
+
+@MainActor
+private func performExternalStoreRefresh(
+  libraryModel: RecipeLibraryModel,
+  sessionRepository: SwiftDataCookingSessionRepository,
+  sessionModel: CookingSessionPresentationModel
+) {
+  libraryModel.reloadAfterExternalStoreChange()
+  sessionRepository.refreshFromPersistentStore()
+  sessionModel.reloadAfterExternalStoreChange()
 }

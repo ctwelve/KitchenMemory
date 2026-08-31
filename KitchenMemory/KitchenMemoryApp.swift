@@ -37,6 +37,7 @@ struct KitchenMemoryApp: App {
     case .ready(let dependencies):
       ContentView(
         model: dependencies.libraryModel,
+        sessionModel: dependencies.sessionModel,
         cloudSyncSettings: dependencies.cloudSyncSettings
       )
     case .unavailable:

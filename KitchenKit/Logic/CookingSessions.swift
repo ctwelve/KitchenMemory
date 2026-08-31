@@ -72,6 +72,75 @@ public struct CookingSessions {
     }
   }
 
+  /// The complete locally observed deletion frontier that an explicit Restore
+  /// must resolve. The subsequent command revalidates this plan so evidence
+  /// arriving between presentation and acceptance cannot be silently ignored.
+  public func unresolvedDeletionIDs(
+    for sessionID: CookingSession.ID
+  ) throws -> [SessionDeletion.ID] {
+    let evidence = try requiredEvidence(id: sessionID)
+    let projected = SessionEvidenceProjector.project(evidence)
+    guard case let .session(session) = projected,
+          case .deleted = session.disposition
+    else { return [] }
+    let resolved = Set(evidence.restorations.map(\.deletionID))
+    return Dictionary(grouping: evidence.deletions, by: \SessionDeletionEvidence.id)
+      .compactMap { $0.value.first }
+      .filter { !resolved.contains($0.id) }
+      .map(\.id)
+      .sorted { $0.rawValue.uuidString < $1.rawValue.uuidString }
+  }
+
+  /// The complete, unambiguous Closure choices that can be presented for an
+  /// explicit competing-Closure decision. Any other Recovery reason or an
+  /// identity collision remains inspectable but is not directly resolvable.
+  public static func closureCandidates(
+    for recovery: SessionRecovery
+  ) -> [SessionClosureEvidence] {
+    guard recovery.reasons == [.competingClosures] else { return [] }
+    let grouped = Dictionary(grouping: recovery.evidence.closures, by: \.id)
+    guard grouped.values.allSatisfy({ values in
+      guard let first = values.first else { return false }
+      return values.allSatisfy { $0 == first }
+    }) else { return [] }
+    return grouped.values.compactMap(\.first).sorted {
+      if $0.finishedAt != $1.finishedAt { return $0.finishedAt < $1.finishedAt }
+      return $0.id.rawValue.uuidString < $1.id.rawValue.uuidString
+    }
+  }
+
+  /// Counts the transitive continuation descendants retained in a classified
+  /// read. Deleting a source never cascades into these descendants, so callers
+  /// can warn without reimplementing aggregate dependency rules.
+  public static func knownDescendantCount(
+    of sessionID: CookingSession.ID,
+    among results: [SessionProjectionResult]
+  ) -> Int {
+    let edges = results.flatMap { result -> [(CookingSession.ID, CookingSession.ID)] in
+      switch result {
+      case let .session(session):
+        guard let sourceSessionID = session.sourceSessionID else { return [] }
+        return [(session.id, sourceSessionID)]
+      case let .unavailable(unavailable):
+        return unavailable.evidence.roots.compactMap { root in
+          root.sourceSessionID.map { (root.id, $0) }
+        }
+      case let .recovery(recovery):
+        return recovery.evidence.roots.compactMap { root in
+          root.sourceSessionID.map { (root.id, $0) }
+        }
+      }
+    }
+    var frontier = [sessionID]
+    var descendants = Set<CookingSession.ID>()
+    while let source = frontier.popLast() {
+      for (candidate, parent) in edges where parent == source {
+        if descendants.insert(candidate).inserted { frontier.append(candidate) }
+      }
+    }
+    return descendants.count
+  }
+
   public func start(
     _ intention: StartCookingSessionIntention
   ) throws -> CookingSessionCommandResult {

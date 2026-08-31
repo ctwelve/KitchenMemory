@@ -69,7 +69,7 @@ target implementation details:
 `ProductionTesting` is deliberately non-distributable. It retains production
 compiler behavior while admitting disposable automated-test storage that is
 disabled in the actual `Production` application. The saved `KitchenMemory`
-scheme uses `Testing` for its default Test and Analyze actions, `Debug` for Run,
+scheme uses `Testing` for its default Test and Analyze actions, `Develop` for Run,
 and `Production` for Profile and Archive. Its plan runs hosted tests and UI
 smoke together on either native destination; the UI harness selects disposable
 storage through its launch arguments. A release-equivalent UI smoke run may
@@ -167,12 +167,16 @@ KitchenMemoryApp
         │   └── CloudSyncPreferenceStoring
         ├── PersistentStoreChangeObserver
         ├── PersonalCloudStatusMonitor
-        └── RecipeLibraryModel
-            └── RecipeLibrary
-                ├── RecipeEditor
-                ├── RecipeImportService
-                ├── SampleRecipeInstallService
-                └── KitchenResetService
+        ├── RecipeLibraryModel
+        │   └── RecipeLibrary
+        │       ├── RecipeEditor
+        │       ├── RecipeImportService
+        │       ├── SampleRecipeInstallService
+        │       └── KitchenResetService
+        ├── SwiftDataCookingSessionRepository
+        ├── CookingSessions
+        └── CookingSessionPresentationModel
+            └── CookingSessionPresentationStoring
 ```
 
 `AppRuntime` is the composition root. It translates process arguments, build
@@ -183,16 +187,63 @@ request, and privacy-safe failure simulation together rather than exposing
 independent flags to callers.
 
 The runtime then creates `PreparedApp`, which retains the model container,
-observable library projection, remote-change observer, personal-cloud status
+observable library and Cooking Session projections, both concrete SwiftData
+repositories, `CookingSessions`, remote-change observer, personal-cloud status
 monitor, and optional sync settings for their complete lifetimes. Its
 implementation creates the concrete SwiftData repository and asset-backed
 sample provider, asks the bootstrap operation for the initial empty Kitchen,
 selects durable or disposable preferences, and prepares the Recipe Library.
 For a personal-cloud store it also starts and retains the persistence adapters
-that feed external changes and account status back into the library projection.
+that feed external changes back into both evidence projections and account
+status into the library projection.
 `KitchenMemoryApp` sees only prepared or unavailable state and retry; tests use
 one explicit disposable runtime configuration rather than constructing the
 production graph through loosely related booleans and optionals.
+
+`CookingSessionPresentationModel` is a replaceable main-actor projection over
+the deep `CookingSessions` interface. It exposes ordinary Active and Stopped
+Sessions for interaction plus ordinary Finished projections for observational
+history, keeps unavailable and recovery classifications out of ordinary
+presentation, and translates typed command results without changing
+`RecipeLibrary` or `RecipeRepository`. Kitchen-wide, Finished-history, and
+Recipe-provenance reads stay behind the same Logic interface; the application
+does not join Session history through visible Recipe objects. The selected Session pointer and an
+ordered accepted-but-not-yet-confirmed command outbox live in an
+application-owned, device-local store. Commands are written there with their
+final stable identities before Logic is called and are normally removed in
+order only after Logic returns each locally durable accepted projection. One
+typed terminal exception applies when Logic definitively rejects a command
+because its source Session is already Finished: that now-impossible identity
+clears while any exact Entry draft remains separately local for explicit
+continuation, copy, or discard. The store
+migrates Slice 14's single pending-command representation as a one-item outbox.
+Progress and complete working-scale replacements project optimistically from
+that queue while preserving the immutable snapshot as their base. Relaunch and
+remote-store refresh therefore retry stable intentions and reread retained
+evidence; process or framework events never manufacture lifecycle Facts or
+prove global synchronization.
+
+Unsubmitted Session Entry text uses a second device-local collection rather
+than the accepted-intention outbox. It retains exact text and an optional
+Session-owned target across navigation, Stop, and relaunch, but it does not
+become synchronized evidence until the presentation layer submits a stable Fact
+identity and Logic confirms local durability. Remote Finish keeps an ineligible
+draft visible for explicit continuation, successfully confirmed copy, or
+discard resolution.
+
+The same device-local store retains the last presentation visit and stale-nudge
+dismissal for each Session. That timing orders a current convenience and offers
+the long-idle prompt only; it is not synchronized, is not an evidence clock, and
+cannot authorize lifecycle. Finished observation reads the closed projection.
+Continuation reuses the durable command outbox, exposes immediate source
+Session and Closure identities from the projected root, and selects the new
+Active Session only after Logic confirms its root is locally durable.
+
+`CookingSessionView` is one semantic SwiftUI interaction that selects Compact,
+Regular, or Wide composition from its container width. Platform identity does
+not choose the content model. Snapshot-owned row IDs remain the target and
+automation identity across recomposition, while native controls supply keyboard,
+pointer, touch, Dynamic Type, and accessibility behavior.
 
 `RecipeLibrary` is the deep Logic module for one Kitchen's recipe-library
 intentions. Its interface loads durable content with current sample presence,

@@ -320,6 +320,13 @@ final class CookingSessionEvidenceEngineTests: XCTestCase {
         }
         XCTAssertEqual(session.lifecycle, .active)
         XCTAssertEqual(session.snapshot, snapshot)
+        XCTAssertEqual(session.sourceSessionID, sourceSessionID)
+        XCTAssertEqual(
+            session.sourceClosureID,
+            SessionClosure.ID(
+                rawValue: UUID(uuidString: "00000000-0000-0000-0000-000000000090")!
+            )
+        )
         XCTAssertEqual(session.workingScale, snapshot.continuationBaseline?.workingScale)
         XCTAssertEqual(session.progress, snapshot.continuationBaseline?.progress)
         XCTAssertEqual(

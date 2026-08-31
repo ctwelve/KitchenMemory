@@ -7,6 +7,7 @@ import SwiftUI
 
 struct ContentView: View {
   @Bindable var model: RecipeLibraryModel
+  @Bindable var sessionModel: CookingSessionPresentationModel
   let cloudSyncSettings: CloudSyncSettings?
   @Environment(\.horizontalSizeClass) private var horizontalSizeClass
   @Environment(\.locale) private var locale
@@ -28,13 +29,52 @@ struct ContentView: View {
           decline: model.declineSampleRecipes
         )
       case .ready:
-        recipeLibrary
+        if let currentSession = sessionModel.currentSession {
+          CookingSessionView(model: sessionModel, session: currentSession)
+        } else {
+          recipeLibrary
+        }
       }
     }
     .task {
       model.loadIfNeeded()
+      sessionModel.loadIfNeeded()
     }
     .tint(Color("AccentColor"))
+    .alert(
+      .sessionIssueTitle,
+      isPresented: sessionIssueIsPresented
+    ) {
+      if sessionModel.issue != .clipboard {
+        Button(.actionTryAgain) { sessionModel.retryCurrentIssue() }
+      }
+      Button(.actionCancel, role: .cancel) {}
+    } message: {
+      if let issue = sessionModel.issue {
+        Text(issue.message)
+      }
+    }
+    .confirmationDialog(
+      .sessionEntryDetachedTitle,
+      isPresented: detachedDraftIsPresented,
+      titleVisibility: .visible
+    ) {
+      Button(.sessionEntryDetachedContinue) {
+        sessionModel.continueDetachedEntryDraft()
+      }
+      Button(.sessionEntryDetachedCopy) {
+        copyAndDiscardDetachedDraft()
+      }
+      Button(.sessionEntryDetachedDiscard, role: .destructive) {
+        sessionModel.discardDetachedEntryDraft()
+      }
+      Button(.actionCancel, role: .cancel) {}
+    } message: {
+      Text(.sessionEntryDetachedMessage)
+    }
+    .onChange(of: model.selectedRecipeID) { _, recipeID in
+      if recipeID != nil { sessionModel.showRecipes() }
+    }
   }
 
   private var recipeLibrary: some View {
@@ -142,53 +182,43 @@ struct ContentView: View {
   }
 
   @ViewBuilder
-  private var recipeList: some View {
-    if let issue = model.issue {
-      ContentUnavailableView {
-        Label(.libraryUnavailableTitle, systemImage: "exclamationmark.triangle")
-      } description: {
-        Text(issue.message(locale: locale))
-      } actions: {
-        Button(.actionTryAgain) { model.retryCurrentIssue() }
-      }
-    } else if model.hasLoaded && model.recipes.isEmpty {
-      ContentUnavailableView(
-        .libraryEmptyTitle,
-        systemImage: "book.closed",
-        description: Text(.libraryEmptyMessage)
-      )
-    } else {
-      List(model.recipes, id: \.recipe.id, selection: $model.selectedRecipeID) { storedRecipe in
-        NavigationLink(value: storedRecipe.recipe.id) {
-          RecipeRow(storedRecipe: storedRecipe)
-        }
-        // Keep the stable identity on the interactive NavigationLink, not on
-        // RecipeRow's visual children. UI tests and assistive technologies
-        // must activate the same element a person clicks to open the recipe.
-        .accessibilityIdentifier("recipe-row-\(storedRecipe.recipe.id.rawValue.uuidString)")
-      }
-      // This identifier is also our launch-complete signal in UI tests. It is
-      // applied to the List itself so it survives row reuse and empty states.
-      .accessibilityIdentifier("recipe-library")
-      .accessibilityLabel(Text(.libraryAccessibilityLabel))
-      .listStyle(.sidebar)
-      .overlay {
-        if !model.hasLoaded {
-          ProgressView(.libraryLoading)
-        }
-      }
-    }
-  }
-
-  @ViewBuilder
   private var detail: some View {
-    if let selectedRecipe = model.selectedRecipe {
+    if let finishedSession = sessionModel.observedFinishedSession {
+      FinishedCookingSessionView(model: sessionModel, session: finishedSession)
+    } else if sessionModel.isShowingDeletedItems {
+      CookingSessionDeletedItemsView(model: sessionModel)
+    } else if sessionModel.isShowingRecovery {
+      CookingSessionRecoveryView(model: sessionModel)
+    } else if sessionModel.isShowingSessionHistory {
+      CookingSessionHistoryView(model: sessionModel)
+    } else if let selectedRecipe = model.selectedRecipe {
       RecipeDetailView(storedRecipe: selectedRecipe)
         // A revision is immutable, but this view owns reading-only state such
         // as the selected scaling basis. Give each new revision fresh state so
         // a just-saved yield is reflected immediately.
         .id(selectedRecipe.revision.id)
         .toolbar {
+          ToolbarItem(placement: .primaryAction) {
+            NavigationLink {
+              CookingSessionHistoryDestinationView(
+                model: sessionModel,
+                prepare: {
+                  sessionModel.showRecipeSessionHistory(for: selectedRecipe.recipe.id)
+                }
+              )
+            } label: {
+              Label(.sessionHistoryRecipeTitle, systemImage: "clock.arrow.circlepath")
+            }
+            .accessibilityIdentifier("recipe-session-history")
+          }
+          ToolbarItem(placement: .primaryAction) {
+            Button {
+              sessionModel.start(from: selectedRecipe)
+            } label: {
+              Label(.sessionActionStart, systemImage: "flame")
+            }
+            .accessibilityIdentifier("start-cooking")
+          }
           ToolbarItem(placement: .primaryAction) {
             Button { activeSheet = .edit(selectedRecipe) } label: {
               Label(.recipeActionEdit, systemImage: "pencil")
@@ -235,6 +265,52 @@ struct ContentView: View {
   }
 }
 
+private extension ContentView {
+  @ViewBuilder
+  var recipeList: some View {
+    RecipeLibrarySidebar(
+      model: model,
+      sessionModel: sessionModel,
+      locale: locale,
+      showSessionHistory: {
+        model.selectedRecipeID = nil
+        sessionModel.showSessionHistory()
+        columnVisibility = .detailOnly
+      },
+      showDeletedItems: {
+        model.selectedRecipeID = nil
+        sessionModel.showDeletedItems()
+        columnVisibility = .detailOnly
+      },
+      showRecovery: {
+        model.selectedRecipeID = nil
+        sessionModel.showRecovery()
+        columnVisibility = .detailOnly
+      }
+    )
+  }
+
+  var sessionIssueIsPresented: Binding<Bool> {
+    Binding(
+      get: { sessionModel.isShowingIssue },
+      set: { isPresented in
+        if !isPresented { sessionModel.dismissIssuePresentation() }
+      }
+    )
+  }
+
+  var detachedDraftIsPresented: Binding<Bool> {
+    Binding(
+      get: { sessionModel.detachedEntryDraft != nil },
+      set: { _ in }
+    )
+  }
+
+  func copyAndDiscardDetachedDraft() {
+    sessionModel.copyAndDiscardDetachedEntryDraft(using: CookingSessionClipboard.copy)
+  }
+}
+
 private struct ToolbarIconLabel: View {
   let title: LocalizedStringResource
   let systemImage: String
@@ -271,7 +347,7 @@ private enum ActiveRecipeSheet: Identifiable {
   }
 }
 
-private struct RecipeRow: View {
+struct RecipeRow: View {
   let storedRecipe: StoredRecipe
 
   var body: some View {
@@ -305,6 +381,7 @@ private struct RecipeRow: View {
 #Preview {
   ContentView(
     model: PreparedApp.preview.libraryModel,
+    sessionModel: PreparedApp.preview.sessionModel,
     cloudSyncSettings: nil
   )
 }

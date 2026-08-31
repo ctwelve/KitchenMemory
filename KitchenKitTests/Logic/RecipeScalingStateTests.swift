@@ -68,4 +68,47 @@ final class RecipeScalingStateTests: XCTestCase {
     state.adjustWorkingYield(by: 1)
     XCTAssertEqual(state.workingYield, hugeNumerator)
   }
+
+  func testExplicitSessionScaleRestoresItsRangeBasisAndWorkingYield() {
+    let recipeYield = RecipeYield(
+      quantity: QuantityExpression(
+        kind: .range,
+        lowerBound: RationalQuantity(numerator: 2),
+        upperBound: RationalQuantity(numerator: 4)
+      ),
+      unitText: "servings",
+      originalText: "2 to 4 servings"
+    )
+
+    let state = RecipeScalingState(
+      recipeYield: recipeYield,
+      workingYield: RationalQuantity(numerator: 6),
+      exactScale: RationalQuantity(numerator: 3, denominator: 2)
+    )
+
+    XCTAssertEqual(state.selectedBasisIndex, 1)
+    XCTAssertEqual(state.workingYield, RationalQuantity(numerator: 6))
+    XCTAssertEqual(state.scale?.multiplier, RationalQuantity(numerator: 3, denominator: 2))
+  }
+
+  func testInvalidExplicitSessionScaleFallsBackToSnapshotBasis() {
+    let recipeYield = RecipeYield(
+      quantity: QuantityExpression(
+        kind: .exact,
+        lowerBound: RationalQuantity(numerator: 2)
+      ),
+      unitText: "servings",
+      originalText: "2 servings"
+    )
+
+    let state = RecipeScalingState(
+      recipeYield: recipeYield,
+      workingYield: RationalQuantity(numerator: 6),
+      exactScale: RationalQuantity(numerator: 2)
+    )
+
+    XCTAssertEqual(state.selectedBasisIndex, 0)
+    XCTAssertEqual(state.workingYield, RationalQuantity(numerator: 2))
+    XCTAssertEqual(state.scale?.multiplier, RationalQuantity(numerator: 1))
+  }
 }

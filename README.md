@@ -84,6 +84,7 @@ been flattened or silently rewritten.
   architecture, workflows, and engineering guidance
 - [0.1 release notes](docs/release-notes-0.1.md)
 - [0.1 release evidence](docs/release-evidence-0.1.md)
+- [0.2 release evidence](docs/release-evidence-0.2.md)
 - [0.1 release engineering](docs/release-engineering.md)
 - [Product doctrine](docs/product-doctrine.md)
 - [Product brief](docs/product-brief.md)

@@ -8,14 +8,27 @@ import SwiftData
 /// SwiftData-backed immutable V3 Cooking Session evidence repository.
 @MainActor
 public final class SwiftDataCookingSessionRepository: CookingSessionRepository {
-  private let context: ModelContext
+  private let modelContainer: ModelContainer
+  private var context: ModelContext
 
   public init(modelContainer: ModelContainer) {
+    self.modelContainer = modelContainer
     context = ModelContext(modelContainer)
   }
 
   private init(context: ModelContext) {
+    modelContainer = context.container
     self.context = context
+  }
+
+  /// Discards the read context after another persistent-store writer imports evidence.
+  ///
+  /// Immutable Session rows are never passed between contexts. Recreating this
+  /// read view makes the next domain query observe the store's imported prefix
+  /// as one fresh snapshot while keeping CloudKit and Core Data outside the
+  /// repository interface.
+  public func refreshFromPersistentStore() {
+    context = ModelContext(modelContainer)
   }
 
   public func append(_ transaction: CookingSessionTransaction) throws {
@@ -95,8 +108,7 @@ public final class SwiftDataCookingSessionRepository: CookingSessionRepository {
     limit: Int
   ) throws -> [SessionProjectionResult] {
     guard limit > 0 else { return [] }
-    return try storedEvidence(in: kitchenID).compactMap {
-      stored -> (StoredSessionEvidence, Date)? in
+    return try storedEvidence(in: kitchenID).compactMap { stored -> (StoredSessionEvidence, Date)? in
       guard let finishedAt = stored.evidence.closures.map(\.finishedAt).max()
       else { return nil }
       return (stored, finishedAt)
@@ -165,7 +177,7 @@ public final class SwiftDataCookingSessionRepository: CookingSessionRepository {
   private func performIsolatedWrite(
     _ operation: (SwiftDataCookingSessionRepository) throws -> Void
   ) throws {
-    let writerContext = ModelContext(context.container)
+    let writerContext = ModelContext(modelContainer)
     let writer = SwiftDataCookingSessionRepository(context: writerContext)
     do {
       try operation(writer)
