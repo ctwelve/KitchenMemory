@@ -290,14 +290,15 @@ class CheckProjectStructureTest < Minitest::Test
           ],
           "defaultOptions" => default_options,
           "testTargets" => target_names.map do |target_name|
-            {
-              "parallelizable" => true,
+            entry = {
               "target" => {
                 "containerPath" => "container:KitchenMemory.xcodeproj",
                 "identifier" => @target_ids.fetch(target_name),
                 "name" => target_name
               }
             }
+            entry["parallelizable"] = true if policy.fetch(:parallel_targets).include?(target_name)
+            entry
           end,
           "version" => 1
         )
@@ -719,6 +720,34 @@ class CheckProjectStructureTest < Minitest::Test
 
     assert_includes error.message, "KitchenMemory.xctestplan test targets"
     assert_includes error.message, "missing: KitchenMemoryUITests"
+  end
+
+  def test_rejects_parallel_ui_smoke_target
+    fixture = Fixture.new
+    plan = JSON.parse(fixture.plans.fetch("KitchenMemory.xctestplan"))
+    ui_target = plan.fetch("testTargets").find do |entry|
+      entry.dig("target", "name") == "KitchenMemoryUITests"
+    end
+    ui_target["parallelizable"] = true
+    fixture.plans["KitchenMemory.xctestplan"] = JSON.generate(plan)
+
+    error = assert_contract_error { validate(fixture) }
+
+    assert_includes error.message, "KitchenMemoryUITests must remain serial"
+  end
+
+  def test_rejects_serial_hosted_application_test_target
+    fixture = Fixture.new
+    plan = JSON.parse(fixture.plans.fetch("KitchenMemory.xctestplan"))
+    hosted_target = plan.fetch("testTargets").find do |entry|
+      entry.dig("target", "name") == "KitchenMemoryTests"
+    end
+    hosted_target.delete("parallelizable")
+    fixture.plans["KitchenMemory.xctestplan"] = JSON.generate(plan)
+
+    error = assert_contract_error { validate(fixture) }
+
+    assert_includes error.message, "KitchenMemoryTests must remain parallel"
   end
 
   def test_rejects_platform_plan_with_wrong_variable_expansion_target

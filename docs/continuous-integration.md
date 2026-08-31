@@ -27,6 +27,14 @@ UI-smoke target. The schemes default Test and Analyze to `Testing`; Xcode Cloud
 may still select a configuration and destination explicitly without introducing
 duplicate scheme names.
 
+The hosted `KitchenMemoryTests` target remains parallelizable. The
+`KitchenMemoryUITests` target is deliberately serial: its methods share one
+application lifecycle, and native macOS runners cannot safely foreground that
+application while another UI runner or retained hosted-test process owns it.
+The UI launch harness terminates a retained macOS host before applying the
+disposable UI-testing launch plan. The project-structure contract enforces this
+parallel-hosted, serial-UI boundary.
+
 The application scheme does not expose Mac Catalyst, Mac Designed for iPhone
 or iPad, or visionOS Designed for iPhone or iPad destinations. Compatibility
 products require an explicit target and acceptance decision; they are not

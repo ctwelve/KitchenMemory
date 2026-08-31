@@ -123,10 +123,12 @@ module KitchenMemory
     }.freeze
     PLAN_POLICIES = {
       "KitchenKit.xctestplan" => {
-        configuration: "Test Scheme Action"
+        configuration: "Test Scheme Action",
+        parallel_targets: %w[KitchenKitTests]
       },
       "KitchenMemory.xctestplan" => {
         configuration: "Test Scheme Action",
+        parallel_targets: %w[KitchenMemoryTests],
         variable_expansion_target: "KitchenMemory"
       }
     }.freeze
@@ -669,13 +671,17 @@ module KitchenMemory
         actual_target_names = test_targets.map { |entry| entry.dig("target", "name") }
         assert_exact_names("#{filename} test targets", actual_target_names, expected_target_names)
 
+        parallel_targets = policy.fetch(:parallel_targets)
         test_targets.each do |entry|
-          unless entry["parallelizable"] == true
-            raise ContractError, "#{filename} test targets must remain parallelizable"
-          end
           reference = entry.fetch("target", {})
           identifier = reference["identifier"]
           name = reference["name"]
+          executes_in_parallel = entry["parallelizable"] == true
+          expected_parallel = parallel_targets.include?(name)
+          unless executes_in_parallel == expected_parallel
+            expectation = expected_parallel ? "parallel" : "serial"
+            raise ContractError, "#{filename} target #{name} must remain #{expectation}"
+          end
           target = targets_by_id[identifier]
           raise ContractError, "#{filename} references missing target identifier #{identifier.inspect}" unless target
           unless target[:name] == name

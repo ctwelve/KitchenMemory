@@ -121,6 +121,7 @@ final class KitchenMemoryUITests: XCTestCase {
   @MainActor
   func testStartupFailureOffersAStableRecoverySurface() {
     let app = XCUIApplication()
+    terminateRetainedApplicationIfNeeded(app)
     app.launchArguments = [
       "-ApplePersistenceIgnoreState", "YES",
       "--ui-testing", "--simulate-startup-failure",
@@ -147,6 +148,7 @@ final class KitchenMemoryUITests: XCTestCase {
 #endif
 
     let app = XCUIApplication()
+    terminateRetainedApplicationIfNeeded(app)
     // UI automation always uses disposable sample data and must never touch a
     // developer's local Kitchen. Ignoring persisted window state also makes a
     // macOS launch deterministic after somebody quits with no windows open.
@@ -160,6 +162,21 @@ final class KitchenMemoryUITests: XCTestCase {
     revealSidebar(in: app, exposing: recipeLibrary)
     XCTAssertTrue(recipeLibrary.waitForExistence(timeout: 5))
     return app
+  }
+
+  @MainActor
+  private func terminateRetainedApplicationIfNeeded(_ app: XCUIApplication) {
+#if os(macOS)
+    guard app.state != .notRunning else { return }
+    // Application-hosted tests can leave the shared executable running in the
+    // background. Reusing that process would retain the hosted-test launch plan
+    // instead of the disposable UI-testing plan assembled below.
+    app.terminate()
+    XCTAssertTrue(
+      app.wait(for: .notRunning, timeout: 5),
+      "The retained hosted-test application did not terminate before UI automation."
+    )
+#endif
   }
 
   // Shared by focused smoke-test extensions in synchronized source files.
@@ -284,50 +301,6 @@ final class KitchenMemoryUITests: XCTestCase {
 
 extension KitchenMemoryUITests {
   @MainActor
-  func testCookingSessionProgressAndScaleSmoke() {
-    let app = launchApp(additionalArguments: ["-AppleLanguages", "(en-US)"])
-    let recipeRow = app.descendants(matching: .any)[
-      "recipe-row-95781805-F5D3-46B0-B685-A660F8AC69F2"
-    ]
-    XCTAssertTrue(recipeRow.waitForExistence(timeout: 5))
-    activate(recipeRow)
-    let start = app.buttons["start-cooking"]
-    XCTAssertTrue(start.waitForExistence(timeout: 5))
-    activate(start)
-
-    let ingredient = app.descendants(matching: .any).matching(
-      NSPredicate(format: "identifier BEGINSWITH %@", "session-ingredient-")
-    ).firstMatch
-    XCTAssertTrue(ingredient.waitForExistence(timeout: 5))
-    let ingredientIdentifier = ingredient.identifier
-    activate(ingredient)
-
-    let instruction = app.descendants(matching: .any).matching(
-      NSPredicate(format: "identifier BEGINSWITH %@", "session-instruction-step-")
-    ).firstMatch
-    XCTAssertTrue(instruction.waitForExistence(timeout: 5))
-    let instructionIdentifier = instruction.identifier
-    activate(instruction)
-
-    let increase = app.buttons["session-working-yield-increment"]
-    XCTAssertTrue(increase.waitForExistence(timeout: 5))
-    activate(increase)
-    XCTAssertTrue(app.descendants(matching: .any)["session-working-yield"].exists)
-
-#if os(iOS)
-    XCUIDevice.shared.orientation = .landscapeLeft
-    XCTAssertTrue(app.descendants(matching: .any)[ingredientIdentifier].waitForExistence(timeout: 5))
-    XCUIDevice.shared.orientation = .portrait
-#endif
-
-    activate(app.buttons["leave-session"])
-    reopenFirstSession(in: app)
-    XCTAssertTrue(app.descendants(matching: .any)[ingredientIdentifier].waitForExistence(timeout: 5))
-    XCTAssertTrue(app.descendants(matching: .any)[instructionIdentifier].exists)
-    XCTAssertTrue(app.descendants(matching: .any)["session-working-yield"].exists)
-  }
-
-  @MainActor
   func testCookingSessionLifecycleShell() {
     let app = launchApp()
     let recipeRow = app.descendants(matching: .any)
@@ -375,8 +348,9 @@ extension KitchenMemoryUITests {
     XCTAssertTrue(app.buttons["resume-session"].waitForExistence(timeout: 5))
   }
 
+  // Shared by focused smoke-test extensions in synchronized source files.
   @MainActor
-  private func reopenFirstSession(in app: XCUIApplication) {
+  func reopenFirstSession(in app: XCUIApplication) {
     let sessionRow = app.descendants(matching: .any)
       .matching(NSPredicate(format: "identifier BEGINSWITH %@", "session-row-"))
       .firstMatch
