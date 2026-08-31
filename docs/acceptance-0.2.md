@@ -222,6 +222,16 @@ Attention, or Recovery—never silent ordinary presentation. All fixtures use
 synthetic UUIDs and content; no person's Kitchen or private diagnostic artifact
 is read, reset, or retained.
 
+Slice 19's separate signed Development harness completed the E1, E2b, E3, E4a,
+E4b, E5, and E7 Mac transport matrix with genuinely independent stores. E1,
+E2b, E4a, E4b, and E5 passed in both reconnect orders. E4a first classified a
+scrambled prefix as Unavailable before reconstructing the restored Finished
+Session; E5 retained its independent Fact through Deleted and restored
+checkpoints; and E7 demonstrated that a later export operation can follow an
+earlier successful one. Every pass came from a clean receiving store's domain
+evidence, never event timing or notification count. The harness uses only
+synthetic bounded output and cannot select Production.
+
 ## Product interaction evidence
 
 ### Automated UI smoke

@@ -450,7 +450,15 @@ Development container. The radios were not manually forced offline; separate
 stores and pre-convergence insertion supplied independence for this alpha gate.
 Deterministic Logic tests still exhaust delivery permutations.
 
-The broader notification, event, local-only reconnection, physical-deletion,
-and receipt-acknowledgement exercises remain staged 0.2 acceptance evidence.
-Production schema initialization and deployment are explicitly outside this
-decision and ordinary application launch.
+Slice 19's separate signed Development harness then exercised the broader E1,
+E2b, E3, E4a, E4b, E5, and E7 transport matrix. Corrected independent store
+URLs proved both reconnect orders for every order-sensitive scenario. Clean
+receivers rebuilt ordinary, Unavailable, Deleted, Restored, and Recovery
+classifications from retained V3 evidence; operation events remained bounded
+diagnostics and never supplied the pass conclusion. The same harness initialized
+the additive Development schema and inspected the generated five-entity model.
+
+CloudKit Console review of server indexes, standard security roles, and
+encryption remains a release-evidence task before any later Production
+promotion. Production schema initialization and deployment are explicitly
+outside this decision and ordinary application launch.

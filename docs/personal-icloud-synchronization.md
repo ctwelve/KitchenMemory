@@ -107,12 +107,14 @@ durability is confirmed. CloudKit synchronizes only retained Cooking Session
 evidence in the SwiftData store.
 
 Managed CloudKit imports post a persistent-store remote-change notification.
-KitchenKit's Persistence responsibility converts that callback into a concurrency-safe
-refresh signal; the application composition root connects it to
+KitchenKit's Persistence responsibility converts that callback into a
+concurrency-safe refresh signal; the application composition root connects it to
 `RecipeLibraryModel` and `CookingSessionPresentationModel` after each model has
 completed its initial load. Each projection then reloads retained repository
-evidence and lets Domain and Logic classify it. This keeps Core Data and
-CloudKit callback mechanics out of Domain and Logic while avoiding an early
+evidence and lets Domain and Logic classify it. The Session repository replaces
+its read context before that reload so an imported row, deletion, or restoration
+cannot remain hidden behind a stale SwiftData registration. This keeps Core Data
+and CloudKit callback mechanics out of Domain and Logic while avoiding an early
 notification bypassing sample-onboarding state. A notification, account state,
 or successful framework event requests a refresh; none proves that a Session
 Fact arrived or that synchronization is globally complete.

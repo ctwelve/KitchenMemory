@@ -306,6 +306,7 @@ struct PreparedApp {
     persistentStoreChangeObserver = plan.store.personalCloudContainerIdentifier != nil
       ? PersistentStoreChangeObserver {
         core.libraryModel.reloadAfterExternalStoreChange()
+        core.cookingSessionRepository.refreshFromPersistentStore()
         sessionModel.reloadAfterExternalStoreChange()
       }
       : nil
