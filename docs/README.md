@@ -39,6 +39,7 @@ products must share one presentation architecture.
 - [Alpha roadmap](alpha-roadmap.md)
 - [Roadmap to 0.2](roadmap-0.2.md)
 - [0.2 acceptance contract](acceptance-0.2.md)
+- [0.2 release evidence](release-evidence-0.2.md)
 - [0.1 release notes](release-notes-0.1.md)
 - [Release engineering](release-engineering.md)
 - [0.1 release evidence](release-evidence-0.1.md)
