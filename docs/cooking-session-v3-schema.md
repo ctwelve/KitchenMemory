@@ -459,7 +459,10 @@ operation events remained bounded diagnostics and never supplied the pass
 conclusion. The same harness initialized the additive Development schema and
 inspected the generated five-entity model.
 
-CloudKit Console review of server indexes, standard security roles, and
-encryption remains a release-evidence task before any later Production
-promotion. Production schema initialization and deployment are explicitly
-outside this decision and ordinary application launch.
+Slice 19's read-only CloudKit Console review confirmed every generated V3
+domain field, the managed single-field indexes, the standard `_world` Read,
+`_icloud` Create, and `_creator` Write grants, and no encrypted field types in
+the Development container. The exact environment and counts are recorded in
+[0.2 release evidence](release-evidence-0.2.md). Production schema
+initialization and deployment remain explicitly outside this decision and
+ordinary application launch.

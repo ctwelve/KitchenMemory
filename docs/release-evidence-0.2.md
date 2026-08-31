@@ -6,13 +6,15 @@ Copyright © 2026 the Kitchen Memory contributors.
 SPDX-License-Identifier: MIT
 -->
 
-- Status: Slice 19 acceptance in progress
+- Status: Slice 19 acceptance complete
 - Candidate version: 0.2.0
 - Evidence opened: 2026-08-30
 - Slice 19 implementation source:
   `daaef9e897cc7a6ed966e686f6e748445bfc8916`
 - Slice 19 exact-evidence source:
   `6056a425505c78827415ea282c7e586369c9fbab`
+- Slice 19 reviewed harness source:
+  `ea1b13fad07d955fe954b9590220b291cf26942d`
 - CloudKit environment: Development only
 - Production environment: Untouched
 
@@ -51,9 +53,10 @@ container configuration and stores outside an explicit disposable root.
 | KitchenKit exact coverage | `daaef9e` | Passed | 8,284/8,284 executable lines; 105 documented Apple-runtime adapter lines excluded |
 | Signed macOS application tests | `6056a42` | Passed | 113/113 tests on macOS 26.6.2 with Xcode 26.6; includes the remote-change callback, composition-root refresh, and ordinary, Deleted, Unavailable, and Recovery reclassification |
 | Strict lint | `6056a42` | Passed | Xcode build-tool plugin completed without warnings across the affected signed build and test targets |
-| Harness deterministic matrix | `6056a42` | Passed | E1, E2b, E3, E4a, E4b, E5, and E7 reconstructed the exact expected evidence multiset and row content |
-| Signed iOS harness build | `6056a42` | Passed | Development application built and signed for physical iPhone with the iOS 26.5 SDK |
-| Signed iPhone execution | `6056a42` | Pending | Build is ready; installation and exact receiving-store conclusion remain to be recorded on the unlocked physical device |
+| Harness deterministic matrix | `ea1b13f` | Passed | E1, E2b, E3, E4a, E4b, E5, and E7 reconstructed the exact expected evidence multiset and row content; fresh stores exercised every partial, Deleted, first, and final checkpoint |
+| Signed iOS harness build | `ea1b13f` | Passed | Development application built, signed, and installed on physical iPhone with the iOS 26.5 SDK |
+| Signed iPhone execution | `ea1b13f` | Passed | A physical iPhone 16 Pro Max on iOS 26.6.1 reconstructed exact E3 evidence in foreground, non-activated background, and terminated-then-relaunch phases |
+| Standards and issue-spec reviews | `ea1b13f` | Passed | Both independent reviewers returned `CLEAN` after the typed scenario plan and complete intermediate-checkpoint matrix were added |
 
 ## Managed CloudKit transport
 
@@ -66,9 +69,9 @@ the receiving store.
 | --- | --- | --- | --- |
 | E1 logical duplicate identity | `daaef9e` | Passed | Both orders retained both physical duplicate roots; identical content coalesced and the conflicting logical identity entered Recovery. |
 | E2b independent immutable inserts | `daaef9e` | Passed | Both orders retained both Facts and reconstructed the same ordinary Stopped Session. |
-| E3 terminated and relaunched | `6056a42` | Passed | A clean receiver launched after sender export and reconstructed the exact root as an ordinary Active Session without requiring a new notification. |
-| E3 foreground notification and import | `6056a42` | Pending | The signed Mac attempt timed out without a content mismatch; a timeout is inconclusive. Physical-iPhone execution remains required. |
-| E3 background notification and import | `6056a42` | Pending | Physical-iPhone execution remains required. |
+| E3 terminated and relaunched | `ea1b13f` | Passed | A clean physical-iPhone receiver launched after sender export and reconstructed the exact root as an ordinary Active Session; notification timing was not treated as authority. |
+| E3 foreground notification and import | `ea1b13f` | Passed | A clean physical-iPhone receiver was foreground-active before server arrival, observed persistent-store remote-change callbacks, and reconstructed the exact root and ordinary Active projection. |
+| E3 background notification and import | `ea1b13f` | Passed | A clean physical-iPhone receiver launched without foreground activation, observed persistent-store remote-change callbacks, and reconstructed the exact root and ordinary Active projection. |
 | E4a multi-record offline export | `daaef9e` | Passed | Both orders retained the root, Fact, Closure, Delete, and Restore. The partial prefix was Unavailable; the complete graph reconstructed the restored Finished Session. |
 | E4b local-only reconnection | `daaef9e` | Passed | Both orders converged the local-only and cloud Facts without treating either replica as an authoritative backup. |
 | E5 deletion transport | `daaef9e` | Passed | Both orders retained Delete, the independent offline Fact, Restore, and repeated disposition evidence; Deleted and restored checkpoints matched exactly without cascade or silent resurrection. |
@@ -93,19 +96,19 @@ The V3 schema fixture is the frozen five-record family in
 | Relationships and constraints | `6056a42` | Passed | Zero relationships, uniqueness constraints, and external-storage attributes. |
 | Encryption declaration | `6056a42` | Passed | No optional CloudKit field-level encryption requested, matching the frozen V3 decision. |
 | Development initialization | `daaef9e` | Passed | The additive schema initialized through the separate signed harness. |
-| CloudKit Console record types and fields | `6056a42` | Pending | Read-only Development review remains to be recorded. |
-| CloudKit Console indexes and standard security roles | `6056a42` | Pending | Read-only Development review remains to be recorded. |
+| CloudKit Console record types and fields | `ea1b13f` | Passed | Development contains the five expected `CD_` Session record types and every generated domain field. Remaining fields are normal managed-store metadata, move-receipt, and asset-companion fields. |
+| CloudKit Console indexes | `ea1b13f` | Passed | Generated single-field indexes are present on all five types: Cooking Session 31, Fact 32, Closure 32, Deletion 24, and Deletion Resolution 23 queryable, searchable, or sortable entries in total. No custom compound index is required for correctness. |
+| CloudKit Console security roles | `ea1b13f` | Passed | The five types use the standard managed private-database grants: `_world` Read, `_icloud` Create, and `_creator` Write. No custom role exists. |
+| CloudKit Console encryption state | `ea1b13f` | Passed | No V3 field is marked encrypted, matching the frozen decision not to request optional field-level encryption. |
+| Later Production runbook | `ea1b13f` | Passed | The bounded additive review, preview, abort, deliberate deployment, and post-deployment verification procedure is recorded in personal iCloud synchronization. |
 | Production deployment | — | Not run | Slice 19 does not authorize or perform Production schema changes. |
 
 ## Open Slice 19 evidence
 
-Slice 19 remains open until all three items below have a recorded conclusion:
-
-- signed physical-iPhone E3 foreground, background, and relaunch receiving-store
-  evidence;
-- read-only CloudKit Console review of Development fields, indexes, security
-  roles, and encryption state; and
-- clean Standards and issue-spec reviews of the complete branch diff.
+No Slice 19 evidence remains open. The read-only CloudKit Console review,
+signed physical-iPhone E3 phases, and independent Standards and issue-spec
+reviews are complete. Production schema initialization, preview, and deployment
+remain deliberately outside this slice.
 
 No iPad claim belongs to Slice 19. The iPad remains part of the final physical
 product walkthrough defined by [the 0.2 acceptance contract](acceptance-0.2.md).

@@ -100,10 +100,11 @@ hide a missing Fact, deletion, restoration, collision payload, or duplicate.
 The harness also initialized the additive V3 Development schema and inspected
 the five generated Session entities, required defaults, optional semantic
 pairs, and absence of relationships, uniqueness constraints, local indexes,
-external storage, or requested optional encryption. Production was not
-selected, initialized, promoted, or otherwise touched. These are
-version-specific results and remain subject to the final 0.2 rerun and server
-schema review.
+external storage, or requested optional encryption. The subsequent read-only
+CloudKit Console review confirmed the five managed record types, their domain
+fields and generated indexes, standard managed security roles, and no encrypted
+field types. Production was not initialized, promoted, or otherwise changed.
+These are version-specific results and remain subject to the final 0.2 rerun.
 
 ## Decision gates unlocked by this research
 

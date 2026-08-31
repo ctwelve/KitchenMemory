@@ -300,6 +300,41 @@ Adding one is release-engineering work: it must use an explicitly reviewed,
 Mac-only configuration and must not turn schema initialization or deployment
 into an ordinary build, archive, or application-launch side effect.
 
+## Future V3 Production deployment runbook
+
+V3 Production promotion is a later publication operation, not part of Slice 19.
+Run it only for an identified 0.2 release candidate after its automated,
+physical-device, migration, privacy, and Development transport evidence passes.
+
+1. Record the exact candidate commit, Xcode version, macOS version, and operator
+   in `release-evidence-0.2.md`. Confirm the working tree is clean and the
+   candidate contains only additive V3 record types and fields.
+2. Build a separately reviewed, Mac-only administration configuration whose
+   entitlements select `iCloud.net.ctwelve.KitchenMemory`. Do not reuse the
+   ordinary Development harness, add the switch to a shared scheme, or alter an
+   ordinary Production launch.
+3. Initialize only that Production container's **Development** environment.
+   In CloudKit Console, explicitly verify the container name and **Dev** badge
+   before inspecting record types, fields, indexes, standard security roles,
+   and encryption state.
+4. Compare the server schema with the accepted V3 model and the existing V1
+   Production baseline. The preview must contain the five new Session types and
+   their fields without removing, renaming, retyping, repurposing, or changing
+   encryption on any published type or field. Abort on any unexplained role or
+   index change.
+5. Open the deployment preview without confirming it. Record its bounded
+   additive conclusion in the evidence ledger; never commit account data, raw
+   schema exports, private records, or screenshots containing them.
+6. A separately authorized publication task may confirm deployment. Afterward,
+   inspect the Production environment directly and record that every expected
+   type, field, index, security grant, and encryption choice is present.
+7. Only after that verification may the release task archive, sign, tag, or
+   distribute the candidate. A failed or ambiguous preview stops publication;
+   it is never repaired by resetting Production or deleting published schema.
+
+The runbook does not authorize deployment. The release operator must make that
+irreversible choice deliberately for the named candidate.
+
 ## 1.0 validation boundary
 
 Automated tests prove local repository behavior, CloudKit configuration
