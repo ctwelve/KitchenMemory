@@ -207,6 +207,20 @@ private final class InMemoryRecipeRepository: RecipeRepository {
     storedKitchens.first { $0.id == id }
   }
 
+  func convergeKitchens(into kitchen: Kitchen, ownedBy ownerID: KitchenOwner.ID) throws {
+    storedKitchens = [kitchen]
+    storedRecipes = storedRecipes.map { stored in
+      StoredRecipe(
+        recipe: Recipe(
+          id: stored.id,
+          kitchenID: kitchen.id,
+          currentRevisionID: stored.revision.id
+        ),
+        revision: stored.revision
+      )
+    }
+  }
+
   func recipe(id: Recipe.ID) throws -> StoredRecipe? {
     storedRecipes.first { $0.id == id }
   }

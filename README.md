@@ -13,7 +13,7 @@ It preserves the recipe you meant to save, makes corrections inexpensive, and
 keeps useful cooking structure without pretending every ingredient can be
 reduced to a perfect database row.
 
-Version 0.1.0 is the first public alpha. A signed and notarized universal macOS
+Version 0.2.2 is the current public alpha. A signed and notarized universal macOS
 build is available from [GitHub Releases](https://github.com/ctwelve/KitchenMemory/releases).
 The iPhone and iPad application is present in the source tree, but this alpha
 does not yet have a public iOS download or TestFlight group.
@@ -23,18 +23,23 @@ does not yet have a public iOS download or TestFlight group.
 The macOS alpha requires macOS 26 or later and runs natively on Apple silicon
 and Intel Macs.
 
-1. Download `KitchenMemory-0.1.0-macOS.zip` from the 0.1.0 release.
+1. Download `KitchenMemory-0.2.2-macOS.zip` from the 0.2.2 release.
 2. Expand the archive and move **Kitchen Memory** to Applications.
 3. Launch it normally. The distributed app is signed with Developer ID,
    notarized by Apple, and carries a stapled notarization ticket.
 4. On first launch, choose whether to add the bundled sample recipes.
 
-This is early-alpha software. The core recipe loop works, but the interface is
-intentionally provisional and the acceptance exercise is smaller than the one
-planned for 1.0. Keep the original copies of recipes that matter to you while
-the storage and recovery experience continues to mature.
+> **Alpha data is disposable.** Kitchen Memory alpha is destructive,
+> crash-test-dummy building and testing. Nothing saved by an alpha build should
+> be considered permanent. Keep the original copies of anything that matters.
+> The project will deliberately hard-reset alpha cloud storage and stabilize its
+> data contract when beta begins.
 
-## What 0.1 can do
+The core recipe and Cooking Session loops work, but the interface and storage
+contract are intentionally provisional. This freedom lets the project repair
+foundational mistakes aggressively before promising beta-grade durability.
+
+## What the alpha can do
 
 - Create and edit structured recipes without requiring every field.
 - Import bounded Schema.org `Recipe` JSON-LD from a webpage and review it before
@@ -45,15 +50,16 @@ the storage and recovery experience continues to mature.
 - Scale exact and ranged quantities for a working yield without changing the
   maintained recipe.
 - Present sectioned ingredients and instructions for reading while cooking.
+- Run Cooking Sessions with immutable snapshots, progress, notes, recovery, and
+  history without rewriting the maintained recipe.
 - Keep one person's recipe library synchronized privately through their iCloud
   account while retaining a useful local store.
 - Run in English (United States), Canadian French, and Mexican Spanish, with a
   localized starter-recipe pack.
 
-Cooking sessions, pantry knowledge, planning, shopping, household sharing,
-OCR, nutrition calculation, and public recipe discovery are deliberately not
-part of 0.1. The next feature release is expected to explore cooking sessions
-without confusing what happened during one cook with the canonical recipe.
+Pantry knowledge, planning, shopping, household sharing, OCR, nutrition
+calculation, and public recipe discovery are deliberately not part of this
+alpha.
 
 ## Privacy
 
@@ -85,6 +91,9 @@ been flattened or silently rewritten.
 - [0.1 release notes](docs/release-notes-0.1.md)
 - [0.1 release evidence](docs/release-evidence-0.1.md)
 - [0.2 release evidence](docs/release-evidence-0.2.md)
+- [0.2.2 release evidence](docs/release-evidence-0.2.2.md)
+- [0.2.2 release notes](docs/release-notes-0.2.2.md)
+- [Rejected 0.2.1 candidate evidence](docs/release-evidence-0.2.1.md)
 - [0.1 release engineering](docs/release-engineering.md)
 - [Product doctrine](docs/product-doctrine.md)
 - [Product brief](docs/product-brief.md)
@@ -126,12 +135,10 @@ xcodebuild test \
   -destination 'platform=macOS'
 ```
 
-The shared SwiftUI interface is a deliberately provisional 0.1 shell. The
-business logic and native app boundaries are intended to survive deeper Mac and
-mobile interface work in 0.2. The accepted 0.2 roadmap delivers cooking sessions
-through bounded foundation, progress, deviation, and history slices; see the
-[roadmap to 0.2](docs/roadmap-0.2.md) for the detailed scope and release
-boundary.
+The shared SwiftUI interface remains deliberately provisional. The business
+logic and native app boundaries are intended to survive deeper platform-specific
+interface work. See the [roadmap to 0.2](docs/roadmap-0.2.md) for the completed
+Cooking Session slices and their release boundary.
 
 ## License
 
