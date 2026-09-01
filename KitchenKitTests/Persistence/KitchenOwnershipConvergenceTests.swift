@@ -69,6 +69,49 @@ final class KitchenOwnershipConvergenceTests: XCTestCase {
     }
   }
 
+  func testRepeatedConvergencePreservesSettledOwnershipEvidence() throws {
+    let container = try KitchenMemorySchema.makeContainer(inMemory: true)
+    let context = ModelContext(container)
+    let ownerID = KitchenOwner.ID(rawValue: "cloudkit:production:current-user")
+    let personalKitchen = Kitchen(
+      id: KitchenBootstrapService.personalKitchenID,
+      ownerID: ownerID,
+      name: "Home"
+    )
+    context.insert(KitchenRecord(id: personalKitchen.id.rawValue, name: "Old Name"))
+    context.insert(KitchenOwnershipRecord(
+      id: personalKitchen.id.rawValue,
+      kitchenID: personalKitchen.id.rawValue,
+      ownerID: ownerID.rawValue
+    ))
+    context.insert(KitchenOwnershipRecord(
+      id: UUID(),
+      kitchenID: personalKitchen.id.rawValue,
+      ownerID: ownerID.rawValue
+    ))
+    try context.save()
+    let canonicalOwnership = try XCTUnwrap(
+      context.fetch(FetchDescriptor<KitchenOwnershipRecord>())
+        .first { $0.id == personalKitchen.id.rawValue }
+    )
+    let firstPersistentID = canonicalOwnership.persistentModelID
+    let repository = SwiftDataRecipeRepository(modelContainer: container)
+
+    try repository.convergeKitchens(into: personalKitchen, ownedBy: ownerID)
+    try repository.convergeKitchens(into: personalKitchen, ownedBy: ownerID)
+    let secondReader = ModelContext(container)
+    let secondOwnership = try XCTUnwrap(
+      secondReader.fetch(FetchDescriptor<KitchenOwnershipRecord>()).first
+    )
+
+    XCTAssertEqual(secondOwnership.persistentModelID, firstPersistentID)
+    XCTAssertEqual(
+      try secondReader.fetchCount(FetchDescriptor<KitchenOwnershipRecord>()),
+      1
+    )
+    XCTAssertEqual(try repository.kitchen(id: personalKitchen.id), personalKitchen)
+  }
+
   private func insertKitchenScopedEvidence(into context: ModelContext, kitchenID: UUID) {
     let sessionID = UUID()
     context.insert(RecipeDeletionRecord(
