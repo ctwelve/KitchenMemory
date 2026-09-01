@@ -442,18 +442,27 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     with ownerID: KitchenOwner.ID
   ) throws {
     let identifier = kitchenID.rawValue
+    var keptCanonicalRecord = false
     for record in try context.fetch(
       FetchDescriptor<KitchenOwnershipRecord>(
         predicate: #Predicate { $0.kitchenID == identifier }
       )
     ) {
-      context.delete(record)
+      if !keptCanonicalRecord,
+        record.id == identifier,
+        record.ownerID == ownerID.rawValue {
+        keptCanonicalRecord = true
+      } else {
+        context.delete(record)
+      }
     }
-    context.insert(KitchenOwnershipRecord(
-      id: identifier,
-      kitchenID: identifier,
-      ownerID: ownerID.rawValue
-    ))
+    if !keptCanonicalRecord {
+      context.insert(KitchenOwnershipRecord(
+        id: identifier,
+        kitchenID: identifier,
+        ownerID: ownerID.rawValue
+      ))
+    }
   }
 
   private func convergeKitchenRecords(
@@ -473,28 +482,35 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
   }
 
   private func rehomeRecipeRecords(to destinationID: UUID) throws {
-    for record in try context.fetch(FetchDescriptor<RecipeRecord>()) {
+    for record in try context.fetch(FetchDescriptor<RecipeRecord>())
+    where record.kitchenID != destinationID {
       record.kitchenID = destinationID
     }
-    for record in try context.fetch(FetchDescriptor<RecipeDeletionRecord>()) {
+    for record in try context.fetch(FetchDescriptor<RecipeDeletionRecord>())
+    where record.kitchenID != destinationID {
       record.kitchenID = destinationID
     }
   }
 
   private func rehomeSessionRecords(to destinationID: UUID) throws {
-    for record in try context.fetch(FetchDescriptor<CookingSessionRecord>()) {
+    for record in try context.fetch(FetchDescriptor<CookingSessionRecord>())
+    where record.kitchenID != destinationID {
       record.kitchenID = destinationID
     }
-    for record in try context.fetch(FetchDescriptor<SessionFactRecord>()) {
+    for record in try context.fetch(FetchDescriptor<SessionFactRecord>())
+    where record.kitchenID != destinationID {
       record.kitchenID = destinationID
     }
-    for record in try context.fetch(FetchDescriptor<SessionClosureRecord>()) {
+    for record in try context.fetch(FetchDescriptor<SessionClosureRecord>())
+    where record.kitchenID != destinationID {
       record.kitchenID = destinationID
     }
-    for record in try context.fetch(FetchDescriptor<SessionDeletionRecord>()) {
+    for record in try context.fetch(FetchDescriptor<SessionDeletionRecord>())
+    where record.kitchenID != destinationID {
       record.kitchenID = destinationID
     }
-    for record in try context.fetch(FetchDescriptor<SessionDeletionResolutionRecord>()) {
+    for record in try context.fetch(FetchDescriptor<SessionDeletionResolutionRecord>())
+    where record.kitchenID != destinationID {
       record.kitchenID = destinationID
     }
   }
@@ -508,7 +524,9 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     var keptDestination = false
     for record in kitchenRecords {
       if record.id == destinationID, !keptDestination {
-        record.name = kitchen.name
+        if record.name != kitchen.name {
+          record.name = kitchen.name
+        }
         keptDestination = true
       } else {
         context.delete(record)
@@ -517,7 +535,8 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     if !keptDestination {
       context.insert(KitchenRecord(id: destinationID, name: kitchen.name))
     }
-    for record in try context.fetch(FetchDescriptor<KitchenOwnershipRecord>()) {
+    for record in try context.fetch(FetchDescriptor<KitchenOwnershipRecord>())
+    where record.kitchenID != destinationID {
       context.delete(record)
     }
     try replaceOwnership(of: kitchen.id, with: ownerID)
