@@ -1,4 +1,4 @@
-# Kitchen Memory 0.2.1
+# Kitchen Memory 0.2.1 rejected candidate
 
 <!--
 Kitchen Memory
@@ -6,7 +6,9 @@ Copyright © 2026 the Kitchen Memory contributors.
 SPDX-License-Identifier: MIT
 -->
 
-Kitchen Memory 0.2.1 is a repair release for the public alpha.
+These notes were prepared for a repair candidate that was rejected during
+physical verification and never published. The corrected repair is released as
+Kitchen Memory 0.2.2.
 
 ## Fixed
 
@@ -32,5 +34,5 @@ the alpha should be considered permanent, and people should retain original
 copies of anything that matters. Kitchen Memory will deliberately hard-reset
 alpha cloud storage and stabilize its data contract when beta begins.
 
-The GitHub release includes the verified, signed, notarized universal macOS
-application and its checksum.
+The private GitHub draft contained a signed and notarized universal macOS
+application and its checksum. That artifact is not distributable.
