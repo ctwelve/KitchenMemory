@@ -11,7 +11,7 @@ This one-shot Mac tool initializes Kitchen Memory's additive V4 model in the
 release operator can review an additive deployment preview before deliberately
 promoting that schema to Production.
 
-For 0.2.1, the only permitted delta from the deployed V3 baseline is
+For 0.2.2, the only permitted delta from the deployed V3 baseline is
 `CD_KitchenOwnershipRecord` with its generated identity, Kitchen ID, and opaque
 owner ID fields and indexes. Any other unexplained change stops the release.
 
@@ -32,7 +32,7 @@ Run the one supported operation with the accepted product commit:
 
 ```sh
 Tools/CloudKitProductionSchemaAdmin/run.sh \
-  <accepted-0.2.1-source-commit>
+  <accepted-0.2.2-source-commit>
 ```
 
 Success means only that the Development server schema accepted the additive

@@ -193,7 +193,7 @@ ordinary inline `Data`, and no relationships, uniqueness constraints, or local
 indexes. Repository validation prevents placeholders or partial evidence from
 becoming ordinary state. V1 and V2 model definitions remain unchanged.
 
-Kitchen Memory 0.2.1 adds `KitchenMemorySchemaV4` and the additive
+Kitchen Memory 0.2.2 adds `KitchenMemorySchemaV4` and the additive
 `KitchenOwnershipRecord`. Its owner value comes from CloudKit's opaque current-
 user record ID for the selected container; it contains no name, email address,
 or Apple ID. Startup may claim unowned V1–V3 alpha Kitchens for that current
@@ -319,12 +319,12 @@ CloudKit Console remains the deliberate Production deployment surface.
 
 ## V4 Production deployment runbook
 
-V4 Production promotion is part of the identified 0.2.1 repair release. Run it
+V4 Production promotion is part of the identified 0.2.2 repair release. Run it
 only after that candidate's automated, migration, privacy, and Development
 schema evidence passes.
 
 1. Record the exact candidate commit, Xcode version, macOS version, and operator
-   in `release-evidence-0.2.1.md`. Confirm the working tree is clean and the
+   in `release-evidence-0.2.2.md`. Confirm the working tree is clean and the
    candidate contains only the additive V4 ownership record type and fields.
 2. Build the separately reviewed Mac-only administration tool documented in
    `Tools/CloudKitProductionSchemaAdmin/README.md` from the accepted source
