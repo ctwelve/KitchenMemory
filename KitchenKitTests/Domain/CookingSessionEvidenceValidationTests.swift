@@ -115,6 +115,32 @@ final class CookingSessionEvidenceValidationTests: XCTestCase {
         XCTAssertEqual(session.lifecycle, .active)
     }
 
+    func testDeepCausalCycleRequiresRecoveryWithoutExhaustingTheCallStack() throws {
+        let fixture = try FactFixture()
+        let cycleLength = 65_536
+        let payload = try SessionFactPayloadCodec.encode(.empty)
+        let facts = (0..<cycleLength).map { offset in
+            let factID = id(1_000 + offset)
+            let nextID = id(1_000 + ((offset + 1) % cycleLength))
+            let heads = CausalHeadsCodec.encode([nextID])
+            return SessionFactEvidence(
+                id: SessionFact.ID(rawValue: factID),
+                sessionID: fixture.sessionID,
+                kitchenID: fixture.kitchenID,
+                kind: SessionFact.Kind.stop.rawValue,
+                targetSnapshotElementID: nil,
+                authoredAt: Date(timeIntervalSince1970: 200),
+                causalHeadsFormatVersion: heads.formatVersion,
+                causalHeadsData: heads.data,
+                payloadFormatVersion: payload.formatVersion,
+                payloadData: payload.data,
+                payloadDigest: payload.digest
+            )
+        }
+
+        assertRecovery(fixture.result(facts: facts), .cycle)
+    }
+
     func testOrdinaryFactMustDescendFromSessionRoot() throws {
         let fixture = try FactFixture()
         let disconnected = try fixture.fact(

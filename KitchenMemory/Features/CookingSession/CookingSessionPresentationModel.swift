@@ -2,6 +2,7 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
+import DequeModule
 import Foundation
 import KitchenKit
 import Observation
@@ -90,7 +91,7 @@ final class CookingSessionPresentationModel {
   var issue: CookingSessionPresentationIssue?
   var isShowingIssue = false
   private(set) var hasLoaded = false
-  var pendingCommands: [PendingCookingSessionCommand]
+  var pendingCommands: Deque<PendingCookingSessionCommand>
   var entryDrafts: [CookingSessionEntryDraft]
   var detachedEntryDraft: CookingSessionEntryDraft?
   var finishedSessionIDs: Set<CookingSession.ID> = []
@@ -109,7 +110,7 @@ final class CookingSessionPresentationModel {
     self.store = store
     self.now = now
     currentSessionID = store.currentSessionID
-    pendingCommands = store.pendingCommands
+    pendingCommands = Deque(store.pendingCommands)
     entryDrafts = store.entryDrafts
     sessionVisits = store.sessionVisits
   }
@@ -123,7 +124,7 @@ final class CookingSessionPresentationModel {
     self.store = store
     self.now = now
     currentSessionID = store.currentSessionID
-    pendingCommands = store.pendingCommands
+    pendingCommands = Deque(store.pendingCommands)
     entryDrafts = store.entryDrafts
     sessionVisits = store.sessionVisits
   }

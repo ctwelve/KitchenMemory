@@ -2,60 +2,90 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
+import DequeModule
 import Foundation
+import OrderedCollections
 
 func coalescedByIdentity<Value: Equatable, Identifier: Hashable>(
     _ values: [Value],
     id: KeyPath<Value, Identifier>
 ) -> [Value]? {
-    let groups = Dictionary(grouping: values) { $0[keyPath: id] }
-    guard groups.values.allSatisfy({ group in
-        guard let first = group.first else { return true }
-        return group.allSatisfy { $0 == first }
-    }) else { return nil }
-    return groups.values.compactMap(\.first)
+    var coalesced: OrderedDictionary<Identifier, Value> = [:]
+    for value in values {
+        let identifier = value[keyPath: id]
+        if let first = coalesced[identifier], first != value { return nil }
+        coalesced[identifier] = value
+    }
+    return Array(coalesced.values)
 }
 
-func directedGraphContainsCycle(_ parents: [UUID: [UUID]]) -> Bool {
-    var visiting: Set<UUID> = []
-    var visited: Set<UUID> = []
-    func visit(_ identifier: UUID) -> Bool {
-        if visiting.contains(identifier) { return true }
-        if visited.contains(identifier) { return false }
-        visiting.insert(identifier)
-        // `visit` starts at a key and recurses only into parents that are keys.
-        // swiftlint:disable:next force_unwrapping
-        for parent in parents[identifier]! {
-            if parents[parent] != nil, visit(parent) { return true }
+struct DirectedGraph<Node: Hashable> {
+    let parentsByNode: [Node: [Node]]
+
+    var containsCycle: Bool {
+        var visiting: Set<Node> = []
+        var visited: Set<Node> = []
+
+        for node in parentsByNode.keys where !visited.contains(node) {
+            var worklist: Deque<DirectedGraphVisit<Node>> = [.enter(node)]
+            while let visit = worklist.popLast() {
+                switch visit {
+                case let .enter(candidate):
+                    if visited.contains(candidate) { continue }
+                    _ = visiting.insert(candidate)
+                    worklist.append(.exit(candidate))
+                    // The worklist starts with a key and admits only parents that are keys.
+                    // swiftlint:disable:next force_unwrapping
+                    for parent in parentsByNode[candidate]!
+                    where parentsByNode[parent] != nil {
+                        if visiting.contains(parent) { return true }
+                        if !visited.contains(parent) { worklist.append(.enter(parent)) }
+                    }
+                case let .exit(candidate):
+                    visiting.remove(candidate)
+                    visited.insert(candidate)
+                }
+            }
         }
-        visiting.remove(identifier)
-        visited.insert(identifier)
         return false
     }
-    return parents.keys.contains(where: visit)
-}
 
-func directedGraphIsAncestor(
-    _ ancestor: UUID,
-    of descendant: UUID,
-    parents: [UUID: [UUID]]
-) -> Bool {
-    if parents[descendant]?.contains(ancestor) == true { return true }
-    return parents[descendant]?.contains {
-        directedGraphIsAncestor(ancestor, of: $0, parents: parents)
-    } ?? false
-}
+    func isAncestor(_ ancestor: Node, of descendant: Node) -> Bool {
+        var visited: Set<Node> = [descendant]
+        var worklist = Deque(parentsByNode[descendant] ?? [])
+        while let candidate = worklist.popFirst() {
+            if candidate == ancestor { return true }
+            guard visited.insert(candidate).inserted else { continue }
+            worklist.append(contentsOf: parentsByNode[candidate] ?? [])
+        }
+        return false
+    }
 
-func directedGraphHeadsAreMaximal(
-    _ heads: [UUID],
-    parents: [UUID: [UUID]]
-) -> Bool {
-    heads.allSatisfy { candidate in
-        !heads.contains { other in
-            candidate != other
-                && directedGraphIsAncestor(candidate, of: other, parents: parents)
+    func formsAntichain(_ nodes: [Node]) -> Bool {
+        nodes.allSatisfy { candidate in
+            !nodes.contains { other in
+                candidate != other && isAncestor(candidate, of: other)
+            }
         }
     }
+
+    func maximalNodes(among candidates: [Node]) -> [Node] {
+        candidates.filter { candidate in
+            !candidates.contains { other in
+                candidate != other && isAncestor(candidate, of: other)
+            }
+        }
+    }
+
+    var maximalNodes: [Node] {
+        let nonmaximalNodes = Set(parentsByNode.values.joined())
+        return parentsByNode.keys.filter { !nonmaximalNodes.contains($0) }
+    }
+}
+
+private enum DirectedGraphVisit<Node> {
+    case enter(Node)
+    case exit(Node)
 }
 
 extension ProjectionBuilder {
@@ -63,29 +93,27 @@ extension ProjectionBuilder {
         _ facts: [DecodedFact],
         parents: [UUID: [UUID]]
     ) -> [DecodedFact] {
-        facts.filter { candidate in
-            !facts.contains { other in
-                candidate.evidence.id != other.evidence.id
-                    && isAncestor(
-                        candidate.evidence.id.rawValue,
-                        of: other.evidence.id.rawValue,
-                        parents: parents
-                    )
-            }
+        let graph = DirectedGraph(parentsByNode: parents)
+        let maximalIDs = Set(graph.maximalNodes(among: facts.map(\.evidence.id.rawValue)))
+        return facts.filter {
+            maximalIDs.contains($0.evidence.id.rawValue)
         }
     }
 
     func isAncestor(_ ancestor: UUID, of descendant: UUID, parents: [UUID: [UUID]]) -> Bool {
-        directedGraphIsAncestor(ancestor, of: descendant, parents: parents)
+        DirectedGraph(parentsByNode: parents).isAncestor(ancestor, of: descendant)
     }
 
     func snapshotTargets(_ snapshot: ExecutionSnapshot) -> [UUID: SessionProgressTarget] {
-        let pairs = snapshot.ingredientSections.flatMap(\.ingredients).map {
+        let ingredients: [(UUID, SessionProgressTarget)] = snapshot.ingredientSections
+            .flatMap(\.ingredients).map {
             ($0.id.rawValue, SessionProgressTarget.ingredient($0.id))
-        } + snapshot.instructionSections.flatMap(\.steps).map {
+        }
+        let instructions: [(UUID, SessionProgressTarget)] = snapshot.instructionSections
+            .flatMap(\.steps).map {
             ($0.id.rawValue, SessionProgressTarget.instruction($0.id))
         }
-        return Dictionary(pairs, uniquingKeysWith: { first, _ in first })
+        return Dictionary(ingredients + instructions, uniquingKeysWith: { first, _ in first })
     }
 
     func snapshotTargetCount(_ snapshot: ExecutionSnapshot) -> Int {

@@ -41,8 +41,14 @@ extension KitchenMemoryUITests {
       ingredient.waitForExistence(timeout: 5),
       "Expected a session ingredient before recording progress."
     )
+    revealSessionElement(ingredient, in: app)
+    let originalIngredientValue = ingredient.value as? String
     activate(ingredient)
-    XCTAssertTrue(ingredient.isSelected, "Ingredient progress was not recorded.")
+    assertAccessibleValueChanged(
+      ingredient,
+      from: originalIngredientValue,
+      message: "Ingredient progress was not recorded."
+    )
 
     let instruction = firstSessionElement(
       in: app,
@@ -52,8 +58,14 @@ extension KitchenMemoryUITests {
       instruction.waitForExistence(timeout: 5),
       "Expected a session instruction before recording progress."
     )
+    revealSessionElement(instruction, in: app)
+    let originalInstructionValue = instruction.value as? String
     activate(instruction)
-    XCTAssertTrue(instruction.isSelected, "Instruction progress was not recorded.")
+    assertAccessibleValueChanged(
+      instruction,
+      from: originalInstructionValue,
+      message: "Instruction progress was not recorded."
+    )
 
     return RecordedSessionProgress(
       ingredientIdentifier: ingredient.identifier,
@@ -69,6 +81,7 @@ extension KitchenMemoryUITests {
       increase.waitForExistence(timeout: 5),
       "Expected the session working-yield control."
     )
+    revealSessionElement(increase, in: app)
     let workingYield = app.descendants(matching: .any)["session-working-yield"]
     XCTAssertTrue(
       workingYield.waitForExistence(timeout: 5),
@@ -91,6 +104,34 @@ extension KitchenMemoryUITests {
     if !recipeRow.waitForExistence(timeout: 2) {
       app.descendants(matching: .any)["recipe-library-shell"].swipeUp()
     }
+#endif
+  }
+
+  @MainActor
+  private func revealSessionElement(_ element: XCUIElement, in app: XCUIApplication) {
+    expectation(for: NSPredicate(format: "isEnabled == true"), evaluatedWith: element)
+    waitForExpectations(timeout: 5)
+    let sessionScroll = app.scrollViews["cooking-session-scroll"]
+    XCTAssertTrue(
+      sessionScroll.waitForExistence(timeout: 2),
+      "Expected the durable Cooking Session scroll surface."
+    )
+#if os(macOS)
+    let requiredReveal = !element.isHittable
+    for _ in 0..<5 where !element.isHittable {
+      sessionScroll.scroll(byDeltaX: 0, deltaY: -300)
+    }
+    if requiredReveal {
+      sessionScroll.scroll(byDeltaX: 0, deltaY: -120)
+    }
+#else
+    for _ in 0..<5 where !element.isHittable {
+      sessionScroll.swipeUp()
+    }
+#endif
+    XCTAssertTrue(element.isHittable, "Expected the durable session control to be reachable.")
+#if os(macOS)
+    element.hover()
 #endif
   }
 
@@ -152,6 +193,24 @@ extension KitchenMemoryUITests {
     app.descendants(matching: .any).matching(
       NSPredicate(format: "identifier BEGINSWITH %@", identifierPrefix)
     ).firstMatch
+  }
+
+  @MainActor
+  private func assertAccessibleValueChanged(
+    _ element: XCUIElement,
+    from originalValue: String?,
+    message: String
+  ) {
+    guard let originalValue else {
+      XCTFail("\(message) The original accessibility value was unavailable.")
+      return
+    }
+    expectation(
+      for: NSPredicate(format: "value != %@", originalValue),
+      evaluatedWith: element
+    )
+    waitForExpectations(timeout: 5)
+    XCTAssertNotEqual(element.value as? String, originalValue, message)
   }
 
 #if os(iOS)

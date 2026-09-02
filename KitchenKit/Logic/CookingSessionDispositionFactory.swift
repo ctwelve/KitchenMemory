@@ -2,6 +2,7 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
+import Algorithms
 import Foundation
 
 struct CookingSessionDispositionFactory {
@@ -62,48 +63,28 @@ struct CookingSessionDispositionFactory {
   }
 
   private func maximalDispositionHeads(_ evidence: SessionEvidence) throws -> [UUID] {
+    let deletions = evidence.deletions.uniqued(on: \.id)
+    let restorations = evidence.restorations.uniqued(on: \.id)
     var parents: [UUID: [UUID]] = [:]
-    for deletion in unique(evidence.deletions, id: \.id) {
+    for deletion in deletions {
       parents[deletion.id.rawValue] = try decode(
         version: deletion.dispositionHeadsFormatVersion,
         data: deletion.dispositionHeadsData
       )
     }
-    for restoration in unique(evidence.restorations, id: \.id) {
+    for restoration in restorations {
       parents[restoration.id.rawValue] = try decode(
         version: restoration.dispositionHeadsFormatVersion,
         data: restoration.dispositionHeadsData
       )
     }
-    return parents.keys.filter { candidate in
-      !parents.keys.contains { other in
-        candidate != other && isAncestor(candidate, of: other, parents: parents)
-      }
-    }.sorted { $0.uuidString < $1.uuidString }
-  }
-
-  private func unique<Value, Identity: Hashable>(
-    _ values: [Value],
-    id: KeyPath<Value, Identity>
-  ) -> [Value] {
-    Dictionary(grouping: values) { $0[keyPath: id] }.compactMap { $0.value.first }
+    return DirectedGraph(parentsByNode: parents).maximalNodes.sorted {
+      $0.uuidString < $1.uuidString
+    }
   }
 
   private func decode(version: Int, data: Data) throws -> [UUID] {
     try CausalHeadsCodec.decode(formatVersion: version, data: data)
   }
 
-  private func isAncestor(
-    _ ancestor: UUID,
-    of descendant: UUID,
-    parents: [UUID: [UUID]]
-  ) -> Bool {
-    // Every descendant is selected from this dictionary's keys.
-    // swiftlint:disable:next force_unwrapping
-    let directParents = parents[descendant]!
-    if directParents.contains(ancestor) { return true }
-    return directParents.contains {
-      isAncestor(ancestor, of: $0, parents: parents)
-    }
-  }
 }

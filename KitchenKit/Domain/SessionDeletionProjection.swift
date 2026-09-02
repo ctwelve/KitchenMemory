@@ -71,7 +71,7 @@ extension ProjectionBuilder {
             if let missing = sessionHeads.first(where: { !knownSessionIDs.contains($0) }) {
                 return .failure(unavailable(.incompleteDeletionDisposition(missing)))
             }
-            guard directedGraphHeadsAreMaximal(sessionHeads, parents: sessionParents) else {
+            guard DirectedGraph(parentsByNode: sessionParents).formsAntichain(sessionHeads) else {
                 return .failure(recovery(.invalidDeletionDisposition))
             }
             switch decodeHeads(
@@ -127,21 +127,19 @@ extension ProjectionBuilder {
         if let missing = parents.values.joined().first(where: { !knownIDs.contains($0) }) {
             return .failure(unavailable(.incompleteDeletionDisposition(missing)))
         }
-        guard !directedGraphContainsCycle(parents) else {
+        let dispositionGraph = DirectedGraph(parentsByNode: parents)
+        guard !dispositionGraph.containsCycle else {
             return .failure(recovery(.invalidDeletionDisposition))
         }
-        guard parents.values.allSatisfy({
-            directedGraphHeadsAreMaximal($0, parents: parents)
-        }) else {
+        guard parents.values.allSatisfy(dispositionGraph.formsAntichain) else {
             return .failure(recovery(.invalidDeletionDisposition))
         }
         let deletionsByID = Dictionary(uniqueKeysWithValues: deletions.map { ($0.id, $0) })
         let restorationsAreCausal = restorations.allSatisfy { restoration in
             guard let deletion = deletionsByID[restoration.deletionID] else { return false }
-            return directedGraphIsAncestor(
+            return dispositionGraph.isAncestor(
                 deletion.id.rawValue,
-                of: restoration.id.rawValue,
-                parents: parents
+                of: restoration.id.rawValue
             )
         }
         guard restorationsAreCausal else {
@@ -167,10 +165,9 @@ extension ProjectionBuilder {
         }
         let needsAttention = context.restorations.contains { restoration in
             unresolved.contains { deletion in
-                !directedGraphIsAncestor(
+                !DirectedGraph(parentsByNode: context.parents).isAncestor(
                     restoration.id.rawValue,
-                    of: deletion.id.rawValue,
-                    parents: context.parents
+                    of: deletion.id.rawValue
                 )
             }
         }

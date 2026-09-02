@@ -87,6 +87,84 @@ final class CookingSessionsRecoveryPlanningTests: XCTestCase {
     )
   }
 
+  func testKnownDescendantsNeverCountTheSourceThroughRetainedLineageCycles() throws {
+    let fixture = try FactFixture()
+    let sourceID = fixture.sessionID
+    let continuationID = CookingSession.ID(rawValue: id(26))
+    let sourceRecovery = SessionRecovery(
+      evidence: SessionEvidence(
+        sessionID: sourceID,
+        roots: [root(id: sourceID, sourceID: continuationID, copying: fixture.root)]
+      ),
+      reasons: [.rootCollision]
+    )
+    let continuationRecovery = SessionRecovery(
+      evidence: SessionEvidence(
+        sessionID: continuationID,
+        roots: [root(id: continuationID, sourceID: sourceID, copying: fixture.root)]
+      ),
+      reasons: [.rootCollision]
+    )
+
+    XCTAssertEqual(CookingSessions.knownDescendantCount(
+      of: sourceID,
+      among: [.recovery(sourceRecovery), .recovery(continuationRecovery)]
+    ), 1)
+  }
+
+  func testKnownDescendantsTraverseLargeBranchingLineageWithRepeatedEvidence() throws {
+    let fixture = try FactFixture()
+    let sourceID = fixture.sessionID
+    var results: [SessionProjectionResult] = []
+    var parentID = sourceID
+    let lineageLength = 65_536
+
+    for offset in 0..<lineageLength {
+      let continuationID = CookingSession.ID(rawValue: id(1_000 + offset))
+      results.append(.session(CookingSessionProjection(
+        id: continuationID,
+        snapshot: ExecutionSnapshot(title: "Continuation \(offset)"),
+        sourceSessionID: parentID,
+        sourceClosureID: SessionClosure.ID()
+      )))
+      if offset.isMultiple(of: 1_024) {
+        let branchID = CookingSession.ID(rawValue: id(100_000 + offset))
+        results.append(.session(CookingSessionProjection(
+          id: branchID,
+          snapshot: ExecutionSnapshot(title: "Branch \(offset)"),
+          sourceSessionID: parentID,
+          sourceClosureID: SessionClosure.ID()
+        )))
+      }
+      parentID = continuationID
+    }
+
+    let unavailableID = CookingSession.ID(rawValue: id(200_000))
+    let unavailableRoot = root(id: unavailableID, sourceID: parentID, copying: fixture.root)
+    results.append(.unavailable(UnavailableSession(
+      evidence: SessionEvidence(
+        sessionID: unavailableID,
+        roots: [unavailableRoot, unavailableRoot]
+      ),
+      reasons: [.missingPredecessor(parentID.rawValue)]
+    )))
+
+    let recoveryID = CookingSession.ID(rawValue: id(200_001))
+    let recoveryRoot = root(id: recoveryID, sourceID: unavailableID, copying: fixture.root)
+    results.append(.recovery(SessionRecovery(
+      evidence: SessionEvidence(
+        sessionID: recoveryID,
+        roots: [recoveryRoot, recoveryRoot]
+      ),
+      reasons: [.rootCollision]
+    )))
+
+    XCTAssertEqual(
+      CookingSessions.knownDescendantCount(of: sourceID, among: results),
+      lineageLength + 64 + 2
+    )
+  }
+
   private func closure(
     id value: Int,
     sessionID: CookingSession.ID,

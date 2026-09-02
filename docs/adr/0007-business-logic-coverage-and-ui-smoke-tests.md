@@ -54,9 +54,13 @@ Use UI automation only for smoke coverage of the durable application shell:
 - the durable recovery shell completes one representative Delete and Restore
   path and reaches the separate Deleted Items and Recovery destinations.
 
-Do not add UI tests for provisional editor layout, scrolling, disclosure state,
-exact visible strings, or detailed accessibility-tree behavior. A feature whose
-behavior can be verified below the view layer must be tested there.
+Do not add UI tests that assert provisional editor layout, scroll position or
+behavior, disclosure state, exact visible strings, or detailed
+accessibility-tree structure. A bounded durable-shell smoke may scroll solely
+to reveal a stable accessibility-identified control when both the control and
+scroll surface have stable identifiers; it must not assert geometry or offsets
+or treat scrolling as product behavior. A feature whose behavior can be
+verified below the view layer must be tested there.
 
 Keep the multiplatform `KitchenMemoryTests` target and the `Testing`
 configuration non-UI. `KitchenMemory.xctestplan` contains that hosted target and

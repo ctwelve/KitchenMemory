@@ -2,6 +2,7 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
+import Algorithms
 import Foundation
 
 struct SessionFactDescription {
@@ -102,9 +103,7 @@ struct CookingSessionCommandFactory {
   }
 
   func maximalSessionHeads(_ evidence: SessionEvidence) throws -> [UUID] {
-    let uniqueFacts = Dictionary(grouping: evidence.facts, by: \.id).compactMap { _, facts in
-      facts.first
-    }
+    let uniqueFacts = evidence.facts.uniqued(on: \.id)
     var parents = Dictionary(uniqueKeysWithValues: try uniqueFacts.map { fact in
       let decoded = try CausalHeadsCodec.decode(
         formatVersion: fact.causalHeadsFormatVersion,
@@ -121,24 +120,8 @@ struct CookingSessionCommandFactory {
         data: closure.causalHeadsData
       )
     }
-    return parents.keys.filter { candidate in
-      !parents.keys.contains { other in
-        candidate != other && isAncestor(candidate, of: other, parents: parents)
-      }
-    }.sorted { $0.uuidString < $1.uuidString }
-  }
-
-  private func isAncestor(
-    _ ancestor: UUID,
-    of descendant: UUID,
-    parents: [UUID: [UUID]]
-  ) -> Bool {
-    // Every descendant is selected from this dictionary's keys.
-    // swiftlint:disable:next force_unwrapping
-    let directParents = parents[descendant]!
-    if directParents.contains(ancestor) { return true }
-    return directParents.contains {
-      isAncestor(ancestor, of: $0, parents: parents)
+    return DirectedGraph(parentsByNode: parents).maximalNodes.sorted {
+      $0.uuidString < $1.uuidString
     }
   }
 }

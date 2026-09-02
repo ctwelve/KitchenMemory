@@ -57,6 +57,11 @@ prove container-width composition boundaries, accessibility-size reading order,
 ordered retry, and relaunch-safe state restoration without coupling automation
 to the provisional SwiftUI tree.
 
+A durable-shell smoke may use bounded scrolling only to reveal a stable
+accessibility-identified control within a stable accessibility-identified scroll
+surface. It must not locate controls by coordinates or assert layout, geometry,
+scroll offsets, or scrolling behavior.
+
 Slice 15 uses native buttons, menus, headings, selection traits, state values,
 and Dynamic Type. A physical iPhone/iPad and Mac pass with keyboard and
 VoiceOver remains deliberate feature-acceptance work rather than evidence

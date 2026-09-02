@@ -176,10 +176,14 @@ Permanent V1 codecs provide canonical bytes for execution snapshots, causal
 heads, fact payloads, outcomes, and closed projections. Causal heads use sorted
 UUID bytes; JSON codecs use sorted keys and reject well-formed noncanonical
 representations on read. SHA-256 digests therefore describe exact stable bytes,
-not a decoder's best-effort interpretation. The engine imports Foundation and
-CryptoKit only. It has no SwiftData, CloudKit, repository, actor, device, or UI
-dependency, so later persistence and synchronization slices are adapters around
-this domain contract rather than authorities over its merge behavior.
+not a decoder's best-effort interpretation. The engine uses Foundation and
+CryptoKit plus narrowly linked Swift Collections products behind Kitchen
+Memory-owned types. It has no SwiftData, CloudKit, repository, actor, device, or
+UI dependency, so later persistence and synchronization slices are adapters
+around this domain contract rather than authorities over its merge behavior.
+KitchenKit Logic and Persistence separately use Swift Algorithms behind owned
+interfaces to coalesce already-validated graph evidence and reconcile duplicate
+immutable Recipe rows.
 
 ### Application composition and stitching points
 
