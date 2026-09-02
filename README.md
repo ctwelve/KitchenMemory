@@ -101,7 +101,7 @@ been flattened or silently rewritten.
 - [Personal iCloud synchronization](docs/personal-icloud-synchronization.md)
 - [Localization architecture](docs/localization-architecture.md)
 - [Continuous integration](docs/continuous-integration.md)
-- [Architecture decisions](docs/README.md#architecture-decisions)
+- [Architecture decisions](docs/README.md#accepted-architecture-decisions)
 - [Artificial intelligence use](AI.md)
 
 ## Building from source

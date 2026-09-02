@@ -380,6 +380,78 @@ class CheckProjectStructureTest < Minitest::Test
     assert_equal expected_core_groups, actual_core_groups
   end
 
+  def test_rejects_root_level_application_swift_source
+    error = assert_contract_error do
+      KitchenMemory::ProjectStructure.validate_application_source_taxonomy(
+        application_sources: {"KitchenMemory/LooseView.swift" => "import SwiftUI\n"},
+        kitchen_kit_sources: {}
+      )
+    end
+
+    assert_includes error.message, "intentional presentation home"
+    assert_includes error.message, "KitchenMemory/LooseView.swift"
+  end
+
+  def test_rejects_presentation_implementation_in_kitchen_kit
+    error = assert_contract_error do
+      KitchenMemory::ProjectStructure.validate_application_source_taxonomy(
+        application_sources: {
+          "KitchenMemory/Composition/KitchenMemoryApp.swift" => "import SwiftUI\n"
+        },
+        kitchen_kit_sources: {
+          "KitchenKit/Logic/AccidentalView.swift" => "import SwiftUI\n"
+        }
+      )
+    end
+
+    assert_includes error.message, "presentation implementation must remain outside KitchenKit"
+    assert_includes error.message, "KitchenKit/Logic/AccidentalView.swift"
+  end
+
+  def test_rejects_scoped_and_attributed_presentation_imports_in_kitchen_kit
+    [
+      "import struct SwiftUI.Color\n",
+      "@preconcurrency import UIKit\n"
+    ].each do |contents|
+      assert_contract_error do
+        KitchenMemory::ProjectStructure.validate_application_source_taxonomy(
+          application_sources: {},
+          kitchen_kit_sources: {"KitchenKit/Logic/AccidentalView.swift" => contents}
+        )
+      end
+    end
+  end
+
+  def test_allows_presentation_import_words_in_comments_and_multiline_strings
+    contents = <<~'SWIFT'
+      /*
+      import SwiftUI
+      */
+      let example = """
+      import UIKit
+      """
+    SWIFT
+
+    KitchenMemory::ProjectStructure.validate_application_source_taxonomy(
+      application_sources: {},
+      kitchen_kit_sources: {"KitchenKit/Logic/ImportExample.swift" => contents}
+    )
+  end
+
+  def test_rejects_new_kitchen_kit_responsibility_home
+    error = assert_contract_error do
+      KitchenMemory::ProjectStructure.validate_application_source_taxonomy(
+        application_sources: {},
+        kitchen_kit_sources: {
+          "KitchenKit/Presentation/RecipeFormatter.swift" => "import Foundation\n"
+        }
+      )
+    end
+
+    assert_includes error.message, "KitchenKit Swift source must remain in an accepted responsibility"
+    assert_includes error.message, "KitchenKit/Presentation/RecipeFormatter.swift"
+  end
+
   def test_rejects_obsolete_target_metadata
     error = assert_contract_error do
       KitchenMemory::ProjectStructure.validate_obsolete_project_metadata(
