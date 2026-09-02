@@ -9,9 +9,9 @@ import XCTest
 @MainActor
 final class CookingSessionPresentationStoreTests: XCTestCase {
   func testCurrentPointerAndPendingCommandSurviveStoreRecreation() throws {
-    let suiteName = "CookingSessionPresentationStoreTests-\(UUID().uuidString)"
-    let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
-    defer { defaults.removePersistentDomain(forName: suiteName) }
+    let defaults = try makeTestUserDefaults(
+      suiteNamePrefix: "CookingSessionPresentationStoreTests"
+    ).defaults
     let sessionID = CookingSession.ID()
     let factID = SessionFact.ID()
     let authoredAt = Date(timeIntervalSince1970: 1_800_000_000)
@@ -35,9 +35,9 @@ final class CookingSessionPresentationStoreTests: XCTestCase {
   }
 
   func testClearingPresentationStateRemovesDurableValues() throws {
-    let suiteName = "CookingSessionPresentationStoreTests-\(UUID().uuidString)"
-    let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
-    defer { defaults.removePersistentDomain(forName: suiteName) }
+    let defaults = try makeTestUserDefaults(
+      suiteNamePrefix: "CookingSessionPresentationStoreTests"
+    ).defaults
     let store = DefaultsCookingSessionPresentationStore(defaults: defaults)
     store.currentSessionID = CookingSession.ID()
     store.pendingCommands = [
@@ -57,9 +57,9 @@ final class CookingSessionPresentationStoreTests: XCTestCase {
   }
 
   func testOrderedOutboxSurvivesStoreRecreation() throws {
-    let suiteName = "CookingSessionPresentationStoreTests-\(UUID().uuidString)"
-    let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
-    defer { defaults.removePersistentDomain(forName: suiteName) }
+    let defaults = try makeTestUserDefaults(
+      suiteNamePrefix: "CookingSessionPresentationStoreTests"
+    ).defaults
     let sessionID = CookingSession.ID()
     let first = PendingCookingSessionCommand.progress(
       factID: SessionFact.ID(),
@@ -88,9 +88,9 @@ final class CookingSessionPresentationStoreTests: XCTestCase {
   }
 
   func testRecoveryCommandsSurviveStoreRecreationWithoutLosingObservedFrontiers() throws {
-    let suiteName = "CookingSessionPresentationStoreTests-\(UUID().uuidString)"
-    let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
-    defer { defaults.removePersistentDomain(forName: suiteName) }
+    let defaults = try makeTestUserDefaults(
+      suiteNamePrefix: "CookingSessionPresentationStoreTests"
+    ).defaults
     let sessionID = CookingSession.ID()
     let deletionIDs = [SessionDeletion.ID(), SessionDeletion.ID()]
     let closureIDs = [SessionClosure.ID(), SessionClosure.ID()]
@@ -124,9 +124,9 @@ final class CookingSessionPresentationStoreTests: XCTestCase {
   }
 
   func testSlice14SingleCommandDecodesAsOneItemOutbox() throws {
-    let suiteName = "CookingSessionPresentationStoreTests-\(UUID().uuidString)"
-    let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
-    defer { defaults.removePersistentDomain(forName: suiteName) }
+    let defaults = try makeTestUserDefaults(
+      suiteNamePrefix: "CookingSessionPresentationStoreTests"
+    ).defaults
     let legacy = PendingCookingSessionCommand.stop(
       factID: SessionFact.ID(),
       sessionID: CookingSession.ID(),
@@ -144,9 +144,9 @@ final class CookingSessionPresentationStoreTests: XCTestCase {
   }
 
   func testEntryDraftSurvivesStoreRecreationWithoutEnteringTheCommandOutbox() throws {
-    let suiteName = "CookingSessionPresentationStoreTests-\(UUID().uuidString)"
-    let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
-    defer { defaults.removePersistentDomain(forName: suiteName) }
+    let defaults = try makeTestUserDefaults(
+      suiteNamePrefix: "CookingSessionPresentationStoreTests"
+    ).defaults
     let sessionID = CookingSession.ID()
     let target = SessionProgressTarget.instruction(SessionInstruction.ID())
     let draft = CookingSessionEntryDraft(
@@ -164,9 +164,9 @@ final class CookingSessionPresentationStoreTests: XCTestCase {
   }
 
   func testDeviceLocalSessionVisitSurvivesStoreRecreation() throws {
-    let suiteName = "CookingSessionPresentationStoreTests-\(UUID().uuidString)"
-    let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
-    defer { defaults.removePersistentDomain(forName: suiteName) }
+    let defaults = try makeTestUserDefaults(
+      suiteNamePrefix: "CookingSessionPresentationStoreTests"
+    ).defaults
     let visit = CookingSessionVisit(
       sessionID: CookingSession.ID(),
       lastVisitedAt: Date(timeIntervalSince1970: 1_800_000_400),
