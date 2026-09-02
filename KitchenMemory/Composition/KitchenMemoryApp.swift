@@ -33,19 +33,11 @@ struct KitchenMemoryApp: App {
 
   @ViewBuilder
   private var applicationContent: some View {
-    switch startup.state {
-    case .preparing:
-      KitchenLoadingView()
-        .background(startupFrameObserver)
-    case .ready(let dependencies):
-      ContentView(
-        model: dependencies.libraryModel,
-        sessionModel: dependencies.sessionModel,
-        cloudSyncSettings: dependencies.cloudSyncSettings
-      )
-    case .unavailable:
-      KitchenUnavailableView(retry: retryPreparation)
-    }
+    ContentView(
+      startupState: startup.state,
+      retryStartup: retryPreparation
+    )
+    .background(startupFrameObserver)
   }
 
 #if os(macOS)

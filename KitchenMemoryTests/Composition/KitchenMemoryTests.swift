@@ -184,6 +184,21 @@ final class AppLaunchPlanTests: XCTestCase {
       .simulatesStartupFailure)
   }
 
+  func testStartupDelaySimulationIsLimitedToTheUITestHarness() throws {
+    let arguments = ["KitchenMemory", "--simulate-startup-delay"]
+
+    XCTAssertTrue(try plan(arguments: arguments, buildEnvironment: .testing)
+      .simulatesStartupDelay)
+    XCTAssertTrue(try plan(arguments: arguments, buildEnvironment: .productionTesting)
+      .simulatesStartupDelay)
+    XCTAssertFalse(try plan(arguments: arguments, buildEnvironment: .debug)
+      .simulatesStartupDelay)
+    XCTAssertFalse(try plan(arguments: arguments, buildEnvironment: .develop)
+      .simulatesStartupDelay)
+    XCTAssertFalse(try plan(arguments: arguments, buildEnvironment: .production)
+      .simulatesStartupDelay)
+  }
+
   func testProductionIgnoresTestingArguments() throws {
     let arguments = [
       "KitchenMemory",

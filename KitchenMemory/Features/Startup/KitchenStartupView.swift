@@ -36,6 +36,39 @@ struct KitchenUnavailableView: View {
   }
 }
 
+struct StartupRecipeLibrarySidebar: View {
+  let presentation: AppShellPresentation
+
+  var body: some View {
+    List {
+      Section {
+        Label(.sessionHistoryTitle, systemImage: "clock.arrow.circlepath")
+        Label(.deletedItemsTitle, systemImage: "trash")
+        Label(.recoveryTitle, systemImage: "wrench.and.screwdriver")
+      } header: {
+        Text(.sessionDiscoveryTitle)
+      }
+      .disabled(true)
+
+      Section {
+        switch presentation {
+        case .loading:
+          ProgressView(.startupLoading)
+        case .recovery:
+          Label(.startupUnavailableTitle, systemImage: "exclamationmark.triangle")
+          Text(.startupUnavailableMessage)
+            .foregroundStyle(.secondary)
+        case .ready:
+          EmptyView()
+        }
+      } header: {
+        Text(.sessionDiscoveryRecipes)
+      }
+    }
+    .listStyle(.sidebar)
+  }
+}
+
 struct SampleRecipeDecisionView: View {
   let accept: () -> Void
   let decline: () -> Void

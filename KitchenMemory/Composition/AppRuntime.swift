@@ -61,6 +61,7 @@ struct AppLaunchPlan: Equatable {
   var offersCloudSyncSetting: Bool
   var initializesCloudKitSchema: Bool
   var simulatesStartupFailure: Bool
+  var simulatesStartupDelay: Bool
 
   static func resolve(
     inputs: AppLaunchInputs,
@@ -112,7 +113,9 @@ struct AppLaunchPlan: Equatable {
       offersCloudSyncSetting: inputs.buildEnvironment.offersCloudSyncSetting,
       initializesCloudKitSchema: initializesCloudKitSchema,
       simulatesStartupFailure: usesTestHarness
-        && inputs.arguments.contains("--simulate-startup-failure")
+        && inputs.arguments.contains("--simulate-startup-failure"),
+      simulatesStartupDelay: usesTestHarness
+        && inputs.arguments.contains("--simulate-startup-delay")
     )
   }
 }
@@ -139,6 +142,9 @@ enum AppRuntime {
         durableCloudSyncIsEnabled:
           durablePreferences.personalCloudSynchronizationEnabled
       )
+      if plan.simulatesStartupDelay {
+        try await Task.sleep(for: .seconds(8))
+      }
       guard !plan.simulatesStartupFailure else {
         throw AppLaunchPlanError.simulatedStartupFailure
       }
@@ -173,7 +179,8 @@ enum AppRuntime {
       cloudSyncIsEnabledAtLaunch: preferences.personalCloudSynchronizationEnabled,
       offersCloudSyncSetting: false,
       initializesCloudKitSchema: false,
-      simulatesStartupFailure: false
+      simulatesStartupFailure: false,
+      simulatesStartupDelay: false
     )
     return try PreparedApp(
       plan: plan,

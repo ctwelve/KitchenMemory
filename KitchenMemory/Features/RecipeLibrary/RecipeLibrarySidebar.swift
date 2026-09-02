@@ -134,3 +134,31 @@ struct CookingSessionRow: View {
     }
   }
 }
+
+struct RecipeRow: View {
+  let storedRecipe: StoredRecipe
+
+  var body: some View {
+    HStack(spacing: 12) {
+      RecipeImage(
+        media: storedRecipe.revision.media.first { $0.role == .thumbnail }
+          ?? storedRecipe.revision.media.first,
+        contentMode: .fill
+      )
+      .frame(width: 56, height: 56)
+      .clipShape(.rect(cornerRadius: 10))
+      .accessibilityHidden(true)
+
+      VStack(alignment: .leading, spacing: 3) {
+        Text(storedRecipe.revision.title)
+          .font(.headline)
+        if let summary = storedRecipe.revision.summary {
+          Text(summary)
+            .font(.caption)
+            .foregroundStyle(.primary)
+        }
+      }
+    }
+    .padding(.vertical, 4)
+  }
+}

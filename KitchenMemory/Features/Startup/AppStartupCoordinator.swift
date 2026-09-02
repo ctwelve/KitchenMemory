@@ -26,6 +26,27 @@ enum AppStartupState {
   }
 }
 
+enum AppShellPresentation: Hashable {
+  case loading
+  case recovery
+  case ready
+
+  init(state: AppStartupState) {
+    switch state {
+    case .preparing:
+      self = .loading
+    case .ready:
+      self = .ready
+    case .unavailable:
+      self = .recovery
+    }
+  }
+
+  var permitsKitchenActions: Bool {
+    self == .ready
+  }
+}
+
 enum AppStartupMilestone: Equatable {
   case startupSurfacePresented
   case preparationStarted

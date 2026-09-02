@@ -180,4 +180,15 @@ final class AppStartupCoordinatorTests: XCTestCase {
       [.startupSurfacePresented, .preparationStarted]
     )
   }
+
+  func testShellPresentationDescribesEveryStartupStateWithoutPrivateFailureDetails() throws {
+    let preparedApp = try AppRuntime.testing()
+
+    XCTAssertEqual(AppShellPresentation(state: .preparing), .loading)
+    XCTAssertEqual(AppShellPresentation(state: .unavailable), .recovery)
+    XCTAssertEqual(AppShellPresentation(state: .ready(preparedApp)), .ready)
+    XCTAssertFalse(AppShellPresentation.loading.permitsKitchenActions)
+    XCTAssertFalse(AppShellPresentation.recovery.permitsKitchenActions)
+    XCTAssertTrue(AppShellPresentation.ready.permitsKitchenActions)
+  }
 }

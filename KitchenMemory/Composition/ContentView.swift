@@ -4,11 +4,13 @@
 
 import KitchenKit
 import SwiftUI
+#if os(iOS)
+import UIKit
+#endif
 
 struct ContentView: View {
-  @Bindable var model: RecipeLibraryModel
-  @Bindable var sessionModel: CookingSessionPresentationModel
-  let cloudSyncSettings: CloudSyncSettings?
+  let startupState: AppStartupState
+  let retryStartup: () -> Void
   @Environment(\.horizontalSizeClass) private var horizontalSizeClass
   @Environment(\.locale) private var locale
   @State private var activeSheet: ActiveRecipeSheet?
@@ -20,37 +22,24 @@ struct ContentView: View {
 
   var body: some View {
     Group {
-      switch model.startupState {
-      case .loading:
-        KitchenLoadingView()
-      case .choosingSamples:
-        SampleRecipeDecisionView(
-          accept: model.acceptSampleRecipes,
-          decline: model.declineSampleRecipes
-        )
-      case .ready:
-        if let currentSession = sessionModel.currentSession {
-          CookingSessionView(model: sessionModel, session: currentSession)
-        } else {
-          recipeLibrary
-        }
+      if usesPersistentLibraryShell {
+        persistentRecipeLibrary
+      } else {
+        phaseContent
       }
     }
-    .task {
-      model.loadIfNeeded()
-      sessionModel.loadIfNeeded()
+    .task(id: shellPresentation) {
+      preparedApp?.libraryModel.loadIfNeeded()
+      preparedApp?.sessionModel.loadIfNeeded()
     }
     .tint(Color("AccentColor"))
-    .alert(
-      .sessionIssueTitle,
-      isPresented: sessionIssueIsPresented
-    ) {
-      if sessionModel.issue != .clipboard {
-        Button(.actionTryAgain) { sessionModel.retryCurrentIssue() }
+    .alert(.sessionIssueTitle, isPresented: sessionIssueIsPresented) {
+      if preparedApp?.sessionModel.issue != .clipboard {
+        Button(.actionTryAgain) { preparedApp?.sessionModel.retryCurrentIssue() }
       }
       Button(.actionCancel, role: .cancel) {}
     } message: {
-      if let issue = sessionModel.issue {
+      if let issue = preparedApp?.sessionModel.issue {
         Text(issue.message)
       }
     }
@@ -60,77 +49,167 @@ struct ContentView: View {
       titleVisibility: .visible
     ) {
       Button(.sessionEntryDetachedContinue) {
-        sessionModel.continueDetachedEntryDraft()
+        preparedApp?.sessionModel.continueDetachedEntryDraft()
       }
-      Button(.sessionEntryDetachedCopy) {
-        copyAndDiscardDetachedDraft()
-      }
+      Button(.sessionEntryDetachedCopy) { copyAndDiscardDetachedDraft() }
       Button(.sessionEntryDetachedDiscard, role: .destructive) {
-        sessionModel.discardDetachedEntryDraft()
+        preparedApp?.sessionModel.discardDetachedEntryDraft()
       }
       Button(.actionCancel, role: .cancel) {}
     } message: {
       Text(.sessionEntryDetachedMessage)
     }
-    .onChange(of: model.selectedRecipeID) { _, recipeID in
-      if recipeID != nil { sessionModel.showRecipes() }
+    .onChange(of: preparedApp?.libraryModel.selectedRecipeID) { _, recipeID in
+      if recipeID != nil { preparedApp?.sessionModel.showRecipes() }
     }
   }
 
-  private var recipeLibrary: some View {
+  private var shellPresentation: AppShellPresentation {
+    AppShellPresentation(state: startupState)
+  }
+
+  private var preparedApp: PreparedApp? {
+    startupState.preparedApp
+  }
+
+  private var usesPersistentLibraryShell: Bool {
+#if os(iOS)
+    horizontalSizeClass == .regular
+      || (horizontalSizeClass == nil && UIDevice.current.userInterfaceIdiom == .pad)
+#else
+    false
+#endif
+  }
+
+  @ViewBuilder
+  private var phaseContent: some View {
+    switch startupState {
+    case .preparing:
+      KitchenLoadingView()
+    case .unavailable:
+      KitchenUnavailableView(retry: retryStartup)
+    case .ready(let dependencies):
+      preparedContent(dependencies)
+    }
+  }
+
+  @ViewBuilder
+  private func preparedContent(_ dependencies: PreparedApp) -> some View {
+    switch dependencies.libraryModel.startupState {
+    case .loading:
+      KitchenLoadingView()
+    case .choosingSamples:
+      SampleRecipeDecisionView(
+        accept: dependencies.libraryModel.acceptSampleRecipes,
+        decline: dependencies.libraryModel.declineSampleRecipes
+      )
+    case .ready:
+      if let currentSession = dependencies.sessionModel.currentSession {
+        CookingSessionView(model: dependencies.sessionModel, session: currentSession)
+      } else {
+        recipeLibrary(dependencies)
+      }
+    }
+  }
+
+  private var persistentRecipeLibrary: some View {
     NavigationSplitView(columnVisibility: $columnVisibility) {
-      recipeList
+      persistentSidebar
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("recipe-library-shell")
+        .navigationTitle(.libraryTitle)
+        .toolbar(removing: usesCustomSidebarToggle ? .sidebarToggle : nil)
+        .toolbar { libraryToolbar }
+    } detail: {
+      persistentDetail
+    }
+    .sheet(item: $activeSheet) { sheet in
+      if let dependencies = preparedApp {
+        RecipeLibrarySheetContent(
+          sheet: sheet,
+          model: dependencies.libraryModel,
+          selectSheet: { activeSheet = $0 }
+        )
+      }
+    }
+#if !os(macOS)
+    .sheet(isPresented: $isShowingSettings) {
+      if let dependencies = preparedApp {
+        NavigationStack {
+          KitchenSettingsView(
+            model: dependencies.libraryModel,
+            cloudSyncSettings: dependencies.cloudSyncSettings
+          )
+        }
+      }
+    }
+#endif
+  }
+
+  @ViewBuilder
+  private var persistentSidebar: some View {
+    switch startupState {
+    case .preparing:
+      StartupRecipeLibrarySidebar(presentation: .loading)
+    case .unavailable:
+      StartupRecipeLibrarySidebar(presentation: .recovery)
+    case .ready(let dependencies):
+      recipeList(dependencies)
+    }
+  }
+
+  @ViewBuilder
+  private var persistentDetail: some View {
+    switch startupState {
+    case .preparing:
+      KitchenLoadingView()
+    case .unavailable:
+      KitchenUnavailableView(retry: retryStartup)
+    case .ready(let dependencies):
+      switch dependencies.libraryModel.startupState {
+      case .loading:
+        KitchenLoadingView()
+      case .choosingSamples:
+        SampleRecipeDecisionView(
+          accept: dependencies.libraryModel.acceptSampleRecipes,
+          decline: dependencies.libraryModel.declineSampleRecipes
+        )
+      case .ready:
+        if let currentSession = dependencies.sessionModel.currentSession {
+          CookingSessionView(model: dependencies.sessionModel, session: currentSession)
+        } else {
+          LibraryDetailRouter(
+            libraryModel: dependencies.libraryModel,
+            sessionModel: dependencies.sessionModel,
+            editRecipe: { activeSheet = .edit($0) }
+          )
+        }
+      }
+    }
+  }
+
+  private func recipeLibrary(_ dependencies: PreparedApp) -> some View {
+    NavigationSplitView(columnVisibility: $columnVisibility) {
+      recipeList(dependencies)
         .navigationTitle(.libraryTitle)
 #if os(macOS)
         .navigationSplitViewColumnWidth(min: 280, ideal: 320)
 #endif
-        // NavigationSplitView installs this item on its sidebar column, so
-        // removal must be scoped to the same view rather than the split root.
         .toolbar(removing: usesCustomSidebarToggle ? .sidebarToggle : nil)
-        .toolbar {
-          ToolbarItem(placement: .primaryAction) {
-            Button {
-              activeSheet = .create
-            } label: {
-              ToolbarIconLabel(.libraryActionNewRecipe, systemImage: "plus")
-            }
-            .accessibilityIdentifier("new-recipe")
-          }
-          ToolbarItem(placement: .primaryAction) {
-            Button {
-              activeSheet = .importURL
-            } label: {
-              ToolbarIconLabel(.libraryActionImportRecipe, systemImage: "square.and.arrow.down")
-            }
-            .accessibilityIdentifier("import-recipe")
-          }
-          if usesCustomSidebarToggle {
-            ToolbarItem(placement: sidebarTogglePlacement) {
-              Button {
-                toggleSidebar()
-              } label: {
-                ToolbarIconLabel(sidebarToggleTitle, systemImage: "sidebar.left")
-              }
-              .accessibilityIdentifier("toggle-sidebar")
-              .help(Text(sidebarToggleTitle))
-            }
-          }
-#if !os(macOS)
-          ToolbarItem(placement: .primaryAction) {
-            Button {
-              isShowingSettings = true
-            } label: {
-              ToolbarIconLabel(.settingsTitle, systemImage: "gearshape")
-            }
-            .accessibilityIdentifier("open-settings")
-          }
-#endif
-        }
+        .toolbar { libraryToolbar }
     } detail: {
-      detail
+      LibraryDetailRouter(
+        libraryModel: dependencies.libraryModel,
+        sessionModel: dependencies.sessionModel,
+        editRecipe: { activeSheet = .edit($0) }
+      )
     }
     .sheet(item: $activeSheet) { sheet in
-      sheetContent(sheet)
+      RecipeLibrarySheetContent(
+        sheet: sheet,
+        model: dependencies.libraryModel,
+        selectSheet: { activeSheet = $0 }
+      )
     }
 #if os(macOS)
     .focusedSceneValue(\.resetKitchenAction) {
@@ -138,22 +217,86 @@ struct ContentView: View {
     }
     .kitchenResetConfirmation(
       isPresented: $isShowingResetConfirmation,
-      model: model,
+      model: dependencies.libraryModel,
       locale: locale
     )
 #else
     .sheet(isPresented: $isShowingSettings) {
       NavigationStack {
         KitchenSettingsView(
-          model: model,
-          cloudSyncSettings: cloudSyncSettings
+          model: dependencies.libraryModel,
+          cloudSyncSettings: dependencies.cloudSyncSettings
         )
       }
     }
 #endif
   }
 
-  private var usesCustomSidebarToggle: Bool {
+  @ToolbarContentBuilder
+  private var libraryToolbar: some ToolbarContent {
+    LibraryToolbar(
+      showsKitchenActions: preparedApp != nil,
+      actionsAreAvailable: preparedApp.map(kitchenActionsAreAvailable) ?? false,
+      showsSidebarToggle: usesCustomSidebarToggle,
+      sidebarToggleTitle: sidebarToggleTitle,
+      sidebarTogglePlacement: sidebarTogglePlacement,
+      createRecipe: { activeSheet = .create },
+      importRecipe: { activeSheet = .importURL },
+      toggleSidebar: toggleSidebar,
+      showSettings: showSettings
+    )
+  }
+}
+
+private extension ContentView {
+  func kitchenActionsAreAvailable(in dependencies: PreparedApp) -> Bool {
+    shellPresentation.permitsKitchenActions
+      && dependencies.libraryModel.startupState == .ready
+  }
+
+  func recipeList(_ dependencies: PreparedApp) -> some View {
+    RecipeLibrarySidebar(
+      model: dependencies.libraryModel,
+      sessionModel: dependencies.sessionModel,
+      locale: locale,
+      showSessionHistory: {
+        dependencies.libraryModel.selectedRecipeID = nil
+        dependencies.sessionModel.showSessionHistory()
+        columnVisibility = .detailOnly
+      },
+      showDeletedItems: {
+        dependencies.libraryModel.selectedRecipeID = nil
+        dependencies.sessionModel.showDeletedItems()
+        columnVisibility = .detailOnly
+      },
+      showRecovery: {
+        dependencies.libraryModel.selectedRecipeID = nil
+        dependencies.sessionModel.showRecovery()
+        columnVisibility = .detailOnly
+      }
+    )
+  }
+  var sessionIssueIsPresented: Binding<Bool> {
+    Binding(
+      get: { preparedApp?.sessionModel.isShowingIssue ?? false },
+      set: { isPresented in
+        if !isPresented { preparedApp?.sessionModel.dismissIssuePresentation() }
+      }
+    )
+  }
+
+  var detachedDraftIsPresented: Binding<Bool> {
+    Binding(
+      get: { preparedApp?.sessionModel.detachedEntryDraft != nil },
+      set: { _ in }
+    )
+  }
+
+  func copyAndDiscardDetachedDraft() {
+    preparedApp?.sessionModel.copyAndDiscardDetachedEntryDraft(using: CookingSessionClipboard.copy)
+  }
+
+  var usesCustomSidebarToggle: Bool {
 #if os(iOS)
     horizontalSizeClass == .regular
 #else
@@ -161,13 +304,13 @@ struct ContentView: View {
 #endif
   }
 
-  private var sidebarToggleTitle: LocalizedStringResource {
+  var sidebarToggleTitle: LocalizedStringResource {
     columnVisibility == .detailOnly
       ? .librarySidebarActionShow
       : .librarySidebarActionHide
   }
 
-  private var sidebarTogglePlacement: ToolbarItemPlacement {
+  var sidebarTogglePlacement: ToolbarItemPlacement {
 #if os(macOS)
     columnVisibility == .detailOnly ? .navigation : .primaryAction
 #else
@@ -175,213 +318,15 @@ struct ContentView: View {
 #endif
   }
 
-  private func toggleSidebar() {
+  func toggleSidebar() {
     withAnimation {
       columnVisibility = columnVisibility == .detailOnly ? .all : .detailOnly
     }
   }
 
-  @ViewBuilder
-  private var detail: some View {
-    if let finishedSession = sessionModel.observedFinishedSession {
-      FinishedCookingSessionView(model: sessionModel, session: finishedSession)
-    } else if sessionModel.isShowingDeletedItems {
-      CookingSessionDeletedItemsView(model: sessionModel)
-    } else if sessionModel.isShowingRecovery {
-      CookingSessionRecoveryView(model: sessionModel)
-    } else if sessionModel.isShowingSessionHistory {
-      CookingSessionHistoryView(model: sessionModel)
-    } else if let selectedRecipe = model.selectedRecipe {
-      RecipeDetailView(storedRecipe: selectedRecipe)
-        // A revision is immutable, but this view owns reading-only state such
-        // as the selected scaling basis. Give each new revision fresh state so
-        // a just-saved yield is reflected immediately.
-        .id(selectedRecipe.revision.id)
-        .toolbar {
-          ToolbarItem(placement: .primaryAction) {
-            NavigationLink {
-              CookingSessionHistoryDestinationView(
-                model: sessionModel,
-                prepare: {
-                  sessionModel.showRecipeSessionHistory(for: selectedRecipe.recipe.id)
-                }
-              )
-            } label: {
-              Label(.sessionHistoryRecipeTitle, systemImage: "clock.arrow.circlepath")
-            }
-            .accessibilityIdentifier("recipe-session-history")
-          }
-          ToolbarItem(placement: .primaryAction) {
-            Button {
-              sessionModel.start(from: selectedRecipe)
-            } label: {
-              Label(.sessionActionStart, systemImage: "flame")
-            }
-            .accessibilityIdentifier("start-cooking")
-          }
-          ToolbarItem(placement: .primaryAction) {
-            Button { activeSheet = .edit(selectedRecipe) } label: {
-              Label(.recipeActionEdit, systemImage: "pencil")
-            }
-              .accessibilityIdentifier("edit-recipe")
-          }
-        }
-    } else {
-      ContentUnavailableView(
-        .librarySelectionEmptyTitle,
-        systemImage: "book.pages",
-        description: Text(.librarySelectionEmptyMessage)
-      )
-      .frame(maxWidth: .infinity, maxHeight: .infinity)
-      .background(Color("AppBackground"))
-    }
+  func showSettings() {
+#if !os(macOS)
+    isShowingSettings = true
+#endif
   }
-
-  @ViewBuilder
-  private func sheetContent(_ sheet: ActiveRecipeSheet) -> some View {
-    switch sheet {
-    case .create:
-      RecipeEditorView(mode: .create) { draft in
-        model.createRecipe(from: draft)
-      }
-    case .edit(let storedRecipe):
-      RecipeEditorView(mode: .revise, draft: RecipeDraft(revision: storedRecipe.revision)) { draft in
-        model.reviseRecipe(id: storedRecipe.recipe.id, from: draft)
-      }
-    case .importURL:
-      RecipeURLImportView(
-        load: { url in try await model.importRecipe(from: url) },
-        select: { activeSheet = .review($0) }
-      )
-    case .review(let option):
-      RecipeEditorView(
-        mode: .importReview,
-        draft: option.draft,
-        reviewConcerns: option.concerns
-      ) { draft in
-        model.createRecipe(from: draft)
-      }
-    }
-  }
-}
-
-private extension ContentView {
-  @ViewBuilder
-  var recipeList: some View {
-    RecipeLibrarySidebar(
-      model: model,
-      sessionModel: sessionModel,
-      locale: locale,
-      showSessionHistory: {
-        model.selectedRecipeID = nil
-        sessionModel.showSessionHistory()
-        columnVisibility = .detailOnly
-      },
-      showDeletedItems: {
-        model.selectedRecipeID = nil
-        sessionModel.showDeletedItems()
-        columnVisibility = .detailOnly
-      },
-      showRecovery: {
-        model.selectedRecipeID = nil
-        sessionModel.showRecovery()
-        columnVisibility = .detailOnly
-      }
-    )
-  }
-
-  var sessionIssueIsPresented: Binding<Bool> {
-    Binding(
-      get: { sessionModel.isShowingIssue },
-      set: { isPresented in
-        if !isPresented { sessionModel.dismissIssuePresentation() }
-      }
-    )
-  }
-
-  var detachedDraftIsPresented: Binding<Bool> {
-    Binding(
-      get: { sessionModel.detachedEntryDraft != nil },
-      set: { _ in }
-    )
-  }
-
-  func copyAndDiscardDetachedDraft() {
-    sessionModel.copyAndDiscardDetachedEntryDraft(using: CookingSessionClipboard.copy)
-  }
-}
-
-private struct ToolbarIconLabel: View {
-  let title: LocalizedStringResource
-  let systemImage: String
-
-  init(_ title: LocalizedStringResource, systemImage: String) {
-    self.title = title
-    self.systemImage = systemImage
-  }
-
-  var body: some View {
-    Label(title, systemImage: systemImage)
-      .labelStyle(.iconOnly)
-      // SF Symbols have different intrinsic heights. A shared box keeps their
-      // visible lower edges aligned without changing the toolbar button target.
-      .frame(width: 20, height: 20, alignment: .bottom)
-      .accessibilityLabel(Text(title))
-  }
-}
-
-private enum ActiveRecipeSheet: Identifiable {
-  case create
-  case edit(StoredRecipe)
-  case importURL
-  case review(RecipeImportOption)
-
-  var id: String {
-    switch self {
-    case .create: "create"
-    case .edit(let recipe): "edit-\(recipe.recipe.id.rawValue.uuidString)"
-    case .importURL: "import-url"
-    case .review(let option):
-      "review-\(option.id.blockIndex)-\(option.id.objectIndex)"
-    }
-  }
-}
-
-struct RecipeRow: View {
-  let storedRecipe: StoredRecipe
-
-  var body: some View {
-    HStack(spacing: 12) {
-      RecipeImage(
-        media: storedRecipe.revision.media.first { $0.role == .thumbnail }
-          ?? storedRecipe.revision.media.first,
-        contentMode: .fill
-      )
-      .frame(width: 56, height: 56)
-      .clipShape(.rect(cornerRadius: 10))
-      // The image repeats the recipe represented by the NavigationLink. If it
-      // remained exposed, VoiceOver would announce an extra image before the
-      // title without adding information or an independent action.
-      .accessibilityHidden(true)
-
-      VStack(alignment: .leading, spacing: 3) {
-        Text(storedRecipe.revision.title)
-          .font(.headline)
-        if let summary = storedRecipe.revision.summary {
-          Text(summary)
-            .font(.caption)
-            .foregroundStyle(.primary)
-        }
-      }
-    }
-    .padding(.vertical, 4)
-  }
-}
-
-#Preview {
-  ContentView(
-    model: PreparedApp.preview.libraryModel,
-    sessionModel: PreparedApp.preview.sessionModel,
-    cloudSyncSettings: nil
-  )
 }
