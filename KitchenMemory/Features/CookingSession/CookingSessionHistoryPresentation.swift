@@ -70,17 +70,27 @@ extension CookingSessionPresentationModel {
 
   @discardableResult
   func selectSession(_ id: CookingSession.ID) -> Bool {
-    guard sessions.contains(where: { $0.id == id }) else { return false }
-    select(id)
+    guard selectOrdinarySession(id) else { return false }
     historyScope = nil
-    observedFinishedSessionID = nil
     return true
+  }
+
+  @discardableResult
+  func selectSessionFromHistory(_ id: CookingSession.ID) -> Bool {
+    selectOrdinarySession(id)
   }
 
   @discardableResult
   func leaveCurrentSession() -> Bool {
     guard currentSessionID != nil else { return false }
     select(nil, recordsVisit: false)
+    return true
+  }
+
+  private func selectOrdinarySession(_ id: CookingSession.ID) -> Bool {
+    guard sessions.contains(where: { $0.id == id }) else { return false }
+    select(id)
+    observedFinishedSessionID = nil
     return true
   }
 

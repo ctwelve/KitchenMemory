@@ -51,8 +51,21 @@ extension KitchenMemoryUITests {
       NSPredicate(format: "identifier BEGINSWITH %@", "history-session-row-")
     ).firstMatch
     XCTAssertTrue(recentRow.waitForExistence(timeout: 5))
+    let recentRowIdentifier = recentRow.identifier
     activate(recentRow)
     XCTAssertTrue(app.buttons["stop-session"].waitForExistence(timeout: 5))
+
+#if os(iOS)
+    let backButton = app.buttons["BackButton"]
+    XCTAssertTrue(backButton.waitForExistence(timeout: 5))
+    activate(backButton)
+    XCTAssertTrue(app.descendants(matching: .any)["sessions-history"].waitForExistence(timeout: 5))
+    let reopenedRecentRow = app.descendants(matching: .any)[recentRowIdentifier]
+    XCTAssertTrue(reopenedRecentRow.waitForExistence(timeout: 5))
+    activate(reopenedRecentRow)
+    XCTAssertTrue(app.buttons["stop-session"].waitForExistence(timeout: 5))
+#endif
+
     activate(app.buttons["leave-session"])
 
     let recipeRow = app.descendants(matching: .any)

@@ -2,49 +2,14 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
-import Combine
 import SwiftUI
-
-@MainActor
-final class AppStartupCoordinator: ObservableObject {
-  @Published private(set) var state: AppStartupState = .preparing
-
-  private let prepareApplication: @MainActor () async -> AppStartupState
-  private var preparationTask: Task<Void, Never>?
-
-  init(
-    prepareApplication: @escaping @MainActor () async -> AppStartupState = AppRuntime.prepare
-  ) {
-    self.prepareApplication = prepareApplication
-  }
-
-  func prepareIfNeeded() {
-    guard preparationTask == nil else { return }
-    preparationTask = Task { [weak self] in
-      guard let self else { return }
-      let preparedState = await prepareApplication()
-      guard !Task.isCancelled else { return }
-      state = preparedState
-      preparationTask = nil
-    }
-  }
-
-  func retry() {
-    preparationTask?.cancel()
-    preparationTask = nil
-    state = .preparing
-    prepareIfNeeded()
-  }
-}
 
 @main
 struct KitchenMemoryApp: App {
   @StateObject private var startup: AppStartupCoordinator
 
   init() {
-    let startup = AppStartupCoordinator()
-    startup.prepareIfNeeded()
-    _startup = StateObject(wrappedValue: startup)
+    _startup = StateObject(wrappedValue: AppStartupCoordinator())
   }
 
   var body: some Scene {
@@ -68,18 +33,11 @@ struct KitchenMemoryApp: App {
 
   @ViewBuilder
   private var applicationContent: some View {
-    switch startup.state {
-    case .preparing:
-      KitchenLoadingView()
-    case .ready(let dependencies):
-      ContentView(
-        model: dependencies.libraryModel,
-        sessionModel: dependencies.sessionModel,
-        cloudSyncSettings: dependencies.cloudSyncSettings
-      )
-    case .unavailable:
-      KitchenUnavailableView(retry: retryPreparation)
-    }
+    ContentView(
+      startupState: startup.state,
+      retryStartup: retryPreparation
+    )
+    .background(startupFrameObserver)
   }
 
 #if os(macOS)
@@ -88,6 +46,7 @@ struct KitchenMemoryApp: App {
     switch startup.state {
     case .preparing:
       KitchenLoadingView()
+        .background(startupFrameObserver)
     case .ready(let dependencies):
       NavigationStack {
         KitchenSettingsView(
@@ -100,6 +59,14 @@ struct KitchenMemoryApp: App {
     }
   }
 #endif
+
+  private var startupFrameObserver: some View {
+    StartupFrameObserver {
+      startup.startupSurfacePresented()
+    }
+    .allowsHitTesting(false)
+    .accessibilityHidden(true)
+  }
 
   private func retryPreparation() {
     startup.retry()

@@ -40,7 +40,7 @@ final class KitchenMemoryUITests: XCTestCase {
     XCTAssertTrue(hiddenToggle.waitForExistence(timeout: 2))
     activate(hiddenToggle)
     XCTAssertTrue(
-      app.descendants(matching: .any)["recipe-library"].waitForExistence(timeout: 2)
+      app.descendants(matching: .any)["recipe-library-shell"].waitForExistence(timeout: 2)
     )
   }
 #endif
@@ -142,9 +142,12 @@ final class KitchenMemoryUITests: XCTestCase {
   // Shared by focused smoke-test extensions in synchronized source files.
   // swiftlint:disable:next test_case_accessibility
   @MainActor
-  func launchApp(additionalArguments: [String] = []) -> XCUIApplication {
+  func launchApp(
+    additionalArguments: [String] = [],
+    prefersRegularWidth: Bool = false
+  ) -> XCUIApplication {
 #if os(iOS)
-    XCUIDevice.shared.orientation = .portrait
+    XCUIDevice.shared.orientation = prefersRegularWidth ? .landscapeLeft : .portrait
 #endif
 
     let app = XCUIApplication()
@@ -157,10 +160,10 @@ final class KitchenMemoryUITests: XCTestCase {
     app.launchArguments.append(contentsOf: additionalArguments)
     app.launch()
 
-    let recipeLibrary = app.descendants(matching: .any)["recipe-library"]
-    ensurePrimaryWindow(in: app, exposing: recipeLibrary)
-    revealSidebar(in: app, exposing: recipeLibrary)
-    XCTAssertTrue(recipeLibrary.waitForExistence(timeout: 5))
+    let libraryReady = app.descendants(matching: .any)["recipe-library-ready"]
+    ensurePrimaryWindow(in: app, exposing: libraryReady)
+    revealSidebar(in: app, exposing: libraryReady)
+    XCTAssertTrue(libraryReady.waitForExistence(timeout: 5))
     return app
   }
 
@@ -282,7 +285,7 @@ final class KitchenMemoryUITests: XCTestCase {
   private func assertDurableShell(arguments: [String]) {
     let app = launchApp(additionalArguments: arguments)
     XCTAssertTrue(
-      app.descendants(matching: .any)["recipe-library"].exists,
+      app.descendants(matching: .any)["recipe-library-shell"].exists,
       "The durable shell failed under localization arguments: \(arguments)"
     )
   }

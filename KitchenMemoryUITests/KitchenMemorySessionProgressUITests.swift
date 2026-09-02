@@ -34,9 +34,7 @@ extension KitchenMemoryUITests {
     XCTAssertTrue(start.waitForExistence(timeout: 5))
     activate(start)
 
-#if os(iOS)
     let adjustedWorkingYield = adjustWorkingYield(in: app)
-#endif
 
     let ingredient = firstSessionElement(in: app, identifierPrefix: "session-ingredient-")
     XCTAssertTrue(
@@ -56,10 +54,6 @@ extension KitchenMemoryUITests {
     )
     activate(instruction)
     XCTAssertTrue(instruction.isSelected, "Instruction progress was not recorded.")
-
-#if os(macOS)
-    let adjustedWorkingYield = adjustWorkingYield(in: app)
-#endif
 
     return RecordedSessionProgress(
       ingredientIdentifier: ingredient.identifier,
@@ -95,7 +89,7 @@ extension KitchenMemoryUITests {
   private func revealRecipeRow(_ recipeRow: XCUIElement, in app: XCUIApplication) {
 #if os(iOS)
     if !recipeRow.waitForExistence(timeout: 2) {
-      app.descendants(matching: .any)["recipe-library"].swipeUp()
+      app.descendants(matching: .any)["recipe-library-shell"].swipeUp()
     }
 #endif
   }

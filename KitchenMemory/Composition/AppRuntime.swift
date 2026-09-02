@@ -6,33 +6,6 @@ import Foundation
 import KitchenKit
 import SwiftData
 
-enum AppStartupState {
-  case preparing
-  case ready(PreparedApp)
-  case unavailable
-  static func prepare(using makePreparedApp: () throws -> PreparedApp) -> Self {
-    do {
-      return .ready(try makePreparedApp())
-    } catch {
-      // Persistence and CloudKit errors can contain local paths or framework
-      // identifiers. Kitchen Memory has no private diagnostic collection path,
-      // so do not interpolate or retain the underlying error merely for logging.
-      return .unavailable
-    }
-  }
-  static func prepare(using makePreparedApp: () async throws -> PreparedApp) async -> Self {
-    do {
-      return .ready(try await makePreparedApp())
-    } catch {
-      return .unavailable
-    }
-  }
-  var preparedApp: PreparedApp? {
-    guard case .ready(let preparedApp) = self else { return nil }
-    return preparedApp
-  }
-}
-
 enum AppLaunchPlanError: Error, Equatable {
   case cloudKitContainerIdentifierMissing
   case simulatedStartupFailure
@@ -88,6 +61,7 @@ struct AppLaunchPlan: Equatable {
   var offersCloudSyncSetting: Bool
   var initializesCloudKitSchema: Bool
   var simulatesStartupFailure: Bool
+  var simulatesStartupDelay: Bool
 
   static func resolve(
     inputs: AppLaunchInputs,
@@ -139,7 +113,9 @@ struct AppLaunchPlan: Equatable {
       offersCloudSyncSetting: inputs.buildEnvironment.offersCloudSyncSetting,
       initializesCloudKitSchema: initializesCloudKitSchema,
       simulatesStartupFailure: usesTestHarness
-        && inputs.arguments.contains("--simulate-startup-failure")
+        && inputs.arguments.contains("--simulate-startup-failure"),
+      simulatesStartupDelay: usesTestHarness
+        && inputs.arguments.contains("--simulate-startup-delay")
     )
   }
 }
@@ -166,6 +142,9 @@ enum AppRuntime {
         durableCloudSyncIsEnabled:
           durablePreferences.personalCloudSynchronizationEnabled
       )
+      if plan.simulatesStartupDelay {
+        try await Task.sleep(for: .seconds(8))
+      }
       guard !plan.simulatesStartupFailure else {
         throw AppLaunchPlanError.simulatedStartupFailure
       }
@@ -200,7 +179,8 @@ enum AppRuntime {
       cloudSyncIsEnabledAtLaunch: preferences.personalCloudSynchronizationEnabled,
       offersCloudSyncSetting: false,
       initializesCloudKitSchema: false,
-      simulatesStartupFailure: false
+      simulatesStartupFailure: false,
+      simulatesStartupDelay: false
     )
     return try PreparedApp(
       plan: plan,

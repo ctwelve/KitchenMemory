@@ -8,38 +8,6 @@ import XCTest
 
 @MainActor
 final class KitchenMemoryTests: XCTestCase {
-  private final class DescriptionRecorder: @unchecked Sendable {
-    var wasRead = false
-  }
-
-  private struct PrivateStartupFailure: Error, CustomStringConvertible {
-    let recorder: DescriptionRecorder
-
-    var description: String {
-      recorder.wasRead = true
-      return "private startup details"
-    }
-  }
-
-  func testStartupPreparationMakesFailureRetryableWithoutReadingPrivateDetails() throws {
-    let recorder = DescriptionRecorder()
-    var shouldFail = true
-    let prepare: () -> AppStartupState = {
-      AppStartupState.prepare {
-        if shouldFail { throw PrivateStartupFailure(recorder: recorder) }
-        return try AppRuntime.testing()
-      }
-    }
-
-    XCTAssertNil(prepare().preparedApp)
-    XCTAssertFalse(recorder.wasRead)
-
-    shouldFail = false
-    let recovered = try XCTUnwrap(prepare().preparedApp)
-    recovered.libraryModel.loadIfNeeded()
-    XCTAssertEqual(recovered.libraryModel.recipes.count, 3)
-  }
-
   func testStarterRecipeLoadsThroughAppComposition() throws {
     let preparedApp = try AppRuntime.testing()
 
@@ -62,28 +30,6 @@ final class KitchenMemoryTests: XCTestCase {
     XCTAssertNotNil(preparedApp.cloudSyncSettings)
     XCTAssertNil(preparedApp.persistentStoreChangeObserver)
     XCTAssertNil(preparedApp.personalCloudStatusMonitor)
-  }
-
-  func testStartupCoordinatorRetainsPreparationAcrossViewLifecycle() async {
-    var continuations: [CheckedContinuation<AppStartupState, Never>] = []
-    let coordinator = AppStartupCoordinator {
-      await withCheckedContinuation { continuations.append($0) }
-    }
-
-    coordinator.prepareIfNeeded()
-    coordinator.prepareIfNeeded()
-    await Task.yield()
-
-    XCTAssertEqual(continuations.count, 1)
-    continuations[0].resume(returning: .unavailable)
-    await Task.yield()
-
-    if case .unavailable = coordinator.state {
-      // Expected: the coordinator, rather than a transient window task, owns
-      // and publishes the completed startup attempt.
-    } else {
-      XCTFail("Expected the completed startup state.")
-    }
   }
 
   func testReloadingDoesNotDuplicateStarterContent() throws {
@@ -236,6 +182,21 @@ final class AppLaunchPlanTests: XCTestCase {
       .simulatesStartupFailure)
     XCTAssertFalse(try plan(arguments: arguments, buildEnvironment: .production)
       .simulatesStartupFailure)
+  }
+
+  func testStartupDelaySimulationIsLimitedToTheUITestHarness() throws {
+    let arguments = ["KitchenMemory", "--simulate-startup-delay"]
+
+    XCTAssertTrue(try plan(arguments: arguments, buildEnvironment: .testing)
+      .simulatesStartupDelay)
+    XCTAssertTrue(try plan(arguments: arguments, buildEnvironment: .productionTesting)
+      .simulatesStartupDelay)
+    XCTAssertFalse(try plan(arguments: arguments, buildEnvironment: .debug)
+      .simulatesStartupDelay)
+    XCTAssertFalse(try plan(arguments: arguments, buildEnvironment: .develop)
+      .simulatesStartupDelay)
+    XCTAssertFalse(try plan(arguments: arguments, buildEnvironment: .production)
+      .simulatesStartupDelay)
   }
 
   func testProductionIgnoresTestingArguments() throws {

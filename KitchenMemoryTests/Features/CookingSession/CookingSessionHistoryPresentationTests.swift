@@ -54,6 +54,24 @@ final class CookingSessionHistoryPresentationTests: XCTestCase {
     XCTAssertFalse(preparedApp.sessionModel.displayedHistorySessions.contains { $0.id == secondID })
   }
 
+  func testSelectingAndLeavingAHistorySessionPreservesTheHistoryScope() throws {
+    let preparedApp = try AppRuntime.testing()
+    preparedApp.libraryModel.loadIfNeeded()
+    preparedApp.sessionModel.loadIfNeeded()
+    let recipe = try XCTUnwrap(preparedApp.libraryModel.recipes.first)
+
+    XCTAssertTrue(preparedApp.sessionModel.start(from: recipe))
+    let sessionID = try XCTUnwrap(preparedApp.sessionModel.currentSessionID)
+    XCTAssertTrue(preparedApp.sessionModel.leaveCurrentSession())
+    preparedApp.sessionModel.showSessionHistory()
+
+    XCTAssertTrue(preparedApp.sessionModel.selectSessionFromHistory(sessionID))
+    XCTAssertEqual(preparedApp.sessionModel.currentSessionID, sessionID)
+    XCTAssertTrue(preparedApp.sessionModel.leaveCurrentSession())
+    XCTAssertTrue(preparedApp.sessionModel.isShowingSessionHistory)
+    XCTAssertEqual(preparedApp.sessionModel.displayedHistorySessions.map(\.id), [sessionID])
+  }
+
   func testRecentHistoryIsVisitOrderedAndBounded() {
     let sessions = (0...6).map { index in
       CookingSessionProjection(
