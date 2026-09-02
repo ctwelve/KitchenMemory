@@ -34,9 +34,7 @@ extension KitchenMemoryUITests {
     XCTAssertTrue(start.waitForExistence(timeout: 5))
     activate(start)
 
-#if os(iOS)
     let adjustedWorkingYield = adjustWorkingYield(in: app)
-#endif
 
     let ingredient = firstSessionElement(in: app, identifierPrefix: "session-ingredient-")
     XCTAssertTrue(
@@ -56,10 +54,6 @@ extension KitchenMemoryUITests {
     )
     activate(instruction)
     XCTAssertTrue(instruction.isSelected, "Instruction progress was not recorded.")
-
-#if os(macOS)
-    let adjustedWorkingYield = adjustWorkingYield(in: app)
-#endif
 
     return RecordedSessionProgress(
       ingredientIdentifier: ingredient.identifier,

@@ -27,15 +27,29 @@ struct CookingSessionLifecyclePresentation {
 struct CookingSessionView: View {
   @Bindable var model: CookingSessionPresentationModel
   let session: CookingSessionProjection
+  let embedsInNavigationStack: Bool
+  let leaveSession: () -> Void
 
   @State private var isShowingFinishConfirmation = false
   @State private var isShowingDraftFinishOptions = false
   @State private var isShowingDeleteConfirmation = false
   @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
+  init(
+    model: CookingSessionPresentationModel,
+    session: CookingSessionProjection,
+    embedsInNavigationStack: Bool = true,
+    leaveSession: (() -> Void)? = nil
+  ) {
+    self.model = model
+    self.session = session
+    self.embedsInNavigationStack = embedsInNavigationStack
+    self.leaveSession = leaveSession ?? { model.leaveCurrentSession() }
+  }
+
   var body: some View {
     let lifecycle = CookingSessionLifecyclePresentation(session.lifecycle)
-    NavigationStack {
+    CookingSessionNavigationContainer(embedsInNavigationStack: embedsInNavigationStack) {
       GeometryReader { geometry in
         let layoutMode = CookingSessionLayoutMode.resolve(
           width: geometry.size.width,
@@ -123,7 +137,7 @@ struct CookingSessionView: View {
   private var lifecycleControls: some View {
     HStack {
       Button(.sessionActionLeave) {
-        model.leaveCurrentSession()
+        leaveSession()
       }
       .accessibilityIdentifier("leave-session")
 
@@ -156,6 +170,28 @@ struct CookingSessionView: View {
 
   private func copyDraftThenFinish() {
     model.copyCurrentEntryDraftAndFinish(using: CookingSessionClipboard.copy)
+  }
+}
+
+private struct CookingSessionNavigationContainer<Content: View>: View {
+  let embedsInNavigationStack: Bool
+  let content: Content
+
+  init(
+    embedsInNavigationStack: Bool,
+    @ViewBuilder content: () -> Content
+  ) {
+    self.embedsInNavigationStack = embedsInNavigationStack
+    self.content = content()
+  }
+
+  @ViewBuilder
+  var body: some View {
+    if embedsInNavigationStack {
+      NavigationStack { content }
+    } else {
+      content
+    }
   }
 }
 

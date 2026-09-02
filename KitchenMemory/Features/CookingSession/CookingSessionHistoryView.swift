@@ -28,6 +28,7 @@ struct CookingSessionHistoryDestinationView: View {
 
 struct CookingSessionHistoryView: View {
   @Bindable var model: CookingSessionPresentationModel
+  @State private var selectedSessionID: CookingSession.ID?
 
   private var ordinarySessions: [CookingSessionProjection] {
     model.displayedHistorySessions.filter { $0.lifecycle != .finished }
@@ -89,6 +90,27 @@ struct CookingSessionHistoryView: View {
       .frame(maxWidth: .infinity, alignment: .center)
     }
     .background(Color("AppBackground"))
+    .navigationDestination(item: $selectedSessionID) { sessionID in
+      CookingSessionHistorySessionDestination(
+        model: model,
+        sessionID: sessionID,
+        leaveSession: {
+          model.leaveCurrentSession()
+          selectedSessionID = nil
+        }
+      )
+    }
+    .onChange(of: selectedSessionID) { previousSessionID, selectedSessionID in
+      guard selectedSessionID == nil,
+            let previousSessionID,
+            model.currentSessionID == previousSessionID
+      else { return }
+      model.leaveCurrentSession()
+    }
+    .onChange(of: model.currentSessionID) { _, currentSessionID in
+      guard let selectedSessionID, currentSessionID != selectedSessionID else { return }
+      self.selectedSessionID = nil
+    }
   }
 
   private var historyTitle: LocalizedStringResource {
@@ -113,23 +135,52 @@ struct CookingSessionHistoryView: View {
     .accessibilityIdentifier(identifier)
   }
 
+  @ViewBuilder
   private func sessionButton(_ session: CookingSessionProjection) -> some View {
-    Button {
-      if session.lifecycle == .finished {
+    if session.lifecycle == .finished {
+      Button {
         model.observeFinishedSession(session.id)
-      } else {
-        model.selectSession(session.id)
+      } label: {
+        CookingSessionHistoryRow(session: session)
       }
-    } label: {
-      CookingSessionHistoryRow(session: session)
+      .buttonStyle(.plain)
+      .accessibilityIdentifier(historyRowIdentifier(session))
+    } else {
+      Button {
+        guard model.selectSessionFromHistory(session.id) else { return }
+        selectedSessionID = session.id
+      } label: {
+        CookingSessionHistoryRow(session: session)
+      }
+      .buttonStyle(.plain)
+      .accessibilityIdentifier(historyRowIdentifier(session))
     }
-    .buttonStyle(.plain)
-    .accessibilityIdentifier(historyRowIdentifier(session))
   }
 
   private func historyRowIdentifier(_ session: CookingSessionProjection) -> String {
     let prefix = session.lifecycle == .finished ? "finished-session-row" : "history-session-row"
     return "\(prefix)-\(session.id.rawValue.uuidString)"
+  }
+}
+
+private struct CookingSessionHistorySessionDestination: View {
+  @Bindable var model: CookingSessionPresentationModel
+  let sessionID: CookingSession.ID
+  let leaveSession: () -> Void
+
+  var body: some View {
+    Group {
+      if let currentSession = model.currentSession, currentSession.id == sessionID {
+        CookingSessionView(
+          model: model,
+          session: currentSession,
+          embedsInNavigationStack: false,
+          leaveSession: leaveSession
+        )
+      } else {
+        Color.clear
+      }
+    }
   }
 }
 

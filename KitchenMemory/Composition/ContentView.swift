@@ -104,7 +104,9 @@ struct ContentView: View {
         decline: dependencies.libraryModel.declineSampleRecipes
       )
     case .ready:
-      if let currentSession = dependencies.sessionModel.currentSession {
+      if let currentSession = dependencies.sessionModel.currentSession,
+         !dependencies.sessionModel.isShowingSessionHistory
+      {
         CookingSessionView(model: dependencies.sessionModel, session: currentSession)
       } else {
         recipeLibrary(dependencies)
@@ -142,7 +144,9 @@ struct ContentView: View {
         .toolbar { libraryToolbar }
 #endif
     } detail: {
-      persistentDetail
+      NavigationStack {
+        persistentDetail
+      }
     }
 #if os(macOS)
     .toolbar(removing: .sidebarToggle)
@@ -200,8 +204,14 @@ struct ContentView: View {
           decline: dependencies.libraryModel.declineSampleRecipes
         )
       case .ready:
-        if let currentSession = dependencies.sessionModel.currentSession {
-          CookingSessionView(model: dependencies.sessionModel, session: currentSession)
+        if let currentSession = dependencies.sessionModel.currentSession,
+           !dependencies.sessionModel.isShowingSessionHistory
+        {
+          CookingSessionView(
+            model: dependencies.sessionModel,
+            session: currentSession,
+            embedsInNavigationStack: false
+          )
         } else {
           LibraryDetailRouter(
             libraryModel: dependencies.libraryModel,
@@ -223,11 +233,13 @@ struct ContentView: View {
         .toolbar(removing: usesCustomSidebarToggle ? .sidebarToggle : nil)
         .toolbar { libraryToolbar }
     } detail: {
-      LibraryDetailRouter(
-        libraryModel: dependencies.libraryModel,
-        sessionModel: dependencies.sessionModel,
-        editRecipe: { activeSheet = .edit($0) }
-      )
+      NavigationStack {
+        LibraryDetailRouter(
+          libraryModel: dependencies.libraryModel,
+          sessionModel: dependencies.sessionModel,
+          editRecipe: { activeSheet = .edit($0) }
+        )
+      }
     }
     .sheet(item: $activeSheet) { sheet in
       RecipeLibrarySheetContent(
