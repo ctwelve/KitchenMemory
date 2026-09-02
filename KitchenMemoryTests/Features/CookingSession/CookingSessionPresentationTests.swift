@@ -251,9 +251,9 @@ extension CookingSessionPresentationTests {
       .appending(path: "KitchenMemory-Slice14-\(UUID().uuidString)")
     try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
     defer { try? FileManager.default.removeItem(at: directory) }
-    let defaultsName = "KitchenMemory.Slice14.\(UUID().uuidString)"
-    let defaults = try XCTUnwrap(UserDefaults(suiteName: defaultsName))
-    defer { defaults.removePersistentDomain(forName: defaultsName) }
+    let defaults = try makeTestUserDefaults(
+      suiteNamePrefix: "KitchenMemory.Slice14"
+    ).defaults
     let storeURL = directory.appending(path: "KitchenMemory.store")
     let sessionID = CookingSession.ID()
     try stageInterruptedStart(sessionID, storeURL: storeURL, defaults: defaults)

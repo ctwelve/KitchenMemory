@@ -12,12 +12,10 @@ final class KitchenPreferencesStoreTests: XCTestCase {
   private struct Fixture {
     let store: DefaultsKitchenPreferencesStore
     let defaults: UserDefaults
-    let suiteName: String
   }
 
   func testStableOnboardingKeyTreatsMissingAndUnknownValuesAsUndecided() throws {
     let fixture = try makeFixture(testName: #function)
-    defer { fixture.defaults.removePersistentDomain(forName: fixture.suiteName) }
 
     XCTAssertEqual(fixture.store.sampleRecipeOnboardingResponse, .undecided)
     fixture.defaults.set(
@@ -39,7 +37,6 @@ final class KitchenPreferencesStoreTests: XCTestCase {
 
   func testDeviceLocalCloudPreferencePreservesEnabledDefaultAndStoresOptOut() throws {
     let fixture = try makeFixture(testName: #function)
-    defer { fixture.defaults.removePersistentDomain(forName: fixture.suiteName) }
 
     XCTAssertTrue(fixture.store.personalCloudSynchronizationEnabled)
 
@@ -60,7 +57,6 @@ final class KitchenPreferencesStoreTests: XCTestCase {
 
   func testOnboardingPreferenceObservationPublishesTypedChanges() async throws {
     let fixture = try makeFixture(testName: #function)
-    defer { fixture.defaults.removePersistentDomain(forName: fixture.suiteName) }
     let changed = expectation(description: "Defaults change observed")
     var receivedResponse: SampleRecipeOnboardingResponse?
     fixture.store.startObservingSampleRecipeOnboardingResponse {
@@ -77,7 +73,6 @@ final class KitchenPreferencesStoreTests: XCTestCase {
 
   func testICloudAccountChangeDoesNotRetainThePreviousAccountsAnswer() async throws {
     let fixture = try makeFixture(testName: #function)
-    defer { fixture.defaults.removePersistentDomain(forName: fixture.suiteName) }
     fixture.store.sampleRecipeOnboardingResponse = .declined
     let changed = expectation(description: "Account change observed")
     var receivedResponse: SampleRecipeOnboardingResponse?
@@ -96,13 +91,14 @@ final class KitchenPreferencesStoreTests: XCTestCase {
   private func makeFixture(
     testName: String
   ) throws -> Fixture {
-    let suiteName = "KitchenPreferencesStoreTests.\(testName).\(UUID().uuidString)"
-    let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
+    let preferences = try makeTestUserDefaults(
+      suiteNamePrefix: "KitchenPreferencesStoreTests.\(testName)"
+    )
     let store = DefaultsKitchenPreferencesStore(
-      defaults: defaults,
+      defaults: preferences.defaults,
       notificationCenter: NotificationCenter(),
       permitsPersonalPreferencesICloud: false
     )
-    return Fixture(store: store, defaults: defaults, suiteName: suiteName)
+    return Fixture(store: store, defaults: preferences.defaults)
   }
 }
