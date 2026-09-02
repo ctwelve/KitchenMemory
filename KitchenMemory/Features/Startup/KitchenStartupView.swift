@@ -65,6 +65,7 @@ struct StartupRecipeLibrarySidebar: View {
         Text(.sessionDiscoveryRecipes)
       }
     }
+    .accessibilityIdentifier("recipe-library-shell")
     .listStyle(.sidebar)
   }
 }

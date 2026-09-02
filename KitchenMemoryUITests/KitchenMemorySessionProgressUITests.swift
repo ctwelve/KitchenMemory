@@ -95,7 +95,7 @@ extension KitchenMemoryUITests {
   private func revealRecipeRow(_ recipeRow: XCUIElement, in app: XCUIApplication) {
 #if os(iOS)
     if !recipeRow.waitForExistence(timeout: 2) {
-      app.descendants(matching: .any)["recipe-library"].swipeUp()
+      app.descendants(matching: .any)["recipe-library-shell"].swipeUp()
     }
 #endif
   }

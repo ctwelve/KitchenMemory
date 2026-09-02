@@ -77,7 +77,7 @@ struct ContentView: View {
     horizontalSizeClass == .regular
       || (horizontalSizeClass == nil && UIDevice.current.userInterfaceIdiom == .pad)
 #else
-    false
+    preparedApp != nil
 #endif
   }
 
@@ -112,17 +112,42 @@ struct ContentView: View {
     }
   }
 
+  @ViewBuilder
   private var persistentRecipeLibrary: some View {
+#if os(macOS)
+    if let dependencies = preparedApp {
+      persistentRecipeLibraryShell
+        .focusedSceneValue(\.resetKitchenAction) {
+          isShowingResetConfirmation = true
+        }
+        .kitchenResetConfirmation(
+          isPresented: $isShowingResetConfirmation,
+          model: dependencies.libraryModel,
+          locale: locale
+        )
+    } else {
+      persistentRecipeLibraryShell
+    }
+#else
+    persistentRecipeLibraryShell
+#endif
+  }
+
+  private var persistentRecipeLibraryShell: some View {
     NavigationSplitView(columnVisibility: $columnVisibility) {
       persistentSidebar
-        .accessibilityElement(children: .contain)
-        .accessibilityIdentifier("recipe-library-shell")
         .navigationTitle(.libraryTitle)
+#if !os(macOS)
         .toolbar(removing: usesCustomSidebarToggle ? .sidebarToggle : nil)
         .toolbar { libraryToolbar }
+#endif
     } detail: {
       persistentDetail
     }
+#if os(macOS)
+    .toolbar(removing: .sidebarToggle)
+    .toolbar { libraryToolbar }
+#endif
     .sheet(item: $activeSheet) { sheet in
       if let dependencies = preparedApp {
         RecipeLibrarySheetContent(
@@ -211,16 +236,7 @@ struct ContentView: View {
         selectSheet: { activeSheet = $0 }
       )
     }
-#if os(macOS)
-    .focusedSceneValue(\.resetKitchenAction) {
-      isShowingResetConfirmation = true
-    }
-    .kitchenResetConfirmation(
-      isPresented: $isShowingResetConfirmation,
-      model: dependencies.libraryModel,
-      locale: locale
-    )
-#else
+#if !os(macOS)
     .sheet(isPresented: $isShowingSettings) {
       NavigationStack {
         KitchenSettingsView(
@@ -262,20 +278,33 @@ private extension ContentView {
       showSessionHistory: {
         dependencies.libraryModel.selectedRecipeID = nil
         dependencies.sessionModel.showSessionHistory()
-        columnVisibility = .detailOnly
+        focusSelectedDestination()
       },
       showDeletedItems: {
         dependencies.libraryModel.selectedRecipeID = nil
         dependencies.sessionModel.showDeletedItems()
-        columnVisibility = .detailOnly
+        focusSelectedDestination()
       },
       showRecovery: {
         dependencies.libraryModel.selectedRecipeID = nil
         dependencies.sessionModel.showRecovery()
-        columnVisibility = .detailOnly
+        focusSelectedDestination()
+      },
+      selectSession: { sessionID in
+        if dependencies.sessionModel.selectSession(sessionID) {
+          focusSelectedDestination()
+        }
       }
     )
   }
+
+  func focusSelectedDestination() {
+    columnVisibility = LibraryNavigationPolicy.destinationSelectionVisibility(
+      current: columnVisibility,
+      preservesSidebar: usesPersistentLibraryShell
+    )
+  }
+
   var sessionIssueIsPresented: Binding<Bool> {
     Binding(
       get: { preparedApp?.sessionModel.isShowingIssue ?? false },
