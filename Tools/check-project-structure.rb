@@ -97,6 +97,29 @@ module KitchenMemory
       "/Localized: LaunchScreen.storyboard",
       "LaunchScreenAssets.xcassets"
     ].freeze
+    APPLICATION_SWIFT_SOURCE_HOMES = %w[
+      KitchenMemory/Composition/
+      KitchenMemory/Features/CookingSession/
+      KitchenMemory/Features/RecipeLibrary/
+      KitchenMemory/Features/Settings/
+      KitchenMemory/Features/Startup/
+      KitchenMemory/PlatformAdapters/
+      KitchenMemory/Resources/
+      KitchenMemory/SharedPresentation/
+    ].freeze
+    KITCHEN_KIT_SWIFT_SOURCE_HOMES = %w[
+      KitchenKit/Domain/
+      KitchenKit/Import/
+      KitchenKit/Logic/
+      KitchenKit/Persistence/
+    ].freeze
+    PRESENTATION_FRAMEWORK_IMPORT = %r{
+      ^\s*
+      (?:@\w+(?:\([^)]*\))?\s+)*
+      import\s+
+      (?:(?:class|enum|func|let|protocol|struct|typealias|var)\s+)?
+      (?:AppKit|SwiftUI|UIKit)(?:\.|\s|$)
+    }x.freeze
     OBSOLETE_PROJECT_METADATA = [
       "KitchenMemory iOS",
       "KitchenMemory macOS",
@@ -223,8 +246,108 @@ module KitchenMemory
         ios_contents: File.read(File.join(root, "KitchenMemory", "Info-iOS.plist")),
         macos_contents: File.read(File.join(root, "KitchenMemory", "Info-macOS.plist"))
       )
+      validate_application_source_taxonomy(
+        application_sources: swift_sources(root, "KitchenMemory"),
+        kitchen_kit_sources: swift_sources(root, "KitchenKit")
+      )
 
       validate(project_contents: File.read(project_path), schemes: schemes, plans: plans)
+    end
+
+    def swift_sources(root, directory)
+      pattern = File.join(root, directory, "**", "*.swift")
+      Dir[pattern].to_h do |path|
+        [path.delete_prefix("#{root}/"), File.read(path)]
+      end
+    end
+
+    def validate_application_source_taxonomy(application_sources:, kitchen_kit_sources:)
+      unexpected_source = application_sources.keys.find do |path|
+        APPLICATION_SWIFT_SOURCE_HOMES.none? { |home| path.start_with?(home) }
+      end
+      if unexpected_source
+        raise ContractError,
+              "application Swift source must have an intentional presentation home: #{unexpected_source}"
+      end
+
+      unexpected_kitchen_kit_source = kitchen_kit_sources.keys.find do |path|
+        KITCHEN_KIT_SWIFT_SOURCE_HOMES.none? { |home| path.start_with?(home) }
+      end
+      if unexpected_kitchen_kit_source
+        raise ContractError,
+              "KitchenKit Swift source must remain in an accepted responsibility: " \
+              "#{unexpected_kitchen_kit_source}"
+      end
+
+      presentation_source = kitchen_kit_sources.find do |_path, contents|
+        swift_code_without_comments_and_literals(contents).match?(PRESENTATION_FRAMEWORK_IMPORT)
+      end
+      return unless presentation_source
+
+      raise ContractError,
+            "presentation implementation must remain outside KitchenKit: #{presentation_source.first}"
+    end
+
+    def swift_code_without_comments_and_literals(contents)
+      code = +""
+      index = 0
+      block_comment_depth = 0
+      string = nil
+
+      while index < contents.length
+        if block_comment_depth.positive?
+          if contents[index, 2] == "/*"
+            block_comment_depth += 1
+            code << "  "
+            index += 2
+          elsif contents[index, 2] == "*/"
+            block_comment_depth -= 1
+            code << "  "
+            index += 2
+          else
+            code << (contents[index] == "\n" ? "\n" : " ")
+            index += 1
+          end
+          next
+        end
+
+        if string
+          if contents[index, string.fetch(:closing).length] == string.fetch(:closing)
+            code << " " * string.fetch(:closing).length
+            index += string.fetch(:closing).length
+            string = nil
+          elsif string.fetch(:hashes).empty? && contents[index] == "\\"
+            code << "  "
+            index += 2
+          else
+            code << (contents[index] == "\n" ? "\n" : " ")
+            index += 1
+          end
+          next
+        end
+
+        if contents[index, 2] == "//"
+          line_end = contents.index("\n", index) || contents.length
+          code << " " * (line_end - index)
+          index = line_end
+        elsif contents[index, 2] == "/*"
+          block_comment_depth = 1
+          code << "  "
+          index += 2
+        elsif (opening = contents[index..].match(/\A(#+)?("""|")/))
+          hashes = opening[1].to_s
+          quotes = opening[2]
+          opening_length = hashes.length + quotes.length
+          string = {closing: "#{quotes}#{hashes}", hashes: hashes}
+          code << " " * opening_length
+          index += opening_length
+        else
+          code << contents[index]
+          index += 1
+        end
+      end
+
+      code
     end
 
     def validate_info_plist_sources(ios_contents:, macos_contents:)

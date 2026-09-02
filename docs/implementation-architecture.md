@@ -47,6 +47,40 @@ property list and entitlements, while platform filters exclude launch resources
 from Mac products.
 `KitchenKit/` belongs only to the KitchenKit target.
 
+### Application presentation taxonomy
+
+Application Swift sources use feature and responsibility homes inside the one
+multiplatform `KitchenMemory` target:
+
+```text
+KitchenMemory/
+├── Composition/             app entry point, launch policy, runtime, and shell
+├── Features/
+│   ├── RecipeLibrary/       browsing, editing, importing, and scaling
+│   ├── CookingSession/      active work, history, recovery, and session outbox
+│   ├── Settings/            preferences, privacy, sync, and destructive reset
+│   └── Startup/             loading, failure, and sample-recipe decisions
+├── SharedPresentation/      localization and cross-feature presentation help
+├── Resources/               application-owned catalog models and providers
+└── PlatformAdapters/        store refresh and platform identity bridges
+```
+
+The synchronized `KitchenMemory/` source root still owns all of these folders,
+the String Catalogs, asset catalogs, privacy manifest, property lists,
+entitlements, and localized launch resources. Folders express application
+ownership; they are not new targets, modules, visibility boundaries, or
+dependency seams. Hosted tests mirror feature or responsibility ownership under
+`KitchenMemoryTests/`. The separate `KitchenMemoryUITests/` target remains one
+identifier-driven smoke suite rather than a second presentation consumer.
+
+The project-structure contract rejects application Swift files outside this
+taxonomy, rejects new KitchenKit responsibility roots, and rejects SwiftUI,
+UIKit, or AppKit imports in `KitchenKit`. A private `KitchenUI` framework should
+be reconsidered only when evidence establishes at least one of these pressures:
+a second real consumer, a distinct dependency footprint, a need for independent
+evolution, or measured build cost that a separate module would improve. Folder
+size or a desire for tidier navigation alone is not that evidence.
+
 The shared SwiftUI layer is an explicit 0.1 compromise, not a permanent promise.
 File-level platform filters and compilation conditions let 0.2 replace either
 platform's presentation with UIKit, AppKit, or platform-specific SwiftUI
