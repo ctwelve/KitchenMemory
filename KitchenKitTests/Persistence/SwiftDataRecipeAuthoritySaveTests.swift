@@ -129,6 +129,31 @@ final class SwiftDataRecipeAuthoritySaveTests: XCTestCase {
     }
   }
 
+  func testSaveRejectsUnknownCausalReferencesWithoutMutation() throws {
+    let container = try KitchenMemorySchema.makeContainer(inMemory: true)
+    let repository = SwiftDataRecipeRepository(modelContainer: container)
+    let kitchen = Kitchen(name: "Home")
+    try repository.save(kitchen)
+
+    let missingParent = makeCommand(
+      kitchenID: kitchen.id,
+      number: 1,
+      title: "Orphan",
+      parents: [.init()]
+    )
+    XCTAssertThrowsError(try repository.save(missingParent))
+
+    let missingSelection = makeCommand(
+      kitchenID: kitchen.id,
+      number: 1,
+      title: "Unobserved",
+      observedSelections: [.init()]
+    )
+    XCTAssertThrowsError(try repository.save(missingSelection))
+
+    assertAuthorityCounts(container: container, saves: 0, selections: 0, revisions: 0)
+  }
+
   private func makeCommand(
     kitchenID: Kitchen.ID,
     recipeID: Recipe.ID = Recipe.ID(),

@@ -404,6 +404,12 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
       Set(command.parentRevisionIDs).count == command.parentRevisionIDs.count,
       Set(selection.observedSelectionIDs).count == selection.observedSelectionIDs.count
     else { throw KitchenMemoryPersistenceError.invalidRecipeSaveCommand }
+    try validateCausalReferences(
+      parentRevisionIDs: command.parentRevisionIDs,
+      observedSelectionIDs: selection.observedSelectionIDs,
+      kitchenID: recipe.kitchenID,
+      recipeID: recipe.id
+    )
     let manifest = RecipePayloadManifest(revision: revision)
     guard manifestCollectionsAreUnique(manifest) else {
       throw KitchenMemoryPersistenceError.invalidRecipeSaveCommand
@@ -414,6 +420,29 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
       revision: RecipeRevisionCodec.encode(revision),
       frontier: RecipeIdentifierSetCodec.encode(selection.observedSelectionIDs.map(\.rawValue))
     )
+  }
+
+  private func validateCausalReferences(
+    parentRevisionIDs: [RecipeRevision.ID],
+    observedSelectionIDs: [RecipeSelectionCommand.ID],
+    kitchenID: Kitchen.ID,
+    recipeID: Recipe.ID
+  ) throws {
+    let parentIDs = Set(parentRevisionIDs.map(\.rawValue))
+    let savedParents = try context.fetch(FetchDescriptor<RecipeSaveRecord>()).filter {
+      parentIDs.contains($0.revisionID)
+        && $0.kitchenID == kitchenID.rawValue
+        && $0.recipeID == recipeID.rawValue
+    }
+    let observedIDs = Set(observedSelectionIDs.map(\.rawValue))
+    let observedSelections = try context.fetch(FetchDescriptor<RecipeSelectionRecord>()).filter {
+      observedIDs.contains($0.id)
+        && $0.kitchenID == kitchenID.rawValue
+        && $0.recipeID == recipeID.rawValue
+    }
+    guard Set(savedParents.map(\.revisionID)) == parentIDs,
+      Set(observedSelections.map(\.id)) == observedIDs
+    else { throw KitchenMemoryPersistenceError.invalidRecipeSaveCommand }
   }
 
   private func matchingRevisionRecords(
