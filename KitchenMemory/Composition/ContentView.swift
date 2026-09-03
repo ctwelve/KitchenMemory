@@ -8,6 +8,12 @@ import SwiftUI
 import UIKit
 #endif
 
+/// The adaptive application shell for startup, library, and Cooking Session destinations.
+///
+/// The shell preserves library navigation on regular-width and Mac layouts and
+/// uses compact navigation on iPhone. It routes already-derived presentation
+/// state; KitchenKit remains responsible for business behavior and durable
+/// Session lifecycle.
 struct ContentView: View {
   let startupState: AppStartupState
   let retryStartup: () -> Void
@@ -105,8 +111,7 @@ struct ContentView: View {
       )
     case .ready:
       if let currentSession = dependencies.sessionModel.currentSession,
-         !dependencies.sessionModel.isShowingSessionHistory
-      {
+         !dependencies.sessionModel.isShowingSessionHistory {
         CookingSessionView(model: dependencies.sessionModel, session: currentSession)
       } else {
         recipeLibrary(dependencies)
@@ -205,8 +210,7 @@ struct ContentView: View {
         )
       case .ready:
         if let currentSession = dependencies.sessionModel.currentSession,
-           !dependencies.sessionModel.isShowingSessionHistory
-        {
+           !dependencies.sessionModel.isShowingSessionHistory {
           CookingSessionView(
             model: dependencies.sessionModel,
             session: currentSession,
@@ -259,9 +263,11 @@ struct ContentView: View {
     }
 #endif
   }
+}
 
+private extension ContentView {
   @ToolbarContentBuilder
-  private var libraryToolbar: some ToolbarContent {
+  var libraryToolbar: some ToolbarContent {
     LibraryToolbar(
       showsKitchenActions: preparedApp != nil,
       actionsAreAvailable: preparedApp.map(kitchenActionsAreAvailable) ?? false,
@@ -274,9 +280,7 @@ struct ContentView: View {
       showSettings: showSettings
     )
   }
-}
 
-private extension ContentView {
   func kitchenActionsAreAvailable(in dependencies: PreparedApp) -> Bool {
     shellPresentation.permitsKitchenActions
       && dependencies.libraryModel.startupState == .ready

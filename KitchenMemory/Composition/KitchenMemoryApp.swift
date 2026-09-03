@@ -4,6 +4,11 @@
 
 import SwiftUI
 
+/// The native application entry point and owner of scene-level presentation.
+///
+/// Startup remains visible while ``AppStartupCoordinator`` prepares the
+/// application graph. The same prepared dependencies then feed the iOS window,
+/// the macOS window, and the macOS Settings scene.
 @main
 struct KitchenMemoryApp: App {
   @StateObject private var startup: AppStartupCoordinator

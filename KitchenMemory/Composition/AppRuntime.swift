@@ -120,6 +120,12 @@ struct AppLaunchPlan: Equatable {
   }
 }
 
+/// Builds the application dependency graph from launch policy and platform state.
+///
+/// This is the composition root: it selects the store, establishes the personal
+/// Kitchen, and connects KitchenKit services to application-owned presentation
+/// models. UI code should consume ``PreparedApp`` instead of assembling partial
+/// graphs of its own.
 @MainActor
 enum AppRuntime {
   struct TestingConfiguration {
@@ -257,6 +263,12 @@ struct PreparedCore {
   }
 }
 
+/// The complete dependency graph consumed by the prepared application shell.
+///
+/// It retains the model container and adapters for their required lifetimes and
+/// exposes the recipe-library and Cooking Session presentation models used by
+/// feature views. External-store notifications re-enter the graph here so both
+/// projections refresh from one ownership-reconciled boundary.
 @MainActor
 struct PreparedApp {
   let modelContainer: ModelContainer
