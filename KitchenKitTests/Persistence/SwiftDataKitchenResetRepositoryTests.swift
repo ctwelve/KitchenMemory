@@ -271,3 +271,41 @@ final class SwiftDataKitchenResetRepositoryTests: XCTestCase {
     try operation(directory.appending(path: "KitchenMemory.store"))
   }
 }
+
+extension SwiftDataKitchenResetRepositoryTests {
+  func testResetRemovesPayloadReachableOnlyFromRestorationEvidence() throws {
+    let container = try KitchenMemorySchema.makeContainer(inMemory: true)
+    let recipes = SwiftDataRecipeRepository(modelContainer: container)
+    let kitchen = Kitchen(name: "Home")
+    let residue = storedRecipe(kitchenID: kitchen.id, title: "Residue", withChildren: true)
+    let sample = storedRecipe(kitchenID: kitchen.id, title: "Sample")
+    try recipes.save(kitchen)
+    try recipes.save(recipe: residue.recipe, revision: residue.revision)
+
+    let context = ModelContext(container)
+    for record in try context.fetch(FetchDescriptor<RecipeRecord>())
+    where record.id == residue.id.rawValue {
+      context.delete(record)
+    }
+    for record in try context.fetch(FetchDescriptor<RecipeSaveRecord>())
+    where record.recipeID == residue.id.rawValue {
+      context.delete(record)
+    }
+    for record in try context.fetch(FetchDescriptor<RecipeSelectionRecord>())
+    where record.recipeID == residue.id.rawValue {
+      context.delete(record)
+    }
+    context.insert(RecipeDeletionResolutionRecord(
+      id: UUID(), deletionID: UUID(), recipeID: residue.id.rawValue,
+      kitchenID: kitchen.id.rawValue, restoredAt: Date()
+    ))
+    try context.save()
+
+    try SwiftDataKitchenResetRepository(modelContainer: container)
+      .reset(kitchenID: kitchen.id, to: [sample])
+
+    let verification = ModelContext(container)
+    assertAuthorityRemoved(residue, from: verification)
+    assertRevisionGraphRemoved(residue.revision, from: verification)
+  }
+}
