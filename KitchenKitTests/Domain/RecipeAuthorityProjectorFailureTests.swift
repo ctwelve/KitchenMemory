@@ -107,6 +107,38 @@ final class RecipeAuthorityProjectorFailureTests: XCTestCase {
       project(fixture.copy(authoredSave, payloadManifestData: manifest.data), revision: authored),
       .recovery(.manifestMismatch(authored.id))
     )
+
+  }
+
+  func testIncompleteRichManifestChecksEveryPayloadFamily() throws {
+    let fixture = RecipeAuthorityFixture()
+    let revision = fixture.revision(1)
+    let selection = fixture.selection(11, revision: revision)
+    let rich = RecipeRevision(
+      id: revision.id, recipeID: revision.recipeID,
+      revisionNumber: revision.revisionNumber, title: revision.title,
+      media: [RecipeMedia(role: .hero, assetName: "hero")],
+      equipment: [EquipmentItem(originalText: "Pan", name: "Pan")],
+      ingredientSections: [
+        IngredientSection(ingredients: [RecipeIngredient(originalText: "Salt")]),
+      ],
+      instructionSections: [
+        InstructionSection(steps: [InstructionStep(text: "Stir")]),
+      ]
+    )
+    var expectedRich = rich
+    expectedRich.instructionSections[0].steps.append(InstructionStep(text: "Serve"))
+    let richSave = try fixture.save(3, revision: rich)
+    let expectedRichManifest = RecipePayloadManifestCodec.encode(
+      RecipePayloadManifest(revision: expectedRich)
+    )
+    XCTAssertEqual(
+      RecipeAuthorityProjector.project(fixture.evidence(
+        saves: [fixture.copy(richSave, payloadManifestData: expectedRichManifest.data)],
+        selections: [selection], revisions: [rich]
+      )),
+      .unavailable(.incompleteManifest(rich.id))
+    )
   }
 
   func testSelectionReferenceAndCodecFailuresAreClassified() throws {
@@ -185,15 +217,19 @@ final class RecipeAuthorityProjectorFailureTests: XCTestCase {
       .recovery(.commandCollision(deletion.id))
     )
 
-    let missingDeletionID = fixture.id(88)
+    let missingDeletionID = fixture.id(87)
     let restoration = RecipeRestorationEvidence(
-      id: fixture.id(31), deletionID: missingDeletionID, kitchenID: fixture.kitchenID,
+      id: fixture.id(31), deletionID: fixture.id(88), kitchenID: fixture.kitchenID,
       recipeID: fixture.recipeID, restoredAt: Date(timeIntervalSince1970: 31)
+    )
+    let earlierMissingRestoration = RecipeRestorationEvidence(
+      id: fixture.id(32), deletionID: missingDeletionID, kitchenID: fixture.kitchenID,
+      recipeID: fixture.recipeID, restoredAt: Date(timeIntervalSince1970: 32)
     )
     XCTAssertEqual(
       RecipeAuthorityProjector.project(fixture.evidence(
         saves: [save], selections: [selection], revisions: [revision],
-        restorations: [restoration]
+        restorations: [restoration, earlierMissingRestoration]
       )),
       .unavailable(.missingDeletion(missingDeletionID))
     )

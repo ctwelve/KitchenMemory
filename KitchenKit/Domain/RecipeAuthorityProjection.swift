@@ -141,9 +141,6 @@ private extension RecipeAuthorityProjector {
     revision: RecipeRevision?
   ) -> RecipeAuthorityProjection? {
     guard let revision else { return .unavailable(.missingRevision(save.revisionID)) }
-    guard revision.id == save.revisionID else {
-      return .recovery(.payloadCollision(save.revisionID))
-    }
     let expected: RecipePayloadManifest
     do {
       expected = try RecipePayloadManifestCodec.decode(
@@ -208,8 +205,8 @@ private extension RecipeAuthorityProjector {
       selections.filter { headIDs.contains($0.id) }.map(\.selectedRevisionID).sorted(by: idPrecedes),
       id: \.self
     )
-    guard let currentID = selected.first else { return .unavailable(.noSelectionEvidence) }
     guard selected.count == 1 else { return .recovery(.competingSelections(selected)) }
+    let currentID = selected[0]
     let projected = AvailableRecipeAuthority(
       recipe: Recipe(
         id: evidence.recipeID,
@@ -232,11 +229,12 @@ private extension RecipeAuthorityProjector {
     graph: CausalGraph<RecipeRevision.ID>,
     parentsByRevision: [RecipeRevision.ID: [RecipeRevision.ID]]
   ) -> [ProjectedRecipeRevision] {
-    revisions.sorted { idPrecedes($0.id, $1.id) }.map { revision in
+    let reconciledIDs = Set(parentsByRevision.filter { $0.value.count > 1 }.keys)
+    return revisions.sorted { idPrecedes($0.id, $1.id) }.map { revision in
       let state: ProjectedRecipeRevision.State
       if revision.id == currentID {
         state = .current
-      } else if (parentsByRevision[revision.id]?.count ?? 0) > 1 {
+      } else if reconciledIDs.contains(revision.id) {
         state = .reconciled
       } else if graph.isAncestor(revision.id, of: currentID) {
         state = .previous

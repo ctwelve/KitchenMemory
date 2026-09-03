@@ -7,7 +7,11 @@ import Foundation
 import SwiftData
 import XCTest
 
+// The matrix keeps all persistence-bound authority failure modes beside one shared fixture.
+// swiftlint:disable file_length
+
 @MainActor
+// swiftlint:disable:next type_body_length
 final class SwiftDataRecipeAuthorityFailureTests: XCTestCase {
   func testSelectionValidationAndCollisionLeaveAcceptedChoiceIntact() throws {
     let container = try KitchenMemorySchema.makeContainer(inMemory: true)
@@ -199,7 +203,7 @@ final class SwiftDataRecipeAuthorityFailureTests: XCTestCase {
     }
   }
 
-  func testSaveRejectsDuplicateManifestIdentityAndChangedImmutablePayload() throws {
+  func testSaveRejectsDuplicateManifestIdentity() throws {
     let container = try KitchenMemorySchema.makeContainer(inMemory: true)
     let repository = SwiftDataRecipeRepository(modelContainer: container)
     let kitchen = Kitchen(name: "Home")
@@ -228,7 +232,13 @@ final class SwiftDataRecipeAuthorityFailureTests: XCTestCase {
     ))) { error in
       XCTAssertEqual(error as? KitchenMemoryPersistenceError, .invalidRecipeSaveCommand)
     }
+  }
 
+  func testSaveRejectsChangedImmutablePayloadAndSelfParent() throws {
+    let container = try KitchenMemorySchema.makeContainer(inMemory: true)
+    let repository = SwiftDataRecipeRepository(modelContainer: container)
+    let kitchen = Kitchen(name: "Home")
+    try repository.save(kitchen)
     let original = makeCommand(kitchenID: kitchen.id, number: 1)
     try repository.save(original)
     let changedRevision = RecipeRevision(
@@ -249,6 +259,178 @@ final class SwiftDataRecipeAuthorityFailureTests: XCTestCase {
         .recipeSaveCommandCollision(commandID: collision.id)
       )
     }
+
+    let selfParent = RecipeSaveCommand(
+      recipe: original.recipe, revision: original.revision, savedAt: Date(),
+      parentRevisionIDs: [original.revision.id],
+      selection: RecipeSelectionCommand(
+        kitchenID: kitchen.id, recipeID: original.recipe.id,
+        selectedRevisionID: original.revision.id, selectedAt: Date()
+      )
+    )
+    XCTAssertThrowsError(try repository.save(selfParent)) { error in
+      XCTAssertEqual(error as? KitchenMemoryPersistenceError, .invalidRecipeSaveCommand)
+    }
+  }
+
+  func testCompatibilitySaveReportsCorruptAcceptedAuthority() throws {
+    let container = try KitchenMemorySchema.makeContainer(inMemory: true)
+    let repository = SwiftDataRecipeRepository(modelContainer: container)
+    let kitchen = Kitchen(name: "Home")
+    try repository.save(kitchen)
+    let command = makeCommand(kitchenID: kitchen.id, number: 1)
+    try repository.save(command)
+    let context = ModelContext(container)
+    let save = try XCTUnwrap(try context.fetch(FetchDescriptor<RecipeSaveRecord>()).first)
+    save.parentRevisionIDsData = Data([0])
+    try context.save()
+
+    XCTAssertThrowsError(
+      try SwiftDataRecipeRepository(modelContainer: container)
+        .save(recipe: command.recipe, revision: command.revision)
+    ) { error in
+      XCTAssertEqual(
+        error as? KitchenMemoryPersistenceError,
+        .invalidStoredValue(field: "recipe.authority")
+      )
+    }
+  }
+
+  func testCompatibilitySaveReportsCorruptSelectionHeads() throws {
+    let container = try KitchenMemorySchema.makeContainer(inMemory: true)
+    let repository = SwiftDataRecipeRepository(modelContainer: container)
+    let kitchen = Kitchen(name: "Home")
+    try repository.save(kitchen)
+    let first = makeCommand(kitchenID: kitchen.id, number: 1)
+    try repository.save(first)
+    let context = ModelContext(container)
+    let selection = try XCTUnwrap(
+      try context.fetch(FetchDescriptor<RecipeSelectionRecord>()).first
+    )
+    selection.observedSelectionIDsData = Data([0])
+    try context.save()
+    let next = makeCommand(kitchenID: kitchen.id, recipeID: first.recipe.id, number: 2)
+
+    XCTAssertThrowsError(
+      try SwiftDataRecipeRepository(modelContainer: container)
+        .save(recipe: next.recipe, revision: next.revision)
+    ) { error in
+      XCTAssertEqual(
+        error as? KitchenMemoryPersistenceError,
+        .invalidStoredValue(field: "recipe.authority")
+      )
+    }
+  }
+
+  func testCompatibilitySaveSortsAllMaximalSelectionHeads() throws {
+    let container = try KitchenMemorySchema.makeContainer(inMemory: true)
+    let repository = SwiftDataRecipeRepository(modelContainer: container)
+    let kitchen = Kitchen(name: "Home")
+    try repository.save(kitchen)
+    let first = makeCommand(kitchenID: kitchen.id, number: 1)
+    try repository.save(first)
+    let laterID = RecipeSelectionCommand.ID(
+      rawValue: UUID(uuidString: "ffffffff-ffff-ffff-ffff-ffffffffffff")!
+    )
+    let earlierID = RecipeSelectionCommand.ID(
+      rawValue: UUID(uuidString: "00000000-0000-0000-0000-000000000001")!
+    )
+    for id in [laterID, earlierID] {
+      try repository.select(RecipeSelectionCommand(
+        id: id, kitchenID: kitchen.id, recipeID: first.recipe.id,
+        selectedRevisionID: first.revision.id, selectedAt: Date(),
+        observedSelectionIDs: [first.selection.id]
+      ))
+    }
+    let next = makeCommand(kitchenID: kitchen.id, recipeID: first.recipe.id, number: 2)
+    try repository.save(recipe: next.recipe, revision: next.revision)
+
+    let context = ModelContext(container)
+    let selection = try XCTUnwrap(try context.fetch(FetchDescriptor<RecipeSelectionRecord>())
+      .first { $0.id == next.revision.id.rawValue })
+    XCTAssertEqual(
+      try RecipeIdentifierSetCodec.decode(
+        formatVersion: selection.frontierFormatVersion,
+        data: selection.observedSelectionIDsData
+      ),
+      [earlierID.rawValue, laterID.rawValue]
+    )
+  }
+
+  func testLegacyRowsReportMissingCrossOwnedAndTieBrokenRevisionEvidence() throws {
+    let container = try KitchenMemorySchema.makeContainer(inMemory: true)
+    let repository = SwiftDataRecipeRepository(modelContainer: container)
+    let kitchen = Kitchen(name: "Home")
+    try repository.save(kitchen)
+    let context = ModelContext(container)
+
+    let missingID = Recipe.ID()
+    context.insert(RecipeRecord(
+      id: missingID.rawValue, kitchenID: kitchen.id.rawValue,
+      currentRevisionID: UUID()
+    ))
+    let crossOwnedID = Recipe.ID()
+    let crossRevision = makeRevisionRecord(recipeID: Recipe.ID(), number: 1)
+    context.insert(RecipeRecord(
+      id: crossOwnedID.rawValue, kitchenID: kitchen.id.rawValue,
+      currentRevisionID: crossRevision.id
+    ))
+    context.insert(crossRevision)
+    let tiedID = Recipe.ID()
+    let earlier = makeRevisionRecord(
+      id: UUID(uuidString: "00000000-0000-0000-0000-000000000001")!,
+      recipeID: tiedID,
+      number: 1
+    )
+    let later = makeRevisionRecord(
+      id: UUID(uuidString: "ffffffff-ffff-ffff-ffff-ffffffffffff")!,
+      recipeID: tiedID,
+      number: 1
+    )
+    context.insert(RecipeRecord(
+      id: tiedID.rawValue, kitchenID: kitchen.id.rawValue,
+      currentRevisionID: earlier.id
+    ))
+    context.insert(earlier)
+    context.insert(later)
+    try context.save()
+
+    let reader = SwiftDataRecipeRepository(modelContainer: container)
+    XCTAssertThrowsError(try reader.recipe(id: missingID)) { error in
+      XCTAssertEqual(error as? KitchenMemoryPersistenceError, .missingCurrentRevision)
+    }
+    XCTAssertThrowsError(try reader.recipe(id: crossOwnedID)) { error in
+      guard case .inconsistentStoredRecipeIdentity = error as? KitchenMemoryPersistenceError
+      else { return XCTFail("Expected ownership failure") }
+    }
+    XCTAssertEqual(try reader.recipe(id: tiedID)?.revision.id.rawValue, later.id)
+  }
+
+  func testReplacementRemovesRetainedPruneEvidence() throws {
+    let container = try KitchenMemorySchema.makeContainer(inMemory: true)
+    let repository = SwiftDataRecipeRepository(modelContainer: container)
+    let kitchen = Kitchen(name: "Home")
+    try repository.save(kitchen)
+    let command = makeCommand(kitchenID: kitchen.id, number: 1)
+    try repository.save(command)
+    let frontier = RecipeAuthorityFrontierCodec.encode(RecipeAuthorityFrontier(
+      revisionHeads: [], selectionHeads: [], deletionIDs: [], restorationIDs: []
+    ))
+    let context = ModelContext(container)
+    context.insert(RecipePruneRecord(
+      id: UUID(), kitchenID: kitchen.id.rawValue, recipeID: command.recipe.id.rawValue,
+      prunedAt: Date(), antiResurrectionUntil: Date().addingTimeInterval(1),
+      frontierFormatVersion: frontier.formatVersion, frontierData: frontier.data,
+      frontierDigest: frontier.digest
+    ))
+    try context.save()
+
+    try repository.replaceRecipes(in: kitchen.id, with: [])
+
+    XCTAssertEqual(
+      try ModelContext(container).fetchCount(FetchDescriptor<RecipePruneRecord>()),
+      0
+    )
   }
 
   private func makeCommand(
@@ -268,6 +450,20 @@ final class SwiftDataRecipeAuthorityFailureTests: XCTestCase {
         kitchenID: kitchenID, recipeID: recipeID, selectedRevisionID: revision.id,
         selectedAt: Date(), observedSelectionIDs: observed
       )
+    )
+  }
+
+  private func makeRevisionRecord(
+    id: UUID = UUID(),
+    recipeID: Recipe.ID,
+    number: Int
+  ) -> RecipeRevisionRecord {
+    let empty = Data("[]".utf8)
+    return RecipeRevisionRecord(
+      id: id, recipeID: recipeID.rawValue, revisionNumber: number, title: "Legacy",
+      summary: nil, authorName: nil, contentLanguage: nil, sourceData: nil,
+      yieldData: nil, prepSeconds: nil, cookSeconds: nil, totalSeconds: nil,
+      cuisinesData: empty, categoriesData: empty, keywordsData: empty
     )
   }
 }
