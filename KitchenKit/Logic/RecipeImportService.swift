@@ -7,6 +7,10 @@
 
 import Foundation
 
+/// A review concern discovered while translating imported content into a draft.
+///
+/// Concerns preserve uncertainty for presentation; they are not silent repairs
+/// and do not authorize saving an import into the library.
 public enum RecipeImportConcern: Equatable, Sendable {
   case missingTitle
   case missingIngredients
@@ -25,6 +29,7 @@ public enum RecipeImportConcern: Equatable, Sendable {
   }
 }
 
+/// One reviewable recipe candidate and the concerns a person should consider.
 public struct RecipeImportOption: Equatable, Identifiable, Sendable {
   public struct Identifier: Hashable, Sendable {
     public var blockIndex: Int
@@ -47,6 +52,7 @@ public struct RecipeImportOption: Equatable, Identifiable, Sendable {
   }
 }
 
+/// Product-facing access to person-initiated recipe import.
 public protocol RecipeImportServing: Sendable {
   func importRecipe(from url: URL) async throws -> [RecipeImportOption]
 }
@@ -59,6 +65,10 @@ public enum RecipeImportServiceError: Error, Equatable, Sendable {
   case networkFailure
 }
 
+/// Converts bounded URL-import results into reviewable recipe drafts.
+///
+/// This service maps transport and parsing failures into product-level errors
+/// and records source evidence. It does not persist a selected candidate.
 public struct RecipeImportService: RecipeImportServing, Sendable {
   private let importer: any RecipeURLImporting
   private let now: @Sendable () -> Date

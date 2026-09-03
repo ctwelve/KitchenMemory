@@ -17,29 +17,6 @@
 		D30000000000000000000021 /* DequeModule in Frameworks */ = {isa = PBXBuildFile; productRef = D30000000000000000000014 /* DequeModule */; };
 /* End PBXBuildFile section */
 
-/* Begin PBXBuildRule section */
-		A1C9B48430429F7E00F1F13D /* PBXBuildRule */ = {
-			isa = PBXBuildRule;
-			compilerSpec = com.apple.compilers.documentation;
-			fileType = folder.documentationcatalog;
-			script = (
-				"# $(DOCC_EXEC)",
-				"",
-				"",
-				"",
-				"",
-				"",
-				"",
-				"",
-				"",
-				"",
-				"",
-				"",
-				"",
-			);
-		};
-/* End PBXBuildRule section */
-
 /* Begin PBXContainerItemProxy section */
 		A1C9A48A3042896F00F1F13D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -332,7 +309,6 @@
 				A1C9A47C3042896F00F1F13D /* Resources */,
 			);
 			buildRules = (
-				A1C9B48430429F7E00F1F13D /* PBXBuildRule */,
 			);
 			dependencies = (
 				A1C9D0013042896F00F1F13D /* PBXTargetDependency */,

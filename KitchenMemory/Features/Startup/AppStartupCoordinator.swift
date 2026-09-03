@@ -5,6 +5,11 @@
 import Combine
 import Foundation
 
+/// The privacy-safe result of preparing the application dependency graph.
+///
+/// Underlying framework errors are deliberately collapsed to ``unavailable``
+/// because persistence failures may contain local paths or account-related
+/// identifiers that must not become presentation or diagnostic state.
 enum AppStartupState {
   case preparing
   case ready(PreparedApp)
@@ -96,6 +101,11 @@ final class AppStartupDiagnostics {
   }
 }
 
+/// Coordinates one cancellable application-preparation attempt at a time.
+///
+/// Preparation begins after the startup surface is presented so first-frame
+/// timing stays observable. A retry retires any in-flight result before starting
+/// a fresh attempt, preventing stale dependencies from reaching the UI.
 @MainActor
 final class AppStartupCoordinator: ObservableObject {
   @Published private(set) var state: AppStartupState = .preparing

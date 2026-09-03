@@ -4,6 +4,10 @@
 
 import Foundation
 
+/// Human-readable provenance for one recipe revision.
+///
+/// This describes attribution and a safe canonical link. Lossless imported
+/// evidence is retained separately by ``RecipeSourceCapture``.
 public struct RecipeSource: Codable, Equatable, Sendable {
     public enum Kind: String, Codable, CaseIterable, Sendable {
         case original, webpage, book, person, imported
@@ -71,6 +75,7 @@ public struct QuantityExpression: Codable, Equatable, Sendable {
     }
 }
 
+/// An authored yield that preserves its original wording alongside optional structure.
 public struct RecipeYield: Codable, Equatable, Sendable {
     public var quantity: QuantityExpression?
     public var unitText: String?
@@ -120,6 +125,7 @@ public struct RecipeMedia: Codable, Equatable, Identifiable, Sendable {
     }
 }
 
+/// An ordered group of ingredients within one immutable recipe revision.
 public struct IngredientSection: Codable, Equatable, Identifiable, Sendable {
     public typealias ID = StableIdentifier<IngredientSection>
 
@@ -134,6 +140,11 @@ public struct IngredientSection: Codable, Equatable, Identifiable, Sendable {
     }
 }
 
+/// One authored ingredient row with lossless wording and optional parsed structure.
+///
+/// `originalText` remains useful when parsing is incomplete. Presentation code
+/// consults ``presentationMode`` rather than assuming structured fields are more
+/// authoritative than the wording a person reviewed.
 public struct RecipeIngredient: Codable, Equatable, Identifiable, Sendable {
     public typealias ID = StableIdentifier<RecipeIngredient>
 
@@ -273,6 +284,7 @@ public struct RecipeIngredient: Codable, Equatable, Identifiable, Sendable {
     }
 }
 
+/// An ordered group of preparation steps within one immutable recipe revision.
 public struct InstructionSection: Codable, Equatable, Identifiable, Sendable {
     public typealias ID = StableIdentifier<InstructionSection>
 
@@ -287,6 +299,7 @@ public struct InstructionSection: Codable, Equatable, Identifiable, Sendable {
     }
 }
 
+/// One authored preparation step with optional structured timing and temperature.
 public struct InstructionStep: Codable, Equatable, Identifiable, Sendable {
     public typealias ID = StableIdentifier<InstructionStep>
 

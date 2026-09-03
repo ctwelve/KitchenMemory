@@ -15,10 +15,15 @@ public enum KitchenMemoryStoreSynchronization: Equatable, Sendable {
   case personalCloud(containerIdentifier: String)
 }
 
+/// Invalid combinations of durable-store location and synchronization policy.
 public enum KitchenMemorySchemaError: Error, Equatable {
   case cloudRequiresDefaultStore
 }
 
+/// The versioned SwiftData schema and container factory used by application adapters.
+///
+/// Domain and Logic callers should depend on repository protocols rather than
+/// using this persistence entry point directly.
 public enum KitchenMemorySchema {
   /// Creates an in-memory test container or the app's durable container.
   ///

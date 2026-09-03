@@ -6,6 +6,11 @@ import KitchenKit
 import Foundation
 import Observation
 
+/// Presentation state for one prepared Kitchen's recipe library.
+///
+/// The model owns selection, startup sample choice, cloud-status display, and
+/// coarse user-facing failure categories. It delegates recipe operations to
+/// KitchenKit's `RecipeLibrary` and never exposes SwiftData records to views.
 @MainActor
 @Observable
 final class RecipeLibraryModel {
