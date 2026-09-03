@@ -61,11 +61,13 @@ import SwiftData
   var id: UUID = UUID()
   var recipeID: UUID = UUID()
   var kitchenID: UUID = UUID()
+  var deletedAt: Date?
 
-  init(id: UUID, recipeID: UUID, kitchenID: UUID) {
+  init(id: UUID, recipeID: UUID, kitchenID: UUID, deletedAt: Date? = nil) {
     self.id = id
     self.recipeID = recipeID
     self.kitchenID = kitchenID
+    self.deletedAt = deletedAt
   }
 }
 
@@ -77,11 +79,18 @@ import SwiftData
   var id: UUID = UUID()
   var deletionID: UUID = UUID()
   var recipeID: UUID = UUID()
+  var kitchenID: UUID?
+  var restoredAt: Date?
 
-  init(id: UUID, deletionID: UUID, recipeID: UUID) {
+  init(
+    id: UUID, deletionID: UUID, recipeID: UUID,
+    kitchenID: UUID? = nil, restoredAt: Date? = nil
+  ) {
     self.id = id
     self.deletionID = deletionID
     self.recipeID = recipeID
+    self.kitchenID = kitchenID
+    self.restoredAt = restoredAt
   }
 }
 

@@ -60,8 +60,9 @@ model.
 An immutable authored version of one recipe. Editing appends a new revision; an
 explicit Recipe Selection chooses the Revision presented as current without
 overwriting history. The accepted authority and migration contract is
-[Recipe authority V5](recipe-authority-v5-schema.md); the current V4
-implementation has not yet adopted it.
+[Recipe authority V5](recipe-authority-v5-schema.md). Its physical schema is
+registered, while current repository behavior still uses the compatibility
+pointer until the authority implementation slices land.
 
 | Field | Meaning |
 | --- | --- |

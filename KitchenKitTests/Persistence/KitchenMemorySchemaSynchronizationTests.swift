@@ -8,7 +8,7 @@ import Foundation
 import SwiftData
 import XCTest
 
-// Frozen V1/V2/V3 manifests are intentionally explicit compatibility evidence.
+// Explicit schema manifests make every intentional alpha change reviewable.
 // swiftlint:disable file_length
 
 @MainActor
@@ -26,6 +26,44 @@ final class KitchenMemorySchemaSynchronizationTests: XCTestCase {
     let entity = try XCTUnwrap(model.entitiesByName["KitchenOwnershipRecord"])
     XCTAssertEqual(Set(entity.attributesByName.keys), ["id", "kitchenID", "ownerID"])
     XCTAssertTrue(entity.relationshipsByName.isEmpty)
+  }
+
+  func testV5AddsTheFrozenRecipeAuthorityShape() throws {
+    let v4Names = Set(KitchenMemorySchemaV4.models.map { String(describing: $0) })
+    let v5Names = Set(KitchenMemorySchemaV5.models.map { String(describing: $0) })
+    XCTAssertEqual(v5Names.subtracting(v4Names), [
+      "RecipePruneRecord", "RecipeSaveRecord", "RecipeSelectionRecord",
+    ])
+
+    let model = try XCTUnwrap(
+      NSManagedObjectModel.makeManagedObjectModel(for: KitchenMemorySchemaV5.models)
+    )
+    let expectedFields: [String: Set<String>] = [
+      "RecipeSaveRecord": [
+        "id", "kitchenID", "recipeID", "revisionID", "savedAt",
+        "ancestryFormatVersion", "parentRevisionIDsData",
+        "payloadManifestFormatVersion", "payloadManifestData",
+        "revisionFormatVersion", "revisionDigest",
+      ],
+      "RecipeSelectionRecord": [
+        "id", "kitchenID", "recipeID", "selectedRevisionID", "selectedAt",
+        "frontierFormatVersion", "observedSelectionIDsData",
+      ],
+      "RecipePruneRecord": [
+        "id", "kitchenID", "recipeID", "prunedAt", "antiResurrectionUntil",
+        "frontierFormatVersion", "frontierData", "frontierDigest",
+      ],
+      "RecipeDeletionRecord": ["id", "kitchenID", "recipeID", "deletedAt"],
+      "RecipeDeletionResolutionRecord": [
+        "id", "kitchenID", "recipeID", "deletionID", "restoredAt",
+      ],
+    ]
+    for (name, fields) in expectedFields {
+      let entity = try XCTUnwrap(model.entitiesByName[name])
+      XCTAssertEqual(Set(entity.attributesByName.keys), fields, name)
+      XCTAssertTrue(entity.relationshipsByName.isEmpty, name)
+      XCTAssertTrue(entity.uniquenessConstraints.isEmpty, name)
+    }
   }
 
   func testV3AddsExactlyTheFiveFrozenCookingSessionRecordFamilies() {
@@ -150,11 +188,12 @@ final class KitchenMemorySchemaSynchronizationTests: XCTestCase {
       ],
       "RecipeDeletionRecord": [
         "id": .UUIDAttributeType, "recipeID": .UUIDAttributeType,
-        "kitchenID": .UUIDAttributeType,
+        "kitchenID": .UUIDAttributeType, "deletedAt": .dateAttributeType,
       ],
       "RecipeDeletionResolutionRecord": [
         "id": .UUIDAttributeType, "deletionID": .UUIDAttributeType,
-        "recipeID": .UUIDAttributeType,
+        "recipeID": .UUIDAttributeType, "kitchenID": .UUIDAttributeType,
+        "restoredAt": .dateAttributeType,
       ],
     ]
     let optionalFields: [String: Set<String>] = [
@@ -171,6 +210,8 @@ final class KitchenMemorySchemaSynchronizationTests: XCTestCase {
       ],
       "InstructionSectionRecord": ["title"],
       "InstructionStepRecord": ["name", "durationSeconds", "temperatureData"],
+      "RecipeDeletionRecord": ["deletedAt"],
+      "RecipeDeletionResolutionRecord": ["kitchenID", "restoredAt"],
     ]
 
     XCTAssertEqual(Set(model.entitiesByName.keys), Set(expectedTypes.keys))
@@ -309,7 +350,7 @@ final class KitchenMemorySchemaSynchronizationTests: XCTestCase {
       repository.recipe(id: Recipe.ID(rawValue: fixture.recipeID))
     )
 
-    XCTAssertEqual(migratedContainer.schema.version, Schema.Version(4, 0, 0))
+    XCTAssertEqual(migratedContainer.schema.version, Schema.Version(5, 0, 0))
     XCTAssertEqual(stored.revision.title, "V1 Soup")
     try assertFixtureGraph(repository, fixture: fixture, title: "V1 Soup")
     XCTAssertTrue(
@@ -325,7 +366,7 @@ final class KitchenMemorySchemaSynchronizationTests: XCTestCase {
     let migratedContainer = try KitchenMemorySchema.makeContainer(storeURL: fixture.storeURL)
     let repository = SwiftDataRecipeRepository(modelContainer: migratedContainer)
 
-    XCTAssertEqual(migratedContainer.schema.version, Schema.Version(4, 0, 0))
+    XCTAssertEqual(migratedContainer.schema.version, Schema.Version(5, 0, 0))
     XCTAssertEqual(
       try repository.recipe(id: Recipe.ID(rawValue: fixture.recipeID))?.revision.title,
       "V2 Soup"
@@ -367,7 +408,7 @@ final class KitchenMemorySchemaSynchronizationTests: XCTestCase {
     let migrated = try KitchenMemorySchema.makeContainer(storeURL: storeURL)
     let repository = SwiftDataRecipeRepository(modelContainer: migrated)
 
-    XCTAssertEqual(migrated.schema.version, Schema.Version(4, 0, 0))
+    XCTAssertEqual(migrated.schema.version, Schema.Version(5, 0, 0))
     XCTAssertEqual(
       try repository.kitchen(id: Kitchen.ID(rawValue: kitchenID)),
       Kitchen(id: Kitchen.ID(rawValue: kitchenID), name: "V3 Kitchen")
@@ -416,7 +457,7 @@ final class KitchenMemorySchemaSynchronizationTests: XCTestCase {
     }
 
     let migratedContainer = try KitchenMemorySchema.makeContainer(storeURL: fixture.storeURL)
-    XCTAssertEqual(migratedContainer.schema.version, Schema.Version(4, 0, 0))
+    XCTAssertEqual(migratedContainer.schema.version, Schema.Version(5, 0, 0))
   }
 
   private func assertFixtureGraph(
