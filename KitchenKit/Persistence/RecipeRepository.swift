@@ -180,29 +180,7 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
   }
 
   public func save(recipe: Recipe, revision: RecipeRevision) throws {
-    let previousRevision = try revisions(for: recipe.id)
-      .filter { $0.id != revision.id }
-      .max { lhs, rhs in lhs.revisionNumber < rhs.revisionNumber }
-    let parentIDs = previousRevision.map { [$0.id] } ?? []
-    let observedSelectionIDs = previousRevision.map {
-      [RecipeSelectionCommand.ID(rawValue: $0.id.rawValue)]
-    } ?? []
-    let selection = RecipeSelectionCommand(
-      id: .init(rawValue: revision.id.rawValue),
-      kitchenID: recipe.kitchenID,
-      recipeID: recipe.id,
-      selectedRevisionID: revision.id,
-      selectedAt: .distantPast,
-      observedSelectionIDs: observedSelectionIDs
-    )
-    try save(RecipeSaveCommand(
-      id: .init(rawValue: revision.id.rawValue),
-      recipe: recipe,
-      revision: revision,
-      savedAt: .distantPast,
-      parentRevisionIDs: parentIDs,
-      selection: selection
-    ))
+    try save(try compatibilityCommand(recipe: recipe, revision: revision))
   }
 
   public func save(_ command: RecipeSaveCommand) throws {
@@ -780,6 +758,96 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
         selectedAt: .distantPast
       )
     )
+  }
+
+  private func compatibilityCommand(
+    recipe: Recipe,
+    revision: RecipeRevision
+  ) throws -> RecipeSaveCommand {
+    if let accepted = try acceptedCompatibilityCommand(recipe: recipe, revision: revision) {
+      return accepted
+    }
+    let currentRevision: RecipeRevision?
+    switch try recipeAuthority(id: recipe.id) {
+    case let .available(authority), let .deleted(authority): currentRevision = authority.current
+    case .none, .pruned, .unavailable, .recovery: currentRevision = nil
+    }
+    let parents = currentRevision.flatMap { $0.id == revision.id ? nil : [$0.id] } ?? []
+    let selection = RecipeSelectionCommand(
+      id: .init(rawValue: revision.id.rawValue),
+      kitchenID: recipe.kitchenID,
+      recipeID: recipe.id,
+      selectedRevisionID: revision.id,
+      selectedAt: .distantPast,
+      observedSelectionIDs: try selectionHeads(for: recipe.id)
+    )
+    return RecipeSaveCommand(
+      id: .init(rawValue: revision.id.rawValue), recipe: recipe, revision: revision,
+      savedAt: .distantPast, parentRevisionIDs: parents, selection: selection
+    )
+  }
+
+  private func acceptedCompatibilityCommand(
+    recipe: Recipe,
+    revision: RecipeRevision
+  ) throws -> RecipeSaveCommand? {
+    let identifier = revision.id.rawValue
+    guard let save = try context.fetch(
+      FetchDescriptor<RecipeSaveRecord>(predicate: #Predicate { $0.id == identifier })
+    ).first,
+      let selection = try context.fetch(
+        FetchDescriptor<RecipeSelectionRecord>(predicate: #Predicate { $0.id == identifier })
+      ).first,
+      save.kitchenID == recipe.kitchenID.rawValue,
+      save.recipeID == recipe.id.rawValue,
+      save.revisionID == identifier,
+      selection.kitchenID == recipe.kitchenID.rawValue,
+      selection.recipeID == recipe.id.rawValue,
+      selection.selectedRevisionID == identifier
+    else { return nil }
+    do {
+      let parents = try RecipeIdentifierSetCodec.decode(
+        formatVersion: save.ancestryFormatVersion, data: save.parentRevisionIDsData
+      ).map(RecipeRevision.ID.init(rawValue:))
+      let frontier = try RecipeIdentifierSetCodec.decode(
+        formatVersion: selection.frontierFormatVersion,
+        data: selection.observedSelectionIDsData
+      ).map(RecipeSelectionCommand.ID.init(rawValue:))
+      return RecipeSaveCommand(
+        id: .init(rawValue: save.id), recipe: recipe, revision: revision,
+        savedAt: save.savedAt, parentRevisionIDs: parents,
+        selection: RecipeSelectionCommand(
+          id: .init(rawValue: selection.id), kitchenID: recipe.kitchenID,
+          recipeID: recipe.id, selectedRevisionID: revision.id,
+          selectedAt: selection.selectedAt, observedSelectionIDs: frontier
+        )
+      )
+    } catch {
+      throw KitchenMemoryPersistenceError.invalidStoredValue(field: "recipe.authority")
+    }
+  }
+
+  private func selectionHeads(
+    for recipeID: Recipe.ID
+  ) throws -> [RecipeSelectionCommand.ID] {
+    let identifier = recipeID.rawValue
+    let records = try context.fetch(
+      FetchDescriptor<RecipeSelectionRecord>(predicate: #Predicate { $0.recipeID == identifier })
+    )
+    do {
+      let observed = try records.flatMap { record in
+        try RecipeIdentifierSetCodec.decode(
+          formatVersion: record.frontierFormatVersion,
+          data: record.observedSelectionIDsData
+        )
+      }
+      let observedSet = Set(observed)
+      return records.map(\.id).filter { !observedSet.contains($0) }
+        .sorted { $0.uuidString < $1.uuidString }
+        .map(RecipeSelectionCommand.ID.init(rawValue:))
+    } catch {
+      throw KitchenMemoryPersistenceError.invalidStoredValue(field: "recipe.authority")
+    }
   }
 
   private func activeDeletionIDs(for recipeID: Recipe.ID) throws -> Set<UUID> {

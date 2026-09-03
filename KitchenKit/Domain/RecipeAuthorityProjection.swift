@@ -8,39 +8,88 @@ import Foundation
 public enum RecipeAuthorityProjector {
   public static func project(_ evidence: RecipeAuthorityEvidence) -> RecipeAuthorityProjection {
     if let disposition = pruneDisposition(evidence) { return disposition }
-    let saves: [RecipeSaveEvidence]
-    switch IdentityCollection.coalesce(
-      evidence.saves,
-      id: \RecipeSaveEvidence.id,
-      orderedBy: { uuidPrecedes($0.id, $1.id) }
-    ) {
-    case let .coalesced(values): saves = values
-    case let .collision(identity): return .recovery(.commandCollision(identity))
+    let normalized: NormalizedRecipeAuthorityEvidence
+    switch normalize(evidence) {
+    case let .projection(projection): return projection
+    case let .normalized(value): normalized = value
     }
-    let selections: [RecipeSelectionEvidence]
-    switch IdentityCollection.coalesce(
-      evidence.selections,
-      id: \RecipeSelectionEvidence.id,
-      orderedBy: { uuidPrecedes($0.id, $1.id) }
-    ) {
-    case let .coalesced(values): selections = values
-    case let .collision(identity): return .recovery(.commandCollision(identity))
-    }
-    guard evidenceHasConsistentOwnership(evidence, saves: saves, selections: selections) else {
-      return .recovery(.crossOwnership)
-    }
-    guard !saves.isEmpty else { return .unavailable(.noSaveEvidence) }
-    guard !selections.isEmpty else { return .unavailable(.noSelectionEvidence) }
+    guard !normalized.saves.isEmpty else { return .unavailable(.noSaveEvidence) }
+    guard !normalized.selections.isEmpty else { return .unavailable(.noSelectionEvidence) }
 
     switch coalescedPayloads(evidence.revisions) {
     case let .collision(identity): return .recovery(.payloadCollision(identity))
     case let .coalesced(revisions):
-      return projectValidated(evidence, saves: saves, selections: selections, revisions: revisions)
+      return projectValidated(
+        normalized.evidence,
+        saves: normalized.saves,
+        selections: normalized.selections,
+        revisions: revisions
+      )
     }
   }
 }
 
+private struct NormalizedRecipeAuthorityEvidence {
+  let evidence: RecipeAuthorityEvidence
+  let saves: [RecipeSaveEvidence]
+  let selections: [RecipeSelectionEvidence]
+}
+
+private enum RecipeAuthorityNormalization {
+  case normalized(NormalizedRecipeAuthorityEvidence)
+  case projection(RecipeAuthorityProjection)
+}
+
 private extension RecipeAuthorityProjector {
+  // Four immutable command families share the same collision rule. Keeping
+  // their normalization together makes the validation order explicit.
+  private static func normalize(
+    _ evidence: RecipeAuthorityEvidence
+  ) -> RecipeAuthorityNormalization {
+    let saves: [RecipeSaveEvidence]
+    switch IdentityCollection.coalesce(
+      evidence.saves, id: \RecipeSaveEvidence.id,
+      orderedBy: { uuidPrecedes($0.id, $1.id) }
+    ) {
+    case let .coalesced(values): saves = values
+    case let .collision(id): return .projection(.recovery(.commandCollision(id)))
+    }
+    let selections: [RecipeSelectionEvidence]
+    switch IdentityCollection.coalesce(
+      evidence.selections, id: \RecipeSelectionEvidence.id,
+      orderedBy: { uuidPrecedes($0.id, $1.id) }
+    ) {
+    case let .coalesced(values): selections = values
+    case let .collision(id): return .projection(.recovery(.commandCollision(id)))
+    }
+    let deletions: [RecipeDeletionEvidence]
+    switch IdentityCollection.coalesce(evidence.deletions, id: \RecipeDeletionEvidence.id) {
+    case let .coalesced(values): deletions = values
+    case let .collision(id): return .projection(.recovery(.commandCollision(id)))
+    }
+    let restorations: [RecipeRestorationEvidence]
+    switch IdentityCollection.coalesce(evidence.restorations, id: \RecipeRestorationEvidence.id) {
+    case let .coalesced(values): restorations = values
+    case let .collision(id): return .projection(.recovery(.commandCollision(id)))
+    }
+    let normalized = RecipeAuthorityEvidence(
+      kitchenID: evidence.kitchenID, recipeID: evidence.recipeID,
+      saves: saves, selections: selections, revisions: evidence.revisions,
+      deletions: deletions, restorations: restorations, prunes: evidence.prunes
+    )
+    guard evidenceHasConsistentOwnership(normalized, saves: saves, selections: selections) else {
+      return .projection(.recovery(.crossOwnership))
+    }
+    let deletionIDs = Set(deletions.map(\.id))
+    if let missing = restorations.map(\.deletionID).sorted(by: uuidPrecedes)
+      .first(where: { !deletionIDs.contains($0) }) {
+      return .projection(.unavailable(.missingDeletion(missing)))
+    }
+    return .normalized(NormalizedRecipeAuthorityEvidence(
+      evidence: normalized, saves: saves, selections: selections
+    ))
+  }
+
   private static func projectValidated(
     _ evidence: RecipeAuthorityEvidence,
     saves: [RecipeSaveEvidence],
@@ -274,13 +323,25 @@ private extension RecipeAuthorityProjector {
     _ actual: RecipePayloadManifest,
     isSubsetOf expected: RecipePayloadManifest
   ) -> Bool {
-    actual.revisionID == expected.revisionID
-      && Set(actual.mediaIDs).isSubset(of: Set(expected.mediaIDs))
-      && Set(actual.equipmentIDs).isSubset(of: Set(expected.equipmentIDs))
-      && Set(actual.ingredientSectionIDs).isSubset(of: Set(expected.ingredientSectionIDs))
-      && Set(actual.ingredientIDs).isSubset(of: Set(expected.ingredientIDs))
-      && Set(actual.instructionSectionIDs).isSubset(of: Set(expected.instructionSectionIDs))
-      && Set(actual.instructionStepIDs).isSubset(of: Set(expected.instructionStepIDs))
+    let actualFamilies: [Set<UUID>] = [
+      Set(actual.mediaIDs.map(\.rawValue)),
+      Set(actual.equipmentIDs.map(\.rawValue)),
+      Set(actual.ingredientSectionIDs.map(\.rawValue)),
+      Set(actual.ingredientIDs.map(\.rawValue)),
+      Set(actual.instructionSectionIDs.map(\.rawValue)),
+      Set(actual.instructionStepIDs.map(\.rawValue)),
+    ]
+    let expectedFamilies: [Set<UUID>] = [
+      Set(expected.mediaIDs.map(\.rawValue)),
+      Set(expected.equipmentIDs.map(\.rawValue)),
+      Set(expected.ingredientSectionIDs.map(\.rawValue)),
+      Set(expected.ingredientIDs.map(\.rawValue)),
+      Set(expected.instructionSectionIDs.map(\.rawValue)),
+      Set(expected.instructionStepIDs.map(\.rawValue)),
+    ]
+    return actual.revisionID == expected.revisionID
+      && zip(actualFamilies, expectedFamilies).allSatisfy { $0.isSubset(of: $1) }
+      && zip(actualFamilies, expectedFamilies).contains { $0.count < $1.count }
   }
 
   private static func idPrecedes<Entity>(

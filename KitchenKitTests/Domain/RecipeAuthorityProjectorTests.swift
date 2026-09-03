@@ -8,7 +8,7 @@ import XCTest
 
 final class RecipeAuthorityProjectorTests: XCTestCase {
   func testLinearSelectionUsesEvidenceNotRevisionNumbersOrDates() throws {
-    let fixture = Fixture()
+    let fixture = RecipeAuthorityFixture()
     let first = fixture.revision(1, number: 99, title: "First")
     let second = fixture.revision(2, number: 1, title: "Second")
     let rootSelection = fixture.selection(11, revision: first)
@@ -28,7 +28,7 @@ final class RecipeAuthorityProjectorTests: XCTestCase {
   }
 
   func testConcurrentSiblingRemainsCompetingBesideExplicitCurrentSelection() throws {
-    let fixture = Fixture()
+    let fixture = RecipeAuthorityFixture()
     let root = fixture.revision(1)
     let chosen = fixture.revision(2)
     let sibling = fixture.revision(3)
@@ -53,7 +53,7 @@ final class RecipeAuthorityProjectorTests: XCTestCase {
   }
 
   func testMultiParentRevisionReconcilesBranches() throws {
-    let fixture = Fixture()
+    let fixture = RecipeAuthorityFixture()
     let root = fixture.revision(1)
     let firstBranch = fixture.revision(2)
     let secondBranch = fixture.revision(3)
@@ -85,7 +85,7 @@ final class RecipeAuthorityProjectorTests: XCTestCase {
   }
 
   func testExactDuplicatesAndEveryInputPermutationProjectIdentically() throws {
-    let fixture = Fixture()
+    let fixture = RecipeAuthorityFixture()
     let first = fixture.revision(1)
     let second = fixture.revision(2)
     let firstSave = try fixture.save(1, revision: first)
@@ -113,7 +113,7 @@ final class RecipeAuthorityProjectorTests: XCTestCase {
   }
 
   func testConflictingDuplicateAndCompetingSelectionHeadsRequireRecovery() throws {
-    let fixture = Fixture()
+    let fixture = RecipeAuthorityFixture()
     let first = fixture.revision(1)
     let second = fixture.revision(2)
     let third = fixture.revision(3)
@@ -153,7 +153,7 @@ final class RecipeAuthorityProjectorTests: XCTestCase {
   }
 
   func testMissingAndCyclicEvidenceClassifyWithoutChoosingAWinner() throws {
-    let fixture = Fixture()
+    let fixture = RecipeAuthorityFixture()
     let first = fixture.revision(1)
     let missing = RecipeRevision.ID(rawValue: fixture.id(99))
     XCTAssertEqual(
@@ -191,7 +191,7 @@ final class RecipeAuthorityProjectorTests: XCTestCase {
   }
 
   func testMissingPayloadIsUnavailableWhileDigestMismatchRequiresRecovery() throws {
-    let fixture = Fixture()
+    let fixture = RecipeAuthorityFixture()
     let revision = fixture.revision(1)
     let save = try fixture.save(1, revision: revision)
     let selection = fixture.selection(11, revision: revision)
@@ -222,11 +222,12 @@ final class RecipeAuthorityProjectorTests: XCTestCase {
       .recovery(.digestMismatch(revision.id))
     )
   }
+
 }
 
 extension RecipeAuthorityProjectorTests {
   func testDeletionAndRestorationChangeVisibilityWithoutChangingCurrentness() throws {
-    let fixture = Fixture()
+    let fixture = RecipeAuthorityFixture()
     let revision = fixture.revision(1)
     let save = try fixture.save(1, revision: revision)
     let selection = fixture.selection(11, revision: revision)
@@ -274,7 +275,7 @@ extension RecipeAuthorityProjectorTests {
   }
 
   func testPruneTombstoneRejectsLatePayloadEvidence() {
-    let fixture = Fixture()
+    let fixture = RecipeAuthorityFixture()
     let encoded = RecipeAuthorityFrontierCodec.encode(RecipeAuthorityFrontier(
       revisionHeads: [],
       selectionHeads: [],
@@ -314,9 +315,10 @@ extension RecipeAuthorityProjectorTests {
       .recovery(.lateEvidenceAfterPrune)
     )
   }
+
 }
 
-private struct Fixture {
+struct RecipeAuthorityFixture {
   let kitchenID = Kitchen.ID(rawValue: UUID(uuidString: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")!)
   let recipeID = Recipe.ID(rawValue: UUID(uuidString: "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb")!)
 
@@ -376,14 +378,21 @@ private struct Fixture {
   func evidence(
     saves: [RecipeSaveEvidence],
     selections: [RecipeSelectionEvidence],
-    revisions: [RecipeRevision]
+    revisions: [RecipeRevision],
+    deletions: [RecipeDeletionEvidence] = [],
+    restorations: [RecipeRestorationEvidence] = [],
+    prunes: [RecipePruneEvidence] = []
   ) -> RecipeAuthorityEvidence {
     RecipeAuthorityEvidence(
       kitchenID: kitchenID,
       recipeID: recipeID,
       saves: saves,
       selections: selections,
-      revisions: revisions
+      revisions: revisions,
+      deletions: deletions,
+      restorations: restorations,
+      prunes: prunes
     )
   }
+
 }
