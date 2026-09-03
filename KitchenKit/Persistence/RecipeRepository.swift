@@ -34,11 +34,15 @@ public protocol RecipeRepository: AnyObject {
   func save(recipe: Recipe, revision: RecipeRevision) throws
   /// Atomically accepts one caller-identified immutable Save and Selection.
   func save(_ command: RecipeSaveCommand) throws
+  /// Atomically chooses an existing accepted Revision using immutable evidence.
+  func select(_ command: RecipeSelectionCommand) throws
   func kitchens() throws -> [Kitchen]
   func kitchen(id: Kitchen.ID) throws -> Kitchen?
   /// Atomically claims legacy Kitchens and converges only matching ownership.
   func convergeKitchens(into kitchen: Kitchen, ownedBy ownerID: KitchenOwner.ID) throws
   func recipe(id: Recipe.ID) throws -> StoredRecipe?
+  /// Projects immutable authority evidence for one Recipe without consulting the V1 pointer.
+  func recipeAuthority(id: Recipe.ID) throws -> RecipeAuthorityProjection?
   func recipes(in kitchenID: Kitchen.ID) throws -> [StoredRecipe]
   /// Atomically adds recipes whose stable identities are not already present.
   func addRecipes(_ recipes: [StoredRecipe], to kitchenID: Kitchen.ID) throws
@@ -51,6 +55,18 @@ public protocol RecipeRepository: AnyObject {
 public extension RecipeRepository {
   func save(_ command: RecipeSaveCommand) throws {
     try save(recipe: command.recipe, revision: command.revision)
+  }
+
+  func recipeAuthority(id: Recipe.ID) throws -> RecipeAuthorityProjection? {
+    guard let stored = try recipe(id: id) else { return nil }
+    return .available(AvailableRecipeAuthority(
+      recipe: stored.recipe,
+      revisions: [ProjectedRecipeRevision(revision: stored.revision, state: .current)]
+    ))
+  }
+
+  func select(_ command: RecipeSelectionCommand) throws {
+    throw KitchenMemoryPersistenceError.recipeSelectionUnsupported
   }
 
   func convergeKitchens(into kitchen: Kitchen, ownedBy ownerID: KitchenOwner.ID) throws {
@@ -114,6 +130,9 @@ public enum KitchenMemoryPersistenceError: Error, Equatable {
 
   /// A Save command's redundant identities or causal sets are inconsistent.
   case invalidRecipeSaveCommand
+
+  /// A repository adapter has not implemented immutable Recipe Selection.
+  case recipeSelectionUnsupported
 }
 
 /// A SwiftData implementation of ``RecipeRepository``.
@@ -192,6 +211,12 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     }
   }
 
+  public func select(_ command: RecipeSelectionCommand) throws {
+    try performIsolatedWrite { writer in
+      try writer.acceptSelection(command)
+    }
+  }
+
   public func kitchen(id: Kitchen.ID) throws -> Kitchen? {
     let identifier = id.rawValue
     let descriptor = FetchDescriptor<KitchenRecord>(predicate: #Predicate { $0.id == identifier })
@@ -225,6 +250,137 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
   }
 
   public func recipe(id: Recipe.ID) throws -> StoredRecipe? {
+    guard let authority = try recipeAuthority(id: id) else { return nil }
+    switch authority {
+    case let .available(projected):
+      return StoredRecipe(recipe: projected.recipe, revision: projected.current)
+    case .deleted, .pruned:
+      return nil
+    case let .unavailable(reason):
+      if case .missingRevision = reason {
+        throw KitchenMemoryPersistenceError.missingCurrentRevision
+      }
+      return nil
+    case .recovery:
+      throw KitchenMemoryPersistenceError.invalidStoredValue(field: "recipe.authority")
+    }
+  }
+
+  public func recipeAuthority(id: Recipe.ID) throws -> RecipeAuthorityProjection? {
+    let recipeID = id.rawValue
+    let recipeRecords = try context.fetch(
+      FetchDescriptor<RecipeRecord>(predicate: #Predicate { $0.id == recipeID })
+    )
+    let saveRecords = try context.fetch(
+      FetchDescriptor<RecipeSaveRecord>(predicate: #Predicate { $0.recipeID == recipeID })
+    )
+    let pruneRecords = try context.fetch(
+      FetchDescriptor<RecipePruneRecord>(predicate: #Predicate { $0.recipeID == recipeID })
+    )
+    guard let kitchenIdentifier = recipeRecords.first?.kitchenID
+      ?? saveRecords.first?.kitchenID
+      ?? pruneRecords.first?.kitchenID
+    else { return nil }
+    if saveRecords.isEmpty, pruneRecords.isEmpty {
+      return try legacyRecipe(id: id).map { stored in
+        .available(AvailableRecipeAuthority(
+          recipe: stored.recipe,
+          revisions: [ProjectedRecipeRevision(revision: stored.revision, state: .current)]
+        ))
+      }
+    }
+    let selectionRecords = try context.fetch(
+      FetchDescriptor<RecipeSelectionRecord>(predicate: #Predicate { $0.recipeID == recipeID })
+    )
+    let revisionRecords = try context.fetch(
+      FetchDescriptor<RecipeRevisionRecord>(predicate: #Predicate { $0.recipeID == recipeID })
+    )
+    let deletionRecords = try context.fetch(
+      FetchDescriptor<RecipeDeletionRecord>(predicate: #Predicate { $0.recipeID == recipeID })
+    )
+    let restorationRecords = try context.fetch(
+      FetchDescriptor<RecipeDeletionResolutionRecord>(
+        predicate: #Predicate { $0.recipeID == recipeID }
+      )
+    )
+    let evidence = RecipeAuthorityEvidence(
+      kitchenID: .init(rawValue: kitchenIdentifier),
+      recipeID: id,
+      saves: saveRecords.map(recipeSaveEvidence),
+      selections: selectionRecords.map(recipeSelectionEvidence),
+      revisions: try revisionRecords.map(domainRevision),
+      deletions: deletionRecords.map(recipeDeletionEvidence),
+      restorations: restorationRecords.map(recipeRestorationEvidence),
+      prunes: pruneRecords.map(recipePruneEvidence)
+    )
+    return RecipeAuthorityProjector.project(evidence)
+  }
+
+  private func recipeSaveEvidence(_ record: RecipeSaveRecord) -> RecipeSaveEvidence {
+    RecipeSaveEvidence(
+      id: record.id,
+      kitchenID: .init(rawValue: record.kitchenID),
+      recipeID: .init(rawValue: record.recipeID),
+      revisionID: .init(rawValue: record.revisionID),
+      savedAt: record.savedAt,
+      ancestryFormatVersion: record.ancestryFormatVersion,
+      parentRevisionIDsData: record.parentRevisionIDsData,
+      payloadManifestFormatVersion: record.payloadManifestFormatVersion,
+      payloadManifestData: record.payloadManifestData,
+      revisionFormatVersion: record.revisionFormatVersion,
+      revisionDigest: record.revisionDigest
+    )
+  }
+
+  private func recipeSelectionEvidence(
+    _ record: RecipeSelectionRecord
+  ) -> RecipeSelectionEvidence {
+    RecipeSelectionEvidence(
+      id: record.id,
+      kitchenID: .init(rawValue: record.kitchenID),
+      recipeID: .init(rawValue: record.recipeID),
+      selectedRevisionID: .init(rawValue: record.selectedRevisionID),
+      selectedAt: record.selectedAt,
+      frontierFormatVersion: record.frontierFormatVersion,
+      observedSelectionIDsData: record.observedSelectionIDsData
+    )
+  }
+
+  private func recipeDeletionEvidence(_ record: RecipeDeletionRecord) -> RecipeDeletionEvidence {
+    RecipeDeletionEvidence(
+      id: record.id,
+      kitchenID: .init(rawValue: record.kitchenID),
+      recipeID: .init(rawValue: record.recipeID),
+      deletedAt: record.deletedAt
+    )
+  }
+
+  private func recipeRestorationEvidence(
+    _ record: RecipeDeletionResolutionRecord
+  ) -> RecipeRestorationEvidence {
+    RecipeRestorationEvidence(
+      id: record.id,
+      deletionID: record.deletionID,
+      kitchenID: record.kitchenID.map(Kitchen.ID.init(rawValue:)),
+      recipeID: .init(rawValue: record.recipeID),
+      restoredAt: record.restoredAt
+    )
+  }
+
+  private func recipePruneEvidence(_ record: RecipePruneRecord) -> RecipePruneEvidence {
+    RecipePruneEvidence(
+      id: record.id,
+      kitchenID: .init(rawValue: record.kitchenID),
+      recipeID: .init(rawValue: record.recipeID),
+      prunedAt: record.prunedAt,
+      antiResurrectionUntil: record.antiResurrectionUntil,
+      frontierFormatVersion: record.frontierFormatVersion,
+      frontierData: record.frontierData,
+      frontierDigest: record.frontierDigest
+    )
+  }
+
+  private func legacyRecipe(id: Recipe.ID) throws -> StoredRecipe? {
     let identifier = id.rawValue
     let recipeDescriptor = FetchDescriptor<RecipeRecord>(
       predicate: #Predicate { $0.id == identifier })
@@ -390,6 +546,38 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     try resolveDeletions(for: command.recipe.id)
   }
 
+  private func acceptSelection(_ command: RecipeSelectionCommand) throws {
+    guard Set(command.observedSelectionIDs).count == command.observedSelectionIDs.count else {
+      throw KitchenMemoryPersistenceError.invalidRecipeSaveCommand
+    }
+    let revisionID = command.selectedRevisionID.rawValue
+    let acceptedSaves = try context.fetch(
+      FetchDescriptor<RecipeSaveRecord>(predicate: #Predicate { $0.revisionID == revisionID })
+    )
+    guard acceptedSaves.contains(where: {
+      $0.kitchenID == command.kitchenID.rawValue && $0.recipeID == command.recipeID.rawValue
+    }) else {
+      throw KitchenMemoryPersistenceError.invalidRecipeSaveCommand
+    }
+    let frontier = RecipeIdentifierSetCodec.encode(command.observedSelectionIDs.map(\.rawValue))
+    let selectionID = command.id.rawValue
+    let existing = try context.fetch(
+      FetchDescriptor<RecipeSelectionRecord>(predicate: #Predicate { $0.id == selectionID })
+    )
+    guard existing.allSatisfy({ selectionRecord($0, matches: command, frontier: frontier) }) else {
+      throw KitchenMemoryPersistenceError.recipeSelectionCommandCollision(commandID: command.id)
+    }
+    if existing.isEmpty {
+      context.insert(selectionRecord(for: command, frontier: frontier))
+    }
+    let recipeID = command.recipeID.rawValue
+    for record in try context.fetch(
+      FetchDescriptor<RecipeRecord>(predicate: #Predicate { $0.id == recipeID })
+    ) where record.kitchenID == command.kitchenID.rawValue {
+      record.currentRevisionID = revisionID
+    }
+  }
+
   private func validateAndEncode(
     _ command: RecipeSaveCommand
   ) throws -> EncodedRecipeSaveAuthority {
@@ -451,12 +639,20 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     matches command: RecipeSaveCommand,
     encoded: EncodedRecipeSaveAuthority
   ) -> Bool {
-    record.kitchenID == command.selection.kitchenID.rawValue
-      && record.recipeID == command.selection.recipeID.rawValue
-      && record.selectedRevisionID == command.selection.selectedRevisionID.rawValue
-      && record.selectedAt == command.selection.selectedAt
-      && record.frontierFormatVersion == encoded.frontier.formatVersion
-      && record.observedSelectionIDsData == encoded.frontier.data
+    selectionRecord(record, matches: command.selection, frontier: encoded.frontier)
+  }
+
+  private func selectionRecord(
+    _ record: RecipeSelectionRecord,
+    matches command: RecipeSelectionCommand,
+    frontier: EncodedRecipeIdentifierSet
+  ) -> Bool {
+    record.kitchenID == command.kitchenID.rawValue
+      && record.recipeID == command.recipeID.rawValue
+      && record.selectedRevisionID == command.selectedRevisionID.rawValue
+      && record.selectedAt == command.selectedAt
+      && record.frontierFormatVersion == frontier.formatVersion
+      && record.observedSelectionIDsData == frontier.data
   }
 
   private func saveRecord(
@@ -482,15 +678,21 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     for command: RecipeSaveCommand,
     encoded: EncodedRecipeSaveAuthority
   ) -> RecipeSelectionRecord {
-    let selection = command.selection
-    return RecipeSelectionRecord(
-      id: selection.id.rawValue,
-      kitchenID: selection.kitchenID.rawValue,
-      recipeID: selection.recipeID.rawValue,
-      selectedRevisionID: selection.selectedRevisionID.rawValue,
-      selectedAt: selection.selectedAt,
-      frontierFormatVersion: encoded.frontier.formatVersion,
-      observedSelectionIDsData: encoded.frontier.data
+    selectionRecord(for: command.selection, frontier: encoded.frontier)
+  }
+
+  private func selectionRecord(
+    for command: RecipeSelectionCommand,
+    frontier: EncodedRecipeIdentifierSet
+  ) -> RecipeSelectionRecord {
+    RecipeSelectionRecord(
+      id: command.id.rawValue,
+      kitchenID: command.kitchenID.rawValue,
+      recipeID: command.recipeID.rawValue,
+      selectedRevisionID: command.selectedRevisionID.rawValue,
+      selectedAt: command.selectedAt,
+      frontierFormatVersion: frontier.formatVersion,
+      observedSelectionIDsData: frontier.data
     )
   }
 

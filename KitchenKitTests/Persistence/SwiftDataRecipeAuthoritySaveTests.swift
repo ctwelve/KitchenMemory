@@ -110,6 +110,42 @@ final class SwiftDataRecipeAuthoritySaveTests: XCTestCase {
     assertAuthorityCounts(container: container, saves: 1, selections: 1, revisions: 1)
   }
 
+  func testSelectingExistingRevisionIsRetrySafeAndIgnoresCompatibilityPointer() throws {
+    let container = try KitchenMemorySchema.makeContainer(inMemory: true)
+    let repository = SwiftDataRecipeRepository(modelContainer: container)
+    let kitchen = Kitchen(name: "Home")
+    try repository.save(kitchen)
+    let first = makeCommand(kitchenID: kitchen.id, number: 1, title: "First")
+    let second = makeCommand(
+      kitchenID: kitchen.id,
+      recipeID: first.recipe.id,
+      number: 2,
+      title: "Second",
+      parents: [first.revision.id],
+      observedSelections: [first.selection.id]
+    )
+    try repository.save(first)
+    try repository.save(second)
+    let choice = RecipeSelectionCommand(
+      kitchenID: kitchen.id,
+      recipeID: first.recipe.id,
+      selectedRevisionID: first.revision.id,
+      selectedAt: Date(timeIntervalSince1970: 500),
+      observedSelectionIDs: [second.selection.id]
+    )
+
+    try repository.select(choice)
+    try repository.select(choice)
+    let context = ModelContext(container)
+    for record in try context.fetch(FetchDescriptor<RecipeRecord>()) {
+      record.currentRevisionID = second.revision.id.rawValue
+    }
+    try context.save()
+
+    XCTAssertEqual(try repository.recipe(id: first.recipe.id)?.revision, first.revision)
+    XCTAssertEqual(try context.fetchCount(FetchDescriptor<RecipeSelectionRecord>()), 3)
+  }
+
   func testReadOnlyFailureLeavesNoRecipePayloadOrAuthorityEvidence() throws {
     try withStore { storeURL in
       let writable = try KitchenMemorySchema.makeContainer(storeURL: storeURL)
