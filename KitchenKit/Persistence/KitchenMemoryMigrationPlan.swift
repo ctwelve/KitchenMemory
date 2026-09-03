@@ -69,6 +69,17 @@ public enum KitchenMemorySchemaV4: VersionedSchema {
   ]
 }
 
+/// Adds immutable Recipe authority evidence and disposition chronology.
+public enum KitchenMemorySchemaV5: VersionedSchema {
+  public static let versionIdentifier = Schema.Version(5, 0, 0)
+
+  public static let models: [any PersistentModel.Type] = KitchenMemorySchemaV4.models + [
+    RecipeSaveRecord.self,
+    RecipeSelectionRecord.self,
+    RecipePruneRecord.self,
+  ]
+}
+
 /// The ordered migration path for Kitchen Memory's private local store.
 ///
 /// Released V1 stores migrate additively to V2; neither existing recipe rows
@@ -79,11 +90,13 @@ public enum KitchenMemoryMigrationPlan: SchemaMigrationPlan {
     KitchenMemorySchemaV2.self,
     KitchenMemorySchemaV3.self,
     KitchenMemorySchemaV4.self,
+    KitchenMemorySchemaV5.self,
   ]
 
   public static let stages: [MigrationStage] = [
     .lightweight(fromVersion: KitchenMemorySchemaV1.self, toVersion: KitchenMemorySchemaV2.self),
     .lightweight(fromVersion: KitchenMemorySchemaV2.self, toVersion: KitchenMemorySchemaV3.self),
     .lightweight(fromVersion: KitchenMemorySchemaV3.self, toVersion: KitchenMemorySchemaV4.self),
+    .lightweight(fromVersion: KitchenMemorySchemaV4.self, toVersion: KitchenMemorySchemaV5.self),
   ]
 }

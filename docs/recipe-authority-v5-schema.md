@@ -12,9 +12,11 @@ SPDX-License-Identifier: MIT
   revision ancestry, current selection, deletion, restoration, and pruning
 
 This document freezes the smallest additive authority model selected by
-[issue #104](https://github.com/ctwelve/KitchenMemory/issues/104). It does not
-implement V5, initialize a CloudKit schema, deploy Production changes, or
-authorize physical pruning. The throwaway
+[issue #104](https://github.com/ctwelve/KitchenMemory/issues/104). Issue #136
+registers the physical records and V4-to-V5 schema stage so runtime code matches
+the initialized Development container. That registration does not implement
+authority commands, projection, backfill, Production deployment, or physical
+pruning. The throwaway
 [prototype branch](https://github.com/ctwelve/KitchenMemory/tree/e04dbaf)
 did not falsify the representation and is intentionally absent from the
 production branch.
@@ -345,7 +347,8 @@ not claim multi-device transport or beta-grade migration coverage.
 The selected shape would have been falsified if any result depended on a
 timestamp, device, arrival order, revision number, mutable pointer, or partially
 delivered edge set. None did. #105 must still implement the frozen codecs,
-models, application backfill, and production tests before V5 is shipped.
+repository commands and projection, application backfill, and production tests
+before V5 authority behavior is shipped.
 
 ## Implementation seam
 

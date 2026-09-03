@@ -20,7 +20,7 @@ public enum CloudKitDevelopmentSchemaInitializer {
 
   public static func initialize(containerIdentifier: String) throws {
     try autoreleasepool {
-      let schema = Schema(versionedSchema: KitchenMemorySchemaV4.self)
+      let schema = Schema(versionedSchema: KitchenMemorySchemaV5.self)
       let configuration = ModelConfiguration(
         "KitchenMemory",
         schema: schema,
@@ -33,7 +33,7 @@ public enum CloudKitDevelopmentSchemaInitializer {
       description.shouldAddStoreAsynchronously = false
 
       guard let model = NSManagedObjectModel.makeManagedObjectModel(
-        for: KitchenMemorySchemaV4.models
+        for: KitchenMemorySchemaV5.models
       ) else {
         throw InitializationError.managedObjectModelUnavailable
       }

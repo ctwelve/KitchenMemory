@@ -167,10 +167,10 @@ The implemented persistence slice remains:
 Kitchen → Recipe → RecipeRevision
 ```
 
-The V4 implementation still persists that payload graph and its legacy mutable
-current pointer. The accepted V5 authority contract adds immutable repository
-evidence around it; it is a frozen implementation target, not a claim that the
-V5 models already ship.
+The current repository still uses that payload graph and its legacy mutable
+current pointer. V5 registers the additive authority record families and
+migration stage, but repository commands and projection remain a later
+implementation slice.
 
 The remaining aggregates establish ownership and identity seams now but are
 implemented only as their product workflows arrive.
