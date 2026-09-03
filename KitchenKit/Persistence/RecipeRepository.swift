@@ -405,7 +405,17 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
       FetchDescriptor<RecipeRecord>(predicate: #Predicate { $0.kitchenID == kitchenIdentifier })
     )
     let recipeIDs = Set(recipeRecords.map(\.id))
-    for recipeID in recipeIDs.sorted(by: { $0.uuidString < $1.uuidString }) {
+    var authoritativeRecipeIDs = Set(
+      try context.fetch(FetchDescriptor<RecipeSaveRecord>()).map(\.recipeID)
+    )
+    authoritativeRecipeIDs.formUnion(
+      try context.fetch(FetchDescriptor<RecipeSelectionRecord>()).map(\.recipeID)
+    )
+    authoritativeRecipeIDs.formUnion(
+      try context.fetch(FetchDescriptor<RecipePruneRecord>()).map(\.recipeID)
+    )
+    let legacyRecipeIDs = recipeIDs.subtracting(authoritativeRecipeIDs)
+    for recipeID in legacyRecipeIDs.sorted(by: { $0.uuidString < $1.uuidString }) {
       try backfillLegacyRecipe(
         id: recipeID,
         records: recipeRecords.filter { $0.id == recipeID },
@@ -414,7 +424,7 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     }
 
     for restoration in try context.fetch(FetchDescriptor<RecipeDeletionResolutionRecord>())
-    where recipeIDs.contains(restoration.recipeID) && restoration.kitchenID == nil {
+    where legacyRecipeIDs.contains(restoration.recipeID) && restoration.kitchenID == nil {
       restoration.kitchenID = kitchenIdentifier
     }
   }

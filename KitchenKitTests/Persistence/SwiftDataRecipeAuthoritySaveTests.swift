@@ -196,8 +196,7 @@ final class SwiftDataRecipeAuthoritySaveTests: XCTestCase {
   }
 
   // Each store isolates one invalid legacy shape so transaction rollback is observable.
-  // swiftlint:disable:next function_body_length
-  func testLegacyBackfillRejectsInvalidGraphsAndAuthorityCollisions() throws {
+  func testLegacyBackfillRejectsInvalidGraphs() throws {
     do {
       let fixture = try makeBackfillStore()
       let container = fixture.container
@@ -230,38 +229,41 @@ final class SwiftDataRecipeAuthoritySaveTests: XCTestCase {
       try context.save()
       XCTAssertThrowsError(try repository.backfillLegacyRecipeAuthority(in: kitchen.id))
     }
-    do {
-      let fixture = try makeBackfillStore()
-      let container = fixture.container
-      let repository = fixture.repository
-      let kitchen = fixture.kitchen
-      let revision = try insertLegacyRecipe(in: container, kitchenID: kitchen.id)
-      let context = ModelContext(container)
-      context.insert(RecipeSaveRecord(
-        id: revision.id, kitchenID: UUID(), recipeID: revision.recipeID,
-        revisionID: revision.id, savedAt: .distantPast,
-        ancestryFormatVersion: 1, parentRevisionIDsData: Data(),
-        payloadManifestFormatVersion: 1, payloadManifestData: Data(),
-        revisionFormatVersion: 1, revisionDigest: Data()
-      ))
-      try context.save()
-      XCTAssertThrowsError(try repository.backfillLegacyRecipeAuthority(in: kitchen.id))
+  }
+
+  func testLegacyBackfillLeavesExistingV5AuthorityUntouched() throws {
+    let fixture = try makeBackfillStore()
+    let command = makeCommand(kitchenID: fixture.kitchen.id, number: 1, title: "Current")
+    try fixture.repository.save(command)
+
+    try fixture.repository.backfillLegacyRecipeAuthority(in: fixture.kitchen.id)
+
+    let context = ModelContext(fixture.container)
+    XCTAssertEqual(try context.fetch(FetchDescriptor<RecipeSaveRecord>()).map(\.id), [
+      command.id.rawValue,
+    ])
+    XCTAssertEqual(try context.fetch(FetchDescriptor<RecipeSelectionRecord>()).map(\.id), [
+      command.selection.id.rawValue,
+    ])
+  }
+
+  func testLegacyBackfillDoesNotManufactureDelayedV5Selection() throws {
+    let fixture = try makeBackfillStore()
+    let command = makeCommand(kitchenID: fixture.kitchen.id, number: 1, title: "Delayed")
+    try fixture.repository.save(command)
+    let context = ModelContext(fixture.container)
+    for selection in try context.fetch(FetchDescriptor<RecipeSelectionRecord>()) {
+      context.delete(selection)
     }
-    do {
-      let fixture = try makeBackfillStore()
-      let container = fixture.container
-      let repository = fixture.repository
-      let kitchen = fixture.kitchen
-      _ = try insertLegacyRecipe(in: container, kitchenID: kitchen.id)
-      try repository.backfillLegacyRecipeAuthority(in: kitchen.id)
-      let context = ModelContext(container)
-      let selection = try XCTUnwrap(
-        try context.fetch(FetchDescriptor<RecipeSelectionRecord>()).first
-      )
-      selection.selectedAt = Date()
-      try context.save()
-      XCTAssertThrowsError(try repository.backfillLegacyRecipeAuthority(in: kitchen.id))
-    }
+    try context.save()
+
+    try fixture.repository.backfillLegacyRecipeAuthority(in: fixture.kitchen.id)
+
+    let reopened = ModelContext(fixture.container)
+    XCTAssertEqual(try reopened.fetch(FetchDescriptor<RecipeSaveRecord>()).map(\.id), [
+      command.id.rawValue,
+    ])
+    XCTAssertTrue(try reopened.fetch(FetchDescriptor<RecipeSelectionRecord>()).isEmpty)
   }
 
   func testSaveRejectsUnknownCausalReferencesWithoutMutation() throws {

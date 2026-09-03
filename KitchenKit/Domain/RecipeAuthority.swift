@@ -77,7 +77,7 @@ public enum RecipeIdentifierSetCodec {
   public static let formatVersion = 1
 
   public static func encode(_ identifiers: [UUID]) -> EncodedRecipeIdentifierSet {
-    let bytes = identifiers.map(uuidBytes).sorted(by: lexicographicallyPrecedes)
+    let bytes = Set(identifiers).map(uuidBytes).sorted(by: lexicographicallyPrecedes)
     return EncodedRecipeIdentifierSet(
       formatVersion: formatVersion,
       data: Data(bytes.flatMap { $0 })
