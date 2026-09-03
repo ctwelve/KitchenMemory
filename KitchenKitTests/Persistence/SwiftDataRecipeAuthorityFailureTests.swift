@@ -206,6 +206,19 @@ final class SwiftDataRecipeAuthorityFailureTests: XCTestCase {
       selectedRevisionID: UUID(), selectedAt: Date(), frontierFormatVersion: 1,
       observedSelectionIDsData: Data()
     ))
+    context.insert(RecipeDeletionResolutionRecord(
+      id: UUID(), deletionID: UUID(), recipeID: UUID(),
+      kitchenID: kitchen.id.rawValue, restoredAt: nil
+    ))
+    let frontier = RecipeAuthorityFrontierCodec.encode(RecipeAuthorityFrontier(
+      revisionHeads: [], selectionHeads: [], deletionIDs: [], restorationIDs: []
+    ))
+    context.insert(RecipePruneRecord(
+      id: UUID(), kitchenID: kitchen.id.rawValue, recipeID: UUID(),
+      prunedAt: .distantPast, antiResurrectionUntil: .distantFuture,
+      frontierFormatVersion: frontier.formatVersion, frontierData: frontier.data,
+      frontierDigest: frontier.digest
+    ))
     try context.save()
 
     XCTAssertEqual(
