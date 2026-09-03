@@ -8,6 +8,7 @@ build_root="${KM_ACCEPTANCE_BUILD_ROOT:-/private/tmp/KitchenMemorySessionAccepta
 derived_data="$build_root/DerivedData"
 app="$build_root/SessionCloudKitAcceptance.app"
 products="$derived_data/Build/Products/Develop"
+numerics_shims="$derived_data/SourcePackages/checkouts/swift-numerics/Sources/_NumericsShims/include"
 framework="$products/KitchenKit.framework"
 product_app="$products/KitchenMemory.app"
 executable="$app/Contents/MacOS/SessionCloudKitAcceptance"
@@ -38,6 +39,9 @@ xcrun swiftc \
   -enable-testing \
   -target arm64-apple-macos26.0 \
   -sdk "$sdk" \
+  -I "$products" \
+  -Xcc "-fmodule-map-file=$numerics_shims/module.modulemap" \
+  -Xcc "-I$numerics_shims" \
   -F "$products" \
   -framework KitchenKit \
   -framework CoreData \
