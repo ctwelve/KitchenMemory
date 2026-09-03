@@ -66,6 +66,89 @@ final class KitchenMemorySchemaSynchronizationTests: XCTestCase {
     }
   }
 
+  // Every assignment is part of the frozen persistence contract.
+  // swiftlint:disable:next function_body_length
+  func testV5RecipeAuthorityInitializersPreserveEveryFrozenField() throws {
+    let kitchenID = try XCTUnwrap(
+      UUID(uuidString: "00000000-0000-0000-0000-000000000001")
+    )
+    let recipeID = try XCTUnwrap(
+      UUID(uuidString: "00000000-0000-0000-0000-000000000002")
+    )
+    let revisionID = try XCTUnwrap(
+      UUID(uuidString: "00000000-0000-0000-0000-000000000003")
+    )
+    let operationID = try XCTUnwrap(
+      UUID(uuidString: "00000000-0000-0000-0000-000000000004")
+    )
+    let timestamp = Date(timeIntervalSince1970: 123)
+    let laterTimestamp = Date(timeIntervalSince1970: 456)
+    let firstData = Data([1, 2, 3])
+    let secondData = Data([4, 5, 6])
+    let thirdData = Data([7, 8, 9])
+
+    let save = RecipeSaveRecord(
+      id: operationID,
+      kitchenID: kitchenID,
+      recipeID: recipeID,
+      revisionID: revisionID,
+      savedAt: timestamp,
+      ancestryFormatVersion: 1,
+      parentRevisionIDsData: firstData,
+      payloadManifestFormatVersion: 2,
+      payloadManifestData: secondData,
+      revisionFormatVersion: 3,
+      revisionDigest: thirdData
+    )
+    XCTAssertEqual(save.id, operationID)
+    XCTAssertEqual(save.kitchenID, kitchenID)
+    XCTAssertEqual(save.recipeID, recipeID)
+    XCTAssertEqual(save.revisionID, revisionID)
+    XCTAssertEqual(save.savedAt, timestamp)
+    XCTAssertEqual(save.ancestryFormatVersion, 1)
+    XCTAssertEqual(save.parentRevisionIDsData, firstData)
+    XCTAssertEqual(save.payloadManifestFormatVersion, 2)
+    XCTAssertEqual(save.payloadManifestData, secondData)
+    XCTAssertEqual(save.revisionFormatVersion, 3)
+    XCTAssertEqual(save.revisionDigest, thirdData)
+
+    let selection = RecipeSelectionRecord(
+      id: operationID,
+      kitchenID: kitchenID,
+      recipeID: recipeID,
+      selectedRevisionID: revisionID,
+      selectedAt: timestamp,
+      frontierFormatVersion: 4,
+      observedSelectionIDsData: firstData
+    )
+    XCTAssertEqual(selection.id, operationID)
+    XCTAssertEqual(selection.kitchenID, kitchenID)
+    XCTAssertEqual(selection.recipeID, recipeID)
+    XCTAssertEqual(selection.selectedRevisionID, revisionID)
+    XCTAssertEqual(selection.selectedAt, timestamp)
+    XCTAssertEqual(selection.frontierFormatVersion, 4)
+    XCTAssertEqual(selection.observedSelectionIDsData, firstData)
+
+    let prune = RecipePruneRecord(
+      id: operationID,
+      kitchenID: kitchenID,
+      recipeID: recipeID,
+      prunedAt: timestamp,
+      antiResurrectionUntil: laterTimestamp,
+      frontierFormatVersion: 5,
+      frontierData: secondData,
+      frontierDigest: thirdData
+    )
+    XCTAssertEqual(prune.id, operationID)
+    XCTAssertEqual(prune.kitchenID, kitchenID)
+    XCTAssertEqual(prune.recipeID, recipeID)
+    XCTAssertEqual(prune.prunedAt, timestamp)
+    XCTAssertEqual(prune.antiResurrectionUntil, laterTimestamp)
+    XCTAssertEqual(prune.frontierFormatVersion, 5)
+    XCTAssertEqual(prune.frontierData, secondData)
+    XCTAssertEqual(prune.frontierDigest, thirdData)
+  }
+
   func testV3AddsExactlyTheFiveFrozenCookingSessionRecordFamilies() {
     let v2Names = Set(KitchenMemorySchemaV2.models.map { String(describing: $0) })
     let v3Names = Set(KitchenMemorySchemaV3.models.map { String(describing: $0) })

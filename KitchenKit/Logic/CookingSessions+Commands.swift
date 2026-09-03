@@ -1,7 +1,6 @@
 // Kitchen Memory
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
-import Algorithms
 import Foundation
 // The exhaustive public command router and its retry contracts stay together.
 // swiftlint:disable file_length
@@ -183,7 +182,7 @@ extension CookingSessions {
           intention.observedClosureIDs.contains(intention.selectedClosureID)
     else { throw CookingSessionLogicError.invalidIntention }
     let projected = SessionEvidenceProjector.project(evidence)
-    let closures = evidence.closures.uniqued(on: \.id)
+    let closures = IdentityCollection.stableUnique(evidence.closures, id: \.id)
       .sorted { $0.id.rawValue.uuidString < $1.id.rawValue.uuidString }
     let selection = ClosureSelection(
       selectedClosureID: intention.selectedClosureID,

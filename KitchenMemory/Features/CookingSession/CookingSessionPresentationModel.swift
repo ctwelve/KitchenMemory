@@ -2,7 +2,6 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
-import DequeModule
 import Foundation
 import KitchenKit
 import Observation
@@ -91,7 +90,7 @@ final class CookingSessionPresentationModel {
   var issue: CookingSessionPresentationIssue?
   var isShowingIssue = false
   private(set) var hasLoaded = false
-  var pendingCommands: Deque<PendingCookingSessionCommand>
+  var outbox: CookingSessionOutbox
   var entryDrafts: [CookingSessionEntryDraft]
   var detachedEntryDraft: CookingSessionEntryDraft?
   var finishedSessionIDs: Set<CookingSession.ID> = []
@@ -110,7 +109,7 @@ final class CookingSessionPresentationModel {
     self.store = store
     self.now = now
     currentSessionID = store.currentSessionID
-    pendingCommands = Deque(store.pendingCommands)
+    outbox = CookingSessionOutbox(persistedCommands: store.pendingCommands)
     entryDrafts = store.entryDrafts
     sessionVisits = store.sessionVisits
   }
@@ -124,7 +123,7 @@ final class CookingSessionPresentationModel {
     self.store = store
     self.now = now
     currentSessionID = store.currentSessionID
-    pendingCommands = Deque(store.pendingCommands)
+    outbox = CookingSessionOutbox(persistedCommands: store.pendingCommands)
     entryDrafts = store.entryDrafts
     sessionVisits = store.sessionVisits
   }
@@ -135,7 +134,11 @@ final class CookingSessionPresentationModel {
   }
 
   var hasPendingCommand: Bool {
-    !pendingCommands.isEmpty
+    !outbox.isEmpty
+  }
+
+  var pendingCommands: [PendingCookingSessionCommand] {
+    outbox.commands
   }
 
   var currentEntryDraft: CookingSessionEntryDraft? {
@@ -145,7 +148,7 @@ final class CookingSessionPresentationModel {
 
   func loadIfNeeded() {
     guard !hasLoaded else { return }
-    if !pendingCommands.isEmpty {
+    if !outbox.isEmpty {
       retryPendingCommands()
     }
     reload()
@@ -154,14 +157,14 @@ final class CookingSessionPresentationModel {
 
   func reloadAfterExternalStoreChange() {
     guard hasLoaded else { return }
-    if !pendingCommands.isEmpty {
+    if !outbox.isEmpty {
       retryPendingCommands()
     }
     reload()
   }
 
   func retryCurrentIssue() {
-    if !pendingCommands.isEmpty {
+    if !outbox.isEmpty {
       retryPendingCommands()
     } else {
       reload()
