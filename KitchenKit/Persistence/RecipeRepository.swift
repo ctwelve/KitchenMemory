@@ -259,8 +259,14 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
       FetchDescriptor<RecipeSaveRecord>(predicate: #Predicate { $0.recipeID == recipeID })
     )
     let saveIDs = Set(scopedSaveRecords.map(\.id))
+    let parentRevisionIDs = Set(scopedSaveRecords.flatMap { record in
+      (try? RecipeIdentifierSetCodec.decode(
+        formatVersion: record.ancestryFormatVersion,
+        data: record.parentRevisionIDsData
+      )) ?? []
+    })
     let saveRecords = try context.fetch(FetchDescriptor<RecipeSaveRecord>())
-      .filter { saveIDs.contains($0.id) }
+      .filter { saveIDs.contains($0.id) || parentRevisionIDs.contains($0.revisionID) }
     let scopedPruneRecords = try context.fetch(
       FetchDescriptor<RecipePruneRecord>(predicate: #Predicate { $0.recipeID == recipeID })
     )
@@ -271,14 +277,21 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
       FetchDescriptor<RecipeSelectionRecord>(predicate: #Predicate { $0.recipeID == recipeID })
     )
     let selectionIDs = Set(scopedSelectionRecords.map(\.id))
+    let observedSelectionIDs = Set(scopedSelectionRecords.flatMap { record in
+      (try? RecipeIdentifierSetCodec.decode(
+        formatVersion: record.frontierFormatVersion,
+        data: record.observedSelectionIDsData
+      )) ?? []
+    })
     let selectionRecords = try context.fetch(FetchDescriptor<RecipeSelectionRecord>())
-      .filter { selectionIDs.contains($0.id) }
+      .filter { selectionIDs.contains($0.id) || observedSelectionIDs.contains($0.id) }
     let scopedRevisionRecords = try context.fetch(
       FetchDescriptor<RecipeRevisionRecord>(predicate: #Predicate { $0.recipeID == recipeID })
     )
     var revisionIDs = Set(scopedRevisionRecords.map(\.id))
     revisionIDs.formUnion(scopedSaveRecords.map(\.revisionID))
     revisionIDs.formUnion(scopedSelectionRecords.map(\.selectedRevisionID))
+    revisionIDs.formUnion(parentRevisionIDs)
     let revisionRecords = try context.fetch(FetchDescriptor<RecipeRevisionRecord>())
       .filter { revisionIDs.contains($0.id) }
     let scopedDeletionRecords = try context.fetch(
