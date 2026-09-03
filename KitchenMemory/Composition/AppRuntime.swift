@@ -240,6 +240,7 @@ struct PreparedCore {
     self.ownerID = ownerID
     let preparedKitchen = try KitchenBootstrapService(repository: recipeRepository)
       .prepareInitialKitchenWithStatus(ownerID: ownerID)
+    try recipeRepository.backfillLegacyRecipeAuthority(in: preparedKitchen.kitchen.id)
     let library = RecipeLibrary(
       kitchenID: preparedKitchen.kitchen.id,
       repository: recipeRepository,

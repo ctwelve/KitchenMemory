@@ -271,6 +271,9 @@ public enum RecipeAuthorityFrontierCodec {
       arrays.append(identifiers)
     }
     guard reader.isAtEnd else { throw RecipeAuthorityCodecError.malformedData }
+    guard arrays.allSatisfy({ Set($0).count == $0.count }) else {
+      throw RecipeAuthorityCodecError.noncanonicalData
+    }
     let frontier = RecipeAuthorityFrontier(
       revisionHeads: arrays[0].map(RecipeRevision.ID.init(rawValue:)),
       selectionHeads: arrays[1].map(RecipeSelectionCommand.ID.init(rawValue:)),

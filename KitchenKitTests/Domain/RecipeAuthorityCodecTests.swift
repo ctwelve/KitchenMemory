@@ -178,6 +178,21 @@ final class RecipeAuthorityCodecTests: XCTestCase {
     XCTAssertThrowsError(
       try RecipeAuthorityFrontierCodec.decode(formatVersion: 1, data: noncanonical)
     )
+    let duplicate = RecipeAuthorityFrontier(
+      revisionHeads: [
+        .init(rawValue: revisionID),
+        .init(rawValue: revisionID),
+      ],
+      selectionHeads: [],
+      deletionIDs: [],
+      restorationIDs: []
+    )
+    XCTAssertThrowsError(
+      try RecipeAuthorityFrontierCodec.decode(
+        formatVersion: 1,
+        data: RecipeAuthorityFrontierCodec.encode(duplicate).data
+      )
+    )
     XCTAssertThrowsError(
       try RecipeAuthorityFrontierCodec.decode(formatVersion: 2, data: encoded.data)
     )
