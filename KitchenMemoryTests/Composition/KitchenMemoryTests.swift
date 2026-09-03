@@ -79,6 +79,71 @@ final class KitchenMemoryTests: XCTestCase {
     )
   }
 
+  func testResetLeavesOnlySamplesAndClearsAllSessionStateAcrossRelaunch() throws {
+    let store = VolatileCookingSessionPresentationStore()
+    let preparedApp = try AppRuntime.testing(.init(sessionPresentationStore: store))
+    preparedApp.libraryModel.loadIfNeeded()
+    preparedApp.sessionModel.loadIfNeeded()
+    let recipe = try XCTUnwrap(preparedApp.libraryModel.recipes.first)
+    XCTAssertTrue(try preparedApp.cookingSessionRepository.sessions(in: recipe.recipe.kitchenID).isEmpty)
+    XCTAssertTrue(preparedApp.sessionModel.start(from: recipe))
+    let sessionID = try XCTUnwrap(preparedApp.sessionModel.currentSessionID)
+    preparedApp.sessionModel.replaceDraft(CookingSessionEntryDraft(
+      sessionID: sessionID,
+      text: "Remember less salt"
+    ))
+    store.pendingCommands = [
+      .stop(factID: SessionFact.ID(), sessionID: sessionID, authoredAt: Date()),
+    ]
+
+    XCTAssertTrue(preparedApp.libraryModel.resetKitchen())
+
+    XCTAssertEqual(preparedApp.libraryModel.recipes.count, 3)
+    XCTAssertTrue(try preparedApp.cookingSessionRepository
+      .sessions(in: recipe.recipe.kitchenID).isEmpty)
+    let relaunched = SwiftDataCookingSessionRepository(modelContainer: preparedApp.modelContainer)
+    XCTAssertTrue(try relaunched.sessions(in: recipe.recipe.kitchenID).isEmpty)
+    XCTAssertNil(store.currentSessionID)
+    XCTAssertTrue(store.pendingCommands.isEmpty)
+    XCTAssertTrue(store.entryDrafts.isEmpty)
+    XCTAssertTrue(store.sessionVisits.isEmpty)
+    XCTAssertNil(preparedApp.sessionModel.currentSessionID)
+    XCTAssertNil(preparedApp.sessionModel.detachedEntryDraft)
+    XCTAssertTrue(preparedApp.sessionModel.sessions.isEmpty)
+    XCTAssertTrue(preparedApp.sessionModel.finishedSessions.isEmpty)
+    XCTAssertTrue(preparedApp.sessionModel.deletedSessions.isEmpty)
+    XCTAssertTrue(preparedApp.sessionModel.waitingSessions.isEmpty)
+    XCTAssertTrue(preparedApp.sessionModel.recoverySessions.isEmpty)
+  }
+
+  func testFailedResetPreservesDurableAndPresentationSessionState() throws {
+    let store = VolatileCookingSessionPresentationStore()
+    let preparedApp = try AppRuntime.testing(.init(
+      library: .empty,
+      sampleProvider: FailingResetSampleProvider(),
+      sessionPresentationStore: store
+    ))
+    preparedApp.libraryModel.loadIfNeeded()
+    XCTAssertTrue(preparedApp.libraryModel.createRecipe(from: RecipeDraft(title: "Keep Me")))
+    preparedApp.sessionModel.loadIfNeeded()
+    let recipe = try XCTUnwrap(preparedApp.libraryModel.selectedRecipe)
+    XCTAssertTrue(preparedApp.sessionModel.start(from: recipe))
+    let sessionID = try XCTUnwrap(preparedApp.sessionModel.currentSessionID)
+    preparedApp.sessionModel.replaceDraft(CookingSessionEntryDraft(
+      sessionID: sessionID,
+      text: "Keep this too"
+    ))
+
+    XCTAssertFalse(preparedApp.libraryModel.resetKitchen())
+
+    XCTAssertEqual(preparedApp.libraryModel.recipes.map(\.revision.title), ["Keep Me"])
+    XCTAssertEqual(try preparedApp.cookingSessionRepository
+      .sessions(in: recipe.recipe.kitchenID).count, 1)
+    XCTAssertEqual(store.currentSessionID, sessionID)
+    XCTAssertEqual(store.entryDrafts.map(\.text), ["Keep this too"])
+    XCTAssertEqual(preparedApp.sessionModel.currentSessionID, sessionID)
+  }
+
   func testSourceURLPolicyAllowsOnlyBoundedCredentialFreeWebLinks() {
     XCTAssertEqual(
       RecipeSourceURLPolicy.validatedURL(from: "  https://recipes.example/soup  ")?
@@ -105,6 +170,15 @@ final class KitchenMemoryTests: XCTestCase {
     for value in rejected {
       XCTAssertNil(RecipeSourceURLPolicy.validatedURL(from: value), value)
     }
+  }
+}
+
+@MainActor
+private struct FailingResetSampleProvider: SampleRecipeProviding {
+  struct Failure: Error {}
+
+  func recipes(in kitchenID: Kitchen.ID) throws -> [StoredRecipe] {
+    throw Failure()
   }
 }
 
