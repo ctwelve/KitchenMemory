@@ -89,6 +89,34 @@ final class RecipeAuthorityCodecTests: XCTestCase {
       try RecipeRevisionCodec.decode(formatVersion: 1, data: first.data + Data([0x0A]))
     )
   }
+
+  func testAuthorityFrontierHasFrozenFamilyOrderAndRejectsNoncanonicalSets() throws {
+    let revisionID = UUID(uuidString: "00000000-0000-0000-0000-000000000001")!
+    let selectionID = UUID(uuidString: "00000000-0000-0000-0000-000000000002")!
+    let deletionID = UUID(uuidString: "00000000-0000-0000-0000-000000000003")!
+    let restorationID = UUID(uuidString: "00000000-0000-0000-0000-000000000004")!
+    let frontier = RecipeAuthorityFrontier(
+      revisionHeads: [.init(rawValue: revisionID)],
+      selectionHeads: [.init(rawValue: selectionID)],
+      deletionIDs: [deletionID],
+      restorationIDs: [restorationID]
+    )
+
+    let encoded = RecipeAuthorityFrontierCodec.encode(frontier)
+
+    XCTAssertEqual(encoded.formatVersion, 1)
+    XCTAssertEqual(encoded.data.count, 80)
+    XCTAssertEqual(
+      try RecipeAuthorityFrontierCodec.decode(formatVersion: 1, data: encoded.data),
+      frontier
+    )
+    var noncanonical = encoded.data
+    noncanonical.replaceSubrange(0..<4, with: [0, 0, 0, 2])
+    noncanonical.insert(contentsOf: Array(repeating: 0, count: 16), at: 20)
+    XCTAssertThrowsError(
+      try RecipeAuthorityFrontierCodec.decode(formatVersion: 1, data: noncanonical)
+    )
+  }
 }
 
 private extension Data {
