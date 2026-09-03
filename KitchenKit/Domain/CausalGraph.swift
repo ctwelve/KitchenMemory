@@ -5,16 +5,17 @@
 import DequeModule
 import OrderedCollections
 
-/// Iterative traversal mechanics shared by Kitchen Memory evidence families.
-///
-/// Construction canonicalizes nodes and parent lists using the caller's stable
-/// total order. Graph policy—whether a missing dependency, cycle, or competing
-/// head is valid—belongs to the Domain caller rather than this module.
+/// Distinguishes a usable graph from conflicting definitions of one node.
 enum CausalGraphConstructionResult<Node: Hashable> {
   case graph(CausalGraph<Node>)
   case collision(node: Node)
 }
 
+/// Iterative traversal mechanics shared by Kitchen Memory evidence families.
+///
+/// Construction canonicalizes nodes and parent lists using the caller's stable
+/// total order. Graph policy—whether a missing dependency, cycle, or competing
+/// head is valid—belongs to the Domain caller rather than this module.
 struct CausalGraph<Node: Hashable> {
   private let parentsByNode: OrderedDictionary<Node, [Node]>
   private let areInIncreasingOrder: (Node, Node) -> Bool
