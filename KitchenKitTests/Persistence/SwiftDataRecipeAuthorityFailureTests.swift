@@ -441,6 +441,54 @@ final class SwiftDataRecipeAuthorityFailureTests: XCTestCase {
     )
   }
 
+  func testProjectionLoadsCrossRecipeParentReferenceForOwnershipRecovery() throws {
+    let container = try KitchenMemorySchema.makeContainer(inMemory: true)
+    let repository = SwiftDataRecipeRepository(modelContainer: container)
+    let kitchen = Kitchen(name: "Home")
+    try repository.save(kitchen)
+    let first = makeCommand(kitchenID: kitchen.id, number: 1)
+    let foreign = makeCommand(kitchenID: kitchen.id, number: 1)
+    try repository.save(first)
+    try repository.save(foreign)
+
+    let context = ModelContext(container)
+    let save = try XCTUnwrap(try context.fetch(FetchDescriptor<RecipeSaveRecord>())
+      .first { $0.id == first.id.rawValue })
+    save.parentRevisionIDsData = RecipeIdentifierSetCodec.encode([
+      foreign.revision.id.rawValue,
+    ]).data
+    try context.save()
+
+    XCTAssertEqual(
+      try SwiftDataRecipeRepository(modelContainer: container).recipeAuthority(id: first.recipe.id),
+      .recovery(.crossOwnership)
+    )
+  }
+
+  func testProjectionLoadsCrossRecipeObservedSelectionForOwnershipRecovery() throws {
+    let container = try KitchenMemorySchema.makeContainer(inMemory: true)
+    let repository = SwiftDataRecipeRepository(modelContainer: container)
+    let kitchen = Kitchen(name: "Home")
+    try repository.save(kitchen)
+    let first = makeCommand(kitchenID: kitchen.id, number: 1)
+    let foreign = makeCommand(kitchenID: kitchen.id, number: 1)
+    try repository.save(first)
+    try repository.save(foreign)
+
+    let context = ModelContext(container)
+    let selection = try XCTUnwrap(try context.fetch(FetchDescriptor<RecipeSelectionRecord>())
+      .first { $0.id == first.selection.id.rawValue })
+    selection.observedSelectionIDsData = RecipeIdentifierSetCodec.encode([
+      foreign.selection.id.rawValue,
+    ]).data
+    try context.save()
+
+    XCTAssertEqual(
+      try SwiftDataRecipeRepository(modelContainer: container).recipeAuthority(id: first.recipe.id),
+      .recovery(.crossOwnership)
+    )
+  }
+
   func testCompatibilitySaveReportsCorruptAcceptedAuthority() throws {
     let container = try KitchenMemorySchema.makeContainer(inMemory: true)
     let repository = SwiftDataRecipeRepository(modelContainer: container)
