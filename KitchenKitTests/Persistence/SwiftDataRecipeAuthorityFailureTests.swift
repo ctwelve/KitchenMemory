@@ -361,6 +361,86 @@ final class SwiftDataRecipeAuthorityFailureTests: XCTestCase {
     }
   }
 
+  func testProjectionGroupsCrossRecipeSaveIdentityCollisions() throws {
+    let container = try KitchenMemorySchema.makeContainer(inMemory: true)
+    let repository = SwiftDataRecipeRepository(modelContainer: container)
+    let kitchen = Kitchen(name: "Home")
+    try repository.save(kitchen)
+    let first = makeCommand(kitchenID: kitchen.id, number: 1)
+    let second = makeCommand(kitchenID: kitchen.id, number: 1)
+    try repository.save(first)
+    try repository.save(second)
+
+    let context = ModelContext(container)
+    let accepted = try XCTUnwrap(try context.fetch(FetchDescriptor<RecipeSaveRecord>())
+      .first { $0.id == first.id.rawValue })
+    context.insert(RecipeSaveRecord(
+      id: accepted.id, kitchenID: kitchen.id.rawValue, recipeID: second.recipe.id.rawValue,
+      revisionID: second.revision.id.rawValue, savedAt: accepted.savedAt,
+      ancestryFormatVersion: accepted.ancestryFormatVersion,
+      parentRevisionIDsData: accepted.parentRevisionIDsData,
+      payloadManifestFormatVersion: accepted.payloadManifestFormatVersion,
+      payloadManifestData: accepted.payloadManifestData,
+      revisionFormatVersion: accepted.revisionFormatVersion,
+      revisionDigest: accepted.revisionDigest
+    ))
+    try context.save()
+
+    XCTAssertEqual(
+      try SwiftDataRecipeRepository(modelContainer: container).recipeAuthority(id: first.recipe.id),
+      .recovery(.commandCollision(first.id.rawValue))
+    )
+  }
+
+  func testProjectionGroupsCrossRecipeSelectionIdentityCollisions() throws {
+    let container = try KitchenMemorySchema.makeContainer(inMemory: true)
+    let repository = SwiftDataRecipeRepository(modelContainer: container)
+    let kitchen = Kitchen(name: "Home")
+    try repository.save(kitchen)
+    let first = makeCommand(kitchenID: kitchen.id, number: 1)
+    let second = makeCommand(kitchenID: kitchen.id, number: 1)
+    try repository.save(first)
+    try repository.save(second)
+
+    let context = ModelContext(container)
+    let accepted = try XCTUnwrap(try context.fetch(FetchDescriptor<RecipeSelectionRecord>())
+      .first { $0.id == first.selection.id.rawValue })
+    context.insert(RecipeSelectionRecord(
+      id: accepted.id, kitchenID: kitchen.id.rawValue, recipeID: second.recipe.id.rawValue,
+      selectedRevisionID: second.revision.id.rawValue, selectedAt: accepted.selectedAt,
+      frontierFormatVersion: accepted.frontierFormatVersion,
+      observedSelectionIDsData: accepted.observedSelectionIDsData
+    ))
+    try context.save()
+
+    XCTAssertEqual(
+      try SwiftDataRecipeRepository(modelContainer: container).recipeAuthority(id: first.recipe.id),
+      .recovery(.commandCollision(first.selection.id.rawValue))
+    )
+  }
+
+  func testProjectionGroupsCrossRecipeRevisionIdentityCollisions() throws {
+    let container = try KitchenMemorySchema.makeContainer(inMemory: true)
+    let repository = SwiftDataRecipeRepository(modelContainer: container)
+    let kitchen = Kitchen(name: "Home")
+    try repository.save(kitchen)
+    let command = makeCommand(kitchenID: kitchen.id, number: 1)
+    try repository.save(command)
+
+    let context = ModelContext(container)
+    context.insert(makeRevisionRecord(
+      id: command.revision.id.rawValue,
+      recipeID: Recipe.ID(),
+      number: 1
+    ))
+    try context.save()
+
+    XCTAssertEqual(
+      try SwiftDataRecipeRepository(modelContainer: container).recipeAuthority(id: command.recipe.id),
+      .recovery(.crossOwnership)
+    )
+  }
+
   func testCompatibilitySaveReportsCorruptAcceptedAuthority() throws {
     let container = try KitchenMemorySchema.makeContainer(inMemory: true)
     let repository = SwiftDataRecipeRepository(modelContainer: container)
