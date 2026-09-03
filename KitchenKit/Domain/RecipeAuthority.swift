@@ -210,6 +210,94 @@ public enum RecipePayloadManifestCodec {
   }
 }
 
+/// The compact authority retained when reconstructable Recipe payload is pruned.
+public struct RecipeAuthorityFrontier: Equatable, Sendable {
+  public let revisionHeads: [RecipeRevision.ID]
+  public let selectionHeads: [RecipeSelectionCommand.ID]
+  public let deletionIDs: [UUID]
+  public let restorationIDs: [UUID]
+
+  public init(
+    revisionHeads: [RecipeRevision.ID],
+    selectionHeads: [RecipeSelectionCommand.ID],
+    deletionIDs: [UUID],
+    restorationIDs: [UUID]
+  ) {
+    self.revisionHeads = revisionHeads
+    self.selectionHeads = selectionHeads
+    self.deletionIDs = deletionIDs
+    self.restorationIDs = restorationIDs
+  }
+}
+
+public struct EncodedRecipeAuthorityFrontier: Equatable, Sendable {
+  public let formatVersion: Int
+  public let data: Data
+  public let digest: Data
+}
+
+/// Format 1 stores four fixed-order, counted canonical identifier sets.
+public enum RecipeAuthorityFrontierCodec {
+  public static let formatVersion = 1
+
+  public static func encode(
+    _ frontier: RecipeAuthorityFrontier
+  ) -> EncodedRecipeAuthorityFrontier {
+    var data = Data()
+    for identifiers in canonicalArrays(frontier) {
+      var count = UInt32(identifiers.count).bigEndian
+      withUnsafeBytes(of: &count) { data.append(contentsOf: $0) }
+      for identifier in identifiers {
+        data.append(contentsOf: uuidBytes(identifier))
+      }
+    }
+    return EncodedRecipeAuthorityFrontier(
+      formatVersion: formatVersion,
+      data: data,
+      digest: Data(SHA256.hash(data: data))
+    )
+  }
+
+  public static func decode(
+    formatVersion: Int,
+    data: Data
+  ) throws -> RecipeAuthorityFrontier {
+    guard formatVersion == self.formatVersion else {
+      throw RecipeAuthorityCodecError.unsupportedFormat(formatVersion)
+    }
+    var reader = RecipeManifestReader(data: data)
+    var arrays: [[UUID]] = []
+    for _ in 0..<4 {
+      guard let identifiers = reader.readUUIDArray() else {
+        throw RecipeAuthorityCodecError.malformedData
+      }
+      arrays.append(identifiers)
+    }
+    guard reader.isAtEnd else { throw RecipeAuthorityCodecError.malformedData }
+    let frontier = RecipeAuthorityFrontier(
+      revisionHeads: arrays[0].map(RecipeRevision.ID.init(rawValue:)),
+      selectionHeads: arrays[1].map(RecipeSelectionCommand.ID.init(rawValue:)),
+      deletionIDs: arrays[2],
+      restorationIDs: arrays[3]
+    )
+    guard encode(frontier).data == data else {
+      throw RecipeAuthorityCodecError.noncanonicalData
+    }
+    return frontier
+  }
+
+  private static func canonicalArrays(_ frontier: RecipeAuthorityFrontier) -> [[UUID]] {
+    [
+      frontier.revisionHeads.map(\.rawValue),
+      frontier.selectionHeads.map(\.rawValue),
+      frontier.deletionIDs,
+      frontier.restorationIDs,
+    ].map { identifiers in
+      RecipeIdentifierSetCodec.encode(identifiers).data.uuidArray
+    }
+  }
+}
+
 public struct EncodedRecipeRevision: Equatable, Sendable {
   public let formatVersion: Int
   public let data: Data
@@ -287,4 +375,13 @@ private func uuid(from bytes: [UInt8]) -> UUID {
 
 private func lexicographicallyPrecedes(_ lhs: [UInt8], _ rhs: [UInt8]) -> Bool {
   lhs.lexicographicallyPrecedes(rhs)
+}
+
+private extension Data {
+  var uuidArray: [UUID] {
+    let bytes = [UInt8](self)
+    return stride(from: 0, to: bytes.count, by: 16).map { offset in
+      uuid(from: Array(bytes[offset..<(offset + 16)]))
+    }
+  }
 }
