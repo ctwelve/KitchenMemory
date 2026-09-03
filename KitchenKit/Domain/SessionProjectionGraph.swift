@@ -93,7 +93,7 @@ extension ProjectionBuilder {
         _ facts: [DecodedFact],
         parents: [UUID: [UUID]]
     ) -> [DecodedFact] {
-        let graph = DirectedGraph(parentsByNode: parents)
+        let graph = causalGraph(parents)
         let maximalIDs = Set(graph.maximalNodes(among: facts.map(\.evidence.id.rawValue)))
         return facts.filter {
             maximalIDs.contains($0.evidence.id.rawValue)
@@ -101,7 +101,11 @@ extension ProjectionBuilder {
     }
 
     func isAncestor(_ ancestor: UUID, of descendant: UUID, parents: [UUID: [UUID]]) -> Bool {
-        DirectedGraph(parentsByNode: parents).isAncestor(ancestor, of: descendant)
+        causalGraph(parents).isAncestor(ancestor, of: descendant)
+    }
+
+    func causalGraph(_ parents: [UUID: [UUID]]) -> CausalGraph<UUID> {
+        CausalGraph(parentsByNode: parents, orderedBy: uuidOrder)
     }
 
     func snapshotTargets(_ snapshot: ExecutionSnapshot) -> [UUID: SessionProgressTarget] {

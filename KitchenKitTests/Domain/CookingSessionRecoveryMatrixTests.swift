@@ -355,6 +355,31 @@ final class CookingSessionRecoveryMatrixTests: XCTestCase {
         )
     }
 
+    func testMultipleMissingDispositionPredecessorsUseCanonicalReasonAcrossArrivalOrders() throws {
+        let fixture = try FactFixture()
+        let lowerMissingID = id(940)
+        let higherMissingID = id(941)
+        let first = makeDeletion(
+            fixture: fixture,
+            id: id(930),
+            dispositionHeads: [higherMissingID]
+        )
+        let second = makeDeletion(
+            fixture: fixture,
+            id: id(931),
+            dispositionHeads: [lowerMissingID]
+        )
+
+        assertUnavailable(
+            fixture.result(deletions: [first, second]),
+            .incompleteDeletionDisposition(lowerMissingID)
+        )
+        assertUnavailable(
+            fixture.result(deletions: [second, first]),
+            .incompleteDeletionDisposition(lowerMissingID)
+        )
+    }
+
     private func closure(
         fixture: FactFixture,
         id: SessionClosure.ID = SessionClosure.ID(rawValue: id(900)),

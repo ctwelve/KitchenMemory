@@ -99,13 +99,18 @@ public struct CookingSessions {
     for recovery: SessionRecovery
   ) -> [SessionClosureEvidence] {
     guard recovery.reasons == [.competingClosures] else { return [] }
-    guard let closures = coalescedByIdentity(recovery.evidence.closures, id: \.id) else {
+    let result = IdentityCollection.coalesce(
+      recovery.evidence.closures,
+      id: \.id,
+      orderedBy: {
+        if $0.finishedAt != $1.finishedAt { return $0.finishedAt < $1.finishedAt }
+        return $0.id.rawValue.uuidString < $1.id.rawValue.uuidString
+      }
+    )
+    guard case let .coalesced(closures) = result else {
       return []
     }
-    return closures.sorted {
-      if $0.finishedAt != $1.finishedAt { return $0.finishedAt < $1.finishedAt }
-      return $0.id.rawValue.uuidString < $1.id.rawValue.uuidString
-    }
+    return closures
   }
 
   /// Counts the transitive continuation descendants retained in a classified

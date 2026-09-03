@@ -119,7 +119,7 @@ extension ProjectionBuilder {
             values[closure.id] = heads
             graph[closure.id.rawValue] = heads
         }
-        let closureGraph = DirectedGraph(parentsByNode: graph)
+        let closureGraph = causalGraph(graph)
         guard !closureGraph.containsCycle else {
             return .failure(recovery(.cycle))
         }

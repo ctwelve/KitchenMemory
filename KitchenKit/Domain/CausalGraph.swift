@@ -20,6 +20,21 @@ struct CausalGraph<Node: Hashable> {
   private let parentsByNode: OrderedDictionary<Node, [Node]>
   private let areInIncreasingOrder: (Node, Node) -> Bool
 
+  init(
+    parentsByNode: [Node: [Node]],
+    orderedBy areInIncreasingOrder: @escaping (Node, Node) -> Bool
+  ) {
+    var orderedParents: OrderedDictionary<Node, [Node]> = [:]
+    for node in parentsByNode.keys.sorted(by: areInIncreasingOrder) {
+      orderedParents[node] = IdentityCollection.stableUnique(
+        (parentsByNode[node] ?? []).sorted(by: areInIncreasingOrder),
+        id: \.self
+      )
+    }
+    self.parentsByNode = orderedParents
+    self.areInIncreasingOrder = areInIncreasingOrder
+  }
+
   private init(
     parentsByNode: OrderedDictionary<Node, [Node]>,
     orderedBy areInIncreasingOrder: @escaping (Node, Node) -> Bool

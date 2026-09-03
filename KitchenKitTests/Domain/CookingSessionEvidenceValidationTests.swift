@@ -150,6 +150,27 @@ final class CookingSessionEvidenceValidationTests: XCTestCase {
         assertRecovery(fixture.result(facts: [disconnected]), .invalidFact)
     }
 
+    func testMultipleMissingFactPredecessorsUseCanonicalReasonAcrossArrivalOrders() throws {
+        let fixture = try FactFixture()
+        let lowerMissingID = id(700)
+        let higherMissingID = id(800)
+        let first = try fixture.fact(
+            id: id(118), kind: .stop, heads: [higherMissingID], payload: .empty
+        )
+        let second = try fixture.fact(
+            id: id(119), kind: .resume, heads: [lowerMissingID], payload: .empty
+        )
+
+        assertUnavailable(
+            fixture.result(facts: [first, second]),
+            .missingPredecessor(lowerMissingID)
+        )
+        assertUnavailable(
+            fixture.result(facts: [second, first]),
+            .missingPredecessor(lowerMissingID)
+        )
+    }
+
     func testCausalHeadsMustBeAMaximalFrontier() throws {
         let fixture = try FactFixture()
         let ancestor = try fixture.fact(
