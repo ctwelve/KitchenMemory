@@ -24,18 +24,23 @@ final class RecipeAuthorityCodecTests: XCTestCase {
     )
   }
 
-  func testIdentifierSetRejectsMalformedDuplicateAndNoncanonicalData() {
+  func testIdentifierSetCanonicalizesDuplicatesAndRejectsMalformedNoncanonicalData() throws {
     let first = UUID(uuidString: "00000000-0000-0000-0000-000000000001")!
     let second = UUID(uuidString: "00000000-0000-0000-0000-000000000002")!
+    let canonical = RecipeIdentifierSetCodec.encode([second, first, first])
+    XCTAssertEqual(
+      try RecipeIdentifierSetCodec.decode(formatVersion: 1, data: canonical.data),
+      [first, second]
+    )
     XCTAssertThrowsError(
       try RecipeIdentifierSetCodec.decode(formatVersion: 1, data: Data([0]))
     )
-    XCTAssertThrowsError(
-      try RecipeIdentifierSetCodec.decode(
-        formatVersion: 1,
-        data: RecipeIdentifierSetCodec.encode([first, first]).data
-      )
-    )
+    let duplicateBytes = RecipeIdentifierSetCodec.encode([first]).data
+      + RecipeIdentifierSetCodec.encode([first]).data
+    XCTAssertThrowsError(try RecipeIdentifierSetCodec.decode(
+      formatVersion: 1,
+      data: duplicateBytes
+    ))
     XCTAssertThrowsError(
       try RecipeIdentifierSetCodec.decode(
         formatVersion: 1,
@@ -178,19 +183,13 @@ final class RecipeAuthorityCodecTests: XCTestCase {
     XCTAssertThrowsError(
       try RecipeAuthorityFrontierCodec.decode(formatVersion: 1, data: noncanonical)
     )
-    let duplicate = RecipeAuthorityFrontier(
-      revisionHeads: [
-        .init(rawValue: revisionID),
-        .init(rawValue: revisionID),
-      ],
-      selectionHeads: [],
-      deletionIDs: [],
-      restorationIDs: []
-    )
+    var duplicate = encoded.data
+    duplicate.replaceSubrange(0..<4, with: [0, 0, 0, 2])
+    duplicate.insert(contentsOf: revisionID.uuidBytes, at: 20)
     XCTAssertThrowsError(
       try RecipeAuthorityFrontierCodec.decode(
         formatVersion: 1,
-        data: RecipeAuthorityFrontierCodec.encode(duplicate).data
+        data: duplicate
       )
     )
     XCTAssertThrowsError(
