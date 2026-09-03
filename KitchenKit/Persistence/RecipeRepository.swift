@@ -284,8 +284,8 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     guard let kitchenIdentifier = kitchenIdentifiers.min(by: {
       $0.uuidString < $1.uuidString
     }) else { return nil }
-    if saveRecords.isEmpty, selectionRecords.isEmpty, deletionRecords.isEmpty,
-      restorationRecords.isEmpty, pruneRecords.isEmpty {
+    if !recipeRecords.isEmpty, saveRecords.isEmpty, selectionRecords.isEmpty,
+      pruneRecords.isEmpty {
       return try legacyRecipe(id: id).map { stored in
         .available(AvailableRecipeAuthority(
           recipe: stored.recipe,
