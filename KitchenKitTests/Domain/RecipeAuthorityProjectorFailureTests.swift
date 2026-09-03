@@ -194,6 +194,27 @@ final class RecipeAuthorityProjectorFailureTests: XCTestCase {
                    .recovery(.malformedEncoding))
     XCTAssertEqual(project([fixture.copy(prune, frontierDigest: Data())]),
                    .recovery(.malformedEncoding))
+
+    let deletion = RecipeDeletionEvidence(
+      id: fixture.id(41), kitchenID: fixture.kitchenID, recipeID: fixture.recipeID,
+      deletedAt: nil
+    )
+    XCTAssertEqual(
+      RecipeAuthorityProjector.project(fixture.evidence(
+        saves: [], selections: [], revisions: [], deletions: [deletion], prunes: [prune]
+      )),
+      .recovery(.lateEvidenceAfterPrune)
+    )
+    let restoration = RecipeRestorationEvidence(
+      id: fixture.id(42), deletionID: deletion.id, kitchenID: fixture.kitchenID,
+      recipeID: fixture.recipeID, restoredAt: nil
+    )
+    XCTAssertEqual(
+      RecipeAuthorityProjector.project(fixture.evidence(
+        saves: [], selections: [], revisions: [], restorations: [restoration], prunes: [prune]
+      )),
+      .recovery(.lateEvidenceAfterPrune)
+    )
   }
 
   func testDispositionDuplicatesAndDanglingRestorationAreValidated() throws {

@@ -35,6 +35,16 @@ final class KitchenOwnershipConvergenceTests: XCTestCase {
     let reader = ModelContext(container)
     let destinationID = personalKitchen.id.rawValue
     XCTAssertEqual(try reader.fetch(FetchDescriptor<RecipeDeletionRecord>()).map(\.kitchenID), [destinationID])
+    XCTAssertEqual(try reader.fetch(FetchDescriptor<RecipeSaveRecord>()).map(\.kitchenID), [destinationID])
+    XCTAssertEqual(
+      try reader.fetch(FetchDescriptor<RecipeSelectionRecord>()).map(\.kitchenID),
+      [destinationID]
+    )
+    XCTAssertEqual(try reader.fetch(FetchDescriptor<RecipePruneRecord>()).map(\.kitchenID), [destinationID])
+    XCTAssertEqual(
+      try reader.fetch(FetchDescriptor<RecipeDeletionResolutionRecord>()).map(\.kitchenID),
+      [destinationID]
+    )
     XCTAssertEqual(try reader.fetch(FetchDescriptor<CookingSessionRecord>()).map(\.kitchenID), [destinationID])
     XCTAssertEqual(try reader.fetch(FetchDescriptor<SessionFactRecord>()).map(\.kitchenID), [destinationID])
     XCTAssertEqual(try reader.fetch(FetchDescriptor<SessionClosureRecord>()).map(\.kitchenID), [destinationID])
@@ -112,12 +122,34 @@ final class KitchenOwnershipConvergenceTests: XCTestCase {
     XCTAssertEqual(try repository.kitchen(id: personalKitchen.id), personalKitchen)
   }
 
+  // One fixture intentionally enumerates every Kitchen-routed persistence family.
+  // swiftlint:disable:next function_body_length
   private func insertKitchenScopedEvidence(into context: ModelContext, kitchenID: UUID) {
     let sessionID = UUID()
     context.insert(RecipeDeletionRecord(
       id: UUID(),
       recipeID: UUID(),
       kitchenID: kitchenID
+    ))
+    let recipeID = UUID()
+    context.insert(RecipeSaveRecord(
+      id: UUID(), kitchenID: kitchenID, recipeID: recipeID, revisionID: UUID(),
+      savedAt: .distantPast, ancestryFormatVersion: 1, parentRevisionIDsData: Data(),
+      payloadManifestFormatVersion: 1, payloadManifestData: Data(),
+      revisionFormatVersion: 1, revisionDigest: Data()
+    ))
+    context.insert(RecipeSelectionRecord(
+      id: UUID(), kitchenID: kitchenID, recipeID: recipeID,
+      selectedRevisionID: UUID(), selectedAt: .distantPast,
+      frontierFormatVersion: 1, observedSelectionIDsData: Data()
+    ))
+    context.insert(RecipePruneRecord(
+      id: UUID(), kitchenID: kitchenID, recipeID: recipeID,
+      prunedAt: .distantPast, antiResurrectionUntil: .distantFuture,
+      frontierFormatVersion: 1, frontierData: Data(), frontierDigest: Data()
+    ))
+    context.insert(RecipeDeletionResolutionRecord(
+      id: UUID(), deletionID: UUID(), recipeID: recipeID, kitchenID: kitchenID
     ))
     context.insert(CookingSessionRecord(
       id: sessionID,
