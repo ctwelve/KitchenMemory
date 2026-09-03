@@ -16,7 +16,7 @@ final class SwiftDataKitchenResetRepositoryTests: XCTestCase {
     let other = Kitchen(name: "Cabin")
     try recipes.save(target)
     try recipes.save(other)
-    let userRecipe = storedRecipe(kitchenID: target.id, title: "User")
+    let userRecipe = storedRecipe(kitchenID: target.id, title: "User", withChildren: true)
     let otherRecipe = storedRecipe(kitchenID: other.id, title: "Other")
     let sample = storedRecipe(kitchenID: target.id, title: "Sample")
     try recipes.save(recipe: userRecipe.recipe, revision: userRecipe.revision)
@@ -24,12 +24,7 @@ final class SwiftDataKitchenResetRepositoryTests: XCTestCase {
     let context = ModelContext(container)
     insertSessionFamilies(kitchenID: target.id.rawValue, marker: 1, context: context)
     insertSessionFamilies(kitchenID: other.id.rawValue, marker: 2, context: context)
-    context.insert(RecipeDeletionRecord(
-      id: UUID(),
-      recipeID: userRecipe.id.rawValue,
-      kitchenID: target.id.rawValue,
-      deletedAt: Date()
-    ))
+    insertRecipeDispositionResidue(userRecipe, kitchenID: target.id, context: context)
     try context.save()
 
     try SwiftDataKitchenResetRepository(modelContainer: container)
@@ -41,10 +36,8 @@ final class SwiftDataKitchenResetRepositoryTests: XCTestCase {
     let verification = ModelContext(container)
     assertSessionCounts(verification, kitchenID: target.id.rawValue, expected: 0)
     assertSessionCounts(verification, kitchenID: other.id.rawValue, expected: 1)
-    XCTAssertFalse(try verification.fetch(FetchDescriptor<RecipeDeletionRecord>())
-      .contains { $0.recipeID == userRecipe.id.rawValue })
-    XCTAssertFalse(try verification.fetch(FetchDescriptor<RecipeSaveRecord>())
-      .contains { $0.recipeID == userRecipe.id.rawValue })
+    assertAuthorityRemoved(userRecipe, from: verification)
+    assertRevisionGraphRemoved(userRecipe.revision, from: verification)
     XCTAssertEqual(try verification.fetch(FetchDescriptor<RecipeSaveRecord>())
       .filter { $0.kitchenID == target.id.rawValue }.map(\.recipeID), [sample.id.rawValue])
   }
@@ -77,13 +70,101 @@ final class SwiftDataKitchenResetRepositoryTests: XCTestCase {
     }
   }
 
-  private func storedRecipe(kitchenID: Kitchen.ID, title: String) -> StoredRecipe {
+  private func storedRecipe(
+    kitchenID: Kitchen.ID,
+    title: String,
+    withChildren: Bool = false
+  ) -> StoredRecipe {
     let recipeID = Recipe.ID()
-    let revision = RecipeRevision(recipeID: recipeID, revisionNumber: 1, title: title)
+    let revision = RecipeRevision(
+      recipeID: recipeID,
+      revisionNumber: 1,
+      title: title,
+      media: withChildren ? [RecipeMedia(role: .hero, assetName: "hero")] : [],
+      equipment: withChildren ? [EquipmentItem(originalText: "Pan", name: "Pan")] : [],
+      ingredientSections: withChildren ? [
+        IngredientSection(
+          title: "Main", ingredients: [RecipeIngredient(originalText: "Salt")]
+        ),
+      ] : [],
+      instructionSections: withChildren ? [
+        InstructionSection(
+          title: "Cook", steps: [InstructionStep(text: "Stir")]
+        ),
+      ] : []
+    )
     return StoredRecipe(
       recipe: Recipe(id: recipeID, kitchenID: kitchenID, currentRevisionID: revision.id),
       revision: revision
     )
+  }
+
+  private func insertRecipeDispositionResidue(
+    _ recipe: StoredRecipe,
+    kitchenID: Kitchen.ID,
+    context: ModelContext
+  ) {
+    let deletionID = UUID()
+    context.insert(RecipeDeletionRecord(
+      id: deletionID, recipeID: recipe.id.rawValue,
+      kitchenID: kitchenID.rawValue, deletedAt: Date()
+    ))
+    context.insert(RecipeDeletionResolutionRecord(
+      id: UUID(), deletionID: deletionID, recipeID: recipe.id.rawValue,
+      kitchenID: kitchenID.rawValue, restoredAt: Date()
+    ))
+    let frontier = RecipeAuthorityFrontierCodec.encode(RecipeAuthorityFrontier(
+      revisionHeads: [recipe.revision.id], selectionHeads: [],
+      deletionIDs: [deletionID], restorationIDs: []
+    ))
+    context.insert(RecipePruneRecord(
+      id: UUID(), kitchenID: kitchenID.rawValue, recipeID: recipe.id.rawValue,
+      prunedAt: Date(), antiResurrectionUntil: Date().addingTimeInterval(1),
+      frontierFormatVersion: frontier.formatVersion, frontierData: frontier.data,
+      frontierDigest: frontier.digest
+    ))
+  }
+
+  private func assertAuthorityRemoved(
+    _ recipe: StoredRecipe,
+    from context: ModelContext,
+    file: StaticString = #filePath,
+    line: UInt = #line
+  ) {
+    XCTAssertFalse(try context.fetch(FetchDescriptor<RecipeDeletionRecord>())
+      .contains { $0.recipeID == recipe.id.rawValue }, file: file, line: line)
+    XCTAssertFalse(try context.fetch(FetchDescriptor<RecipeSaveRecord>())
+      .contains { $0.recipeID == recipe.id.rawValue }, file: file, line: line)
+    XCTAssertFalse(try context.fetch(FetchDescriptor<RecipeSelectionRecord>())
+      .contains { $0.recipeID == recipe.id.rawValue }, file: file, line: line)
+    XCTAssertFalse(try context.fetch(FetchDescriptor<RecipeDeletionResolutionRecord>())
+      .contains { $0.recipeID == recipe.id.rawValue }, file: file, line: line)
+    XCTAssertFalse(try context.fetch(FetchDescriptor<RecipePruneRecord>())
+      .contains { $0.recipeID == recipe.id.rawValue }, file: file, line: line)
+  }
+
+  private func assertRevisionGraphRemoved(
+    _ revision: RecipeRevision,
+    from context: ModelContext,
+    file: StaticString = #filePath,
+    line: UInt = #line
+  ) {
+    XCTAssertFalse(try context.fetch(FetchDescriptor<RecipeRevisionRecord>())
+      .contains { $0.id == revision.id.rawValue }, file: file, line: line)
+    XCTAssertFalse(try context.fetch(FetchDescriptor<RecipeMediaRecord>())
+      .contains { $0.revisionID == revision.id.rawValue }, file: file, line: line)
+    XCTAssertFalse(try context.fetch(FetchDescriptor<EquipmentRecord>())
+      .contains { $0.revisionID == revision.id.rawValue }, file: file, line: line)
+    XCTAssertFalse(try context.fetch(FetchDescriptor<IngredientSectionRecord>())
+      .contains { $0.revisionID == revision.id.rawValue }, file: file, line: line)
+    let ingredientIDs = Set(revision.ingredientSections.flatMap(\.ingredients).map { $0.id.rawValue })
+    XCTAssertFalse(try context.fetch(FetchDescriptor<RecipeIngredientRecord>())
+      .contains { ingredientIDs.contains($0.id) }, file: file, line: line)
+    XCTAssertFalse(try context.fetch(FetchDescriptor<InstructionSectionRecord>())
+      .contains { $0.revisionID == revision.id.rawValue }, file: file, line: line)
+    let stepIDs = Set(revision.instructionSections.flatMap(\.steps).map { $0.id.rawValue })
+    XCTAssertFalse(try context.fetch(FetchDescriptor<InstructionStepRecord>())
+      .contains { stepIDs.contains($0.id) }, file: file, line: line)
   }
 
   // Placeholder values are sufficient: reset owns physical removal, not projection.
@@ -153,13 +234,15 @@ final class SwiftDataKitchenResetRepositoryTests: XCTestCase {
     return try ModelContainer(
       for: schema,
       migrationPlan: KitchenMemoryMigrationPlan.self,
-      configurations: [ModelConfiguration(
-        "KitchenMemoryResetReadOnly",
-        schema: schema,
-        url: storeURL,
-        allowsSave: false,
-        cloudKitDatabase: .none
-      )],
+      configurations: [
+        ModelConfiguration(
+          "KitchenMemoryResetReadOnly",
+          schema: schema,
+          url: storeURL,
+          allowsSave: false,
+          cloudKitDatabase: .none,
+        ),
+      ],
     )
   }
 
