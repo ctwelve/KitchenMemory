@@ -81,6 +81,10 @@ private struct EncodedRecipeSaveAuthority {
   let frontier: EncodedRecipeIdentifierSet
 }
 
+private enum RecipePayloadReconstructionError: Error {
+  case collision(RecipeRevision.ID)
+}
+
 /// Failures detected while translating between domain values and stored rows.
 public enum KitchenMemoryPersistenceError: Error, Equatable {
   /// The recipe and revision do not refer to each other as current content.
@@ -318,6 +322,8 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     }
   }
 
+  // All synchronized authority families must be collected before ownership can be derived.
+  // swiftlint:disable:next function_body_length
   public func recipeAuthority(id: Recipe.ID) throws -> RecipeAuthorityProjection? {
     let recipeID = id.rawValue
     let recipeRecords = try context.fetch(
@@ -329,18 +335,6 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     let pruneRecords = try context.fetch(
       FetchDescriptor<RecipePruneRecord>(predicate: #Predicate { $0.recipeID == recipeID })
     )
-    guard let kitchenIdentifier = recipeRecords.first?.kitchenID
-      ?? saveRecords.first?.kitchenID
-      ?? pruneRecords.first?.kitchenID
-    else { return nil }
-    if saveRecords.isEmpty, pruneRecords.isEmpty {
-      return try legacyRecipe(id: id).map { stored in
-        .available(AvailableRecipeAuthority(
-          recipe: stored.recipe,
-          revisions: [ProjectedRecipeRevision(revision: stored.revision, state: .current)]
-        ))
-      }
-    }
     let selectionRecords = try context.fetch(
       FetchDescriptor<RecipeSelectionRecord>(predicate: #Predicate { $0.recipeID == recipeID })
     )
@@ -355,12 +349,36 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
         predicate: #Predicate { $0.recipeID == recipeID }
       )
     )
+    let kitchenIdentifiers = recipeRecords.map(\.kitchenID)
+      + saveRecords.map(\.kitchenID)
+      + selectionRecords.map(\.kitchenID)
+      + deletionRecords.map(\.kitchenID)
+      + restorationRecords.compactMap(\.kitchenID)
+      + pruneRecords.map(\.kitchenID)
+    guard let kitchenIdentifier = kitchenIdentifiers.min(by: {
+      $0.uuidString < $1.uuidString
+    }) else { return nil }
+    if saveRecords.isEmpty, selectionRecords.isEmpty, deletionRecords.isEmpty,
+      restorationRecords.isEmpty, pruneRecords.isEmpty {
+      return try legacyRecipe(id: id).map { stored in
+        .available(AvailableRecipeAuthority(
+          recipe: stored.recipe,
+          revisions: [ProjectedRecipeRevision(revision: stored.revision, state: .current)]
+        ))
+      }
+    }
+    let revisions: [RecipeRevision]
+    do {
+      revisions = try revisionRecords.map(domainRevision)
+    } catch let RecipePayloadReconstructionError.collision(revisionID) {
+      return .recovery(.payloadCollision(revisionID))
+    }
     let evidence = RecipeAuthorityEvidence(
       kitchenID: .init(rawValue: kitchenIdentifier),
       recipeID: id,
       saves: saveRecords.map(recipeSaveEvidence),
       selections: selectionRecords.map(recipeSelectionEvidence),
-      revisions: try revisionRecords.map(domainRevision),
+      revisions: revisions,
       deletions: deletionRecords.map(recipeDeletionEvidence),
       restorations: restorationRecords.map(recipeRestorationEvidence),
       prunes: pruneRecords.map(recipePruneEvidence)
@@ -471,15 +489,36 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
 
   public func recipes(in kitchenID: Kitchen.ID) throws -> [StoredRecipe] {
     let identifier = kitchenID.rawValue
-    let descriptor = FetchDescriptor<RecipeRecord>(
-      predicate: #Predicate { $0.kitchenID == identifier }
-    )
-    return try context.fetch(descriptor)
-      .uniqued(on: \.id)
-      .compactMap { try recipe(id: .init(rawValue: $0.id)) }
+    let recipeIDs = try recipeIdentifiers(in: identifier)
+    return try recipeIDs
+      .compactMap { try recipe(id: .init(rawValue: $0)) }
       .sorted {
         $0.revision.title.localizedStandardCompare($1.revision.title) == .orderedAscending
       }
+  }
+
+  private func recipeIdentifiers(in kitchenID: UUID) throws -> [UUID] {
+    var identifiers = Set(try context.fetch(
+      FetchDescriptor<RecipeRecord>(predicate: #Predicate { $0.kitchenID == kitchenID })
+    ).map(\.id))
+    identifiers.formUnion(try context.fetch(
+      FetchDescriptor<RecipeSaveRecord>(predicate: #Predicate { $0.kitchenID == kitchenID })
+    ).map(\.recipeID))
+    identifiers.formUnion(try context.fetch(
+      FetchDescriptor<RecipeSelectionRecord>(predicate: #Predicate { $0.kitchenID == kitchenID })
+    ).map(\.recipeID))
+    identifiers.formUnion(try context.fetch(
+      FetchDescriptor<RecipeDeletionRecord>(predicate: #Predicate { $0.kitchenID == kitchenID })
+    ).map(\.recipeID))
+    identifiers.formUnion(try context.fetch(
+      FetchDescriptor<RecipeDeletionResolutionRecord>(
+        predicate: #Predicate { $0.kitchenID == kitchenID }
+      )
+    ).map(\.recipeID))
+    identifiers.formUnion(try context.fetch(
+      FetchDescriptor<RecipePruneRecord>(predicate: #Predicate { $0.kitchenID == kitchenID })
+    ).map(\.recipeID))
+    return identifiers.sorted { $0.uuidString < $1.uuidString }
   }
 
   public func addRecipes(_ recipes: [StoredRecipe], to kitchenID: Kitchen.ID) throws {
@@ -610,6 +649,15 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     guard acceptedSaves.contains(where: {
       $0.kitchenID == command.kitchenID.rawValue && $0.recipeID == command.recipeID.rawValue
     }) else {
+      throw KitchenMemoryPersistenceError.invalidRecipeSaveCommand
+    }
+    let observedIDs = Set(command.observedSelectionIDs.map(\.rawValue))
+    let observedRecords = try context.fetch(FetchDescriptor<RecipeSelectionRecord>()).filter {
+      observedIDs.contains($0.id)
+        && $0.kitchenID == command.kitchenID.rawValue
+        && $0.recipeID == command.recipeID.rawValue
+    }
+    guard Set(observedRecords.map(\.id)) == observedIDs else {
       throw KitchenMemoryPersistenceError.invalidRecipeSaveCommand
     }
     let frontier = RecipeIdentifierSetCodec.encode(command.observedSelectionIDs.map(\.rawValue))
@@ -1194,6 +1242,22 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     where record.kitchenID != destinationID {
       record.kitchenID = destinationID
     }
+    for record in try context.fetch(FetchDescriptor<RecipeSaveRecord>())
+    where record.kitchenID != destinationID {
+      record.kitchenID = destinationID
+    }
+    for record in try context.fetch(FetchDescriptor<RecipeSelectionRecord>())
+    where record.kitchenID != destinationID {
+      record.kitchenID = destinationID
+    }
+    for record in try context.fetch(FetchDescriptor<RecipePruneRecord>())
+    where record.kitchenID != destinationID {
+      record.kitchenID = destinationID
+    }
+    for record in try context.fetch(FetchDescriptor<RecipeDeletionResolutionRecord>())
+    where record.kitchenID != destinationID {
+      record.kitchenID = destinationID
+    }
   }
 
   private func rehomeSessionRecords(to destinationID: UUID) throws {
@@ -1335,11 +1399,16 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
   private func domainRevision(from record: RecipeRevisionRecord) throws -> RecipeRevision {
     let storedSource = try decodeSource(record.sourceData)
     let revisionID = record.id
-    let media = try context.fetch(
+    let mediaRecords = try coalescedPayloadRows(context.fetch(
       FetchDescriptor<RecipeMediaRecord>(
         predicate: #Predicate { $0.revisionID == revisionID }, sortBy: [SortDescriptor(\.sortIndex)]
       )
-    ).uniqued(on: \.id).map { item in
+    ), revisionID: record.id, id: \.id) { lhs, rhs in
+      lhs.revisionID == rhs.revisionID && lhs.sortIndex == rhs.sortIndex
+        && lhs.role == rhs.role && lhs.assetName == rhs.assetName
+        && lhs.mediaAccessibilityLabel == rhs.mediaAccessibilityLabel
+    }
+    let media = try mediaRecords.map { item in
       guard let role = RecipeMedia.Role(rawValue: item.role) else {
         throw KitchenMemoryPersistenceError.invalidStoredValue(field: "media.role")
       }
@@ -1347,11 +1416,16 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
         id: .init(rawValue: item.id), role: role, assetName: item.assetName,
         accessibilityLabel: item.mediaAccessibilityLabel)
     }
-    let equipment = try context.fetch(
+    let equipmentRecords = try coalescedPayloadRows(context.fetch(
       FetchDescriptor<EquipmentRecord>(
         predicate: #Predicate { $0.revisionID == revisionID }, sortBy: [SortDescriptor(\.sortIndex)]
       )
-    ).uniqued(on: \.id).map { item in
+    ), revisionID: record.id, id: \.id) { lhs, rhs in
+      lhs.revisionID == rhs.revisionID && lhs.sortIndex == rhs.sortIndex
+        && lhs.originalText == rhs.originalText && lhs.quantityData == rhs.quantityData
+        && lhs.name == rhs.name && lhs.isOptional == rhs.isOptional
+    }
+    let equipment = try equipmentRecords.map { item in
       EquipmentItem(
         id: .init(rawValue: item.id), originalText: item.originalText,
         quantity: try decodeOptional(
@@ -1359,11 +1433,13 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
         name: item.name, isOptional: item.isOptional)
     }
 
-    let ingredientSectionRecords = try context.fetch(
+    let ingredientSectionRecords = try coalescedPayloadRows(context.fetch(
       FetchDescriptor<IngredientSectionRecord>(
         predicate: #Predicate { $0.revisionID == revisionID }, sortBy: [SortDescriptor(\.sortIndex)]
       )
-    ).uniqued(on: \.id)
+    ), revisionID: record.id, id: \.id) { lhs, rhs in
+      lhs.revisionID == rhs.revisionID && lhs.sortIndex == rhs.sortIndex && lhs.title == rhs.title
+    }
     let ingredientSections = try ingredientSectionRecords.map { section in
       let sectionID = section.id
       let storedItems = try context.fetch(
@@ -1371,7 +1447,10 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
           predicate: #Predicate { $0.sectionID == sectionID }, sortBy: [SortDescriptor(\.sortIndex)]
         )
       )
-      let items = try storedItems.uniqued(on: \.id).map { item in
+      let itemRecords = try coalescedPayloadRows(
+        storedItems, revisionID: record.id, id: \.id, equivalent: ingredientsMatch
+      )
+      let items = try itemRecords.map { item in
         guard let presentationMode = RecipeIngredient.PresentationMode(rawValue: item.presentationMode)
         else {
           throw KitchenMemoryPersistenceError.invalidStoredValue(
@@ -1400,11 +1479,13 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
         id: .init(rawValue: section.id), title: section.title, ingredients: items)
     }
 
-    let instructionSectionRecords = try context.fetch(
+    let instructionSectionRecords = try coalescedPayloadRows(context.fetch(
       FetchDescriptor<InstructionSectionRecord>(
         predicate: #Predicate { $0.revisionID == revisionID }, sortBy: [SortDescriptor(\.sortIndex)]
       )
-    ).uniqued(on: \.id)
+    ), revisionID: record.id, id: \.id) { lhs, rhs in
+      lhs.revisionID == rhs.revisionID && lhs.sortIndex == rhs.sortIndex && lhs.title == rhs.title
+    }
     let instructionSections = try instructionSectionRecords.map { section in
       let sectionID = section.id
       let storedSteps = try context.fetch(
@@ -1412,7 +1493,13 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
           predicate: #Predicate { $0.sectionID == sectionID }, sortBy: [SortDescriptor(\.sortIndex)]
         )
       )
-      let steps = try storedSteps.uniqued(on: \.id).map { step in
+      let stepRecords = try coalescedPayloadRows(storedSteps, revisionID: record.id, id: \.id) { lhs, rhs in
+        lhs.sectionID == rhs.sectionID && lhs.sortIndex == rhs.sortIndex
+          && lhs.name == rhs.name && lhs.text == rhs.text
+          && lhs.durationSeconds == rhs.durationSeconds
+          && lhs.temperatureData == rhs.temperatureData
+      }
+      let steps = try stepRecords.map { step in
         InstructionStep(
           id: .init(rawValue: step.id), name: step.name, text: step.text,
           duration: step.durationSeconds.map(RecipeDuration.init(seconds:)),
@@ -1453,6 +1540,41 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
       media: media, equipment: equipment, ingredientSections: ingredientSections,
       instructionSections: instructionSections
     )
+  }
+
+  private func coalescedPayloadRows<Record>(
+    _ records: [Record],
+    revisionID: UUID,
+    id: KeyPath<Record, UUID>,
+    equivalent: (Record, Record) -> Bool
+  ) throws -> [Record] {
+    var retained: [UUID: Record] = [:]
+    var result: [Record] = []
+    for record in records {
+      let identifier = record[keyPath: id]
+      if let existing = retained[identifier] {
+        guard equivalent(existing, record) else {
+          throw RecipePayloadReconstructionError.collision(.init(rawValue: revisionID))
+        }
+      } else {
+        retained[identifier] = record
+        result.append(record)
+      }
+    }
+    return result
+  }
+
+  private func ingredientsMatch(
+    _ lhs: RecipeIngredientRecord,
+    _ rhs: RecipeIngredientRecord
+  ) -> Bool {
+    lhs.sectionID == rhs.sectionID && lhs.sortIndex == rhs.sortIndex
+      && lhs.originalText == rhs.originalText && lhs.presentationMode == rhs.presentationMode
+      && lhs.customDisplayText == rhs.customDisplayText && lhs.quantityData == rhs.quantityData
+      && lhs.unitText == rhs.unitText && lhs.packageData == rhs.packageData
+      && lhs.ingredientText == rhs.ingredientText && lhs.preparation == rhs.preparation
+      && lhs.note == rhs.note && lhs.isOptional == rhs.isOptional
+      && lhs.scalingBehavior == rhs.scalingBehavior && lhs.parseState == rhs.parseState
   }
 
   private func deleteRevisionRows(revisionID: UUID) throws {

@@ -13,6 +13,8 @@ import XCTest
 @MainActor
 // swiftlint:disable:next type_body_length
 final class SwiftDataRecipeAuthorityFailureTests: XCTestCase {
+  // This one scenario asserts each rejected Selection shape and the unchanged durable result.
+  // swiftlint:disable:next function_body_length
   func testSelectionValidationAndCollisionLeaveAcceptedChoiceIntact() throws {
     let container = try KitchenMemorySchema.makeContainer(inMemory: true)
     let repository = SwiftDataRecipeRepository(modelContainer: container)
@@ -35,6 +37,15 @@ final class SwiftDataRecipeAuthorityFailureTests: XCTestCase {
       selectedRevisionID: RecipeRevision.ID(), selectedAt: Date()
     )
     XCTAssertThrowsError(try repository.select(unknownRevision)) { error in
+      XCTAssertEqual(error as? KitchenMemoryPersistenceError, .invalidRecipeSaveCommand)
+    }
+
+    let unknownObservation = RecipeSelectionCommand(
+      kitchenID: kitchen.id, recipeID: command.recipe.id,
+      selectedRevisionID: command.revision.id, selectedAt: Date(),
+      observedSelectionIDs: [.init()]
+    )
+    XCTAssertThrowsError(try repository.select(unknownObservation)) { error in
       XCTAssertEqual(error as? KitchenMemoryPersistenceError, .invalidRecipeSaveCommand)
     }
 
@@ -181,6 +192,70 @@ final class SwiftDataRecipeAuthorityFailureTests: XCTestCase {
         .invalidStoredValue(field: "recipe.authority")
       )
     }
+  }
+
+  func testPartialScopedEvidenceRemainsVisibleAndPayloadNeedsNoCompatibilityRow() throws {
+    let container = try KitchenMemorySchema.makeContainer(inMemory: true)
+    let repository = SwiftDataRecipeRepository(modelContainer: container)
+    let kitchen = Kitchen(name: "Home")
+    try repository.save(kitchen)
+    let partialRecipeID = Recipe.ID()
+    let context = ModelContext(container)
+    context.insert(RecipeSelectionRecord(
+      id: UUID(), kitchenID: kitchen.id.rawValue, recipeID: partialRecipeID.rawValue,
+      selectedRevisionID: UUID(), selectedAt: Date(), frontierFormatVersion: 1,
+      observedSelectionIDsData: Data()
+    ))
+    try context.save()
+
+    XCTAssertEqual(
+      try repository.recipeAuthority(id: partialRecipeID),
+      .unavailable(.noSaveEvidence)
+    )
+
+    let command = makeCommand(kitchenID: kitchen.id, number: 1)
+    try repository.save(command)
+    let cleanup = ModelContext(container)
+    for record in try cleanup.fetch(FetchDescriptor<RecipeRecord>())
+    where record.id == command.recipe.id.rawValue {
+      cleanup.delete(record)
+    }
+    try cleanup.save()
+
+    XCTAssertEqual(try repository.recipes(in: kitchen.id).map(\.id), [command.recipe.id])
+  }
+
+  func testConflictingPhysicalChildRowsBecomePayloadRecovery() throws {
+    let container = try KitchenMemorySchema.makeContainer(inMemory: true)
+    let repository = SwiftDataRecipeRepository(modelContainer: container)
+    let kitchen = Kitchen(name: "Home")
+    try repository.save(kitchen)
+    let recipeID = Recipe.ID()
+    let mediaID = RecipeMedia.ID()
+    let revision = RecipeRevision(
+      recipeID: recipeID, revisionNumber: 1, title: "Soup",
+      media: [RecipeMedia(id: mediaID, role: .hero, assetName: "first")]
+    )
+    let recipe = Recipe(id: recipeID, kitchenID: kitchen.id, currentRevisionID: revision.id)
+    let command = RecipeSaveCommand(
+      recipe: recipe, revision: revision, savedAt: Date(), parentRevisionIDs: [],
+      selection: RecipeSelectionCommand(
+        kitchenID: kitchen.id, recipeID: recipeID,
+        selectedRevisionID: revision.id, selectedAt: Date()
+      )
+    )
+    try repository.save(command)
+    let context = ModelContext(container)
+    context.insert(RecipeMediaRecord(
+      id: mediaID.rawValue, revisionID: revision.id.rawValue, sortIndex: 0,
+      role: RecipeMedia.Role.hero.rawValue, assetName: "conflict", accessibilityLabel: nil
+    ))
+    try context.save()
+
+    XCTAssertEqual(
+      try repository.recipeAuthority(id: recipeID),
+      .recovery(.payloadCollision(revision.id))
+    )
   }
 
   func testMissingAuthoritativeRevisionMapsToLegacyMissingRevisionFailure() throws {

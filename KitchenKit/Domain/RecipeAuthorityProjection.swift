@@ -275,7 +275,8 @@ private extension RecipeAuthorityProjector {
       }
     }
     let carriesLateEvidence = !evidence.saves.isEmpty || !evidence.selections.isEmpty
-      || !evidence.revisions.isEmpty
+      || !evidence.revisions.isEmpty || !evidence.deletions.isEmpty
+      || !evidence.restorations.isEmpty
     return carriesLateEvidence ? .recovery(.lateEvidenceAfterPrune) : .pruned
   }
 
