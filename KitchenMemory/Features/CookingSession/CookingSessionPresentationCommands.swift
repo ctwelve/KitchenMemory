@@ -2,6 +2,7 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
+import DequeModule
 import Foundation
 import KitchenKit
 @MainActor
@@ -226,7 +227,7 @@ extension CookingSessionPresentationModel {
   }
 
   func persistPendingCommands() {
-    store.pendingCommands = pendingCommands
+    store.pendingCommands = Array(pendingCommands)
   }
 
   func applyingPendingCommands(

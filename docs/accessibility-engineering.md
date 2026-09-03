@@ -12,10 +12,12 @@ stability of the interface being proved.
 
 The current shared SwiftUI interface is replaceable scaffolding. During this
 phase, use native semantics and avoid creating obvious barriers, but keep UI
-automation to the application-shell smoke tests defined by
-[ADR 0007](adr/0007-business-logic-coverage-and-ui-smoke-tests.md). Comprehensive audits and
-interaction-specific accessibility tests resume when the relevant interface is
-stable enough to represent a shipping contract.
+automation to the accessible top-level structure defined by
+[ADR 0007](adr/0007-business-logic-coverage-and-ui-smoke-tests.md). Comprehensive
+audits and interaction-specific accessibility tests resume when the relevant
+interface is stable enough to represent a shipping contract and
+[Issue 132](https://github.com/ctwelve/KitchenMemory/issues/132) defines the
+appropriate validation layers.
 
 ## Principles during prototyping
 
@@ -35,27 +37,24 @@ placeholder interface has received release-level proof.
 
 ## Current automated scope
 
-The UI suite verifies only that:
+The UI suite verifies only that the recipe library, Settings, and startup
+recovery expose meaningfully named accessibility elements and that the recipe,
+Sessions, Deleted Items, and Recovery destinations are reachable and expose
+their named top-level structure.
 
-- the application launches into the recipe library;
-- a recipe can be selected from the sidebar;
-- the sidebar can be hidden and restored where that control is present; and
-- Settings presents confirmation before destructive reset;
-- the Cooking Session lifecycle shell can Start, Stop, Resume, Finish, leave,
-  and reopen retained work; and
-- one representative Cooking Session path can account for an ingredient,
-  complete an instruction, and change a working yield when available; and
-- the first-class Sessions destination exposes Current, Recent, and Finished
-  history, deliberate Session switching, and one representative continuation
-  path with inspectable lineage; and
-- the durable recovery shell confirms one Delete and Restore path and exposes
-  the separate Deleted Items and Recovery destinations.
+Stable identifiers locate those elements without depending on translated copy;
+the assertions then inspect accessible names and enabled state. An identifier is
+an automation hook, not a user-facing name and not proof of accessibility.
+Navigation activation is only a means of revealing the next top-level structure.
+The suite does not test workflow behavior, coordinates, layout, geometry,
+scrolling, or incidental hierarchy shape.
 
-The tests use stable identifiers instead of visible English copy so they remain
-useful through String Catalog adoption and localization. Hosted tests separately
-prove container-width composition boundaries, accessibility-size reading order,
-ordered retry, and relaunch-safe state restoration without coupling automation
-to the provisional SwiftUI tree.
+Hosted and framework tests separately prove behavior, including
+container-width composition boundaries, accessibility-size reading order,
+ordered retry, state transitions, and relaunch-safe restoration. Human
+assistive-technology walkthroughs remain necessary because element existence
+and labels cannot establish focus order, grouping, spoken coherence, or actual
+VoiceOver usability.
 
 Slice 15 uses native buttons, menus, headings, selection traits, state values,
 and Dynamic Type. A physical iPhone/iPad and Mac pass with keyboard and
@@ -71,12 +70,14 @@ Before declaring an interface stable or release-ready:
 2. establish the String Catalog and verify layouts with representative longer
    translations and right-to-left presentation;
 3. manually inspect the workflow on each supported platform and input model;
-4. add focused automated checks for stable, high-value interaction contracts;
+4. apply the layered automation strategy produced by Issue 132 to stable,
+   high-value semantic contracts;
 5. run platform accessibility audits and investigate each result against the
    current Xcode toolchain; and
 6. document only the narrow exceptions that current evidence requires.
 
-Do not restore broad UI assertions merely to increase a coverage percentage.
+Do not restore broad UI assertions merely to increase a coverage percentage or
+to prove that standard controls respond to taps.
 Coverage goals apply to durable business logic; accessibility confidence for a
 stable interface requires semantic review, assistive-technology use, and focused
 automation together.

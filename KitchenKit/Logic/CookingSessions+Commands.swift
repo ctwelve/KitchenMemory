@@ -1,6 +1,7 @@
 // Kitchen Memory
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
+import Algorithms
 import Foundation
 // The exhaustive public command router and its retry contracts stay together.
 // swiftlint:disable file_length
@@ -181,8 +182,8 @@ extension CookingSessions {
           Set(intention.observedClosureIDs).count == intention.observedClosureIDs.count,
           intention.observedClosureIDs.contains(intention.selectedClosureID)
     else { throw CookingSessionLogicError.invalidIntention }
-    let closures = Dictionary(grouping: evidence.closures, by: \SessionClosureEvidence.id)
-      .compactMap { $0.value.first }
+    let projected = SessionEvidenceProjector.project(evidence)
+    let closures = evidence.closures.uniqued(on: \.id)
       .sorted { $0.id.rawValue.uuidString < $1.id.rawValue.uuidString }
     let selection = ClosureSelection(
       selectedClosureID: intention.selectedClosureID,
@@ -196,7 +197,6 @@ extension CookingSessions {
     if try closureResolutionAlreadyExists(intention, in: evidence) {
       return try classifiedResult(id: intention.fact.sessionID)
     }
-    let projected = SessionEvidenceProjector.project(evidence)
     guard closures.map(\.id) == intention.observedClosureIDs else {
       guard Set(intention.observedClosureIDs).isSubset(of: Set(closures.map(\.id))),
             closures.count > 1,

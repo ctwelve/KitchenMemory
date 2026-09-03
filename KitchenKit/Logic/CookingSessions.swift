@@ -2,6 +2,8 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
+import Algorithms
+import DequeModule
 import Foundation
 
 /// Product intentions and classified reads for one Kitchen's Cooking Sessions.
@@ -84,8 +86,7 @@ public struct CookingSessions {
           case .deleted = session.disposition
     else { return [] }
     let resolved = Set(evidence.restorations.map(\.deletionID))
-    return Dictionary(grouping: evidence.deletions, by: \SessionDeletionEvidence.id)
-      .compactMap { $0.value.first }
+    return evidence.deletions.uniqued(on: \.id)
       .filter { !resolved.contains($0.id) }
       .map(\.id)
       .sorted { $0.rawValue.uuidString < $1.rawValue.uuidString }
@@ -98,12 +99,10 @@ public struct CookingSessions {
     for recovery: SessionRecovery
   ) -> [SessionClosureEvidence] {
     guard recovery.reasons == [.competingClosures] else { return [] }
-    let grouped = Dictionary(grouping: recovery.evidence.closures, by: \.id)
-    guard grouped.values.allSatisfy({ values in
-      guard let first = values.first else { return false }
-      return values.allSatisfy { $0 == first }
-    }) else { return [] }
-    return grouped.values.compactMap(\.first).sorted {
+    guard let closures = coalescedByIdentity(recovery.evidence.closures, id: \.id) else {
+      return []
+    }
+    return closures.sorted {
       if $0.finishedAt != $1.finishedAt { return $0.finishedAt < $1.finishedAt }
       return $0.id.rawValue.uuidString < $1.id.rawValue.uuidString
     }
@@ -131,14 +130,20 @@ public struct CookingSessions {
         }
       }
     }
-    var frontier = [sessionID]
-    var descendants = Set<CookingSession.ID>()
-    while let source = frontier.popLast() {
-      for (candidate, parent) in edges where parent == source {
-        if descendants.insert(candidate).inserted { frontier.append(candidate) }
+    let childrenByParent = Dictionary(grouping: edges, by: \.1).mapValues { edges in
+      edges.map(\.0)
+    }
+    var frontier: Deque<CookingSession.ID> = [sessionID]
+    var visited: Set<CookingSession.ID> = [sessionID]
+    var descendantCount = 0
+    while let source = frontier.popFirst() {
+      for candidate in childrenByParent[source] ?? [] {
+        guard visited.insert(candidate).inserted else { continue }
+        descendantCount += 1
+        frontier.append(candidate)
       }
     }
-    return descendants.count
+    return descendantCount
   }
 
   public func start(

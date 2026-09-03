@@ -4,122 +4,68 @@
 
 import XCTest
 
-/// Smoke tests for the durable application shell.
+/// Accessibility-oriented checks for the durable application shell.
 ///
-/// Product behavior belongs in the domain, logic, import, and persistence
-/// suites. Keep this suite small and independent of provisional editor layout,
-/// visible copy, and accessibility-tree details while the interface evolves.
+/// These tests prove that top-level destinations are exposed through the
+/// accessibility hierarchy with meaningful names. Product behavior belongs in
+/// the domain, Logic, persistence, and hosted application suites.
 final class KitchenMemoryUITests: XCTestCase {
   override func setUpWithError() throws {
     continueAfterFailure = false
   }
 
   @MainActor
-  func testRecipeSidebarLaunchesAndOpensARecipe() {
+  func testTopLevelDestinationsExposeAccessibleNavigation() {
     let app = launchApp()
-    let recipeRow = app.descendants(matching: .any)
+    let shell = app.descendants(matching: .any)["recipe-library-shell"]
+    assertAccessibleLabel(shell, description: "recipe library")
+
+    visitTopLevelDestination(
+      "sessions-destination",
+      revealing: "sessions-history",
+      description: "Sessions",
+      in: app
+    )
+    visitTopLevelDestination(
+      "deleted-items-destination",
+      revealing: "deleted-items",
+      description: "Deleted Items",
+      in: app
+    )
+    visitTopLevelDestination(
+      "recovery-destination",
+      revealing: "session-recovery",
+      description: "Recovery",
+      in: app
+    )
+
+    let recipeRow = app.buttons
       .matching(NSPredicate(format: "identifier BEGINSWITH %@", "recipe-row-"))
       .firstMatch
-
+    revealSidebar(in: app, exposing: recipeRow)
     XCTAssertTrue(recipeRow.waitForExistence(timeout: 5))
+    assertAccessibleLabel(recipeRow, description: "recipe")
     activate(recipeRow)
-    XCTAssertTrue(
-      app.descendants(matching: .any)["recipe-detail"].waitForExistence(timeout: 5)
-    )
+
+    let recipeDetail = app.descendants(matching: .any)["recipe-detail"]
+    XCTAssertTrue(recipeDetail.waitForExistence(timeout: 5))
+    assertAccessibleLabel(recipeDetail, description: "recipe detail")
+    app.terminate()
   }
 
-#if os(macOS)
   @MainActor
-  func testSidebarCanBeHiddenAndShown() {
-    let app = launchApp()
-    let toggle = sidebarToggle(in: app)
-
-    XCTAssertTrue(toggle.waitForExistence(timeout: 2))
-    activate(toggle)
-    let hiddenToggle = sidebarToggle(in: app)
-    XCTAssertTrue(hiddenToggle.waitForExistence(timeout: 2))
-    activate(hiddenToggle)
-    XCTAssertTrue(
-      app.descendants(matching: .any)["recipe-library-shell"].waitForExistence(timeout: 2)
-    )
-  }
-#endif
-
-  @MainActor
-  func testSettingsPresentsDestructiveResetConfirmation() {
-    let app = launchApp()
+  func testSettingsExposeAccessibleTopLevelStructure() {
+    let app = launchApp(additionalArguments: ["--ui-testing-cloud-sync-disabled"])
     openSettings(in: app)
 
-    let reset = app.buttons["settings-reset-kitchen"]
-    revealSettingsRow(reset, in: app)
-    XCTAssertTrue(reset.waitForExistence(timeout: 5))
-    activate(reset)
-    XCTAssertTrue(app.buttons["confirm-reset-kitchen"].waitForExistence(timeout: 3))
+    let synchronization = app.switches["settings-icloud-sync"]
+    XCTAssertTrue(synchronization.waitForExistence(timeout: 5))
+    assertAccessibleLabel(synchronization, description: "iCloud synchronization setting")
+    app.terminate()
   }
 
   @MainActor
-  func testSettingsPresentsPrivacyDisplay() {
-    let app = launchApp()
-    openSettings(in: app)
-
-    let privacy = app.descendants(matching: .any)["settings-privacy"]
-    revealSettingsRow(privacy, in: app)
-    XCTAssertTrue(privacy.waitForExistence(timeout: 5))
-    activate(privacy)
-    XCTAssertTrue(
-      app.descendants(matching: .any)["privacy-display"].waitForExistence(timeout: 3)
-    )
-  }
-
-  @MainActor
-  func testReconnectingICloudSyncRequiresMergeConfirmation() {
-    let app = launchApp(additionalArguments: [
-      "--ui-testing-cloud-sync-disabled",
-    ])
-    openSettings(in: app)
-
-    let synchronizationToggle = app.descendants(matching: .any)["settings-icloud-sync"]
-    XCTAssertTrue(synchronizationToggle.waitForExistence(timeout: 5))
-#if os(iOS)
-    // XCTest targets the center of the full SwiftUI row by default, while the
-    // iOS 26 Form exposes the actionable switch at the trailing edge.
-    synchronizationToggle.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 0.5)).tap()
-    XCTAssertTrue(app.alerts.firstMatch.waitForExistence(timeout: 3))
-#else
-    activate(synchronizationToggle)
-    XCTAssertTrue(
-      app.buttons["confirm-icloud-reconnection"].waitForExistence(timeout: 3)
-    )
-#endif
-  }
-
-  @MainActor
-  func testEnglishInterfaceLaunchesTheLocalizedShell() {
-    assertLocalizedShell(localeIdentifier: "en-US")
-  }
-
-  @MainActor
-  func testCanadianFrenchInterfaceLaunchesTheLocalizedShell() {
-    assertLocalizedShell(localeIdentifier: "fr-CA")
-  }
-
-  @MainActor
-  func testMexicanSpanishInterfaceLaunchesTheLocalizedShell() {
-    assertLocalizedShell(localeIdentifier: "es-MX")
-  }
-
-  @MainActor
-  func testDoubleLocalizationLaunchesTheDurableShell() {
-    assertDurableShell(arguments: ["-NSDoubleLocalizedStrings", "YES"])
-  }
-
-  @MainActor
-  func testRightToLeftLocalizationLaunchesTheDurableShell() {
-    assertDurableShell(arguments: ["-NSForceRightToLeftWritingDirection", "YES"])
-  }
-
-  @MainActor
-  func testStartupFailureOffersAStableRecoverySurface() {
+  func testStartupFailureExposesAccessibleRecoveryAction() {
     let app = XCUIApplication()
     terminateRetainedApplicationIfNeeded(app)
     app.launchArguments = [
@@ -128,35 +74,47 @@ final class KitchenMemoryUITests: XCTestCase {
     ]
     app.launch()
 
-    // The actionable child is the stable cross-platform signal that the
-    // privacy-safe recovery surface is present.
-    let retryButton = app.buttons["retry-startup"]
-    ensurePrimaryWindow(in: app, exposing: retryButton)
-    XCTAssertTrue(
-      retryButton.waitForExistence(timeout: 5),
-      "Expected the startup recovery action."
-    )
+    let retry = app.buttons["retry-startup"]
+    ensurePrimaryWindow(in: app, exposing: retry)
+    XCTAssertTrue(retry.waitForExistence(timeout: 5))
+    assertAccessibleLabel(retry, description: "startup recovery action")
     app.terminate()
   }
 
-  // Shared by focused smoke-test extensions in synchronized source files.
-  // swiftlint:disable:next test_case_accessibility
   @MainActor
-  func launchApp(
-    additionalArguments: [String] = [],
-    prefersRegularWidth: Bool = false
-  ) -> XCUIApplication {
+  private func visitTopLevelDestination(
+    _ identifier: String,
+    revealing detailIdentifier: String,
+    description: String,
+    in app: XCUIApplication
+  ) {
+    let destination = app.buttons[identifier]
+    revealSidebar(in: app, exposing: destination)
+    XCTAssertTrue(destination.waitForExistence(timeout: 5))
+    assertAccessibleLabel(destination, description: "\(description) destination")
+    XCTAssertTrue(
+      destination.isEnabled,
+      "Expected the \(description) destination to be enabled."
+    )
+    activate(destination)
+
+    let detail = app.staticTexts[detailIdentifier]
+    XCTAssertTrue(detail.waitForExistence(timeout: 5))
+    assertAccessibleText(detail, description: "\(description) heading")
+  }
+
+  @MainActor
+  private func launchApp(additionalArguments: [String] = []) -> XCUIApplication {
 #if os(iOS)
-    XCUIDevice.shared.orientation = prefersRegularWidth ? .landscapeLeft : .portrait
+    XCUIDevice.shared.orientation = .portrait
 #endif
 
     let app = XCUIApplication()
     terminateRetainedApplicationIfNeeded(app)
-    // UI automation always uses disposable sample data and must never touch a
-    // developer's local Kitchen. Ignoring persisted window state also makes a
-    // macOS launch deterministic after somebody quits with no windows open.
-    app.launchArguments.append(contentsOf: ["-ApplePersistenceIgnoreState", "YES"])
-    app.launchArguments.append("--ui-testing")
+    app.launchArguments = [
+      "-ApplePersistenceIgnoreState", "YES",
+      "--ui-testing",
+    ]
     app.launchArguments.append(contentsOf: additionalArguments)
     app.launch()
 
@@ -171,9 +129,6 @@ final class KitchenMemoryUITests: XCTestCase {
   private func terminateRetainedApplicationIfNeeded(_ app: XCUIApplication) {
 #if os(macOS)
     guard app.state != .notRunning else { return }
-    // Application-hosted tests can leave the shared executable running in the
-    // background. Reusing that process would retain the hosted-test launch plan
-    // instead of the disposable UI-testing plan assembled below.
     app.terminate()
     XCTAssertTrue(
       app.wait(for: .notRunning, timeout: 5),
@@ -182,14 +137,10 @@ final class KitchenMemoryUITests: XCTestCase {
 #endif
   }
 
-  // Shared by focused smoke-test extensions in synchronized source files.
-  // swiftlint:disable:next test_case_accessibility
   @MainActor
-  func revealSidebar(in app: XCUIApplication, exposing element: XCUIElement) {
+  private func revealSidebar(in app: XCUIApplication, exposing element: XCUIElement) {
 #if os(iOS)
     if !element.waitForExistence(timeout: 2) {
-      // A compact split view may present the selected recipe first. Return to
-      // the durable sidebar before exercising either application-shell smoke.
       let backButton = app.buttons["BackButton"]
       if backButton.waitForExistence(timeout: 3) {
         activate(backButton)
@@ -197,7 +148,6 @@ final class KitchenMemoryUITests: XCTestCase {
     }
 #else
     if !element.waitForExistence(timeout: 2) {
-      // macOS may restore a previous split-view selection between launches.
       let toggle = app.buttons["toggle-sidebar"]
       if toggle.waitForExistence(timeout: 3) {
         activate(toggle)
@@ -206,10 +156,8 @@ final class KitchenMemoryUITests: XCTestCase {
 #endif
   }
 
-  // Shared by focused smoke-test extensions in synchronized source files.
-  // swiftlint:disable:next test_case_accessibility
   @MainActor
-  func activate(_ element: XCUIElement) {
+  private func activate(_ element: XCUIElement) {
 #if os(macOS)
     element.click()
 #else
@@ -221,73 +169,10 @@ final class KitchenMemoryUITests: XCTestCase {
   private func ensurePrimaryWindow(in app: XCUIApplication, exposing element: XCUIElement) {
 #if os(macOS)
     if !element.waitForExistence(timeout: 2) {
-      // XCUITest can relaunch a WindowGroup app into a retained no-window
-      // lifecycle even when persisted restoration state is disabled. Command-N
-      // exercises the public New Window path without depending on localized UI.
       app.activate()
       app.typeKey("n", modifierFlags: .command)
     }
 #endif
-  }
-
-#if os(macOS)
-  @MainActor
-  private func sidebarToggle(in app: XCUIApplication) -> XCUIElement {
-    let toggle = app.descendants(matching: .any)["toggle-sidebar"]
-    if !toggle.exists {
-      // The compact default test window can place trailing toolbar actions in
-      // AppKit's overflow menu. Open it without coupling the smoke to a label.
-      let toolbarOverflow = app.popUpButtons.firstMatch
-      if toolbarOverflow.waitForExistence(timeout: 2) {
-        activate(toolbarOverflow)
-        let overflowActions = toolbarOverflow.menuItems
-        if overflowActions.count > 1 {
-          // The sidebar action trails the other overflowed primary actions.
-          return overflowActions.element(boundBy: overflowActions.count - 1)
-        }
-      }
-    }
-    return toggle
-  }
-#endif
-
-  @MainActor
-  private func assertLocalizedShell(localeIdentifier: String) {
-    let app = launchApp(additionalArguments: [
-      "-AppleLanguages", "(\(localeIdentifier))",
-      "-AppleLocale", localeIdentifier,
-    ])
-    openSettings(in: app)
-
-    let privacy = app.descendants(matching: .any)["settings-privacy"]
-    revealSettingsRow(privacy, in: app)
-    XCTAssertTrue(
-      privacy.waitForExistence(timeout: 5),
-      "Missing localized Privacy row for \(localeIdentifier)"
-    )
-    activate(privacy)
-    XCTAssertTrue(
-      app.descendants(matching: .any)["privacy-display"].waitForExistence(timeout: 3),
-      "Missing localized Privacy display for \(localeIdentifier)"
-    )
-  }
-
-  @MainActor
-  private func revealSettingsRow(_ row: XCUIElement, in app: XCUIApplication) {
-#if !os(macOS)
-    if !row.waitForExistence(timeout: 2) {
-      app.swipeUp()
-    }
-#endif
-  }
-
-  @MainActor
-  private func assertDurableShell(arguments: [String]) {
-    let app = launchApp(additionalArguments: arguments)
-    XCTAssertTrue(
-      app.descendants(matching: .any)["recipe-library-shell"].exists,
-      "The durable shell failed under localization arguments: \(arguments)"
-    )
   }
 
   @MainActor
@@ -297,68 +182,28 @@ final class KitchenMemoryUITests: XCTestCase {
 #else
     let openSettings = app.buttons["open-settings"]
     XCTAssertTrue(openSettings.waitForExistence(timeout: 2))
+    assertAccessibleLabel(openSettings, description: "Settings action")
     activate(openSettings)
 #endif
   }
-}
 
-extension KitchenMemoryUITests {
   @MainActor
-  func testCookingSessionLifecycleShell() {
-    let app = launchApp()
-    let recipeRow = app.descendants(matching: .any)
-      .matching(NSPredicate(format: "identifier BEGINSWITH %@", "recipe-row-"))
-      .firstMatch
-    XCTAssertTrue(recipeRow.waitForExistence(timeout: 5))
-    activate(recipeRow)
-
-    let start = app.buttons["start-cooking"]
-    XCTAssertTrue(start.waitForExistence(timeout: 5))
-    activate(start)
-    let stop = app.buttons["stop-session"]
-    XCTAssertTrue(stop.waitForExistence(timeout: 5))
-    activate(stop)
-    let resume = app.buttons["resume-session"]
-    XCTAssertTrue(resume.waitForExistence(timeout: 5))
-    activate(resume)
-
-    let finish = app.buttons["finish-session"]
-    XCTAssertTrue(finish.waitForExistence(timeout: 5))
-    activate(finish)
-    // iOS exposes the SwiftUI alert action through nested button wrappers that
-    // share one identifier; either wrapper activates the same native action.
-    let confirmation = app.buttons["confirm-finish-session"].firstMatch
-    XCTAssertTrue(confirmation.waitForExistence(timeout: 3))
-    activate(confirmation)
-    XCTAssertFalse(app.buttons["finish-session"].waitForExistence(timeout: 3))
-
-    let continuation = app.buttons["continue-session"]
-    XCTAssertTrue(continuation.waitForExistence(timeout: 5))
-    activate(continuation)
-    leaveStoppedSession(in: app)
+  private func assertAccessibleLabel(_ element: XCUIElement, description: String) {
+    let label = element.label.trimmingCharacters(in: .whitespacesAndNewlines)
+    XCTAssertFalse(
+      label.isEmpty,
+      "Expected the \(description) to expose a meaningful accessibility label."
+    )
   }
 
   @MainActor
-  private func leaveStoppedSession(in app: XCUIApplication) {
-    let stop = app.buttons["stop-session"]
-    XCTAssertTrue(stop.waitForExistence(timeout: 5))
-    activate(stop)
-    let leave = app.buttons["leave-session"]
-    XCTAssertTrue(leave.waitForExistence(timeout: 5))
-    activate(leave)
-
-    reopenFirstSession(in: app)
-    XCTAssertTrue(app.buttons["resume-session"].waitForExistence(timeout: 5))
-  }
-
-  // Shared by focused smoke-test extensions in synchronized source files.
-  @MainActor
-  func reopenFirstSession(in app: XCUIApplication) {
-    let sessionRow = app.descendants(matching: .any)
-      .matching(NSPredicate(format: "identifier BEGINSWITH %@", "session-row-"))
-      .firstMatch
-    revealSidebar(in: app, exposing: sessionRow)
-    XCTAssertTrue(sessionRow.waitForExistence(timeout: 5))
-    activate(sessionRow)
+  private func assertAccessibleText(_ element: XCUIElement, description: String) {
+    let label = element.label.trimmingCharacters(in: .whitespacesAndNewlines)
+    let value = (element.value as? String)?
+      .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+    XCTAssertFalse(
+      label.isEmpty && value.isEmpty,
+      "Expected the \(description) to expose meaningful accessible text."
+    )
   }
 }

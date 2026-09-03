@@ -76,3 +76,10 @@ privacy manifest. Adding a telemetry, crash-reporting, advertising, attribution,
 or other data-transmitting dependency is a privacy change even when it arrives
 as a transitive package. A manifest copied from an earlier release is not
 evidence that the current binary has the same behavior.
+
+Swift Collections, Swift Algorithms, and the transitive Swift Numerics package
+contain no privacy manifest, tracking, data collection, networking, plugins,
+executables, or binary artifacts at the reviewed revisions. They perform
+in-process collection and sequence operations only. Their absence from the
+application privacy manifest is deliberate, but the signed product must still
+be inspected for every embedded framework and privacy manifest before release.

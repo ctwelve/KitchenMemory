@@ -197,6 +197,10 @@ fix, test, diagnostic, or documentation change; it should not expand this loop.
   without logging recipe contents or unnecessary account identifiers.
 - Verify the shipped privacy manifest against the release binary and the
   diagnostic boundary in [privacy engineering](privacy.md).
+- Enumerate every non-system framework in the signed iOS and macOS products;
+  reconcile the result with `DEPENDENCIES.md` and `Package.resolved`, and record
+  every embedded dependency privacy manifest. Swift package products expected
+  to be statically linked must not appear as unexplained embedded frameworks.
 - Document what iCloud synchronization does and does not replace, how local data
   behaves offline, and which reset or recovery actions are destructive.
 - Maintain a release-blocker list and known-issues record. A workaround must be

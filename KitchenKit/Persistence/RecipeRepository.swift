@@ -2,6 +2,7 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
+import Algorithms
 import Foundation
 import SwiftData
 
@@ -163,8 +164,7 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
 
   public func kitchens() throws -> [Kitchen] {
     let descriptor = FetchDescriptor<KitchenRecord>(sortBy: [SortDescriptor(\.name)])
-    var seenIDs = Set<UUID>()
-    return try context.fetch(descriptor).filter { seenIDs.insert($0.id).inserted }.map {
+    return try context.fetch(descriptor).uniqued(on: \.id).map {
       Kitchen(
         id: .init(rawValue: $0.id),
         ownerID: try ownerID(for: .init(rawValue: $0.id)),
@@ -223,9 +223,8 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     let descriptor = FetchDescriptor<RecipeRecord>(
       predicate: #Predicate { $0.kitchenID == identifier }
     )
-    var seenIDs = Set<UUID>()
     return try context.fetch(descriptor)
-      .filter { seenIDs.insert($0.id).inserted }
+      .uniqued(on: \.id)
       .compactMap { try recipe(id: .init(rawValue: $0.id)) }
       .sorted {
         $0.revision.title.localizedStandardCompare($1.revision.title) == .orderedAscending
@@ -249,9 +248,8 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     let descriptor = FetchDescriptor<RecipeRevisionRecord>(
       predicate: #Predicate { $0.recipeID == identifier }
     )
-    var seenIDs = Set<UUID>()
     return try context.fetch(descriptor)
-      .filter { seenIDs.insert($0.id).inserted }
+      .uniqued(on: \.id)
       .map(domainRevision)
       .sorted { lhs, rhs in
         if lhs.revisionNumber != rhs.revisionNumber {
@@ -634,12 +632,11 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
   private func domainRevision(from record: RecipeRevisionRecord) throws -> RecipeRevision {
     let storedSource = try decodeSource(record.sourceData)
     let revisionID = record.id
-    var seenMediaIDs = Set<UUID>()
     let media = try context.fetch(
       FetchDescriptor<RecipeMediaRecord>(
         predicate: #Predicate { $0.revisionID == revisionID }, sortBy: [SortDescriptor(\.sortIndex)]
       )
-    ).filter { seenMediaIDs.insert($0.id).inserted }.map { item in
+    ).uniqued(on: \.id).map { item in
       guard let role = RecipeMedia.Role(rawValue: item.role) else {
         throw KitchenMemoryPersistenceError.invalidStoredValue(field: "media.role")
       }
@@ -647,12 +644,11 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
         id: .init(rawValue: item.id), role: role, assetName: item.assetName,
         accessibilityLabel: item.mediaAccessibilityLabel)
     }
-    var seenEquipmentIDs = Set<UUID>()
     let equipment = try context.fetch(
       FetchDescriptor<EquipmentRecord>(
         predicate: #Predicate { $0.revisionID == revisionID }, sortBy: [SortDescriptor(\.sortIndex)]
       )
-    ).filter { seenEquipmentIDs.insert($0.id).inserted }.map { item in
+    ).uniqued(on: \.id).map { item in
       EquipmentItem(
         id: .init(rawValue: item.id), originalText: item.originalText,
         quantity: try decodeOptional(
@@ -660,12 +656,11 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
         name: item.name, isOptional: item.isOptional)
     }
 
-    var seenIngredientSectionIDs = Set<UUID>()
     let ingredientSectionRecords = try context.fetch(
       FetchDescriptor<IngredientSectionRecord>(
         predicate: #Predicate { $0.revisionID == revisionID }, sortBy: [SortDescriptor(\.sortIndex)]
       )
-    ).filter { seenIngredientSectionIDs.insert($0.id).inserted }
+    ).uniqued(on: \.id)
     let ingredientSections = try ingredientSectionRecords.map { section in
       let sectionID = section.id
       let storedItems = try context.fetch(
@@ -673,8 +668,7 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
           predicate: #Predicate { $0.sectionID == sectionID }, sortBy: [SortDescriptor(\.sortIndex)]
         )
       )
-      var seenItemIDs = Set<UUID>()
-      let items = try storedItems.filter { seenItemIDs.insert($0.id).inserted }.map { item in
+      let items = try storedItems.uniqued(on: \.id).map { item in
         guard let presentationMode = RecipeIngredient.PresentationMode(rawValue: item.presentationMode)
         else {
           throw KitchenMemoryPersistenceError.invalidStoredValue(
@@ -703,12 +697,11 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
         id: .init(rawValue: section.id), title: section.title, ingredients: items)
     }
 
-    var seenInstructionSectionIDs = Set<UUID>()
     let instructionSectionRecords = try context.fetch(
       FetchDescriptor<InstructionSectionRecord>(
         predicate: #Predicate { $0.revisionID == revisionID }, sortBy: [SortDescriptor(\.sortIndex)]
       )
-    ).filter { seenInstructionSectionIDs.insert($0.id).inserted }
+    ).uniqued(on: \.id)
     let instructionSections = try instructionSectionRecords.map { section in
       let sectionID = section.id
       let storedSteps = try context.fetch(
@@ -716,8 +709,7 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
           predicate: #Predicate { $0.sectionID == sectionID }, sortBy: [SortDescriptor(\.sortIndex)]
         )
       )
-      var seenStepIDs = Set<UUID>()
-      let steps = try storedSteps.filter { seenStepIDs.insert($0.id).inserted }.map { step in
+      let steps = try storedSteps.uniqued(on: \.id).map { step in
         InstructionStep(
           id: .init(rawValue: step.id), name: step.name, text: step.text,
           duration: step.durationSeconds.map(RecipeDuration.init(seconds:)),

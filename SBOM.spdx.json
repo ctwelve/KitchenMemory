@@ -87,6 +87,93 @@
       ]
     },
     {
+      "name": "swift-algorithms",
+      "SPDXID": "SPDXRef-Package-swift-algorithms",
+      "versionInfo": "1.2.1",
+      "downloadLocation": "https://github.com/apple/swift-algorithms",
+      "filesAnalyzed": false,
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "87e50f483c54e6efd60e885f7f5aa946cee68023"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "Apache-2.0 WITH Swift-exception",
+      "copyrightText": "Copyright Apple Inc. and the Swift project authors",
+      "primaryPackagePurpose": "LIBRARY",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:github/apple/swift-algorithms@1.2.1"
+        },
+        {
+          "referenceCategory": "OTHER",
+          "referenceType": "resolved-package-identity",
+          "referenceLocator": "swift-algorithms"
+        }
+      ]
+    },
+    {
+      "name": "swift-collections",
+      "SPDXID": "SPDXRef-Package-swift-collections",
+      "versionInfo": "1.6.0",
+      "downloadLocation": "https://github.com/apple/swift-collections",
+      "filesAnalyzed": false,
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "a0cb0954ecb21e4e31b0070e6ed5674e8556685a"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "Apache-2.0 WITH Swift-exception",
+      "copyrightText": "Copyright Apple Inc. and the Swift project authors",
+      "primaryPackagePurpose": "LIBRARY",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:github/apple/swift-collections@1.6.0"
+        },
+        {
+          "referenceCategory": "OTHER",
+          "referenceType": "resolved-package-identity",
+          "referenceLocator": "swift-collections"
+        }
+      ]
+    },
+    {
+      "name": "swift-numerics",
+      "SPDXID": "SPDXRef-Package-swift-numerics",
+      "versionInfo": "1.1.1",
+      "downloadLocation": "https://github.com/apple/swift-numerics.git",
+      "filesAnalyzed": false,
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "0c0290ff6b24942dadb83a929ffaaa1481df04a2"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "Apache-2.0 WITH Swift-exception",
+      "copyrightText": "Copyright Apple Inc. and the Swift Numerics project authors",
+      "primaryPackagePurpose": "SOURCE",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:github/apple/swift-numerics@1.1.1"
+        },
+        {
+          "referenceCategory": "OTHER",
+          "referenceType": "resolved-package-identity",
+          "referenceLocator": "swift-numerics"
+        }
+      ]
+    },
+    {
       "name": "SwiftLintPlugins",
       "SPDXID": "SPDXRef-Package-SwiftLintPlugins",
       "versionInfo": "0.65.0",
@@ -150,6 +237,21 @@
       "spdxElementId": "SPDXRef-Package-KitchenMemory",
       "relationshipType": "DEPENDS_ON",
       "relatedSpdxElement": "SPDXRef-Package-Defaults"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-KitchenMemory",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-swift-algorithms"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-KitchenMemory",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-swift-collections"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-swift-numerics",
+      "relationshipType": "DEPENDENCY_OF",
+      "relatedSpdxElement": "SPDXRef-Package-swift-algorithms"
     },
     {
       "spdxElementId": "SPDXRef-Package-SwiftLintPlugins",
