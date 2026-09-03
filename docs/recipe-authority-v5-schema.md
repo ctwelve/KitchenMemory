@@ -13,8 +13,10 @@ SPDX-License-Identifier: MIT
 
 This document freezes the smallest additive authority model selected by
 [issue #104](https://github.com/ctwelve/KitchenMemory/issues/104). Issue #136
-registers the physical records and V4-to-V5 schema stage so runtime code matches
-the initialized Development container. That registration does not implement
+registers the physical records and V5 schema so runtime code matches the
+Development container. During alpha, adopting this schema permits a destructive
+local and CloudKit reset under ADR 0016 rather than promising preservation of
+earlier stores. That registration does not implement
 authority commands, projection, backfill, Production deployment, or physical
 pruning. The throwaway
 [prototype branch](https://github.com/ctwelve/KitchenMemory/tree/e04dbaf)
@@ -275,14 +277,16 @@ may be maintained as a disposable local index while older builds exist, but V5
 projection, retry, conflict, deletion, restoration, and pruning decisions must
 not read it as authority.
 
-## Migration from V4
+## Alpha adoption from V4
 
-V4-to-V5 is an additive lightweight schema stage followed by an
-application-owned, retry-safe backfill ledger. The schema stage introduces the
-three new model types, adds optional `deletedAt` to `RecipeDeletionRecord`, and
-adds optional `kitchenID` plus optional `restoredAt` to
-`RecipeDeletionResolutionRecord`. The backfill does not replace existing
-Recipe, Revision, child-payload, disposition, or Cooking Session records.
+V5 introduces the three new model types, adds optional `deletedAt` to
+`RecipeDeletionRecord`, and adds optional `kitchenID` plus optional `restoredAt`
+to `RecipeDeletionResolutionRecord`. Alpha installations may reset their local
+and CloudKit data when adopting this shape; #136 does not promise that a store
+created by an earlier alpha model will migrate in place.
+
+If preserving a legacy graph becomes necessary after the beta stabilization
+boundary, the application-owned backfill is:
 
 For each valid legacy Recipe graph, backfill:
 
@@ -304,10 +308,11 @@ logical duplicates. A disagreement beneath an existing domain identity becomes
 recovery. Legacy records with unknown deletion dates are not automatically
 eligible for time-based pruning.
 
-Existing Recipe and Revision identities, payload rows, and authored ordering do
-not change. A Cooking Session's self-contained Execution Snapshot and its Recipe
-and Revision provenance remain readable without V5 authority evidence. Alpha
-reset freedom from ADR 0016 does not weaken these ownership or recovery rules.
+For a preserved store, existing Recipe and Revision identities, payload rows,
+and authored ordering do not change. A Cooking Session's self-contained
+Execution Snapshot and its Recipe and Revision provenance remain readable
+without V5 authority evidence. Alpha reset freedom from ADR 0016 does not
+weaken these ownership or recovery rules once new V5 data exists.
 
 ## Falsification result
 

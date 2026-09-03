@@ -164,8 +164,8 @@ revision numbers, and `currentRevisionID` do not decide currentness. V5 also
 adds a complete payload manifest so piecemeal CloudKit delivery is unavailable
 rather than mistaken for a valid partial Revision. See
 [Recipe authority V5](recipe-authority-v5-schema.md). The V5 physical records
-and schema migration are registered by #136 so the app recognizes the
-initialized Development model. Authority codecs, commands, projection, and
+and current alpha schema are registered by #136. Earlier alpha stores may reset
+under ADR 0016; authority codecs, commands, projection, and any post-beta
 backfill remain work for #105 and later slices.
 
 V2 makes deletion equally explicit. A reset writes an append-only deletion

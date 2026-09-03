@@ -168,9 +168,9 @@ Kitchen → Recipe → RecipeRevision
 ```
 
 The current repository still uses that payload graph and its legacy mutable
-current pointer. V5 registers the additive authority record families and
-migration stage, but repository commands and projection remain a later
-implementation slice.
+current pointer. V5 registers the authority record families as the current
+alpha schema, but repository commands and projection remain a later
+implementation slice. Earlier alpha stores may be reset under ADR 0016.
 
 The remaining aggregates establish ownership and identity seams now but are
 implemented only as their product workflows arrive.
