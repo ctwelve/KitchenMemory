@@ -244,7 +244,8 @@ struct PreparedCore {
       kitchenID: preparedKitchen.kitchen.id,
       repository: recipeRepository,
       samples: samples,
-      importer: RecipeImportService()
+      importer: RecipeImportService(),
+      resetRepository: SwiftDataKitchenResetRepository(modelContainer: modelContainer)
     )
     if plan.sampleFixture == .installed { try library.installSamples() }
     libraryModel = RecipeLibraryModel(
@@ -301,6 +302,11 @@ struct PreparedApp {
       sessions: core.cookingSessions,
       store: sessionPresentationStore
     )
+    let sessionRepository = core.cookingSessionRepository
+    core.libraryModel.installResetPresentationHandler {
+      sessionRepository.refreshFromPersistentStore()
+      sessionModel.resetAfterKitchenReset()
+    }
     modelContainer = core.modelContainer
     libraryModel = core.libraryModel
     cookingSessionRepository = core.cookingSessionRepository

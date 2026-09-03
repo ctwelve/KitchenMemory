@@ -158,8 +158,73 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     self.context = ModelContext(modelContainer)
   }
 
-  private init(context: ModelContext) {
+  init(context: ModelContext) {
     self.context = context
+  }
+
+  func resetRecipesInCurrentTransaction(
+    in kitchenID: Kitchen.ID,
+    with recipes: [StoredRecipe]
+  ) throws {
+    try validate(recipes, in: kitchenID)
+    let kitchenIdentifier = kitchenID.rawValue
+    let recipeRecords = try context.fetch(
+      FetchDescriptor<RecipeRecord>(predicate: #Predicate { $0.kitchenID == kitchenIdentifier })
+    )
+    var recipeIDs = Set(recipeRecords.map(\.id))
+    recipeIDs.formUnion(try context.fetch(
+      FetchDescriptor<RecipeSaveRecord>(predicate: #Predicate { $0.kitchenID == kitchenIdentifier })
+    ).map(\.recipeID))
+    recipeIDs.formUnion(try context.fetch(
+      FetchDescriptor<RecipeDeletionRecord>(
+        predicate: #Predicate { $0.kitchenID == kitchenIdentifier }
+      )
+    ).map(\.recipeID))
+    recipeIDs.formUnion(try context.fetch(
+      FetchDescriptor<RecipeSelectionRecord>(
+        predicate: #Predicate { $0.kitchenID == kitchenIdentifier }
+      )
+    ).map(\.recipeID))
+    recipeIDs.formUnion(try context.fetch(
+      FetchDescriptor<RecipePruneRecord>(predicate: #Predicate { $0.kitchenID == kitchenIdentifier })
+    ).map(\.recipeID))
+
+    for revision in try context.fetch(FetchDescriptor<RecipeRevisionRecord>())
+    where recipeIDs.contains(revision.recipeID) {
+      try deleteRevisionRows(revisionID: revision.id)
+      context.delete(revision)
+    }
+    recipeRecords.forEach(context.delete)
+    try deleteRecipeAuthorityAndDisposition(kitchenID: kitchenIdentifier, recipeIDs: recipeIDs)
+    for stored in recipes {
+      try accept(legacyAuthorityCommand(for: stored))
+    }
+  }
+
+  private func deleteRecipeAuthorityAndDisposition(
+    kitchenID: UUID,
+    recipeIDs: Set<UUID>
+  ) throws {
+    for record in try context.fetch(FetchDescriptor<RecipeDeletionRecord>())
+    where record.kitchenID == kitchenID || recipeIDs.contains(record.recipeID) {
+      context.delete(record)
+    }
+    for record in try context.fetch(FetchDescriptor<RecipeDeletionResolutionRecord>())
+    where record.kitchenID == kitchenID || recipeIDs.contains(record.recipeID) {
+      context.delete(record)
+    }
+    for record in try context.fetch(FetchDescriptor<RecipeSaveRecord>())
+    where record.kitchenID == kitchenID || recipeIDs.contains(record.recipeID) {
+      context.delete(record)
+    }
+    for record in try context.fetch(FetchDescriptor<RecipeSelectionRecord>())
+    where record.kitchenID == kitchenID || recipeIDs.contains(record.recipeID) {
+      context.delete(record)
+    }
+    for record in try context.fetch(FetchDescriptor<RecipePruneRecord>())
+    where record.kitchenID == kitchenID || recipeIDs.contains(record.recipeID) {
+      context.delete(record)
+    }
   }
 
   public func save(_ kitchen: Kitchen) throws {
