@@ -2,7 +2,6 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
-import Algorithms
 import Foundation
 
 struct SessionFactDescription {
@@ -103,25 +102,32 @@ struct CookingSessionCommandFactory {
   }
 
   func maximalSessionHeads(_ evidence: SessionEvidence) throws -> [UUID] {
-    let uniqueFacts = evidence.facts.uniqued(on: \.id)
-    var parents = Dictionary(uniqueKeysWithValues: try uniqueFacts.map { fact in
-      let decoded = try CausalHeadsCodec.decode(
-        formatVersion: fact.causalHeadsFormatVersion,
+    let facts = IdentityCollection.stableUnique(evidence.facts, id: \.id)
+    let roots = IdentityCollection.stableUnique(evidence.roots, id: \.id)
+    let closures = IdentityCollection.stableUnique(evidence.closures, id: \.id)
+    var parents = Dictionary(uniqueKeysWithValues: roots.map {
+      ($0.id.rawValue, [UUID]())
+    })
+    for fact in facts {
+      parents[fact.id.rawValue] = try decodeHeads(
+        version: fact.causalHeadsFormatVersion,
         data: fact.causalHeadsData
       )
-      return (fact.id.rawValue, decoded)
-    })
-    for root in evidence.roots {
-      parents[root.id.rawValue] = []
     }
-    for closure in evidence.closures {
-      parents[closure.id.rawValue] = try CausalHeadsCodec.decode(
-        formatVersion: closure.causalHeadsFormatVersion,
+    for closure in closures {
+      parents[closure.id.rawValue] = try decodeHeads(
+        version: closure.causalHeadsFormatVersion,
         data: closure.causalHeadsData
       )
     }
-    return DirectedGraph(parentsByNode: parents).maximalNodes.sorted {
-      $0.uuidString < $1.uuidString
-    }
+    return CausalGraph(parentsByNode: parents, orderedBy: uuidOrder).maximalNodes
+  }
+
+  private func decodeHeads(version: Int, data: Data) throws -> [UUID] {
+    try CausalHeadsCodec.decode(formatVersion: version, data: data)
+  }
+
+  private func uuidOrder(_ lhs: UUID, _ rhs: UUID) -> Bool {
+    lhs.uuidString < rhs.uuidString
   }
 }
