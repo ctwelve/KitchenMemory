@@ -182,9 +182,9 @@ CryptoKit plus narrowly linked Swift Collections products behind Kitchen
 Memory-owned types. It has no SwiftData, CloudKit, repository, actor, device, or
 UI dependency, so later persistence and synchronization slices are adapters
 around this domain contract rather than authorities over its merge behavior.
-KitchenKit Logic and Persistence separately use Swift Algorithms behind owned
-interfaces to coalesce already-validated graph evidence and reconcile duplicate
-immutable Recipe rows.
+KitchenKit Logic also uses a Collections deque for iterative dependency traversal,
+while Persistence uses Swift Algorithms behind the owned Recipe repository
+interface to reconcile duplicate immutable rows.
 
 ### Application composition and stitching points
 

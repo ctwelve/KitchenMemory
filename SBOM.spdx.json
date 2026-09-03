@@ -241,12 +241,14 @@
     {
       "spdxElementId": "SPDXRef-Package-KitchenMemory",
       "relationshipType": "DEPENDS_ON",
-      "relatedSpdxElement": "SPDXRef-Package-swift-algorithms"
+      "relatedSpdxElement": "SPDXRef-Package-swift-algorithms",
+      "comment": "KitchenKit RecipeRepository uses Algorithms to coalesce duplicate immutable Recipe rows during merge reconciliation."
     },
     {
       "spdxElementId": "SPDXRef-Package-KitchenMemory",
       "relationshipType": "DEPENDS_ON",
-      "relatedSpdxElement": "SPDXRef-Package-swift-collections"
+      "relatedSpdxElement": "SPDXRef-Package-swift-collections",
+      "comment": "KitchenKit uses DequeModule and OrderedCollections for causal traversal, Logic dependency discovery, and identity semantics; KitchenMemory uses DequeModule behind its device-local Cooking Session outbox."
     },
     {
       "spdxElementId": "SPDXRef-Package-swift-numerics",

@@ -25,9 +25,11 @@ struct CausalGraph<Node: Hashable> {
     orderedBy areInIncreasingOrder: @escaping (Node, Node) -> Bool
   ) {
     var orderedParents: OrderedDictionary<Node, [Node]> = [:]
-    for node in parentsByNode.keys.sorted(by: areInIncreasingOrder) {
+    for (node, parents) in parentsByNode.sorted(by: {
+      areInIncreasingOrder($0.key, $1.key)
+    }) {
       orderedParents[node] = IdentityCollection.stableUnique(
-        (parentsByNode[node] ?? []).sorted(by: areInIncreasingOrder),
+        parents.sorted(by: areInIncreasingOrder),
         id: \.self
       )
     }
@@ -81,7 +83,10 @@ struct CausalGraph<Node: Hashable> {
           if visited.contains(candidate) { continue }
           _ = visiting.insert(candidate)
           workQueue.append(.exit(candidate))
-          for parent in (parentsByNode[candidate] ?? []).reversed()
+          // Every entered candidate is either a retained key or was admitted by
+          // the retained-key check below, so this lookup is structurally total.
+          // swiftlint:disable:next force_unwrapping
+          for parent in parentsByNode[candidate]!.reversed()
           where parentsByNode[parent] != nil {
             if visiting.contains(parent) { return true }
             if !visited.contains(parent) { workQueue.append(.enter(parent)) }

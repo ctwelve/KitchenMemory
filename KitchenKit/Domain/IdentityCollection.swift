@@ -13,7 +13,8 @@ enum IdentityCoalescingResult<Value: Equatable, Identity: Hashable>: Equatable {
 ///
 /// Stable uniqueness preserves first-seen order and deliberately ignores later
 /// values with the same identity. Coalescing accepts only exact retries,
-/// reports conflicting identity reuse, and emits the caller's canonical order.
+/// reports conflicting identity reuse, and either preserves first-seen order or
+/// emits the caller's explicit canonical order.
 enum IdentityCollection {
   static func stableUnique<Value, Identity: Hashable>(
     _ values: [Value],
@@ -27,8 +28,27 @@ enum IdentityCollection {
 
   static func coalesce<Value: Equatable, Identity: Hashable>(
     _ values: [Value],
+    id: KeyPath<Value, Identity>
+  ) -> IdentityCoalescingResult<Value, Identity> {
+    coalescePreservingOrder(values, id: id)
+  }
+
+  static func coalesce<Value: Equatable, Identity: Hashable>(
+    _ values: [Value],
     id: KeyPath<Value, Identity>,
     orderedBy areInIncreasingOrder: (Value, Value) -> Bool
+  ) -> IdentityCoalescingResult<Value, Identity> {
+    switch coalescePreservingOrder(values, id: id) {
+    case let .coalesced(values):
+      return .coalesced(values.sorted(by: areInIncreasingOrder))
+    case let .collision(identity):
+      return .collision(identity: identity)
+    }
+  }
+
+  private static func coalescePreservingOrder<Value: Equatable, Identity: Hashable>(
+    _ values: [Value],
+    id: KeyPath<Value, Identity>
   ) -> IdentityCoalescingResult<Value, Identity> {
     var valuesByIdentity: OrderedDictionary<Identity, Value> = [:]
     for value in values {
@@ -39,6 +59,6 @@ enum IdentityCollection {
         valuesByIdentity[identity] = value
       }
     }
-    return .coalesced(valuesByIdentity.values.sorted(by: areInIncreasingOrder))
+    return .coalesced(Array(valuesByIdentity.values))
   }
 }

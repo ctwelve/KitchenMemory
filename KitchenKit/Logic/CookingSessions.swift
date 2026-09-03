@@ -2,7 +2,6 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
-import Algorithms
 import DequeModule
 import Foundation
 
@@ -86,7 +85,7 @@ public struct CookingSessions {
           case .deleted = session.disposition
     else { return [] }
     let resolved = Set(evidence.restorations.map(\.deletionID))
-    return evidence.deletions.uniqued(on: \.id)
+    return IdentityCollection.stableUnique(evidence.deletions, id: \.id)
       .filter { !resolved.contains($0.id) }
       .map(\.id)
       .sorted { $0.rawValue.uuidString < $1.rawValue.uuidString }
