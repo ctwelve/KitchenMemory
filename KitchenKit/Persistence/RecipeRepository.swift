@@ -483,38 +483,10 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
       selection: selection
     )
     let encoded = try validateAndEncode(command)
-    try backfillSave(command, encoded: encoded)
-    if isSelected { try backfillSelection(command, encoded: encoded) }
-  }
-
-  private func backfillSave(
-    _ command: RecipeSaveCommand,
-    encoded: EncodedRecipeSaveAuthority
-  ) throws {
-    let identifier = command.id.rawValue
-    let records = try context.fetch(
-      FetchDescriptor<RecipeSaveRecord>(predicate: #Predicate { $0.id == identifier })
-    )
-    guard records.allSatisfy({ saveRecord($0, matches: command, encoded: encoded) }) else {
-      throw KitchenMemoryPersistenceError.recipeSaveCommandCollision(commandID: command.id)
+    context.insert(saveRecord(for: command, encoded: encoded))
+    if isSelected {
+      context.insert(selectionRecord(for: command, encoded: encoded))
     }
-    if records.isEmpty { context.insert(saveRecord(for: command, encoded: encoded)) }
-  }
-
-  private func backfillSelection(
-    _ command: RecipeSaveCommand,
-    encoded: EncodedRecipeSaveAuthority
-  ) throws {
-    let identifier = command.selection.id.rawValue
-    let records = try context.fetch(
-      FetchDescriptor<RecipeSelectionRecord>(predicate: #Predicate { $0.id == identifier })
-    )
-    guard records.allSatisfy({ selectionRecord($0, matches: command, encoded: encoded) }) else {
-      throw KitchenMemoryPersistenceError.recipeSelectionCommandCollision(
-        commandID: command.selection.id
-      )
-    }
-    if records.isEmpty { context.insert(selectionRecord(for: command, encoded: encoded)) }
   }
 
   private func validateAndEncode(
