@@ -2,7 +2,6 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
-import DequeModule
 import Foundation
 import KitchenKit
 @MainActor
@@ -95,7 +94,7 @@ extension CookingSessionPresentationModel {
   }
 
   func retryPendingCommands() {
-    while let pending = pendingCommands.first {
+    while let pending = outbox.head {
       do {
         let result = try perform(pending)
         guard apply(result, for: pending) else { return }
@@ -112,26 +111,26 @@ extension CookingSessionPresentationModel {
 
 extension CookingSessionPresentationModel {
   func prepareForNewCommand() -> Bool {
-    guard !pendingCommands.isEmpty else { return true }
+    guard !outbox.isEmpty else { return true }
     retryPendingCommands()
-    return pendingCommands.isEmpty
+    return outbox.isEmpty
   }
 
   func stageAndPerform(_ pending: PendingCookingSessionCommand) -> Bool {
-    pendingCommands = [pending]
+    outbox.replace(with: pending)
     persistPendingCommands()
     retryPendingCommands()
-    return !pendingCommands.contains(pending)
+    return !outbox.contains(pending)
   }
 
   func stageIndependentAndPerform(_ pending: PendingCookingSessionCommand) -> Bool {
-    guard pendingCommands.allSatisfy({ $0.isIndependentActivity(for: pending.sessionID) }) else {
+    guard outbox.allSatisfy({ $0.isIndependentActivity(for: pending.sessionID) }) else {
       return false
     }
-    pendingCommands.append(pending)
+    outbox.enqueue(pending)
     persistPendingCommands()
     retryPendingCommands()
-    return !pendingCommands.contains(pending)
+    return !outbox.contains(pending)
   }
 
   // Exhaustive durable terminal-state routing keeps every outbox retirement
@@ -142,12 +141,12 @@ extension CookingSessionPresentationModel {
   ) -> Bool {
     switch PendingCookingSessionResolution(result: result, pending: pending) {
     case let .accepted(session):
-      guard pendingCommands.first == pending else { return false }
+      guard outbox.head == pending else { return false }
       // Draft state crosses its local durability boundary before the outbox
       // identity is cleared. A process interruption can therefore replay the
       // accepted command, but can never strand or lose the user's text.
       applyDraftAcceptance(for: pending, session: session)
-      pendingCommands.removeFirst()
+      outbox.retireHead()
       persistPendingCommands()
       issue = nil
       isShowingIssue = false
@@ -156,30 +155,30 @@ extension CookingSessionPresentationModel {
       if pending.refreshesClassification { reload() }
       return true
     case .rejectedByFinishedSource:
-      guard pendingCommands.first == pending else { return false }
+      guard outbox.head == pending else { return false }
       // Logic has definitively rejected this specific identity because its
       // source Session is already Finished. The command can never become
       // eligible on retry, while any exact local draft remains separately
       // durable for explicit continuation, copy, or discard.
-      pendingCommands.removeFirst()
+      outbox.retireHead()
       persistPendingCommands()
       issue = nil
       isShowingIssue = false
       return true
     case let .retiredStaleConsent(attention):
-      guard pendingCommands.first == pending else { return false }
+      guard outbox.head == pending else { return false }
       // Consent to resolve retained evidence is bounded to what the user saw.
       // A changed frontier or candidate set requires a fresh explicit choice.
-      pendingCommands.removeFirst()
+      outbox.retireHead()
       persistPendingCommands()
       reload()
       present(.attention(attention))
       return true
     case .retiredCompletedRestore:
-      guard pendingCommands.first == pending else { return false }
+      guard outbox.head == pending else { return false }
       // Another replica may already have restored the observed frontier. The
       // local intention is then complete and safe to retire idempotently.
-      pendingCommands.removeFirst()
+      outbox.retireHead()
       persistPendingCommands()
       issue = nil
       isShowingIssue = false
@@ -227,7 +226,7 @@ extension CookingSessionPresentationModel {
   }
 
   func persistPendingCommands() {
-    store.pendingCommands = Array(pendingCommands)
+    store.pendingCommands = outbox.commands
   }
 
   func applyingPendingCommands(
@@ -237,7 +236,7 @@ extension CookingSessionPresentationModel {
     var workingScale = session.workingScale
     var entries = session.entries
     var outcome = session.outcome
-    for pending in pendingCommands where pending.sessionID == session.id {
+    for pending in outbox.commands where pending.sessionID == session.id {
       switch pending {
       case let .progress(_, _, _, value):
         progress.removeAll { $0.target == value.target }
