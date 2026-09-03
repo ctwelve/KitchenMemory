@@ -69,6 +69,54 @@ final class RecipeAuthorityCodecTests: XCTestCase {
     )
   }
 
+  func testPayloadManifestRejectsUnsupportedMalformedAndDuplicateData() {
+    XCTAssertThrowsError(
+      try RecipePayloadManifestCodec.decode(formatVersion: 2, data: Data())
+    )
+    XCTAssertThrowsError(
+      try RecipePayloadManifestCodec.decode(formatVersion: 1, data: Data())
+    )
+
+    let revisionID = UUID(uuidString: "00000000-0000-0000-0000-000000000001")!
+    var missingFamilies = Data(revisionID.uuidBytes)
+    missingFamilies.append(contentsOf: [0, 0, 0, 0])
+    XCTAssertThrowsError(
+      try RecipePayloadManifestCodec.decode(formatVersion: 1, data: missingFamilies)
+    )
+
+    let duplicateID = RecipeMedia.ID(
+      rawValue: UUID(uuidString: "00000000-0000-0000-0000-000000000002")!
+    )
+    let duplicate = RecipePayloadManifest(
+      revisionID: .init(rawValue: revisionID),
+      mediaIDs: [duplicateID, duplicateID],
+      equipmentIDs: [],
+      ingredientSectionIDs: [],
+      ingredientIDs: [],
+      instructionSectionIDs: [],
+      instructionStepIDs: []
+    )
+    XCTAssertThrowsError(
+      try RecipePayloadManifestCodec.decode(
+        formatVersion: 1,
+        data: RecipePayloadManifestCodec.encode(duplicate).data
+      )
+    )
+
+    let valid = RecipePayloadManifestCodec.encode(RecipePayloadManifest(
+      revisionID: .init(rawValue: revisionID),
+      mediaIDs: [],
+      equipmentIDs: [],
+      ingredientSectionIDs: [],
+      ingredientIDs: [],
+      instructionSectionIDs: [],
+      instructionStepIDs: []
+    )).data
+    XCTAssertThrowsError(
+      try RecipePayloadManifestCodec.decode(formatVersion: 1, data: valid + Data([0]))
+    )
+  }
+
   func testRevisionCodecIsCanonicalAndDigestCoversCompleteValue() throws {
     let recipeID = Recipe.ID(rawValue: UUID(uuidString: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")!)
     var revision = RecipeRevision(
@@ -87,6 +135,20 @@ final class RecipeAuthorityCodecTests: XCTestCase {
     XCTAssertNotEqual(first.digest, second.digest)
     XCTAssertThrowsError(
       try RecipeRevisionCodec.decode(formatVersion: 1, data: first.data + Data([0x0A]))
+    )
+    XCTAssertThrowsError(
+      try RecipeRevisionCodec.decode(formatVersion: 2, data: first.data)
+    )
+    XCTAssertThrowsError(
+      try RecipeRevisionCodec.decode(formatVersion: 1, data: Data("{}".utf8))
+    )
+
+    let object = try XCTUnwrap(
+      JSONSerialization.jsonObject(with: first.data) as? [String: Any]
+    )
+    let noncanonical = try JSONSerialization.data(withJSONObject: object, options: [.prettyPrinted])
+    XCTAssertThrowsError(
+      try RecipeRevisionCodec.decode(formatVersion: 1, data: noncanonical)
     )
   }
 
@@ -116,6 +178,21 @@ final class RecipeAuthorityCodecTests: XCTestCase {
     XCTAssertThrowsError(
       try RecipeAuthorityFrontierCodec.decode(formatVersion: 1, data: noncanonical)
     )
+    XCTAssertThrowsError(
+      try RecipeAuthorityFrontierCodec.decode(formatVersion: 2, data: encoded.data)
+    )
+    XCTAssertThrowsError(
+      try RecipeAuthorityFrontierCodec.decode(formatVersion: 1, data: Data())
+    )
+    XCTAssertThrowsError(
+      try RecipeAuthorityFrontierCodec.decode(formatVersion: 1, data: encoded.data + Data([0]))
+    )
+  }
+}
+
+private extension UUID {
+  var uuidBytes: [UInt8] {
+    withUnsafeBytes(of: uuid) { Array($0) }
   }
 }
 

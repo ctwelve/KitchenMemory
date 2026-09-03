@@ -192,9 +192,6 @@ public enum RecipePayloadManifestCodec {
       instructionSectionIDs: arrays[4].map(InstructionSection.ID.init(rawValue:)),
       instructionStepIDs: arrays[5].map(InstructionStep.ID.init(rawValue:))
     )
-    guard encode(manifest).data == data else {
-      throw RecipeAuthorityCodecError.noncanonicalData
-    }
     return manifest
   }
 
