@@ -271,16 +271,26 @@ final class SwiftDataRecipeAuthoritySaveTests: XCTestCase {
     let fixture = try makeBackfillStore()
     let command = makeCommand(kitchenID: fixture.kitchen.id, number: 1, title: "Current")
     try fixture.repository.save(command)
+    let context = ModelContext(fixture.container)
+    context.insert(RecipeDeletionResolutionRecord(
+      id: UUID(), deletionID: UUID(), recipeID: command.recipe.id.rawValue,
+      kitchenID: nil, restoredAt: nil
+    ))
+    try context.save()
 
     try fixture.repository.backfillLegacyRecipeAuthority(in: fixture.kitchen.id)
 
-    let context = ModelContext(fixture.container)
-    XCTAssertEqual(try context.fetch(FetchDescriptor<RecipeSaveRecord>()).map(\.id), [
+    let reopened = ModelContext(fixture.container)
+    XCTAssertEqual(try reopened.fetch(FetchDescriptor<RecipeSaveRecord>()).map(\.id), [
       command.id.rawValue,
     ])
-    XCTAssertEqual(try context.fetch(FetchDescriptor<RecipeSelectionRecord>()).map(\.id), [
+    XCTAssertEqual(try reopened.fetch(FetchDescriptor<RecipeSelectionRecord>()).map(\.id), [
       command.selection.id.rawValue,
     ])
+    XCTAssertEqual(
+      try reopened.fetch(FetchDescriptor<RecipeDeletionResolutionRecord>()).first?.kitchenID,
+      fixture.kitchen.id.rawValue
+    )
   }
 
   func testLegacyBackfillDoesNotManufactureDelayedV5Selection() throws {
@@ -321,6 +331,51 @@ final class SwiftDataRecipeAuthoritySaveTests: XCTestCase {
     let reopened = ModelContext(fixture.container)
     XCTAssertTrue(try reopened.fetch(FetchDescriptor<RecipeSaveRecord>()).isEmpty)
     XCTAssertTrue(try reopened.fetch(FetchDescriptor<RecipeSelectionRecord>()).isEmpty)
+  }
+
+  func testLegacyBackfillRejectsCrossRecipeSaveIdentityBeforeMutation() throws {
+    let fixture = try makeBackfillStore()
+    let revision = try insertLegacyRecipe(in: fixture.container, kitchenID: fixture.kitchen.id)
+    let context = ModelContext(fixture.container)
+    context.insert(RecipeSaveRecord(
+      id: revision.id, kitchenID: UUID(), recipeID: UUID(), revisionID: UUID(),
+      savedAt: .distantPast, ancestryFormatVersion: 1, parentRevisionIDsData: Data(),
+      payloadManifestFormatVersion: 1, payloadManifestData: Data(),
+      revisionFormatVersion: 1, revisionDigest: Data()
+    ))
+    try context.save()
+
+    XCTAssertThrowsError(
+      try fixture.repository.backfillLegacyRecipeAuthority(in: fixture.kitchen.id)
+    ) { error in
+      XCTAssertEqual(
+        error as? KitchenMemoryPersistenceError,
+        .recipeSaveCommandCollision(commandID: .init(rawValue: revision.id))
+      )
+    }
+    assertAuthorityCounts(container: fixture.container, saves: 1, selections: 0, revisions: 1)
+  }
+
+  func testLegacyBackfillRejectsCrossRecipeSelectionIdentityAndRollsBackSave() throws {
+    let fixture = try makeBackfillStore()
+    let revision = try insertLegacyRecipe(in: fixture.container, kitchenID: fixture.kitchen.id)
+    let context = ModelContext(fixture.container)
+    context.insert(RecipeSelectionRecord(
+      id: revision.id, kitchenID: UUID(), recipeID: UUID(), selectedRevisionID: UUID(),
+      selectedAt: .distantPast, frontierFormatVersion: 1,
+      observedSelectionIDsData: Data()
+    ))
+    try context.save()
+
+    XCTAssertThrowsError(
+      try fixture.repository.backfillLegacyRecipeAuthority(in: fixture.kitchen.id)
+    ) { error in
+      XCTAssertEqual(
+        error as? KitchenMemoryPersistenceError,
+        .recipeSelectionCommandCollision(commandID: .init(rawValue: revision.id))
+      )
+    }
+    assertAuthorityCounts(container: fixture.container, saves: 0, selections: 1, revisions: 1)
   }
 
   func testSaveRejectsUnknownCausalReferencesWithoutMutation() throws {

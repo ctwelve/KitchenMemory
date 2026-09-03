@@ -712,26 +712,28 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
       FetchDescriptor<RecipeRecord>(predicate: #Predicate { $0.kitchenID == kitchenIdentifier })
     )
     let recipeIDs = Set(recipeRecords.map(\.id))
-    var authoritativeRecipeIDs = Set(
-      try context.fetch(FetchDescriptor<RecipeSaveRecord>()).map(\.recipeID)
-    )
-    authoritativeRecipeIDs.formUnion(
-      try context.fetch(FetchDescriptor<RecipeSelectionRecord>()).map(\.recipeID)
-    )
+    let saveRecords = try context.fetch(FetchDescriptor<RecipeSaveRecord>())
+    let selectionRecords = try context.fetch(FetchDescriptor<RecipeSelectionRecord>())
+    var authoritativeRecipeIDs = Set(saveRecords.map(\.recipeID))
+    authoritativeRecipeIDs.formUnion(selectionRecords.map(\.recipeID))
     authoritativeRecipeIDs.formUnion(
       try context.fetch(FetchDescriptor<RecipePruneRecord>()).map(\.recipeID)
     )
+    let reservedSaveIDs = Set(saveRecords.map(\.id))
+    let reservedSelectionIDs = Set(selectionRecords.map(\.id))
     let legacyRecipeIDs = recipeIDs.subtracting(authoritativeRecipeIDs)
     for recipeID in legacyRecipeIDs.sorted(by: { $0.uuidString < $1.uuidString }) {
       try backfillLegacyRecipe(
         id: recipeID,
         records: recipeRecords.filter { $0.id == recipeID },
-        kitchenID: kitchenID
+        kitchenID: kitchenID,
+        reservedSaveIDs: reservedSaveIDs,
+        reservedSelectionIDs: reservedSelectionIDs
       )
     }
 
     for restoration in try context.fetch(FetchDescriptor<RecipeDeletionResolutionRecord>())
-    where legacyRecipeIDs.contains(restoration.recipeID) && restoration.kitchenID == nil {
+    where recipeIDs.contains(restoration.recipeID) && restoration.kitchenID == nil {
       restoration.kitchenID = kitchenIdentifier
     }
   }
@@ -739,7 +741,9 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
   private func backfillLegacyRecipe(
     id recipeID: UUID,
     records: [RecipeRecord],
-    kitchenID: Kitchen.ID
+    kitchenID: Kitchen.ID,
+    reservedSaveIDs: Set<UUID>,
+    reservedSelectionIDs: Set<UUID>
   ) throws {
     let revisionRecords = try context.fetch(
       FetchDescriptor<RecipeRevisionRecord>(predicate: #Predicate { $0.recipeID == recipeID })
@@ -754,6 +758,20 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     let selectedIDs = Set(records.map { RecipeRevision.ID(rawValue: $0.currentRevisionID) })
     guard selectedIDs.isSubset(of: revisionIDs) else {
       throw KitchenMemoryPersistenceError.missingCurrentRevision
+    }
+    for revision in revisions {
+      guard !reservedSaveIDs.contains(revision.id.rawValue) else {
+        throw KitchenMemoryPersistenceError.recipeSaveCommandCollision(
+          commandID: .init(rawValue: revision.id.rawValue)
+        )
+      }
+      guard !selectedIDs.contains(revision.id)
+        || !reservedSelectionIDs.contains(revision.id.rawValue)
+      else {
+        throw KitchenMemoryPersistenceError.recipeSelectionCommandCollision(
+          commandID: .init(rawValue: revision.id.rawValue)
+        )
+      }
     }
     for revision in revisions.sorted(by: { $0.id.rawValue.uuidString < $1.id.rawValue.uuidString }) {
       try backfillLegacyRevision(
