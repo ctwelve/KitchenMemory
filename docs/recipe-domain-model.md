@@ -53,12 +53,15 @@ model.
 | --- | --- |
 | `id` | Stable application identity |
 | `kitchenID` | Owning Kitchen identity |
-| `currentRevisionID` | Revision currently presented as maintained content |
+| `currentRevisionID` | V4 compatibility pointer; the accepted V5 model derives current presentation from immutable Recipe Selection evidence |
 
 ### RecipeRevision
 
-An immutable authored version of one recipe. Editing appends a new revision and
-makes it current; it does not overwrite the previous value.
+An immutable authored version of one recipe. Editing appends a new revision; an
+explicit Recipe Selection chooses the Revision presented as current without
+overwriting history. The accepted authority and migration contract is
+[Recipe authority V5](recipe-authority-v5-schema.md); the current V4
+implementation has not yet adopted it.
 
 | Field | Meaning |
 | --- | --- |

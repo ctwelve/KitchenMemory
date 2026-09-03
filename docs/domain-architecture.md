@@ -112,6 +112,16 @@ Creating a revision is an intentional domain action. SwiftData save history and
 CloudKit conflict metadata are implementation details and do not substitute for
 recipe revisions.
 
+A Recipe is born only when its first explicit Save Revision operation succeeds.
+Each immutable Revision names zero, one, or many parent Revisions. Immutable
+Selection evidence, not a clock, revision number, device, delivery order, or
+mutable pointer, determines which existing Revision is presented as current.
+Concurrent branches survive until a person chooses one existing Revision or
+saves a multi-parent reconciliation. Deletion and restoration form a separate
+disposition history, and pruning leaves compact anti-resurrection evidence.
+The additive physical representation and legacy migration are frozen in the
+[Recipe authority V5 persistence contract](recipe-authority-v5-schema.md).
+
 ## Cooking Session evidence
 
 A `CookingSession` is one device-independent performance of one retained recipe
@@ -156,6 +166,11 @@ The implemented persistence slice remains:
 ```text
 Kitchen → Recipe → RecipeRevision
 ```
+
+The V4 implementation still persists that payload graph and its legacy mutable
+current pointer. The accepted V5 authority contract adds immutable repository
+evidence around it; it is a frozen implementation target, not a claim that the
+V5 models already ship.
 
 The remaining aggregates establish ownership and identity seams now but are
 implemented only as their product workflows arrive.
