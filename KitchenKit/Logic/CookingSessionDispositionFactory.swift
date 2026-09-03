@@ -2,7 +2,6 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
-import Algorithms
 import Foundation
 
 struct CookingSessionDispositionFactory {
@@ -63,8 +62,8 @@ struct CookingSessionDispositionFactory {
   }
 
   private func maximalDispositionHeads(_ evidence: SessionEvidence) throws -> [UUID] {
-    let deletions = evidence.deletions.uniqued(on: \.id)
-    let restorations = evidence.restorations.uniqued(on: \.id)
+    let deletions = IdentityCollection.stableUnique(evidence.deletions, id: \.id)
+    let restorations = IdentityCollection.stableUnique(evidence.restorations, id: \.id)
     var parents: [UUID: [UUID]] = [:]
     for deletion in deletions {
       parents[deletion.id.rawValue] = try decode(
@@ -78,9 +77,10 @@ struct CookingSessionDispositionFactory {
         data: restoration.dispositionHeadsData
       )
     }
-    return DirectedGraph(parentsByNode: parents).maximalNodes.sorted {
-      $0.uuidString < $1.uuidString
-    }
+    return CausalGraph(
+      parentsByNode: parents,
+      orderedBy: { $0.uuidString < $1.uuidString }
+    ).maximalNodes
   }
 
   private func decode(version: Int, data: Data) throws -> [UUID] {
