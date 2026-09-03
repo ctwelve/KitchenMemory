@@ -138,10 +138,13 @@ extension ProjectionBuilder {
         parents: [UUID: [UUID]]
     ) -> DispositionContextResult {
         let knownIDs = Set(parents.keys)
-        if let missing = parents.values.joined().first(where: { !knownIDs.contains($0) }) {
+        let dispositionGraph = causalGraph(parents)
+        let missing = dispositionGraph.reachableNodes(from: Array(parents.keys))
+            .filter { !knownIDs.contains($0) }
+            .min(by: uuidOrder)
+        if let missing {
             return .failure(unavailable(.incompleteDeletionDisposition(missing)))
         }
-        let dispositionGraph = causalGraph(parents)
         guard !dispositionGraph.containsCycle else {
             return .failure(recovery(.invalidDeletionDisposition))
         }

@@ -227,7 +227,10 @@ struct ProjectionBuilder {
         let knownIDs = Set(headsByID.keys)
             .union(closures.map(\.id.rawValue))
             .union([root.id.rawValue])
-        if let missing = headsByID.values.joined().first(where: { !knownIDs.contains($0) }) {
+        let missing = causalGraph.reachableNodes(from: Array(headsByID.keys))
+            .filter { !knownIDs.contains($0) }
+            .min(by: uuidOrder)
+        if let missing {
             return .failure(unavailable(.missingPredecessor(missing)))
         }
         guard headsByID.values.allSatisfy(causalGraph.formsAntichain) else {
