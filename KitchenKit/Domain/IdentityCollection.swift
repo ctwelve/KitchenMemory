@@ -11,9 +11,9 @@ enum IdentityCoalescingResult<Value: Equatable, Identity: Hashable>: Equatable {
 
 /// Kitchen Memory-owned identity semantics for unordered retained evidence.
 ///
-/// Both operations preserve first-seen order. Stable uniqueness deliberately
-/// ignores later values with the same identity, while coalescing accepts only
-/// exact retries and reports conflicting identity reuse.
+/// Stable uniqueness preserves first-seen order and deliberately ignores later
+/// values with the same identity. Coalescing accepts only exact retries,
+/// reports conflicting identity reuse, and emits the caller's canonical order.
 enum IdentityCollection {
   static func stableUnique<Value, Identity: Hashable>(
     _ values: [Value],
@@ -27,7 +27,8 @@ enum IdentityCollection {
 
   static func coalesce<Value: Equatable, Identity: Hashable>(
     _ values: [Value],
-    id: KeyPath<Value, Identity>
+    id: KeyPath<Value, Identity>,
+    orderedBy areInIncreasingOrder: (Value, Value) -> Bool
   ) -> IdentityCoalescingResult<Value, Identity> {
     var valuesByIdentity: OrderedDictionary<Identity, Value> = [:]
     for value in values {
@@ -38,6 +39,6 @@ enum IdentityCollection {
         valuesByIdentity[identity] = value
       }
     }
-    return .coalesced(Array(valuesByIdentity.values))
+    return .coalesced(valuesByIdentity.values.sorted(by: areInIncreasingOrder))
   }
 }

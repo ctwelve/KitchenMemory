@@ -7,18 +7,50 @@ import OrderedCollections
 
 /// Iterative traversal mechanics shared by Kitchen Memory evidence families.
 ///
-/// Nodes and parent lists retain their supplied order. Graph policy—whether a
-/// missing dependency, cycle, or competing head is valid—belongs to the Domain
-/// caller rather than this module.
+/// Construction canonicalizes nodes and parent lists using the caller's stable
+/// total order. Graph policy—whether a missing dependency, cycle, or competing
+/// head is valid—belongs to the Domain caller rather than this module.
+enum CausalGraphConstructionResult<Node: Hashable> {
+  case graph(CausalGraph<Node>)
+  case collision(node: Node)
+}
+
 struct CausalGraph<Node: Hashable> {
   private let parentsByNode: OrderedDictionary<Node, [Node]>
+  private let areInIncreasingOrder: (Node, Node) -> Bool
 
-  init(_ parentLists: [(node: Node, parents: [Node])]) {
+  private init(
+    parentsByNode: OrderedDictionary<Node, [Node]>,
+    orderedBy areInIncreasingOrder: @escaping (Node, Node) -> Bool
+  ) {
+    self.parentsByNode = parentsByNode
+    self.areInIncreasingOrder = areInIncreasingOrder
+  }
+
+  static func coalescing(
+    _ parentLists: [(node: Node, parents: [Node])],
+    orderedBy areInIncreasingOrder: @escaping (Node, Node) -> Bool
+  ) -> CausalGraphConstructionResult<Node> {
     var orderedParents: OrderedDictionary<Node, [Node]> = [:]
-    for parentList in parentLists where orderedParents[parentList.node] == nil {
-      orderedParents[parentList.node] = parentList.parents
+    for parentList in parentLists.sorted(by: {
+      areInIncreasingOrder($0.node, $1.node)
+    }) {
+      let canonicalParents = IdentityCollection.stableUnique(
+        parentList.parents.sorted(by: areInIncreasingOrder),
+        id: \.self
+      )
+      if let retainedParents = orderedParents[parentList.node] {
+        guard retainedParents == canonicalParents else {
+          return .collision(node: parentList.node)
+        }
+      } else {
+        orderedParents[parentList.node] = canonicalParents
+      }
     }
-    parentsByNode = orderedParents
+    return .graph(CausalGraph(
+      parentsByNode: orderedParents,
+      orderedBy: areInIncreasingOrder
+    ))
   }
 
   var containsCycle: Bool {
@@ -60,18 +92,16 @@ struct CausalGraph<Node: Hashable> {
 
   func formsAntichain(_ nodes: [Node]) -> Bool {
     nodes.allSatisfy { candidate in
-      !nodes.contains { other in
-        candidate != other && isAncestor(candidate, of: other)
-      }
+      isMaximal(candidate, among: nodes)
     }
   }
 
   func maximalNodes(among candidates: [Node]) -> [Node] {
-    IdentityCollection.stableUnique(candidates, id: \.self).filter { candidate in
-      !candidates.contains { other in
-        candidate != other && isAncestor(candidate, of: other)
-      }
-    }
+    let canonicalCandidates = IdentityCollection.stableUnique(
+      candidates.sorted(by: areInIncreasingOrder),
+      id: \.self
+    )
+    return canonicalCandidates.filter { isMaximal($0, among: canonicalCandidates) }
   }
 
   var maximalNodes: [Node] {
@@ -83,12 +113,22 @@ struct CausalGraph<Node: Hashable> {
   /// Referenced parents without a retained node are included but not expanded.
   func reachableNodes(from startingNodes: [Node]) -> [Node] {
     var reached = OrderedSet<Node>()
-    var workQueue = Deque(startingNodes)
+    let canonicalStartingNodes = IdentityCollection.stableUnique(
+      startingNodes.sorted(by: areInIncreasingOrder),
+      id: \.self
+    )
+    var workQueue = Deque(canonicalStartingNodes)
     while let candidate = workQueue.popFirst() {
       guard reached.append(candidate).inserted else { continue }
       workQueue.append(contentsOf: parentsByNode[candidate] ?? [])
     }
     return Array(reached)
+  }
+
+  private func isMaximal(_ candidate: Node, among nodes: [Node]) -> Bool {
+    !nodes.contains { other in
+      candidate != other && isAncestor(candidate, of: other)
+    }
   }
 }
 
