@@ -38,7 +38,7 @@ struct ProjectionBuilder {
     // turn the same retained bytes from Unavailable into Recovery or vice versa.
     // swiftlint:disable:next cyclomatic_complexity function_body_length
     func build() -> SessionProjectionResult {
-        guard let root = evidence.roots.first else {
+        guard let firstRoot = evidence.roots.first else {
             return unavailable(.missingRoot)
         }
         guard evidence.roots.allSatisfy({ $0.id == evidence.sessionID }),
@@ -47,9 +47,14 @@ struct ProjectionBuilder {
         else {
             return recovery(.crossSessionReference)
         }
-        guard evidence.roots.allSatisfy({ $0 == root }) else {
+        guard case .coalesced = IdentityCollection.coalesce(
+            evidence.roots,
+            id: \.id,
+            orderedBy: { uuidOrder($0.id.rawValue, $1.id.rawValue) }
+        ) else {
             return recovery(.rootCollision)
         }
+        let root = firstRoot
         guard let facts = coalescedFacts() else {
             return recovery(.factCollision)
         }
@@ -103,7 +108,14 @@ struct ProjectionBuilder {
     }
 
     private func coalescedFacts() -> [SessionFactEvidence]? {
-        coalescedByIdentity(evidence.facts, id: \.id)?.sorted(by: factOrder)
+        switch IdentityCollection.coalesce(
+            evidence.facts,
+            id: \.id,
+            orderedBy: factOrder
+        ) {
+        case let .coalesced(facts): facts
+        case .collision: nil
+        }
     }
 
     private func validContinuation(
@@ -170,8 +182,13 @@ struct ProjectionBuilder {
     }
 
     private func coalescedClosures() -> [SessionClosureEvidence]? {
-        coalescedByIdentity(evidence.closures, id: \.id)?.sorted {
-            uuidOrder($0.id.rawValue, $1.id.rawValue)
+        switch IdentityCollection.coalesce(
+            evidence.closures,
+            id: \.id,
+            orderedBy: { uuidOrder($0.id.rawValue, $1.id.rawValue) }
+        ) {
+        case let .coalesced(closures): closures
+        case .collision: nil
         }
     }
 
@@ -203,7 +220,7 @@ struct ProjectionBuilder {
                 return .failure(recovery(.malformedCausalHeads))
             }
         }
-        let causalGraph = DirectedGraph(parentsByNode: headsByID)
+        let causalGraph = causalGraph(headsByID)
         guard !causalGraph.containsCycle else {
             return .failure(recovery(.cycle))
         }
@@ -271,9 +288,10 @@ struct ProjectionBuilder {
         }
         guard closureHeads.count == closures.count else { return nil }
         let heads = closureHeads.flatMap { $0 }
+        let graph = causalGraph(parents)
         return Set(parents.keys.filter { identifier in
             heads.contains(identifier) || heads.contains {
-                DirectedGraph(parentsByNode: parents).isAncestor(identifier, of: $0)
+                graph.isAncestor(identifier, of: $0)
             }
         })
     }
@@ -369,8 +387,9 @@ struct ProjectionBuilder {
                 return recovery(.invalidFact)
             }
         }
+        let graph = causalGraph(parents)
         guard facts.filter({ $0.kind != .conflictResolution }).allSatisfy({
-            DirectedGraph(parentsByNode: parents).isAncestor(
+            graph.isAncestor(
                 root.id.rawValue,
                 of: $0.evidence.id.rawValue
             )

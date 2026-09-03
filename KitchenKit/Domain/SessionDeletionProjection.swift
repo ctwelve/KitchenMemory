@@ -23,10 +23,24 @@ extension ProjectionBuilder {
         else {
             return .failure(recovery(.crossSessionReference))
         }
-        guard let deletions = coalescedByIdentity(evidence.deletions, id: \.id) else {
+        let deletions: [SessionDeletionEvidence]
+        switch IdentityCollection.coalesce(
+            evidence.deletions,
+            id: \.id,
+            orderedBy: { uuidOrder($0.id.rawValue, $1.id.rawValue) }
+        ) {
+        case let .coalesced(values): deletions = values
+        case .collision:
             return .failure(recovery(.deletionCollision))
         }
-        guard let restorations = coalescedByIdentity(evidence.restorations, id: \.id) else {
+        let restorations: [SessionDeletionResolutionEvidence]
+        switch IdentityCollection.coalesce(
+            evidence.restorations,
+            id: \.id,
+            orderedBy: { uuidOrder($0.id.rawValue, $1.id.rawValue) }
+        ) {
+        case let .coalesced(values): restorations = values
+        case .collision:
             return .failure(recovery(.restorationCollision))
         }
         guard !deletions.isEmpty || !restorations.isEmpty else { return .none }
@@ -71,7 +85,7 @@ extension ProjectionBuilder {
             if let missing = sessionHeads.first(where: { !knownSessionIDs.contains($0) }) {
                 return .failure(unavailable(.incompleteDeletionDisposition(missing)))
             }
-            guard DirectedGraph(parentsByNode: sessionParents).formsAntichain(sessionHeads) else {
+            guard causalGraph(sessionParents).formsAntichain(sessionHeads) else {
                 return .failure(recovery(.invalidDeletionDisposition))
             }
             switch decodeHeads(
@@ -127,7 +141,7 @@ extension ProjectionBuilder {
         if let missing = parents.values.joined().first(where: { !knownIDs.contains($0) }) {
             return .failure(unavailable(.incompleteDeletionDisposition(missing)))
         }
-        let dispositionGraph = DirectedGraph(parentsByNode: parents)
+        let dispositionGraph = causalGraph(parents)
         guard !dispositionGraph.containsCycle else {
             return .failure(recovery(.invalidDeletionDisposition))
         }
@@ -163,9 +177,10 @@ extension ProjectionBuilder {
         guard !unresolved.isEmpty else {
             return .session(session.withDisposition(.ordinary))
         }
+        let dispositionGraph = causalGraph(context.parents)
         let needsAttention = context.restorations.contains { restoration in
             unresolved.contains { deletion in
-                !DirectedGraph(parentsByNode: context.parents).isAncestor(
+                !dispositionGraph.isAncestor(
                     restoration.id.rawValue,
                     of: deletion.id.rawValue
                 )
