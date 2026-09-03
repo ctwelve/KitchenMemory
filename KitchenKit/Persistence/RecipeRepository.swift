@@ -428,7 +428,8 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     let recipeDescriptor = FetchDescriptor<RecipeRecord>(
       predicate: #Predicate { $0.id == identifier })
     let recipeRecords = try context.fetch(recipeDescriptor)
-    guard let recipeRecord = recipeRecords.first else { return nil }
+    // The caller establishes that at least one compatibility Recipe row exists.
+    let recipeRecord = recipeRecords[0]
     guard try activeDeletionIDs(for: id).isEmpty else { return nil }
     let currentRevisionIDs = Set(recipeRecords.map(\.currentRevisionID))
     let currentRevisionRecords = try context.fetch(FetchDescriptor<RecipeRevisionRecord>())
@@ -837,7 +838,9 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     case let .available(authority), let .deleted(authority): currentRevision = authority.current
     case .none, .pruned, .unavailable, .recovery: currentRevision = nil
     }
-    let parents = currentRevision.flatMap { $0.id == revision.id ? nil : [$0.id] } ?? []
+    // Equal current content necessarily has accepted Save/Selection rows and
+    // returned through acceptedCompatibilityCommand above.
+    let parents = currentRevision.map { [$0.id] } ?? []
     let selection = RecipeSelectionCommand(
       id: .init(rawValue: revision.id.rawValue),
       kitchenID: recipe.kitchenID,
@@ -858,10 +861,12 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
   ) throws -> RecipeSaveCommand? {
     let identifier = revision.id.rawValue
     guard let save = try context.fetch(
-      FetchDescriptor<RecipeSaveRecord>(predicate: #Predicate { $0.id == identifier })
+      FetchDescriptor<RecipeSaveRecord>(predicate: #Predicate { $0.revisionID == identifier })
     ).first,
       let selection = try context.fetch(
-        FetchDescriptor<RecipeSelectionRecord>(predicate: #Predicate { $0.id == identifier })
+        FetchDescriptor<RecipeSelectionRecord>(
+          predicate: #Predicate { $0.selectedRevisionID == identifier }
+        )
       ).first,
       save.kitchenID == recipe.kitchenID.rawValue,
       save.recipeID == recipe.id.rawValue,
@@ -1113,9 +1118,6 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
   private func replace(_ revision: RecipeRevision) throws {
     let identifier = revision.id.rawValue
     try deleteRevisionRows(revisionID: identifier)
-    let descriptor = FetchDescriptor<RecipeRevisionRecord>(
-      predicate: #Predicate { $0.id == identifier })
-    if let oldRecord = try context.fetch(descriptor).first { context.delete(oldRecord) }
 
     context.insert(
       RecipeRevisionRecord(
