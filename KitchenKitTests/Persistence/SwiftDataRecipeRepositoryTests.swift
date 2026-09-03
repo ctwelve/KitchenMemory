@@ -56,7 +56,7 @@ final class SwiftDataRecipeRepositoryTests: XCTestCase {
     XCTAssertNotNil(container.migrationPlan)
   }
 
-  func testSavingTheSameRecipeUpdatesInsteadOfDuplicatingItsChildren() throws {
+  func testSavingChangedContentUnderTheSameRevisionIdentityIsRejected() throws {
     let kitchen = Kitchen(name: "Test Kitchen")
     let recipeID = Recipe.ID()
     let revision = RecipeRevision(
@@ -86,12 +86,12 @@ final class SwiftDataRecipeRepositoryTests: XCTestCase {
       try repository.recipe(id: recipe.id),
       StoredRecipe(recipe: recipe, revision: revision)
     )
-    try repository.save(recipe: recipe, revision: editedRevision)
+    XCTAssertThrowsError(try repository.save(recipe: recipe, revision: editedRevision))
 
     let stored = try XCTUnwrap(repository.recipe(id: recipe.id))
-    XCTAssertEqual(stored.revision.title, "Leftover Tuna Noodle Hotdish")
+    XCTAssertEqual(stored.revision.title, "Tuna Noodle Hotdish")
     XCTAssertEqual(stored.revision.media, revision.media)
-    XCTAssertTrue(stored.revision.equipment.isEmpty)
+    XCTAssertEqual(stored.revision.equipment, revision.equipment)
     XCTAssertEqual(stored.revision.ingredientSections, revision.ingredientSections)
     XCTAssertEqual(stored.revision.instructionSections, revision.instructionSections)
     XCTAssertEqual(try repository.recipes(in: kitchen.id), [stored])
