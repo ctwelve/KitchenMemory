@@ -192,6 +192,15 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     }
   }
 
+  /// Idempotently gives a valid pre-V5 Recipe graph deterministic Save and
+  /// root Selection evidence. The Kitchen transaction is the completion
+  /// boundary: a failed pass never leaves partially backfilled authority.
+  public func backfillLegacyRecipeAuthority(in kitchenID: Kitchen.ID) throws {
+    try performIsolatedWrite { writer in
+      try writer.backfillLegacyAuthority(in: kitchenID)
+    }
+  }
+
   public func kitchen(id: Kitchen.ID) throws -> Kitchen? {
     let identifier = id.rawValue
     let descriptor = FetchDescriptor<KitchenRecord>(predicate: #Predicate { $0.id == identifier })
@@ -388,6 +397,114 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
       context.insert(selectionRecord(for: command, encoded: encoded))
     }
     try resolveDeletions(for: command.recipe.id)
+  }
+
+  private func backfillLegacyAuthority(in kitchenID: Kitchen.ID) throws {
+    let kitchenIdentifier = kitchenID.rawValue
+    let recipeRecords = try context.fetch(
+      FetchDescriptor<RecipeRecord>(predicate: #Predicate { $0.kitchenID == kitchenIdentifier })
+    )
+    let recipeIDs = Set(recipeRecords.map(\.id))
+    for recipeID in recipeIDs.sorted(by: { $0.uuidString < $1.uuidString }) {
+      try backfillLegacyRecipe(
+        id: recipeID,
+        records: recipeRecords.filter { $0.id == recipeID },
+        kitchenID: kitchenID
+      )
+    }
+
+    for restoration in try context.fetch(FetchDescriptor<RecipeDeletionResolutionRecord>())
+    where recipeIDs.contains(restoration.recipeID) && restoration.kitchenID == nil {
+      restoration.kitchenID = kitchenIdentifier
+    }
+  }
+
+  private func backfillLegacyRecipe(
+    id recipeID: UUID,
+    records: [RecipeRecord],
+    kitchenID: Kitchen.ID
+  ) throws {
+    let revisionRecords = try context.fetch(
+      FetchDescriptor<RecipeRevisionRecord>(predicate: #Predicate { $0.recipeID == recipeID })
+    )
+    let revisions: [RecipeRevision]
+    switch IdentityCollection.coalesce(try revisionRecords.map(domainRevision), id: \RecipeRevision.id) {
+    case let .coalesced(values): revisions = values
+    case .collision:
+      throw KitchenMemoryPersistenceError.invalidStoredValue(field: "recipe.authority")
+    }
+    let revisionIDs = Set(revisions.map(\.id))
+    let selectedIDs = Set(records.map { RecipeRevision.ID(rawValue: $0.currentRevisionID) })
+    guard selectedIDs.isSubset(of: revisionIDs) else {
+      throw KitchenMemoryPersistenceError.missingCurrentRevision
+    }
+    for revision in revisions.sorted(by: { $0.id.rawValue.uuidString < $1.id.rawValue.uuidString }) {
+      try backfillLegacyRevision(
+        revision,
+        kitchenID: kitchenID,
+        isSelected: selectedIDs.contains(revision.id)
+      )
+    }
+  }
+
+  private func backfillLegacyRevision(
+    _ revision: RecipeRevision,
+    kitchenID: Kitchen.ID,
+    isSelected: Bool
+  ) throws {
+    let recipe = Recipe(
+      id: revision.recipeID,
+      kitchenID: kitchenID,
+      currentRevisionID: revision.id
+    )
+    let selection = RecipeSelectionCommand(
+      id: .init(rawValue: revision.id.rawValue),
+      kitchenID: kitchenID,
+      recipeID: recipe.id,
+      selectedRevisionID: revision.id,
+      selectedAt: .distantPast
+    )
+    let command = RecipeSaveCommand(
+      id: .init(rawValue: revision.id.rawValue),
+      recipe: recipe,
+      revision: revision,
+      savedAt: .distantPast,
+      parentRevisionIDs: [],
+      selection: selection
+    )
+    let encoded = try validateAndEncode(command)
+    try backfillSave(command, encoded: encoded)
+    if isSelected { try backfillSelection(command, encoded: encoded) }
+  }
+
+  private func backfillSave(
+    _ command: RecipeSaveCommand,
+    encoded: EncodedRecipeSaveAuthority
+  ) throws {
+    let identifier = command.id.rawValue
+    let records = try context.fetch(
+      FetchDescriptor<RecipeSaveRecord>(predicate: #Predicate { $0.id == identifier })
+    )
+    guard records.allSatisfy({ saveRecord($0, matches: command, encoded: encoded) }) else {
+      throw KitchenMemoryPersistenceError.recipeSaveCommandCollision(commandID: command.id)
+    }
+    if records.isEmpty { context.insert(saveRecord(for: command, encoded: encoded)) }
+  }
+
+  private func backfillSelection(
+    _ command: RecipeSaveCommand,
+    encoded: EncodedRecipeSaveAuthority
+  ) throws {
+    let identifier = command.selection.id.rawValue
+    let records = try context.fetch(
+      FetchDescriptor<RecipeSelectionRecord>(predicate: #Predicate { $0.id == identifier })
+    )
+    guard records.allSatisfy({ selectionRecord($0, matches: command, encoded: encoded) }) else {
+      throw KitchenMemoryPersistenceError.recipeSelectionCommandCollision(
+        commandID: command.selection.id
+      )
+    }
+    if records.isEmpty { context.insert(selectionRecord(for: command, encoded: encoded)) }
   }
 
   private func validateAndEncode(

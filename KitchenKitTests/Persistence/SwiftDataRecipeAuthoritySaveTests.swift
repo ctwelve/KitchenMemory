@@ -8,6 +8,8 @@ import SwiftData
 import XCTest
 
 @MainActor
+// The suite keeps one authority writer fixture boundary visible in one place.
+// swiftlint:disable:next type_body_length
 final class SwiftDataRecipeAuthoritySaveTests: XCTestCase {
   func testFirstSaveAndExactRetryCoalesceAllLogicalRowsAcrossRelaunch() throws {
     try withStore { storeURL in
@@ -129,6 +131,57 @@ final class SwiftDataRecipeAuthoritySaveTests: XCTestCase {
     }
   }
 
+  func testLegacyBackfillCreatesDeterministicAuthorityAndIsIdempotent() throws {
+    let container = try KitchenMemorySchema.makeContainer(inMemory: true)
+    let repository = SwiftDataRecipeRepository(modelContainer: container)
+    let kitchen = Kitchen(name: "Home")
+    try repository.save(kitchen)
+    let recipeID = Recipe.ID()
+    let first = makeRevision(recipeID: recipeID, number: 1, title: "First")
+    let second = makeRevision(recipeID: recipeID, number: 2, title: "Second")
+    let context = ModelContext(container)
+    context.insert(RecipeRecord(
+      id: recipeID.rawValue,
+      kitchenID: kitchen.id.rawValue,
+      currentRevisionID: first.id
+    ))
+    context.insert(RecipeRecord(
+      id: recipeID.rawValue,
+      kitchenID: kitchen.id.rawValue,
+      currentRevisionID: second.id
+    ))
+    context.insert(first)
+    context.insert(second)
+    let deletionID = UUID()
+    context.insert(RecipeDeletionRecord(
+      id: deletionID,
+      recipeID: recipeID.rawValue,
+      kitchenID: kitchen.id.rawValue
+    ))
+    context.insert(RecipeDeletionResolutionRecord(
+      id: UUID(),
+      deletionID: deletionID,
+      recipeID: recipeID.rawValue,
+      kitchenID: nil
+    ))
+    try context.save()
+
+    try repository.backfillLegacyRecipeAuthority(in: kitchen.id)
+    try repository.backfillLegacyRecipeAuthority(in: kitchen.id)
+
+    let reopened = ModelContext(container)
+    let saves = try reopened.fetch(FetchDescriptor<RecipeSaveRecord>())
+    let selections = try reopened.fetch(FetchDescriptor<RecipeSelectionRecord>())
+    XCTAssertEqual(Set(saves.map(\.id)), Set([first.id, second.id]))
+    XCTAssertEqual(Set(selections.map(\.id)), Set([first.id, second.id]))
+    XCTAssertTrue(saves.allSatisfy { $0.parentRevisionIDsData.isEmpty })
+    XCTAssertTrue(selections.allSatisfy { $0.observedSelectionIDsData.isEmpty })
+    XCTAssertEqual(
+      try reopened.fetch(FetchDescriptor<RecipeDeletionResolutionRecord>()).first?.kitchenID,
+      kitchen.id.rawValue
+    )
+  }
+
   func testSaveRejectsUnknownCausalReferencesWithoutMutation() throws {
     let container = try KitchenMemorySchema.makeContainer(inMemory: true)
     let repository = SwiftDataRecipeRepository(modelContainer: container)
@@ -176,6 +229,30 @@ final class SwiftDataRecipeAuthoritySaveTests: XCTestCase {
         selectedAt: Date(timeIntervalSince1970: TimeInterval(200 + number)),
         observedSelectionIDs: observedSelections
       )
+    )
+  }
+
+  private func makeRevision(
+    recipeID: Recipe.ID,
+    number: Int,
+    title: String
+  ) -> RecipeRevisionRecord {
+    RecipeRevisionRecord(
+      id: UUID(),
+      recipeID: recipeID.rawValue,
+      revisionNumber: number,
+      title: title,
+      summary: nil,
+      authorName: nil,
+      contentLanguage: nil,
+      sourceData: nil,
+      yieldData: nil,
+      prepSeconds: nil,
+      cookSeconds: nil,
+      totalSeconds: nil,
+      cuisinesData: Data("[]".utf8),
+      categoriesData: Data("[]".utf8),
+      keywordsData: Data("[]".utf8)
     )
   }
 
