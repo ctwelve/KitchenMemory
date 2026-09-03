@@ -302,6 +302,27 @@ final class SwiftDataRecipeAuthoritySaveTests: XCTestCase {
     XCTAssertTrue(try reopened.fetch(FetchDescriptor<RecipeSelectionRecord>()).isEmpty)
   }
 
+  func testLegacyBackfillTreatsPruneAsExistingV5Authority() throws {
+    let fixture = try makeBackfillStore()
+    let revision = try insertLegacyRecipe(
+      in: fixture.container,
+      kitchenID: fixture.kitchen.id
+    )
+    let context = ModelContext(fixture.container)
+    context.insert(RecipePruneRecord(
+      id: UUID(), kitchenID: fixture.kitchen.id.rawValue, recipeID: revision.recipeID,
+      prunedAt: Date(), antiResurrectionUntil: Date(), frontierFormatVersion: 1,
+      frontierData: Data(), frontierDigest: Data()
+    ))
+    try context.save()
+
+    try fixture.repository.backfillLegacyRecipeAuthority(in: fixture.kitchen.id)
+
+    let reopened = ModelContext(fixture.container)
+    XCTAssertTrue(try reopened.fetch(FetchDescriptor<RecipeSaveRecord>()).isEmpty)
+    XCTAssertTrue(try reopened.fetch(FetchDescriptor<RecipeSelectionRecord>()).isEmpty)
+  }
+
   func testSaveRejectsUnknownCausalReferencesWithoutMutation() throws {
     let container = try KitchenMemorySchema.makeContainer(inMemory: true)
     let repository = SwiftDataRecipeRepository(modelContainer: container)
