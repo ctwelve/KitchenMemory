@@ -40,8 +40,8 @@ A slice is not implementation-complete until it has:
   build settings, and runtime integration independently of that shared metric;
 - preserved migration fixtures and fresh-store tests whenever persistence
   changes;
-- a small identifier-driven UI smoke only for behavior that must cross the
-  application boundary; and
+- a small UI suite proving accessible top-level structure and navigation, not
+  feature behavior; and
 - clean builds, tests, strict lint, and documentation appropriate to the slice.
 
 Coverage is evidence rather than a substitute for good tests. Generated code,
@@ -140,10 +140,8 @@ withdrawn-evidence exclusion, and Finish while a meaningful draft remains
 pending. Inferred structure and input modality never become authority.
 
 Outcome tests cover selection, change, clear, concurrent values,
-Finish-with-Outcome, and competing unseen Outcome evidence. UI smoke proves
-submission, one edit or withdrawal, the pending-draft Finish choice, and the
-explicit continuation, copy, and discard paths when remote Finish makes a
-local draft ineligible for its source.
+Finish-with-Outcome, and competing unseen Outcome evidence. These behaviors are
+proved below the UI; the top-level accessibility suite does not repeat them.
 
 ### Local draft and accepted-intention recovery
 
@@ -234,13 +232,14 @@ conclusions belong in the evidence ledger before the slice closes.
 
 ## Product interaction evidence
 
-### Automated UI smoke
+### Automated accessibility structure
 
-UI automation proves only that the durable application seams work. Stable
-identifiers drive launch, navigation, Start or Resume, one progress intention,
-one Session Entry, Stop, Finish confirmation, history, Deleted Items, and
-Recovery access where those surfaces exist. Tests do not encode exact copy,
-layout, scrolling, screenshot appearance, or the platform accessibility tree.
+UI automation proves only that the durable top-level application structure is
+present in the accessibility hierarchy and that its principal destinations are
+reachable. Stable identifiers locate meaningfully named elements for the recipe
+library, Settings, startup recovery, recipes, Sessions, Deleted Items, and
+Recovery. The suite does not repeat Cooking Session behavior or encode exact
+copy, layout, scrolling, screenshot appearance, or incidental hierarchy shape.
 
 ### Physical products
 
@@ -277,10 +276,12 @@ minor layout roughness may move to 0.2.x.
 
 The stable walkthrough requires native names, roles, values, sensible focus,
 usable Dynamic Type, VoiceOver access to core actions, and Mac keyboard
-operation. Stable identifiers support the small UI smoke suite. Exhaustive
-accessibility-tree automation, screenshot matrices, exact-focus scripts, and
-broad hardening remain deferred because the shared UI is still provisional and
-the two native products construct materially different accessibility trees.
+operation. Stable identifiers support the small top-level suite but do not
+prove accessibility. Exhaustive accessibility-tree automation, screenshot
+matrices, exact-focus scripts, and broad hardening remain deferred because the
+shared UI is still provisional and the two native products construct materially
+different accessibility trees. Issue 132 holds the work to define that future
+automation strategy.
 
 ## Sample evidence and privacy
 

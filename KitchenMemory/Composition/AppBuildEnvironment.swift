@@ -28,9 +28,10 @@ enum AppBuildEnvironment: CaseIterable {
   }
 
   var offersCloudSyncSetting: Bool {
-    // The unified platform plans run UI smoke through Testing. Expose the
-    // setting there while synchronizesWithPersonalCloud remains false, so the
-    // smoke can verify reconnection safely against its disposable store.
+    // The unified platform plans run accessibility checks through Testing.
+    // Expose the setting there while synchronizesWithPersonalCloud remains
+    // false so its top-level semantics can be inspected against a disposable
+    // store.
     self == .develop || self == .testing || self == .production || self == .productionTesting
   }
 
