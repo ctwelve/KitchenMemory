@@ -7,6 +7,9 @@ import Foundation
 import SwiftData
 import XCTest
 
+// Authority backfill scenarios intentionally share the same physical-row fixture helpers.
+// swiftlint:disable file_length
+
 @MainActor
 // The suite keeps one authority writer fixture boundary visible in one place.
 // swiftlint:disable:next type_body_length
@@ -131,6 +134,8 @@ final class SwiftDataRecipeAuthoritySaveTests: XCTestCase {
     }
   }
 
+  // The assertion keeps deterministic identities, ordering, restoration routing, and retry together.
+  // swiftlint:disable:next function_body_length
   func testLegacyBackfillCreatesDeterministicAuthorityAndIsIdempotent() throws {
     let container = try KitchenMemorySchema.makeContainer(inMemory: true)
     let repository = SwiftDataRecipeRepository(modelContainer: container)
@@ -139,6 +144,8 @@ final class SwiftDataRecipeAuthoritySaveTests: XCTestCase {
     let recipeID = Recipe.ID()
     let first = makeRevision(recipeID: recipeID, number: 1, title: "First")
     let second = makeRevision(recipeID: recipeID, number: 2, title: "Second")
+    let otherRecipeID = Recipe.ID()
+    let other = makeRevision(recipeID: otherRecipeID, number: 1, title: "Other")
     let context = ModelContext(container)
     context.insert(RecipeRecord(
       id: recipeID.rawValue,
@@ -152,6 +159,12 @@ final class SwiftDataRecipeAuthoritySaveTests: XCTestCase {
     ))
     context.insert(first)
     context.insert(second)
+    context.insert(RecipeRecord(
+      id: otherRecipeID.rawValue,
+      kitchenID: kitchen.id.rawValue,
+      currentRevisionID: other.id
+    ))
+    context.insert(other)
     let deletionID = UUID()
     context.insert(RecipeDeletionRecord(
       id: deletionID,
@@ -172,14 +185,83 @@ final class SwiftDataRecipeAuthoritySaveTests: XCTestCase {
     let reopened = ModelContext(container)
     let saves = try reopened.fetch(FetchDescriptor<RecipeSaveRecord>())
     let selections = try reopened.fetch(FetchDescriptor<RecipeSelectionRecord>())
-    XCTAssertEqual(Set(saves.map(\.id)), Set([first.id, second.id]))
-    XCTAssertEqual(Set(selections.map(\.id)), Set([first.id, second.id]))
+    XCTAssertEqual(Set(saves.map(\.id)), Set([first.id, second.id, other.id]))
+    XCTAssertEqual(Set(selections.map(\.id)), Set([first.id, second.id, other.id]))
     XCTAssertTrue(saves.allSatisfy { $0.parentRevisionIDsData.isEmpty })
     XCTAssertTrue(selections.allSatisfy { $0.observedSelectionIDsData.isEmpty })
     XCTAssertEqual(
       try reopened.fetch(FetchDescriptor<RecipeDeletionResolutionRecord>()).first?.kitchenID,
       kitchen.id.rawValue
     )
+  }
+
+  // Each store isolates one invalid legacy shape so transaction rollback is observable.
+  // swiftlint:disable:next function_body_length
+  func testLegacyBackfillRejectsInvalidGraphsAndAuthorityCollisions() throws {
+    do {
+      let fixture = try makeBackfillStore()
+      let container = fixture.container
+      let repository = fixture.repository
+      let kitchen = fixture.kitchen
+      let context = ModelContext(container)
+      context.insert(RecipeRecord(
+        id: UUID(), kitchenID: kitchen.id.rawValue, currentRevisionID: UUID()
+      ))
+      try context.save()
+      XCTAssertThrowsError(try repository.backfillLegacyRecipeAuthority(in: kitchen.id)) { error in
+        XCTAssertEqual(error as? KitchenMemoryPersistenceError, .missingCurrentRevision)
+      }
+    }
+    do {
+      let fixture = try makeBackfillStore()
+      let container = fixture.container
+      let repository = fixture.repository
+      let kitchen = fixture.kitchen
+      let recipeID = Recipe.ID()
+      let first = makeRevision(recipeID: recipeID, number: 1, title: "First")
+      let conflict = makeRevision(recipeID: recipeID, number: 1, title: "Conflict")
+      conflict.id = first.id
+      let context = ModelContext(container)
+      context.insert(RecipeRecord(
+        id: recipeID.rawValue, kitchenID: kitchen.id.rawValue, currentRevisionID: first.id
+      ))
+      context.insert(first)
+      context.insert(conflict)
+      try context.save()
+      XCTAssertThrowsError(try repository.backfillLegacyRecipeAuthority(in: kitchen.id))
+    }
+    do {
+      let fixture = try makeBackfillStore()
+      let container = fixture.container
+      let repository = fixture.repository
+      let kitchen = fixture.kitchen
+      let revision = try insertLegacyRecipe(in: container, kitchenID: kitchen.id)
+      let context = ModelContext(container)
+      context.insert(RecipeSaveRecord(
+        id: revision.id, kitchenID: UUID(), recipeID: revision.recipeID,
+        revisionID: revision.id, savedAt: .distantPast,
+        ancestryFormatVersion: 1, parentRevisionIDsData: Data(),
+        payloadManifestFormatVersion: 1, payloadManifestData: Data(),
+        revisionFormatVersion: 1, revisionDigest: Data()
+      ))
+      try context.save()
+      XCTAssertThrowsError(try repository.backfillLegacyRecipeAuthority(in: kitchen.id))
+    }
+    do {
+      let fixture = try makeBackfillStore()
+      let container = fixture.container
+      let repository = fixture.repository
+      let kitchen = fixture.kitchen
+      _ = try insertLegacyRecipe(in: container, kitchenID: kitchen.id)
+      try repository.backfillLegacyRecipeAuthority(in: kitchen.id)
+      let context = ModelContext(container)
+      let selection = try XCTUnwrap(
+        try context.fetch(FetchDescriptor<RecipeSelectionRecord>()).first
+      )
+      selection.selectedAt = Date()
+      try context.save()
+      XCTAssertThrowsError(try repository.backfillLegacyRecipeAuthority(in: kitchen.id))
+    }
   }
 
   func testSaveRejectsUnknownCausalReferencesWithoutMutation() throws {
@@ -256,6 +338,30 @@ final class SwiftDataRecipeAuthoritySaveTests: XCTestCase {
     )
   }
 
+  private func makeBackfillStore() throws -> BackfillStore {
+    let container = try KitchenMemorySchema.makeContainer(inMemory: true)
+    let repository = SwiftDataRecipeRepository(modelContainer: container)
+    let kitchen = Kitchen(name: "Home")
+    try repository.save(kitchen)
+    return BackfillStore(container: container, repository: repository, kitchen: kitchen)
+  }
+
+  @discardableResult
+  private func insertLegacyRecipe(
+    in container: ModelContainer,
+    kitchenID: Kitchen.ID
+  ) throws -> RecipeRevisionRecord {
+    let recipeID = Recipe.ID()
+    let revision = makeRevision(recipeID: recipeID, number: 1, title: "Legacy")
+    let context = ModelContext(container)
+    context.insert(RecipeRecord(
+      id: recipeID.rawValue, kitchenID: kitchenID.rawValue, currentRevisionID: revision.id
+    ))
+    context.insert(revision)
+    try context.save()
+    return revision
+  }
+
   private func assertAuthorityCounts(
     container: ModelContainer,
     saves: Int,
@@ -304,4 +410,11 @@ final class SwiftDataRecipeAuthoritySaveTests: XCTestCase {
     defer { try? FileManager.default.removeItem(at: directory) }
     try operation(directory.appending(path: "KitchenMemory.store"))
   }
+}
+
+@MainActor
+private struct BackfillStore {
+  let container: ModelContainer
+  let repository: SwiftDataRecipeRepository
+  let kitchen: Kitchen
 }
