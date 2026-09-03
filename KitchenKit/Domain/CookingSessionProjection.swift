@@ -49,8 +49,7 @@ struct ProjectionBuilder {
         }
         guard case .coalesced = IdentityCollection.coalesce(
             evidence.roots,
-            id: \.id,
-            orderedBy: { uuidOrder($0.id.rawValue, $1.id.rawValue) }
+            id: \.id
         ) else {
             return recovery(.rootCollision)
         }

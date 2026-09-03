@@ -130,24 +130,23 @@ final class CookingSessionCommandGraphTests: XCTestCase {
     for index in 1..<256 {
       deep[identifiers[index]] = [identifiers[index - 1]]
     }
-    let cases: [[UUID: [UUID]]] = [
-      [:],
-      [root: []],
-      [root: [], first: [root], second: [first]],
-      [root: [], first: [root], second: [root]],
-      [root: [], first: [root], second: [root], merge: [first, second]],
-      [root: [], first: [root, root]],
-      [first: [second], second: [first]],
-      deep,
+    let legacyCases: [(parents: [UUID: [UUID]], heads: [UUID])] = [
+      ([:], []),
+      ([root: []], [root]),
+      ([root: [], first: [root], second: [first]], [second]),
+      ([root: [], first: [root], second: [root]], [first, second]),
+      ([root: [], first: [root], second: [root], merge: [first, second]], [merge]),
+      ([root: [], first: [root, root]], [first]),
+      ([first: [second], second: [first]], []),
+      (deep, [identifiers[255]]),
     ]
 
-    for parents in cases {
-      let legacy = DirectedGraph(parentsByNode: parents).maximalNodes.sorted(by: uuidOrder)
+    for legacyCase in legacyCases {
       let migrated = CausalGraph(
-        parentsByNode: parents,
+        parentsByNode: legacyCase.parents,
         orderedBy: uuidOrder
       ).maximalNodes
-      XCTAssertEqual(migrated, legacy)
+      XCTAssertEqual(migrated, legacyCase.heads)
     }
   }
 

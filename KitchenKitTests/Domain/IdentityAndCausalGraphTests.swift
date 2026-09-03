@@ -51,6 +51,18 @@ final class IdentityCollectionTests: XCTestCase {
       ),
       .coalesced([])
     )
+
+    XCTAssertEqual(
+      IdentityCollection.coalesce([first, second, first], id: \.id),
+      .coalesced([first, second])
+    )
+    XCTAssertEqual(
+      IdentityCollection.coalesce(
+        [first, IdentifiedValue(id: 2, payload: "collision")],
+        id: \.id
+      ),
+      .collision(identity: 2)
+    )
   }
 }
 

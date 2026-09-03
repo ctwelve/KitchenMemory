@@ -22,8 +22,8 @@ package inventory.
 | Component | Version | License | Purpose |
 | --- | --- | --- | --- |
 | [Defaults](https://github.com/sindresorhus/Defaults) | 9.0.9 | MIT | Typed local storage, observation, and iCloud key-value synchronization for the sample-onboarding preference |
-| [swift-collections](https://github.com/apple/swift-collections) | 1.6.0 | Apache-2.0 WITH Swift-exception | `DequeModule` for the ordered Cooking Session outbox and stack-safe causal-graph worklists; `OrderedCollections` for first-seen identity coalescing |
-| [swift-algorithms](https://github.com/apple/swift-algorithms) | 1.2.1 | Apache-2.0 WITH Swift-exception | `Algorithms` coalesces already-validated retained Session evidence for graph construction and duplicate immutable Recipe rows during CloudKit merge reconciliation |
+| [swift-collections](https://github.com/apple/swift-collections) | 1.6.0 | Apache-2.0 WITH Swift-exception | `DequeModule` for the ordered Cooking Session outbox, stack-safe causal-graph worklists, and Logic dependency discovery; `OrderedCollections` for first-seen identity coalescing |
+| [swift-algorithms](https://github.com/apple/swift-algorithms) | 1.2.1 | Apache-2.0 WITH Swift-exception | `Algorithms` coalesces duplicate immutable Recipe rows during CloudKit merge reconciliation |
 
 Only the `Defaults` library product from that package is linked. `DefaultsMacros` is deliberately
 not linked: the onboarding preference remains behind Kitchen Memory's testable
@@ -39,9 +39,9 @@ enabled under Kitchen Memory's privacy policy.
 The `KitchenMemory` application target links `DequeModule` for its in-memory
 Cooking Session command outbox while preserving arrays at the presentation-store
 codec boundary. `KitchenKit` links `DequeModule`, `OrderedCollections`, and
-`Algorithms`; the Collections products implement the causal graph while
-Algorithms coalesces already-validated graph evidence in Logic and reconciles
-duplicate immutable rows inside the owned Recipe repository. The umbrella
+`Algorithms`; the Collections products implement causal-graph worklists,
+first-seen identity semantics, and dependency traversal, while Algorithms
+coalesces duplicate immutable rows inside the owned Recipe repository. The umbrella
 `Collections` product and unrelated collection modules are not linked. Package
 types remain implementation details behind Kitchen
 Memory-owned presentation, Domain, Logic, and repository interfaces. Swift Async
