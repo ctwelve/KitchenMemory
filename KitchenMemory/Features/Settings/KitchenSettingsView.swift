@@ -68,6 +68,7 @@ struct KitchenSettingsView: View {
             )
           )
           .accessibilityIdentifier("settings-icloud-sync")
+          .accessibilityLabel(Text(.settingsIcloudToggle))
           .alert(
             .settingsIcloudReconnectTitle,
             isPresented: $isShowingCloudReconnectionConfirmation

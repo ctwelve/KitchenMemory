@@ -71,7 +71,8 @@ entitlements, and localized launch resources. Folders express application
 ownership; they are not new targets, modules, visibility boundaries, or
 dependency seams. Hosted tests mirror feature or responsibility ownership under
 `KitchenMemoryTests/`. The separate `KitchenMemoryUITests/` target remains one
-identifier-driven smoke suite rather than a second presentation consumer.
+small accessible top-level navigation suite rather than a second presentation
+consumer.
 
 The project-structure contract rejects application Swift files outside this
 taxonomy, rejects new KitchenKit responsibility roots, and rejects SwiftUI,
@@ -98,7 +99,7 @@ target implementation details:
 | `Develop` | ordinary developer runs and schema exercises | development | debug |
 | `Testing` | deterministic business-logic and integration tests | off | debug |
 | `Production` | profile, archive, and distribution | production | release |
-| `ProductionTesting` | production UI smoke-test host only | off | release |
+| `ProductionTesting` | production UI-validation host only | off | release |
 
 `ProductionTesting` is deliberately non-distributable. It retains production
 compiler behavior while admitting disposable automated-test storage that is
@@ -106,7 +107,7 @@ disabled in the actual `Production` application. The saved `KitchenMemory`
 scheme uses `Testing` for its default Test and Analyze actions, `Develop` for Run,
 and `Production` for Profile and Archive. Its plan runs hosted tests and UI
 smoke together on either native destination; the UI harness selects disposable
-storage through its launch arguments. A release-equivalent UI smoke run may
+storage through its launch arguments. A release-equivalent UI validation run may
 select `ProductionTesting` explicitly.
 
 The project keeps `MERGED_BINARY_TYPE` at `automatic` so Xcode can optimize
@@ -176,10 +177,14 @@ Permanent V1 codecs provide canonical bytes for execution snapshots, causal
 heads, fact payloads, outcomes, and closed projections. Causal heads use sorted
 UUID bytes; JSON codecs use sorted keys and reject well-formed noncanonical
 representations on read. SHA-256 digests therefore describe exact stable bytes,
-not a decoder's best-effort interpretation. The engine imports Foundation and
-CryptoKit only. It has no SwiftData, CloudKit, repository, actor, device, or UI
-dependency, so later persistence and synchronization slices are adapters around
-this domain contract rather than authorities over its merge behavior.
+not a decoder's best-effort interpretation. The engine uses Foundation and
+CryptoKit plus narrowly linked Swift Collections products behind Kitchen
+Memory-owned types. It has no SwiftData, CloudKit, repository, actor, device, or
+UI dependency, so later persistence and synchronization slices are adapters
+around this domain contract rather than authorities over its merge behavior.
+KitchenKit Logic and Persistence separately use Swift Algorithms behind owned
+interfaces to coalesce already-validated graph evidence and reconcile duplicate
+immutable Recipe rows.
 
 ### Application composition and stitching points
 
@@ -481,7 +486,7 @@ resources, and hosted runtime behavior live in one multiplatform
 `KitchenMemoryTests` target. The two shared schemes build only their primary
 products and leave test-target membership solely to their referenced plans.
 The checked-in `KitchenMemory.xctestplan` contains `KitchenMemoryTests` and the
-shared `KitchenMemoryUITests` smoke target, and runs unchanged on iOS Simulator
+shared `KitchenMemoryUITests` top-level navigation target, and runs unchanged on iOS Simulator
 and native macOS. The scheme uses `Testing` for Test so both kinds of test
 receive a least-privilege, disposable host. The exact coverage gate requires every
 executable business-logic line in KitchenKit to be covered by the core macOS

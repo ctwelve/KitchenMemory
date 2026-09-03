@@ -94,7 +94,7 @@ amends them.
 - [0004: Apple persistence and portability](adr/0004-apple-persistence-and-portability.md)
 - [0005: Testing and comprehension](adr/0005-testing-and-comprehension.md)
 - [0006: Use a shared UI for the foundation slices](adr/0006-shared-ui-for-foundation-slices.md)
-- [0007: Business-logic coverage and UI smoke tests](adr/0007-business-logic-coverage-and-ui-smoke-tests.md)
+- [0007: Business-logic coverage and constrained UI automation](adr/0007-business-logic-coverage-and-ui-smoke-tests.md)
 - [0008: Freeze the 0.1 localization contract](adr/0008-freeze-the-0-1-localization-contract.md)
 - [0010: Distinct Cooking Session module seam](adr/0010-distinct-cooking-session-module.md)
 - [0011: Cooking Session document envelopes](adr/0011-use-document-envelopes-for-cooking-sessions.md)

@@ -2,6 +2,7 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
+import Algorithms
 import Foundation
 
 @MainActor
@@ -63,8 +64,7 @@ extension CookingSessions {
     guard case let .session(session) = projected else { return attention(from: projected) }
     guard case .deleted = session.disposition else { return .attention(.restoreNotNeeded) }
     let resolved = Set(evidence.restorations.map(\.deletionID))
-    let unresolved = Dictionary(grouping: evidence.deletions, by: \SessionDeletionEvidence.id)
-      .compactMap { $0.value.first }
+    let unresolved = evidence.deletions.uniqued(on: \.id)
       .filter { !resolved.contains($0.id) }
       .sorted { $0.id.rawValue.uuidString < $1.id.rawValue.uuidString }
     guard !unresolved.isEmpty else { return .attention(.restoreNotNeeded) }

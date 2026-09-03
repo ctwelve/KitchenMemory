@@ -176,15 +176,12 @@ Localization proof remains layered and deterministic:
 - decode every localized recipe asset and validate stable identity relationships;
 - preserve source strings and numerical domain values across presentation
   locales; and
-- keep UI smoke tests identifier-driven rather than asserting translated copy;
-- launch the durable shell and Privacy display under every supported interface
-  locale; and
-- launch smoke coverage with doubled localized strings and forced right-to-left
-  writing direction to expose basic layout assumptions.
+- keep the top-level UI suite independent of translated copy.
 
-These UI checks prove reachability and structural survival, not linguistic
-quality or pixel-perfect layout. Native review of the three locales, long text,
-right-to-left direction, Dynamic Type, and assistive technologies remains part
-of release hardening. The identifier-driven smoke boundary from
-[ADR 0007](adr/0007-business-logic-coverage-and-ui-smoke-tests.md) still applies: a localized
-screen is not a reason to encode its provisional visual hierarchy in tests.
+The catalog and presentation tests own deterministic localization proof. Native
+review of the three locales, doubled and long text, right-to-left direction,
+Dynamic Type, and assistive technologies remains part of release hardening.
+The constrained automation boundary from
+[ADR 0007](adr/0007-business-logic-coverage-and-ui-smoke-tests.md) still applies:
+localization is not a reason to restore interaction-heavy scripts or encode a
+provisional visual hierarchy in UI tests.

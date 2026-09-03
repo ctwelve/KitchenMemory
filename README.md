@@ -108,7 +108,7 @@ been flattened or silently rewritten.
 
 Open `KitchenMemory.xcodeproj` in Xcode. Run the **KitchenMemory** scheme and
 choose an iPhone, iPad, iOS Simulator, or My Mac destination. The same checked-in
-application scheme and plan run the hosted and UI-smoke tests on either native
+application scheme and plan run the hosted and top-level accessibility tests on either native
 platform. The minimal **KitchenKit** scheme likewise references a checked-in
 plan for its unhosted test target. Each scheme builds only its primary product;
 its plan alone owns test-target membership.
@@ -126,7 +126,7 @@ product-logic, and persistence code lives in the native `KitchenKit` framework.
 
 KitchenKit tests run once through its shared scheme and explicit plan. The
 application plan runs the multiplatform composition and resource tests plus the
-shared identifier-driven UI smoke suite on each selected destination. For example:
+shared accessible top-level navigation suite on each selected destination. For example:
 
 ```sh
 xcodebuild test \

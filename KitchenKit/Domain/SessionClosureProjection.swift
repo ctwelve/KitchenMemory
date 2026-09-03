@@ -119,12 +119,11 @@ extension ProjectionBuilder {
             values[closure.id] = heads
             graph[closure.id.rawValue] = heads
         }
-        guard !directedGraphContainsCycle(graph) else {
+        let closureGraph = DirectedGraph(parentsByNode: graph)
+        guard !closureGraph.containsCycle else {
             return .failure(recovery(.cycle))
         }
-        guard values.values.allSatisfy({
-            directedGraphHeadsAreMaximal($0, parents: graph)
-        }) else {
+        guard values.values.allSatisfy(closureGraph.formsAntichain) else {
             return .failure(recovery(.inconsistentClosure))
         }
         let resolutionIDs = facts.filter { $0.kind == .conflictResolution }
@@ -133,7 +132,7 @@ extension ProjectionBuilder {
             heads.allSatisfy { head in
                 !resolutionIDs.contains(head)
                     && !resolutionIDs.contains {
-                        directedGraphIsAncestor($0, of: head, parents: graph)
+                        closureGraph.isAncestor($0, of: head)
                     }
             }
         }) else {

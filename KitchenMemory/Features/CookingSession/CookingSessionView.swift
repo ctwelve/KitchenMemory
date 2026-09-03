@@ -84,6 +84,7 @@ struct CookingSessionView: View {
             .padding(28)
             .frame(maxWidth: .infinity, alignment: .center)
           }
+          .accessibilityIdentifier("cooking-session-scroll")
           lifecycleControls
             .padding(.horizontal, 28)
             .padding(.vertical, 16)

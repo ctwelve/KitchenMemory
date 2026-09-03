@@ -203,7 +203,8 @@ struct ProjectionBuilder {
                 return .failure(recovery(.malformedCausalHeads))
             }
         }
-        guard !directedGraphContainsCycle(headsByID) else {
+        let causalGraph = DirectedGraph(parentsByNode: headsByID)
+        guard !causalGraph.containsCycle else {
             return .failure(recovery(.cycle))
         }
         let knownIDs = Set(headsByID.keys)
@@ -212,9 +213,7 @@ struct ProjectionBuilder {
         if let missing = headsByID.values.joined().first(where: { !knownIDs.contains($0) }) {
             return .failure(unavailable(.missingPredecessor(missing)))
         }
-        guard headsByID.values.allSatisfy({
-            directedGraphHeadsAreMaximal($0, parents: headsByID)
-        }) else {
+        guard headsByID.values.allSatisfy(causalGraph.formsAntichain) else {
             return .failure(recovery(.invalidFact))
         }
         let closedCone = closedFactCone(closures: closures, parents: headsByID)
@@ -274,7 +273,7 @@ struct ProjectionBuilder {
         let heads = closureHeads.flatMap { $0 }
         return Set(parents.keys.filter { identifier in
             heads.contains(identifier) || heads.contains {
-                directedGraphIsAncestor(identifier, of: $0, parents: parents)
+                DirectedGraph(parentsByNode: parents).isAncestor(identifier, of: $0)
             }
         })
     }
@@ -371,10 +370,9 @@ struct ProjectionBuilder {
             }
         }
         guard facts.filter({ $0.kind != .conflictResolution }).allSatisfy({
-            directedGraphIsAncestor(
+            DirectedGraph(parentsByNode: parents).isAncestor(
                 root.id.rawValue,
-                of: $0.evidence.id.rawValue,
-                parents: parents
+                of: $0.evidence.id.rawValue
             )
         }) else {
             return recovery(.invalidFact)

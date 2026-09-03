@@ -8,7 +8,7 @@ SPDX-License-Identifier: MIT
 
 Xcode Cloud is Kitchen Memory's continuous-integration system. The repository
 checks in one `KitchenMemory` scheme and plan so local and cloud Test actions
-select the same hosted and UI-smoke targets on iOS and macOS destinations. It
+select the same hosted and top-level accessibility targets on iOS and macOS destinations. It
 also checks in a minimal `KitchenKit` scheme and plan for the unhosted framework
 suite. Every shared scheme references one explicit plan.
 
@@ -23,7 +23,7 @@ Each shared scheme has one top-level product buildable; Xcode adds dependencies
 through ordinary resolution. Its saved plan is the sole owner of test-target
 membership: `KitchenKit.xctestplan` contains the unhosted framework target,
 while the application plan contains its multiplatform hosted-test target and the shared
-UI-smoke target. The schemes default Test and Analyze to `Testing`; Xcode Cloud
+top-level accessibility target. The schemes default Test and Analyze to `Testing`; Xcode Cloud
 may still select a configuration and destination explicitly without introducing
 duplicate scheme names.
 
@@ -55,7 +55,8 @@ The development workflow starts for meaningful project changes pushed to
 perform separate iOS and macOS Build, Analyze, and Test actions using the same
 `KitchenMemory` scheme, plus the macOS-destination `KitchenKit` lane, but never
 archive a product. Those actions use `Testing`; each destination Test action runs
-its hosted correctness target and the bounded shared UI smoke suite. Local
+its hosted correctness target and the small accessible top-level navigation
+suite. Local
 developer runs use the
 same application scheme with the `Develop` configuration. The distinct
 development bundle identifier keeps local stores,
@@ -232,10 +233,12 @@ The separate rulesets are intentional: authority to create a release does not
 grant authority to move or erase its evidence. The Ruby release contract then
 validates the tag and committed version inside Xcode Cloud.
 
-The UI target contains smoke tests only. Localization of durable copy and
-formatting proceeds independently, but comprehensive localized-layout assertions,
-accessibility audits, and interaction-specific UI suites are deferred until the
-relevant interface is stable. See
+The UI target contains only accessible top-level structure and navigation
+checks. It does not re-prove feature workflows or standard control activation.
+Localization of durable copy and formatting proceeds independently, while
+comprehensive localized-layout assertions, accessibility audits, focus and
+grouping checks, and interaction-specific UI suites are deferred until the
+relevant interface is stable and the future strategy is defined. See
 [ADR 0007](adr/0007-business-logic-coverage-and-ui-smoke-tests.md) and
 [accessibility engineering](accessibility-engineering.md). Localization
 ownership and its non-UI testing boundary are described in
@@ -252,14 +255,14 @@ the testing exception does not alter a shipped application.
 Application-hosted XCTest processes also select an in-memory store in those two
 testing configurations by detecting Xcode's hosted-test environment. This keeps
 the saved application plan disposable without relying on a plan-level launch
-argument. UI smoke tests pass their own harness argument and use the same
+argument. UI navigation tests pass their own harness argument and use the same
 disposable `Testing` host by default. Ordinary development and production
 launches continue to use durable storage; `ProductionTesting` remains available
 for an explicitly selected release-optimized smoke run.
 
-UI smoke launches also ignore persisted application-window restoration state.
+UI navigation launches also ignore persisted application-window restoration state.
 On macOS, XCUITest can nevertheless relaunch a live `WindowGroup` application
-without creating its primary window. The smoke harness detects the missing
+without creating its primary window. The navigation harness detects the missing
 expected surface and invokes the public Command-N New Window path before making
 assertions. This keeps launches deterministic without depending on localized
 menu copy or altering ordinary application behavior.
