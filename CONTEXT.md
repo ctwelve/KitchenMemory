@@ -8,6 +8,36 @@ Kitchen Memory preserves the distinct human truths of maintained recipes and wha
 The account-scoped identity permitted to own and reconcile one Kitchen. The identity is opaque and carries no person-facing name or contact information.
 _Avoid_: User account, Apple ID, member
 
+## Recipe authority
+
+**Recipe**:
+The durable Kitchen-owned identity of one maintained dish across all of its authored revisions, selections, and library disposition.
+_Avoid_: Recipe file, current version
+
+**Recipe Editing Draft**:
+A device-local recoverable working copy that has not yet become shared maintained intent; it may disappear without changing Recipe history.
+_Avoid_: Recipe Revision, synchronized draft
+
+**Recipe Revision**:
+One immutable synchronized representation of maintained Recipe intent, with explicit zero-, one-, or multi-parent ancestry.
+_Avoid_: Autosave, database version
+
+**Recipe Save**:
+An explicit idempotent intention that creates or extends a Recipe by accepting one complete Recipe Revision.
+_Avoid_: SwiftData save, sync event
+
+**Recipe Selection**:
+Immutable evidence choosing one existing Recipe Revision for current presentation while naming the prior selections the choice observed.
+_Avoid_: Last edited revision, mutable current pointer
+
+**Recipe Deletion**:
+A deliberate instruction to remove a Recipe from ordinary library presentation while retaining its authority evidence for synchronization, restoration, and later pruning.
+_Avoid_: Revision deletion, permanent erasure
+
+**Recipe Tombstone**:
+The compact authority evidence retained after Recipe payload is pruned so delayed synchronized data cannot silently resurrect the Recipe.
+_Avoid_: Empty Recipe, deleted row
+
 ## Cooking sessions
 
 **Cooking Session**:

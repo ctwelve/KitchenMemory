@@ -53,6 +53,8 @@ For implementation work, begin with:
 ### Domain and workflows
 
 - [Recipe domain model](recipe-domain-model.md)
+- [Recipe authority V5 persistence contract](recipe-authority-v5-schema.md) —
+  decision-frozen additive authority and migration contract.
 - [Domain context and vocabulary](../CONTEXT.md)
 - [Domain architecture](domain-architecture.md)
 - [Web recipe import](web-import.md)
@@ -103,6 +105,7 @@ amends them.
 - [0014: Native capabilities and evidence-based dependencies](adr/0014-prefer-native-capabilities-and-evidence-based-dependencies.md)
 - [0015: Adopt the MIT License](adr/0015-adopt-mit-license.md)
 - [0016: Alpha data contract and beta stabilization](adr/0016-alpha-data-contract-and-beta-stabilization.md)
+- [0017: Additive Recipe authority evidence](adr/0017-use-additive-recipe-authority-evidence.md)
 
 ### Superseded architecture decisions
 

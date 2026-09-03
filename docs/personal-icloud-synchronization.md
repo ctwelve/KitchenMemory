@@ -152,9 +152,19 @@ two offline devices can still create separate storage rows carrying the same
 domain UUID. Repository reads collapse those rows by logical identity throughout
 the recipe graph. The mutable `RecipeRecord.currentRevisionID` is not allowed to
 erase a competing branch merely because CloudKit resolves that pointer with
-last-writer-wins: the repository considers every immutable revision carrying the
-recipe UUID. The highest revision number wins; equal revision numbers use the
-revision UUID as a stable tie-breaker. Every revision remains in history.
+last-writer-wins: the current V4 repository considers every immutable revision
+carrying the recipe UUID. Its highest-revision-number and UUID tie-break is an
+alpha compatibility behavior, not accepted synchronized authority.
+
+The decision-frozen V5 contract replaces that tie-break with immutable Recipe
+Save and Selection evidence. Selection names the prior selection frontier it
+observed; concurrent choices therefore remain explicit until a later choice or
+multi-parent reconciliation observes them. Clocks, devices, arrival order,
+revision numbers, and `currentRevisionID` do not decide currentness. V5 also
+adds a complete payload manifest so piecemeal CloudKit delivery is unavailable
+rather than mistaken for a valid partial Revision. See
+[Recipe authority V5](recipe-authority-v5-schema.md). V5 implementation and
+migration remain work for #105 and later slices.
 
 V2 makes deletion equally explicit. A reset writes an append-only deletion
 marker before physically removing recipe content. Any unresolved marker hides
@@ -165,10 +175,13 @@ Markers and resolutions may arrive in any order or be duplicated without
 changing the eventual result. This is a repository reconciliation rule, not a
 CloudKit type exposed to Domain or Logic.
 
-Together these rules make edit, delete, and observed-restore outcomes converge
-without confusing an internal CloudKit record name with product identity. The
-signed multi-device acceptance matrix still verifies Apple's transport and the
-person-facing recovery sequence before release.
+V2 deletion markers remain the implemented alpha behavior. V5 migrates them
+additively into dated Recipe disposition evidence and later compact Prune
+frontiers without repurposing their published fields. Together, the accepted V5
+rules make edit, selection, delete, observed-restore, and anti-resurrection
+outcomes converge without confusing an internal CloudKit record name with
+product identity. The signed multi-device acceptance matrix still verifies
+Apple's transport and the person-facing recovery sequence before release.
 
 After the first production schema is deployed:
 
