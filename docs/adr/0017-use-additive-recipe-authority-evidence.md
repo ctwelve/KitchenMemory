@@ -45,5 +45,5 @@ inventing ancestry that legacy evidence cannot prove.
   repurpose published fields or alter legacy payload identities.
 - The repository adapter absorbs codec, migration, transport, and projection
   complexity so Domain and UI clients receive one deep Recipe authority seam.
-- The prototype HTML remains only on the throwaway branch recorded in issue
-  #104 and is not shipped.
+- The logic and physical probe code remains only on the throwaway branch
+  recorded in issue #104 and is not shipped.

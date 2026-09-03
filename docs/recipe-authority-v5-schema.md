@@ -6,7 +6,7 @@ Copyright © 2026 the Kitchen Memory contributors.
 SPDX-License-Identifier: MIT
 -->
 
-- Status: Decision-frozen; logic prototype passed
+- Status: Decision-frozen; logic and Development-schema smokes passed
 - Decided: 2026-09-03
 - Scope: Additive SwiftData and managed-CloudKit authority for Recipe creation,
   revision ancestry, current selection, deletion, restoration, and pruning
@@ -15,7 +15,7 @@ This document freezes the smallest additive authority model selected by
 [issue #104](https://github.com/ctwelve/KitchenMemory/issues/104). It does not
 implement V5, initialize a CloudKit schema, deploy Production changes, or
 authorize physical pruning. The throwaway
-[logic prototype](https://github.com/ctwelve/KitchenMemory/blob/2f42a69/KitchenKit/Prototypes/RecipeAuthorityPrototype.html)
+[prototype branch](https://github.com/ctwelve/KitchenMemory/tree/e04dbaf)
 did not falsify the representation and is intentionally absent from the
 production branch.
 
@@ -327,11 +327,25 @@ All scenarios preserved their expected classification. In particular:
 - legacy payload and snapshot identities remained intact; and
 - conflicting command reuse entered recovery.
 
+A second, deliberately small physical probe extended the signed Development
+harness with the exact candidate fields. On Xcode 26.6 (17F113), macOS 26.6.2,
+and the macOS/iOS 26.5 SDKs, generated-schema inspection found the three new
+entities and the two extended V2 entities with the declared attributes, zero
+relationships, zero indexes, and zero uniqueness constraints. Binary attributes
+were not marked for external storage.
+
+One in-memory V5 transaction saved and read one row from every authority family
+while retaining a representative V4 Recipe, Recipe Revision, and self-contained
+Cooking Session snapshot. The resettable
+`iCloud.net.ctwelve.dev.KitchenMemory` Development schema then initialized
+successfully with the additive shape. Production was neither initialized nor
+deployed. This smoke proves generated shape and basic persistence only; it does
+not claim multi-device transport or beta-grade migration coverage.
+
 The selected shape would have been falsified if any result depended on a
 timestamp, device, arrival order, revision number, mutable pointer, or partially
 delivered edge set. None did. #105 must still implement the frozen codecs,
-models, migration fixtures, and a physical SwiftData schema smoke before V5 is
-shipped.
+models, application backfill, and production tests before V5 is shipped.
 
 ## Implementation seam
 
