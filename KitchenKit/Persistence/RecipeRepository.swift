@@ -567,6 +567,7 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
       for stored in recipes {
         guard try writer.recipe(id: stored.id) == nil else { continue }
         try writer.accept(writer.legacyAuthorityCommand(for: stored))
+        try writer.restoreActiveDeletions(for: stored.id, in: kitchenID)
       }
     }
   }
@@ -996,16 +997,7 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     let revisionRecords = try context.fetch(FetchDescriptor<RecipeRevisionRecord>())
       .filter { recipeIdentifiers.contains($0.recipeID) }
 
-    var deletedRecipeIDs = Set<UUID>()
-    for recipe in recipeRecords where deletedRecipeIDs.insert(recipe.id).inserted {
-      context.insert(
-        RecipeDeletionRecord(
-          id: UUID(),
-          recipeID: recipe.id,
-          kitchenID: recipe.kitchenID
-        )
-      )
-    }
+    markDeleted(recipeRecords)
 
     for revision in revisionRecords {
       try deleteRevisionRows(revisionID: revision.id)
@@ -1039,6 +1031,18 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
 
     for stored in recipes {
       try accept(legacyAuthorityCommand(for: stored))
+      try restoreActiveDeletions(for: stored.id, in: kitchenID)
+    }
+  }
+
+  private func markDeleted(_ recipes: [RecipeRecord]) {
+    var deletedRecipeIDs = Set<UUID>()
+    for recipe in recipes where deletedRecipeIDs.insert(recipe.id).inserted {
+      context.insert(RecipeDeletionRecord(
+        id: UUID(),
+        recipeID: recipe.id,
+        kitchenID: recipe.kitchenID
+      ))
     }
   }
 
@@ -1166,6 +1170,22 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
       )
     )
     return Set(deletions.map(\.id)).subtracting(resolutions.map(\.deletionID))
+  }
+
+  private func restoreActiveDeletions(
+    for recipeID: Recipe.ID,
+    in kitchenID: Kitchen.ID
+  ) throws {
+    let identifier = recipeID.rawValue
+    for deletionID in try activeDeletionIDs(for: recipeID) {
+      context.insert(RecipeDeletionResolutionRecord(
+        id: UUID(),
+        deletionID: deletionID,
+        recipeID: identifier,
+        kitchenID: kitchenID.rawValue,
+        restoredAt: Date()
+      ))
+    }
   }
 
   private func validateOwnership(of recipe: Recipe) throws {
