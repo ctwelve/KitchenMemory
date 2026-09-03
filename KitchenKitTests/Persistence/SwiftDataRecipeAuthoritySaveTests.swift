@@ -68,6 +68,40 @@ final class SwiftDataRecipeAuthoritySaveTests: XCTestCase {
     )
   }
 
+  func testSavingDeletedRecipeDoesNotManufactureRestorationEvidence() throws {
+    let container = try KitchenMemorySchema.makeContainer(inMemory: true)
+    let repository = SwiftDataRecipeRepository(modelContainer: container)
+    let kitchen = Kitchen(name: "Home")
+    try repository.save(kitchen)
+    let first = makeCommand(kitchenID: kitchen.id, number: 1, title: "Soup")
+    try repository.save(first)
+    let context = ModelContext(container)
+    context.insert(RecipeDeletionRecord(
+      id: UUID(),
+      recipeID: first.recipe.id.rawValue,
+      kitchenID: kitchen.id.rawValue,
+      deletedAt: Date(timeIntervalSince1970: 300)
+    ))
+    try context.save()
+    let second = makeCommand(
+      kitchenID: kitchen.id,
+      recipeID: first.recipe.id,
+      number: 2,
+      title: "Better Soup",
+      parents: [first.revision.id],
+      observedSelections: [first.selection.id]
+    )
+
+    try repository.save(second)
+
+    XCTAssertNil(try repository.recipe(id: first.recipe.id))
+    XCTAssertEqual(try repository.revisions(for: first.recipe.id).first, second.revision)
+    assertAuthorityCounts(container: container, saves: 2, selections: 2, revisions: 2)
+    XCTAssertTrue(
+      try ModelContext(container).fetch(FetchDescriptor<RecipeDeletionResolutionRecord>()).isEmpty
+    )
+  }
+
   func testConflictingSaveOrSelectionIdentityIsRejectedWithoutMutation() throws {
     let container = try KitchenMemorySchema.makeContainer(inMemory: true)
     let repository = SwiftDataRecipeRepository(modelContainer: container)

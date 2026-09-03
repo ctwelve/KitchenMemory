@@ -396,7 +396,6 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     if selections.isEmpty {
       context.insert(selectionRecord(for: command, encoded: encoded))
     }
-    try resolveDeletions(for: command.recipe.id)
   }
 
   private func backfillLegacyAuthority(in kitchenID: Kitchen.ID) throws {
@@ -739,19 +738,6 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
       )
     )
     return Set(deletions.map(\.id)).subtracting(resolutions.map(\.deletionID))
-  }
-
-  private func resolveDeletions(for recipeID: Recipe.ID) throws {
-    let identifier = recipeID.rawValue
-    for deletionID in try activeDeletionIDs(for: recipeID) {
-      context.insert(
-        RecipeDeletionResolutionRecord(
-          id: UUID(),
-          deletionID: deletionID,
-          recipeID: identifier
-        )
-      )
-    }
   }
 
   private func validateOwnership(of recipe: Recipe) throws {
