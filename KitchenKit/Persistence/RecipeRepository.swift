@@ -192,6 +192,11 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     recipeIDs.formUnion(try context.fetch(
       FetchDescriptor<RecipePruneRecord>(predicate: #Predicate { $0.kitchenID == kitchenIdentifier })
     ).map(\.recipeID))
+    recipeIDs.formUnion(try context.fetch(
+      FetchDescriptor<RecipeDeletionResolutionRecord>(
+        predicate: #Predicate { $0.kitchenID == kitchenIdentifier }
+      )
+    ).map(\.recipeID))
 
     for revision in try context.fetch(FetchDescriptor<RecipeRevisionRecord>())
     where recipeIDs.contains(revision.recipeID) {
