@@ -255,26 +255,48 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     let recipeRecords = try context.fetch(
       FetchDescriptor<RecipeRecord>(predicate: #Predicate { $0.id == recipeID })
     )
-    let saveRecords = try context.fetch(
+    let scopedSaveRecords = try context.fetch(
       FetchDescriptor<RecipeSaveRecord>(predicate: #Predicate { $0.recipeID == recipeID })
     )
-    let pruneRecords = try context.fetch(
+    let saveIDs = Set(scopedSaveRecords.map(\.id))
+    let saveRecords = try context.fetch(FetchDescriptor<RecipeSaveRecord>())
+      .filter { saveIDs.contains($0.id) }
+    let scopedPruneRecords = try context.fetch(
       FetchDescriptor<RecipePruneRecord>(predicate: #Predicate { $0.recipeID == recipeID })
     )
-    let selectionRecords = try context.fetch(
+    let pruneIDs = Set(scopedPruneRecords.map(\.id))
+    let pruneRecords = try context.fetch(FetchDescriptor<RecipePruneRecord>())
+      .filter { pruneIDs.contains($0.id) }
+    let scopedSelectionRecords = try context.fetch(
       FetchDescriptor<RecipeSelectionRecord>(predicate: #Predicate { $0.recipeID == recipeID })
     )
-    let revisionRecords = try context.fetch(
+    let selectionIDs = Set(scopedSelectionRecords.map(\.id))
+    let selectionRecords = try context.fetch(FetchDescriptor<RecipeSelectionRecord>())
+      .filter { selectionIDs.contains($0.id) }
+    let scopedRevisionRecords = try context.fetch(
       FetchDescriptor<RecipeRevisionRecord>(predicate: #Predicate { $0.recipeID == recipeID })
     )
-    let deletionRecords = try context.fetch(
+    var revisionIDs = Set(scopedRevisionRecords.map(\.id))
+    revisionIDs.formUnion(scopedSaveRecords.map(\.revisionID))
+    revisionIDs.formUnion(scopedSelectionRecords.map(\.selectedRevisionID))
+    let revisionRecords = try context.fetch(FetchDescriptor<RecipeRevisionRecord>())
+      .filter { revisionIDs.contains($0.id) }
+    let scopedDeletionRecords = try context.fetch(
       FetchDescriptor<RecipeDeletionRecord>(predicate: #Predicate { $0.recipeID == recipeID })
     )
-    let restorationRecords = try context.fetch(
+    let scopedRestorationRecords = try context.fetch(
       FetchDescriptor<RecipeDeletionResolutionRecord>(
         predicate: #Predicate { $0.recipeID == recipeID }
       )
     )
+    var deletionIDs = Set(scopedDeletionRecords.map(\.id))
+    deletionIDs.formUnion(scopedRestorationRecords.map(\.deletionID))
+    let deletionRecords = try context.fetch(FetchDescriptor<RecipeDeletionRecord>())
+      .filter { deletionIDs.contains($0.id) }
+    let restorationIDs = Set(scopedRestorationRecords.map(\.id))
+    let restorationRecords = try context.fetch(
+      FetchDescriptor<RecipeDeletionResolutionRecord>()
+    ).filter { restorationIDs.contains($0.id) }
     let kitchenIdentifiers = recipeRecords.map(\.kitchenID)
       + saveRecords.map(\.kitchenID)
       + selectionRecords.map(\.kitchenID)
