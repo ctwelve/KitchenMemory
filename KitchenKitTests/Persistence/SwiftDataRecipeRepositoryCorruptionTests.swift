@@ -24,7 +24,7 @@ final class SwiftDataRecipeRepositoryCorruptionTests: XCTestCase {
     }
   }
 
-  func testAuthorityRevisionMovedToAnotherRecipeIsReportedAsMissing() throws {
+  func testAuthorityRevisionMovedToAnotherRecipeRequiresRecovery() throws {
     let fixture = try makeFixture()
     let context = ModelContext(fixture.container)
     let revision = try XCTUnwrap(context.fetch(FetchDescriptor<RecipeRevisionRecord>()).first)
@@ -32,7 +32,10 @@ final class SwiftDataRecipeRepositoryCorruptionTests: XCTestCase {
     try context.save()
 
     XCTAssertThrowsError(try fixture.reader().recipe(id: fixture.recipeID)) { error in
-      XCTAssertEqual(error as? KitchenMemoryPersistenceError, .missingCurrentRevision)
+      XCTAssertEqual(
+        error as? KitchenMemoryPersistenceError,
+        .invalidStoredValue(field: "recipe.authority")
+      )
     }
   }
 
