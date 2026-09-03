@@ -123,6 +123,22 @@ final class SwiftDataKitchenResetRepositoryTests: XCTestCase {
       frontierFormatVersion: frontier.formatVersion, frontierData: frontier.data,
       frontierDigest: frontier.digest
     ))
+    let staleForeignKitchenID = UUID()
+    let foreignDeletionID = UUID()
+    context.insert(RecipeDeletionRecord(
+      id: foreignDeletionID, recipeID: recipe.id.rawValue,
+      kitchenID: staleForeignKitchenID, deletedAt: Date()
+    ))
+    context.insert(RecipeDeletionResolutionRecord(
+      id: UUID(), deletionID: foreignDeletionID, recipeID: recipe.id.rawValue,
+      kitchenID: staleForeignKitchenID, restoredAt: Date()
+    ))
+    context.insert(RecipePruneRecord(
+      id: UUID(), kitchenID: staleForeignKitchenID, recipeID: recipe.id.rawValue,
+      prunedAt: Date(), antiResurrectionUntil: Date().addingTimeInterval(1),
+      frontierFormatVersion: frontier.formatVersion, frontierData: frontier.data,
+      frontierDigest: frontier.digest
+    ))
   }
 
   private func assertAuthorityRemoved(
