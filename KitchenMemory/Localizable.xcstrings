@@ -145,6 +145,30 @@
         }
       }
     },
+    "recipe.import.document.hint": {
+      "comment": "Hint below the local document import button. Choosing a file opens the file picker and does not require a webpage URL. Use device-neutral wording for Mac, iPhone, and iPad.",
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Have an HTML or JSON-LD file? Choose it here—no URL needed."
+          }
+        },
+        "es-MX": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Tienes un archivo HTML o JSON-LD? Selecciónalo aquí; no necesitas una URL."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vous avez un fichier HTML ou JSON-LD? Sélectionnez-le ici, sans URL."
+          }
+        }
+      }
+    },
     "recipe.import.accept-draft": {
       "comment": "Accept a staged Import Candidate into editing; does not save a shared Recipe.",
       "extractionState": "manual",
