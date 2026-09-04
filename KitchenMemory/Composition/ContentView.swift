@@ -324,42 +324,34 @@ private extension ContentView {
       sessionModel: dependencies.sessionModel,
       locale: locale,
       showSessionHistory: {
-        dependencies.libraryModel.isShowingDrafts = false
-        dependencies.libraryModel.closeEditor()
-        dependencies.libraryModel.selectedRecipeID = nil
-        dependencies.sessionModel.showSessionHistory()
-        focusSelectedDestination()
+        navigate(in: dependencies, to: dependencies.sessionModel.showSessionHistory)
       },
       showDeletedItems: {
-        dependencies.libraryModel.isShowingDrafts = false
-        dependencies.libraryModel.closeEditor()
-        dependencies.libraryModel.selectedRecipeID = nil
-        dependencies.sessionModel.showDeletedItems()
-        focusSelectedDestination()
+        navigate(in: dependencies, to: dependencies.sessionModel.showDeletedItems)
       },
       showRecovery: {
-        dependencies.libraryModel.isShowingDrafts = false
-        dependencies.libraryModel.closeEditor()
-        dependencies.libraryModel.selectedRecipeID = nil
-        dependencies.sessionModel.showRecovery()
-        focusSelectedDestination()
+        navigate(in: dependencies, to: dependencies.sessionModel.showRecovery)
       },
       showDrafts: {
-        dependencies.libraryModel.closeEditor()
-        dependencies.libraryModel.selectedRecipeID = nil
-        dependencies.sessionModel.leaveCurrentSession()
-        dependencies.sessionModel.showRecipes()
-        dependencies.libraryModel.isShowingDrafts = true
-        focusSelectedDestination()
+        navigate(in: dependencies) {
+          dependencies.sessionModel.leaveCurrentSession()
+          dependencies.sessionModel.showRecipes()
+          dependencies.libraryModel.isShowingDrafts = true
+        }
       },
       selectSession: { sessionID in
-        dependencies.libraryModel.isShowingDrafts = false
-        dependencies.libraryModel.closeEditor()
-        if dependencies.sessionModel.selectSession(sessionID) {
-          focusSelectedDestination()
+        navigate(in: dependencies) {
+          _ = dependencies.sessionModel.selectSession(sessionID)
         }
       }
     )
+  }
+
+  func navigate(in dependencies: PreparedApp, to destination: () -> Void) {
+    guard dependencies.libraryModel.prepareForLibraryNavigation() else { return }
+    dependencies.libraryModel.selectedRecipeID = nil
+    destination()
+    focusSelectedDestination()
   }
 
   func focusSelectedDestination() {

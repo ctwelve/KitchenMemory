@@ -76,6 +76,8 @@ final class RecipeDraftRelaunchTests: XCTestCase {
     XCTAssertTrue(model.editingStorageFailed)
     model.closeEditor()
     XCTAssertNotNil(model.editor)
+    XCTAssertFalse(model.selectRecipeForReading(model.recipes.first?.id))
+    XCTAssertNotNil(model.editor)
     XCTAssertFalse(model.saveEditor())
     XCTAssertEqual(try app.recipeRepository.recipes(in: kitchenID(app)).count, initialCount)
     store.refusesWrites = false

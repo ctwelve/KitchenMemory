@@ -71,6 +71,23 @@ extension RecipeLibraryModel {
     if persistEditingDrafts() { editor = nil }
   }
 
+  @discardableResult
+  func prepareForLibraryNavigation() -> Bool {
+    if editor != nil {
+      closeEditor()
+      guard editor == nil else { return false }
+    }
+    isShowingDrafts = false
+    return true
+  }
+
+  @discardableResult
+  func selectRecipeForReading(_ id: Recipe.ID?) -> Bool {
+    guard prepareForLibraryNavigation() else { return false }
+    selectedRecipeID = id
+    return true
+  }
+
   func resumeEditingDraft(_ id: UUID) {
     editor = authoringItems.first { $0.id == id }
   }

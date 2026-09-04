@@ -16,7 +16,7 @@ struct RecipeLibrarySidebar: View {
   let selectSession: (CookingSession.ID) -> Void
 
   var body: some View {
-    List(selection: $model.selectedRecipeID) {
+    List(selection: recipeSelection) {
       sessionSection
       recipeSection
     }
@@ -34,6 +34,15 @@ struct RecipeLibrarySidebar: View {
     .overlay {
       if !model.hasLoaded { ProgressView(.libraryLoading) }
     }
+  }
+
+  private var recipeSelection: Binding<Recipe.ID?> {
+    Binding(get: { model.selectedRecipeID }, set: { id in
+      if model.selectRecipeForReading(id) {
+        sessionModel.leaveCurrentSession()
+        sessionModel.showRecipes()
+      }
+    })
   }
 
   private var sessionSection: some View {
