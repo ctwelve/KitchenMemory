@@ -9,6 +9,40 @@ import XCTest
 @MainActor
 final class LibraryCommandActionsTests: XCTestCase {
 #if os(macOS)
+  func testNewRecipeMenuOpensAnEditorWithoutAWindowAndPreservesExistingDraft() throws {
+    let app = try AppRuntime.testing()
+    app.libraryModel.loadIfNeeded()
+    let savedRecipeCount = app.libraryModel.recipes.count
+    var openedWindows = 0
+    let actions = try XCTUnwrap(RecipeLibraryCommands.resolveNewRecipeActions(
+      app: app, focused: nil, libraryWindowPresent: false, openLibrary: { openedWindows += 1 }
+    ))
+    XCTAssertTrue(actions.perform(.newRecipe))
+    XCTAssertEqual(openedWindows, 1)
+    let firstDraft = try XCTUnwrap(app.libraryModel.editor)
+    firstDraft.session.title = "Keep this draft"
+    XCTAssertTrue(actions.perform(.newRecipe))
+    XCTAssertEqual(openedWindows, 2)
+    XCTAssertNotEqual(app.libraryModel.editor?.id, firstDraft.id)
+    XCTAssertTrue(app.libraryModel.editingDrafts.contains { $0.id == firstDraft.id })
+    XCTAssertEqual(app.libraryModel.recipes.count, savedRecipeCount)
+    let focused = RecipeLibraryCommands.resolveNewRecipeActions(
+      app: app, focused: LibraryCommandActions(library: app.libraryModel, sessions: app.sessionModel),
+      libraryWindowPresent: true, openLibrary: { openedWindows += 1 }
+    )
+    XCTAssertTrue(try XCTUnwrap(focused).perform(.newRecipe))
+    XCTAssertEqual(openedWindows, 2)
+    XCTAssertNil(RecipeLibraryCommands.resolveNewRecipeActions(
+      app: app, focused: nil, libraryWindowPresent: true, openLibrary: { openedWindows += 1 }
+    ))
+    XCTAssertNil(RecipeLibraryCommands.resolveNewRecipeActions(
+      app: nil, focused: nil, libraryWindowPresent: false, openLibrary: { openedWindows += 1 }
+    ))
+    app.libraryModel.editor?.confirmsDiscard = true
+    XCTAssertFalse(actions.perform(.newRecipe))
+    XCTAssertEqual(openedWindows, 2)
+  }
+
   func testImportMenuWorksWithoutAWindowButDoesNotBypassBlockedWindowActions() throws {
     let app = try AppRuntime.testing()
     app.libraryModel.loadIfNeeded()

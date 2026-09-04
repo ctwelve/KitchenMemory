@@ -20,6 +20,7 @@ struct RecipeEquipmentEditorView: View {
           isFirst: index == 0, isLast: index == items.count - 1
         )
         .id(items[index].id)
+        .modifier(EditorGroupSurface(index: index))
       }
       Button(.recipeEditorEquipmentAdd, systemImage: "plus") {
         items.append(EquipmentItem(originalText: "", name: ""))

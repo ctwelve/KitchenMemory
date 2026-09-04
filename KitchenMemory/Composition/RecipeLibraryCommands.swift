@@ -23,7 +23,9 @@ struct RecipeLibraryCommands: Commands {
       .keyboardShortcut("n", modifiers: [.command, .shift])
     }
     CommandGroup(replacing: .newItem) {
-      action(.libraryActionNewRecipe, .newRecipe).keyboardShortcut("n")
+      Button(.libraryActionNewRecipe) { newRecipeActions?.perform(.newRecipe) }
+        .disabled(newRecipeActions?.canPerform(.newRecipe) != true)
+        .keyboardShortcut("n")
       Button(.libraryActionImportRecipe) { importActions?.perform(.importRecipe) }
         .disabled(importActions?.canPerform(.importRecipe) != true)
         .keyboardShortcut("i", modifiers: [.command, .shift])
@@ -48,6 +50,23 @@ struct RecipeLibraryCommands: Commands {
   private var importActions: LibraryCommandActions? {
     Self.resolveImportActions(app: app, focused: actions, libraryWindowPresent: libraryWindowPresent == true) {
       openWindow(id: Self.importWindowID)
+    }
+  }
+
+  private var newRecipeActions: LibraryCommandActions? {
+    Self.resolveNewRecipeActions(app: app, focused: actions, libraryWindowPresent: libraryWindowPresent == true) {
+      openWindow(id: Self.windowID)
+    }
+  }
+
+  static func resolveNewRecipeActions(
+    app: PreparedApp?, focused: LibraryCommandActions?, libraryWindowPresent: Bool,
+    openLibrary: @escaping () -> Void
+  ) -> LibraryCommandActions? {
+    if libraryWindowPresent { return focused }
+    return app.map {
+      LibraryCommandActions(library: $0.libraryModel, sessions: $0.sessionModel,
+                            focusDestination: openLibrary)
     }
   }
 

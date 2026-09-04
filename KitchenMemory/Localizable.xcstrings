@@ -1554,23 +1554,23 @@
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nueva receta"
+            "value" : "Nueva receta…"
           }
         },
         "fr-CA" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nouvelle recette"
+            "value" : "Nouvelle recette…"
           }
         },
         "en-US" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "New Recipe"
+            "value" : "New Recipe…"
           }
         }
       },
-      "comment" : "Toolbar action that starts creating a recipe.",
+      "comment" : "Toolbar and menu action that opens the recipe editor for further input before saving a recipe.",
       "extractionState" : "manual"
     },
     "library.action.import-recipe" : {
