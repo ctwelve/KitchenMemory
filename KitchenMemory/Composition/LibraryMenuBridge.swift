@@ -11,6 +11,7 @@ struct LibraryMenuBridge: ViewModifier {
   func body(content: Content) -> some View {
 #if os(macOS)
     content.focusedSceneValue(\.libraryCommandActions, isAvailable ? actions : nil)
+      .focusedSceneValue(\.libraryWindowPresent, true)
 #else
     content
 #endif
@@ -22,7 +23,16 @@ private struct LibraryCommandActionsKey: FocusedValueKey {
   typealias Value = LibraryCommandActions
 }
 
+private struct LibraryWindowPresentKey: FocusedValueKey {
+  typealias Value = Bool
+}
+
 extension FocusedValues {
+  var libraryWindowPresent: Bool? {
+    get { self[LibraryWindowPresentKey.self] }
+    set { self[LibraryWindowPresentKey.self] = newValue }
+  }
+
   var libraryCommandActions: LibraryCommandActions? {
     get { self[LibraryCommandActionsKey.self] }
     set { self[LibraryCommandActionsKey.self] = newValue }

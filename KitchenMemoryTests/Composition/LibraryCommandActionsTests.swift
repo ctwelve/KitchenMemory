@@ -8,6 +8,39 @@ import XCTest
 
 @MainActor
 final class LibraryCommandActionsTests: XCTestCase {
+#if os(macOS)
+  func testImportMenuWorksWithoutAWindowButDoesNotBypassBlockedWindowActions() throws {
+    let app = try AppRuntime.testing()
+    app.libraryModel.loadIfNeeded()
+    var appDialogCount = 0
+    var windowDialogCount = 0
+    let fallback = RecipeLibraryCommands.resolveImportActions(
+      app: app, focused: nil, libraryWindowPresent: false, openImport: { appDialogCount += 1 }
+    )
+    XCTAssertTrue(try XCTUnwrap(fallback).perform(.importRecipe))
+    XCTAssertEqual(appDialogCount, 1)
+    let focused = LibraryCommandActions(
+      library: app.libraryModel, sessions: app.sessionModel, openImport: { windowDialogCount += 1 }
+    )
+    let routed = RecipeLibraryCommands.resolveImportActions(
+      app: app, focused: focused, libraryWindowPresent: true, openImport: { appDialogCount += 1 }
+    )
+    XCTAssertTrue(try XCTUnwrap(routed).perform(.importRecipe))
+    XCTAssertEqual(windowDialogCount, 1)
+    XCTAssertEqual(appDialogCount, 1)
+    XCTAssertNil(RecipeLibraryCommands.resolveImportActions(
+      app: app, focused: nil, libraryWindowPresent: true, openImport: { appDialogCount += 1 }
+    ))
+    XCTAssertNil(RecipeLibraryCommands.resolveImportActions(
+      app: nil, focused: nil, libraryWindowPresent: false, openImport: { appDialogCount += 1 }
+    ))
+    XCTAssertTrue(focused.perform(.newRecipe))
+    app.libraryModel.editor?.confirmsDiscard = true
+    XCTAssertFalse(try XCTUnwrap(fallback).perform(.importRecipe))
+    XCTAssertEqual(appDialogCount, 1)
+  }
+#endif
+
   func testNavigationRetainsDraftAndCandidateCannotPublishFromSaveCommand() throws {
     let app = try AppRuntime.testing()
     let actions = LibraryCommandActions(library: app.libraryModel, sessions: app.sessionModel)

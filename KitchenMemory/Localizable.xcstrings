@@ -145,6 +145,30 @@
         }
       }
     },
+    "menu.window.new-library": {
+      "comment": "macOS Window menu command that opens a new recipe library window, including when all library windows are closed.",
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "New Recipe Library Window"
+          }
+        },
+        "es-MX": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nueva ventana de la biblioteca de recetas"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nouvelle fenêtre de la bibliothèque de recettes"
+          }
+        }
+      }
+    },
     "recipe.import.document.hint": {
       "comment": "Hint below the local document import button. Choosing a file opens the file picker and does not require a webpage URL. Use device-neutral wording for Mac, iPhone, and iPad.",
       "extractionState": "manual",
@@ -1554,23 +1578,23 @@
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Importar receta"
+            "value" : "Importar receta…"
           }
         },
         "fr-CA" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Importer une recette"
+            "value" : "Importer une recette…"
           }
         },
         "en-US" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Import Recipe"
+            "value" : "Import Recipe…"
           }
         }
       },
-      "comment" : "Toolbar action that starts importing a recipe from the web.",
+      "comment" : "Toolbar and menu action that opens the recipe import dialog for a webpage or local file. The ellipsis indicates further input is required.",
       "extractionState" : "manual"
     },
     "settings.title" : {
