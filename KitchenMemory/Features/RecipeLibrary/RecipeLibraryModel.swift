@@ -187,15 +187,17 @@ final class RecipeLibraryModel {
   @discardableResult
   func resetKitchen() -> Bool {
     do {
-      try library.reset()
       // Only this explicitly confirmed destructive action may replace a document
       // that could not be decoded. Ordinary autosave never does so.
+      // Purge local authoring first: a failed file write must leave shared data
+      // untouched, and a later shared-reset failure must not resurrect old drafts.
       try editingStore.save([])
       authoringItems = []
       editingStorageIsAvailable = true
       editingStorageFailed = false
       editor = nil
       isShowingDrafts = false
+      try library.reset()
       resetPresentationState()
       samplePreferences.sampleRecipeOnboardingResponse = .accepted
       sampleOnboardingResponse = .accepted
