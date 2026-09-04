@@ -39,6 +39,7 @@ public struct RecipeEditSession: Codable, Equatable, Sendable {
   public var sourceAuthor: String
   public var sourcePublisher: String
   public var sourceURL: String
+  public var equipment: [EquipmentItem]?
   public var ingredientSections: [IngredientSection]
   public var instructionSections: [InstructionSection]
 
@@ -61,6 +62,7 @@ public struct RecipeEditSession: Codable, Equatable, Sendable {
     sourceAuthor = draft.source?.authorName ?? ""
     sourcePublisher = draft.source?.publisherName ?? ""
     sourceURL = draft.source?.canonicalURL?.absoluteString ?? ""
+    equipment = draft.equipment
     ingredientSections = draft.ingredientSections
     instructionSections = draft.instructionSections
     preservedSourceCapture = draft.sourceCapture
@@ -101,6 +103,7 @@ public struct RecipeEditSession: Codable, Equatable, Sendable {
       cuisines: preservedCuisines,
       categories: preservedCategories,
       keywords: preservedKeywords,
+      equipment: equipment,
       ingredientSections: ingredientSections,
       instructionSections: instructionSections
     )
@@ -108,6 +111,12 @@ public struct RecipeEditSession: Codable, Equatable, Sendable {
 
   public mutating func moveIngredientSection(at index: Int, by offset: Int) {
     moveElement(in: &ingredientSections, at: index, by: offset)
+  }
+
+  public mutating func moveEquipment(at index: Int, by offset: Int) {
+    guard var items = equipment else { return }
+    moveElement(in: &items, at: index, by: offset)
+    equipment = items
   }
 
   public mutating func moveInstructionSection(at index: Int, by offset: Int) {

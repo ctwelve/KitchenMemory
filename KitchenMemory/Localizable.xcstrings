@@ -1,6 +1,102 @@
 {
   "sourceLanguage" : "en-US",
   "strings" : {
+    "recipe.editor.equipment.add": {
+      "comment": "Adds a blank Equipment item to the local Recipe draft.",
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add Equipment"
+          }
+        },
+        "es-MX": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Agregar equipo"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajouter de l’équipement"
+          }
+        }
+      }
+    },
+    "recipe.editor.equipment.untitled": {
+      "comment": "Fallback title for an empty Equipment item.",
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Equipment Item"
+          }
+        },
+        "es-MX": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elemento de equipo"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Article d’équipement"
+          }
+        }
+      }
+    },
+    "recipe.editor.equipment.wording": {
+      "comment": "Editable original Equipment wording; incomplete human text is valid.",
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Original Wording"
+          }
+        },
+        "es-MX": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Texto original"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Texte d’origine"
+          }
+        }
+      }
+    },
+    "recipe.editor.equipment.name": {
+      "comment": "Optional structured Equipment name, separate from original wording.",
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Equipment Name"
+          }
+        },
+        "es-MX": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nombre del equipo"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nom de l’équipement"
+          }
+        }
+      }
+    },
     "recipe.import.document.action": {
       "comment": "Choose a local HTML or JSON-LD document for staged recipe import.",
       "extractionState": "manual",

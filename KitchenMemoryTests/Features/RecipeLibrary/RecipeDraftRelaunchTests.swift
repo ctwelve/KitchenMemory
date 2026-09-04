@@ -35,11 +35,13 @@ final class RecipeDraftRelaunchTests: XCTestCase {
     model.beginEditing(recipe)
     let draft = try XCTUnwrap(model.editor)
     draft.session.summary = "Retained change"
+    draft.session.equipment = [EquipmentItem(originalText: "the old skillet", name: "")]
     model.closeEditor()
     let relaunched = try library(app, store: store)
     relaunched.beginEditing(recipe)
     XCTAssertEqual(relaunched.editor?.id, draft.id)
     XCTAssertEqual(relaunched.editor?.session.summary, "Retained change")
+    XCTAssertEqual(relaunched.editor?.session.equipment, draft.session.equipment)
     XCTAssertEqual(relaunched.editingDrafts.count, 1)
     relaunched.discardEditor(confirmed: true)
     XCTAssertTrue(try store.load().isEmpty)
@@ -53,6 +55,7 @@ final class RecipeDraftRelaunchTests: XCTestCase {
     model.beginEditing()
     store.refusesWrites = true
     model.editor?.session.title = "Still only local"
+    model.editor?.session.equipment = [EquipmentItem(originalText: "a broad pan", name: "")]
     XCTAssertTrue(model.editingStorageFailed)
     model.closeEditor()
     XCTAssertNotNil(model.editor)
@@ -60,6 +63,8 @@ final class RecipeDraftRelaunchTests: XCTestCase {
     XCTAssertEqual(try app.recipeRepository.recipes(in: kitchenID(app)).count, initialCount)
     store.refusesWrites = false
     XCTAssertTrue(model.saveEditor())
+    XCTAssertEqual(model.recipes.first { $0.revision.title == "Still only local" }?
+      .revision.equipment.first?.originalText, "a broad pan")
     XCTAssertFalse(model.editingStorageFailed)
     XCTAssertTrue(try store.load().isEmpty)
   }
@@ -124,6 +129,7 @@ final class RecipeDraftRelaunchTests: XCTestCase {
     first.session.title = "Soup in progress"
     first.session.prepMinutes = "half an hour?"
     first.session.sourceURL = "unfinished link"
+    first.session.equipment = [EquipmentItem(originalText: "some kind of strainer", name: "")]
     model.closeEditor()
     model.beginEditing()
     let second = try XCTUnwrap(model.editor)
