@@ -19,14 +19,23 @@ struct KitchenMemoryApp: App {
 
   var body: some Scene {
 #if os(macOS)
-    WindowGroup {
+    WindowGroup(id: RecipeLibraryCommands.windowID) {
       applicationContent
     }
     .commands {
       SidebarCommands()
-      RecipeLibraryCommands()
-      KitchenCommands()
+      RecipeLibraryCommands(app: startup.state.preparedApp)
+      KitchenCommands(model: startup.state.preparedApp?.libraryModel)
     }
+
+    Window(Text(.recipeImportTitle), id: RecipeLibraryCommands.importWindowID) {
+      if let app = startup.state.preparedApp {
+        RecipeImportWindow(model: app.libraryModel)
+      }
+    }
+    .defaultLaunchBehavior(.suppressed)
+    .restorationBehavior(.disabled)
+    .commandsRemoved()
 
     Settings {
       settingsContent
