@@ -108,6 +108,9 @@ struct RecipeURLImportView: View {
         showsDocumentPicker = true
       }
       .disabled(session.isLoading)
+      Text(.recipeImportDocumentHint)
+        .font(.footnote)
+        .foregroundStyle(.secondary)
     }
   }
 
