@@ -4351,19 +4351,19 @@
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Revisa el texto y la estructura importados antes de guardar. La revisión y el guardado no vuelven a contactar el origen. Al guardar se conservan localmente la URL final y los metadatos JSON-LD limitados, incluso los campos que no se muestran aquí."
+            "value" : "Revisa el texto y la estructura importados antes de aceptar el borrador. La revisión y el guardado no vuelven a contactar el origen. La referencia de origen y los metadatos JSON-LD limitados, incluso los campos no mostrados aquí, ya se conservan solo en este dispositivo. Guardar revisión los agrega a la cocina y permite su sincronización."
           }
         },
         "fr-CA" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vérifiez le libellé et la structure importés avant d’enregistrer. La révision et l’enregistrement ne contactent pas de nouveau la source. L’enregistrement conserve localement l’URL finale et les métadonnées JSON-LD limitées, y compris les champs non affichés ici."
+            "value" : "Vérifiez le libellé et la structure importés avant d’accepter le brouillon. La révision et l’enregistrement ne contactent pas de nouveau la source. La référence source et les métadonnées JSON-LD limitées, y compris les champs non affichés ici, sont déjà conservées uniquement sur cet appareil. Enregistrer la révision les ajoute à la cuisine et permet leur synchronisation."
           }
         },
         "en-US" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Check the imported wording and structure before saving. Review and save do not contact the source again. Saving keeps the final source URL and bounded JSON-LD metadata locally, including fields not shown here."
+            "value" : "Check the imported wording and structure before accepting the draft. Review and save do not contact the source again. The source reference and bounded JSON-LD metadata, including fields not shown here, are already retained only on this device. Save Revision adds them to the kitchen, where they can synchronize."
           }
         }
       },
@@ -7111,23 +7111,23 @@
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Si guardas una receta, Memoria de cocina conserva localmente la URL final de origen y un bloque limitado de metadatos JSON-LD de la receta, incluso los campos de origen que no se muestran en el editor de revisión."
+            "value" : "Al importar, Memoria de cocina conserva inmediatamente la referencia de origen y un bloque limitado de metadatos JSON-LD, incluso los campos no mostrados en la revisión. Los candidatos y borradores permanecen solo en este dispositivo hasta que guardes una revisión en la cocina. Los documentos locales se leen sin acceso a la red."
           }
         },
         "fr-CA" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Si vous enregistrez une recette, Mémoire de cuisine conserve localement l’URL source finale et un bloc limité de métadonnées JSON-LD de la recette, y compris les champs sources non affichés dans l’éditeur de révision."
+            "value" : "Lors de l’importation, Mémoire de cuisine conserve immédiatement la référence source et un bloc limité de métadonnées JSON-LD, y compris les champs non affichés dans la révision. Les candidats et brouillons restent uniquement sur cet appareil jusqu’à l’enregistrement d’une révision dans la cuisine. Les documents locaux sont lus sans accès au réseau."
           }
         },
         "en-US" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "If you save a recipe, Kitchen Memory keeps the final source URL and one bounded JSON-LD recipe-metadata block locally, including source fields not shown in the review editor."
+            "value" : "Importing immediately retains the source reference and one bounded JSON-LD metadata block in Kitchen Memory, including fields not shown in review. Candidates and drafts stay only on this device until you save a revision into the kitchen. Local documents are read without network access."
           }
         }
       },
-      "comment" : "Privacy explanation of source data retained only after saving an imported recipe.",
+      "comment" : "Privacy explanation of immediate device-local staging and the explicit Save Revision synchronization boundary.",
       "extractionState" : "manual"
     },
     "recipe.import.candidate.untitled" : {
