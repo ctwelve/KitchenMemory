@@ -120,6 +120,26 @@ final class RecipeDraftRelaunchTests: XCTestCase {
     XCTAssertTrue(try store.load().isEmpty)
   }
 
+  func testFailedLocalPurgeLeavesSharedKitchenUntouchedUntilResetRetry() throws {
+    let app = try AppRuntime.testing()
+    let store = FailingRecipeEditingStore()
+    let model = try library(app, store: store)
+    let custom = try RecipeEditor(repository: app.recipeRepository).create(
+      in: kitchenID(app), from: RecipeDraft(title: "Must remain if reset cannot start")
+    )
+    model.reload()
+    model.beginEditing(custom)
+    model.editor?.session.title = "Unsaved change"
+    store.refusesWrites = true
+    XCTAssertFalse(model.resetKitchen())
+    XCTAssertNotNil(try app.recipeRepository.recipe(id: custom.id))
+    XCTAssertEqual(model.editor?.session.title, "Unsaved change")
+    store.refusesWrites = false
+    XCTAssertTrue(model.resetKitchen())
+    XCTAssertNil(try app.recipeRepository.recipe(id: custom.id))
+    XCTAssertTrue(try store.load().isEmpty)
+  }
+
   func testRelaunchRetriesCommittedSaveAfterDraftCleanupFailureWithoutDuplicatingRecipe() throws {
     let app = try AppRuntime.testing()
     let store = FailingRecipeEditingStore()
