@@ -1,6 +1,30 @@
 {
   "sourceLanguage" : "en-US",
   "strings" : {
+    "menu.recipe.title": {
+      "comment": "macOS menu containing actions for the currently selected Recipe.",
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recipe"
+          }
+        },
+        "es-MX": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Receta"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recette"
+          }
+        }
+      }
+    },
     "recipe.editor.equipment.add": {
       "comment": "Adds a blank Equipment item to the local Recipe draft.",
       "extractionState": "manual",

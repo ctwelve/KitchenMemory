@@ -74,6 +74,9 @@ struct ContentView: View {
       }
     }
     .modifier(RecipeDraftFailureAlert(model: preparedApp?.libraryModel))
+    .modifier(LibraryMenuBridge(
+      actions: libraryActions, isAvailable: activeSheet == nil && !isShowingResetConfirmation
+    ))
   }
 
   private var shellPresentation: AppShellPresentation {
@@ -160,7 +163,6 @@ struct ContentView: View {
       }
     }
 #if os(macOS)
-    .toolbar(removing: .sidebarToggle)
     .toolbar { libraryToolbar }
 #endif
     .sheet(item: $activeSheet) { _ in
@@ -226,8 +228,7 @@ struct ContentView: View {
         } else {
           LibraryDetailRouter(
             libraryModel: dependencies.libraryModel,
-            sessionModel: dependencies.sessionModel,
-            editRecipe: { dependencies.libraryModel.beginEditing($0) }
+            sessionModel: dependencies.sessionModel
           )
         }
       }
@@ -247,8 +248,7 @@ struct ContentView: View {
       NavigationStack {
         LibraryDetailRouter(
           libraryModel: dependencies.libraryModel,
-          sessionModel: dependencies.sessionModel,
-          editRecipe: { dependencies.libraryModel.beginEditing($0) }
+          sessionModel: dependencies.sessionModel
         )
       }
     }
@@ -288,20 +288,19 @@ private extension ContentView {
   var libraryToolbar: some ToolbarContent {
     LibraryToolbar(
       showsKitchenActions: preparedApp != nil,
-      actionsAreAvailable: preparedApp.map(kitchenActionsAreAvailable) ?? false,
+      actions: libraryActions,
       showsSidebarToggle: usesCustomSidebarToggle,
       sidebarToggleTitle: sidebarToggleTitle,
-      sidebarTogglePlacement: sidebarTogglePlacement,
-      createRecipe: { preparedApp?.libraryModel.beginEditing() },
-      importRecipe: { activeSheet = .importURL },
       toggleSidebar: toggleSidebar,
       showSettings: showSettings
     )
   }
 
-  func kitchenActionsAreAvailable(in dependencies: PreparedApp) -> Bool {
-    shellPresentation.permitsKitchenActions
-      && dependencies.libraryModel.startupState == .ready
+  var libraryActions: LibraryCommandActions? {
+    preparedApp.map {
+      LibraryCommandActions(library: $0.libraryModel, sessions: $0.sessionModel,
+                            openImport: { activeSheet = .importURL }, focusDestination: focusSelectedDestination)
+    }
   }
 
   func recipeList(_ dependencies: PreparedApp) -> some View {
@@ -310,20 +309,16 @@ private extension ContentView {
       sessionModel: dependencies.sessionModel,
       locale: locale,
       showSessionHistory: {
-        navigate(in: dependencies, to: dependencies.sessionModel.showSessionHistory)
+        libraryActions?.perform(.sessions)
       },
       showDeletedItems: {
-        navigate(in: dependencies, to: dependencies.sessionModel.showDeletedItems)
+        libraryActions?.perform(.deletedItems)
       },
       showRecovery: {
-        navigate(in: dependencies, to: dependencies.sessionModel.showRecovery)
+        libraryActions?.perform(.recovery)
       },
       showDrafts: {
-        navigate(in: dependencies) {
-          dependencies.sessionModel.leaveCurrentSession()
-          dependencies.sessionModel.showRecipes()
-          dependencies.libraryModel.isShowingDrafts = true
-        }
+        libraryActions?.perform(.drafts)
       },
       selectSession: { sessionID in
         navigate(in: dependencies) {
@@ -367,7 +362,7 @@ private extension ContentView {
 #if os(iOS)
     horizontalSizeClass == .regular
 #else
-    true
+    false
 #endif
   }
 
@@ -375,14 +370,6 @@ private extension ContentView {
     columnVisibility == .detailOnly
       ? .librarySidebarActionShow
       : .librarySidebarActionHide
-  }
-
-  var sidebarTogglePlacement: ToolbarItemPlacement {
-#if os(macOS)
-    columnVisibility == .detailOnly ? .navigation : .primaryAction
-#else
-    .navigation
-#endif
   }
 
   func toggleSidebar() {

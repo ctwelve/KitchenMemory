@@ -49,6 +49,7 @@ struct RecipeURLImportView: View {
       .toolbar {
         ToolbarItem(placement: .cancellationAction) {
           Button(.actionCancel) { dismiss() }
+            .help(Text(.actionCancel))
         }
       }
       .onDisappear {

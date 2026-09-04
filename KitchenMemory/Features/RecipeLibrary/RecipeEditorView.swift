@@ -34,7 +34,6 @@ struct RecipeEditorView: View {
 
   @Environment(\.locale) private var locale
   @Bindable var editor: RecipeEditingModel
-  @State private var confirmsDiscard = false
 
   init(
     mode: Mode,
@@ -76,20 +75,24 @@ struct RecipeEditorView: View {
       .navigationBarTitleDisplayMode(.inline)
 #endif
       .toolbar {
-        ToolbarItem(placement: .cancellationAction) { Button(.recipeEditorActionClose, action: close) }
+        ToolbarItem(placement: .cancellationAction) {
+          Button(.recipeEditorActionClose, action: close).help(Text(.recipeEditorActionClose))
+        }
         ToolbarItem(placement: .destructiveAction) {
-          Button(.recipeEditorActionDiscard, role: .destructive) { confirmsDiscard = true }
+          Button(.recipeEditorActionDiscard, role: .destructive) { editor.confirmsDiscard = true }
+            .help(Text(.recipeEditorActionDiscard))
             .disabled(editor.pendingSave != nil)
         }
         ToolbarItem(placement: .confirmationAction) {
           Button(editor.isImportCandidate ? .recipeImportAcceptDraft : .recipeEditorReviseActionSave) {
             _ = save()
           }
-            .disabled(!editor.isImportCandidate && editor.pendingSave == nil && !editor.session.canSave)
+            .disabled(!editor.isImportCandidate && !editor.canSaveRevision)
             .accessibilityIdentifier("recipe-editor-save")
+            .help(Text(editor.isImportCandidate ? .recipeImportAcceptDraft : .recipeEditorReviseActionSave))
         }
       }
-      .confirmationDialog(.recipeEditorDiscardConfirmation, isPresented: $confirmsDiscard) {
+      .confirmationDialog(.recipeEditorDiscardConfirmation, isPresented: $editor.confirmsDiscard) {
         Button(.recipeEditorActionDiscard, role: .destructive, action: discard)
         Button(.actionCancel, role: .cancel) {}
       }
