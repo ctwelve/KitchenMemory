@@ -26,6 +26,8 @@ public struct RecipeDraft: Codable, Equatable, Sendable {
   public var cuisines: [String]
   public var categories: [String]
   public var keywords: [String]
+  /// Nil preserves Equipment for legacy callers; an explicit empty array removes it.
+  public var equipment: [EquipmentItem]?
   public var ingredientSections: [IngredientSection]
   public var instructionSections: [InstructionSection]
 
@@ -43,6 +45,7 @@ public struct RecipeDraft: Codable, Equatable, Sendable {
     cuisines: [String] = [],
     categories: [String] = [],
     keywords: [String] = [],
+    equipment: [EquipmentItem]? = nil,
     ingredientSections: [IngredientSection] = [],
     instructionSections: [InstructionSection] = []
   ) {
@@ -59,6 +62,7 @@ public struct RecipeDraft: Codable, Equatable, Sendable {
     self.cuisines = cuisines
     self.categories = categories
     self.keywords = keywords
+    self.equipment = equipment
     self.ingredientSections = ingredientSections
     self.instructionSections = instructionSections
   }
@@ -103,6 +107,7 @@ public struct RecipeDraft: Codable, Equatable, Sendable {
       cuisines: revision.cuisines,
       categories: revision.categories,
       keywords: revision.keywords,
+      equipment: revision.equipment,
       ingredientSections: revision.ingredientSections,
       instructionSections: revision.instructionSections
     )
@@ -249,7 +254,7 @@ public struct RecipeEditor {
       categories: draft.categories,
       keywords: draft.keywords,
       media: existing?.media ?? [],
-      equipment: existing?.equipment ?? [],
+      equipment: cleaned(draft.equipment ?? existing?.equipment ?? [], reidentify: existing != nil),
       // Section and child identifiers are local to one immutable revision.
       // Reusing them would make persistence queries for an older section pull
       // in rows from every later revision with the same section identifier.
@@ -261,6 +266,19 @@ public struct RecipeEditor {
   private func text(_ line: String) -> String? {
     let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
     return trimmed.isEmpty ? nil : trimmed
+  }
+
+  private func cleaned(_ items: [EquipmentItem], reidentify: Bool) -> [EquipmentItem] {
+    items.compactMap { item in
+      let original = text(item.originalText) ?? ""
+      let name = text(item.name) ?? ""
+      let quantity = cleaned(item.quantity)
+      guard !original.isEmpty || !name.isEmpty || quantity != nil else { return nil }
+      return EquipmentItem(
+        id: reidentify ? EquipmentItem.ID() : item.id,
+        originalText: original, quantity: quantity, name: name, isOptional: item.isOptional
+      )
+    }
   }
 
   private func optional(_ text: String?) -> String? {

@@ -31,6 +31,7 @@ final class RecipeEditingModel: Identifiable {
     original = record.original
     concerns = record.concerns
     session = record.session
+    if session.equipment == nil { session.equipment = original?.revision.equipment ?? [] }
     observedSelectionIDs = record.observedSelectionIDs
     pendingSave = record.pendingSave
     isImportCandidate = record.isImportCandidate ?? false
@@ -44,6 +45,7 @@ final class RecipeEditingModel: Identifiable {
     self.concerns = concerns
     session = RecipeEditSession(draft: draft ?? original.map { RecipeDraft(revision: $0.revision) }
       ?? RecipeDraft())
+    if session.equipment == nil { session.equipment = [] }
   }
 }
 
