@@ -18,9 +18,9 @@ struct RecipeLibrarySheetContent: View {
   var body: some View {
     RecipeURLImportView(
       load: { url in try await model.importRecipe(from: url) },
+      loadDocument: model.importDocument,
       select: {
-        model.beginImportReview($0)
-        close()
+        if model.beginImportReview($0) { close() }
       }
     )
   }
@@ -32,11 +32,13 @@ struct RecipeEditingDestination: View {
 
   var body: some View {
     RecipeEditorView(
-      mode: editor.original == nil ? (editor.concerns.isEmpty ? .create : .importReview) : .revise,
+      mode: editor.isImportCandidate ? .importReview : (editor.original == nil ? .create : .revise),
       editor: editor,
       close: model.closeEditor,
       discard: { model.discardEditor(confirmed: true) },
-      save: model.saveEditor
+      save: {
+        editor.isImportCandidate ? model.acceptImportCandidate(editor.id) : model.saveEditor()
+      }
     )
     .id(editor.id)
   }

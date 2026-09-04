@@ -31,7 +31,9 @@ final class RecipeLibraryModel {
   private(set) var recipes: [StoredRecipe] = []
   var selectedRecipeID: Recipe.ID?
   var editor: RecipeEditingModel?
-  var editingDrafts: [RecipeEditingModel] = []
+  var authoringItems: [RecipeEditingModel] = []
+  var editingDrafts: [RecipeEditingModel] { authoringItems.filter { !$0.isImportCandidate } }
+  var importCandidates: [RecipeEditingModel] { authoringItems.filter(\.isImportCandidate) }
   var isShowingDrafts = false
   private(set) var issue: RecipeLibraryIssue?
   private(set) var hasLoaded = false
@@ -176,17 +178,20 @@ final class RecipeLibraryModel {
   }
 
   func importRecipe(from url: URL) async throws -> [RecipeImportOption] {
-    try await library.importRecipe(from: url)
+    let options = try await library.importRecipe(from: url)
+    try Task.checkCancellation()
+    try stageImports(options)
+    return options
   }
 
   @discardableResult
   func resetKitchen() -> Bool {
     do {
       try library.reset()
-      let retainedDrafts = editingDrafts
-      editingDrafts = []
+      let retainedDrafts = authoringItems
+      authoringItems = []
       guard persistEditingDrafts() else {
-        editingDrafts = retainedDrafts
+        authoringItems = retainedDrafts
         issue = .reset
         return false
       }

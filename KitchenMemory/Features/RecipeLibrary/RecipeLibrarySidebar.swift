@@ -38,10 +38,10 @@ struct RecipeLibrarySidebar: View {
 
   private var sessionSection: some View {
     Section {
-      if !model.editingDrafts.isEmpty {
+      if !model.authoringItems.isEmpty {
         Button(action: showDrafts) {
           Label(.recipeDraftsTitle, systemImage: "square.and.pencil")
-            .badge(model.editingDrafts.count)
+            .badge(model.authoringItems.count)
         }
         .accessibilityIdentifier("drafts-destination")
       }

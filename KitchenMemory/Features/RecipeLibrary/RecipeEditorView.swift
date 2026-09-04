@@ -82,8 +82,10 @@ struct RecipeEditorView: View {
             .disabled(editor.pendingSave != nil)
         }
         ToolbarItem(placement: .confirmationAction) {
-          Button(.recipeEditorReviseActionSave) { _ = save() }
-            .disabled(editor.pendingSave == nil && !editor.session.canSave)
+          Button(editor.isImportCandidate ? .recipeImportAcceptDraft : .recipeEditorReviseActionSave) {
+            _ = save()
+          }
+            .disabled(!editor.isImportCandidate && editor.pendingSave == nil && !editor.session.canSave)
             .accessibilityIdentifier("recipe-editor-save")
         }
       }

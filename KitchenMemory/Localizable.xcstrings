@@ -1,6 +1,78 @@
 {
   "sourceLanguage" : "en-US",
   "strings" : {
+    "recipe.import.document.action": {
+      "comment": "Choose a local HTML or JSON-LD document for staged recipe import.",
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Import HTML or JSON-LD Document"
+          }
+        },
+        "es-MX": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importar documento HTML o JSON-LD"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importer un document HTML ou JSON-LD"
+          }
+        }
+      }
+    },
+    "recipe.import.accept-draft": {
+      "comment": "Accept a staged Import Candidate into editing; does not save a shared Recipe.",
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Accept into Draft"
+          }
+        },
+        "es-MX": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aceptar como borrador"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Accepter comme brouillon"
+          }
+        }
+      }
+    },
+    "recipe.import.candidate.local-note": {
+      "comment": "Distinguishes an unaccepted local import from a Recipe editing draft.",
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Import awaiting acceptance · Only on this device"
+          }
+        },
+        "es-MX": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importación pendiente de aceptación · Solo en este dispositivo"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importation en attente d’acceptation · Sur cet appareil seulement"
+          }
+        }
+      }
+    },
     "recipe.drafts.title": {
       "comment": "Destination containing device-local unfinished Recipe work.",
       "extractionState": "manual",

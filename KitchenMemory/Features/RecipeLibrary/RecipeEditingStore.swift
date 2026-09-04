@@ -13,6 +13,8 @@ struct RecipeEditingRecord: Codable, Equatable {
   var session: RecipeEditSession
   var observedSelectionIDs: [RecipeSelectionCommand.ID]
   var pendingSave: RecipeSaveCommand?
+  var isImportCandidate: Bool?
+  var importIdentifier: String?
 }
 
 @MainActor
