@@ -26,6 +26,7 @@ struct IngredientSectionEditor: View {
             moveDown: { move(index, by: 1) },
             delete: { section.ingredients.remove(at: index) }
         )
+        .modifier(EditorGroupSurface(index: index, level: .item))
       }
       Button(.recipeEditorIngredientsActionAdd, systemImage: "plus") {
         section.ingredients.append(RecipeIngredient(parseState: .edited))
