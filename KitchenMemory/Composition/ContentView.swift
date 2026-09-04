@@ -20,7 +20,7 @@ struct ContentView: View {
   @Environment(\.horizontalSizeClass) private var horizontalSizeClass
   @Environment(\.locale) private var locale
   @State private var activeSheet: ActiveRecipeSheet?
-  @State private var columnVisibility: NavigationSplitViewVisibility = .automatic
+  @State private var columnVisibility = LibraryNavigationPolicy.initialVisibility
   @State private var isShowingResetConfirmation = false
 #if !os(macOS)
   @State private var isShowingSettings = false
@@ -163,6 +163,7 @@ struct ContentView: View {
       }
     }
 #if os(macOS)
+    .navigationSplitViewStyle(.balanced)
     .toolbar { libraryToolbar }
 #endif
     .sheet(item: $activeSheet) { _ in

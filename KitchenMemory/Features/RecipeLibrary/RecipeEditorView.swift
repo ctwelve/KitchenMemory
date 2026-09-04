@@ -162,11 +162,7 @@ private extension RecipeEditorView {
 
   private var sourceSection: some View {
     Section(.recipeEditorSourceSection) {
-      Picker(selection: $editor.session.sourceKind) {
-        ForEach(RecipeSource.Kind.allCases, id: \.self) { Text($0.label).tag($0) }
-      } label: {
-        EditorFieldLabel(.recipeEditorSourceKindField)
-      }
+      sourceKindField
       EditorTextField(.recipeEditorSourceTitleField, text: $editor.session.sourceTitle)
       EditorTextField(.recipeEditorSourceAuthorField, text: $editor.session.sourceAuthor)
       EditorTextField(.recipeEditorSourcePublisherField, text: $editor.session.sourcePublisher)
@@ -182,6 +178,33 @@ private extension RecipeEditorView {
     }
   }
 
+  private var sourceKindPicker: some View {
+    Picker(selection: $editor.session.sourceKind) {
+      ForEach(RecipeSource.Kind.allCases, id: \.self) { Text($0.label).tag($0) }
+    } label: {
+      EditorFieldLabel(.recipeEditorSourceKindField)
+    }
+  }
+
+  @ViewBuilder
+  private var sourceKindField: some View {
+#if os(macOS)
+    ViewThatFits(in: .horizontal) {
+      HStack(spacing: 12) {
+        EditorFieldLabel(.recipeEditorSourceKindField)
+        sourceKindPicker.labelsHidden().fixedSize()
+      }
+      VStack(alignment: .leading, spacing: 6) {
+        EditorFieldLabel(.recipeEditorSourceKindField)
+        sourceKindPicker.labelsHidden()
+      }
+    }
+    .frame(maxWidth: .infinity, alignment: .leading)
+#else
+    sourceKindPicker
+#endif
+  }
+
   private var ingredientsSection: some View {
     Section {
       ForEach(editor.session.ingredientSections.indices, id: \.self) { sectionIndex in
@@ -192,6 +215,7 @@ private extension RecipeEditorView {
           delete: { editor.session.ingredientSections.remove(at: sectionIndex) }
         )
         .id("ingredient-section-\(editor.session.ingredientSections[sectionIndex].id.rawValue.uuidString)")
+        .modifier(EditorGroupSurface(index: sectionIndex))
       }
       Button(.recipeEditorIngredientsActionAddSection, systemImage: "plus") {
         editor.session.ingredientSections.append(IngredientSection(title: nil, ingredients: []))
@@ -212,6 +236,7 @@ private extension RecipeEditorView {
           delete: { editor.session.instructionSections.remove(at: sectionIndex) }
         )
         .id("instruction-section-\(editor.session.instructionSections[sectionIndex].id.rawValue.uuidString)")
+        .modifier(EditorGroupSurface(index: sectionIndex))
       }
       Button(.recipeEditorInstructionsActionAddSection, systemImage: "plus") {
         editor.session.instructionSections.append(InstructionSection(title: nil, steps: []))

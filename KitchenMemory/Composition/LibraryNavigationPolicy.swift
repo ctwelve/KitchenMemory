@@ -5,6 +5,14 @@
 import SwiftUI
 
 enum LibraryNavigationPolicy {
+  static var initialVisibility: NavigationSplitViewVisibility {
+#if os(macOS)
+    .all
+#else
+    .automatic
+#endif
+  }
+
   static func destinationSelectionVisibility(
     current: NavigationSplitViewVisibility,
     preservesSidebar: Bool
