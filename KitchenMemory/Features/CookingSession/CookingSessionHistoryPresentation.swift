@@ -39,7 +39,9 @@ extension CookingSessionPresentationModel {
   func sidebarSessions(for recipeID: Recipe.ID) -> [CookingSessionProjection] {
     let matchingIDs = sidebarSessionIDsByRecipe[recipeID] ?? []
     let candidates = sessions.filter { matchingIDs.contains($0.id) }
-    return recentHistorySessions(from: candidates, excluding: nil)
+    let active = candidates.filter { $0.lifecycle == .active }.sorted(by: sessionOrder)
+    let stopped = candidates.filter { $0.lifecycle == .stopped }
+    return active + recentHistorySessions(from: stopped, excluding: nil)
   }
 
   func refreshSidebarAssociations(for recipeIDs: [Recipe.ID]) {

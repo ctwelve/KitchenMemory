@@ -50,6 +50,16 @@ final class KitchenMemoryUITests: XCTestCase {
   }
 
   @MainActor
+  func testAttentionEvidenceExposesAccessibleRecoveryNavigation() {
+    let app = launchApp(additionalArguments: ["--ui-testing-recovery-fixture"])
+    visitTopLevelDestination(
+      "recovery-destination", revealing: "session-recovery",
+      description: "Recovery", in: app
+    )
+    app.terminate()
+  }
+
+  @MainActor
   func testSettingsExposeAccessibleTopLevelStructure() {
     let app = launchApp(additionalArguments: ["--ui-testing-cloud-sync-disabled"])
     openSettings(in: app)
