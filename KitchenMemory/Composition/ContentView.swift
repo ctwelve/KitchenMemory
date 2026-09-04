@@ -72,6 +72,7 @@ struct ContentView: View {
       }
     }
     .alert(.recipeEditorDraftFailureTitle, isPresented: draftFailureIsPresented) {
+      Button(.actionTryAgain) { preparedApp?.libraryModel.retryEditingStorage() }
       Button(.actionCancel, role: .cancel) {}
     } message: {
       Text(.recipeEditorDraftFailureMessage)

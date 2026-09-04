@@ -188,13 +188,12 @@ final class RecipeLibraryModel {
   func resetKitchen() -> Bool {
     do {
       try library.reset()
-      let retainedDrafts = authoringItems
+      // Only this explicitly confirmed destructive action may replace a document
+      // that could not be decoded. Ordinary autosave never does so.
+      try editingStore.save([])
       authoringItems = []
-      guard persistEditingDrafts() else {
-        authoringItems = retainedDrafts
-        issue = .reset
-        return false
-      }
+      editingStorageIsAvailable = true
+      editingStorageFailed = false
       editor = nil
       isShowingDrafts = false
       resetPresentationState()

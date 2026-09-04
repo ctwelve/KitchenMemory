@@ -9,6 +9,23 @@ import XCTest
 
 @MainActor
 final class RecipeDraftRelaunchTests: XCTestCase {
+  func testRetryRecoversTransientReadFailureWithoutOverwritingRetainedWork() throws {
+    let app = try AppRuntime.testing()
+    let store = FailingRecipeEditingStore()
+    let original = try library(app, store: store)
+    original.beginEditing()
+    original.editor?.session.title = "Keep this draft"
+    store.refusesReads = true
+    let relaunched = try library(app, store: store)
+    XCTAssertFalse(relaunched.editingStorageIsAvailable)
+    store.refusesReads = false
+    relaunched.retryEditingStorage()
+    XCTAssertTrue(relaunched.editingStorageIsAvailable)
+    XCTAssertEqual(relaunched.editingDrafts.first?.session.title, "Keep this draft")
+    relaunched.retryEditingStorage()
+    XCTAssertFalse(relaunched.editingStorageFailed)
+  }
+
   func testDraftSaveKeepsObservedAncestryWhenAnotherRevisionArrives() throws {
     let app = try AppRuntime.testing()
     let model = try library(app, store: VolatileRecipeEditingStore())
@@ -83,6 +100,10 @@ final class RecipeDraftRelaunchTests: XCTestCase {
     XCTAssertNil(model.editor)
     XCTAssertFalse(model.persistEditingDrafts())
     XCTAssertEqual(try Data(contentsOf: url), original)
+    XCTAssertTrue(model.resetKitchen(), "An explicit reset must also clear unreadable local editing data")
+    XCTAssertTrue(try FileRecipeEditingStore(url: url).load().isEmpty)
+    model.beginEditing()
+    XCTAssertNotNil(model.editor)
   }
 
   func testKitchenResetClearsLocalDraftsAlongWithSharedContents() throws {
@@ -166,10 +187,14 @@ final class RecipeDraftRelaunchTests: XCTestCase {
 
 @MainActor
 private final class FailingRecipeEditingStore: RecipeEditingStoring {
+  var refusesReads = false
   var refusesRemoval = false
   var refusesWrites = false
   private var drafts: [RecipeEditingRecord] = []
-  func load() throws -> [RecipeEditingRecord] { drafts }
+  func load() throws -> [RecipeEditingRecord] {
+    if refusesReads { throw CocoaError(.fileReadUnknown) }
+    return drafts
+  }
   func save(_ drafts: [RecipeEditingRecord]) throws {
     if refusesWrites { throw CocoaError(.fileWriteUnknown) }
     if refusesRemoval, drafts.count < self.drafts.count {
