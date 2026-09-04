@@ -149,8 +149,10 @@ struct ContentView: View {
         .toolbar { libraryToolbar }
 #endif
     } detail: {
-      NavigationStack {
+      if preparedApp?.libraryModel.editor != nil {
         persistentDetail
+      } else {
+        NavigationStack { persistentDetail }
       }
     }
 #if os(macOS)
@@ -162,7 +164,7 @@ struct ContentView: View {
         RecipeLibrarySheetContent(
           sheet: sheet,
           model: dependencies.libraryModel,
-          selectSheet: { activeSheet = $0 }
+          close: { activeSheet = nil }
         )
       }
     }
@@ -209,7 +211,9 @@ struct ContentView: View {
           decline: dependencies.libraryModel.declineSampleRecipes
         )
       case .ready:
-        if let currentSession = dependencies.sessionModel.currentSession,
+        if let editor = dependencies.libraryModel.editor {
+          RecipeEditingDestination(model: dependencies.libraryModel, editor: editor)
+        } else if let currentSession = dependencies.sessionModel.currentSession,
            !dependencies.sessionModel.isShowingSessionHistory {
           CookingSessionView(
             model: dependencies.sessionModel,
@@ -220,7 +224,7 @@ struct ContentView: View {
           LibraryDetailRouter(
             libraryModel: dependencies.libraryModel,
             sessionModel: dependencies.sessionModel,
-            editRecipe: { activeSheet = .edit($0) }
+            editRecipe: { dependencies.libraryModel.beginEditing($0) }
           )
         }
       }
@@ -241,7 +245,7 @@ struct ContentView: View {
         LibraryDetailRouter(
           libraryModel: dependencies.libraryModel,
           sessionModel: dependencies.sessionModel,
-          editRecipe: { activeSheet = .edit($0) }
+          editRecipe: { dependencies.libraryModel.beginEditing($0) }
         )
       }
     }
@@ -249,10 +253,15 @@ struct ContentView: View {
       RecipeLibrarySheetContent(
         sheet: sheet,
         model: dependencies.libraryModel,
-        selectSheet: { activeSheet = $0 }
+        close: { activeSheet = nil }
       )
     }
 #if !os(macOS)
+    .fullScreenCover(isPresented: compactEditorIsPresented) {
+      if let editor = dependencies.libraryModel.editor {
+        RecipeEditingDestination(model: dependencies.libraryModel, editor: editor)
+      }
+    }
     .sheet(isPresented: $isShowingSettings) {
       NavigationStack {
         KitchenSettingsView(
@@ -266,6 +275,13 @@ struct ContentView: View {
 }
 
 private extension ContentView {
+  var compactEditorIsPresented: Binding<Bool> {
+    Binding(
+      get: { !usesPersistentLibraryShell && preparedApp?.libraryModel.editor != nil },
+      set: { if !$0 { preparedApp?.libraryModel.closeEditor() } }
+    )
+  }
+
   @ToolbarContentBuilder
   var libraryToolbar: some ToolbarContent {
     LibraryToolbar(
@@ -274,7 +290,7 @@ private extension ContentView {
       showsSidebarToggle: usesCustomSidebarToggle,
       sidebarToggleTitle: sidebarToggleTitle,
       sidebarTogglePlacement: sidebarTogglePlacement,
-      createRecipe: { activeSheet = .create },
+      createRecipe: { preparedApp?.libraryModel.beginEditing() },
       importRecipe: { activeSheet = .importURL },
       toggleSidebar: toggleSidebar,
       showSettings: showSettings

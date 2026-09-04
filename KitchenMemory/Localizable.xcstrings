@@ -1,6 +1,102 @@
 {
   "sourceLanguage" : "en-US",
   "strings" : {
+    "recipe.editor.action.close": {
+      "comment": "Close editor while retaining its local draft.",
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Close"
+          }
+        },
+        "es-MX": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cerrar"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fermer"
+          }
+        }
+      }
+    },
+    "recipe.editor.action.discard": {
+      "comment": "Explicit destructive action abandoning a Recipe editing draft.",
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discard"
+          }
+        },
+        "es-MX": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Descartar"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abandonner"
+          }
+        }
+      }
+    },
+    "recipe.editor.discard.confirmation": {
+      "comment": "Confirmation before removing an editing draft; maintained Recipe history is unaffected.",
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discard this draft?"
+          }
+        },
+        "es-MX": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Descartar este borrador?"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abandonner ce brouillon?"
+          }
+        }
+      }
+    },
+    "recipe.editor.title.validation": {
+      "comment": "Inline explanation that saving a Recipe Revision requires a title.",
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter a title before saving."
+          }
+        },
+        "es-MX": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Escribe un título antes de guardar."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saisissez un titre avant d’enregistrer."
+          }
+        }
+      }
+    },
     "deleted.items.empty-message" : {
       "comment" : "Deleted Items empty-state explanation.",
       "extractionState" : "manual",

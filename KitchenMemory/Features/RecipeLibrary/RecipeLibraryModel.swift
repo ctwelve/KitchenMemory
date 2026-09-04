@@ -27,6 +27,8 @@ final class RecipeLibraryModel {
 
   private(set) var recipes: [StoredRecipe] = []
   var selectedRecipeID: Recipe.ID?
+  var editor: RecipeEditingModel?
+  var editingDrafts: [RecipeEditingModel] = []
   private(set) var issue: RecipeLibraryIssue?
   private(set) var hasLoaded = false
   private(set) var startupState: StartupState = .loading
