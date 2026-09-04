@@ -41,7 +41,10 @@ final class RecipeDraftRelaunchTests: XCTestCase {
     XCTAssertTrue(revisions.contains(elsewhere.revision))
     XCTAssertTrue(revisions.contains { $0.title == "Local branch" })
     guard case .recovery(.competingSelections) = try app.recipeRepository.recipeAuthority(id: original.id)
-    else { return XCTFail("Concurrent selection must remain explicit") }
+    else {
+      XCTFail("Concurrent selection must remain explicit")
+      return
+    }
   }
 
   func testExistingRecipeReusesOneDraftAcrossCloseAndRelaunch() throws {
