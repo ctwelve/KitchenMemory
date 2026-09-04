@@ -96,6 +96,11 @@ final class CookingSessionRecoveryPresentationTests: XCTestCase {
     XCTAssertEqual(model.recoverySessions, [recovery])
     XCTAssertEqual(model.deletedItemCount, 1)
     XCTAssertEqual(model.recoveryItemCount, 2)
+    XCTAssertTrue(model.showsRecoveryDestination)
+    service.results = []
+    model.reload()
+    XCTAssertFalse(model.showsRecoveryDestination)
+    XCTAssertEqual(model.recoveryItemCount, 0)
   }
 
   func testClosureChoicesRequireCompetingClosuresAndCoalesceExactRetries() {
@@ -247,7 +252,7 @@ final class CookingSessionRecoveryPresentationTests: XCTestCase {
 
 @MainActor
 private final class RecoverySessionService: CookingSessionServing {
-  let results: [SessionProjectionResult]
+  var results: [SessionProjectionResult]
 
   init(results: [SessionProjectionResult]) {
     self.results = results

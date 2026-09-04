@@ -32,12 +32,8 @@ final class KitchenMemoryUITests: XCTestCase {
       description: "Deleted Items",
       in: app
     )
-    visitTopLevelDestination(
-      "recovery-destination",
-      revealing: "session-recovery",
-      description: "Recovery",
-      in: app
-    )
+    // A clean Kitchen has no recovery evidence requiring a destination.
+    XCTAssertFalse(app.buttons["recovery-destination"].exists)
 
     let recipeRow = app.buttons
       .matching(NSPredicate(format: "identifier BEGINSWITH %@", "recipe-row-"))

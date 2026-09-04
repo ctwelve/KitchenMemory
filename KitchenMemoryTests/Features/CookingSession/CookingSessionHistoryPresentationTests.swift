@@ -9,6 +9,49 @@ import XCTest
 
 @MainActor
 final class CookingSessionHistoryPresentationTests: XCTestCase {
+  func testSessionsWithoutAvailableRecipeRemainInIndependentHistory() {
+    let active = CookingSessionProjection(
+      id: CookingSession.ID(), snapshot: ExecutionSnapshot(title: "Retained cook")
+    )
+    let finished = CookingSessionProjection(
+      id: CookingSession.ID(), snapshot: ExecutionSnapshot(title: "Finished cook"), lifecycle: .finished
+    )
+    let service = HistorySessionService(results: [.session(active), .session(finished)])
+    let model = CookingSessionPresentationModel(
+      sessions: service, store: VolatileCookingSessionPresentationStore()
+    )
+    model.loadIfNeeded()
+    model.refreshSidebarAssociations(for: [Recipe.ID()])
+    XCTAssertTrue(model.sidebarSessions(for: Recipe.ID()).isEmpty)
+    model.showSessionHistory()
+    XCTAssertEqual(Set(model.displayedHistorySessions.map(\.id)), [active.id, finished.id])
+  }
+
+  func testSidebarAssociatesSessionsWithExactRecipeAndSelectionPreservesLifecycle() throws {
+    let app = try AppRuntime.testing()
+    app.libraryModel.loadIfNeeded()
+    app.sessionModel.loadIfNeeded()
+    let first = try XCTUnwrap(app.libraryModel.recipes.first)
+    let second = try XCTUnwrap(app.libraryModel.recipes.dropFirst().first)
+    XCTAssertTrue(app.sessionModel.start(from: first))
+    let firstID = try XCTUnwrap(app.sessionModel.currentSessionID)
+    XCTAssertTrue(app.sessionModel.stopCurrentSession())
+    XCTAssertTrue(app.sessionModel.start(from: second))
+    let secondID = try XCTUnwrap(app.sessionModel.currentSessionID)
+
+    app.sessionModel.refreshSidebarAssociations(for: [first.recipe.id, second.recipe.id])
+
+    XCTAssertEqual(app.sessionModel.sidebarSessions(for: first.recipe.id).map(\.id), [firstID])
+    XCTAssertEqual(app.sessionModel.sidebarSessions(for: second.recipe.id).map(\.id), [secondID])
+    XCTAssertTrue(app.sessionModel.sidebarSessions(for: Recipe.ID()).isEmpty)
+    XCTAssertTrue(app.sessionModel.selectSession(firstID))
+    XCTAssertEqual(app.sessionModel.currentSessionID, firstID)
+    XCTAssertEqual(app.sessionModel.currentSession?.lifecycle, .stopped)
+    XCTAssertEqual(app.sessionModel.sessions.first { $0.id == secondID }?.lifecycle, .active)
+    app.sessionModel.showSessionHistory()
+    XCTAssertEqual(Set(app.sessionModel.displayedHistorySessions.map(\.id)), [firstID, secondID])
+  }
+
   func testHistoryIncludesCurrentWorkAndFinishedObservation() throws {
     let preparedApp = try AppRuntime.testing()
     preparedApp.libraryModel.loadIfNeeded()

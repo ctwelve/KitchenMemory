@@ -97,6 +97,7 @@ final class CookingSessionPresentationModel {
   var historyScope: CookingSessionHistoryScope?
   var libraryDestination: CookingSessionLibraryDestination?
   var recipeHistorySessions: [CookingSessionProjection] = []
+  var sidebarSessionIDsByRecipe: [Recipe.ID: Set<CookingSession.ID>] = [:]
   var observedFinishedSessionID: CookingSession.ID?
   var sessionVisits: [CookingSessionVisit]
 
