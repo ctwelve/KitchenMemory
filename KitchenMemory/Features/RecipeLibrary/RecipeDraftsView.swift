@@ -9,7 +9,7 @@ struct RecipeDraftsView: View {
   @Bindable var model: RecipeLibraryModel
 
   var body: some View {
-    List(model.editingDrafts) { draft in
+    List(model.authoringItems) { draft in
       Button { model.resumeEditingDraft(draft.id) } label: {
         VStack(alignment: .leading) {
           if draft.session.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
@@ -17,7 +17,7 @@ struct RecipeDraftsView: View {
           } else {
             Text(draft.session.title)
           }
-          Text(.recipeDraftsLocalNote)
+          Text(draft.isImportCandidate ? .recipeImportCandidateLocalNote : .recipeDraftsLocalNote)
             .font(.caption)
             .foregroundStyle(.secondary)
         }

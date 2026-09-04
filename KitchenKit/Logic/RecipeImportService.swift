@@ -30,8 +30,8 @@ public enum RecipeImportConcern: Codable, Equatable, Sendable {
 }
 
 /// One reviewable recipe candidate and the concerns a person should consider.
-public struct RecipeImportOption: Equatable, Identifiable, Sendable {
-  public struct Identifier: Hashable, Sendable {
+public struct RecipeImportOption: Codable, Equatable, Identifiable, Sendable {
+  public struct Identifier: Codable, Hashable, Sendable {
     public var blockIndex: Int
     public var objectIndex: Int
 
@@ -70,6 +70,37 @@ public enum RecipeImportServiceError: Error, Equatable, Sendable {
 /// This service maps transport and parsing failures into product-level errors
 /// and records source evidence. It does not persist a selected candidate.
 public struct RecipeImportService: RecipeImportServing, Sendable {
+  public enum DocumentFormat: Sendable { case html, jsonLD }
+
+  public static func documentOptions(
+    from data: Data, sourceURL: URL, format: DocumentFormat,
+    capturedAt: Date = Date()
+  ) throws -> [RecipeImportOption] {
+    let parser = SchemaOrgRecipeImporter()
+    guard data.count <= parser.limits.maximumInputBytes else {
+      throw RecipeImportServiceError.pageTooLarge
+    }
+    let result: RecipeImportResult
+    switch format {
+    case .html:
+      guard let html = String(data: data, encoding: .utf8) else {
+        throw RecipeImportServiceError.unsupportedPage
+      }
+      result = parser.importHTML(html, documentURL: sourceURL)
+    case .jsonLD:
+      result = parser.importJSONLD(data, documentURL: sourceURL)
+    }
+    return try options(from: result, requestedURL: sourceURL, capturedAt: capturedAt).map { option in
+      var option = option
+      if sourceURL.isFileURL {
+        option.draft.source?.kind = .imported
+        option.draft.source?.canonicalURL = nil
+        option.draft.source?.title = sourceURL.lastPathComponent
+      }
+      return option
+    }
+  }
+
   private let importer: any RecipeURLImporting
   private let now: @Sendable () -> Date
 

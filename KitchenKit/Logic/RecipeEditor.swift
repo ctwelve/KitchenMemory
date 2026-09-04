@@ -12,7 +12,7 @@ import Foundation
 /// It deliberately carries the recipe's authored structure rather than a
 /// flattened transcription. This lets an editor make local corrections without
 /// losing section headings, ingredient provenance, or incomplete details.
-public struct RecipeDraft: Equatable, Sendable {
+public struct RecipeDraft: Codable, Equatable, Sendable {
   public var title: String
   public var summary: String?
   public var authorName: String?

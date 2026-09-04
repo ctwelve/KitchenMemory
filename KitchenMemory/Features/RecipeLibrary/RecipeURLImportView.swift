@@ -6,15 +6,18 @@ import Accessibility
 import Foundation
 import KitchenKit
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct RecipeURLImportView: View {
   let load: (URL) async throws -> [RecipeImportOption]
+  let loadDocument: (URL) throws -> [RecipeImportOption]
   let select: (RecipeImportOption) -> Void
 
   @Environment(\.dismiss) private var dismiss
   @Environment(\.locale) private var locale
   @State private var session = RecipeImportSession()
   @State private var importTask: Task<Void, Never>?
+  @State private var showsDocumentPicker = false
 
   var body: some View {
     NavigationStack {
@@ -31,6 +34,14 @@ struct RecipeURLImportView: View {
 #endif
       }
       .accessibilityIdentifier("recipe-url-import-scroll")
+      .fileImporter(isPresented: $showsDocumentPicker, allowedContentTypes: [.html, .json]) { result in
+        do {
+          let options = try loadDocument(result.get())
+          if case .review(let option) = session.receive(options) { select(option) }
+        } catch CocoaError.userCancelled {
+          // Dismissing the native picker leaves the current import intent alone.
+        } catch { session.receive(error: error) }
+      }
       .navigationTitle(session.candidates.isEmpty ? .recipeImportTitle : .recipeImportChooseTitle)
 #if os(iOS)
       .navigationBarTitleDisplayMode(.inline)
@@ -92,6 +103,10 @@ struct RecipeURLImportView: View {
         Text(session.isLoading ? .recipeImportFetchProgress : .recipeImportFetchAction)
       )
       .accessibilityIdentifier("recipe-import-fetch")
+      Button(.recipeImportDocumentAction, systemImage: "doc") {
+        showsDocumentPicker = true
+      }
+      .disabled(session.isLoading)
     }
   }
 

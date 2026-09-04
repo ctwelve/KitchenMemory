@@ -15,12 +15,15 @@ final class RecipeEditingModel: Identifiable {
   let concerns: [RecipeImportConcern]
   var observedSelectionIDs: [RecipeSelectionCommand.ID] = []
   var pendingSave: RecipeSaveCommand?
+  var isImportCandidate = false
+  var importIdentifier: String?
   var session: RecipeEditSession { didSet { changed() } }
   @ObservationIgnored var changed: () -> Void = {}
 
   var record: RecipeEditingRecord {
     RecipeEditingRecord(id: id, original: original, concerns: concerns, session: session,
-                        observedSelectionIDs: observedSelectionIDs, pendingSave: pendingSave)
+                        observedSelectionIDs: observedSelectionIDs, pendingSave: pendingSave,
+                        isImportCandidate: isImportCandidate, importIdentifier: importIdentifier)
   }
 
   init(record: RecipeEditingRecord) {
@@ -30,6 +33,8 @@ final class RecipeEditingModel: Identifiable {
     session = record.session
     observedSelectionIDs = record.observedSelectionIDs
     pendingSave = record.pendingSave
+    isImportCandidate = record.isImportCandidate ?? false
+    importIdentifier = record.importIdentifier
   }
 
   init(original: StoredRecipe? = nil, draft: RecipeDraft? = nil,
@@ -45,7 +50,7 @@ final class RecipeEditingModel: Identifiable {
 extension RecipeLibraryModel {
   func beginEditing(_ original: StoredRecipe? = nil) {
     guard editingStorageIsAvailable else { editingStorageFailed = true; return }
-    if let original, let retained = editingDrafts.first(where: { $0.original?.id == original.id }) {
+    if let original, let retained = authoringItems.first(where: { $0.original?.id == original.id }) {
       editor = retained
       return
     }
@@ -54,16 +59,7 @@ extension RecipeLibraryModel {
       do { draft.observedSelectionIDs = try library.editingSelectionHeads(for: original.id) }
       catch { editingStorageFailed = true; return }
     }
-    editingDrafts.append(draft)
-    observeEditingDraft(draft)
-    editor = draft
-    _ = persistEditingDrafts()
-  }
-
-  func beginImportReview(_ option: RecipeImportOption) {
-    guard editingStorageIsAvailable else { editingStorageFailed = true; return }
-    let draft = RecipeEditingModel(draft: option.draft, concerns: option.concerns)
-    editingDrafts.append(draft)
+    authoringItems.append(draft)
     observeEditingDraft(draft)
     editor = draft
     _ = persistEditingDrafts()
@@ -74,20 +70,20 @@ extension RecipeLibraryModel {
   }
 
   func resumeEditingDraft(_ id: UUID) {
-    editor = editingDrafts.first { $0.id == id }
+    editor = authoringItems.first { $0.id == id }
   }
 
   func restoreEditingDrafts() {
     do {
-      editingDrafts = try editingStore.load().map(RecipeEditingModel.init(record:))
-      editingDrafts.forEach(observeEditingDraft)
+      authoringItems = try editingStore.load().map(RecipeEditingModel.init(record:))
+      authoringItems.forEach(observeEditingDraft)
     } catch {
       editingStorageIsAvailable = false
       editingStorageFailed = true
     }
   }
 
-  private func observeEditingDraft(_ draft: RecipeEditingModel) {
+  func observeEditingDraft(_ draft: RecipeEditingModel) {
     draft.changed = { [weak self] in _ = self?.persistEditingDrafts() }
   }
 
@@ -95,7 +91,7 @@ extension RecipeLibraryModel {
   func persistEditingDrafts() -> Bool {
     guard editingStorageIsAvailable else { return false }
     do {
-      try editingStore.save(editingDrafts.map(\.record))
+      try editingStore.save(authoringItems.map(\.record))
       editingStorageFailed = false
       return true
     } catch {
@@ -106,14 +102,14 @@ extension RecipeLibraryModel {
 
   func discardEditor(confirmed: Bool) {
     guard confirmed, let editor else { return }
-    let retained = editingDrafts
-    editingDrafts.removeAll { $0.id == editor.id }
-    if persistEditingDrafts() { self.editor = nil } else { editingDrafts = retained }
+    let retained = authoringItems
+    authoringItems.removeAll { $0.id == editor.id }
+    if persistEditingDrafts() { self.editor = nil } else { authoringItems = retained }
   }
 
   @discardableResult
   func saveEditor() -> Bool {
-    guard let editor else { return false }
+    guard let editor, !editor.isImportCandidate else { return false }
     do {
       if editor.pendingSave == nil {
         editor.pendingSave = try library.prepareSave(
