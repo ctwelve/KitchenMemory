@@ -168,6 +168,7 @@ struct KitchenSettingsView: View {
     .toolbar {
       ToolbarItem(placement: .confirmationAction) {
         Button(.actionDone) { dismiss() }
+          .help(Text(.actionDone))
       }
     }
 #endif

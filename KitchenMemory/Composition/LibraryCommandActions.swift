@@ -23,8 +23,7 @@ struct LibraryCommandActions {
     case .newRecipe, .importRecipe:
       return library.editingStorageIsAvailable
     case .saveRevision:
-      guard let editor = library.editor, !editor.isImportCandidate else { return false }
-      return editor.pendingSave != nil || editor.session.canSave
+      return library.editor?.canSaveRevision == true
     case .editRecipe, .startCooking, .recipeHistory:
       guard library.selectedRecipe != nil, library.editor == nil,
             !library.isShowingDrafts, sessions.currentSession == nil,

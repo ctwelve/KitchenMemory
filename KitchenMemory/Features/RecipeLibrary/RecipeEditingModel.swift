@@ -21,6 +21,7 @@ final class RecipeEditingModel: Identifiable {
     return command
   }
   var isImportCandidate: Bool { phase == .importCandidate }
+  var canSaveRevision: Bool { !isImportCandidate && (pendingSave != nil || session.canSave) }
   var importIdentifier: String?
   var session: RecipeEditSession { didSet { changed() } }
   @ObservationIgnored var changed: () -> Void = {}

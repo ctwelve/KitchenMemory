@@ -87,7 +87,7 @@ struct RecipeEditorView: View {
           Button(editor.isImportCandidate ? .recipeImportAcceptDraft : .recipeEditorReviseActionSave) {
             _ = save()
           }
-            .disabled(!editor.isImportCandidate && editor.pendingSave == nil && !editor.session.canSave)
+            .disabled(!editor.isImportCandidate && !editor.canSaveRevision)
             .accessibilityIdentifier("recipe-editor-save")
             .help(Text(editor.isImportCandidate ? .recipeImportAcceptDraft : .recipeEditorReviseActionSave))
         }
