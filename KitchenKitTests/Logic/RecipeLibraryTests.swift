@@ -19,6 +19,12 @@ final class RecipeLibraryTests: XCTestCase {
       RecipeSaveCommand.self, from: JSONEncoder().encode(command)
     )
     XCTAssertEqual(retained, command)
+    XCTAssertEqual(RecipeAuthoringPhase.importCandidate.acceptingImport(), .editing)
+    XCTAssertEqual(RecipeAuthoringPhase.editing.acceptingImport(), .editing)
+    let frozenPhase = RecipeAuthoringPhase.saving(command)
+    XCTAssertEqual(frozenPhase.acceptingImport(), frozenPhase)
+    XCTAssertEqual(try JSONDecoder().decode(RecipeAuthoringPhase.self,
+      from: JSONEncoder().encode(frozenPhase)), frozenPhase)
     try library.save(retained)
     XCTAssertEqual(try library.load().recipes.first?.revision.title, "Soup")
     XCTAssertTrue(try library.editingSelectionHeads(for: command.recipe.id).isEmpty)
@@ -57,6 +63,20 @@ final class RecipeLibraryTests: XCTestCase {
 
     XCTAssertEqual(contents.recipes, [userRecipe, sampleRecipes[0]])
     XCTAssertEqual(contents.samplePresence, .partial)
+  }
+
+  func testDocumentInterpretationAndCandidateIdentityStayBehindLibraryInterface() throws {
+    let library = makeLibrary(kitchen: Kitchen(name: "Home"), repository: InMemoryRecipeRepository())
+    let data = Data(#"{"@type":"Recipe","name":"Toast"}"#.utf8)
+    let options = try library.importDocument(data, sourceURL: URL(fileURLWithPath: "/tmp/toast.json"),
+                                             format: .jsonLD)
+    let candidate = try XCTUnwrap(options.first)
+    XCTAssertEqual(candidate.draft.title, "Toast")
+    let restored = try JSONDecoder().decode(RecipeImportOption.self, from: JSONEncoder().encode(candidate))
+    XCTAssertEqual(try candidate.retentionIdentifier(), try restored.retentionIdentifier())
+    let different = RecipeImportOption(id: candidate.id, draft: RecipeDraft(title: "Different"), concerns: [])
+    XCTAssertNotEqual(try candidate.retentionIdentifier(), try different.retentionIdentifier())
+    XCTAssertTrue(try library.load().recipes.isEmpty)
   }
 
   func testCreatesAndRevisesThroughOneLibraryInterface() throws {

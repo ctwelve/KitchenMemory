@@ -168,10 +168,9 @@ struct ContentView: View {
     .toolbar(removing: .sidebarToggle)
     .toolbar { libraryToolbar }
 #endif
-    .sheet(item: $activeSheet) { sheet in
+    .sheet(item: $activeSheet) { _ in
       if let dependencies = preparedApp {
         RecipeLibrarySheetContent(
-          sheet: sheet,
           model: dependencies.libraryModel,
           close: { activeSheet = nil }
         )
@@ -258,9 +257,8 @@ struct ContentView: View {
         )
       }
     }
-    .sheet(item: $activeSheet) { sheet in
+    .sheet(item: $activeSheet) { _ in
       RecipeLibrarySheetContent(
-        sheet: sheet,
         model: dependencies.libraryModel,
         close: { activeSheet = nil }
       )

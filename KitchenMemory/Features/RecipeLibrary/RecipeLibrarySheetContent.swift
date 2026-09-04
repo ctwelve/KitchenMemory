@@ -11,7 +11,6 @@ enum ActiveRecipeSheet: String, Identifiable {
 }
 
 struct RecipeLibrarySheetContent: View {
-  let sheet: ActiveRecipeSheet
   let model: RecipeLibraryModel
   let close: () -> Void
 
