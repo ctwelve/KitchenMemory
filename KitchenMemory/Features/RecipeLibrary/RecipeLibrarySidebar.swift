@@ -12,6 +12,7 @@ struct RecipeLibrarySidebar: View {
   let showSessionHistory: () -> Void
   let showDeletedItems: () -> Void
   let showRecovery: () -> Void
+  let showDrafts: () -> Void
   let selectSession: (CookingSession.ID) -> Void
 
   var body: some View {
@@ -37,6 +38,13 @@ struct RecipeLibrarySidebar: View {
 
   private var sessionSection: some View {
     Section {
+      if !model.editingDrafts.isEmpty {
+        Button(action: showDrafts) {
+          Label(.recipeDraftsTitle, systemImage: "square.and.pencil")
+            .badge(model.editingDrafts.count)
+        }
+        .accessibilityIdentifier("drafts-destination")
+      }
       NavigationLink {
         CookingSessionHistoryDestinationView(
           model: sessionModel,

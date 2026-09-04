@@ -66,7 +66,15 @@ struct ContentView: View {
       Text(.sessionEntryDetachedMessage)
     }
     .onChange(of: preparedApp?.libraryModel.selectedRecipeID) { _, recipeID in
-      if recipeID != nil { preparedApp?.sessionModel.showRecipes() }
+      if recipeID != nil {
+        preparedApp?.libraryModel.isShowingDrafts = false
+        preparedApp?.sessionModel.showRecipes()
+      }
+    }
+    .alert(.recipeEditorDraftFailureTitle, isPresented: draftFailureIsPresented) {
+      Button(.actionCancel, role: .cancel) {}
+    } message: {
+      Text(.recipeEditorDraftFailureMessage)
     }
   }
 
@@ -275,6 +283,13 @@ struct ContentView: View {
 }
 
 private extension ContentView {
+  var draftFailureIsPresented: Binding<Bool> {
+    Binding(
+      get: { preparedApp?.libraryModel.editingStorageFailed ?? false },
+      set: { preparedApp?.libraryModel.editingStorageFailed = $0 }
+    )
+  }
+
   var compactEditorIsPresented: Binding<Bool> {
     Binding(
       get: { !usesPersistentLibraryShell && preparedApp?.libraryModel.editor != nil },
@@ -308,21 +323,37 @@ private extension ContentView {
       sessionModel: dependencies.sessionModel,
       locale: locale,
       showSessionHistory: {
+        dependencies.libraryModel.isShowingDrafts = false
+        dependencies.libraryModel.closeEditor()
         dependencies.libraryModel.selectedRecipeID = nil
         dependencies.sessionModel.showSessionHistory()
         focusSelectedDestination()
       },
       showDeletedItems: {
+        dependencies.libraryModel.isShowingDrafts = false
+        dependencies.libraryModel.closeEditor()
         dependencies.libraryModel.selectedRecipeID = nil
         dependencies.sessionModel.showDeletedItems()
         focusSelectedDestination()
       },
       showRecovery: {
+        dependencies.libraryModel.isShowingDrafts = false
+        dependencies.libraryModel.closeEditor()
         dependencies.libraryModel.selectedRecipeID = nil
         dependencies.sessionModel.showRecovery()
         focusSelectedDestination()
       },
+      showDrafts: {
+        dependencies.libraryModel.closeEditor()
+        dependencies.libraryModel.selectedRecipeID = nil
+        dependencies.sessionModel.leaveCurrentSession()
+        dependencies.sessionModel.showRecipes()
+        dependencies.libraryModel.isShowingDrafts = true
+        focusSelectedDestination()
+      },
       selectSession: { sessionID in
+        dependencies.libraryModel.isShowingDrafts = false
+        dependencies.libraryModel.closeEditor()
         if dependencies.sessionModel.selectSession(sessionID) {
           focusSelectedDestination()
         }

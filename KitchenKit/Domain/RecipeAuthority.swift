@@ -6,7 +6,7 @@ import CryptoKit
 import Foundation
 
 /// A caller-owned command choosing which accepted Recipe Revision is current.
-public struct RecipeSelectionCommand: Equatable, Sendable {
+public struct RecipeSelectionCommand: Codable, Equatable, Sendable {
   public typealias ID = StableIdentifier<RecipeSelectionCommand>
 
   public let id: ID
@@ -34,7 +34,7 @@ public struct RecipeSelectionCommand: Equatable, Sendable {
 }
 
 /// One retry-safe intention to append immutable Recipe content and select it.
-public struct RecipeSaveCommand: Equatable, Sendable {
+public struct RecipeSaveCommand: Codable, Equatable, Sendable {
   public typealias ID = StableIdentifier<RecipeSaveCommand>
 
   public let id: ID
