@@ -153,6 +153,16 @@ protocol CookingSessionPresentationStoring: AnyObject {
   var pendingCommands: [PendingCookingSessionCommand] { get set }
   var entryDrafts: [CookingSessionEntryDraft] { get set }
   var sessionVisits: [CookingSessionVisit] { get set }
+  func clear()
+}
+
+extension CookingSessionPresentationStoring {
+  func clear() {
+    currentSessionID = nil
+    pendingCommands = []
+    entryDrafts = []
+    sessionVisits = []
+  }
 }
 
 /// Device-local presentation state. These values deliberately use ordinary

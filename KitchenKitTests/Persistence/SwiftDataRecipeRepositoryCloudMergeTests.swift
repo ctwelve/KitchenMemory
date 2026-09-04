@@ -9,7 +9,9 @@ import XCTest
 
 @MainActor
 final class SwiftDataRecipeRepositoryCloudMergeTests: XCTestCase {
-  func testLogicalDuplicatesFromIndependentDevicesProduceOneDomainGraph() throws {
+  // The scenario intentionally assembles one complete duplicated payload graph.
+  // swiftlint:disable:next function_body_length
+  func testDuplicatedPayloadWithoutAuthorityCannotWinByArrivalOrder() throws {
     let container = try KitchenMemorySchema.makeContainer(inMemory: true)
     let repository = SwiftDataRecipeRepository(modelContainer: container)
     let kitchen = Kitchen(name: "Home")
@@ -48,17 +50,22 @@ final class SwiftDataRecipeRepositoryCloudMergeTests: XCTestCase {
     insertDuplicateChildren(revisionID: higherID, into: context)
     try context.save()
 
-    let stored = try XCTUnwrap(repository.recipe(id: recipeID))
-    XCTAssertEqual(stored.revision.title, "Chosen")
+    XCTAssertEqual(
+      try repository.recipeAuthority(id: recipeID),
+      .unavailable(.missingSave(.init(rawValue: lowerID)))
+    )
+    XCTAssertNil(try repository.recipe(id: recipeID))
     XCTAssertEqual(try repository.kitchens().count, 1)
-    XCTAssertEqual(try repository.recipes(in: kitchen.id).count, 1)
-    XCTAssertEqual(try repository.revisions(for: recipeID).count, 3)
-    XCTAssertEqual(stored.revision.media.count, 1)
-    XCTAssertEqual(stored.revision.equipment.count, 1)
-    XCTAssertEqual(stored.revision.ingredientSections.count, 1)
-    XCTAssertEqual(stored.revision.ingredientSections[0].ingredients.count, 1)
-    XCTAssertEqual(stored.revision.instructionSections.count, 1)
-    XCTAssertEqual(stored.revision.instructionSections[0].steps.count, 1)
+    XCTAssertTrue(try repository.recipes(in: kitchen.id).isEmpty)
+    let revisions = try repository.revisions(for: recipeID)
+    XCTAssertEqual(revisions.count, 3)
+    let duplicated = try XCTUnwrap(revisions.first { $0.id.rawValue == higherID })
+    XCTAssertEqual(duplicated.media.count, 1)
+    XCTAssertEqual(duplicated.equipment.count, 1)
+    XCTAssertEqual(duplicated.ingredientSections.count, 1)
+    XCTAssertEqual(duplicated.ingredientSections[0].ingredients.count, 1)
+    XCTAssertEqual(duplicated.instructionSections.count, 1)
+    XCTAssertEqual(duplicated.instructionSections[0].steps.count, 1)
   }
 
   private func makeRevision(id: UUID, recipeID: UUID, title: String) -> RecipeRevisionRecord {

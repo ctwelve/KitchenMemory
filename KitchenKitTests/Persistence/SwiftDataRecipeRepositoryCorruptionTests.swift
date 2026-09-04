@@ -24,21 +24,17 @@ final class SwiftDataRecipeRepositoryCorruptionTests: XCTestCase {
     }
   }
 
-  func testCurrentRevisionOwnedByAnotherRecipeIsReportedAsCorruption() throws {
+  func testAuthorityRevisionMovedToAnotherRecipeRequiresRecovery() throws {
     let fixture = try makeFixture()
     let context = ModelContext(fixture.container)
     let revision = try XCTUnwrap(context.fetch(FetchDescriptor<RecipeRevisionRecord>()).first)
-    let revisionID = RecipeRevision.ID(rawValue: revision.id)
     revision.recipeID = Recipe.ID().rawValue
     try context.save()
 
     XCTAssertThrowsError(try fixture.reader().recipe(id: fixture.recipeID)) { error in
       XCTAssertEqual(
         error as? KitchenMemoryPersistenceError,
-        .inconsistentStoredRecipeIdentity(
-          recipeID: fixture.recipeID,
-          revisionID: revisionID
-        )
+        .invalidStoredValue(field: "recipe.authority")
       )
     }
   }

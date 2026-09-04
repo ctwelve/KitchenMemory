@@ -125,15 +125,16 @@ final class RecipeEditorTests: XCTestCase {
       ]),
     ]
     let importedRevision = RecipeRevision(
-      id: first.revision.id,
       recipeID: first.recipe.id,
-      revisionNumber: 1,
+      revisionNumber: 2,
       title: first.revision.title,
       source: source,
       media: [media],
       ingredientSections: originalSections
     )
-    try repository.save(recipe: first.recipe, revision: importedRevision)
+    var importedRecipe = first.recipe
+    importedRecipe.currentRevisionID = importedRevision.id
+    try repository.save(recipe: importedRecipe, revision: importedRevision)
 
     let edited = try editor.revise(
       recipeID: first.recipe.id,

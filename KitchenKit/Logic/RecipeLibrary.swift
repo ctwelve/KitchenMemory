@@ -36,14 +36,18 @@ public struct RecipeLibrary {
     kitchenID: Kitchen.ID,
     repository: any RecipeRepository,
     samples: any SampleRecipeProviding,
-    importer: any RecipeImportServing
+    importer: any RecipeImportServing,
+    resetRepository: (any KitchenResetRepository)? = nil
   ) {
     self.kitchenID = kitchenID
     self.repository = repository
     editor = RecipeEditor(repository: repository)
     self.importer = importer
     sampleInstaller = SampleRecipeInstallService(repository: repository, samples: samples)
-    resetter = KitchenResetService(repository: repository, samples: samples)
+    resetter = KitchenResetService(
+      repository: resetRepository ?? RecipeOnlyKitchenResetRepository(repository: repository),
+      samples: samples
+    )
   }
 
   /// Loads recipe content and derives current sample presence in one pass.

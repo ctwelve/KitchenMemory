@@ -16,7 +16,7 @@ final class RecipeRepositoryReconciliationTests: XCTestCase {
     let recipeID: UUID
   }
 
-  func testAllRevisionsReconcileWhenCloudKitKeepsOneMutablePointer() throws {
+  func testPayloadWithoutSaveEvidenceDoesNotBecomeCurrentFromMutablePointer() throws {
     let fixture = try makeFixture()
     let lowerID = try XCTUnwrap(UUID(uuidString: "10000000-0000-0000-0000-000000000000"))
     let higherID = try XCTUnwrap(UUID(uuidString: "F0000000-0000-0000-0000-000000000000"))
@@ -28,12 +28,15 @@ final class RecipeRepositoryReconciliationTests: XCTestCase {
     try context.save()
 
     let repository = SwiftDataRecipeRepository(modelContainer: fixture.container)
-    let stored = try XCTUnwrap(repository.recipe(id: .init(rawValue: fixture.recipeID)))
+    let recipeID = Recipe.ID(rawValue: fixture.recipeID)
 
-    XCTAssertEqual(stored.revision.title, "Rule winner")
-    XCTAssertEqual(stored.recipe.currentRevisionID.rawValue, higherID)
     XCTAssertEqual(
-      try repository.revisions(for: stored.id).map(\.title),
+      try repository.recipeAuthority(id: recipeID),
+      .unavailable(.missingSave(.init(rawValue: lowerID)))
+    )
+    XCTAssertNil(try repository.recipe(id: recipeID))
+    XCTAssertEqual(
+      try repository.revisions(for: recipeID).map(\.title),
       ["Rule winner", "Pointer winner", "Original"]
     )
   }
@@ -61,12 +64,16 @@ final class RecipeRepositoryReconciliationTests: XCTestCase {
 
     let restored = makeRestoredRecipe(
       recipeID: recipeID,
-      revisionID: staleRevisionID,
+      revisionID: UUID(),
       kitchenID: fixture.kitchen.id
     )
     try repository.addRecipes([restored], to: fixture.kitchen.id)
 
-    XCTAssertEqual(try repository.recipe(id: recipeID), restored)
+    XCTAssertEqual(
+      try repository.recipeAuthority(id: recipeID),
+      .unavailable(.missingSave(.init(rawValue: staleRevisionID)))
+    )
+    XCTAssertNil(try repository.recipe(id: recipeID))
     try assertOneDeletionAndResolution(in: fixture.container)
   }
 

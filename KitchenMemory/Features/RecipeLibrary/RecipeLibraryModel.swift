@@ -23,6 +23,7 @@ final class RecipeLibraryModel {
   private let library: RecipeLibrary
   private let samplePreferences: any SampleRecipeOnboardingStoring
   private var hasEstablishedKitchenEvidence: Bool
+  private var resetPresentationState: () -> Void = {}
 
   private(set) var recipes: [StoredRecipe] = []
   var selectedRecipeID: Recipe.ID?
@@ -49,6 +50,10 @@ final class RecipeLibraryModel {
 
   var selectedRecipe: StoredRecipe? {
     recipes.first { $0.recipe.id == selectedRecipeID }
+  }
+
+  func installResetPresentationHandler(_ handler: @escaping () -> Void) {
+    resetPresentationState = handler
   }
 
   func loadIfNeeded() {
@@ -169,6 +174,7 @@ final class RecipeLibraryModel {
   func resetKitchen() -> Bool {
     do {
       try library.reset()
+      resetPresentationState()
       samplePreferences.sampleRecipeOnboardingResponse = .accepted
       sampleOnboardingResponse = .accepted
       reload()

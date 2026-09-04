@@ -163,6 +163,33 @@ final class CookingSessionPresentationModel {
     reload()
   }
 
+  /// Clears every device-local and projected Session value after durable reset succeeds.
+  func resetAfterKitchenReset() {
+    store.clear()
+    sessions = []
+    finishedSessions = []
+    deletedSessions = []
+    waitingDeletedSessions = []
+    waitingSessions = []
+    recoverySessions = []
+    currentSessionID = nil
+    finishedSessionCount = 0
+    unavailableSessionCount = 0
+    recoverySessionCount = 0
+    issue = nil
+    isShowingIssue = false
+    outbox = CookingSessionOutbox(persistedCommands: [])
+    entryDrafts = []
+    detachedEntryDraft = nil
+    finishedSessionIDs = []
+    historyScope = nil
+    libraryDestination = nil
+    recipeHistorySessions = []
+    observedFinishedSessionID = nil
+    sessionVisits = []
+    hasLoaded = true
+  }
+
   func retryCurrentIssue() {
     if !outbox.isEmpty {
       retryPendingCommands()
