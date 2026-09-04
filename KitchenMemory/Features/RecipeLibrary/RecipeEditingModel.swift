@@ -15,6 +15,7 @@ final class RecipeEditingModel: Identifiable {
   let concerns: [RecipeImportConcern]
   var observedSelectionIDs: [RecipeSelectionCommand.ID] = []
   var phase: RecipeAuthoringPhase
+  var confirmsDiscard = false
   var pendingSave: RecipeSaveCommand? {
     guard case .saving(let command) = phase else { return nil }
     return command

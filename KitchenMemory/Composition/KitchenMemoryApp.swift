@@ -23,6 +23,8 @@ struct KitchenMemoryApp: App {
       applicationContent
     }
     .commands {
+      SidebarCommands()
+      RecipeLibraryCommands()
       KitchenCommands()
     }
 
