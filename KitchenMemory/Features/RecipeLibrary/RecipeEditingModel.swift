@@ -63,8 +63,10 @@ extension RecipeLibraryModel {
     }
     let draft = RecipeEditingModel(original: original)
     if let original {
-      do { draft.observedSelectionIDs = try library.editingSelectionHeads(for: original.id) }
-      catch { editingStorageFailed = true; return }
+      do { draft.observedSelectionIDs = try library.editingSelectionHeads(for: original.id) } catch {
+        editingStorageFailed = true
+        return
+      }
     }
     authoringItems.append(draft)
     observeEditingDraft(draft)

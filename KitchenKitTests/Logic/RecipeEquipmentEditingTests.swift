@@ -17,7 +17,7 @@ final class RecipeEquipmentEditingTests: XCTestCase {
     let equipment = [
       EquipmentItem(originalText: "2 large bowls", quantity: .init(
         kind: .exact, lowerBound: .init(numerator: 2)), name: "large bowls"),
-      EquipmentItem(originalText: "something heavy to press it", name: "", isOptional: true)
+      EquipmentItem(originalText: "something heavy to press it", name: "", isOptional: true),
     ]
     let first = try editor.create(in: kitchen.id, from: RecipeDraft(title: "Tofu", equipment: equipment))
     XCTAssertEqual(first.revision.equipment, equipment)
@@ -67,7 +67,7 @@ final class RecipeEquipmentEditingTests: XCTestCase {
         EquipmentItem(originalText: " \n ", name: ""),
         EquipmentItem(originalText: "a pan, any size", name: ""),
         EquipmentItem(originalText: "", name: "  spatula  "),
-        EquipmentItem(originalText: "", quantity: .init(kind: .text, text: "a few"), name: "")
+        EquipmentItem(originalText: "", quantity: .init(kind: .text, text: "a few"), name: ""),
       ]
     ))
     XCTAssertEqual(stored.revision.equipment.map(\.originalText), ["a pan, any size", "", ""])

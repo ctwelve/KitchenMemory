@@ -57,7 +57,9 @@ struct ContentView: View {
       Button(.sessionEntryDetachedContinue) {
         preparedApp?.sessionModel.continueDetachedEntryDraft()
       }
-      Button(.sessionEntryDetachedCopy) { copyAndDiscardDetachedDraft() }
+      Button(.sessionEntryDetachedCopy) {
+        preparedApp?.sessionModel.copyAndDiscardDetachedEntryDraft(using: CookingSessionClipboard.copy)
+      }
       Button(.sessionEntryDetachedDiscard, role: .destructive) {
         preparedApp?.sessionModel.discardDetachedEntryDraft()
       }
@@ -71,21 +73,14 @@ struct ContentView: View {
         preparedApp?.sessionModel.showRecipes()
       }
     }
-    .alert(.recipeEditorDraftFailureTitle, isPresented: draftFailureIsPresented) {
-      Button(.actionTryAgain) { preparedApp?.libraryModel.retryEditingStorage() }
-      Button(.actionCancel, role: .cancel) {}
-    } message: {
-      Text(.recipeEditorDraftFailureMessage)
-    }
+    .modifier(RecipeDraftFailureAlert(model: preparedApp?.libraryModel))
   }
 
   private var shellPresentation: AppShellPresentation {
     AppShellPresentation(state: startupState)
   }
 
-  private var preparedApp: PreparedApp? {
-    startupState.preparedApp
-  }
+  private var preparedApp: PreparedApp? { startupState.preparedApp }
 
   private var usesPersistentLibraryShell: Bool {
 #if os(iOS)
@@ -282,13 +277,6 @@ struct ContentView: View {
 }
 
 private extension ContentView {
-  var draftFailureIsPresented: Binding<Bool> {
-    Binding(
-      get: { preparedApp?.libraryModel.editingStorageFailed ?? false },
-      set: { preparedApp?.libraryModel.editingStorageFailed = $0 }
-    )
-  }
-
   var compactEditorIsPresented: Binding<Bool> {
     Binding(
       get: { !usesPersistentLibraryShell && preparedApp?.libraryModel.editor != nil },
@@ -373,10 +361,6 @@ private extension ContentView {
       get: { preparedApp?.sessionModel.detachedEntryDraft != nil },
       set: { _ in }
     )
-  }
-
-  func copyAndDiscardDetachedDraft() {
-    preparedApp?.sessionModel.copyAndDiscardDetachedEntryDraft(using: CookingSessionClipboard.copy)
   }
 
   var usesCustomSidebarToggle: Bool {
