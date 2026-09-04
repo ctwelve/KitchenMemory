@@ -79,9 +79,19 @@ extension RecipeLibraryModel {
     do {
       authoringItems = try editingStore.load().map(RecipeEditingModel.init(record:))
       authoringItems.forEach(observeEditingDraft)
+      editingStorageIsAvailable = true
+      editingStorageFailed = false
     } catch {
       editingStorageIsAvailable = false
       editingStorageFailed = true
+    }
+  }
+
+  func retryEditingStorage() {
+    if editingStorageIsAvailable {
+      _ = persistEditingDrafts()
+    } else {
+      restoreEditingDrafts()
     }
   }
 

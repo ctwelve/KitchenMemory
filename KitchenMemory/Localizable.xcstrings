@@ -272,19 +272,19 @@
         "en-US": {
           "stringUnit": {
             "state": "translated",
-            "value": "Your editing work is still open. Keep it open and try again. Existing draft files have not been discarded."
+            "value": "Editing data could not be read or saved. Keep any open work here and try again. Existing draft files have not been discarded."
           }
         },
         "es-MX": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tu trabajo sigue abierto. Déjalo abierto e inténtalo de nuevo. No se han descartado los archivos de borrador existentes."
+            "value": "No se pudieron leer o guardar los datos de edición. Mantén aquí cualquier trabajo abierto e inténtalo de nuevo. No se han descartado los archivos de borrador existentes."
           }
         },
         "fr-CA": {
           "stringUnit": {
             "state": "translated",
-            "value": "Votre travail est toujours ouvert. Gardez-le ouvert et réessayez. Les fichiers de brouillon existants n’ont pas été supprimés."
+            "value": "Les données de modification n’ont pas pu être lues ou enregistrées. Gardez ici tout travail ouvert et réessayez. Les fichiers de brouillon existants n’ont pas été supprimés."
           }
         }
       }
