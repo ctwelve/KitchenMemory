@@ -8,6 +8,23 @@ import XCTest
 
 @MainActor
 final class RecipeEditingPresentationTests: XCTestCase {
+  func testSelectingAnotherRecipeRetainsEditingIntentAndShowsTheSelectedRecipe() throws {
+    let app = try AppRuntime.testing()
+    let model = app.libraryModel
+    model.loadIfNeeded()
+    let first = try XCTUnwrap(model.recipes.first)
+    let second = try XCTUnwrap(model.recipes.dropFirst().first)
+    model.beginEditing(first)
+    let draft = try XCTUnwrap(model.editor)
+    draft.session.title = "Local correction"
+    XCTAssertTrue(model.selectRecipeForReading(second.id))
+    XCTAssertNil(model.editor)
+    XCTAssertEqual(model.selectedRecipe?.id, second.id)
+    model.beginEditing(first)
+    XCTAssertEqual(model.editor?.id, draft.id)
+    XCTAssertEqual(model.editor?.session.title, "Local correction")
+  }
+
   func testClosePreservesEditingIntentWithoutChangingRecipeAndSaveCreatesRevision() throws {
     let app = try AppRuntime.testing()
     let library = app.libraryModel
