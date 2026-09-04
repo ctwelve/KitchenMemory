@@ -4,12 +4,12 @@
 <dict>
 	<key>com.apple.developer.aps-environment</key>
 	<string>$(KITCHEN_MEMORY_APS_ENVIRONMENT)</string>
+	<key>com.apple.developer.icloud-container-environment</key>
+	<string>$(KITCHEN_MEMORY_CLOUDKIT_ENVIRONMENT)</string>
 	<key>com.apple.developer.icloud-container-identifiers</key>
 	<array>
 		<string>$(KITCHEN_MEMORY_CLOUDKIT_CONTAINER)</string>
 	</array>
-	<key>com.apple.developer.icloud-container-environment</key>
-	<string>$(KITCHEN_MEMORY_CLOUDKIT_ENVIRONMENT)</string>
 	<key>com.apple.developer.icloud-services</key>
 	<array>
 		<string>CloudKit</string>
