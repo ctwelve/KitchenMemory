@@ -24,6 +24,12 @@ struct RecipeLibrarySidebar: View {
     .accessibilityIdentifier("recipe-library-shell")
     .accessibilityLabel(Text(.libraryAccessibilityLabel))
     .listStyle(.sidebar)
+    .onChange(of: model.recipes.map(\.recipe.id), initial: true) { _, recipeIDs in
+      sessionModel.refreshSidebarAssociations(for: recipeIDs)
+    }
+    .onChange(of: sessionModel.sessions.map(\.id)) { _, _ in
+      sessionModel.refreshSidebarAssociations(for: model.recipes.map(\.recipe.id))
+    }
     .overlay {
       if !model.hasLoaded { ProgressView(.libraryLoading) }
     }
@@ -52,25 +58,17 @@ struct RecipeLibrarySidebar: View {
       }
       .accessibilityIdentifier("deleted-items-destination")
 
-      NavigationLink {
-        CookingSessionRecoveryDestinationView(
-          model: sessionModel,
-          prepare: showRecovery
-        )
-      } label: {
-        Label(.recoveryTitle, systemImage: "wrench.and.screwdriver")
-          .badge(sessionModel.recoveryItemCount)
-      }
-      .accessibilityIdentifier("recovery-destination")
-
-      ForEach(sessionModel.sidebarSessions, id: \.id) { session in
-        Button {
-          selectSession(session.id)
+      if sessionModel.showsRecoveryDestination {
+        NavigationLink {
+          CookingSessionRecoveryDestinationView(
+            model: sessionModel,
+            prepare: showRecovery
+          )
         } label: {
-          CookingSessionRow(session: session)
+          Label(.recoveryTitle, systemImage: "wrench.and.screwdriver")
+            .badge(sessionModel.recoveryItemCount)
         }
-        .buttonStyle(.borderless)
-        .accessibilityIdentifier("session-row-\(session.id.rawValue.uuidString)")
+        .accessibilityIdentifier("recovery-destination")
       }
     } header: {
       Text(.sessionDiscoveryTitle)
@@ -90,6 +88,16 @@ struct RecipeLibrarySidebar: View {
             RecipeRow(storedRecipe: storedRecipe)
           }
           .accessibilityIdentifier("recipe-row-\(storedRecipe.recipe.id.rawValue.uuidString)")
+          ForEach(sessionModel.sidebarSessions(for: storedRecipe.recipe.id), id: \.id) { session in
+            Button {
+              selectSession(session.id)
+            } label: {
+              CookingSessionRow(session: session)
+                .padding(.leading, 24)
+            }
+            .buttonStyle(.borderless)
+            .accessibilityIdentifier("session-row-\(session.id.rawValue.uuidString)")
+          }
         }
       }
     } header: {
