@@ -20,7 +20,10 @@ final class RecipeLibraryModel {
     case ready
   }
 
-  private let library: RecipeLibrary
+  let library: RecipeLibrary
+  let editingStore: any RecipeEditingStoring
+  var editingStorageFailed = false
+  var editingStorageIsAvailable = true
   private let samplePreferences: any SampleRecipeOnboardingStoring
   private var hasEstablishedKitchenEvidence: Bool
   private var resetPresentationState: () -> Void = {}
@@ -29,6 +32,7 @@ final class RecipeLibraryModel {
   var selectedRecipeID: Recipe.ID?
   var editor: RecipeEditingModel?
   var editingDrafts: [RecipeEditingModel] = []
+  var isShowingDrafts = false
   private(set) var issue: RecipeLibraryIssue?
   private(set) var hasLoaded = false
   private(set) var startupState: StartupState = .loading
@@ -39,15 +43,18 @@ final class RecipeLibraryModel {
   init(
     library: RecipeLibrary,
     samplePreferences: any SampleRecipeOnboardingStoring,
-    kitchenWasCreated: Bool
+    kitchenWasCreated: Bool,
+    editingStore: any RecipeEditingStoring = VolatileRecipeEditingStore()
   ) {
     self.library = library
+    self.editingStore = editingStore
     self.samplePreferences = samplePreferences
     hasEstablishedKitchenEvidence = !kitchenWasCreated
     sampleOnboardingResponse = samplePreferences.sampleRecipeOnboardingResponse
     samplePreferences.startObservingSampleRecipeOnboardingResponse { [weak self] response in
       self?.receiveSampleOnboardingResponse(response)
     }
+    restoreEditingDrafts()
   }
 
   var selectedRecipe: StoredRecipe? {
@@ -176,6 +183,15 @@ final class RecipeLibraryModel {
   func resetKitchen() -> Bool {
     do {
       try library.reset()
+      let retainedDrafts = editingDrafts
+      editingDrafts = []
+      guard persistEditingDrafts() else {
+        editingDrafts = retainedDrafts
+        issue = .reset
+        return false
+      }
+      editor = nil
+      isShowingDrafts = false
       resetPresentationState()
       samplePreferences.sampleRecipeOnboardingResponse = .accepted
       sampleOnboardingResponse = .accepted

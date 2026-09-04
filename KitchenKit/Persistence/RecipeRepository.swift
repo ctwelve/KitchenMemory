@@ -11,7 +11,7 @@ import SwiftData
 // swiftlint:disable file_length type_body_length
 
 /// A recipe together with the revision selected as its current content.
-public struct StoredRecipe: Equatable, Identifiable, Sendable {
+public struct StoredRecipe: Codable, Equatable, Identifiable, Sendable {
   public var id: Recipe.ID { recipe.id }
   public let recipe: Recipe
   public let revision: RecipeRevision
@@ -36,6 +36,7 @@ public protocol RecipeRepository: AnyObject {
   func save(_ command: RecipeSaveCommand) throws
   /// Atomically chooses an existing accepted Revision using immutable evidence.
   func select(_ command: RecipeSelectionCommand) throws
+  func selectionHeads(for recipeID: Recipe.ID) throws -> [RecipeSelectionCommand.ID]
   func kitchens() throws -> [Kitchen]
   func kitchen(id: Kitchen.ID) throws -> Kitchen?
   /// Atomically claims legacy Kitchens and converges only matching ownership.
@@ -53,6 +54,8 @@ public protocol RecipeRepository: AnyObject {
 }
 
 public extension RecipeRepository {
+  func selectionHeads(for recipeID: Recipe.ID) throws -> [RecipeSelectionCommand.ID] { [] }
+
   func save(_ command: RecipeSaveCommand) throws {
     try save(recipe: command.recipe, revision: command.revision)
   }
@@ -1134,7 +1137,7 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     }
   }
 
-  private func selectionHeads(
+  public func selectionHeads(
     for recipeID: Recipe.ID
   ) throws -> [RecipeSelectionCommand.ID] {
     let identifier = recipeID.rawValue

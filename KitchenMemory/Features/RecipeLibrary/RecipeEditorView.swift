@@ -59,12 +59,14 @@ struct RecipeEditorView: View {
         List {
           editorSections
         }
+        .disabled(editor.pendingSave != nil)
         .listStyle(.inset)
         .accessibilityIdentifier("recipe-editor-scroll")
 #else
         Form {
           editorSections
         }
+        .disabled(editor.pendingSave != nil)
         .accessibilityIdentifier("recipe-editor-scroll")
 #endif
       }
@@ -77,10 +79,11 @@ struct RecipeEditorView: View {
         ToolbarItem(placement: .cancellationAction) { Button(.recipeEditorActionClose, action: close) }
         ToolbarItem(placement: .destructiveAction) {
           Button(.recipeEditorActionDiscard, role: .destructive) { confirmsDiscard = true }
+            .disabled(editor.pendingSave != nil)
         }
         ToolbarItem(placement: .confirmationAction) {
           Button(.recipeEditorReviseActionSave) { _ = save() }
-            .disabled(!editor.session.canSave)
+            .disabled(editor.pendingSave == nil && !editor.session.canSave)
             .accessibilityIdentifier("recipe-editor-save")
         }
       }

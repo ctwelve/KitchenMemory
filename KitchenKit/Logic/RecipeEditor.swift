@@ -197,6 +197,30 @@ public struct RecipeEditor {
     return StoredRecipe(recipe: recipe, revision: revision)
   }
 
+  /// Freezes an explicit save for durable retry, using the draft's observed base.
+  public func prepareSave(
+    in kitchenID: Kitchen.ID,
+    from draft: RecipeDraft,
+    original: StoredRecipe?,
+    observedSelectionIDs: [RecipeSelectionCommand.ID]
+  ) throws -> RecipeSaveCommand {
+    let recipeID = original?.id ?? Recipe.ID()
+    let revision = try revision(
+      recipeID: recipeID, number: (original?.revision.revisionNumber ?? 0) + 1,
+      from: draft, preserving: original?.revision
+    )
+    let recipe = Recipe(id: recipeID, kitchenID: kitchenID, currentRevisionID: revision.id)
+    let now = Date()
+    return RecipeSaveCommand(
+      recipe: recipe, revision: revision, savedAt: now,
+      parentRevisionIDs: original.map { [$0.revision.id] } ?? [],
+      selection: RecipeSelectionCommand(
+        kitchenID: kitchenID, recipeID: recipeID, selectedRevisionID: revision.id,
+        selectedAt: now, observedSelectionIDs: observedSelectionIDs
+      )
+    )
+  }
+
   private func revision(
     recipeID: Recipe.ID,
     number: Int,

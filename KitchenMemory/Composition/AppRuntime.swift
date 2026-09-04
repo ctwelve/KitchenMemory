@@ -251,7 +251,10 @@ struct PreparedCore {
     libraryModel = RecipeLibraryModel(
       library: library,
       samplePreferences: preferences,
-      kitchenWasCreated: initialKitchenWasCreatedOverride ?? preparedKitchen.wasCreated
+      kitchenWasCreated: initialKitchenWasCreatedOverride ?? preparedKitchen.wasCreated,
+      editingStore: plan.store.isInMemory
+        ? VolatileRecipeEditingStore()
+        : try FileRecipeEditingStore.deviceLocal(ownerID: ownerID)
     )
     cookingSessionRepository = SwiftDataCookingSessionRepository(
       modelContainer: modelContainer

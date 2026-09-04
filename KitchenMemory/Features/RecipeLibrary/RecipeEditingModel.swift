@@ -13,7 +13,24 @@ final class RecipeEditingModel: Identifiable {
   let id: UUID
   let original: StoredRecipe?
   let concerns: [RecipeImportConcern]
-  var session: RecipeEditSession
+  var observedSelectionIDs: [RecipeSelectionCommand.ID] = []
+  var pendingSave: RecipeSaveCommand?
+  var session: RecipeEditSession { didSet { changed() } }
+  @ObservationIgnored var changed: () -> Void = {}
+
+  var record: RecipeEditingRecord {
+    RecipeEditingRecord(id: id, original: original, concerns: concerns, session: session,
+                        observedSelectionIDs: observedSelectionIDs, pendingSave: pendingSave)
+  }
+
+  init(record: RecipeEditingRecord) {
+    id = record.id
+    original = record.original
+    concerns = record.concerns
+    session = record.session
+    observedSelectionIDs = record.observedSelectionIDs
+    pendingSave = record.pendingSave
+  }
 
   init(original: StoredRecipe? = nil, draft: RecipeDraft? = nil,
        concerns: [RecipeImportConcern] = []) {
@@ -27,39 +44,92 @@ final class RecipeEditingModel: Identifiable {
 
 extension RecipeLibraryModel {
   func beginEditing(_ original: StoredRecipe? = nil) {
+    guard editingStorageIsAvailable else { editingStorageFailed = true; return }
     if let original, let retained = editingDrafts.first(where: { $0.original?.id == original.id }) {
       editor = retained
       return
     }
     let draft = RecipeEditingModel(original: original)
+    if let original {
+      do { draft.observedSelectionIDs = try library.editingSelectionHeads(for: original.id) }
+      catch { editingStorageFailed = true; return }
+    }
     editingDrafts.append(draft)
+    observeEditingDraft(draft)
     editor = draft
+    _ = persistEditingDrafts()
   }
 
   func beginImportReview(_ option: RecipeImportOption) {
+    guard editingStorageIsAvailable else { editingStorageFailed = true; return }
     let draft = RecipeEditingModel(draft: option.draft, concerns: option.concerns)
     editingDrafts.append(draft)
+    observeEditingDraft(draft)
     editor = draft
+    _ = persistEditingDrafts()
   }
 
-  func closeEditor() { editor = nil }
+  func closeEditor() {
+    if persistEditingDrafts() { editor = nil }
+  }
+
+  func resumeEditingDraft(_ id: UUID) {
+    editor = editingDrafts.first { $0.id == id }
+  }
+
+  func restoreEditingDrafts() {
+    do {
+      editingDrafts = try editingStore.load().map(RecipeEditingModel.init(record:))
+      editingDrafts.forEach(observeEditingDraft)
+    } catch {
+      editingStorageIsAvailable = false
+      editingStorageFailed = true
+    }
+  }
+
+  private func observeEditingDraft(_ draft: RecipeEditingModel) {
+    draft.changed = { [weak self] in _ = self?.persistEditingDrafts() }
+  }
+
+  @discardableResult
+  func persistEditingDrafts() -> Bool {
+    guard editingStorageIsAvailable else { return false }
+    do {
+      try editingStore.save(editingDrafts.map(\.record))
+      editingStorageFailed = false
+      return true
+    } catch {
+      editingStorageFailed = true
+      return false
+    }
+  }
 
   func discardEditor(confirmed: Bool) {
     guard confirmed, let editor else { return }
+    let retained = editingDrafts
     editingDrafts.removeAll { $0.id == editor.id }
-    self.editor = nil
+    if persistEditingDrafts() { self.editor = nil } else { editingDrafts = retained }
   }
 
   @discardableResult
   func saveEditor() -> Bool {
-    guard let editor, let draft = try? editor.session.validatedDraft() else { return false }
-    let saved: Bool
-    if let original = editor.original {
-      saved = reviseRecipe(id: original.id, from: draft)
-    } else {
-      saved = createRecipe(from: draft)
+    guard let editor else { return false }
+    do {
+      if editor.pendingSave == nil {
+        editor.pendingSave = try library.prepareSave(
+          from: editor.session.validatedDraft(), original: editor.original,
+          observedSelectionIDs: editor.observedSelectionIDs
+        )
+      }
+      guard persistEditingDrafts(), let command = editor.pendingSave else { return false }
+      try library.save(command)
+      selectedRecipeID = command.recipe.id
+      reload()
+      discardEditor(confirmed: true)
+      return self.editor == nil
+    } catch {
+      editingStorageFailed = true
+      return false
     }
-    if saved { discardEditor(confirmed: true) }
-    return saved
   }
 }

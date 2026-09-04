@@ -24,7 +24,7 @@ public enum RecipeEditSessionError: Error, Equatable, Sendable {
 ///
 /// The current sheet and a future in-page editor can bind to the same value
 /// without making SwiftUI responsible for validation or lossless draft assembly.
-public struct RecipeEditSession: Equatable, Sendable {
+public struct RecipeEditSession: Codable, Equatable, Sendable {
   public static let maximumDurationMinutes = 366 * 24 * 60
 
   public var title: String

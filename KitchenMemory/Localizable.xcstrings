@@ -1,6 +1,126 @@
 {
   "sourceLanguage" : "en-US",
   "strings" : {
+    "recipe.drafts.title": {
+      "comment": "Destination containing device-local unfinished Recipe work.",
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Drafts"
+          }
+        },
+        "es-MX": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Borradores"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Brouillons"
+          }
+        }
+      }
+    },
+    "recipe.drafts.untitled": {
+      "comment": "A draft with no authored title yet.",
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Untitled Recipe"
+          }
+        },
+        "es-MX": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Receta sin título"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recette sans titre"
+          }
+        }
+      }
+    },
+    "recipe.drafts.local-note": {
+      "comment": "Clarifies that unfinished editing is stored only on this device.",
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Only on this device"
+          }
+        },
+        "es-MX": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Solo en este dispositivo"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sur cet appareil seulement"
+          }
+        }
+      }
+    },
+    "recipe.editor.draft-failure.title": {
+      "comment": "Title for an unsuccessful local draft or Recipe save.",
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn’t Save Your Work"
+          }
+        },
+        "es-MX": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudo guardar tu trabajo"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossible d’enregistrer votre travail"
+          }
+        }
+      }
+    },
+    "recipe.editor.draft-failure.message": {
+      "comment": "Explains a local read/write failure without promising durability.",
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your editing work is still open. Keep it open and try again. Existing draft files have not been discarded."
+          }
+        },
+        "es-MX": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tu trabajo sigue abierto. Déjalo abierto e inténtalo de nuevo. No se han descartado los archivos de borrador existentes."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Votre travail est toujours ouvert. Gardez-le ouvert et réessayez. Les fichiers de brouillon existants n’ont pas été supprimés."
+          }
+        }
+      }
+    },
     "recipe.editor.action.close": {
       "comment": "Close editor while retaining its local draft.",
       "extractionState": "manual",

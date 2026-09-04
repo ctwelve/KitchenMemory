@@ -12,7 +12,9 @@ struct LibraryDetailRouter: View {
 
   @ViewBuilder
   var body: some View {
-    if let finishedSession = sessionModel.observedFinishedSession {
+    if libraryModel.isShowingDrafts {
+      RecipeDraftsView(model: libraryModel)
+    } else if let finishedSession = sessionModel.observedFinishedSession {
       FinishedCookingSessionView(model: sessionModel, session: finishedSession)
     } else if sessionModel.isShowingDeletedItems {
       CookingSessionDeletedItemsView(model: sessionModel)

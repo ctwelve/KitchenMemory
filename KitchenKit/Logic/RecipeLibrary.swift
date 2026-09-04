@@ -78,6 +78,25 @@ public struct RecipeLibrary {
     try await importer.importRecipe(from: url)
   }
 
+  public func editingSelectionHeads(for recipeID: Recipe.ID) throws -> [RecipeSelectionCommand.ID] {
+    try repository.selectionHeads(for: recipeID)
+  }
+
+  public func prepareSave(
+    from draft: RecipeDraft, original: StoredRecipe?,
+    observedSelectionIDs: [RecipeSelectionCommand.ID]
+  ) throws -> RecipeSaveCommand {
+    try editor.prepareSave(in: kitchenID, from: draft, original: original,
+                           observedSelectionIDs: observedSelectionIDs)
+  }
+
+  public func save(_ command: RecipeSaveCommand) throws {
+    guard command.recipe.kitchenID == kitchenID else {
+      throw KitchenMemoryPersistenceError.inconsistentRecipeIdentity
+    }
+    try repository.save(command)
+  }
+
   public func installSamples() throws {
     try sampleInstaller.install(in: kitchenID)
   }

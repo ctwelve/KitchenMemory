@@ -11,7 +11,7 @@ import Foundation
 ///
 /// Concerns preserve uncertainty for presentation; they are not silent repairs
 /// and do not authorize saving an import into the library.
-public enum RecipeImportConcern: Equatable, Sendable {
+public enum RecipeImportConcern: Codable, Equatable, Sendable {
   case missingTitle
   case missingIngredients
   case missingInstructions
