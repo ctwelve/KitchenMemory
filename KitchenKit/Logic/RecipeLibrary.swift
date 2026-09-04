@@ -78,6 +78,12 @@ public struct RecipeLibrary {
     try await importer.importRecipe(from: url)
   }
 
+  public func importDocument(
+    _ data: Data, sourceURL: URL, format: RecipeImportService.DocumentFormat
+  ) throws -> [RecipeImportOption] {
+    try RecipeImportService.documentOptions(from: data, sourceURL: sourceURL, format: format)
+  }
+
   public func editingSelectionHeads(for recipeID: Recipe.ID) throws -> [RecipeSelectionCommand.ID] {
     try repository.selectionHeads(for: recipeID)
   }

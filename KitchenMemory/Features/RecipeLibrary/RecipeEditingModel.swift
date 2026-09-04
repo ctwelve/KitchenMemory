@@ -14,35 +14,40 @@ final class RecipeEditingModel: Identifiable {
   let original: StoredRecipe?
   let concerns: [RecipeImportConcern]
   var observedSelectionIDs: [RecipeSelectionCommand.ID] = []
-  var pendingSave: RecipeSaveCommand?
-  var isImportCandidate = false
+  var phase: RecipeAuthoringPhase
+  var pendingSave: RecipeSaveCommand? {
+    guard case .saving(let command) = phase else { return nil }
+    return command
+  }
+  var isImportCandidate: Bool { phase == .importCandidate }
   var importIdentifier: String?
   var session: RecipeEditSession { didSet { changed() } }
   @ObservationIgnored var changed: () -> Void = {}
 
   var record: RecipeEditingRecord {
     RecipeEditingRecord(id: id, original: original, concerns: concerns, session: session,
-                        observedSelectionIDs: observedSelectionIDs, pendingSave: pendingSave,
-                        isImportCandidate: isImportCandidate, importIdentifier: importIdentifier)
+                        observedSelectionIDs: observedSelectionIDs, pendingSave: nil,
+                        isImportCandidate: nil, importIdentifier: importIdentifier, phase: phase)
   }
 
   init(record: RecipeEditingRecord) {
     id = record.id
     original = record.original
     concerns = record.concerns
+    phase = record.phase ?? record.pendingSave.map(RecipeAuthoringPhase.saving)
+      ?? (record.isImportCandidate == true ? .importCandidate : .editing)
     session = record.session
     if session.equipment == nil { session.equipment = original?.revision.equipment ?? [] }
     observedSelectionIDs = record.observedSelectionIDs
-    pendingSave = record.pendingSave
-    isImportCandidate = record.isImportCandidate ?? false
     importIdentifier = record.importIdentifier
   }
 
   init(original: StoredRecipe? = nil, draft: RecipeDraft? = nil,
-       concerns: [RecipeImportConcern] = []) {
+       concerns: [RecipeImportConcern] = [], phase: RecipeAuthoringPhase = .editing) {
     id = UUID()
     self.original = original
     self.concerns = concerns
+    self.phase = phase
     session = RecipeEditSession(draft: draft ?? original.map { RecipeDraft(revision: $0.revision) }
       ?? RecipeDraft())
     if session.equipment == nil { session.equipment = [] }
@@ -141,10 +146,10 @@ extension RecipeLibraryModel {
     guard let editor, !editor.isImportCandidate else { return false }
     do {
       if editor.pendingSave == nil {
-        editor.pendingSave = try library.prepareSave(
+        editor.phase = .saving(try library.prepareSave(
           from: editor.session.validatedDraft(), original: editor.original,
           observedSelectionIDs: editor.observedSelectionIDs
-        )
+        ))
       }
       guard persistEditingDrafts(), let command = editor.pendingSave else { return false }
       try library.save(command)

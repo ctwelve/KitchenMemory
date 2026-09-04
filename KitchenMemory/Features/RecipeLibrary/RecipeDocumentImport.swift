@@ -17,8 +17,8 @@ extension RecipeLibraryModel {
       guard let chunk = try handle.read(upToCount: maximum + 1 - data.count), !chunk.isEmpty else { break }
       data.append(chunk)
     }
-    let options = try RecipeImportService.documentOptions(
-      from: data, sourceURL: url,
+    let options = try library.importDocument(
+      data, sourceURL: url,
       format: ["html", "htm"].contains(url.pathExtension.lowercased()) ? .html : .jsonLD
     )
     try stageImports(options)

@@ -15,6 +15,7 @@ struct RecipeEditingRecord: Codable, Equatable {
   var pendingSave: RecipeSaveCommand?
   var isImportCandidate: Bool?
   var importIdentifier: String?
+  var phase: RecipeAuthoringPhase?
 }
 
 @MainActor
