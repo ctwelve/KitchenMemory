@@ -175,6 +175,7 @@ struct EditorTextField: View {
         multilineField
       } else {
         TextField(label, text: $text, prompt: promptText)
+          .textFieldStyle(.roundedBorder)
           .labelsHidden()
       }
     } label: {
@@ -184,6 +185,7 @@ struct EditorTextField: View {
 
   private var multilineField: some View {
     TextField(label, text: $text, prompt: promptText, axis: .vertical)
+      .textFieldStyle(.roundedBorder)
       .labelsHidden()
       .lineLimit(2...8)
       .fixedSize(horizontal: false, vertical: true)

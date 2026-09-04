@@ -27,33 +27,35 @@ struct RecipeEditorView: View {
   }
 
   let mode: Mode
-  let save: (RecipeDraft) -> Bool
+  let save: () -> Bool
+  let close: () -> Void
+  let discard: () -> Void
   let reviewConcerns: [RecipeImportConcern]
 
-  @Environment(\.dismiss) private var dismiss
   @Environment(\.locale) private var locale
-  @State private var session: RecipeEditSession
+  @Bindable var editor: RecipeEditingModel
+  @State private var confirmsDiscard = false
 
   init(
     mode: Mode,
-    draft: RecipeDraft = RecipeDraft(),
-    reviewConcerns: [RecipeImportConcern] = [],
-    save: @escaping (RecipeDraft) -> Bool
+    editor: RecipeEditingModel,
+    close: @escaping () -> Void,
+    discard: @escaping () -> Void,
+    save: @escaping () -> Bool
   ) {
     self.mode = mode
     self.save = save
-    self.reviewConcerns = reviewConcerns
-    _session = State(initialValue: RecipeEditSession(draft: draft))
+    self.reviewConcerns = editor.concerns
+    self.editor = editor
+    self.close = close
+    self.discard = discard
   }
 
   var body: some View {
     NavigationStack {
       Group {
 #if os(macOS)
-        // Form adopts its content's ideal height in a macOS sheet, so bounding
-        // the sheet alone can clip the content without creating a scrollable
-        // viewport. List owns its scroll view and still provides native Section
-        // presentation and form controls.
+        // List owns the scrolling viewport as the detail column resizes.
         List {
           editorSections
         }
@@ -66,30 +68,26 @@ struct RecipeEditorView: View {
         .accessibilityIdentifier("recipe-editor-scroll")
 #endif
       }
+      .textFieldStyle(.roundedBorder)
       .navigationTitle(mode.title)
 #if os(iOS)
       .navigationBarTitleDisplayMode(.inline)
 #endif
       .toolbar {
-        ToolbarItem(placement: .cancellationAction) { Button(.actionCancel) { dismiss() } }
+        ToolbarItem(placement: .cancellationAction) { Button(.recipeEditorActionClose, action: close) }
+        ToolbarItem(placement: .destructiveAction) {
+          Button(.recipeEditorActionDiscard, role: .destructive) { confirmsDiscard = true }
+        }
         ToolbarItem(placement: .confirmationAction) {
-          Button(mode.saveLabel) {
-            if let draft = try? session.validatedDraft(), save(draft) { dismiss() }
-          }
-            .disabled(!session.canSave)
+          Button(.recipeEditorReviseActionSave) { _ = save() }
+            .disabled(!editor.session.canSave)
             .accessibilityIdentifier("recipe-editor-save")
         }
       }
-#if os(macOS)
-      .frame(
-        minWidth: 680,
-        idealWidth: 760,
-        maxWidth: 900,
-        minHeight: 520,
-        idealHeight: 680,
-        maxHeight: 760
-      )
-#endif
+      .confirmationDialog(.recipeEditorDiscardConfirmation, isPresented: $confirmsDiscard) {
+        Button(.recipeEditorActionDiscard, role: .destructive, action: discard)
+        Button(.actionCancel, role: .cancel) {}
+      }
     }
   }
 }
@@ -132,35 +130,39 @@ private extension RecipeEditorView {
 
   private var recipeSection: some View {
     Section(.recipeEditorRecipeSection) {
-      EditorTextField(.recipeEditorTitleField, text: $session.title)
+      EditorTextField(.recipeEditorTitleField, text: $editor.session.title)
         .accessibilityIdentifier("recipe-editor-title")
-      EditorTextField(.recipeEditorSummaryField, text: $session.summary, multiline: true)
+      if editor.session.validationIssues.contains(.missingTitle) {
+        Label(.recipeEditorTitleValidation, systemImage: "exclamationmark.triangle")
+          .foregroundStyle(.red)
+      }
+      EditorTextField(.recipeEditorSummaryField, text: $editor.session.summary, multiline: true)
         .accessibilityIdentifier("recipe-editor-summary")
-      EditorTextField(.recipeEditorAuthorField, text: $session.authorName)
-      RecipeYieldEditor(recipeYield: $session.recipeYield)
+      EditorTextField(.recipeEditorAuthorField, text: $editor.session.authorName)
+      RecipeYieldEditor(recipeYield: $editor.session.recipeYield)
     }
   }
 
   private var timingSection: some View {
     Section(.recipeEditorTimesSection) {
-      durationField(.recipeEditorTimePreparationField, text: $session.prepMinutes, field: .preparation)
-      durationField(.recipeEditorTimeCookingField, text: $session.cookMinutes, field: .cooking)
-      durationField(.recipeEditorTimeTotalField, text: $session.totalMinutes, field: .total)
+      durationField(.recipeEditorTimePreparationField, text: $editor.session.prepMinutes, field: .preparation)
+      durationField(.recipeEditorTimeCookingField, text: $editor.session.cookMinutes, field: .cooking)
+      durationField(.recipeEditorTimeTotalField, text: $editor.session.totalMinutes, field: .total)
     }
   }
 
   private var sourceSection: some View {
     Section(.recipeEditorSourceSection) {
-      Picker(selection: $session.sourceKind) {
+      Picker(selection: $editor.session.sourceKind) {
         ForEach(RecipeSource.Kind.allCases, id: \.self) { Text($0.label).tag($0) }
       } label: {
         EditorFieldLabel(.recipeEditorSourceKindField)
       }
-      EditorTextField(.recipeEditorSourceTitleField, text: $session.sourceTitle)
-      EditorTextField(.recipeEditorSourceAuthorField, text: $session.sourceAuthor)
-      EditorTextField(.recipeEditorSourcePublisherField, text: $session.sourcePublisher)
-      EditorTextField(.recipeEditorSourceUrlField, text: $session.sourceURL)
-      if session.validationIssues.contains(.invalidSourceURL) {
+      EditorTextField(.recipeEditorSourceTitleField, text: $editor.session.sourceTitle)
+      EditorTextField(.recipeEditorSourceAuthorField, text: $editor.session.sourceAuthor)
+      EditorTextField(.recipeEditorSourcePublisherField, text: $editor.session.sourcePublisher)
+      EditorTextField(.recipeEditorSourceUrlField, text: $editor.session.sourceURL)
+      if editor.session.validationIssues.contains(.invalidSourceURL) {
         Label(
           .recipeEditorSourceUrlValidation,
           systemImage: "exclamationmark.triangle"
@@ -173,17 +175,17 @@ private extension RecipeEditorView {
 
   private var ingredientsSection: some View {
     Section {
-      ForEach(session.ingredientSections.indices, id: \.self) { sectionIndex in
+      ForEach(editor.session.ingredientSections.indices, id: \.self) { sectionIndex in
         IngredientSectionEditor(
-          section: $session.ingredientSections[sectionIndex],
-          moveUp: { session.moveIngredientSection(at: sectionIndex, by: -1) },
-          moveDown: { session.moveIngredientSection(at: sectionIndex, by: 1) },
-          delete: { session.ingredientSections.remove(at: sectionIndex) }
+          section: $editor.session.ingredientSections[sectionIndex],
+          moveUp: { editor.session.moveIngredientSection(at: sectionIndex, by: -1) },
+          moveDown: { editor.session.moveIngredientSection(at: sectionIndex, by: 1) },
+          delete: { editor.session.ingredientSections.remove(at: sectionIndex) }
         )
-        .id("ingredient-section-\(session.ingredientSections[sectionIndex].id.rawValue.uuidString)")
+        .id("ingredient-section-\(editor.session.ingredientSections[sectionIndex].id.rawValue.uuidString)")
       }
       Button(.recipeEditorIngredientsActionAddSection, systemImage: "plus") {
-        session.ingredientSections.append(IngredientSection(title: nil, ingredients: []))
+        editor.session.ingredientSections.append(IngredientSection(title: nil, ingredients: []))
       }
       .accessibilityIdentifier("add-ingredient-section")
     } header: { Text(.recipeEditorIngredientsSection) } footer: {
@@ -193,17 +195,17 @@ private extension RecipeEditorView {
 
   private var instructionsSection: some View {
     Section {
-      ForEach(session.instructionSections.indices, id: \.self) { sectionIndex in
+      ForEach(editor.session.instructionSections.indices, id: \.self) { sectionIndex in
         InstructionSectionEditor(
-          section: $session.instructionSections[sectionIndex],
-          moveUp: { session.moveInstructionSection(at: sectionIndex, by: -1) },
-          moveDown: { session.moveInstructionSection(at: sectionIndex, by: 1) },
-          delete: { session.instructionSections.remove(at: sectionIndex) }
+          section: $editor.session.instructionSections[sectionIndex],
+          moveUp: { editor.session.moveInstructionSection(at: sectionIndex, by: -1) },
+          moveDown: { editor.session.moveInstructionSection(at: sectionIndex, by: 1) },
+          delete: { editor.session.instructionSections.remove(at: sectionIndex) }
         )
-        .id("instruction-section-\(session.instructionSections[sectionIndex].id.rawValue.uuidString)")
+        .id("instruction-section-\(editor.session.instructionSections[sectionIndex].id.rawValue.uuidString)")
       }
       Button(.recipeEditorInstructionsActionAddSection, systemImage: "plus") {
-        session.instructionSections.append(InstructionSection(title: nil, steps: []))
+        editor.session.instructionSections.append(InstructionSection(title: nil, steps: []))
       }
       .accessibilityIdentifier("add-instruction-section")
     } header: { Text(.recipeEditorInstructionsSection) }
@@ -216,7 +218,7 @@ private extension RecipeEditorView {
   ) -> some View {
     Group {
       EditorTextField(title, text: text)
-      if session.validationIssues.contains(.invalidDuration(field)) {
+      if editor.session.validationIssues.contains(.invalidDuration(field)) {
         Label(.recipeEditorTimeValidation, systemImage: "exclamationmark.triangle")
           .foregroundStyle(.red)
       }
