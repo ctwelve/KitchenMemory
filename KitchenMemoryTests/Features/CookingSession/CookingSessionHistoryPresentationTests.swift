@@ -9,6 +9,30 @@ import XCTest
 
 @MainActor
 final class CookingSessionHistoryPresentationTests: XCTestCase {
+  func testSidebarKeepsEveryActiveSessionEvenBeyondTheRecentHistoryLimit() throws {
+    let app = try AppRuntime.testing()
+    app.libraryModel.loadIfNeeded()
+    app.sessionModel.loadIfNeeded()
+    let recipe = try XCTUnwrap(app.libraryModel.recipes.first)
+    var activeIDs: Set<CookingSession.ID> = []
+    for _ in 0..<6 {
+      XCTAssertTrue(app.sessionModel.start(from: recipe))
+      activeIDs.insert(try XCTUnwrap(app.sessionModel.currentSessionID))
+      XCTAssertTrue(app.sessionModel.leaveCurrentSession())
+    }
+    for _ in 0..<7 {
+      XCTAssertTrue(app.sessionModel.start(from: recipe))
+      XCTAssertTrue(app.sessionModel.stopCurrentSession())
+      XCTAssertTrue(app.sessionModel.leaveCurrentSession())
+    }
+    app.sessionModel.refreshSidebarAssociations(for: [recipe.id])
+    let sidebar = app.sessionModel.sidebarSessions(for: recipe.id)
+    XCTAssertEqual(Set(sidebar.filter { $0.lifecycle == .active }.map(\.id)), activeIDs)
+    XCTAssertEqual(sidebar.filter { $0.lifecycle == .stopped }.count, 5)
+    app.sessionModel.showSessionHistory()
+    XCTAssertEqual(app.sessionModel.displayedHistorySessions.count, 13)
+  }
+
   func testSessionsWithoutAvailableRecipeRemainInIndependentHistory() {
     let active = CookingSessionProjection(
       id: CookingSession.ID(), snapshot: ExecutionSnapshot(title: "Retained cook")

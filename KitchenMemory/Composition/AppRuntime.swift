@@ -162,7 +162,7 @@ enum AppRuntime {
         : durablePreferences
       try initializeCloudKitSchemaIfRequested(plan: plan)
       let ownerID = try await KitchenOwnerIdentity.resolve(plan: plan, inputs: inputs)
-      return try PreparedApp(
+      let app = try PreparedApp(
         plan: plan,
         ownerID: ownerID,
         preferences: preferences,
@@ -171,6 +171,13 @@ enum AppRuntime {
           ? VolatileCookingSessionPresentationStore()
           : DefaultsCookingSessionPresentationStore()
       )
+#if TESTING
+      if plan.store.isInMemory, inputs.arguments.contains("--ui-testing"),
+         inputs.arguments.contains("--ui-testing-recovery-fixture") {
+        try app.installRecoveryNavigationFixture()
+      }
+#endif
+      return app
     }
   }
 
