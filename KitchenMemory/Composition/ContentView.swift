@@ -21,6 +21,7 @@ struct ContentView: View {
   @Environment(\.locale) private var locale
   @State private var activeSheet: ActiveRecipeSheet?
   @State private var columnVisibility = LibraryNavigationPolicy.initialVisibility
+  @State private var preferredCompactColumn: NavigationSplitViewColumn = .detail
   @State private var isShowingResetConfirmation = false
 #if !os(macOS)
   @State private var isShowingSettings = false
@@ -142,7 +143,7 @@ struct ContentView: View {
   }
 
   private var persistentRecipeLibraryShell: some View {
-    NavigationSplitView(columnVisibility: $columnVisibility) {
+    NavigationSplitView(columnVisibility: $columnVisibility, preferredCompactColumn: $preferredCompactColumn) {
       persistentSidebar
         .navigationTitle(.libraryTitle)
 #if !os(macOS)
@@ -217,7 +218,7 @@ struct ContentView: View {
   }
 
   private func recipeLibrary(_ dependencies: PreparedApp) -> some View {
-    NavigationSplitView(columnVisibility: $columnVisibility) {
+    NavigationSplitView(columnVisibility: $columnVisibility, preferredCompactColumn: $preferredCompactColumn) {
       recipeList(dependencies)
         .navigationTitle(.libraryTitle)
 #if os(macOS)
@@ -309,6 +310,9 @@ private extension ContentView {
   }
 
   func focusSelectedDestination() {
+    // Column visibility governs regular layouts; a collapsed split view needs
+    // an explicit preferred column after the person navigates back to its sidebar.
+    preferredCompactColumn = .detail
     columnVisibility = LibraryNavigationPolicy.destinationSelectionVisibility(
       current: columnVisibility,
       preservesSidebar: usesPersistentLibraryShell
