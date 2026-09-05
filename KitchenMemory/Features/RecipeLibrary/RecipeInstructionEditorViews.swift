@@ -23,6 +23,7 @@ struct InstructionSectionEditor: View {
             moveDown: { move(index, by: 1) },
             delete: { section.steps.remove(at: index) }
         )
+        .modifier(EditorGroupSurface(index: index, level: .item))
       }
       Button(.recipeEditorInstructionsActionAddStep, systemImage: "plus") {
         section.steps.append(InstructionStep(text: ""))
