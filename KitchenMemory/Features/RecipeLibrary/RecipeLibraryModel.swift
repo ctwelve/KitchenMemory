@@ -22,8 +22,13 @@ final class RecipeLibraryModel {
 
   let library: RecipeLibrary
   let editingStore: any RecipeEditingStoring
-  var editingStorageFailed = false
-  var editingStorageIsAvailable = true
+  let drafts: RecipeDrafts
+  @ObservationIgnored var editingPresentations: [UUID: RecipeEditingModel] = [:]
+  var editingStorageFailed: Bool {
+    get { drafts.storageFailed }
+    set { if !newValue { drafts.dismissStorageFailure() } }
+  }
+  var editingStorageIsAvailable: Bool { drafts.storageIsAvailable }
   private let samplePreferences: any SampleRecipeOnboardingStoring
   private var hasEstablishedKitchenEvidence: Bool
   private var resetPresentationState: () -> Void = {}
@@ -31,7 +36,6 @@ final class RecipeLibraryModel {
   private(set) var recipes: [StoredRecipe] = []
   var selectedRecipeID: Recipe.ID?
   var editor: RecipeEditingModel?
-  var authoringItems: [RecipeEditingModel] = []
   var editingDrafts: [RecipeEditingModel] { authoringItems.filter { !$0.isImportCandidate } }
   var importCandidates: [RecipeEditingModel] { authoringItems.filter(\.isImportCandidate) }
   var isShowingDrafts = false
@@ -50,13 +54,13 @@ final class RecipeLibraryModel {
   ) {
     self.library = library
     self.editingStore = editingStore
+    drafts = RecipeDrafts(library: library, store: editingStore)
     self.samplePreferences = samplePreferences
     hasEstablishedKitchenEvidence = !kitchenWasCreated
     sampleOnboardingResponse = samplePreferences.sampleRecipeOnboardingResponse
     samplePreferences.startObservingSampleRecipeOnboardingResponse { [weak self] response in
       self?.receiveSampleOnboardingResponse(response)
     }
-    restoreEditingDrafts()
   }
 
   var selectedRecipe: StoredRecipe? {
@@ -191,10 +195,8 @@ final class RecipeLibraryModel {
       // that could not be decoded. Ordinary autosave never does so.
       // Purge local authoring first: a failed file write must leave shared data
       // untouched, and a later shared-reset failure must not resurrect old drafts.
-      try editingStore.save([])
-      authoringItems = []
-      editingStorageIsAvailable = true
-      editingStorageFailed = false
+      guard drafts.purge() else { issue = .reset; return false }
+      editingPresentations = [:]
       editor = nil
       isShowingDrafts = false
       try library.reset()
