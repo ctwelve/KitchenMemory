@@ -109,6 +109,7 @@ private extension RecipeEditorView {
     recipeSection
     timingSection
     sourceSection
+    RecipeMediaEditorView(session: $editor.session)
     RecipeEquipmentEditorView(session: $editor.session)
     ingredientsSection
     instructionsSection

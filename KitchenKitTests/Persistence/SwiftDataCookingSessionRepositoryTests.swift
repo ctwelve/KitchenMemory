@@ -706,7 +706,7 @@ private final class TemporarySessionStore {
   }
 
   func readOnlyContainer() throws -> ModelContainer {
-    let schema = Schema(versionedSchema: KitchenMemorySchemaV5.self)
+    let schema = Schema(versionedSchema: KitchenMemorySchemaV6.self)
     let configuration = ModelConfiguration(
       "KitchenMemoryReadOnly",
       schema: schema,

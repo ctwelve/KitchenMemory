@@ -14,6 +14,19 @@ import XCTest
 @MainActor
 // swiftlint:disable:next type_body_length
 final class KitchenMemorySchemaSynchronizationTests: XCTestCase {
+  func testV6AddsOnlyOptionalExternalImagePayloads() throws {
+    let old = Set(KitchenMemorySchemaV5.models.map { String(describing: $0) })
+    let current = Set(KitchenMemorySchemaV6.models.map { String(describing: $0) })
+    XCTAssertEqual(current.subtracting(old), ["RecipeImagePayloadRecord"])
+    let model = try XCTUnwrap(NSManagedObjectModel.makeManagedObjectModel(for: KitchenMemorySchemaV6.models))
+    let entity = try XCTUnwrap(model.entitiesByName["RecipeImagePayloadRecord"])
+    XCTAssertEqual(Set(entity.attributesByName.keys), ["revisionID", "mediaID", "imageData"])
+    XCTAssertTrue(entity.relationshipsByName.isEmpty)
+    XCTAssertTrue(entity.uniquenessConstraints.isEmpty)
+    XCTAssertTrue(try XCTUnwrap(entity.attributesByName["imageData"]).isOptional)
+    XCTAssertTrue(try XCTUnwrap(entity.attributesByName["imageData"]).allowsExternalBinaryDataStorage)
+  }
+
   func testV4AddsOnlyKitchenOwnershipEvidence() throws {
     let v3Names = Set(KitchenMemorySchemaV3.models.map { String(describing: $0) })
     let v4Names = Set(KitchenMemorySchemaV4.models.map { String(describing: $0) })
@@ -433,7 +446,7 @@ final class KitchenMemorySchemaSynchronizationTests: XCTestCase {
       repository.recipe(id: Recipe.ID(rawValue: fixture.recipeID))
     )
 
-    XCTAssertEqual(migratedContainer.schema.version, Schema.Version(5, 0, 0))
+    XCTAssertEqual(migratedContainer.schema.version, Schema.Version(6, 0, 0))
     XCTAssertEqual(stored.revision.title, "V1 Soup")
     try assertFixtureGraph(repository, fixture: fixture, title: "V1 Soup")
     XCTAssertTrue(
@@ -449,7 +462,7 @@ final class KitchenMemorySchemaSynchronizationTests: XCTestCase {
     let migratedContainer = try KitchenMemorySchema.makeContainer(storeURL: fixture.storeURL)
     let repository = SwiftDataRecipeRepository(modelContainer: migratedContainer)
 
-    XCTAssertEqual(migratedContainer.schema.version, Schema.Version(5, 0, 0))
+    XCTAssertEqual(migratedContainer.schema.version, Schema.Version(6, 0, 0))
     XCTAssertEqual(
       try repository.recipe(id: Recipe.ID(rawValue: fixture.recipeID))?.revision.title,
       "V2 Soup"
@@ -491,7 +504,7 @@ final class KitchenMemorySchemaSynchronizationTests: XCTestCase {
     let migrated = try KitchenMemorySchema.makeContainer(storeURL: storeURL)
     let repository = SwiftDataRecipeRepository(modelContainer: migrated)
 
-    XCTAssertEqual(migrated.schema.version, Schema.Version(5, 0, 0))
+    XCTAssertEqual(migrated.schema.version, Schema.Version(6, 0, 0))
     XCTAssertEqual(
       try repository.kitchen(id: Kitchen.ID(rawValue: kitchenID)),
       Kitchen(id: Kitchen.ID(rawValue: kitchenID), name: "V3 Kitchen")
@@ -540,7 +553,7 @@ final class KitchenMemorySchemaSynchronizationTests: XCTestCase {
     }
 
     let migratedContainer = try KitchenMemorySchema.makeContainer(storeURL: fixture.storeURL)
-    XCTAssertEqual(migratedContainer.schema.version, Schema.Version(5, 0, 0))
+    XCTAssertEqual(migratedContainer.schema.version, Schema.Version(6, 0, 0))
   }
 
   private func assertFixtureGraph(

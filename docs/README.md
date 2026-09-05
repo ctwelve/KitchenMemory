@@ -78,6 +78,8 @@ For implementation work, begin with:
 
 ### Agent operations
 
+- [Xcode agent workflow](agents/xcode.md) — MCP connection and signed native testing.
+
 These files define repository workflow for coding agents. They are operational
 guidance, not product or architecture decisions.
 

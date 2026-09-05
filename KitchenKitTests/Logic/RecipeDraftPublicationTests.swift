@@ -23,6 +23,7 @@ final class RecipeDraftPublicationTests: XCTestCase {
     let drafts = RecipeDrafts(library: library, store: store)
     let draft = try XCTUnwrap(drafts.begin())
     draft.session.title = "Exactly one soup"
+    draft.session.media = [RecipeMedia(role: .hero, imageData: Data([1, 2, 3]))]
     store.refusesRemoval = true
     XCTAssertFalse(try XCTUnwrap(drafts.save(draft.id)).removedDraft)
     XCTAssertEqual(try library.load().recipes.count, 1)

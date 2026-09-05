@@ -30,17 +30,19 @@ final class RecipeDraftCompatibilityTests: XCTestCase {
     XCTAssertTrue(try store.load().isEmpty)
   }
 
-  func testLegacyPhasesAndMissingEquipmentRestoreWithoutLosingFrozenIntention() throws {
+  func testLegacyPhasesAndMissingCollectionsRestoreWithoutLosingFrozenIntention() throws {
     let repository = SwiftDataRecipeRepository(modelContainer: try KitchenMemorySchema.makeContainer(inMemory: true))
     let kitchen = Kitchen(name: "Home")
     try repository.save(kitchen)
     let library = RecipeLibrary(kitchenID: kitchen.id, repository: repository,
                                 samples: CompatibilitySamples(), importer: RecipeImportService())
     let original = try library.create(from: RecipeDraft(
-      title: "Soup", equipment: [EquipmentItem(originalText: "Pot", name: "Pot")]
+      title: "Soup", media: [RecipeMedia(role: .hero, assetName: "SyntheticHero")],
+      equipment: [EquipmentItem(originalText: "Pot", name: "Pot")]
     ))
     var session = RecipeEditSession(draft: RecipeDraft(revision: original.revision))
     session.equipment = nil
+    session.media = nil
     let command = try library.prepareSave(from: RecipeDraft(title: "Frozen"), original: nil,
                                           observedSelectionIDs: [])
     let store = VolatileRecipeEditingStore()
@@ -58,6 +60,8 @@ final class RecipeDraftCompatibilityTests: XCTestCase {
     XCTAssertEqual(drafts.drafts.map(\.phase), [.editing, .saving(command), .importCandidate, .editing])
     XCTAssertEqual(drafts.drafts.first?.session.equipment, original.revision.equipment)
     XCTAssertEqual(drafts.drafts.last?.session.equipment, [])
+    XCTAssertEqual(drafts.drafts.first?.session.media, original.revision.media)
+    XCTAssertEqual(drafts.drafts.last?.session.media, [])
     XCTAssertTrue(drafts.persist())
     XCTAssertEqual(try store.load().map(\.phase), drafts.drafts.map(\.phase))
   }
