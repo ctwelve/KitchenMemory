@@ -29,9 +29,10 @@ struct RecipeDetailView: View {
   var body: some View {
     ScrollView {
       VStack(alignment: .leading, spacing: 24) {
-        hero
+        RecipeHeroImage(media: revision.media.first { $0.role == .hero })
         header
         metadata
+        RecipeGalleryView(media: revision.media)
         RecipeScalingControls(selection: $scalingSelection)
         source
         if !revision.equipment.isEmpty {
@@ -130,25 +131,6 @@ struct RecipeDetailView: View {
 }
 
 private extension RecipeDetailView {
-  @ViewBuilder private var hero: some View {
-    if let media = revision.media.first(where: { $0.role == .hero }),
-      RecipePrivateImage.image(for: media) != nil {
-      RecipeImage(
-        media: media,
-        contentMode: .fill
-      )
-      .frame(maxWidth: .infinity)
-      .containerRelativeFrame(.vertical) { length, _ in
-        min(max(length * 0.34, 240), 420)
-      }
-      .clipShape(.rect(cornerRadius: 20))
-      .overlay {
-        RoundedRectangle(cornerRadius: 20)
-          .stroke(Color("SubtleBorder"), lineWidth: 1)
-      }
-    }
-  }
-
   private var header: some View {
     VStack(alignment: .leading, spacing: 10) {
       Text(revision.title)

@@ -1,6 +1,102 @@
 {
   "sourceLanguage" : "en-US",
   "strings" : {
+  "recipe.media.gallery.title": {
+    "comment": "Recipe gallery heading, control, or unavailable payload message.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Gallery"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Galería"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Galerie"
+        }
+      }
+    }
+  },
+  "recipe.media.gallery.add": {
+    "comment": "Recipe gallery heading, control, or unavailable payload message.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Add gallery images"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Agregar imágenes a la galería"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ajouter des images à la galerie"
+        }
+      }
+    }
+  },
+  "recipe.media.gallery.remove": {
+    "comment": "Recipe gallery heading, control, or unavailable payload message.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Remove gallery image"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Quitar imagen de la galería"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Retirer l’image de la galerie"
+        }
+      }
+    }
+  },
+  "recipe.media.unavailable": {
+    "comment": "Recipe gallery heading, control, or unavailable payload message.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Image unavailable"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Imagen no disponible"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Image indisponible"
+        }
+      }
+    }
+  },
   "recipe.media.hero.title": {
     "comment": "Recipe media editor control or private image failure.",
     "extractionState": "manual",
