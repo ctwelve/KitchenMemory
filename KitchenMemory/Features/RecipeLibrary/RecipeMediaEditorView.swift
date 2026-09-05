@@ -8,8 +8,6 @@ import UniformTypeIdentifiers
 
 struct RecipeMediaEditorView: View {
   @Binding var session: RecipeEditSession
-  @State private var selectsImage = false
-  @State private var importFailed = false
 
   var body: some View {
     Section(.recipeMediaHeroTitle) {
@@ -28,22 +26,13 @@ struct RecipeMediaEditorView: View {
         }
         .accessibilityIdentifier("recipe-media-remove-hero")
       }
-      Button(.recipeMediaChooseHero, systemImage: "photo") { selectsImage = true }
-        .accessibilityIdentifier("recipe-media-choose-hero")
-      if importFailed {
-        Label(.recipeMediaImportFailure, systemImage: "exclamationmark.triangle")
-          .foregroundStyle(.secondary)
-      }
-    }
-    .fileImporter(isPresented: $selectsImage, allowedContentTypes: [.image]) { result in
-      do {
-        let data = try RecipePrivateImage.importedData(from: result.get())
+      RecipeImageImportButton(title: .recipeMediaChooseHero, allowsMultipleSelection: false) { images in
+        guard let data = images.first else { return }
         session.media = (session.media ?? []).filter { $0.role != .hero }
           + [RecipeMedia(role: .hero, imageData: data)]
-        importFailed = false
-      } catch {
-        importFailed = true
       }
+      .accessibilityIdentifier("recipe-media-choose-hero")
     }
+    RecipeGalleryEditorView(session: $session)
   }
 }

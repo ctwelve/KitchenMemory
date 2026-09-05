@@ -36,5 +36,11 @@ Replacement and removal do not erase older Revision payloads. Cooking Session
 Execution Snapshots continue to contain only `SessionMediaReference`, never
 image bytes. Dependency-aware reclamation remains governed by the Recipe
 pruning work; this media slice introduces no automatic image garbage collection.
+The gallery uses the same media representation, independently of hero selection.
+Multiple selected files are accepted into the local draft together. Explicit
+Move Up and Move Down actions reorder only gallery entries, retaining identities,
+descriptions, and non-gallery roles. Reading preserves authored order and shows
+an unavailable message and retained description for missing images.
+
 Production CloudKit schema promotion and signed cross-device acceptance remain
 release operations, separate from deterministic local and hosted tests.
