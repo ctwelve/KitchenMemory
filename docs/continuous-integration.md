@@ -69,7 +69,7 @@ The completed feature baseline was collected on `slice/completion` before its
 merge to `main`. Release engineering begins from that `main` baseline and uses
 focused reviewed fixes rather than extending the integration branch as an
 indefinite parallel trunk. A future batch of feature slices may establish a new
-`slice/*` integration record branch.
+`slice/*` integration branch.
 
 `release-eng/*` owns repeatable release plumbing and its directly supporting
 hardening: CI contracts, dependency inventory, SBOM maintenance, version and tag
@@ -77,16 +77,76 @@ validation, packaging, signing, notarization, and distribution automation. It
 is not a second feature lane. User-visible defects remain `bugs/*`, while new
 product capability remains `slice/*`.
 
-Published `slice/*`, `bugs/*`, and `release-eng/*` branches are governed record
-branches. Retain them after they merge so the repository preserves the feature
-integration, hardening, and release-engineering lineage that produced each
-accepted `main` state. Short-lived working branches, including `codex/*`, are
-not record branches. Prune them after their work has merged into the appropriate
-governed record branch.
+Published `slice/*`, `bugs/*`, and `release-eng/*` branches are governed
+integration lanes. GitHub automatically deletes their remote branches after
+merge. The merge commit, pull request, and protected `main` history preserve
+the accepted integration and its evidence; keeping a branch name is unnecessary.
+Local integration branches, working branches such as `codex/*`, and completed
+worktrees are short-lived working state. Clean them up only after verifying
+their work on `main` and the required merge evidence, as described in
+[branch cleanup](#branch-cleanup).
 
 Build, Analyze, and the complete platform Test actions are required to pass.
 The KitchenKit coverage gate has reached exact complete line coverage; a
 failing logic test or coverage check is a product defect.
+
+### Branch cleanup
+
+Cleanup follows acceptance and integration; it does not substitute for either.
+Confirm that the intended pull request is merged into `main`, its required
+pull-request checks passed, and the iOS and macOS `Merge to main` Production
+Build actions succeeded for the actual merge commit. A deleted remote branch
+or a green result from another commit is not proof of that state.
+
+Inspect local state before switching branches or removing anything:
+
+```sh
+git status --short --branch
+git worktree list
+git branch -vv
+gh pr view <number> --json state,baseRefName,headRefName,mergeCommit,url
+```
+
+Run the following from the checkout that will keep `main`. If `main` is already
+checked out in another worktree, use that checkout. Preserve any uncommitted
+work and stop if switching or fast-forwarding fails; do not reset the checkout
+to make cleanup succeed.
+
+```sh
+git fetch origin --prune
+git switch main
+git merge --ff-only origin/main
+git branch --merged main
+```
+
+Pruning removes stale remote-tracking references, not local branches. Verify
+that the pull request's merge commit is an ancestor of this updated `main`.
+For each explicitly identified completed branch, require that its tip is also
+an ancestor of `main` (and appears in `git branch --merged main`). A working
+branch merged only into an unaccepted slice is not ready for local cleanup.
+
+For a completed linked worktree, inspect its status, including untracked files,
+and confirm its branch or detached HEAD is contained in `main`. Check for
+ignored local artifacts that need preserving as well. Remove only that clean,
+inactive worktree, from another checkout, before deleting its branch:
+
+```sh
+git -C <completed-worktree-path> status --short --untracked-files=all --ignored
+git worktree remove <completed-worktree-path>
+git branch -d <verified-completed-branch>
+```
+
+The paths, branch names, and pull-request number above are placeholders for
+the specific work being cleaned up. The merged-branch list is evidence to
+inspect, not a bulk deletion list. Leave active, unmerged, unrelated, dirty,
+locked, or ambiguous worktrees and branches alone. Never add `--force`, use
+`git branch -D`, or use `git reset --hard` or `git clean` to bypass a refusal.
+If a squash or rebase means ancestry cannot prove containment, preserve the
+branch for explicit reconciliation rather than treating a merged PR as enough.
+
+This lifecycle preserves branch naming, pull-request gates, protected-main
+rules, and immutable release tags. It does not authorize deleting release tags
+or rewriting historical evidence.
 
 ### Main production
 

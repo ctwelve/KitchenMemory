@@ -37,7 +37,7 @@ For implementation work, begin with:
 - [Architecture decisions](#accepted-architecture-decisions) for accepted
   constraints and their rationale.
 - [Continuous integration](continuous-integration.md) for the current validation
-  contract.
+  contract and [post-merge branch cleanup](continuous-integration.md#branch-cleanup).
 
 ## Current product guidance
 
