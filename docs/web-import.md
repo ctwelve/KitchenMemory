@@ -52,6 +52,16 @@ state and never creates a Recipe. Save Revision freezes and persists a retryable
 command before committing shared evidence, then removes the draft only after
 success. Reopening or retrying that command preserves its identities.
 
+KitchenKit's `RecipeDrafts` owns that collection, editable contents, import phases,
+storage availability, and publication sequence. `RecipeEditingDraft` is the
+observable editing interface; native views bind to it without copying mutable
+contents. The app supplies the owner-scoped document URL, selection, and dialogs.
+Reusable atomic file records and legacy decoding belong to KitchenKit. Typing
+persists immediately, including invalid text; a failed write retains the latest
+in-memory contents and vetoes leaving. Structural operations roll back their
+local collection or phase on failure. Reset purges local drafts before touching
+shared contents, and a later shared reset failure never restores those drafts.
+
 For local documents, the immutable capture retains the selected file URL and
 bounded JSON-LD transcription; the source title is the filename. A file URL is
 never promoted to an active attribution link. Unknown properties, diagnostics,

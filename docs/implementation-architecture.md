@@ -22,6 +22,32 @@ iOS Simulator, and Mac destinations.
 - `Logic/` owns product operations and presentation-independent workflow state.
 
 These are architectural seams, not separately importable Swift submodules.
+`RecipeDrafts` owns the complete device-local Recipe Editing Draft lifetime:
+collection membership, observable editable contents, durable phases, storage
+recovery, and frozen-command publication. `FileRecipeEditingStore` owns atomic
+document encoding and legacy restoration; the app supplies its owner-scoped URL.
+The native `RecipeEditingModel` holds only a binding adapter and discard-dialog
+state, not a second mutable editing session. App reset purges these local drafts
+before resetting shared Kitchen contents.
+
+`RecipeLibraryNavigation` is the app graph's single accepted destination owner.
+Recipe selection metadata survives refresh without changing that destination;
+editor identity, Session identity, history return scope, finished observation,
+Drafts, Deleted Items, and Recovery are mutually exclusive cases. Command
+eligibility and transitions use this same state. Window-specific command adapters
+only supply import presentation and destination-focus effects. Every departure
+from an editor passes KitchenKit's local persistence check before changing
+destination. Navigation never emits Stop or Finish; those remain explicit
+Cooking Session commands. Native compact navigation bindings derive from the
+accepted destination rather than maintaining another selected Session ID.
+
+Library reads derive bundled-sample presence from the loaded Recipe IDs, so
+content and sample status describe the same snapshot. Standalone sample-presence
+callers still perform their own repository read. The authority reader itself is
+unchanged: recovery classification, causal validation, collision handling, and
+payload validation remain at the repository boundary. Broader read optimization
+requires bounded measurement; this slice adds no cache or background machinery.
+
 The application links one framework and writes `import KitchenKit`. Import and
 Persistence depend conceptually on Domain but not on one another; Logic
 coordinates all three responsibilities without depending on the application or
@@ -352,6 +378,22 @@ container's opaque current-user identity as separate ownership evidence. On
 startup, legacy unowned alpha Kitchens may be converged into the deterministic
 personal Kitchen; an explicitly different owner stops that operation before
 mutation.
+
+Recipe authority requirements have no inherited success implementations.
+Every `RecipeRepository` adapter explicitly implements Save, Selection, Selection
+head reads, authority projection, and ownership convergence, or throws an
+unsupported-operation error. `RecipeEditor` creates explicit Save commands for
+both convenience creation and revision; durable draft publication retains those
+commands for exact retry. The concrete SwiftData pair-based Save entry point
+still serves bulk/sample and retained fixture callers through its authority
+writer. It is not a fallback for command-based Save. Actual V5 backfill and
+payload decoding remain necessary retained-data behavior.
+
+The production conformer is `SwiftDataRecipeRepository`. The narrow
+`InMemoryRecipeRepository` in library tests and `SessionRecipeRepository` in
+Cooking Session tests explicitly reject unsupported authority operations;
+authority and Save tests use disposable real SwiftData through the repository
+interface instead of a second test-only evidence engine.
 
 `SwiftDataCookingSessionRepository` is a separate main-actor adapter over the
 same container. Its public transaction vocabulary encodes the smallest complete

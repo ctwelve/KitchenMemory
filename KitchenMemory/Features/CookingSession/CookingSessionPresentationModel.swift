@@ -44,11 +44,6 @@ enum CookingSessionHistoryScope: Equatable {
   case recipe(Recipe.ID)
 }
 
-enum CookingSessionLibraryDestination: Equatable {
-  case deletedItems
-  case recovery
-}
-
 enum CookingSessionPresentationIssue: Equatable {
   case read
   case clipboard
@@ -76,6 +71,7 @@ final class CookingSessionPresentationModel {
   let service: any CookingSessionServing
   let store: any CookingSessionPresentationStoring
   let now: () -> Date
+  let navigation: RecipeLibraryNavigation
 
   var sessions: [CookingSessionProjection] = []
   var finishedSessions: [CookingSessionProjection] = []
@@ -83,7 +79,7 @@ final class CookingSessionPresentationModel {
   var waitingDeletedSessions: [UnavailableSession] = []
   var waitingSessions: [UnavailableSession] = []
   var recoverySessions: [SessionRecovery] = []
-  private(set) var currentSessionID: CookingSession.ID?
+  var currentSessionID: CookingSession.ID? { navigation.currentSessionID }
   var finishedSessionCount = 0
   var unavailableSessionCount = 0
   var recoverySessionCount = 0
@@ -94,22 +90,26 @@ final class CookingSessionPresentationModel {
   var entryDrafts: [CookingSessionEntryDraft]
   var detachedEntryDraft: CookingSessionEntryDraft?
   var finishedSessionIDs: Set<CookingSession.ID> = []
-  var historyScope: CookingSessionHistoryScope?
-  var libraryDestination: CookingSessionLibraryDestination?
+  var historyScope: CookingSessionHistoryScope? { navigation.historyScope }
   var recipeHistorySessions: [CookingSessionProjection] = []
   var sidebarSessionIDsByRecipe: [Recipe.ID: Set<CookingSession.ID>] = [:]
-  var observedFinishedSessionID: CookingSession.ID?
+  var observedFinishedSessionID: CookingSession.ID? {
+    guard case .finished(let id, _) = navigation.destination else { return nil }
+    return id
+  }
   var sessionVisits: [CookingSessionVisit]
 
   init(
     sessions: CookingSessions,
     store: any CookingSessionPresentationStoring,
-    now: @escaping () -> Date = Date.init
+    now: @escaping () -> Date = Date.init,
+    navigation: RecipeLibraryNavigation = RecipeLibraryNavigation()
   ) {
     service = sessions
     self.store = store
     self.now = now
-    currentSessionID = store.currentSessionID
+    self.navigation = navigation
+    navigation.installSessionStore(store)
     outbox = CookingSessionOutbox(persistedCommands: store.pendingCommands)
     entryDrafts = store.entryDrafts
     sessionVisits = store.sessionVisits
@@ -118,12 +118,14 @@ final class CookingSessionPresentationModel {
   init(
     sessions: any CookingSessionServing,
     store: any CookingSessionPresentationStoring,
-    now: @escaping () -> Date = Date.init
+    now: @escaping () -> Date = Date.init,
+    navigation: RecipeLibraryNavigation = RecipeLibraryNavigation()
   ) {
     service = sessions
     self.store = store
     self.now = now
-    currentSessionID = store.currentSessionID
+    self.navigation = navigation
+    navigation.installSessionStore(store)
     outbox = CookingSessionOutbox(persistedCommands: store.pendingCommands)
     entryDrafts = store.entryDrafts
     sessionVisits = store.sessionVisits
@@ -173,7 +175,7 @@ final class CookingSessionPresentationModel {
     waitingDeletedSessions = []
     waitingSessions = []
     recoverySessions = []
-    currentSessionID = nil
+    navigation.move(to: .recipe)
     finishedSessionCount = 0
     unavailableSessionCount = 0
     recoverySessionCount = 0
@@ -183,10 +185,7 @@ final class CookingSessionPresentationModel {
     entryDrafts = []
     detachedEntryDraft = nil
     finishedSessionIDs = []
-    historyScope = nil
-    libraryDestination = nil
     recipeHistorySessions = []
-    observedFinishedSessionID = nil
     sessionVisits = []
     hasLoaded = true
   }
@@ -221,10 +220,13 @@ final class CookingSessionPresentationModel {
     }
   }
 
-  func select(_ id: CookingSession.ID?, recordsVisit: Bool = true) {
-    currentSessionID = id
-    store.currentSessionID = id
+  @discardableResult
+  func select(_ id: CookingSession.ID?, recordsVisit: Bool = true) -> Bool {
+    let next: RecipeLibraryNavigation.Destination = id.map { .session($0, history: historyScope) }
+      ?? historyScope.map { .history($0) } ?? .recipe
+    guard navigation.move(to: next) else { return false }
     if let id, recordsVisit { recordVisit(to: id) }
+    return true
   }
 
   func replaceDraft(_ draft: CookingSessionEntryDraft) {

@@ -195,31 +195,17 @@ extension CookingSessionPresentationModel {
     pending: PendingCookingSessionCommand
   ) {
     if case .delete = pending {
-      if currentSessionID == session.id { select(nil, recordsVisit: false) }
-      historyScope = nil
-      observedFinishedSessionID = nil
-      libraryDestination = .deletedItems
+      // Deleting another Session must not displace the continuation being read.
+      if currentSessionID == nil || currentSessionID == session.id { navigation.move(to: .deletedItems) }
     } else if case .restore = pending {
-      select(nil, recordsVisit: false)
-      historyScope = nil
-      observedFinishedSessionID = nil
-      libraryDestination = .deletedItems
+      navigation.move(to: .deletedItems)
     } else if case .resolveClosure = pending {
-      select(nil, recordsVisit: false)
-      historyScope = nil
-      observedFinishedSessionID = nil
-      libraryDestination = .recovery
+      navigation.move(to: .recovery)
     } else if case .continueSession = pending {
-      select(session.id)
-      historyScope = nil
-      libraryDestination = nil
-      observedFinishedSessionID = nil
+      selectSession(session.id)
     } else if session.lifecycle == .finished {
       sessions.removeAll { $0.id == session.id }
-      if currentSessionID == session.id { select(nil, recordsVisit: false) }
-      historyScope = .all
-      libraryDestination = nil
-      observedFinishedSessionID = session.id
+      navigation.move(to: .finished(session.id, history: .all))
     } else {
       select(pending.sessionID)
     }

@@ -37,12 +37,8 @@ struct RecipeLibrarySidebar: View {
   }
 
   private var recipeSelection: Binding<Recipe.ID?> {
-    Binding(get: { model.selectedRecipeID }, set: { id in
-      if model.selectRecipeForReading(id) {
-        sessionModel.leaveCurrentSession()
-        sessionModel.showRecipes()
-      }
-    })
+    Binding(get: { model.navigation.destination == .recipe ? model.selectedRecipeID : nil },
+            set: { model.selectRecipeForReading($0) })
   }
 
   private var sessionSection: some View {
@@ -54,34 +50,19 @@ struct RecipeLibrarySidebar: View {
         }
         .accessibilityIdentifier("drafts-destination")
       }
-      NavigationLink {
-        CookingSessionHistoryDestinationView(
-          model: sessionModel,
-          prepare: showSessionHistory
-        )
-      } label: {
+      Button(action: showSessionHistory) {
         Label(.sessionHistoryTitle, systemImage: "clock.arrow.circlepath")
       }
       .accessibilityIdentifier("sessions-destination")
 
-      NavigationLink {
-        DeletedItemsDestinationView(
-          model: sessionModel,
-          prepare: showDeletedItems
-        )
-      } label: {
+      Button(action: showDeletedItems) {
         Label(.deletedItemsTitle, systemImage: "trash")
           .badge(sessionModel.deletedItemCount)
       }
       .accessibilityIdentifier("deleted-items-destination")
 
       if sessionModel.showsRecoveryDestination {
-        NavigationLink {
-          CookingSessionRecoveryDestinationView(
-            model: sessionModel,
-            prepare: showRecovery
-          )
-        } label: {
+        Button(action: showRecovery) {
           Label(.recoveryTitle, systemImage: "wrench.and.screwdriver")
             .badge(sessionModel.recoveryItemCount)
         }
@@ -90,6 +71,7 @@ struct RecipeLibrarySidebar: View {
     } header: {
       Text(.sessionDiscoveryTitle)
     }
+    .buttonStyle(.borderless)
   }
 
   @ViewBuilder

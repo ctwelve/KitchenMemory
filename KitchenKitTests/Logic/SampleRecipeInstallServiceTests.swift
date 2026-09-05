@@ -17,12 +17,17 @@ final class SampleRecipeInstallServiceTests: XCTestCase {
     let service = SampleRecipeInstallService(repository: repository, samples: samples)
 
     XCTAssertEqual(try service.presence(in: kitchen.id), .none)
+    XCTAssertEqual(try service.presence(in: kitchen.id, installedRecipeIDs: []), .none)
 
     try repository.addRecipes([samples.recipes(in: kitchen.id)[0]], to: kitchen.id)
     XCTAssertEqual(try service.presence(in: kitchen.id), .partial)
+    XCTAssertEqual(try service.presence(in: kitchen.id,
+      installedRecipeIDs: [samples.recipes(in: kitchen.id)[0].id, Recipe.ID()]), .partial)
 
     try service.install(in: kitchen.id)
     XCTAssertEqual(try service.presence(in: kitchen.id), .complete)
+    XCTAssertEqual(try service.presence(in: kitchen.id,
+      installedRecipeIDs: Set(samples.recipes(in: kitchen.id).map(\.id))), .complete)
     XCTAssertEqual(try repository.recipes(in: kitchen.id).count, 2)
   }
 }

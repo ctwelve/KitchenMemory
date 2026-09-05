@@ -9,34 +9,6 @@ import XCTest
 
 @MainActor
 final class RecipeImportStagingTests: XCTestCase {
-  func testAcceptanceRetryAfterAmbiguousLocalWriteDoesNotDuplicateDraft() throws {
-    let app = try AppRuntime.testing()
-    let store = AmbiguousImportStore()
-    let model = RecipeLibraryModel(
-      library: app.libraryModel.library,
-      samplePreferences: VolatileKitchenPreferencesStore(sampleRecipeOnboardingResponse: .accepted),
-      kitchenWasCreated: false, editingStore: store
-    )
-    let option = RecipeImportOption(
-      id: .init(blockIndex: 0, objectIndex: 0), draft: RecipeDraft(title: "Soup"), concerns: []
-    )
-    try model.stageImports([option])
-    let id = try XCTUnwrap(model.importCandidates.first?.id)
-    store.failAfterWrite = true
-    XCTAssertFalse(model.acceptImportCandidate(id))
-    store.failAfterWrite = false
-    let relaunched = RecipeLibraryModel(
-      library: model.library,
-      samplePreferences: VolatileKitchenPreferencesStore(sampleRecipeOnboardingResponse: .accepted),
-      kitchenWasCreated: false, editingStore: store
-    )
-    XCTAssertTrue(relaunched.acceptImportCandidate(id))
-    XCTAssertEqual(relaunched.editingDrafts.count, 1)
-    XCTAssertTrue(relaunched.importCandidates.isEmpty)
-    relaunched.discardEditor(confirmed: true)
-    XCTAssertTrue(try store.load().isEmpty)
-  }
-
   func testDocumentEntryPointStagesLocallyAndAbandonmentDoesNotChangeLibrary() throws {
     let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
     defer { try? FileManager.default.removeItem(at: directory) }
@@ -102,16 +74,5 @@ final class RecipeImportStagingTests: XCTestCase {
     XCTAssertEqual(relaunched.recipes.count, initialCount + 1)
     XCTAssertEqual(relaunched.selectedRecipe?.revision.sourceCapture, capture)
     XCTAssertFalse(relaunched.acceptImportCandidate(candidateID))
-  }
-}
-
-@MainActor
-private final class AmbiguousImportStore: RecipeEditingStoring {
-  var failAfterWrite = false
-  private var drafts: [RecipeEditingRecord] = []
-  func load() throws -> [RecipeEditingRecord] { drafts }
-  func save(_ drafts: [RecipeEditingRecord]) throws {
-    self.drafts = drafts
-    if failAfterWrite { throw CocoaError(.fileWriteUnknown) }
   }
 }

@@ -21,6 +21,7 @@ struct ContentView: View {
   @Environment(\.locale) private var locale
   @State private var activeSheet: ActiveRecipeSheet?
   @State private var columnVisibility = LibraryNavigationPolicy.initialVisibility
+  @State private var preferredCompactColumn: NavigationSplitViewColumn = .detail
   @State private var isShowingResetConfirmation = false
 #if !os(macOS)
   @State private var isShowingSettings = false
@@ -66,12 +67,6 @@ struct ContentView: View {
       Button(.actionCancel, role: .cancel) {}
     } message: {
       Text(.sessionEntryDetachedMessage)
-    }
-    .onChange(of: preparedApp?.libraryModel.selectedRecipeID) { _, recipeID in
-      if recipeID != nil {
-        preparedApp?.libraryModel.isShowingDrafts = false
-        preparedApp?.sessionModel.showRecipes()
-      }
     }
     .modifier(RecipeDraftFailureAlert(model: preparedApp?.libraryModel))
     .modifier(LibraryMenuBridge(
@@ -148,7 +143,7 @@ struct ContentView: View {
   }
 
   private var persistentRecipeLibraryShell: some View {
-    NavigationSplitView(columnVisibility: $columnVisibility) {
+    NavigationSplitView(columnVisibility: $columnVisibility, preferredCompactColumn: $preferredCompactColumn) {
       persistentSidebar
         .navigationTitle(.libraryTitle)
 #if !os(macOS)
@@ -217,27 +212,13 @@ struct ContentView: View {
           decline: dependencies.libraryModel.declineSampleRecipes
         )
       case .ready:
-        if let editor = dependencies.libraryModel.editor {
-          RecipeEditingDestination(model: dependencies.libraryModel, editor: editor)
-        } else if let currentSession = dependencies.sessionModel.currentSession,
-           !dependencies.sessionModel.isShowingSessionHistory {
-          CookingSessionView(
-            model: dependencies.sessionModel,
-            session: currentSession,
-            embedsInNavigationStack: false
-          )
-        } else {
-          LibraryDetailRouter(
-            libraryModel: dependencies.libraryModel,
-            sessionModel: dependencies.sessionModel
-          )
-        }
+        LibraryDetailRouter(libraryModel: dependencies.libraryModel, sessionModel: dependencies.sessionModel)
       }
     }
   }
 
   private func recipeLibrary(_ dependencies: PreparedApp) -> some View {
-    NavigationSplitView(columnVisibility: $columnVisibility) {
+    NavigationSplitView(columnVisibility: $columnVisibility, preferredCompactColumn: $preferredCompactColumn) {
       recipeList(dependencies)
         .navigationTitle(.libraryTitle)
 #if os(macOS)
@@ -249,7 +230,8 @@ struct ContentView: View {
       NavigationStack {
         LibraryDetailRouter(
           libraryModel: dependencies.libraryModel,
-          sessionModel: dependencies.sessionModel
+          sessionModel: dependencies.sessionModel,
+          presentsEditor: false
         )
       }
     }
@@ -322,21 +304,15 @@ private extension ContentView {
         libraryActions?.perform(.drafts)
       },
       selectSession: { sessionID in
-        navigate(in: dependencies) {
-          _ = dependencies.sessionModel.selectSession(sessionID)
-        }
+        if dependencies.sessionModel.selectSession(sessionID) { focusSelectedDestination() }
       }
     )
   }
 
-  func navigate(in dependencies: PreparedApp, to destination: () -> Void) {
-    guard dependencies.libraryModel.prepareForLibraryNavigation() else { return }
-    dependencies.libraryModel.selectedRecipeID = nil
-    destination()
-    focusSelectedDestination()
-  }
-
   func focusSelectedDestination() {
+    // Column visibility governs regular layouts; a collapsed split view needs
+    // an explicit preferred column after the person navigates back to its sidebar.
+    preferredCompactColumn = .detail
     columnVisibility = LibraryNavigationPolicy.destinationSelectionVisibility(
       current: columnVisibility,
       preservesSidebar: usesPersistentLibraryShell
