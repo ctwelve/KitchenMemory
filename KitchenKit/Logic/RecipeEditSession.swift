@@ -39,6 +39,7 @@ public struct RecipeEditSession: Codable, Equatable, Sendable {
   public var sourceAuthor: String
   public var sourcePublisher: String
   public var sourceURL: String
+  public var media: [RecipeMedia]?
   public var equipment: [EquipmentItem]?
   public var ingredientSections: [IngredientSection]
   public var instructionSections: [InstructionSection]
@@ -62,6 +63,7 @@ public struct RecipeEditSession: Codable, Equatable, Sendable {
     sourceAuthor = draft.source?.authorName ?? ""
     sourcePublisher = draft.source?.publisherName ?? ""
     sourceURL = draft.source?.canonicalURL?.absoluteString ?? ""
+    media = draft.media
     equipment = draft.equipment
     ingredientSections = draft.ingredientSections
     instructionSections = draft.instructionSections
@@ -103,6 +105,7 @@ public struct RecipeEditSession: Codable, Equatable, Sendable {
       cuisines: preservedCuisines,
       categories: preservedCategories,
       keywords: preservedKeywords,
+      media: media,
       equipment: equipment,
       ingredientSections: ingredientSections,
       instructionSections: instructionSections

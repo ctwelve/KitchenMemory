@@ -12,8 +12,8 @@ struct RecipeImage: View {
 
   var body: some View {
     Group {
-      if let media {
-        Image(SampleRecipeCatalog.imageResource(named: media.assetName))
+      if let media, let image = RecipePrivateImage.image(for: media) {
+        image
           .resizable()
           .aspectRatio(contentMode: contentMode)
       } else {
