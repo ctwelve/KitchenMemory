@@ -7,7 +7,7 @@ import Foundation
 extension RecipeEditSession {
   public mutating func replaceHeroImage(with data: Data) {
     removeHeroImage()
-    media = (media ?? []) + [RecipeMedia(role: .hero, imageData: data)]
+    media?.append(RecipeMedia(role: .hero, imageData: data))
   }
 
   public mutating func removeHeroImage() {

@@ -56,4 +56,25 @@ final class RecipeGalleryEditingTests: XCTestCase {
     XCTAssertEqual(session.media?[1].accessibilityLabel, "Before cooking")
   }
 
+  func testMediaActionsStartFromEmptyDraftsAndIgnoreStaleControls() throws {
+    var session = RecipeEditSession()
+    let missingID = RecipeMedia.ID()
+    session.removeMedia(id: missingID)
+    session.setMediaDescription("No such image", for: missingID)
+    session.moveGalleryImage(at: 0, by: 1)
+    XCTAssertNil(session.media)
+    session.removeHeroImage()
+    XCTAssertEqual(session.media, [])
+    session.replaceHeroImage(with: Data([1]))
+    XCTAssertEqual(session.media?.map(\.role), [.hero])
+
+    var galleryDraft = RecipeEditSession()
+    galleryDraft.addGalleryImages([Data([2])])
+    let image = try XCTUnwrap(galleryDraft.media?.first)
+    galleryDraft.setMediaDescription("", for: image.id)
+    galleryDraft.moveGalleryImage(at: 0, by: Int.max)
+    galleryDraft.removeMedia(id: missingID)
+    XCTAssertEqual(galleryDraft.media, [image])
+  }
+
 }
