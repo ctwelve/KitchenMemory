@@ -9,9 +9,10 @@ Recipe; restoration is a separate explicit intention.
 `RecipeDeleteCommand` and `RecipeRestoreCommand` are caller-owned Codable values.
 Keep the complete command, including its identity and timestamp, when retrying.
 The Recipe repository accepts each command in one isolated local transaction.
-Delete writes one deletion row; Restore writes one resolution per observed
-deletion, with stable row identities derived from the Restore identity and the
-observed deletion identity. Exact retries coalesce; a row identity reused with
+Delete writes one deletion row; Restore carries an explicit `RecipeRestoration`
+identity for each observed deletion. There is no separate Restore batch identity.
+Each persisted identity binds its deletion, Recipe, Kitchen, and restoration date.
+Keep the same resolution list on retry. Exact retries coalesce; a row identity reused with
 different content is rejected. Neither operation removes payload or invokes
 Kitchen reset or sample-pack replacement.
 

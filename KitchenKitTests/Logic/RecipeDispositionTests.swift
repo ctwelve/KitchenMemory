@@ -63,19 +63,36 @@ final class RecipeDispositionTests: XCTestCase {
     let encoded = try JSONEncoder().encode(restore)
     try repository.restore(JSONDecoder().decode(RecipeRestoreCommand.self, from: encoded))
     XCTAssertThrowsError(try repository.restore(RecipeRestoreCommand(
-      id: restore.id, kitchenID: kitchen.id, recipeID: original.id,
-      observedDeletionIDs: [deletion.id], restoredAt: restore.restoredAt.addingTimeInterval(1)
+      kitchenID: kitchen.id, recipeID: original.id,
+      restorations: restore.restorations, restoredAt: restore.restoredAt.addingTimeInterval(1)
     )))
     try repository.delete(deletion)
     XCTAssertNotNil(try repository.recipe(id: original.id))
     let second = RecipeDeleteCommand(kitchenID: kitchen.id, recipeID: original.id)
     try repository.delete(second)
+    let reused = try XCTUnwrap(restore.restorations.first)
+    XCTAssertThrowsError(try repository.restore(RecipeRestoreCommand(
+      kitchenID: kitchen.id, recipeID: original.id,
+      restorations: [RecipeRestoration(id: reused.id, deletionID: second.id)], restoredAt: restore.restoredAt
+    )))
+    let other = try RecipeEditor(repository: repository).create(in: kitchen.id, from: RecipeDraft(title: "Stew"))
+    let otherDelete = RecipeDeleteCommand(kitchenID: kitchen.id, recipeID: other.id)
+    try repository.delete(otherDelete)
+    XCTAssertThrowsError(try repository.restore(RecipeRestoreCommand(
+      kitchenID: kitchen.id, recipeID: other.id,
+      restorations: [RecipeRestoration(id: reused.id, deletionID: otherDelete.id)], restoredAt: restore.restoredAt
+    )))
+    XCTAssertThrowsError(try repository.restore(RecipeRestoreCommand(
+      kitchenID: kitchen.id, recipeID: original.id,
+      restorations: [reused, RecipeRestoration(id: reused.id, deletionID: second.id)], restoredAt: restore.restoredAt
+    )))
     for ids in [[], [second.id, second.id], [second.id, UUID()]] {
       XCTAssertThrowsError(try repository.restore(RecipeRestoreCommand(
         kitchenID: kitchen.id, recipeID: original.id, observedDeletionIDs: ids
       )))
     }
-    XCTAssertEqual(try repository.deletedRecipes(in: kitchen.id).first?.observedDeletionIDs, [second.id])
+    XCTAssertEqual(try repository.deletedRecipes(in: kitchen.id).first { $0.id == original.id }?.observedDeletionIDs,
+                   [second.id])
   }
 
   func testSaveBeforeDeleteAndDependentCookingSessionRemainUsable() throws {

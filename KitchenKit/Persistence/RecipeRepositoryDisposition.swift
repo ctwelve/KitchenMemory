@@ -28,13 +28,14 @@ extension SwiftDataRecipeRepository {
 
   public func restore(_ command: RecipeRestoreCommand) throws {
     guard !command.observedDeletionIDs.isEmpty,
-          Set(command.observedDeletionIDs).count == command.observedDeletionIDs.count
+          Set(command.observedDeletionIDs).count == command.observedDeletionIDs.count,
+          Set(command.restorations.map(\.id)).count == command.restorations.count
     else { throw RecipeDispositionError.invalidCommand }
     try performIsolatedWrite { writer in
-      let rows = command.observedDeletionIDs.map { deletionID in
+      let rows = command.restorations.map { restoration in
         RecipeDeletionResolutionRecord(
-          id: derivedID(namespace: command.id, kind: "recipe-restore", source: deletionID),
-          deletionID: deletionID, recipeID: command.recipeID.rawValue,
+          id: restoration.id,
+          deletionID: restoration.deletionID, recipeID: command.recipeID.rawValue,
           kitchenID: command.kitchenID.rawValue, restoredAt: command.restoredAt
         )
       }

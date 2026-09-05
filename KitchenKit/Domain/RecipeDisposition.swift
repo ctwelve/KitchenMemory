@@ -19,22 +19,43 @@ public struct RecipeDeleteCommand: Codable, Equatable, Sendable {
   }
 }
 
-/// Explicitly resolves only the deletion identities the person observed.
-public struct RecipeRestoreCommand: Codable, Equatable, Sendable {
+/// The immutable identity of one observed deletion resolution, as stored in V5.
+public struct RecipeRestoration: Codable, Equatable, Sendable {
   public let id: UUID
+  public let deletionID: UUID
+
+  public init(id: UUID = UUID(), deletionID: UUID) {
+    self.id = id
+    self.deletionID = deletionID
+  }
+}
+
+/// An atomic batch of caller-identified resolutions, with no separate batch identity.
+public struct RecipeRestoreCommand: Codable, Equatable, Sendable {
   public let kitchenID: Kitchen.ID
   public let recipeID: Recipe.ID
-  public let observedDeletionIDs: [UUID]
+  public let restorations: [RecipeRestoration]
   public let restoredAt: Date
 
+  public var observedDeletionIDs: [UUID] { restorations.map(\.deletionID) }
+
   public init(
-    id: UUID = UUID(), kitchenID: Kitchen.ID, recipeID: Recipe.ID,
+    kitchenID: Kitchen.ID, recipeID: Recipe.ID,
     observedDeletionIDs: [UUID], restoredAt: Date = Date()
   ) {
-    self.id = id
+    self.init(
+      kitchenID: kitchenID, recipeID: recipeID,
+      restorations: observedDeletionIDs.map { RecipeRestoration(deletionID: $0) }, restoredAt: restoredAt
+    )
+  }
+
+  public init(
+    kitchenID: Kitchen.ID, recipeID: Recipe.ID,
+    restorations: [RecipeRestoration], restoredAt: Date
+  ) {
     self.kitchenID = kitchenID
     self.recipeID = recipeID
-    self.observedDeletionIDs = observedDeletionIDs
+    self.restorations = restorations
     self.restoredAt = restoredAt
   }
 }
