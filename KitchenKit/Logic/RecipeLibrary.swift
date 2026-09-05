@@ -59,7 +59,7 @@ public struct RecipeLibrary {
     let recipes = try repository.recipes(in: kitchenID)
     let samplePresence: SampleRecipePresence
     do {
-      samplePresence = try sampleInstaller.presence(in: kitchenID)
+      samplePresence = try sampleInstaller.presence(in: kitchenID, installedRecipeIDs: Set(recipes.map(\.id)))
     } catch {
       samplePresence = .unavailable
     }

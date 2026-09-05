@@ -77,11 +77,14 @@ final class RecipeLibraryTests: XCTestCase {
       makeStoredRecipe(title: "Chili", kitchenID: otherKitchen.id),
     ]
     let library = makeLibrary(kitchen: kitchen, repository: repository, samples: samples)
+    repository.recipesAfterNextRead = []
 
     let contents = try library.load()
 
     XCTAssertEqual(contents.recipes, [userRecipe, sampleRecipes[0]])
     XCTAssertEqual(contents.samplePresence, .partial)
+    repository.refusesReads = true
+    XCTAssertThrowsError(try library.load(), "A failed content read remains a library failure")
   }
 
   func testDocumentInterpretationAndCandidateIdentityStayBehindLibraryInterface() throws {
@@ -265,6 +268,8 @@ private final class InMemoryRecipeRepository: RecipeRepository {
   }
 
   var storedRecipes: [StoredRecipe] = []
+  var recipesAfterNextRead: [StoredRecipe]?
+  var refusesReads = false
   private var storedKitchens: [Kitchen] = []
   private var revisionsByRecipeID: [Recipe.ID: [RecipeRevision]] = [:]
 
@@ -315,7 +320,14 @@ private final class InMemoryRecipeRepository: RecipeRepository {
   }
 
   func recipes(in kitchenID: Kitchen.ID) throws -> [StoredRecipe] {
-    storedRecipes.filter { $0.recipe.kitchenID == kitchenID }
+    if refusesReads { throw CocoaError(.fileReadUnknown) }
+    defer {
+      if let recipesAfterNextRead {
+        storedRecipes = recipesAfterNextRead
+        self.recipesAfterNextRead = nil
+      }
+    }
+    return storedRecipes.filter { $0.recipe.kitchenID == kitchenID }
   }
 
   func addRecipes(_ recipes: [StoredRecipe], to kitchenID: Kitchen.ID) throws {
