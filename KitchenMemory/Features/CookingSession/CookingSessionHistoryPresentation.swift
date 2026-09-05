@@ -36,10 +36,28 @@ extension CookingSessionPresentationModel {
     }
   }
 
-  var sidebarSessions: [CookingSessionProjection] {
-    let currentID = currentHistorySession?.id
-    let recent = recentHistorySessions(from: sessions, excluding: currentID)
-    return Array(([currentHistorySession].compactMap { $0 } + recent).prefix(3))
+  func sidebarSessions(for recipeID: Recipe.ID) -> [CookingSessionProjection] {
+    let matchingIDs = sidebarSessionIDsByRecipe[recipeID] ?? []
+    let candidates = sessions.filter { matchingIDs.contains($0.id) }
+    let active = candidates.filter { $0.lifecycle == .active }.sorted(by: sessionOrder)
+    let stopped = candidates.filter { $0.lifecycle == .stopped }
+    return active + recentHistorySessions(from: stopped, excluding: nil)
+  }
+
+  func refreshSidebarAssociations(for recipeIDs: [Recipe.ID]) {
+    do {
+      var associations: [Recipe.ID: Set<CookingSession.ID>] = [:]
+      for recipeID in recipeIDs {
+        associations[recipeID] = Set(try service.sessions(for: recipeID).compactMap { result in
+          guard case let .session(session) = result else { return nil }
+          return session.id
+        })
+      }
+      sidebarSessionIDsByRecipe = associations
+    } catch {
+      sidebarSessionIDsByRecipe = [:]
+      present(.read)
+    }
   }
 
   func recentHistorySessions(

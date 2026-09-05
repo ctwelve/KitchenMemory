@@ -8,11 +8,15 @@ import SwiftUI
 struct LibraryDetailRouter: View {
   @Bindable var libraryModel: RecipeLibraryModel
   @Bindable var sessionModel: CookingSessionPresentationModel
-  let editRecipe: (StoredRecipe) -> Void
+  private var actions: LibraryCommandActions {
+    LibraryCommandActions(library: libraryModel, sessions: sessionModel)
+  }
 
   @ViewBuilder
   var body: some View {
-    if let finishedSession = sessionModel.observedFinishedSession {
+    if libraryModel.isShowingDrafts {
+      RecipeDraftsView(model: libraryModel)
+    } else if let finishedSession = sessionModel.observedFinishedSession {
       FinishedCookingSessionView(model: sessionModel, session: finishedSession)
     } else if sessionModel.isShowingDeletedItems {
       CookingSessionDeletedItemsView(model: sessionModel)
@@ -29,25 +33,31 @@ struct LibraryDetailRouter: View {
               CookingSessionHistoryDestinationView(
                 model: sessionModel,
                 prepare: {
-                  sessionModel.showRecipeSessionHistory(for: selectedRecipe.recipe.id)
+                  actions.perform(.recipeHistory)
                 }
               )
             } label: {
               Label(.sessionHistoryRecipeTitle, systemImage: "clock.arrow.circlepath")
             }
             .accessibilityIdentifier("recipe-session-history")
+            .help(Text(.sessionHistoryRecipeTitle))
+            .disabled(!actions.canPerform(.recipeHistory))
           }
           ToolbarItem(placement: .primaryAction) {
-            Button { sessionModel.start(from: selectedRecipe) } label: {
+            Button { actions.perform(.startCooking) } label: {
               Label(.sessionActionStart, systemImage: "flame")
             }
             .accessibilityIdentifier("start-cooking")
+            .help(Text(.sessionActionStart))
+            .disabled(!actions.canPerform(.startCooking))
           }
           ToolbarItem(placement: .primaryAction) {
-            Button { editRecipe(selectedRecipe) } label: {
+            Button { actions.perform(.editRecipe) } label: {
               Label(.recipeActionEdit, systemImage: "pencil")
             }
             .accessibilityIdentifier("edit-recipe")
+            .help(Text(.recipeActionEdit))
+            .disabled(!actions.canPerform(.editRecipe))
           }
         }
     } else {

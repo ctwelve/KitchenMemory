@@ -20,13 +20,21 @@ final class RecipeLibraryModel {
     case ready
   }
 
-  private let library: RecipeLibrary
+  let library: RecipeLibrary
+  let editingStore: any RecipeEditingStoring
+  var editingStorageFailed = false
+  var editingStorageIsAvailable = true
   private let samplePreferences: any SampleRecipeOnboardingStoring
   private var hasEstablishedKitchenEvidence: Bool
   private var resetPresentationState: () -> Void = {}
 
   private(set) var recipes: [StoredRecipe] = []
   var selectedRecipeID: Recipe.ID?
+  var editor: RecipeEditingModel?
+  var authoringItems: [RecipeEditingModel] = []
+  var editingDrafts: [RecipeEditingModel] { authoringItems.filter { !$0.isImportCandidate } }
+  var importCandidates: [RecipeEditingModel] { authoringItems.filter(\.isImportCandidate) }
+  var isShowingDrafts = false
   private(set) var issue: RecipeLibraryIssue?
   private(set) var hasLoaded = false
   private(set) var startupState: StartupState = .loading
@@ -37,15 +45,18 @@ final class RecipeLibraryModel {
   init(
     library: RecipeLibrary,
     samplePreferences: any SampleRecipeOnboardingStoring,
-    kitchenWasCreated: Bool
+    kitchenWasCreated: Bool,
+    editingStore: any RecipeEditingStoring = VolatileRecipeEditingStore()
   ) {
     self.library = library
+    self.editingStore = editingStore
     self.samplePreferences = samplePreferences
     hasEstablishedKitchenEvidence = !kitchenWasCreated
     sampleOnboardingResponse = samplePreferences.sampleRecipeOnboardingResponse
     samplePreferences.startObservingSampleRecipeOnboardingResponse { [weak self] response in
       self?.receiveSampleOnboardingResponse(response)
     }
+    restoreEditingDrafts()
   }
 
   var selectedRecipe: StoredRecipe? {
@@ -167,12 +178,25 @@ final class RecipeLibraryModel {
   }
 
   func importRecipe(from url: URL) async throws -> [RecipeImportOption] {
-    try await library.importRecipe(from: url)
+    let options = try await library.importRecipe(from: url)
+    try Task.checkCancellation()
+    try stageImports(options)
+    return options
   }
 
   @discardableResult
   func resetKitchen() -> Bool {
     do {
+      // Only this explicitly confirmed destructive action may replace a document
+      // that could not be decoded. Ordinary autosave never does so.
+      // Purge local authoring first: a failed file write must leave shared data
+      // untouched, and a later shared-reset failure must not resurrect old drafts.
+      try editingStore.save([])
+      authoringItems = []
+      editingStorageIsAvailable = true
+      editingStorageFailed = false
+      editor = nil
+      isShowingDrafts = false
       try library.reset()
       resetPresentationState()
       samplePreferences.sampleRecipeOnboardingResponse = .accepted

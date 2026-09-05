@@ -636,6 +636,15 @@ class CheckProjectStructureTest < Minitest::Test
     assert_includes error.message, "must express macOS sandbox capabilities in build settings"
   end
 
+  def test_rejects_missing_user_selected_file_read_capability
+    fixture = Fixture.new
+    fixture.project.sub!("\t\t\t\t\"ENABLE_USER_SELECTED_FILES[sdk=macosx*]\" = readonly;\n", "")
+
+    error = assert_contract_error { validate(fixture) }
+
+    assert_includes error.message, "must express macOS sandbox capabilities in build settings"
+  end
+
   def test_rejects_develop_configuration_using_production_bundle_identifier
     fixture = Fixture.new
     fixture.project.sub!(

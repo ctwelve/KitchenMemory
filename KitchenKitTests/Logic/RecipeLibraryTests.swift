@@ -8,6 +8,43 @@ import XCTest
 
 @MainActor
 final class RecipeLibraryTests: XCTestCase {
+  func testPreparedSaveCanBeRetainedAndReplayedWithoutReauthoringItsContent() throws {
+    let kitchen = Kitchen(name: "Home")
+    let repository = InMemoryRecipeRepository()
+    let library = makeLibrary(kitchen: kitchen, repository: repository)
+    let command = try library.prepareSave(
+      from: RecipeDraft(title: "Soup"), original: nil, observedSelectionIDs: []
+    )
+    let retained = try JSONDecoder().decode(
+      RecipeSaveCommand.self, from: JSONEncoder().encode(command)
+    )
+    XCTAssertEqual(retained, command)
+    XCTAssertEqual(RecipeAuthoringPhase.importCandidate.acceptingImport(), .editing)
+    XCTAssertEqual(RecipeAuthoringPhase.editing.acceptingImport(), .editing)
+    let frozenPhase = RecipeAuthoringPhase.saving(command)
+    XCTAssertEqual(frozenPhase.acceptingImport(), frozenPhase)
+    XCTAssertEqual(try JSONDecoder().decode(RecipeAuthoringPhase.self,
+      from: JSONEncoder().encode(frozenPhase)), frozenPhase)
+    try library.save(retained)
+    XCTAssertEqual(try library.load().recipes.first?.revision.title, "Soup")
+    XCTAssertTrue(try library.editingSelectionHeads(for: command.recipe.id).isEmpty)
+    let original = StoredRecipe(recipe: command.recipe, revision: command.revision)
+    let revised = try library.prepareSave(
+      from: RecipeDraft(title: "Revised soup"), original: original,
+      observedSelectionIDs: [command.selection.id]
+    )
+    XCTAssertEqual(revised.parentRevisionIDs, [command.revision.id])
+    XCTAssertEqual(revised.selection.observedSelectionIDs, [command.selection.id])
+    XCTAssertEqual(revised.revision.revisionNumber, 2)
+    try library.save(revised)
+    XCTAssertEqual(try repository.revisions(for: command.recipe.id).count, 2)
+    let foreign = makeLibrary(kitchen: Kitchen(name: "Other"), repository: repository)
+    XCTAssertThrowsError(try foreign.save(command))
+    XCTAssertThrowsError(try library.prepareSave(
+      from: RecipeDraft(), original: nil, observedSelectionIDs: []
+    ))
+  }
+
   func testLoadsKitchenContentAndDerivesSamplePresenceTogether() throws {
     let kitchen = Kitchen(name: "Home")
     let otherKitchen = Kitchen(name: "Cabin")
@@ -26,6 +63,20 @@ final class RecipeLibraryTests: XCTestCase {
 
     XCTAssertEqual(contents.recipes, [userRecipe, sampleRecipes[0]])
     XCTAssertEqual(contents.samplePresence, .partial)
+  }
+
+  func testDocumentInterpretationAndCandidateIdentityStayBehindLibraryInterface() throws {
+    let library = makeLibrary(kitchen: Kitchen(name: "Home"), repository: InMemoryRecipeRepository())
+    let data = Data(#"{"@type":"Recipe","name":"Toast"}"#.utf8)
+    let options = try library.importDocument(data, sourceURL: URL(fileURLWithPath: "/tmp/toast.json"),
+                                             format: .jsonLD)
+    let candidate = try XCTUnwrap(options.first)
+    XCTAssertEqual(candidate.draft.title, "Toast")
+    let restored = try JSONDecoder().decode(RecipeImportOption.self, from: JSONEncoder().encode(candidate))
+    XCTAssertEqual(try candidate.retentionIdentifier(), try restored.retentionIdentifier())
+    let different = RecipeImportOption(id: candidate.id, draft: RecipeDraft(title: "Different"), concerns: [])
+    XCTAssertNotEqual(try candidate.retentionIdentifier(), try different.retentionIdentifier())
+    XCTAssertTrue(try library.load().recipes.isEmpty)
   }
 
   func testCreatesAndRevisesThroughOneLibraryInterface() throws {

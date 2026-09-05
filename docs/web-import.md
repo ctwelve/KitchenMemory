@@ -35,13 +35,27 @@ URL
  → normalize instruction hierarchy
  → parse ingredient lines provisionally
  → validate without rejecting partial data
- → present import review
- → save recipe
+ → atomically retain device-local candidates
+ → present resumable import review
+ → accept into a device-local editing draft
+ → explicitly save an immutable recipe revision
 ```
 
 Network fetching lives behind a small interface so the same pipeline can later
-consume a Safari share extension or saved HTML file and already consumes test
-fixtures without knowing where the document came from.
+consume a Safari share extension. The document picker already accepts saved HTML
+and JSON-LD in JSON documents through the same bounded parser, without networking.
+
+Candidates and accepted drafts live in the device-local Drafts collection, outside
+CloudKit and recipe authority. Closing review retains them; confirmed Discard
+removes only the local item. Acceptance atomically changes the same local item's
+state and never creates a Recipe. Save Revision freezes and persists a retryable
+command before committing shared evidence, then removes the draft only after
+success. Reopening or retrying that command preserves its identities.
+
+For local documents, the immutable capture retains the selected file URL and
+bounded JSON-LD transcription; the source title is the filename. A file URL is
+never promoted to an active attribution link. Unknown properties, diagnostics,
+and provisional ingredient interpretation survive candidate review and acceptance.
 
 `URLSessionRecipeDocumentLoader` now provides that interface for person-entered
 URLs. It uses a fresh ephemeral session, accepts only HTTPS, carries no cookies,

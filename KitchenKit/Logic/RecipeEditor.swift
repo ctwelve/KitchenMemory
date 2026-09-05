@@ -7,108 +7,6 @@
 
 import Foundation
 
-/// The editable representation of a recipe revision.
-///
-/// It deliberately carries the recipe's authored structure rather than a
-/// flattened transcription. This lets an editor make local corrections without
-/// losing section headings, ingredient provenance, or incomplete details.
-public struct RecipeDraft: Equatable, Sendable {
-  public var title: String
-  public var summary: String?
-  public var authorName: String?
-  public var contentLanguage: RecipeContentLanguage?
-  public var source: RecipeSource?
-  public var sourceCapture: RecipeSourceCapture?
-  public var recipeYield: RecipeYield?
-  public var prepDuration: RecipeDuration?
-  public var cookDuration: RecipeDuration?
-  public var totalDuration: RecipeDuration?
-  public var cuisines: [String]
-  public var categories: [String]
-  public var keywords: [String]
-  public var ingredientSections: [IngredientSection]
-  public var instructionSections: [InstructionSection]
-
-  public init(
-    title: String = "",
-    summary: String? = nil,
-    authorName: String? = nil,
-    contentLanguage: RecipeContentLanguage? = nil,
-    source: RecipeSource? = nil,
-    sourceCapture: RecipeSourceCapture? = nil,
-    recipeYield: RecipeYield? = nil,
-    prepDuration: RecipeDuration? = nil,
-    cookDuration: RecipeDuration? = nil,
-    totalDuration: RecipeDuration? = nil,
-    cuisines: [String] = [],
-    categories: [String] = [],
-    keywords: [String] = [],
-    ingredientSections: [IngredientSection] = [],
-    instructionSections: [InstructionSection] = []
-  ) {
-    self.title = title
-    self.summary = summary
-    self.authorName = authorName
-    self.contentLanguage = contentLanguage
-    self.source = source
-    self.sourceCapture = sourceCapture
-    self.recipeYield = recipeYield
-    self.prepDuration = prepDuration
-    self.cookDuration = cookDuration
-    self.totalDuration = totalDuration
-    self.cuisines = cuisines
-    self.categories = categories
-    self.keywords = keywords
-    self.ingredientSections = ingredientSections
-    self.instructionSections = instructionSections
-  }
-
-  /// Convenience for callers that collect a simple, unsectioned recipe.
-  public init(
-    title: String = "",
-    summary: String? = nil,
-    contentLanguage: RecipeContentLanguage? = nil,
-    ingredientLines: [String],
-    instructionLines: [String] = []
-  ) {
-    self.init(
-      title: title,
-      summary: summary,
-      contentLanguage: contentLanguage,
-      ingredientSections: ingredientLines.isEmpty
-        ? []
-        : [
-          IngredientSection(ingredients: ingredientLines.map {
-            RecipeIngredient(originalText: $0, presentationMode: .original, parseState: .edited)
-          }),
-        ],
-      instructionSections: instructionLines.isEmpty
-        ? []
-        : [InstructionSection(steps: instructionLines.map { InstructionStep(text: $0) })]
-    )
-  }
-
-  public init(revision: RecipeRevision) {
-    self.init(
-      title: revision.title,
-      summary: revision.summary,
-      authorName: revision.authorName,
-      contentLanguage: revision.contentLanguage,
-      source: revision.source,
-      sourceCapture: revision.sourceCapture,
-      recipeYield: revision.recipeYield,
-      prepDuration: revision.prepDuration,
-      cookDuration: revision.cookDuration,
-      totalDuration: revision.totalDuration,
-      cuisines: revision.cuisines,
-      categories: revision.categories,
-      keywords: revision.keywords,
-      ingredientSections: revision.ingredientSections,
-      instructionSections: revision.instructionSections
-    )
-  }
-}
-
 /// Validation failures for the initial text-first editor.
 public enum RecipeEditorError: Error, Equatable {
   case missingTitle
@@ -197,6 +95,30 @@ public struct RecipeEditor {
     return StoredRecipe(recipe: recipe, revision: revision)
   }
 
+  /// Freezes an explicit save for durable retry, using the draft's observed base.
+  public func prepareSave(
+    in kitchenID: Kitchen.ID,
+    from draft: RecipeDraft,
+    original: StoredRecipe?,
+    observedSelectionIDs: [RecipeSelectionCommand.ID]
+  ) throws -> RecipeSaveCommand {
+    let recipeID = original?.id ?? Recipe.ID()
+    let revision = try revision(
+      recipeID: recipeID, number: (original?.revision.revisionNumber ?? 0) + 1,
+      from: draft, preserving: original?.revision
+    )
+    let recipe = Recipe(id: recipeID, kitchenID: kitchenID, currentRevisionID: revision.id)
+    let now = Date()
+    return RecipeSaveCommand(
+      recipe: recipe, revision: revision, savedAt: now,
+      parentRevisionIDs: original.map { [$0.revision.id] } ?? [],
+      selection: RecipeSelectionCommand(
+        kitchenID: kitchenID, recipeID: recipeID, selectedRevisionID: revision.id,
+        selectedAt: now, observedSelectionIDs: observedSelectionIDs
+      )
+    )
+  }
+
   private func revision(
     recipeID: Recipe.ID,
     number: Int,
@@ -225,7 +147,7 @@ public struct RecipeEditor {
       categories: draft.categories,
       keywords: draft.keywords,
       media: existing?.media ?? [],
-      equipment: existing?.equipment ?? [],
+      equipment: cleaned(draft.equipment ?? existing?.equipment ?? [], reidentify: existing != nil),
       // Section and child identifiers are local to one immutable revision.
       // Reusing them would make persistence queries for an older section pull
       // in rows from every later revision with the same section identifier.
@@ -237,6 +159,19 @@ public struct RecipeEditor {
   private func text(_ line: String) -> String? {
     let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
     return trimmed.isEmpty ? nil : trimmed
+  }
+
+  private func cleaned(_ items: [EquipmentItem], reidentify: Bool) -> [EquipmentItem] {
+    items.compactMap { item in
+      let original = text(item.originalText) ?? ""
+      let name = text(item.name) ?? ""
+      let quantity = cleaned(item.quantity)
+      guard !original.isEmpty || !name.isEmpty || quantity != nil else { return nil }
+      return EquipmentItem(
+        id: reidentify ? EquipmentItem.ID() : item.id,
+        originalText: original, quantity: quantity, name: name, isOptional: item.isOptional
+      )
+    }
   }
 
   private func optional(_ text: String?) -> String? {

@@ -49,7 +49,10 @@ struct RecipeDetailView: View {
               .font(.caption)
               .foregroundStyle(.secondary)
               ForEach(revision.equipment) { item in
-                bullet(item.originalText)
+                bullet(item.originalText.isEmpty
+                  ? [RecipePresentationFormatter(locale: locale).quantity(item.quantity), item.name]
+                    .compactMap { $0 }.filter { !$0.isEmpty }.joined(separator: " ")
+                  : item.originalText)
               }
             }
           }

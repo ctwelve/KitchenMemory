@@ -683,6 +683,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				"ENABLE_OUTGOING_NETWORK_CONNECTIONS[sdk=macosx*]" = YES;
 				ENABLE_PREVIEWS = YES;
+				"ENABLE_USER_SELECTED_FILES[sdk=macosx*]" = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				"INFOPLIST_FILE[sdk=iphoneos*]" = "KitchenMemory/Info-iOS.plist";
 				"INFOPLIST_FILE[sdk=iphonesimulator*]" = "KitchenMemory/Info-iOS.plist";
@@ -732,6 +733,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				"ENABLE_OUTGOING_NETWORK_CONNECTIONS[sdk=macosx*]" = YES;
 				ENABLE_PREVIEWS = YES;
+				"ENABLE_USER_SELECTED_FILES[sdk=macosx*]" = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				"INFOPLIST_FILE[sdk=iphoneos*]" = "KitchenMemory/Info-iOS.plist";
 				"INFOPLIST_FILE[sdk=iphonesimulator*]" = "KitchenMemory/Info-iOS.plist";
@@ -1697,6 +1699,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				"ENABLE_OUTGOING_NETWORK_CONNECTIONS[sdk=macosx*]" = YES;
 				ENABLE_PREVIEWS = YES;
+				"ENABLE_USER_SELECTED_FILES[sdk=macosx*]" = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				"INFOPLIST_FILE[sdk=iphoneos*]" = "KitchenMemory/Info-iOS.plist";
 				"INFOPLIST_FILE[sdk=iphonesimulator*]" = "KitchenMemory/Info-iOS.plist";
@@ -1867,6 +1870,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				"ENABLE_OUTGOING_NETWORK_CONNECTIONS[sdk=macosx*]" = YES;
 				ENABLE_PREVIEWS = YES;
+				"ENABLE_USER_SELECTED_FILES[sdk=macosx*]" = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				"INFOPLIST_FILE[sdk=iphoneos*]" = "KitchenMemory/Info-iOS.plist";
 				"INFOPLIST_FILE[sdk=iphonesimulator*]" = "KitchenMemory/Info-iOS.plist";
@@ -2030,6 +2034,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				"ENABLE_OUTGOING_NETWORK_CONNECTIONS[sdk=macosx*]" = YES;
 				ENABLE_PREVIEWS = YES;
+				"ENABLE_USER_SELECTED_FILES[sdk=macosx*]" = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				"INFOPLIST_FILE[sdk=iphoneos*]" = "KitchenMemory/Info-iOS.plist";
 				"INFOPLIST_FILE[sdk=iphonesimulator*]" = "KitchenMemory/Info-iOS.plist";

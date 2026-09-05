@@ -68,7 +68,8 @@ module KitchenMemory
         },
         capability_settings: {
           "ENABLE_APP_SANDBOX[sdk=macosx*]" => "YES",
-          "ENABLE_OUTGOING_NETWORK_CONNECTIONS[sdk=macosx*]" => "YES"
+          "ENABLE_OUTGOING_NETWORK_CONNECTIONS[sdk=macosx*]" => "YES",
+          "ENABLE_USER_SELECTED_FILES[sdk=macosx*]" => "readonly"
         },
         production_entitlements: {
           "CODE_SIGN_ENTITLEMENTS[sdk=iphoneos*]" => "KitchenMemory/KitchenMemory-iOS.entitlements",
@@ -631,7 +632,8 @@ module KitchenMemory
 
           actual_capability_settings = settings.select do |setting, _value|
             setting.start_with?("ENABLE_APP_SANDBOX") ||
-              setting.start_with?("ENABLE_OUTGOING_NETWORK_CONNECTIONS")
+              setting.start_with?("ENABLE_OUTGOING_NETWORK_CONNECTIONS") ||
+              setting.start_with?("ENABLE_USER_SELECTED_FILES")
           end
           unless actual_capability_settings == contract[:capability_settings]
             raise ContractError,

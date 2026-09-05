@@ -8,6 +8,14 @@ import XCTest
 
 @MainActor
 final class LibraryNavigationPolicyTests: XCTestCase {
+  func testInitialVisibilityShowsMacSidebarAndKeepsIOSAdaptive() {
+#if os(macOS)
+    XCTAssertEqual(LibraryNavigationPolicy.initialVisibility, .all)
+#else
+    XCTAssertEqual(LibraryNavigationPolicy.initialVisibility, .automatic)
+#endif
+  }
+
   func testDestinationSelectionPreservesRegularShellAndFocusesCompactDetail() {
     XCTAssertEqual(
       LibraryNavigationPolicy.destinationSelectionVisibility(

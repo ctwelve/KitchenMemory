@@ -32,12 +32,8 @@ final class KitchenMemoryUITests: XCTestCase {
       description: "Deleted Items",
       in: app
     )
-    visitTopLevelDestination(
-      "recovery-destination",
-      revealing: "session-recovery",
-      description: "Recovery",
-      in: app
-    )
+    // A clean Kitchen has no recovery evidence requiring a destination.
+    XCTAssertFalse(app.buttons["recovery-destination"].exists)
 
     let recipeRow = app.buttons
       .matching(NSPredicate(format: "identifier BEGINSWITH %@", "recipe-row-"))
@@ -50,6 +46,16 @@ final class KitchenMemoryUITests: XCTestCase {
     let recipeDetail = app.descendants(matching: .any)["recipe-detail"]
     XCTAssertTrue(recipeDetail.waitForExistence(timeout: 5))
     assertAccessibleLabel(recipeDetail, description: "recipe detail")
+    app.terminate()
+  }
+
+  @MainActor
+  func testAttentionEvidenceExposesAccessibleRecoveryNavigation() {
+    let app = launchApp(additionalArguments: ["--ui-testing-recovery-fixture"])
+    visitTopLevelDestination(
+      "recovery-destination", revealing: "session-recovery",
+      description: "Recovery", in: app
+    )
     app.terminate()
   }
 

@@ -8,6 +8,35 @@ import XCTest
 
 @MainActor
 final class RecipeImportServiceTests: XCTestCase {
+  func testDocumentImportPreservesSourceWithoutTurningLocalPathIntoAnActiveLink() throws {
+    let source = URL(fileURLWithPath: "/private/tmp/recipe.json")
+    let json = #"{"@context":"https://schema.org","@type":"Recipe","name":"Soup","extra":"unknown"}"#
+    let options = try RecipeImportService.documentOptions(
+      from: Data(json.utf8), sourceURL: source, format: .jsonLD
+    )
+    let option = try XCTUnwrap(options.first)
+    XCTAssertEqual(option.draft.title, "Soup")
+    XCTAssertEqual(option.draft.source?.kind, .imported)
+    XCTAssertNil(option.draft.source?.canonicalURL)
+    XCTAssertEqual(option.draft.sourceCapture?.payload, Data(json.utf8))
+    XCTAssertEqual(option.draft.sourceCapture?.sourceURL, source)
+    XCTAssertTrue(option.concerns.contains(.missingIngredients))
+    let html = "<script type=\"application/ld+json\">\(json)</script>"
+    XCTAssertEqual(try RecipeImportService.documentOptions(
+      from: Data(html.utf8), sourceURL: source, format: .html
+    ).first?.draft.title, "Soup")
+    XCTAssertThrowsError(try RecipeImportService.documentOptions(
+      from: Data([0xFF]), sourceURL: source, format: .html
+    ))
+    XCTAssertThrowsError(try RecipeImportService.documentOptions(
+      from: Data("broken".utf8), sourceURL: source, format: .jsonLD
+    ))
+    XCTAssertThrowsError(try RecipeImportService.documentOptions(
+      from: Data(repeating: 0, count: RecipeImportLimits().maximumInputBytes + 1),
+      sourceURL: source, format: .jsonLD
+    ))
+  }
+
   // This test intentionally keeps one complete imported candidate and all of
   // its mapped evidence visible together.
   // swiftlint:disable:next function_body_length

@@ -1,6 +1,462 @@
 {
   "sourceLanguage" : "en-US",
   "strings" : {
+    "menu.recipe.title": {
+      "comment": "macOS menu containing actions for the currently selected Recipe.",
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recipe"
+          }
+        },
+        "es-MX": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Receta"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recette"
+          }
+        }
+      }
+    },
+    "recipe.editor.equipment.add": {
+      "comment": "Adds a blank Equipment item to the local Recipe draft.",
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add Equipment"
+          }
+        },
+        "es-MX": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Agregar equipo"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajouter de l’équipement"
+          }
+        }
+      }
+    },
+    "recipe.editor.equipment.untitled": {
+      "comment": "Fallback title for an empty Equipment item.",
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Equipment Item"
+          }
+        },
+        "es-MX": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elemento de equipo"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Article d’équipement"
+          }
+        }
+      }
+    },
+    "recipe.editor.equipment.wording": {
+      "comment": "Editable original Equipment wording; incomplete human text is valid.",
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Original Wording"
+          }
+        },
+        "es-MX": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Texto original"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Texte d’origine"
+          }
+        }
+      }
+    },
+    "recipe.editor.equipment.name": {
+      "comment": "Optional structured Equipment name, separate from original wording.",
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Equipment Name"
+          }
+        },
+        "es-MX": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nombre del equipo"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nom de l’équipement"
+          }
+        }
+      }
+    },
+    "recipe.import.document.action": {
+      "comment": "Choose a local HTML or JSON-LD document for staged recipe import.",
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Import HTML or JSON-LD Document"
+          }
+        },
+        "es-MX": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importar documento HTML o JSON-LD"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importer un document HTML ou JSON-LD"
+          }
+        }
+      }
+    },
+    "menu.window.new-library": {
+      "comment": "macOS Window menu command that opens a new recipe library window, including when all library windows are closed.",
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "New Recipe Library Window"
+          }
+        },
+        "es-MX": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nueva ventana de la biblioteca de recetas"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nouvelle fenêtre de la bibliothèque de recettes"
+          }
+        }
+      }
+    },
+    "recipe.import.document.hint": {
+      "comment": "Hint below the local document import button. Choosing a file opens the file picker and does not require a webpage URL. Use device-neutral wording for Mac, iPhone, and iPad.",
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Have an HTML or JSON-LD file? Choose it here—no URL needed."
+          }
+        },
+        "es-MX": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Tienes un archivo HTML o JSON-LD? Selecciónalo aquí; no necesitas una URL."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vous avez un fichier HTML ou JSON-LD? Sélectionnez-le ici, sans URL."
+          }
+        }
+      }
+    },
+    "recipe.import.accept-draft": {
+      "comment": "Accept a staged Import Candidate into editing; does not save a shared Recipe.",
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Accept into Draft"
+          }
+        },
+        "es-MX": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aceptar como borrador"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Accepter comme brouillon"
+          }
+        }
+      }
+    },
+    "recipe.import.candidate.local-note": {
+      "comment": "Distinguishes an unaccepted local import from a Recipe editing draft.",
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Import awaiting acceptance · Only on this device"
+          }
+        },
+        "es-MX": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importación pendiente de aceptación · Solo en este dispositivo"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importation en attente d’acceptation · Sur cet appareil seulement"
+          }
+        }
+      }
+    },
+    "recipe.drafts.title": {
+      "comment": "Destination containing device-local unfinished Recipe work.",
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Drafts"
+          }
+        },
+        "es-MX": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Borradores"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Brouillons"
+          }
+        }
+      }
+    },
+    "recipe.drafts.untitled": {
+      "comment": "A draft with no authored title yet.",
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Untitled Recipe"
+          }
+        },
+        "es-MX": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Receta sin título"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recette sans titre"
+          }
+        }
+      }
+    },
+    "recipe.drafts.local-note": {
+      "comment": "Clarifies that unfinished editing is stored only on this device.",
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Only on this device"
+          }
+        },
+        "es-MX": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Solo en este dispositivo"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sur cet appareil seulement"
+          }
+        }
+      }
+    },
+    "recipe.editor.draft-failure.title": {
+      "comment": "Title for an unsuccessful local draft or Recipe save.",
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn’t Save Your Work"
+          }
+        },
+        "es-MX": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudo guardar tu trabajo"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossible d’enregistrer votre travail"
+          }
+        }
+      }
+    },
+    "recipe.editor.draft-failure.message": {
+      "comment": "Explains a local read/write failure without promising durability.",
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Editing data could not be read or saved. Keep any open work here and try again. Existing draft files have not been discarded."
+          }
+        },
+        "es-MX": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudieron leer o guardar los datos de edición. Mantén aquí cualquier trabajo abierto e inténtalo de nuevo. No se han descartado los archivos de borrador existentes."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les données de modification n’ont pas pu être lues ou enregistrées. Gardez ici tout travail ouvert et réessayez. Les fichiers de brouillon existants n’ont pas été supprimés."
+          }
+        }
+      }
+    },
+    "recipe.editor.action.close": {
+      "comment": "Close editor while retaining its local draft.",
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Close"
+          }
+        },
+        "es-MX": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cerrar"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fermer"
+          }
+        }
+      }
+    },
+    "recipe.editor.action.discard": {
+      "comment": "Explicit destructive action abandoning a Recipe editing draft.",
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discard"
+          }
+        },
+        "es-MX": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Descartar"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abandonner"
+          }
+        }
+      }
+    },
+    "recipe.editor.discard.confirmation": {
+      "comment": "Confirmation before removing an editing draft; maintained Recipe history is unaffected.",
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discard this draft?"
+          }
+        },
+        "es-MX": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Descartar este borrador?"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abandonner ce brouillon?"
+          }
+        }
+      }
+    },
+    "recipe.editor.title.validation": {
+      "comment": "Inline explanation that saving a Recipe Revision requires a title.",
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter a title before saving."
+          }
+        },
+        "es-MX": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Escribe un título antes de guardar."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saisissez un titre avant d’enregistrer."
+          }
+        }
+      }
+    },
     "deleted.items.empty-message" : {
       "comment" : "Deleted Items empty-state explanation.",
       "extractionState" : "manual",
@@ -1098,23 +1554,23 @@
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nueva receta"
+            "value" : "Nueva receta…"
           }
         },
         "fr-CA" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nouvelle recette"
+            "value" : "Nouvelle recette…"
           }
         },
         "en-US" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "New Recipe"
+            "value" : "New Recipe…"
           }
         }
       },
-      "comment" : "Toolbar action that starts creating a recipe.",
+      "comment" : "Toolbar and menu action that opens the recipe editor for further input before saving a recipe.",
       "extractionState" : "manual"
     },
     "library.action.import-recipe" : {
@@ -1122,23 +1578,23 @@
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Importar receta"
+            "value" : "Importar receta…"
           }
         },
         "fr-CA" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Importer une recette"
+            "value" : "Importer une recette…"
           }
         },
         "en-US" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Import Recipe"
+            "value" : "Import Recipe…"
           }
         }
       },
-      "comment" : "Toolbar action that starts importing a recipe from the web.",
+      "comment" : "Toolbar and menu action that opens the recipe import dialog for a webpage or local file. The ellipsis indicates further input is required.",
       "extractionState" : "manual"
     },
     "settings.title" : {
@@ -3967,19 +4423,19 @@
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Revisa el texto y la estructura importados antes de guardar. La revisión y el guardado no vuelven a contactar el origen. Al guardar se conservan localmente la URL final y los metadatos JSON-LD limitados, incluso los campos que no se muestran aquí."
+            "value" : "Revisa el texto y la estructura importados antes de aceptar el borrador. La revisión y el guardado no vuelven a contactar el origen. La referencia de origen y los metadatos JSON-LD limitados, incluso los campos no mostrados aquí, ya se conservan solo en este dispositivo. Guardar revisión los agrega a la cocina y permite su sincronización."
           }
         },
         "fr-CA" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vérifiez le libellé et la structure importés avant d’enregistrer. La révision et l’enregistrement ne contactent pas de nouveau la source. L’enregistrement conserve localement l’URL finale et les métadonnées JSON-LD limitées, y compris les champs non affichés ici."
+            "value" : "Vérifiez le libellé et la structure importés avant d’accepter le brouillon. La révision et l’enregistrement ne contactent pas de nouveau la source. La référence source et les métadonnées JSON-LD limitées, y compris les champs non affichés ici, sont déjà conservées uniquement sur cet appareil. Enregistrer la révision les ajoute à la cuisine et permet leur synchronisation."
           }
         },
         "en-US" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Check the imported wording and structure before saving. Review and save do not contact the source again. Saving keeps the final source URL and bounded JSON-LD metadata locally, including fields not shown here."
+            "value" : "Check the imported wording and structure before accepting the draft. Review and save do not contact the source again. The source reference and bounded JSON-LD metadata, including fields not shown here, are already retained only on this device. Save Revision adds them to the kitchen, where they can synchronize."
           }
         }
       },
@@ -6727,23 +7183,23 @@
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Si guardas una receta, Memoria de cocina conserva localmente la URL final de origen y un bloque limitado de metadatos JSON-LD de la receta, incluso los campos de origen que no se muestran en el editor de revisión."
+            "value" : "Al importar, Memoria de cocina conserva inmediatamente la referencia de origen y un bloque limitado de metadatos JSON-LD, incluso los campos no mostrados en la revisión. Los candidatos y borradores permanecen solo en este dispositivo hasta que guardes una revisión en la cocina. Los documentos locales se leen sin acceso a la red."
           }
         },
         "fr-CA" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Si vous enregistrez une recette, Mémoire de cuisine conserve localement l’URL source finale et un bloc limité de métadonnées JSON-LD de la recette, y compris les champs sources non affichés dans l’éditeur de révision."
+            "value" : "Lors de l’importation, Mémoire de cuisine conserve immédiatement la référence source et un bloc limité de métadonnées JSON-LD, y compris les champs non affichés dans la révision. Les candidats et brouillons restent uniquement sur cet appareil jusqu’à l’enregistrement d’une révision dans la cuisine. Les documents locaux sont lus sans accès au réseau."
           }
         },
         "en-US" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "If you save a recipe, Kitchen Memory keeps the final source URL and one bounded JSON-LD recipe-metadata block locally, including source fields not shown in the review editor."
+            "value" : "Importing immediately retains the source reference and one bounded JSON-LD metadata block in Kitchen Memory, including fields not shown in review. Candidates and drafts stay only on this device until you save a revision into the kitchen. Local documents are read without network access."
           }
         }
       },
-      "comment" : "Privacy explanation of source data retained only after saving an imported recipe.",
+      "comment" : "Privacy explanation of immediate device-local staging and the explicit Save Revision synchronization boundary.",
       "extractionState" : "manual"
     },
     "recipe.import.candidate.untitled" : {

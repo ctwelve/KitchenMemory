@@ -4,6 +4,9 @@
 
 import KitchenKit
 import SwiftUI
+#if os(macOS)
+import AppKit
+#endif
 
 private enum KitchenResetCopy {
   static func title(locale: Locale) -> String {
@@ -28,14 +31,41 @@ extension FocusedValues {
 
 #if os(macOS)
 struct KitchenCommands: Commands {
+  let model: RecipeLibraryModel?
+  @Environment(\.locale) private var locale
   @FocusedValue(\.resetKitchenAction) private var resetKitchenAction
 
   var body: some Commands {
     CommandMenu(.menuKitchenTitle) {
       Button(.settingsResetAction, role: .destructive) {
-        resetKitchenAction?()
+        if let resetKitchenAction {
+          resetKitchenAction()
+        } else if let model {
+          confirmReset(model)
+        }
       }
-      .disabled(resetKitchenAction == nil)
+      .disabled(model?.startupState != .ready)
+    }
+  }
+
+  private func confirmReset(_ model: RecipeLibraryModel) {
+    let alert = NSAlert()
+    alert.alertStyle = .warning
+    alert.messageText = KitchenResetCopy.title(locale: locale)
+    alert.informativeText = KitchenResetCopy.message(locale: locale)
+    alert.addButton(withTitle: LocalizedStringResource.actionCancel.localized(for: locale))
+    let reset = alert.addButton(
+      withTitle: LocalizedStringResource.settingsResetConfirmationAction.localized(for: locale)
+    )
+    reset.hasDestructiveAction = true
+    // Cancel is the default; Reset requires an explicit destructive choice.
+    guard alert.runModal() == .alertSecondButtonReturn else { return }
+    if !model.resetKitchen() {
+      let failure = NSAlert()
+      failure.alertStyle = .warning
+      failure.messageText = RecipeLibraryIssue.reset.message(locale: locale)
+      failure.addButton(withTitle: LocalizedStringResource.actionCancel.localized(for: locale))
+      failure.runModal()
     }
   }
 }
@@ -168,6 +198,7 @@ struct KitchenSettingsView: View {
     .toolbar {
       ToolbarItem(placement: .confirmationAction) {
         Button(.actionDone) { dismiss() }
+          .help(Text(.actionDone))
       }
     }
 #endif

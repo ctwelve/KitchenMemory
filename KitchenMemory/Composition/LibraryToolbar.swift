@@ -6,12 +6,9 @@ import SwiftUI
 
 struct LibraryToolbar: ToolbarContent {
   let showsKitchenActions: Bool
-  let actionsAreAvailable: Bool
+  let actions: LibraryCommandActions?
   let showsSidebarToggle: Bool
   let sidebarToggleTitle: LocalizedStringResource
-  let sidebarTogglePlacement: ToolbarItemPlacement
-  let createRecipe: () -> Void
-  let importRecipe: () -> Void
   let toggleSidebar: () -> Void
   let showSettings: () -> Void
 
@@ -19,22 +16,25 @@ struct LibraryToolbar: ToolbarContent {
   var body: some ToolbarContent {
     if showsKitchenActions {
       ToolbarItem(placement: .primaryAction) {
-        Button(action: createRecipe) {
+        Button { actions?.perform(.newRecipe) } label: {
           ToolbarIconLabel(.libraryActionNewRecipe, systemImage: "plus")
         }
-        .disabled(!actionsAreAvailable)
+        .disabled(actions?.canPerform(.newRecipe) != true)
         .accessibilityIdentifier("new-recipe")
+        .help(Text(.libraryActionNewRecipe))
       }
       ToolbarItem(placement: .primaryAction) {
-        Button(action: importRecipe) {
+        Button { actions?.perform(.importRecipe) } label: {
           ToolbarIconLabel(.libraryActionImportRecipe, systemImage: "square.and.arrow.down")
         }
-        .disabled(!actionsAreAvailable)
+        .disabled(actions?.canPerform(.importRecipe) != true)
         .accessibilityIdentifier("import-recipe")
+        .help(Text(.libraryActionImportRecipe))
       }
     }
+#if os(iOS)
     if showsSidebarToggle {
-      ToolbarItem(placement: sidebarTogglePlacement) {
+      ToolbarItem(placement: .navigation) {
         Button(action: toggleSidebar) {
           ToolbarIconLabel(sidebarToggleTitle, systemImage: "sidebar.left")
         }
@@ -42,6 +42,7 @@ struct LibraryToolbar: ToolbarContent {
         .help(Text(sidebarToggleTitle))
       }
     }
+#endif
 #if !os(macOS)
     if showsKitchenActions {
       ToolbarItem(placement: .primaryAction) {
@@ -49,6 +50,7 @@ struct LibraryToolbar: ToolbarContent {
           ToolbarIconLabel(.settingsTitle, systemImage: "gearshape")
         }
         .accessibilityIdentifier("open-settings")
+        .help(Text(.settingsTitle))
       }
     }
 #endif

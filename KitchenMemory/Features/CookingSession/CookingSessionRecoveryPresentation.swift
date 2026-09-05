@@ -15,6 +15,8 @@ extension CookingSessionPresentationModel {
     waitingSessions.count + recoverySessions.count
   }
 
+  var showsRecoveryDestination: Bool { recoveryItemCount > 0 }
+
   var isShowingDeletedItems: Bool {
     libraryDestination == .deletedItems
   }
