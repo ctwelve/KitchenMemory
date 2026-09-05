@@ -71,6 +71,7 @@ struct RecipeLibrarySidebar: View {
     } header: {
       Text(.sessionDiscoveryTitle)
     }
+    .buttonStyle(.borderless)
   }
 
   @ViewBuilder
