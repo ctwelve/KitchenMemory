@@ -69,7 +69,7 @@ final class RecipeLibraryModel {
     hasEstablishedKitchenEvidence = !kitchenWasCreated
     sampleOnboardingResponse = samplePreferences.sampleRecipeOnboardingResponse
     navigation.prepareToLeaveEditor = { [weak self] in
-      guard let self else { return true }
+      guard let self, editor != nil else { return true }
       return editor?.confirmsDiscard != true && drafts.prepareToLeave()
     }
     samplePreferences.startObservingSampleRecipeOnboardingResponse { [weak self] response in
@@ -211,8 +211,10 @@ final class RecipeLibraryModel {
       // untouched, and a later shared-reset failure must not resurrect old drafts.
       guard drafts.purge() else { issue = .reset; return false }
       editingPresentations = [:]
-      navigation.move(to: .recipe)
+      if case .editor = navigation.destination { navigation.move(to: .recipe) }
+      if isShowingDrafts { navigation.move(to: .recipe) }
       try library.reset()
+      navigation.move(to: .recipe)
       resetPresentationState()
       samplePreferences.sampleRecipeOnboardingResponse = .accepted
       sampleOnboardingResponse = .accepted

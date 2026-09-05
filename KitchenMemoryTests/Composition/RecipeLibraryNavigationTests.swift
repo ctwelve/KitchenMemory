@@ -9,6 +9,31 @@ import XCTest
 
 @MainActor
 final class RecipeLibraryNavigationTests: XCTestCase {
+  func testSuccessfulDraftRemovalDoesNotAskForAnotherWriteBeforeLeaving() throws {
+    for savesRecipe in [false, true] {
+      let app = try AppRuntime.testing()
+      let store = NavigationDraftStore()
+      let library = RecipeLibraryModel(
+        library: app.libraryModel.library,
+        samplePreferences: VolatileKitchenPreferencesStore(sampleRecipeOnboardingResponse: .accepted),
+        kitchenWasCreated: false, editingStore: store
+      )
+      library.loadIfNeeded()
+      library.beginEditing()
+      library.editor?.session.title = "Complete this action"
+      store.refusesWritesAfterRemoval = true
+      if savesRecipe {
+        XCTAssertTrue(library.saveEditor())
+      } else {
+        library.discardEditor(confirmed: true)
+      }
+      XCTAssertTrue(library.drafts.drafts.isEmpty)
+      XCTAssertNil(library.editor)
+      XCTAssertEqual(library.navigation.destination, .recipe)
+      XCTAssertFalse(library.editingStorageFailed)
+    }
+  }
+
   func testFailedDraftLeaveVetoesEveryNavigationEntryPointWithoutChangingSelection() throws {
     let app = try AppRuntime.testing()
     let store = NavigationDraftStore()
@@ -116,10 +141,12 @@ final class RecipeLibraryNavigationTests: XCTestCase {
 @MainActor
 private final class NavigationDraftStore: RecipeEditingStoring {
   var refusesWrites = false
+  var refusesWritesAfterRemoval = false
   private var records: [RecipeEditingRecord] = []
   func load() throws -> [RecipeEditingRecord] { records }
   func save(_ records: [RecipeEditingRecord]) throws {
     if refusesWrites { throw CocoaError(.fileWriteUnknown) }
     self.records = records
+    if refusesWritesAfterRemoval && records.isEmpty { refusesWrites = true }
   }
 }
