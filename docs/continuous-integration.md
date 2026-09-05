@@ -94,9 +94,12 @@ failing logic test or coverage check is a product defect.
 
 Cleanup follows acceptance and integration; it does not substitute for either.
 Confirm that the intended pull request is merged into `main`, its required
-pull-request checks passed, and the iOS and macOS `Merge to main` Production
-Build actions succeeded for the actual merge commit. A deleted remote branch
-or a green result from another commit is not proof of that state.
+pull-request checks passed, and the applicable iOS and macOS `Merge to main`
+Production Build actions succeeded for the actual merge commit. If the workflow
+did not start because of the documented [change filters](#change-filters),
+verify and record that the exact merged diff qualifies for that exclusion;
+an unexplained missing run is not an exemption. A deleted remote branch or a
+green result from another commit is not proof of the required state.
 
 Inspect local state before switching branches or removing anything:
 
