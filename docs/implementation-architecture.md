@@ -22,6 +22,14 @@ iOS Simulator, and Mac destinations.
 - `Logic/` owns product operations and presentation-independent workflow state.
 
 These are architectural seams, not separately importable Swift submodules.
+`RecipeDrafts` owns the complete device-local Recipe Editing Draft lifetime:
+collection membership, observable editable contents, durable phases, storage
+recovery, and frozen-command publication. `FileRecipeEditingStore` owns atomic
+document encoding and legacy restoration; the app supplies its owner-scoped URL.
+The native `RecipeEditingModel` holds only a binding adapter and discard-dialog
+state, not a second mutable editing session. App reset purges these local drafts
+before resetting shared Kitchen contents.
+
 The application links one framework and writes `import KitchenKit`. Import and
 Persistence depend conceptually on Domain but not on one another; Logic
 coordinates all three responsibilities without depending on the application or
