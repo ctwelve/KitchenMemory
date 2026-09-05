@@ -113,6 +113,16 @@ public struct SampleRecipeInstallService {
   public func presence(in kitchenID: Kitchen.ID) throws -> SampleRecipePresence {
     let sampleIDs = Set(try samples.recipes(in: kitchenID).map(\.id))
     let installedIDs = Set(try repository.recipes(in: kitchenID).map(\.id))
+    return Self.presence(sampleIDs: sampleIDs, installedIDs: installedIDs)
+  }
+
+  /// Derives presence from the same content snapshot a library has already loaded.
+  public func presence(in kitchenID: Kitchen.ID, installedRecipeIDs: Set<Recipe.ID>) throws -> SampleRecipePresence {
+    let sampleIDs = Set(try samples.recipes(in: kitchenID).map(\.id))
+    return Self.presence(sampleIDs: sampleIDs, installedIDs: installedRecipeIDs)
+  }
+
+  private static func presence(sampleIDs: Set<Recipe.ID>, installedIDs: Set<Recipe.ID>) -> SampleRecipePresence {
     let installedCount = sampleIDs.intersection(installedIDs).count
 
     if installedCount == sampleIDs.count { return .complete }

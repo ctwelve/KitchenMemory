@@ -41,6 +41,13 @@ destination. Navigation never emits Stop or Finish; those remain explicit
 Cooking Session commands. Native compact navigation bindings derive from the
 accepted destination rather than maintaining another selected Session ID.
 
+Library reads derive bundled-sample presence from the loaded Recipe IDs, so
+content and sample status describe the same snapshot. Standalone sample-presence
+callers still perform their own repository read. The authority reader itself is
+unchanged: recovery classification, causal validation, collision handling, and
+payload validation remain at the repository boundary. Broader read optimization
+requires bounded measurement; this slice adds no cache or background machinery.
+
 The application links one framework and writes `import KitchenKit`. Import and
 Persistence depend conceptually on Domain but not on one another; Logic
 coordinates all three responsibilities without depending on the application or
