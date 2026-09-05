@@ -22,10 +22,12 @@ public struct StoredRecipe: Codable, Equatable, Identifiable, Sendable {
   }
 }
 
-/// Domain-facing storage operations needed by the first recipe workflow.
+/// Domain-facing Recipe storage and immutable authority operations.
 ///
 /// The protocol mentions no SwiftData types, so application use cases and test
 /// doubles can depend on it without adopting the persistence framework.
+/// Every adapter must implement authority guarantees or explicitly reject the
+/// operation; no default fabricates evidence or weakens a Save command.
 @MainActor
 public protocol RecipeRepository: AnyObject {
   func save(_ kitchen: Kitchen) throws
@@ -51,30 +53,6 @@ public protocol RecipeRepository: AnyObject {
   func revisions(for recipeID: Recipe.ID) throws -> [RecipeRevision]
   /// Atomically replaces every recipe and revision owned by one Kitchen.
   func replaceRecipes(in kitchenID: Kitchen.ID, with recipes: [StoredRecipe]) throws
-}
-
-public extension RecipeRepository {
-  func selectionHeads(for recipeID: Recipe.ID) throws -> [RecipeSelectionCommand.ID] { [] }
-
-  func save(_ command: RecipeSaveCommand) throws {
-    try save(recipe: command.recipe, revision: command.revision)
-  }
-
-  func recipeAuthority(id: Recipe.ID) throws -> RecipeAuthorityProjection? {
-    guard let stored = try recipe(id: id) else { return nil }
-    return .available(AvailableRecipeAuthority(
-      recipe: stored.recipe,
-      revisions: [ProjectedRecipeRevision(revision: stored.revision, state: .current)]
-    ))
-  }
-
-  func select(_ command: RecipeSelectionCommand) throws {
-    throw KitchenMemoryPersistenceError.recipeSelectionUnsupported
-  }
-
-  func convergeKitchens(into kitchen: Kitchen, ownedBy ownerID: KitchenOwner.ID) throws {
-    throw KitchenMemoryPersistenceError.ownershipConvergenceUnsupported
-  }
 }
 
 private struct EncodedRecipeSaveAuthority {
@@ -140,6 +118,11 @@ public enum KitchenMemoryPersistenceError: Error, Equatable {
 
   /// A repository adapter has not implemented immutable Recipe Selection.
   case recipeSelectionUnsupported
+
+  /// A narrow adapter does not implement immutable Save or authority reads.
+  case recipeSaveUnsupported
+  case recipeAuthorityUnsupported
+  case recipeSelectionHeadsUnsupported
 }
 
 /// A SwiftData implementation of ``RecipeRepository``.
