@@ -16,8 +16,8 @@ struct RecipeGalleryView: View {
         LazyVGrid(columns: [GridItem(.adaptive(minimum: 200))], alignment: .leading, spacing: 16) {
           ForEach(gallery) { item in
             VStack(alignment: .leading, spacing: 8) {
-              if RecipePrivateImage.image(for: item) != nil {
-                RecipeImage(media: item, contentMode: .fit)
+              if let image = RecipePrivateImage.image(for: item) {
+                RecipeImage(media: item, contentMode: .fit, resolvedImage: image)
                   .frame(maxWidth: .infinity).frame(height: 220)
               } else {
                 Label(.recipeMediaUnavailable, systemImage: "photo")

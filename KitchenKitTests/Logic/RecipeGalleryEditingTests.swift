@@ -39,9 +39,21 @@ final class RecipeGalleryEditingTests: XCTestCase {
     let second = try editor.revise(recipeID: first.id, from: session.validatedDraft())
     XCTAssertEqual(second.revision.media, [hero, secondImage, firstImage])
     XCTAssertEqual(try repository.revisions(for: first.id).last?.media, [hero, firstImage, secondImage])
-    session.media?.removeAll { $0.id == firstImage.id }
+    session.removeMedia(id: firstImage.id)
     let third = try editor.revise(recipeID: first.id, from: session.validatedDraft())
     XCTAssertEqual(third.revision.media, [hero, secondImage])
     XCTAssertEqual(try repository.revisions(for: first.id)[1].media, [hero, secondImage, firstImage])
   }
+  func testAddingGalleryImagesKeepsHeroAndAuthoredDescriptions() throws {
+    let hero = RecipeMedia(role: .hero, imageData: Data([1]))
+    var session = RecipeEditSession(draft: RecipeDraft(title: "Soup", media: [hero]))
+    session.addGalleryImages([Data([2]), Data([3])])
+    let gallery = try XCTUnwrap(session.media).filter { $0.role == .gallery }
+    XCTAssertEqual(gallery.map(\.imageData), [Data([2]), Data([3])])
+    XCTAssertNotEqual(gallery[0].id, gallery[1].id)
+    session.setMediaDescription("Before cooking", for: gallery[0].id)
+    XCTAssertEqual(session.media?.first, hero)
+    XCTAssertEqual(session.media?[1].accessibilityLabel, "Before cooking")
+  }
+
 }

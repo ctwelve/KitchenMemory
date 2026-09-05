@@ -17,19 +17,17 @@ struct RecipeMediaEditorView: View {
         EditorTextField(.recipeMediaDescription, text: Binding(
           get: { hero.accessibilityLabel ?? "" },
           set: { value in
-            guard let index = session.media?.firstIndex(where: { $0.id == hero.id }) else { return }
-            session.media?[index].accessibilityLabel = value.isEmpty ? nil : value
+            session.setMediaDescription(value, for: hero.id)
           }
         ), multiline: true)
         Button(.recipeMediaRemoveHero, role: .destructive) {
-          session.media = (session.media ?? []).filter { $0.role != .hero }
+          session.removeHeroImage()
         }
         .accessibilityIdentifier("recipe-media-remove-hero")
       }
       RecipeImageImportButton(title: .recipeMediaChooseHero, allowsMultipleSelection: false) { images in
         guard let data = images.first else { return }
-        session.media = (session.media ?? []).filter { $0.role != .hero }
-          + [RecipeMedia(role: .hero, imageData: data)]
+        session.replaceHeroImage(with: data)
       }
       .accessibilityIdentifier("recipe-media-choose-hero")
     }

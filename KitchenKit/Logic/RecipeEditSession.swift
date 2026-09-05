@@ -116,16 +116,6 @@ public struct RecipeEditSession: Codable, Equatable, Sendable {
     moveElement(in: &ingredientSections, at: index, by: offset)
   }
 
-  public mutating func moveGalleryImage(at index: Int, by offset: Int) {
-    guard var items = media else { return }
-    let indices = items.indices.filter { items[$0].role == .gallery }
-    guard indices.indices.contains(index) else { return }
-    let (destination, overflow) = index.addingReportingOverflow(offset)
-    guard !overflow, indices.indices.contains(destination) else { return }
-    items.swapAt(indices[index], indices[destination])
-    media = items
-  }
-
   public mutating func moveEquipment(at index: Int, by offset: Int) {
     guard var items = equipment else { return }
     moveElement(in: &items, at: index, by: offset)

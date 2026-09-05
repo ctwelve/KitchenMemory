@@ -20,7 +20,7 @@ final class RecipeMediaEditingTests: XCTestCase {
     session = try JSONDecoder().decode(RecipeEditSession.self, from: JSONEncoder().encode(session))
     let first = try editor.create(in: kitchen.id, from: session.validatedDraft())
     XCTAssertEqual(try repository.recipe(id: first.id)?.revision.media, [hero])
-    session.media = []
+    session.removeHeroImage()
     let second = try editor.revise(recipeID: first.id, from: session.validatedDraft())
     XCTAssertTrue(second.revision.media.isEmpty)
     XCTAssertEqual(try repository.revisions(for: first.id).last?.media, [hero])
@@ -74,6 +74,31 @@ final class RecipeMediaEditingTests: XCTestCase {
     try context.save()
     try repository.save(command)
     XCTAssertEqual(try repository.revisions(for: command.recipe.id), [command.revision])
+  }
+
+  func testReplacingHeroPreservesGalleryAndSourceInEveryRetainedRevision() throws {
+    let repository = SwiftDataRecipeRepository(
+      modelContainer: try KitchenMemorySchema.makeContainer(inMemory: true)
+    )
+    let kitchen = Kitchen(name: "Media Kitchen")
+    try repository.save(kitchen)
+    let editor = RecipeEditor(repository: repository)
+    let source = RecipeSource(kind: .book, title: "Synthetic cooking guide")
+    let gallery = RecipeMedia(role: .gallery, imageData: Data([3]))
+    var session = RecipeEditSession(draft: RecipeDraft(title: "Soup", source: source, media: [gallery]))
+    session.replaceHeroImage(with: Data([1]))
+    let first = try editor.create(in: kitchen.id, from: session.validatedDraft())
+    let originalHero = try XCTUnwrap(first.revision.media.first { $0.role == .hero })
+    session.replaceHeroImage(with: Data([2]))
+    let replacement = try XCTUnwrap(session.media?.first { $0.role == .hero })
+    session.setMediaDescription("Another bowl", for: replacement.id)
+    let second = try editor.revise(recipeID: first.id, from: session.validatedDraft())
+    XCTAssertNotEqual(replacement.id, originalHero.id)
+    XCTAssertEqual(second.revision.media.first { $0.role == .hero }?.imageData, Data([2]))
+    XCTAssertEqual(second.revision.media.first { $0.role == .hero }?.accessibilityLabel, "Another bowl")
+    XCTAssertEqual(second.revision.media.filter { $0.role == .gallery }, [gallery])
+    XCTAssertEqual(second.revision.source, source)
+    XCTAssertEqual(try repository.revisions(for: first.id).last, first.revision)
   }
 
 }

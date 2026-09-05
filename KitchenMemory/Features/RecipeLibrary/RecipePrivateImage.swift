@@ -47,7 +47,7 @@ enum RecipePrivateImage {
       guard let data = media.imageData, media.acceptsImageData(data),
         let source = CGImageSourceCreateWithData(data as CFData, nil),
         let decoded = CGImageSourceCreateImageAtIndex(source, 0, nil) else { return nil }
-      return Image(decorative: decoded, scale: 1)
+      return Image(decoded, scale: 1, label: Text(media.accessibilityLabel ?? ""))
     }
 #if os(macOS)
     guard let image = SampleRecipeCatalog.resourceBundle.image(forResource: media.assetName) else { return nil }

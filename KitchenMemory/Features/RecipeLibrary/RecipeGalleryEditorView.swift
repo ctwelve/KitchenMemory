@@ -17,8 +17,7 @@ struct RecipeGalleryEditorView: View {
           EditorTextField(.recipeMediaDescription, text: Binding(
             get: { media.accessibilityLabel ?? "" },
             set: { value in
-              guard let position = session.media?.firstIndex(where: { $0.id == media.id }) else { return }
-              session.media?[position].accessibilityLabel = value.isEmpty ? nil : value
+              session.setMediaDescription(value, for: media.id)
             }
           ), multiline: true)
           ViewThatFits(in: .horizontal) {
@@ -30,7 +29,7 @@ struct RecipeGalleryEditorView: View {
         .accessibilityIdentifier("recipe-gallery-editor-\(media.id.rawValue.uuidString)")
       }
       RecipeImageImportButton(title: .recipeMediaGalleryAdd, allowsMultipleSelection: true) { images in
-        session.media = (session.media ?? []) + images.map { RecipeMedia(role: .gallery, imageData: $0) }
+        session.addGalleryImages(images)
       }
       .accessibilityIdentifier("recipe-gallery-add")
     }
@@ -40,7 +39,7 @@ struct RecipeGalleryEditorView: View {
     Button(.actionMoveUp) { session.moveGalleryImage(at: index, by: -1) }.disabled(index == 0)
     Button(.actionMoveDown) { session.moveGalleryImage(at: index, by: 1) }.disabled(index == gallery.count - 1)
     Button(.recipeMediaGalleryRemove, role: .destructive) {
-      session.media?.removeAll { $0.id == media.id }
+      session.removeMedia(id: media.id)
     }
   }
 }

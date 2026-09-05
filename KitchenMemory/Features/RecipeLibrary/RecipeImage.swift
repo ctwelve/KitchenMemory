@@ -8,11 +8,12 @@ import SwiftUI
 struct RecipeImage: View {
   let media: RecipeMedia?
   var contentMode: ContentMode = .fill
+  var resolvedImage: Image?
   @Environment(\.locale) private var locale
 
   var body: some View {
     Group {
-      if let media, let image = RecipePrivateImage.image(for: media) {
+      if let image = resolvedImage ?? media.flatMap(RecipePrivateImage.image) {
         image
           .resizable()
           .aspectRatio(contentMode: contentMode)
