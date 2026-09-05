@@ -452,6 +452,11 @@ recipe documents remain data assets so a translation preserves coherent
 instructions, ingredients, attribution, and accessibility descriptions. See
 [localization architecture](localization-architecture.md).
 
+## Private Recipe media
+
+Private image selection, draft retention, additive V6 payload storage, and
+authority-independent image availability follow the [Recipe media contract](recipe-media.md).
+
 ## Sample resources
 
 Deterministic starter content is application data, so its loader and resources

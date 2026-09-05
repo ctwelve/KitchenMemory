@@ -655,7 +655,11 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     }
     let revisions = try matchingRevisionRecords(for: command)
     try upsert(command.recipe)
-    if revisions.isEmpty { try replace(command.revision) }
+    if revisions.isEmpty {
+      try replace(command.revision)
+    } else {
+      try restoreImagePayloads(for: command.revision)
+    }
     if saved.isEmpty {
       context.insert(saveRecord(for: command, encoded: encoded))
     }
@@ -868,6 +872,36 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     else { throw KitchenMemoryPersistenceError.invalidRecipeSaveCommand }
   }
 
+  private func imageData(for media: RecipeMedia, recipeID: UUID) throws -> Data? {
+    guard media.isPrivateImage else { return nil }
+    let revisions = try context.fetch(FetchDescriptor<RecipeRevisionRecord>(
+      predicate: #Predicate { $0.recipeID == recipeID }
+    ))
+    let revisionIDs = Set(revisions.map(\.id))
+    let mediaID = media.id.rawValue
+    let payloads = try context.fetch(FetchDescriptor<RecipeImagePayloadRecord>(
+      predicate: #Predicate { $0.mediaID == mediaID }
+    ))
+    // A later textual revision may have been saved before these bytes arrived.
+    // Resolve retained references only within this Recipe's immutable history.
+    return payloads.filter { revisionIDs.contains($0.revisionID) }
+      .compactMap(\.imageData).first(where: media.acceptsImageData)
+  }
+
+  private func restoreImagePayloads(for revision: RecipeRevision) throws {
+    let revisionID = revision.id.rawValue
+    for media in revision.media {
+      guard let data = media.imageData, media.acceptsImageData(data) else { continue }
+      let mediaID = media.id.rawValue
+      let existing = try context.fetch(FetchDescriptor<RecipeImagePayloadRecord>(
+        predicate: #Predicate { $0.revisionID == revisionID && $0.mediaID == mediaID }
+      ))
+      if !existing.contains(where: { $0.imageData == data }) {
+        context.insert(RecipeImagePayloadRecord(revisionID: revisionID, mediaID: mediaID, imageData: data))
+      }
+    }
+  }
+
   private func matchingRevisionRecords(
     for command: RecipeSaveCommand
   ) throws -> [RecipeRevisionRecord] {
@@ -875,7 +909,10 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     let records = try context.fetch(
       FetchDescriptor<RecipeRevisionRecord>(predicate: #Predicate { $0.id == revisionID })
     )
-    guard try records.allSatisfy({ try domainRevision(from: $0) == command.revision }) else {
+    let expected = try RecipeRevisionCodec.encode(command.revision)
+    guard try records.allSatisfy({
+      try RecipeRevisionCodec.encode(domainRevision(from: $0)) == expected
+    }) else {
       throw KitchenMemoryPersistenceError.recipeSaveCommandCollision(commandID: command.id)
     }
     return records
@@ -1381,6 +1418,11 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
       ))
 
     for (index, media) in revision.media.enumerated() {
+      if let data = media.imageData, media.acceptsImageData(data) {
+        context.insert(RecipeImagePayloadRecord(
+          revisionID: identifier, mediaID: media.id.rawValue, imageData: data
+        ))
+      }
       context.insert(
         RecipeMediaRecord(
           id: media.id.rawValue, revisionID: identifier, sortIndex: index,
@@ -1444,9 +1486,11 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
       guard let role = RecipeMedia.Role(rawValue: item.role) else {
         throw KitchenMemoryPersistenceError.invalidStoredValue(field: "media.role")
       }
-      return RecipeMedia(
+      var media = RecipeMedia(
         id: .init(rawValue: item.id), role: role, assetName: item.assetName,
         accessibilityLabel: item.mediaAccessibilityLabel)
+      media.imageData = try imageData(for: media, recipeID: record.recipeID)
+      return media
     }
     let equipmentRecords = try coalescedPayloadRows(context.fetch(
       FetchDescriptor<EquipmentRecord>(
@@ -1610,6 +1654,9 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
   }
 
   private func deleteRevisionRows(revisionID: UUID) throws {
+    for record in try context.fetch(FetchDescriptor<RecipeImagePayloadRecord>(
+      predicate: #Predicate { $0.revisionID == revisionID }
+    )) { context.delete(record) }
     for record in try context.fetch(FetchDescriptor<RecipeMediaRecord>(
       predicate: #Predicate { $0.revisionID == revisionID }
     )) {

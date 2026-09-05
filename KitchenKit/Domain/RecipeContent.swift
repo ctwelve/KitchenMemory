@@ -110,6 +110,8 @@ public struct RecipeMedia: Codable, Equatable, Identifiable, Sendable {
     public let id: ID
     public var role: Role
     public var assetName: String
+    /// Optional locally available bytes; authority retains the content-addressed reference.
+    public var imageData: Data?
     public var accessibilityLabel: String?
 
     public init(

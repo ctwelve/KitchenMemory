@@ -130,19 +130,22 @@ struct RecipeDetailView: View {
 }
 
 private extension RecipeDetailView {
-  private var hero: some View {
-    RecipeImage(
-      media: revision.media.first { $0.role == .hero } ?? revision.media.first,
-      contentMode: .fill
-    )
-    .frame(maxWidth: .infinity)
-    .containerRelativeFrame(.vertical) { length, _ in
-      min(max(length * 0.34, 240), 420)
-    }
-    .clipShape(.rect(cornerRadius: 20))
-    .overlay {
-      RoundedRectangle(cornerRadius: 20)
-        .stroke(Color("SubtleBorder"), lineWidth: 1)
+  @ViewBuilder private var hero: some View {
+    if let media = revision.media.first(where: { $0.role == .hero }),
+      RecipePrivateImage.image(for: media) != nil {
+      RecipeImage(
+        media: media,
+        contentMode: .fill
+      )
+      .frame(maxWidth: .infinity)
+      .containerRelativeFrame(.vertical) { length, _ in
+        min(max(length * 0.34, 240), 420)
+      }
+      .clipShape(.rect(cornerRadius: 20))
+      .overlay {
+        RoundedRectangle(cornerRadius: 20)
+          .stroke(Color("SubtleBorder"), lineWidth: 1)
+      }
     }
   }
 
