@@ -140,7 +140,7 @@ public struct RecipeEditor {
       cuisines: draft.cuisines,
       categories: draft.categories,
       keywords: draft.keywords,
-      media: existing?.media ?? [],
+      media: draft.media ?? existing?.media ?? [],
       equipment: cleaned(draft.equipment ?? existing?.equipment ?? [], reidentify: existing != nil),
       // Section and child identifiers are local to one immutable revision.
       // Reusing them would make persistence queries for an older section pull

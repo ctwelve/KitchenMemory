@@ -24,6 +24,7 @@ public struct RecipeDraft: Codable, Equatable, Sendable {
   public var categories: [String]
   public var keywords: [String]
   /// Nil preserves Equipment for legacy callers; an explicit empty array removes it.
+  public var media: [RecipeMedia]?
   public var equipment: [EquipmentItem]?
   public var ingredientSections: [IngredientSection]
   public var instructionSections: [InstructionSection]
@@ -42,6 +43,7 @@ public struct RecipeDraft: Codable, Equatable, Sendable {
     cuisines: [String] = [],
     categories: [String] = [],
     keywords: [String] = [],
+    media: [RecipeMedia]? = nil,
     equipment: [EquipmentItem]? = nil,
     ingredientSections: [IngredientSection] = [],
     instructionSections: [InstructionSection] = []
@@ -59,6 +61,7 @@ public struct RecipeDraft: Codable, Equatable, Sendable {
     self.cuisines = cuisines
     self.categories = categories
     self.keywords = keywords
+    self.media = media
     self.equipment = equipment
     self.ingredientSections = ingredientSections
     self.instructionSections = instructionSections
@@ -104,6 +107,7 @@ public struct RecipeDraft: Codable, Equatable, Sendable {
       cuisines: revision.cuisines,
       categories: revision.categories,
       keywords: revision.keywords,
+      media: revision.media,
       equipment: revision.equipment,
       ingredientSections: revision.ingredientSections,
       instructionSections: revision.instructionSections

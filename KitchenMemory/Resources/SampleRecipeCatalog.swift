@@ -94,7 +94,7 @@ public enum SampleRecipeCatalogError: Error, Equatable {
 
 /// Loads deterministic sample content from the application's asset catalog.
 public enum SampleRecipeCatalog {
-    private static let resourceBundle = Bundle(for: SampleRecipeCatalogBundleToken.self)
+    static let resourceBundle = Bundle(for: SampleRecipeCatalogBundleToken.self)
 
     public static func loadManifest() throws -> SampleRecipePackManifest {
         try decodeAsset(named: "SampleManifest", as: SampleRecipePackManifest.self)

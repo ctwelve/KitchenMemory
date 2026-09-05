@@ -49,6 +49,7 @@ public final class RecipeEditingDraft: Identifiable {
     importIdentifier = record.importIdentifier
     var session = record.session
     if session.equipment == nil { session.equipment = record.original?.revision.equipment ?? [] }
+    if session.media == nil { session.media = record.original?.revision.media ?? [] }
     contents = session
   }
 
@@ -64,6 +65,7 @@ public final class RecipeEditingDraft: Identifiable {
       draft: draft ?? original.map { RecipeDraft(revision: $0.revision) } ?? RecipeDraft()
     )
     if session.equipment == nil { session.equipment = [] }
+    if session.media == nil { session.media = [] }
     contents = session
   }
 }

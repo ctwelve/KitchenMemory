@@ -311,7 +311,15 @@ public enum RecipeRevisionCodec {
   public static func encode(_ revision: RecipeRevision) throws -> EncodedRecipeRevision {
     let encoder = JSONEncoder()
     encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
-    let data = try encoder.encode(revision)
+    // Image transport availability is independent of immutable Recipe authority.
+    // The media reference itself includes the digest of the selected bytes.
+    var authority = revision
+    authority.media = revision.media.map { media in
+      var reference = media
+      reference.imageData = nil
+      return reference
+    }
+    let data = try encoder.encode(authority)
     return EncodedRecipeRevision(
       formatVersion: formatVersion,
       data: data,

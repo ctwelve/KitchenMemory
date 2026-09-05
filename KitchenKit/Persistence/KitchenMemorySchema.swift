@@ -36,7 +36,7 @@ public enum KitchenMemorySchema {
     storeURL: URL? = nil,
     synchronization: KitchenMemoryStoreSynchronization = .localOnly
   ) throws -> ModelContainer {
-    let schema = Schema(versionedSchema: KitchenMemorySchemaV5.self)
+    let schema = Schema(versionedSchema: KitchenMemorySchemaV6.self)
     let configuration = try makeConfiguration(
       schema: schema,
       inMemory: inMemory,
