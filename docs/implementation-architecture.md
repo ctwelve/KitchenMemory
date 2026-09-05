@@ -30,6 +30,17 @@ The native `RecipeEditingModel` holds only a binding adapter and discard-dialog
 state, not a second mutable editing session. App reset purges these local drafts
 before resetting shared Kitchen contents.
 
+`RecipeLibraryNavigation` is the app graph's single accepted destination owner.
+Recipe selection metadata survives refresh without changing that destination;
+editor identity, Session identity, history return scope, finished observation,
+Drafts, Deleted Items, and Recovery are mutually exclusive cases. Command
+eligibility and transitions use this same state. Window-specific command adapters
+only supply import presentation and destination-focus effects. Every departure
+from an editor passes KitchenKit's local persistence check before changing
+destination. Navigation never emits Stop or Finish; those remain explicit
+Cooking Session commands. Native compact navigation bindings derive from the
+accepted destination rather than maintaining another selected Session ID.
+
 The application links one framework and writes `import KitchenKit`. Import and
 Persistence depend conceptually on Domain but not on one another; Logic
 coordinates all three responsibilities without depending on the application or

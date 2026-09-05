@@ -18,25 +18,19 @@ extension CookingSessionPresentationModel {
   var showsRecoveryDestination: Bool { recoveryItemCount > 0 }
 
   var isShowingDeletedItems: Bool {
-    libraryDestination == .deletedItems
+    navigation.destination == .deletedItems
   }
 
   var isShowingRecovery: Bool {
-    libraryDestination == .recovery
+    navigation.destination == .recovery
   }
 
   func showDeletedItems() {
-    select(nil, recordsVisit: false)
-    historyScope = nil
-    observedFinishedSessionID = nil
-    libraryDestination = .deletedItems
+    navigation.move(to: .deletedItems)
   }
 
   func showRecovery() {
-    select(nil, recordsVisit: false)
-    historyScope = nil
-    observedFinishedSessionID = nil
-    libraryDestination = .recovery
+    navigation.move(to: .recovery)
   }
 
   @discardableResult

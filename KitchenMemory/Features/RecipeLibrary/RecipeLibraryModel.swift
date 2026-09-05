@@ -23,6 +23,7 @@ final class RecipeLibraryModel {
   let library: RecipeLibrary
   let editingStore: any RecipeEditingStoring
   let drafts: RecipeDrafts
+  let navigation: RecipeLibraryNavigation
   @ObservationIgnored var editingPresentations: [UUID: RecipeEditingModel] = [:]
   var editingStorageFailed: Bool {
     get { drafts.storageFailed }
@@ -34,11 +35,18 @@ final class RecipeLibraryModel {
   private var resetPresentationState: () -> Void = {}
 
   private(set) var recipes: [StoredRecipe] = []
-  var selectedRecipeID: Recipe.ID?
-  var editor: RecipeEditingModel?
+  var selectedRecipeID: Recipe.ID? {
+    get { navigation.selectedRecipeID }
+    set { navigation.selectRecipe(newValue) }
+  }
+  var editor: RecipeEditingModel? {
+    guard case .editor(let id) = navigation.destination,
+          let draft = drafts.drafts.first(where: { $0.id == id }) else { return nil }
+    return presentation(for: draft)
+  }
   var editingDrafts: [RecipeEditingModel] { authoringItems.filter { !$0.isImportCandidate } }
   var importCandidates: [RecipeEditingModel] { authoringItems.filter(\.isImportCandidate) }
-  var isShowingDrafts = false
+  var isShowingDrafts: Bool { navigation.destination == .drafts }
   private(set) var issue: RecipeLibraryIssue?
   private(set) var hasLoaded = false
   private(set) var startupState: StartupState = .loading
@@ -50,14 +58,20 @@ final class RecipeLibraryModel {
     library: RecipeLibrary,
     samplePreferences: any SampleRecipeOnboardingStoring,
     kitchenWasCreated: Bool,
-    editingStore: any RecipeEditingStoring = VolatileRecipeEditingStore()
+    editingStore: any RecipeEditingStoring = VolatileRecipeEditingStore(),
+    navigation: RecipeLibraryNavigation = RecipeLibraryNavigation()
   ) {
     self.library = library
     self.editingStore = editingStore
     drafts = RecipeDrafts(library: library, store: editingStore)
+    self.navigation = navigation
     self.samplePreferences = samplePreferences
     hasEstablishedKitchenEvidence = !kitchenWasCreated
     sampleOnboardingResponse = samplePreferences.sampleRecipeOnboardingResponse
+    navigation.prepareToLeaveEditor = { [weak self] in
+      guard let self else { return true }
+      return editor?.confirmsDiscard != true && drafts.prepareToLeave()
+    }
     samplePreferences.startObservingSampleRecipeOnboardingResponse { [weak self] response in
       self?.receiveSampleOnboardingResponse(response)
     }
@@ -128,9 +142,9 @@ final class RecipeLibraryModel {
       samplePresence = contents.samplePresence
       if let preferredRecipeID,
          recipes.contains(where: { $0.recipe.id == preferredRecipeID }) {
-        selectedRecipeID = preferredRecipeID
+        navigation.reconcileRecipeSelection(preferredRecipeID)
       } else if !recipes.contains(where: { $0.recipe.id == selectedRecipeID }) {
-        selectedRecipeID = recipes.first?.recipe.id
+        navigation.reconcileRecipeSelection(recipes.first?.recipe.id)
       }
       issue = nil
       hasLoaded = true
@@ -138,7 +152,7 @@ final class RecipeLibraryModel {
       return true
     } catch {
       recipes = []
-      selectedRecipeID = nil
+      navigation.reconcileRecipeSelection(nil)
       samplePresence = .unavailable
       issue = .read
       hasLoaded = true
@@ -197,8 +211,7 @@ final class RecipeLibraryModel {
       // untouched, and a later shared-reset failure must not resurrect old drafts.
       guard drafts.purge() else { issue = .reset; return false }
       editingPresentations = [:]
-      editor = nil
-      isShowingDrafts = false
+      navigation.move(to: .recipe)
       try library.reset()
       resetPresentationState()
       samplePreferences.sampleRecipeOnboardingResponse = .accepted

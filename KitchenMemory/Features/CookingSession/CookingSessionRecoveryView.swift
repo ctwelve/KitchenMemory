@@ -5,36 +5,6 @@
 import KitchenKit
 import SwiftUI
 
-struct DeletedItemsDestinationView: View {
-  @Bindable var model: CookingSessionPresentationModel
-  let prepare: () -> Void
-  @State private var hasPrepared = false
-
-  var body: some View {
-    CookingSessionDeletedItemsView(model: model)
-      .onAppear {
-        guard !hasPrepared else { return }
-        hasPrepared = true
-        prepare()
-      }
-  }
-}
-
-struct CookingSessionRecoveryDestinationView: View {
-  @Bindable var model: CookingSessionPresentationModel
-  let prepare: () -> Void
-  @State private var hasPrepared = false
-
-  var body: some View {
-    CookingSessionRecoveryView(model: model)
-      .onAppear {
-        guard !hasPrepared else { return }
-        hasPrepared = true
-        prepare()
-      }
-  }
-}
-
 struct CookingSessionDeletedItemsView: View {
   @Bindable var model: CookingSessionPresentationModel
   @State private var pendingRestore: CookingSessionProjection?

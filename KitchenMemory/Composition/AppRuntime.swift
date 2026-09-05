@@ -310,7 +310,8 @@ struct PreparedApp {
     )
     let sessionModel = CookingSessionPresentationModel(
       sessions: core.cookingSessions,
-      store: sessionPresentationStore
+      store: sessionPresentationStore,
+      navigation: core.libraryModel.navigation
     )
     let sessionRepository = core.cookingSessionRepository
     core.libraryModel.installResetPresentationHandler {

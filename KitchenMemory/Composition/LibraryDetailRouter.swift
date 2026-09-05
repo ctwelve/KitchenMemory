@@ -8,35 +8,47 @@ import SwiftUI
 struct LibraryDetailRouter: View {
   @Bindable var libraryModel: RecipeLibraryModel
   @Bindable var sessionModel: CookingSessionPresentationModel
+  var presentsEditor = true
   private var actions: LibraryCommandActions {
     LibraryCommandActions(library: libraryModel, sessions: sessionModel)
   }
 
   @ViewBuilder
   var body: some View {
-    if libraryModel.isShowingDrafts {
+    switch libraryModel.navigation.destination {
+    case .editor:
+      if presentsEditor, let editor = libraryModel.editor {
+        RecipeEditingDestination(model: libraryModel, editor: editor)
+      }
+    case .drafts:
       RecipeDraftsView(model: libraryModel)
-    } else if let finishedSession = sessionModel.observedFinishedSession {
-      FinishedCookingSessionView(model: sessionModel, session: finishedSession)
-    } else if sessionModel.isShowingDeletedItems {
+    case .finished:
+      if let finishedSession = sessionModel.observedFinishedSession {
+        FinishedCookingSessionView(model: sessionModel, session: finishedSession)
+      }
+    case .deletedItems:
       CookingSessionDeletedItemsView(model: sessionModel)
-    } else if sessionModel.isShowingRecovery {
+    case .recovery:
       CookingSessionRecoveryView(model: sessionModel)
-    } else if sessionModel.isShowingSessionHistory {
+    case .history, .session(_, history: .some):
       CookingSessionHistoryView(model: sessionModel)
-    } else if let selectedRecipe = libraryModel.selectedRecipe {
+    case .session:
+      if let session = sessionModel.currentSession {
+        CookingSessionView(model: sessionModel, session: session, embedsInNavigationStack: false)
+      }
+    case .recipe:
+      recipeContent
+    }
+  }
+
+  @ViewBuilder
+  private var recipeContent: some View {
+    if let selectedRecipe = libraryModel.selectedRecipe {
       RecipeDetailView(storedRecipe: selectedRecipe)
         .id(selectedRecipe.revision.id)
         .toolbar {
           ToolbarItem(placement: .primaryAction) {
-            NavigationLink {
-              CookingSessionHistoryDestinationView(
-                model: sessionModel,
-                prepare: {
-                  actions.perform(.recipeHistory)
-                }
-              )
-            } label: {
+            Button { actions.perform(.recipeHistory) } label: {
               Label(.sessionHistoryRecipeTitle, systemImage: "clock.arrow.circlepath")
             }
             .accessibilityIdentifier("recipe-session-history")

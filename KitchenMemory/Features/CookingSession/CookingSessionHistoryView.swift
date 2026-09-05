@@ -5,30 +5,12 @@
 import KitchenKit
 import SwiftUI
 
-struct CookingSessionHistoryDestinationView: View {
-  @Bindable var model: CookingSessionPresentationModel
-  let prepare: () -> Void
-  @State private var hasPrepared = false
-
-  var body: some View {
-    Group {
-      if let finishedSession = model.observedFinishedSession {
-        FinishedCookingSessionView(model: model, session: finishedSession)
-      } else {
-        CookingSessionHistoryView(model: model)
-      }
-    }
-    .onAppear {
-      guard !hasPrepared else { return }
-      hasPrepared = true
-      prepare()
-    }
-  }
-}
-
 struct CookingSessionHistoryView: View {
   @Bindable var model: CookingSessionPresentationModel
-  @State private var selectedSessionID: CookingSession.ID?
+  private var selectedSessionID: Binding<CookingSession.ID?> {
+    Binding(get: { model.historyScope == nil ? nil : model.currentSessionID },
+            set: { if $0 == nil { model.leaveCurrentSession() } })
+  }
 
   private var ordinarySessions: [CookingSessionProjection] {
     model.displayedHistorySessions.filter { $0.lifecycle != .finished }
@@ -90,26 +72,14 @@ struct CookingSessionHistoryView: View {
       .frame(maxWidth: .infinity, alignment: .center)
     }
     .background(Color("AppBackground"))
-    .navigationDestination(item: $selectedSessionID) { sessionID in
+    .navigationDestination(item: selectedSessionID) { sessionID in
       CookingSessionHistorySessionDestination(
         model: model,
         sessionID: sessionID,
         leaveSession: {
           model.leaveCurrentSession()
-          selectedSessionID = nil
         }
       )
-    }
-    .onChange(of: selectedSessionID) { previousSessionID, selectedSessionID in
-      guard selectedSessionID == nil,
-            let previousSessionID,
-            model.currentSessionID == previousSessionID
-      else { return }
-      model.leaveCurrentSession()
-    }
-    .onChange(of: model.currentSessionID) { _, currentSessionID in
-      guard let selectedSessionID, currentSessionID != selectedSessionID else { return }
-      self.selectedSessionID = nil
     }
   }
 
@@ -147,8 +117,7 @@ struct CookingSessionHistoryView: View {
       .accessibilityIdentifier(historyRowIdentifier(session))
     } else {
       Button {
-        guard model.selectSessionFromHistory(session.id) else { return }
-        selectedSessionID = session.id
+        model.selectSessionFromHistory(session.id)
       } label: {
         CookingSessionHistoryRow(session: session)
       }

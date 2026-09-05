@@ -88,8 +88,9 @@ extension CookingSessionPresentationModel {
 
   @discardableResult
   func selectSession(_ id: CookingSession.ID) -> Bool {
-    guard selectOrdinarySession(id) else { return false }
-    historyScope = nil
+    guard sessions.contains(where: { $0.id == id }),
+          navigation.move(to: .session(id, history: nil)) else { return false }
+    recordVisit(to: id)
     return true
   }
 
@@ -101,25 +102,20 @@ extension CookingSessionPresentationModel {
   @discardableResult
   func leaveCurrentSession() -> Bool {
     guard currentSessionID != nil else { return false }
-    select(nil, recordsVisit: false)
-    return true
+    return select(nil, recordsVisit: false)
   }
 
   private func selectOrdinarySession(_ id: CookingSession.ID) -> Bool {
     guard sessions.contains(where: { $0.id == id }) else { return false }
-    select(id)
-    observedFinishedSessionID = nil
-    return true
+    return select(id)
   }
 
   func showSessionHistory() {
-    select(nil, recordsVisit: false)
-    historyScope = .all
-    libraryDestination = nil
-    observedFinishedSessionID = nil
+    navigation.move(to: .history(.all))
   }
 
-  func showRecipeSessionHistory(for recipeID: Recipe.ID) {
+  @discardableResult
+  func showRecipeSessionHistory(for recipeID: Recipe.ID) -> Bool {
     do {
       let results = try service.sessions(for: recipeID)
       let matchingIDs = Set(results.compactMap { result -> CookingSession.ID? in
@@ -127,21 +123,18 @@ extension CookingSessionPresentationModel {
         else { return nil }
         return session.id
       })
+      guard navigation.move(to: .history(.recipe(recipeID))) else { return false }
       recipeHistorySessions = sessions.filter { matchingIDs.contains($0.id) }
         + finishedSessions.filter { matchingIDs.contains($0.id) }
-      select(nil, recordsVisit: false)
-      historyScope = .recipe(recipeID)
-      libraryDestination = nil
-      observedFinishedSessionID = nil
+      return true
     } catch {
       present(.read)
+      return false
     }
   }
 
   func showRecipes() {
-    historyScope = nil
-    libraryDestination = nil
-    observedFinishedSessionID = nil
+    navigation.move(to: .recipe)
   }
 
   @discardableResult
@@ -149,12 +142,11 @@ extension CookingSessionPresentationModel {
     guard finishedSessions.contains(where: { $0.id == id })
             || recipeHistorySessions.contains(where: { $0.id == id })
     else { return false }
-    observedFinishedSessionID = id
-    return true
+    return navigation.move(to: .finished(id, history: historyScope ?? .all))
   }
 
   func dismissObservedFinishedSession() {
-    observedFinishedSessionID = nil
+    navigation.move(to: .history(historyScope ?? .all))
   }
 
   @discardableResult
@@ -213,11 +205,11 @@ extension CookingSessionPresentationModel {
     recoverySessionCount = classified.recovery.count
     finishedSessionIDs = finishedIDs
     refreshDetachedEntryDraft()
-    if let currentSessionID, finishedIDs.contains(currentSessionID) {
+    if let currentSessionID, !sessions.contains(where: { $0.id == currentSessionID }) {
       select(nil, recordsVisit: false)
     }
     if let observedFinishedSessionID, !finishedIDs.contains(observedFinishedSessionID) {
-      self.observedFinishedSessionID = nil
+      dismissObservedFinishedSession()
     }
     if pendingCommands.isEmpty {
       issue = nil
