@@ -25,7 +25,7 @@ final class RecipeRepositoryConvergenceContractTests: XCTestCase {
     }
   }
 
-  func testDefaultAuthorityAndCommandAdaptersRemainExplicit() throws {
+  func testNarrowAdapterRejectsUnsupportedAuthorityAndCommandsWithoutMutation() throws {
     let recipeID = Recipe.ID()
     let kitchenID = Kitchen.ID()
     let revision = RecipeRevision(recipeID: recipeID, revisionNumber: 1, title: "Soup")
@@ -35,17 +35,12 @@ final class RecipeRepositoryConvergenceContractTests: XCTestCase {
     )
     let repository = SessionRecipeRepository(stored: [stored])
 
-    XCTAssertEqual(
-      try repository.recipeAuthority(id: recipeID),
-      .available(AvailableRecipeAuthority(
-        recipe: stored.recipe,
-        revisions: [ProjectedRecipeRevision(revision: revision, state: .current)]
-      ))
-    )
-    XCTAssertNil(try repository.recipeAuthority(id: Recipe.ID()))
+    XCTAssertThrowsError(try repository.recipeAuthority(id: recipeID))
+    XCTAssertThrowsError(try repository.recipeAuthority(id: Recipe.ID()))
+    XCTAssertThrowsError(try repository.selectionHeads(for: recipeID))
 
     let newRevision = RecipeRevision(recipeID: recipeID, revisionNumber: 2, title: "Better")
-    try repository.save(RecipeSaveCommand(
+    XCTAssertThrowsError(try repository.save(RecipeSaveCommand(
       recipe: Recipe(id: recipeID, kitchenID: kitchenID, currentRevisionID: newRevision.id),
       revision: newRevision,
       savedAt: Date(),
@@ -56,8 +51,8 @@ final class RecipeRepositoryConvergenceContractTests: XCTestCase {
         selectedRevisionID: newRevision.id,
         selectedAt: Date()
       )
-    ))
-    XCTAssertEqual(repository.stored.last?.revision, newRevision)
+    )))
+    XCTAssertEqual(repository.stored, [stored])
 
     XCTAssertThrowsError(try repository.select(RecipeSelectionCommand(
       kitchenID: kitchenID,

@@ -72,27 +72,21 @@ public struct RecipeEditor {
   }
 
   public func create(in kitchenID: Kitchen.ID, from draft: RecipeDraft) throws -> StoredRecipe {
-    let recipeID = Recipe.ID()
-    let revision = try revision(recipeID: recipeID, number: 1, from: draft)
-    let recipe = Recipe(id: recipeID, kitchenID: kitchenID, currentRevisionID: revision.id)
-    try repository.save(recipe: recipe, revision: revision)
-    return StoredRecipe(recipe: recipe, revision: revision)
+    let command = try prepareSave(in: kitchenID, from: draft, original: nil, observedSelectionIDs: [])
+    try repository.save(command)
+    return StoredRecipe(recipe: command.recipe, revision: command.revision)
   }
 
   public func revise(recipeID: Recipe.ID, from draft: RecipeDraft) throws -> StoredRecipe {
     guard let stored = try repository.recipe(id: recipeID) else {
       throw RecipeEditorError.missingRecipe
     }
-    let revision = try revision(
-      recipeID: recipeID,
-      number: stored.revision.revisionNumber + 1,
-      from: draft,
-      preserving: stored.revision
+    let command = try prepareSave(
+      in: stored.recipe.kitchenID, from: draft, original: stored,
+      observedSelectionIDs: repository.selectionHeads(for: recipeID)
     )
-    var recipe = stored.recipe
-    recipe.currentRevisionID = revision.id
-    try repository.save(recipe: recipe, revision: revision)
-    return StoredRecipe(recipe: recipe, revision: revision)
+    try repository.save(command)
+    return StoredRecipe(recipe: command.recipe, revision: command.revision)
   }
 
   /// Freezes an explicit save for durable retry, using the draft's observed base.

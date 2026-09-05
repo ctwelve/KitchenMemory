@@ -353,6 +353,22 @@ startup, legacy unowned alpha Kitchens may be converged into the deterministic
 personal Kitchen; an explicitly different owner stops that operation before
 mutation.
 
+Recipe authority requirements have no inherited success implementations.
+Every `RecipeRepository` adapter explicitly implements Save, Selection, Selection
+head reads, authority projection, and ownership convergence, or throws an
+unsupported-operation error. `RecipeEditor` creates explicit Save commands for
+both convenience creation and revision; durable draft publication retains those
+commands for exact retry. The concrete SwiftData pair-based Save entry point
+still serves bulk/sample and retained fixture callers through its authority
+writer. It is not a fallback for command-based Save. Actual V5 backfill and
+payload decoding remain necessary retained-data behavior.
+
+The production conformer is `SwiftDataRecipeRepository`. The narrow
+`InMemoryRecipeRepository` in library tests and `SessionRecipeRepository` in
+Cooking Session tests explicitly reject unsupported authority operations;
+authority and Save tests use disposable real SwiftData through the repository
+interface instead of a second test-only evidence engine.
+
 `SwiftDataCookingSessionRepository` is a separate main-actor adapter over the
 same container. Its public transaction vocabulary encodes the smallest complete
 V3 append boundaries: root, Fact, Closure, Closure plus Delete, Delete, observed
