@@ -41,33 +41,22 @@ extension RecipeLibraryModel {
   }
 
   func beginEditing(_ original: StoredRecipe? = nil) {
-    guard let draft = drafts.begin(original) else { return }
-    editor = presentation(for: draft)
+    guard navigation.canLeave(), let draft = drafts.begin(original) else { return }
+    navigation.move(to: .editor(draft.id))
   }
 
   func closeEditor() {
-    if drafts.prepareToLeave() { editor = nil }
-  }
-
-  @discardableResult
-  func prepareForLibraryNavigation() -> Bool {
-    if editor != nil {
-      closeEditor()
-      guard editor == nil else { return false }
-    }
-    isShowingDrafts = false
-    return true
+    navigation.move(to: .recipe)
   }
 
   @discardableResult
   func selectRecipeForReading(_ id: Recipe.ID?) -> Bool {
-    guard prepareForLibraryNavigation() else { return false }
-    selectedRecipeID = id
-    return true
+    navigation.selectRecipe(id)
   }
 
   func resumeEditingDraft(_ id: UUID) {
-    editor = drafts.drafts.first { $0.id == id }.map(presentation)
+    guard drafts.drafts.contains(where: { $0.id == id }) else { return }
+    navigation.move(to: .editor(id))
   }
 
   func retryEditingStorage() { drafts.retryStorage() }
@@ -77,15 +66,15 @@ extension RecipeLibraryModel {
 
   func discardEditor(confirmed: Bool) {
     guard confirmed, let editor else { return }
-    if drafts.discard(editor.id) { self.editor = nil }
+    if drafts.discard(editor.id) { navigation.move(to: .recipe) }
   }
 
   @discardableResult
   func saveEditor() -> Bool {
     guard let editor, let publication = drafts.save(editor.id) else { return false }
-    selectedRecipeID = publication.recipeID
+    navigation.reconcileRecipeSelection(publication.recipeID)
     reload()
-    if publication.removedDraft { self.editor = nil }
+    if publication.removedDraft { navigation.move(to: .recipe) }
     return publication.removedDraft
   }
 }

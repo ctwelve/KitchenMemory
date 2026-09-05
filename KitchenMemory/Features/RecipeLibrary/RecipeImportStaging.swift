@@ -13,14 +13,13 @@ extension RecipeLibraryModel {
   @discardableResult
   func beginImportReview(_ option: RecipeImportOption) -> Bool {
     guard let candidate = drafts.review(option) else { return false }
-    editor = presentation(for: candidate)
-    return true
+    return navigation.move(to: .editor(candidate.id))
   }
 
   @discardableResult
   func acceptImportCandidate(_ id: UUID) -> Bool {
     guard let candidate = drafts.drafts.first(where: { $0.id == id }) else { return false }
-    editor = presentation(for: candidate)
+    guard navigation.move(to: .editor(candidate.id)) else { return false }
     return drafts.accept(id)
   }
 }
