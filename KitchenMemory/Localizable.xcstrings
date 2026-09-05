@@ -1,6 +1,246 @@
 {
   "sourceLanguage" : "en-US",
   "strings" : {
+  "recipe.action.delete": {
+    "comment": "Recipe deletion or restoration control and status.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Delete Recipe"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Eliminar receta"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Supprimer la recette"
+        }
+      }
+    }
+  },
+  "recipe.action.restore": {
+    "comment": "Recipe deletion or restoration control and status.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Restore Recipe"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Restaurar receta"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Restaurer la recette"
+        }
+      }
+    }
+  },
+  "recipe.delete.confirmation": {
+    "comment": "Recipe deletion or restoration control and status.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Delete this Recipe?"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "¿Eliminar esta receta?"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Supprimer cette recette?"
+        }
+      }
+    }
+  },
+  "recipe.delete.message": {
+    "comment": "Recipe deletion or restoration control and status.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The Recipe moves to Deleted Items. Its history, local drafts, and Cooking Sessions are preserved."
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "La receta se mueve a Elementos eliminados. Se conservan su historial, los borradores locales y las sesiones de cocina."
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "La recette est déplacée vers les éléments supprimés. Son historique, les brouillons locaux et les séances de cuisine sont conservés."
+        }
+      }
+    }
+  },
+  "recipe.restore.confirmation": {
+    "comment": "Recipe deletion or restoration control and status.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Restore this Recipe to the library?"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "¿Restaurar esta receta en la biblioteca?"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Restaurer cette recette dans la bibliothèque?"
+        }
+      }
+    }
+  },
+  "recipe.deleted.label": {
+    "comment": "Recipe deletion or restoration control and status.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Deleted Recipe"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Receta eliminada"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Recette supprimée"
+        }
+      }
+    }
+  },
+  "recipe.deleted.fallback": {
+    "comment": "Recipe deletion or restoration control and status.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Recipe"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Receta"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Recette"
+        }
+      }
+    }
+  },
+  "recipe.deleted.waiting": {
+    "comment": "Recipe deletion or restoration control and status.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Waiting for Recipe content. Try again after more evidence arrives."
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Esperando el contenido de la receta. Intenta de nuevo cuando llegue más información."
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "En attente du contenu de la recette. Réessayez lorsque des données supplémentaires seront disponibles."
+        }
+      }
+    }
+  },
+  "recipe.deleted.recovery": {
+    "comment": "Recipe deletion or restoration control and status.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Recipe evidence needs recovery before restoration."
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Los datos de la receta necesitan recuperación antes de restaurarla."
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Les données de la recette nécessitent une récupération avant sa restauration."
+        }
+      }
+    }
+  },
+  "recipe.disposition.failure": {
+    "comment": "Recipe deletion or restoration control and status.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The Recipe could not be deleted or restored. Try again to retry the same action."
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "No se pudo eliminar o restaurar la receta. Intenta de nuevo para repetir la misma acción."
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Impossible de supprimer ou de restaurer la recette. Réessayez pour reprendre la même action."
+        }
+      }
+    }
+  },
   "recipe.media.gallery.title": {
     "comment": "Recipe gallery heading, control, or unavailable payload message.",
     "extractionState": "manual",
