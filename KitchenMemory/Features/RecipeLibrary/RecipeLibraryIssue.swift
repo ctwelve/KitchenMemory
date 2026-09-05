@@ -9,6 +9,7 @@ enum RecipeLibraryIssue: Equatable {
   case save
   case reset
   case samples
+  case disposition
 
   func message(locale: Locale = .current) -> String {
     switch self {
@@ -18,6 +19,8 @@ enum RecipeLibraryIssue: Equatable {
       LocalizedStringResource.libraryFailureSave.localized(for: locale)
     case .reset:
       LocalizedStringResource.libraryFailureReset.localized(for: locale)
+    case .disposition:
+      LocalizedStringResource.recipeDispositionFailure.localized(for: locale)
     case .samples:
       LocalizedStringResource.libraryFailureSamples.localized(for: locale)
     }

@@ -37,6 +37,9 @@ public protocol RecipeRepository: AnyObject {
   /// Atomically accepts one caller-identified immutable Save and Selection.
   func save(_ command: RecipeSaveCommand) throws
   /// Atomically chooses an existing accepted Revision using immutable evidence.
+  func delete(_ command: RecipeDeleteCommand) throws
+  func restore(_ command: RecipeRestoreCommand) throws
+  func deletedRecipes(in kitchenID: Kitchen.ID) throws -> [DeletedRecipe]
   func select(_ command: RecipeSelectionCommand) throws
   func selectionHeads(for recipeID: Recipe.ID) throws -> [RecipeSelectionCommand.ID]
   func kitchens() throws -> [Kitchen]
@@ -132,7 +135,7 @@ public enum KitchenMemoryPersistenceError: Error, Equatable {
 /// context rather than passing managed records between actors.
 @MainActor
 public final class SwiftDataRecipeRepository: RecipeRepository {
-  private let context: ModelContext
+  let context: ModelContext
   private let encoder = JSONEncoder()
   private let decoder = JSONDecoder()
 
@@ -515,7 +518,8 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
 
   public func recipes(in kitchenID: Kitchen.ID) throws -> [StoredRecipe] {
     let identifier = kitchenID.rawValue
-    let recipeIDs = try recipeIdentifiers(in: identifier)
+    let deletedIDs = Set(try deletedRecipes(in: kitchenID).map { $0.id.rawValue })
+    let recipeIDs = try recipeIdentifiers(in: identifier).filter { !deletedIDs.contains($0) }
     return try recipeIDs
       .compactMap { try recipe(id: .init(rawValue: $0)) }
       .sorted {
@@ -591,7 +595,7 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     }
   }
 
-  private func performIsolatedWrite(
+  func performIsolatedWrite(
     _ operation: (SwiftDataRecipeRepository) throws -> Void
   ) throws {
     // A failed SwiftData save leaves its ModelContext's pending graph changed.
@@ -709,7 +713,7 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     }
   }
 
-  private func backfillLegacyAuthority(in kitchenID: Kitchen.ID) throws {
+  func backfillLegacyAuthority(in kitchenID: Kitchen.ID) throws {
     let kitchenIdentifier = kitchenID.rawValue
     let recipeRecords = try context.fetch(
       FetchDescriptor<RecipeRecord>(predicate: #Predicate { $0.kitchenID == kitchenIdentifier })
