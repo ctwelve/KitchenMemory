@@ -10,6 +10,27 @@ import XCTest
 
 @MainActor
 final class RecipeDraftRelaunchTests: XCTestCase {
+  func testSharedResetFailureDoesNotResurrectLocallyPurgedDrafts() throws {
+    let app = try AppRuntime.testing()
+    let store = VolatileRecipeEditingStore()
+    let model = RecipeLibraryModel(
+      library: RecipeLibrary(kitchenID: try kitchenID(app), repository: app.recipeRepository,
+                             samples: FailedDraftResetSamples(), importer: RecipeImportService()),
+      samplePreferences: VolatileKitchenPreferencesStore(sampleRecipeOnboardingResponse: .accepted),
+      kitchenWasCreated: false, editingStore: store
+    )
+    model.loadIfNeeded()
+    let contents = model.recipes
+    model.beginEditing()
+    model.editor?.session.title = "Explicitly purged"
+    XCTAssertFalse(model.resetKitchen())
+    XCTAssertEqual(model.recipes, contents)
+    XCTAssertNil(model.editor)
+    XCTAssertTrue(model.drafts.drafts.isEmpty)
+    XCTAssertTrue(try store.load().isEmpty)
+    XCTAssertTrue(RecipeDrafts(library: model.library, store: store).drafts.isEmpty)
+  }
+
   func testDraftWriteFailurePreventsPublicationAndKeepsEditorOpen() throws {
     let app = try AppRuntime.testing()
     let store = FailingRecipeEditingStore()
@@ -124,6 +145,11 @@ final class RecipeDraftRelaunchTests: XCTestCase {
     model.loadIfNeeded()
     return model
   }
+}
+
+@MainActor
+private struct FailedDraftResetSamples: SampleRecipeProviding {
+  func recipes(in kitchenID: Kitchen.ID) throws -> [StoredRecipe] { throw CocoaError(.fileReadUnknown) }
 }
 
 @MainActor

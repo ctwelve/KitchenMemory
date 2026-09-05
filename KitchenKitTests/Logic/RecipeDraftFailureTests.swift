@@ -43,6 +43,9 @@ final class RecipeDraftFailureTests: XCTestCase {
     XCTAssertFalse(reopened.storageIsAvailable)
     XCTAssertNil(reopened.begin())
     XCTAssertFalse(reopened.persist())
+    XCTAssertNil(reopened.review(RecipeImportOption(
+      id: .init(blockIndex: 0, objectIndex: 0), draft: RecipeDraft(title: "Do not replace retained work"), concerns: []
+    )))
     reopened.dismissStorageFailure()
     XCTAssertFalse(reopened.storageFailed)
     store.refusesReads = false
