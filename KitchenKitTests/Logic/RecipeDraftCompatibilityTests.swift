@@ -4,10 +4,32 @@
 
 @testable import KitchenKit
 import Foundation
+import SwiftData
 import XCTest
 
 @MainActor
 final class RecipeDraftCompatibilityTests: XCTestCase {
+  func testUnreadableSelectionContextCannotBeginAnUnanchoredExistingRecipeDraft() throws {
+    let container = try KitchenMemorySchema.makeContainer(inMemory: true)
+    let repository = SwiftDataRecipeRepository(modelContainer: container)
+    let kitchen = Kitchen(name: "Home")
+    try repository.save(kitchen)
+    let original = try RecipeEditor(repository: repository).create(in: kitchen.id, from: RecipeDraft(title: "Soup"))
+    let context = ModelContext(container)
+    let selection = try XCTUnwrap(try context.fetch(FetchDescriptor<RecipeSelectionRecord>()).first)
+    selection.frontierFormatVersion = -1
+    try context.save()
+    let reopened = SwiftDataRecipeRepository(modelContainer: container)
+    let library = RecipeLibrary(kitchenID: kitchen.id, repository: reopened,
+                                samples: CompatibilitySamples(), importer: RecipeImportService())
+    let store = VolatileRecipeEditingStore()
+    let drafts = RecipeDrafts(library: library, store: store)
+    XCTAssertNil(drafts.begin(original))
+    XCTAssertTrue(drafts.storageFailed)
+    XCTAssertTrue(drafts.drafts.isEmpty)
+    XCTAssertTrue(try store.load().isEmpty)
+  }
+
   func testLegacyPhasesAndMissingEquipmentRestoreWithoutLosingFrozenIntention() throws {
     let repository = SwiftDataRecipeRepository(modelContainer: try KitchenMemorySchema.makeContainer(inMemory: true))
     let kitchen = Kitchen(name: "Home")
