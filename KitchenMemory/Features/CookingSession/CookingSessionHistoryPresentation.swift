@@ -205,7 +205,7 @@ extension CookingSessionPresentationModel {
     recoverySessionCount = classified.recovery.count
     finishedSessionIDs = finishedIDs
     refreshDetachedEntryDraft()
-    if let currentSessionID, !sessions.contains(where: { $0.id == currentSessionID }) {
+    if let currentSessionID, finishedIDs.contains(currentSessionID) {
       select(nil, recordsVisit: false)
     }
     if let observedFinishedSessionID, !finishedIDs.contains(observedFinishedSessionID) {
