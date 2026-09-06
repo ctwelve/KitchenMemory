@@ -61,19 +61,25 @@ final class RecipeRetentionEvidenceTests: XCTestCase {
   }
 
   func testLateChildOnlyDeliveryKeepsTombstoneAndOffersRecovery() throws {
-    let deliveries: [(ModelContext, UUID) -> Void] = [
-      { $0.insert(RecipeImagePayloadRecord(revisionID: $1, mediaID: UUID(), imageData: Data([1, 2]))) },
-      { $0.insert(RecipeMediaRecord(id: UUID(), revisionID: $1, sortIndex: 0, role: "hero",
+    let deliveries: [(ModelContext, StoredRecipe) -> Void] = [
+      { $0.insert(RecipeImagePayloadRecord(revisionID: $1.revision.id.rawValue,
+                                           mediaID: UUID(), imageData: Data([1, 2]))) },
+      { $0.insert(RecipeMediaRecord(id: UUID(), revisionID: $1.revision.id.rawValue, sortIndex: 0, role: "hero",
                                     assetName: "image", accessibilityLabel: nil)) },
-      { $0.insert(EquipmentRecord(id: UUID(), revisionID: $1, sortIndex: 0, originalText: "pot",
+      { $0.insert(EquipmentRecord(id: UUID(), revisionID: $1.revision.id.rawValue, sortIndex: 0, originalText: "pot",
                                   quantityData: nil, name: "pot", isOptional: false)) },
-      { $0.insert(IngredientSectionRecord(id: UUID(), revisionID: $1, sortIndex: 0, title: nil)) },
-      { $0.insert(InstructionSectionRecord(id: UUID(), revisionID: $1, sortIndex: 0, title: nil)) },
+      { $0.insert(IngredientSectionRecord(id: UUID(), revisionID: $1.revision.id.rawValue, sortIndex: 0, title: nil)) },
+      { $0.insert(InstructionSectionRecord(id: UUID(), revisionID: $1.revision.id.rawValue,
+                                           sortIndex: 0, title: nil)) },
+      { $0.insert(RecipeDeletionRecord(id: UUID(), recipeID: $1.id.rawValue,
+                                       kitchenID: $1.recipe.kitchenID.rawValue, deletedAt: Date())) },
+      { $0.insert(RecipeDeletionResolutionRecord(id: UUID(), deletionID: UUID(), recipeID: $1.id.rawValue,
+        kitchenID: $1.recipe.kitchenID.rawValue, restoredAt: Date())) },
     ]
     for delivery in deliveries { try assertLatePayloadRequiresRecovery(delivery) }
   }
 
-  private func assertLatePayloadRequiresRecovery(_ delivery: (ModelContext, UUID) -> Void) throws {
+  private func assertLatePayloadRequiresRecovery(_ delivery: (ModelContext, StoredRecipe) -> Void) throws {
     let container = try KitchenMemorySchema.makeContainer(inMemory: true)
     let repository = SwiftDataRecipeRepository(modelContainer: container)
     let kitchen = Kitchen(name: "Kitchen")
@@ -84,10 +90,11 @@ final class RecipeRetentionEvidenceTests: XCTestCase {
                                               deletedAt: now.addingTimeInterval(-31 * 86_400)))
     _ = try repository.maintainDeletedRecipes(in: kitchen.id, at: now)
     let replica = ModelContext(container)
-    delivery(replica, recipe.revision.id.rawValue)
+    delivery(replica, recipe)
     try replica.save()
     XCTAssertEqual(try repository.recipeAuthority(id: recipe.id), .recovery(.lateEvidenceAfterPrune))
     XCTAssertEqual(try repository.recoveryRecipes(in: kitchen.id).map(\.id), [recipe.id])
+    XCTAssertTrue(try repository.deletedRecipes(in: kitchen.id).isEmpty)
     XCTAssertTrue(try repository.maintainDeletedRecipes(in: kitchen.id, at: now.addingTimeInterval(10 * 366 * 86_400))
       .expiredTombstoneRecipeIDs.isEmpty)
   }
