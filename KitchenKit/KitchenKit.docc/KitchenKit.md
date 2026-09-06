@@ -43,6 +43,16 @@ Domain values and evidence projector  Domain
 - ``RecipeRevision``
 - ``StableIdentifier``
 
+### Folder Organization
+
+- ``Folder``
+- ``FolderLibrary``
+- ``FolderIntent``
+- ``FolderCommand``
+- ``FolderCollision``
+- ``FolderCheckpoint``
+- ``FolderRepository``
+
 ### Recipe Content
 
 - ``RecipeSource``

@@ -26,7 +26,18 @@ public final class SwiftDataKitchenResetRepository: KitchenResetRepository {
     try context.transaction {
       try recipeRepository.resetRecipesInCurrentTransaction(in: kitchenID, with: recipes)
       try deleteSessions(in: kitchenID, context: context)
+      try deleteOrganization(in: kitchenID, context: context)
     }
+  }
+
+  private func deleteOrganization(in kitchenID: Kitchen.ID, context: ModelContext) throws {
+    let identifier = kitchenID.rawValue
+    for record in try context.fetch(FetchDescriptor<OrganizationActionRecord>(
+      predicate: #Predicate { $0.kitchenID == identifier }
+    )) { context.delete(record) }
+    for record in try context.fetch(FetchDescriptor<OrganizationCheckpointRecord>(
+      predicate: #Predicate { $0.kitchenID == identifier }
+    )) { context.delete(record) }
   }
 
   private func deleteSessions(in kitchenID: Kitchen.ID, context: ModelContext) throws {

@@ -5,6 +5,9 @@
 import Foundation
 import SwiftData
 
+/// One current model selection for ordinary stores and explicit schema administration.
+typealias CurrentKitchenMemorySchema = KitchenMemorySchemaV7
+
 /// Selects whether a durable Kitchen Memory store participates in personal sync.
 ///
 /// This is deliberately a persistence concern. Domain values and repository
@@ -36,7 +39,7 @@ public enum KitchenMemorySchema {
     storeURL: URL? = nil,
     synchronization: KitchenMemoryStoreSynchronization = .localOnly
   ) throws -> ModelContainer {
-    let schema = Schema(versionedSchema: KitchenMemorySchemaV6.self)
+    let schema = Schema(versionedSchema: CurrentKitchenMemorySchema.self)
     let configuration = try makeConfiguration(
       schema: schema,
       inMemory: inMemory,

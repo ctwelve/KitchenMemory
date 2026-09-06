@@ -246,7 +246,7 @@ final class SwiftDataKitchenResetRepositoryTests: XCTestCase {
   }
 
   private func readOnlyContainer(storeURL: URL) throws -> ModelContainer {
-    let schema = Schema(versionedSchema: KitchenMemorySchemaV6.self)
+    let schema = Schema(versionedSchema: KitchenMemorySchemaV7.self)
     return try ModelContainer(
       for: schema,
       migrationPlan: KitchenMemoryMigrationPlan.self,

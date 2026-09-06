@@ -101,3 +101,17 @@ _Avoid_: Permanently erased item, finished item
 **Pruning**:
 The dependency-aware physical removal of retained data that is no longer needed to reconstruct, explain, synchronize, or restore any surviving item; pruning remains distinct from user-visible deletion.
 _Avoid_: Delete, Empty Trash, permanent erasure
+
+## Recipe organization
+
+**Folder**:
+A Kitchen-owned location in an acyclic hierarchy that may contain other Folders and the primary placement of Recipes; a Recipe belongs to at most one Folder.
+_Avoid_: Recipe category, Tag, Revision container
+
+**Unfiled**:
+The computed set of Recipes without a live primary Folder, rather than a stored Folder identity.
+_Avoid_: Root Folder, default Folder
+
+**Folder Collision**:
+Separate live Folder identities sharing the same normalized sibling name and awaiting a person's Merge or Rename decision.
+_Avoid_: Duplicate Recipe, automatic deduplication

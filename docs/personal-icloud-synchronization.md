@@ -306,8 +306,9 @@ The Develop-and-macOS-only argument temporarily hands the Development app's
 default store to
 `NSPersistentCloudKitContainer`, asks it to initialize the development schema,
 unloads that store, and then lets the ordinary SwiftData container open it.
-The initializer builds the complete V4 managed model; it remains an explicit
-one-shot operation and does not imply Production promotion.
+The initializer shares the ordinary store factory’s current schema selection
+(currently V7), including private image payloads and organization evidence. It
+remains an explicit one-shot operation and does not imply Production promotion.
 The initializer lives with the rest of the store implementation in
 `Persistence/Cloud`. iOS, Debug, Testing, ProductionTesting, and
 Production builds do not contain this switch. Ordinary Development and
