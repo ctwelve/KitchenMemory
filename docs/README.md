@@ -41,6 +41,8 @@ For implementation work, begin with:
 
 ## Current product guidance
 
+- [Recipe revision reconciliation](recipe-reconciliation.md) — explicit comparisons, local choices, and multi-parent Save.
+
 - [Product doctrine](product-doctrine.md) — accepted durable principles.
 - [Product brief](product-brief.md) — product purpose, audience, and boundaries.
 - [Privacy engineering](privacy.md) — accepted no-data posture.

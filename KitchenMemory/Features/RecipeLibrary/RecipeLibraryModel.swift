@@ -35,6 +35,8 @@ final class RecipeLibraryModel {
   private var resetPresentationState: () -> Void = {}
 
   private(set) var recipes: [StoredRecipe] = []
+  private(set) var reconciliations: [RecipeReconciliation] = []
+  var reconciliationFailed = false
   var selectedRecipeID: Recipe.ID? {
     get { navigation.selectedRecipeID }
     set { navigation.selectRecipe(newValue) }
@@ -139,6 +141,7 @@ final class RecipeLibraryModel {
     do {
       let contents = try library.load()
       recipes = contents.recipes
+      reconciliations = contents.reconciliations
       samplePresence = contents.samplePresence
       if let preferredRecipeID,
          recipes.contains(where: { $0.recipe.id == preferredRecipeID }) {
@@ -152,6 +155,7 @@ final class RecipeLibraryModel {
       return true
     } catch {
       recipes = []
+      reconciliations = []
       navigation.reconcileRecipeSelection(nil)
       samplePresence = .unavailable
       issue = .read

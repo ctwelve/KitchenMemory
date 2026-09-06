@@ -47,6 +47,13 @@ struct LibraryDetailRouter: View {
       RecipeDetailView(storedRecipe: selectedRecipe)
         .id(selectedRecipe.revision.id)
         .toolbar {
+          if let comparison = libraryModel.reconciliations.first(where: { $0.recipeID == selectedRecipe.id }) {
+            ToolbarItem(placement: .primaryAction) {
+              Button { libraryModel.beginReconciliation(comparison) } label: {
+                Label(.recipeComparisonTitle, systemImage: "arrow.triangle.branch")
+              }
+            }
+          }
           ToolbarItem(placement: .primaryAction) {
             Button { actions.perform(.recipeHistory) } label: {
               Label(.sessionHistoryRecipeTitle, systemImage: "clock.arrow.circlepath")

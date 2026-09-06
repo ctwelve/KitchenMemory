@@ -25,6 +25,9 @@ struct RecipeLibrarySidebar: View {
     .accessibilityIdentifier("recipe-library-shell")
     .accessibilityLabel(Text(.libraryAccessibilityLabel))
     .listStyle(.sidebar)
+    .alert(.recipeComparisonUnavailable, isPresented: $model.reconciliationFailed) {
+      Button(.actionCancel, role: .cancel) {}
+    } message: { Text(.recipeComparisonExistingDraft) }
     .onChange(of: model.recipes.map(\.recipe.id), initial: true) { _, recipeIDs in
       sessionModel.refreshSidebarAssociations(for: recipeIDs)
     }
@@ -79,9 +82,19 @@ struct RecipeLibrarySidebar: View {
     Section {
       if let issue = model.issue {
         unavailableLibrary(issue)
-      } else if model.hasLoaded, model.recipes.isEmpty {
+      } else if model.hasLoaded, model.recipes.isEmpty, model.reconciliations.isEmpty {
         emptyLibrary
       } else {
+        ForEach(model.reconciliations, id: \.recipeID) { comparison in
+          Button { model.beginReconciliation(comparison) } label: {
+            VStack(alignment: .leading) {
+              Label(.recipeComparisonTitle, systemImage: "arrow.triangle.branch")
+              Text(comparison.revisions.map(\.title).joined(separator: " / "))
+                .font(.caption).foregroundStyle(.secondary)
+            }
+          }
+          .accessibilityIdentifier("reconcile-recipe-\(comparison.recipeID.rawValue.uuidString)")
+        }
         ForEach(model.recipes, id: \.recipe.id) { storedRecipe in
           NavigationLink(value: storedRecipe.recipe.id) {
             RecipeRow(storedRecipe: storedRecipe)

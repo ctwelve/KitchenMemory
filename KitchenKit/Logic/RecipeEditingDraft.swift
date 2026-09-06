@@ -11,6 +11,7 @@ import Observation
 public final class RecipeEditingDraft: Identifiable {
   public let id: UUID
   public let original: StoredRecipe?
+  public private(set) var reconciliation: RecipeReconciliation?
   public let concerns: [RecipeImportConcern]
   public internal(set) var observedSelectionIDs: [RecipeSelectionCommand.ID]
   public internal(set) var phase: RecipeAuthoringPhase
@@ -32,15 +33,20 @@ public final class RecipeEditingDraft: Identifiable {
     return command
   }
   public var isImportCandidate: Bool { phase == .importCandidate }
-  public var canSaveRevision: Bool { !isImportCandidate && (pendingSave != nil || session.canSave) }
+  public var canSaveRevision: Bool {
+    !isImportCandidate && (reconciliation == nil || reconciliation?.draft != nil)
+      && (pendingSave != nil || session.canSave)
+  }
 
   var record: RecipeEditingRecord {
     RecipeEditingRecord(id: id, original: original, concerns: concerns, session: session,
-                        observedSelectionIDs: observedSelectionIDs, importIdentifier: importIdentifier, phase: phase)
+                        observedSelectionIDs: observedSelectionIDs, importIdentifier: importIdentifier,
+                        phase: phase, reconciliation: reconciliation)
   }
 
   init(record: RecipeEditingRecord) {
     id = record.id
+    reconciliation = record.reconciliation
     original = record.original
     concerns = record.concerns
     phase = record.phase ?? record.pendingSave.map(RecipeAuthoringPhase.saving)
@@ -54,9 +60,11 @@ public final class RecipeEditingDraft: Identifiable {
   }
 
   init(original: StoredRecipe? = nil, draft: RecipeDraft? = nil,
-       concerns: [RecipeImportConcern] = [], phase: RecipeAuthoringPhase = .editing) {
+       concerns: [RecipeImportConcern] = [], phase: RecipeAuthoringPhase = .editing,
+       reconciliation: RecipeReconciliation? = nil) {
     id = UUID()
     self.original = original
+    self.reconciliation = reconciliation
     self.concerns = concerns
     self.phase = phase
     observedSelectionIDs = []
@@ -68,4 +76,32 @@ public final class RecipeEditingDraft: Identifiable {
     if session.media == nil { session.media = [] }
     contents = session
   }
+  public func chooseRevision(_ id: RecipeRevision.ID) throws {
+    try reconcile { try $0.chooseRevision(id) }
+  }
+
+  public func choose(_ field: RecipeComparisonField, from id: RecipeRevision.ID) throws {
+    try reconcile { try $0.choose(field, from: id) }
+  }
+
+  public func chooseIngredient(
+    from id: RecipeRevision.ID, section: Int, ingredient: Int,
+    targetSection: Int, replacing targetIngredient: Int? = nil
+  ) throws {
+    try reconcile {
+      try $0.chooseIngredient(from: id, section: section, ingredient: ingredient,
+                              targetSection: targetSection, replacing: targetIngredient)
+    }
+  }
+
+  private func reconcile(_ change: (inout RecipeReconciliation) throws -> Void) throws {
+    guard pendingSave == nil, var comparison = reconciliation else { throw RecipeReconciliationError.invalidChoice }
+    if comparison.draft != nil { try comparison.retainEdits(from: session) }
+    try change(&comparison)
+    guard let selected = comparison.draft else { throw RecipeReconciliationError.missingChoice }
+    reconciliation = comparison
+    contents = RecipeEditSession(draft: selected)
+    changed()
+  }
+
 }
