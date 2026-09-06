@@ -1,0 +1,133 @@
+// Temporary measurement overlay. Never included in ordinary app builds.
+import CryptoKit
+import Darwin
+import Foundation
+import KitchenKit
+
+@MainActor
+enum StartupMeasurement {
+  static let environment = ProcessInfo.processInfo.environment
+  static var isActive: Bool { environment["KM_STARTUP_RUN"] != nil }
+  static var origin: TimeInterval = 0
+  static var emitted = 0
+  static var libraryLoaded = false
+  static let fixtureCount = 20
+  static var cloudEnabled: Bool { environment["KM_STARTUP_STORE"] == "cloud" }
+  static var run: String { environment["KM_STARTUP_RUN"] ?? "" }
+  static var action: String { environment["KM_STARTUP_ACTION"] ?? "measure" }
+  static var fixtureIDs: Set<Recipe.ID> { Set((0..<fixtureCount).map { Recipe.ID(rawValue: identifier($0)) }) }
+
+  static var storeURL: URL? {
+    guard isActive else { return nil }
+    let replica = environment["KM_STARTUP_REPLICA"] ?? ""
+    precondition(!replica.isEmpty && replica.count < 80 && replica.allSatisfy { $0.isLetter || $0.isNumber || $0 == "-" })
+    let root = FileManager.default.temporaryDirectory.appending(path: "KitchenMemoryStartup")
+      .appending(path: replica)
+    do { try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true) }
+    catch { exit(2) }
+    return root.appending(path: "KitchenMemory.store")
+  }
+
+  static func start() {
+    guard isActive else { return }
+    precondition(AppBuildEnvironment.current == .develop)
+    precondition(UUID(uuidString: run) != nil)
+    precondition(["local", "cloud"].contains(environment["KM_STARTUP_STORE"] ?? ""))
+    precondition(Bundle.main.object(forInfoDictionaryKey: AppLaunchInputs.cloudKitContainerInfoKey) as? String
+                 == "iCloud.net.ctwelve.dev.KitchenMemory")
+    origin = ProcessInfo.processInfo.systemUptime
+    mark("appEntry")
+    var info = kinfo_proc()
+    var size = MemoryLayout<kinfo_proc>.stride
+    var request: [Int32] = [CTL_KERN, KERN_PROC, KERN_PROC_PID, getpid()]
+    let result = sysctl(&request, UInt32(request.count), &info, &size, nil, 0)
+    if result == 0 {
+      var now = timeval()
+      gettimeofday(&now, nil)
+      let started = info.kp_proc.p_un.__p_starttime
+      let age = Double(now.tv_sec - started.tv_sec) + Double(now.tv_usec - started.tv_usec) / 1_000_000
+      mark("processCreated", elapsed: -age)
+    }
+    mark(result == 0 ? (info.kp_proc.p_flag & P_TRACED != 0 ? "debuggerAttached" : "debuggerDetached")
+         : "debuggerUnknown")
+  }
+
+  static func mark(_ milestone: String, elapsed: TimeInterval? = nil) {
+    guard isActive else { return }
+    guard emitted < 32 else { return }
+    emitted += 1
+    let elapsed = elapsed ?? ProcessInfo.processInfo.systemUptime - origin
+    let output: [String: Any] = ["milestone": milestone, "secondsFromAppEntry": elapsed]
+    guard let data = try? JSONSerialization.data(withJSONObject: output, options: [.sortedKeys]) else { exit(2) }
+    print("KM_STARTUP " + String(decoding: data, as: UTF8.self))
+    fflush(stdout)
+  }
+
+  static func identifier(_ index: Int) -> UUID {
+    let bytes = Array(SHA256.hash(data: Data((run + ":" + String(index)).utf8)).prefix(16))
+    return UUID(uuid: (bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5], bytes[6], bytes[7],
+                       bytes[8], bytes[9], bytes[10], bytes[11], bytes[12], bytes[13], bytes[14], bytes[15]))
+  }
+
+  static func libraryDidLoad() {
+    guard isActive, !libraryLoaded else { return }
+    libraryLoaded = true
+    mark("libraryLocallyReadable")
+  }
+
+  static func prepared(_ app: PreparedApp) {
+    guard isActive else { return }
+    Task { @MainActor in
+      do {
+        for _ in 0..<3000 {
+          if libraryLoaded { break }
+          try await Task.sleep(for: .milliseconds(10))
+        }
+        guard libraryLoaded else {
+          mark("fixtureUnavailable")
+          exit(2)
+        }
+        if action == "seed" || action == "emit" {
+          let range = action == "seed" ? 0..<fixtureCount : fixtureCount..<(fixtureCount + 1)
+          for index in range {
+            let recipeID = Recipe.ID(rawValue: identifier(index))
+            guard try app.recipeRepository.recipe(id: recipeID) == nil else { continue }
+            let revision = RecipeRevision(recipeID: recipeID, revisionNumber: 1,
+                                          title: "Startup fixture \(index)")
+            try app.recipeRepository.save(recipe: Recipe(id: recipeID, kitchenID: KitchenBootstrapService.personalKitchenID,
+                                                         currentRevisionID: revision.id), revision: revision)
+          }
+          app.libraryModel.reload()
+          mark(action == "seed" ? "fixtureSeeded" : "fixtureEmitted")
+        }
+        let present = Set(app.libraryModel.recipes.map(\.id))
+        mark(fixtureIDs.isSubset(of: present) ? "fixtureLocallyReadable" : "fixtureNotYetReadable")
+        let deltaID = Recipe.ID(rawValue: identifier(fixtureCount))
+        let deltaWasLocal = present.contains(deltaID)
+        if cloudEnabled, deltaWasLocal { mark("receivingEvidenceAlreadyLocal") }
+        var fixtureImported = fixtureIDs.isSubset(of: present)
+        var deltaImported = deltaWasLocal
+        let waits = action == "receive" ? 180 : (action == "seed" || action == "emit") && cloudEnabled ? 60 : 3
+        for _ in 0..<waits {
+          try await Task.sleep(for: .seconds(1))
+          let current = Set(app.libraryModel.recipes.map(\.id))
+          if cloudEnabled, !fixtureImported, fixtureIDs.isSubset(of: current) {
+            fixtureImported = true
+            mark("fixtureImportedReadable")
+          }
+          if cloudEnabled, !deltaImported, current.contains(deltaID) {
+            deltaImported = true
+            mark("receivingStoreEvidenceReadable")
+            if action == "receive" { break }
+          }
+        }
+        if action == "receive", !deltaImported { mark("receivingEvidenceNotObserved") }
+        mark("measurementEnded")
+        exit(0)
+      } catch {
+        mark("fixtureUnavailable")
+        exit(2)
+      }
+    }
+  }
+}
