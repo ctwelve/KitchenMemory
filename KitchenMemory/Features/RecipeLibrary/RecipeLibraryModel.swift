@@ -37,6 +37,7 @@ final class RecipeLibraryModel {
   private(set) var recipes: [StoredRecipe] = []
   private(set) var reconciliations: [RecipeReconciliation] = []
   var reconciliationFailed = false
+  var reconciliationFailureMessage: LocalizedStringResource = .recipeComparisonStorageFailure
   var selectedRecipeID: Recipe.ID? {
     get { navigation.selectedRecipeID }
     set { navigation.selectRecipe(newValue) }

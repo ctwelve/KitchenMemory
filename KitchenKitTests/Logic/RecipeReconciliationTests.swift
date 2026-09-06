@@ -19,6 +19,7 @@ final class RecipeReconciliationTests: XCTestCase {
       kitchenID: Kitchen.ID(), revisions: [first, second], observedSelectionIDs: []
     )
     XCTAssertNil(comparison.draft)
+    XCTAssertEqual(RecipeComparisonField.allCases.map(\.id).count, 16)
     XCTAssertEqual(Set(try comparison.differences(between: first.id, and: second.id)),
                    [.title, .summary, .ingredients, .media])
     try comparison.chooseRevision(first.id)
@@ -76,7 +77,9 @@ final class RecipeReconciliationTests: XCTestCase {
     let original = try editor.create(in: kitchen.id, from: RecipeDraft(title: "Soup"))
     let observed = try repository.selectionHeads(for: original.id)
     for title in ["A", "B", "C"] {
-      try repository.save(editor.prepareSave(in: kitchen.id, from: RecipeDraft(title: title),
+      try repository.save(editor.prepareSave(in: kitchen.id, from: RecipeDraft(title: title, ingredientSections: [
+                                              IngredientSection(ingredients: [RecipeIngredient(originalText: "salt")]),
+                                            ]),
                                             original: original, observedSelectionIDs: observed))
     }
     let comparison = try XCTUnwrap(repository.reconciliations(in: kitchen.id).first)
@@ -93,6 +96,8 @@ final class RecipeReconciliationTests: XCTestCase {
     XCTAssertFalse(draft.canSaveRevision)
     XCTAssertNil(drafts.save(draft.id))
     try draft.chooseRevision(comparison.revisions[0].id)
+    try draft.choose(.ingredients, from: comparison.revisions[0].id)
+    try draft.chooseIngredient(from: comparison.revisions[1].id, section: 0, ingredient: 0, targetSection: 0)
     var session = draft.session
     session.title = "  Deliberate title  "
     draft.session = session
@@ -160,7 +165,7 @@ final class RecipeReconciliationTests: XCTestCase {
     let unknown = QuantityExpression(kind: .none, text: " as available ")
     let first = RecipeRevision(
       recipeID: recipeID, revisionNumber: 1, title: " Soup ", summary: "  Notes  ", authorName: "  Cook  ",
-      source: RecipeSource(kind: .book, title: "  Notebook  "),
+      source: RecipeSource(kind: .book, title: "  Notebook  ", authorName: "  Cook  ", publisherName: " Press "),
       recipeYield: RecipeYield(quantity: unknown, originalText: "  a pot  "),
       prepDuration: RecipeDuration(seconds: 91),
       media: [RecipeMedia(role: .hero, imageData: Data([7, 8]))],
@@ -194,6 +199,14 @@ final class RecipeReconciliationTests: XCTestCase {
     XCTAssertEqual(result.ingredientSections.first?.ingredients.first?.quantity, unknown)
     XCTAssertEqual(result.instructionSections.first?.steps.first?.text, "  Stir  ")
     XCTAssertNotEqual(result.ingredientSections.first?.id, first.ingredientSections.first?.id)
+    var changed = session
+    changed.sourceTitle = "New book"
+    changed.recipeYield?.unitText = "bowls"
+    let edited = try comparison.editedDraft(from: changed)
+    XCTAssertEqual(edited.source?.title, "New book")
+    XCTAssertEqual(edited.source?.authorName, "  Cook  ")
+    XCTAssertEqual(edited.source?.publisherName, " Press ")
+    XCTAssertEqual(edited.recipeYield?.originalText, "  a pot  ")
     let maximum = RecipeRevision(recipeID: recipeID, revisionNumber: Int.max, title: "Overflow")
     let invalid = try RecipeReconciliation(kitchenID: Kitchen.ID(), revisions: [first, maximum],
                                           observedSelectionIDs: [])

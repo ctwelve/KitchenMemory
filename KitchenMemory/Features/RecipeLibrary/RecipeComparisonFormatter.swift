@@ -42,7 +42,7 @@ struct RecipeComparisonFormatter {
     case .author: revision.authorName ?? unknown
     case .language: revision.contentLanguage?.rawValue ?? unknown
     case .source: source(revision)
-    case .yield: lines([revision.recipeYield?.originalText, formatter.quantity(revision.recipeYield?.quantity),
+    case .yield: lines([revision.recipeYield?.originalText, quantity(revision.recipeYield?.quantity),
                        revision.recipeYield?.unitText,
     ])
     case .preparation: duration(revision.prepDuration)
@@ -60,20 +60,42 @@ struct RecipeComparisonFormatter {
       })
     })
     case .equipment: lines(revision.equipment.map {
-      lines([$0.originalText, $0.name, formatter.quantity($0.quantity), $0.isOptional ? optional : nil])
+      lines([$0.originalText, $0.name, quantity($0.quantity), $0.isOptional ? optional : nil])
     })
     case .media: lines(revision.media.map {
-      lines([$0.accessibilityLabel, $0.assetName])
+      lines([$0.accessibilityLabel, $0.assetName, role($0.role).localized(for: locale)])
     })
     }
   }
 
   func ingredient(_ value: RecipeIngredient) -> String {
     lines([value.originalText, formatter.ingredient(value), value.customDisplayText,
-           formatter.quantity(value.quantity), value.unitText, value.ingredientText,
-           value.package.map { lines([formatter.quantity($0.quantity), $0.unitText]) },
+           quantity(value.quantity), value.unitText, value.ingredientText,
+           value.package.map { lines([quantity($0.quantity), $0.unitText]) },
            value.preparation, value.note, value.isOptional ? optional : nil,
+           scaling(value.scalingBehavior).localized(for: locale),
     ])
+  }
+
+  private func role(_ value: RecipeMedia.Role) -> LocalizedStringResource {
+    switch value {
+    case .hero: .recipeMediaHeroTitle
+    case .gallery: .recipeMediaGalleryTitle
+    case .thumbnail: .recipeComparisonThumbnail
+    }
+  }
+
+  private func quantity(_ value: QuantityExpression?) -> String? {
+    guard let value else { return nil }
+    return lines([formatter.quantity(value), value.text])
+  }
+
+  private func scaling(_ value: RecipeIngredient.ScalingBehavior) -> LocalizedStringResource {
+    switch value {
+    case .linear: .recipeIngredientScalingLinear
+    case .fixed: .recipeIngredientScalingFixed
+    case .manualReview: .recipeIngredientScalingManualReview
+    }
   }
 
   private var optional: String { LocalizedStringResource.fieldOptionalPrompt.localized(for: locale) }
@@ -86,7 +108,7 @@ struct RecipeComparisonFormatter {
     lines([revision.source.map { sourceKind($0.kind).localized(for: locale) },
            revision.source?.title, revision.source?.authorName, revision.source?.publisherName,
            revision.source?.canonicalURL?.absoluteString, revision.sourceCapture?.sourceURL.absoluteString,
-           revision.sourceCapture?.capturedAt.formatted(date: .abbreviated, time: .standard),
+           revision.sourceCapture?.capturedAt.formatted(.dateTime.locale(locale)),
     ])
   }
 

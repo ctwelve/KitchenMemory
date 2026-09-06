@@ -8,6 +8,22 @@ import XCTest
 
 @MainActor
 final class RecipeReconciliationPresentationTests: XCTestCase {
+  func testComparisonShowsUnknownQuantitiesScalingAndMediaRoles() {
+    let formatter = RecipeComparisonFormatter(locale: Locale(identifier: "fr-CA"))
+    let ingredient = RecipeIngredient(originalText: "salt",
+                                      quantity: QuantityExpression(kind: .none, text: "as needed"),
+                                      scalingBehavior: .fixed)
+    XCTAssertTrue(formatter.ingredient(ingredient).contains("as needed"))
+    var revision = RecipeRevision(recipeID: Recipe.ID(), revisionNumber: 1, title: "Soup",
+                                  media: [RecipeMedia(role: .hero, assetName: "image")])
+    let hero = formatter.value(.media, revision: revision)
+    revision.media[0].role = .thumbnail
+    XCTAssertNotEqual(formatter.value(.media, revision: revision), hero)
+    var other = ingredient
+    other.scalingBehavior = .linear
+    XCTAssertNotEqual(formatter.ingredient(other), formatter.ingredient(ingredient))
+  }
+
   func testComparisonOpensAnUnselectedDraftAndPublishesOnlyAfterSave() throws {
     let app = try AppRuntime.testing()
     let model = app.libraryModel

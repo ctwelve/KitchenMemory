@@ -1,6 +1,56 @@
 {
   "sourceLanguage" : "en-US",
   "strings" : {
+
+  "recipe.comparison.thumbnail": {
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Thumbnail"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Miniatura"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Vignette"
+        }
+      }
+    }
+  }
+,
+
+  "recipe.comparison.storageFailure": {
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The comparison draft could not be opened or saved. Retry after local draft storage is available."
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "No se pudo abrir o guardar el borrador de comparación. Vuelve a intentarlo cuando esté disponible el almacenamiento local."
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Impossible d’ouvrir ou d’enregistrer le brouillon de comparaison. Réessayez lorsque le stockage local sera disponible."
+        }
+      }
+    }
+  }
+,
   "recipe.comparison.title": {
     "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
     "extractionState": "manual",

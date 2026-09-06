@@ -110,8 +110,16 @@ public struct RecipeReconciliation: Codable, Equatable, Sendable {
   /// Editor round-trip conversions do not count as deliberate changes.
   public func editedDraft(from session: RecipeEditSession) throws -> RecipeDraft {
     guard var result = draft else { throw RecipeReconciliationError.missingChoice }
-    let baseline = try RecipeEditSession(draft: result).validatedDraft()
-    let edited = try session.validatedDraft()
+    let original = RecipeEditSession(draft: result)
+    let baseline = try original.validatedDraft()
+    var edited = try session.validatedDraft()
+    edited.recipeYield = session.recipeYield
+    if var source = edited.source {
+      if session.sourceTitle == original.sourceTitle { source.title = result.source?.title }
+      if session.sourceAuthor == original.sourceAuthor { source.authorName = result.source?.authorName }
+      if session.sourcePublisher == original.sourcePublisher { source.publisherName = result.source?.publisherName }
+      edited.source = source
+    }
     for field in try Self.differences(baseline, edited) { field.copy(from: edited, to: &result) }
     return result
   }

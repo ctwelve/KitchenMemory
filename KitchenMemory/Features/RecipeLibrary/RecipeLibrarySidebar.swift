@@ -27,7 +27,7 @@ struct RecipeLibrarySidebar: View {
     .listStyle(.sidebar)
     .alert(.recipeComparisonUnavailable, isPresented: $model.reconciliationFailed) {
       Button(.actionCancel, role: .cancel) {}
-    } message: { Text(.recipeComparisonExistingDraft) }
+    } message: { Text(model.reconciliationFailureMessage) }
     .onChange(of: model.recipes.map(\.recipe.id), initial: true) { _, recipeIDs in
       sessionModel.refreshSidebarAssociations(for: recipeIDs)
     }

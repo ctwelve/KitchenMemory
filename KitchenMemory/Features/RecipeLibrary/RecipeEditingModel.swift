@@ -85,6 +85,10 @@ extension RecipeLibraryModel {
     do {
       let draft = try drafts.beginReconciliation(comparison)
       navigation.move(to: .editor(draft.id))
-    } catch { reconciliationFailed = true }
+    } catch {
+      reconciliationFailureMessage = error as? RecipeReconciliationError == .existingDraft
+        ? .recipeComparisonExistingDraft : .recipeComparisonStorageFailure
+      reconciliationFailed = true
+    }
   }
 }
