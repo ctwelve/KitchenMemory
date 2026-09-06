@@ -4,7 +4,9 @@ Recipe authority exposes competing revisions without using revision numbers,
 clocks, or device identity to choose a winner. A Recipe with competing Selection
 heads appears as a comparison entry in the library instead of making unrelated
 Recipes unreadable. A selected Recipe with another surviving branch offers the
-same comparison from its reading toolbar.
+same comparison from its reading toolbar. Deleted Items offers comparison when
+competing selections prevent restoration; reconciliation keeps the Recipe deleted
+until the person explicitly restores it.
 
 The person chooses a starting Revision and can then take individual fields or
 ingredient rows from any shown Revision. Field comparisons ignore revision-local

@@ -82,10 +82,10 @@ struct RecipeLibrarySidebar: View {
     Section {
       if let issue = model.issue {
         unavailableLibrary(issue)
-      } else if model.hasLoaded, model.recipes.isEmpty, model.reconciliations.isEmpty {
+      } else if model.hasLoaded, model.recipes.isEmpty, model.visibleReconciliations.isEmpty {
         emptyLibrary
       } else {
-        ForEach(model.reconciliations, id: \.recipeID) { comparison in
+        ForEach(model.visibleReconciliations, id: \.recipeID) { comparison in
           Button { model.beginReconciliation(comparison) } label: {
             VStack(alignment: .leading) {
               Label(.recipeComparisonTitle, systemImage: "arrow.triangle.branch")

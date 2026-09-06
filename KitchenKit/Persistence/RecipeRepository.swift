@@ -520,7 +520,6 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
   public func reconciliations(in kitchenID: Kitchen.ID) throws -> [RecipeReconciliation] {
     try recipeIdentifiers(in: kitchenID.rawValue).compactMap { identifier in
       let recipeID = Recipe.ID(rawValue: identifier)
-      guard try activeDeletionIDs(for: recipeID).isEmpty else { return nil }
       let selected: [RecipeRevision.ID]
       switch try recipeAuthority(id: recipeID) {
       case let .available(value): selected = [value.current.id]

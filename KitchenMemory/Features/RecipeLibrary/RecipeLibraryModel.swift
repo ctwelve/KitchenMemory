@@ -36,6 +36,9 @@ final class RecipeLibraryModel {
 
   private(set) var recipes: [StoredRecipe] = []
   private(set) var reconciliations: [RecipeReconciliation] = []
+  var visibleReconciliations: [RecipeReconciliation] {
+    reconciliations.filter { comparison in !deletedRecipes.contains { $0.id == comparison.recipeID } }
+  }
   var reconciliationFailed = false
   var reconciliationFailureMessage: LocalizedStringResource = .recipeComparisonStorageFailure
   private(set) var deletedRecipes: [DeletedRecipe] = []

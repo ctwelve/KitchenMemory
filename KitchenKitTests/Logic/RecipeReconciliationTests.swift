@@ -32,6 +32,31 @@ final class RecipeReconciliationTests: XCTestCase {
     let restored = try JSONDecoder().decode(RecipeReconciliation.self, from: JSONEncoder().encode(comparison))
     XCTAssertEqual(restored, comparison)
   }
+  func testDeletedCompetitionCanBeReconciledBeforeExplicitRestoration() throws {
+    let repository = SwiftDataRecipeRepository(modelContainer: try KitchenMemorySchema.makeContainer(inMemory: true))
+    let kitchen = Kitchen(name: "Kitchen")
+    try repository.save(kitchen)
+    let editor = RecipeEditor(repository: repository)
+    let original = try editor.create(in: kitchen.id, from: RecipeDraft(title: "Soup"))
+    let observed = try repository.selectionHeads(for: original.id)
+    try repository.delete(RecipeDeleteCommand(kitchenID: kitchen.id, recipeID: original.id))
+    for title in ["A", "B"] {
+      try repository.save(editor.prepareSave(in: kitchen.id, from: RecipeDraft(title: title),
+                                            original: original, observedSelectionIDs: observed))
+    }
+    var comparison = try XCTUnwrap(repository.reconciliations(in: kitchen.id).first)
+    try comparison.chooseRevision(comparison.revisions[0].id)
+    try repository.save(editor.prepareReconciliationSave(
+      comparison, session: RecipeEditSession(draft: try XCTUnwrap(comparison.draft))
+    ))
+    XCTAssertTrue(try repository.recipes(in: kitchen.id).isEmpty)
+    let deleted = try XCTUnwrap(repository.deletedRecipes(in: kitchen.id).first)
+    XCTAssertNotNil(deleted.recoverableRecipe)
+    try repository.restore(RecipeRestoreCommand(kitchenID: kitchen.id, recipeID: original.id,
+                                                observedDeletionIDs: deleted.observedDeletionIDs))
+    XCTAssertEqual(try repository.recipes(in: kitchen.id).count, 1)
+  }
+
   func testCompetingSelectionsRemainDiscoverableAndSaveNamesBothParents() throws {
     let repository = SwiftDataRecipeRepository(
       modelContainer: try KitchenMemorySchema.makeContainer(inMemory: true)
