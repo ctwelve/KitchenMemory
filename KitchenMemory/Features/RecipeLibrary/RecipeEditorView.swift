@@ -103,9 +103,13 @@ struct RecipeEditorView: View {
 private extension RecipeEditorView {
   @ViewBuilder
   private var editorSections: some View {
+    if editor.draft.reconciliation != nil {
+      RecipeReconciliationView(editor: editor)
+    }
     if mode == .importReview {
       importReviewSection
     }
+    if editor.draft.reconciliation == nil || editor.draft.reconciliation?.draft != nil {
     recipeSection
     timingSection
     sourceSection
@@ -113,6 +117,7 @@ private extension RecipeEditorView {
     RecipeEquipmentEditorView(session: $editor.session)
     ingredientsSection
     instructionsSection
+    }
   }
 
   private var importReviewSection: some View {

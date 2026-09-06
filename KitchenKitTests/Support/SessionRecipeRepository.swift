@@ -7,6 +7,8 @@ import Foundation
 
 @MainActor
 final class SessionRecipeRepository: RecipeRepository {
+  func reconciliations(in kitchenID: Kitchen.ID) throws -> [RecipeReconciliation] { [] }
+
   func save(_ command: RecipeSaveCommand) throws {
     throw KitchenMemoryPersistenceError.recipeSaveUnsupported
   }

@@ -113,26 +113,53 @@ public struct RecipeEditor {
     )
   }
 
+  /// Reconciliation preserves authored values and names every compared parent.
+  public func prepareReconciliationSave(
+    _ comparison: RecipeReconciliation, session: RecipeEditSession
+  ) throws -> RecipeSaveCommand {
+    _ = try RecipeReconciliation(
+      kitchenID: comparison.kitchenID, revisions: comparison.revisions,
+      observedSelectionIDs: comparison.observedSelectionIDs
+    )
+    guard let original = comparison.revisions.first,
+          let maximum = comparison.revisions.map(\.revisionNumber).max(), maximum < Int.max
+    else { throw RecipeReconciliationError.invalidParents }
+    let revision = try revision(
+      recipeID: original.recipeID, number: maximum + 1,
+      from: comparison.editedDraft(from: session), preserving: original, preserveAuthoredValues: true
+    )
+    let recipe = Recipe(id: original.recipeID, kitchenID: comparison.kitchenID, currentRevisionID: revision.id)
+    let now = Date()
+    return RecipeSaveCommand(
+      recipe: recipe, revision: revision, savedAt: now, parentRevisionIDs: comparison.parentRevisionIDs,
+      selection: RecipeSelectionCommand(
+        kitchenID: recipe.kitchenID, recipeID: recipe.id, selectedRevisionID: revision.id,
+        selectedAt: now, observedSelectionIDs: comparison.observedSelectionIDs
+      )
+    )
+  }
+
   private func revision(
     recipeID: Recipe.ID,
     number: Int,
     from draft: RecipeDraft,
-    preserving existing: RecipeRevision? = nil
+    preserving existing: RecipeRevision? = nil,
+    preserveAuthoredValues: Bool = false
   ) throws -> RecipeRevision {
     let title = draft.title.trimmingCharacters(in: .whitespacesAndNewlines)
     guard !title.isEmpty else { throw RecipeEditorError.missingTitle }
     let summary = draft.summary?.trimmingCharacters(in: .whitespacesAndNewlines)
-    let ingredientSections = cleaned(draft.ingredientSections)
-    let instructionSections = cleaned(draft.instructionSections)
+    let ingredientSections = preserveAuthoredValues ? draft.ingredientSections : cleaned(draft.ingredientSections)
+    let instructionSections = preserveAuthoredValues ? draft.instructionSections : cleaned(draft.instructionSections)
     return RecipeRevision(
       recipeID: recipeID,
       revisionNumber: number,
-      title: title,
-      summary: summary?.isEmpty == true ? nil : summary,
-      authorName: optional(draft.authorName),
+      title: preserveAuthoredValues ? draft.title : title,
+      summary: preserveAuthoredValues ? draft.summary : (summary?.isEmpty == true ? nil : summary),
+      authorName: preserveAuthoredValues ? draft.authorName : optional(draft.authorName),
       contentLanguage: draft.contentLanguage,
       source: draft.source,
-      sourceCapture: draft.sourceCapture ?? existing?.sourceCapture,
+      sourceCapture: preserveAuthoredValues ? draft.sourceCapture : (draft.sourceCapture ?? existing?.sourceCapture),
       recipeYield: draft.recipeYield,
       prepDuration: draft.prepDuration,
       cookDuration: draft.cookDuration,
@@ -141,13 +168,20 @@ public struct RecipeEditor {
       categories: draft.categories,
       keywords: draft.keywords,
       media: draft.media ?? existing?.media ?? [],
-      equipment: cleaned(draft.equipment ?? existing?.equipment ?? [], reidentify: existing != nil),
+      equipment: preserveAuthoredValues ? reidentifiedEquipment(draft.equipment ?? [])
+        : cleaned(draft.equipment ?? existing?.equipment ?? [], reidentify: existing != nil),
       // Section and child identifiers are local to one immutable revision.
       // Reusing them would make persistence queries for an older section pull
       // in rows from every later revision with the same section identifier.
       ingredientSections: existing == nil ? ingredientSections : reidentified(ingredientSections),
       instructionSections: existing == nil ? instructionSections : reidentified(instructionSections)
     )
+  }
+
+  private func reidentifiedEquipment(_ equipment: [EquipmentItem]) -> [EquipmentItem] {
+    equipment.map {
+      EquipmentItem(originalText: $0.originalText, quantity: $0.quantity, name: $0.name, isOptional: $0.isOptional)
+    }
   }
 
   private func text(_ line: String) -> String? {

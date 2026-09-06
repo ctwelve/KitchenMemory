@@ -9,9 +9,12 @@ import Foundation
 /// The durable content and bundled-sample state of one Kitchen's library.
 public struct RecipeLibraryContents: Equatable, Sendable {
   public let recipes: [StoredRecipe]
+  public let reconciliations: [RecipeReconciliation]
   public let samplePresence: SampleRecipePresence
 
-  public init(recipes: [StoredRecipe], samplePresence: SampleRecipePresence) {
+  public init(recipes: [StoredRecipe], samplePresence: SampleRecipePresence,
+              reconciliations: [RecipeReconciliation] = []) {
+    self.reconciliations = reconciliations
     self.recipes = recipes
     self.samplePresence = samplePresence
   }
@@ -63,7 +66,8 @@ public struct RecipeLibrary {
     } catch {
       samplePresence = .unavailable
     }
-    return RecipeLibraryContents(recipes: recipes, samplePresence: samplePresence)
+    return RecipeLibraryContents(recipes: recipes, samplePresence: samplePresence,
+                                 reconciliations: try repository.reconciliations(in: kitchenID))
   }
 
   public func create(from draft: RecipeDraft) throws -> StoredRecipe {
@@ -101,6 +105,13 @@ public struct RecipeLibrary {
       throw KitchenMemoryPersistenceError.inconsistentRecipeIdentity
     }
     try repository.save(command)
+  }
+
+  public func prepareReconciliationSave(
+    _ comparison: RecipeReconciliation, session: RecipeEditSession
+  ) throws -> RecipeSaveCommand {
+    guard comparison.kitchenID == kitchenID else { throw RecipeReconciliationError.invalidParents }
+    return try editor.prepareReconciliationSave(comparison, session: session)
   }
 
   public func installSamples() throws {

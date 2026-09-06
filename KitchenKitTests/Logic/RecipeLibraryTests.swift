@@ -251,6 +251,8 @@ private struct FailingSampleProvider: SampleRecipeProviding {
 
 @MainActor
 private final class InMemoryRecipeRepository: RecipeRepository {
+  func reconciliations(in kitchenID: Kitchen.ID) throws -> [RecipeReconciliation] { [] }
+
   func save(_ command: RecipeSaveCommand) throws {
     throw KitchenMemoryPersistenceError.recipeSaveUnsupported
   }

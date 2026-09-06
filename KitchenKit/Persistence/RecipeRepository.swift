@@ -46,6 +46,7 @@ public protocol RecipeRepository: AnyObject {
   func recipe(id: Recipe.ID) throws -> StoredRecipe?
   /// Projects immutable authority evidence for one Recipe without consulting the V1 pointer.
   func recipeAuthority(id: Recipe.ID) throws -> RecipeAuthorityProjection?
+  func reconciliations(in kitchenID: Kitchen.ID) throws -> [RecipeReconciliation]
   func recipes(in kitchenID: Kitchen.ID) throws -> [StoredRecipe]
   /// Atomically adds recipes whose stable identities are not already present.
   func addRecipes(_ recipes: [StoredRecipe], to kitchenID: Kitchen.ID) throws
@@ -513,11 +514,41 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     return StoredRecipe(recipe: recipe, revision: try domainRevision(from: revisionRecord))
   }
 
+  public func reconciliations(in kitchenID: Kitchen.ID) throws -> [RecipeReconciliation] {
+    try recipeIdentifiers(in: kitchenID.rawValue).compactMap { identifier in
+      let recipeID = Recipe.ID(rawValue: identifier)
+      guard try activeDeletionIDs(for: recipeID).isEmpty else { return nil }
+      let selected: [RecipeRevision.ID]
+      switch try recipeAuthority(id: recipeID) {
+      case let .available(value): selected = [value.current.id]
+      case let .recovery(.competingSelections(ids)): selected = ids
+      default: return nil
+      }
+      let saves = try context.fetch(FetchDescriptor<RecipeSaveRecord>(
+        predicate: #Predicate { $0.recipeID == identifier }
+      ))
+      let parents = try Set(saves.flatMap {
+        try RecipeIdentifierSetCodec.decode(formatVersion: $0.ancestryFormatVersion, data: $0.parentRevisionIDsData)
+      })
+      let candidates = Set(saves.map(\.revisionID)).subtracting(parents).union(selected.map(\.rawValue))
+      guard candidates.count > 1 else { return nil }
+      let revisions = try revisions(for: recipeID).filter { candidates.contains($0.id.rawValue) }
+        .sorted { $0.id.rawValue.uuidString < $1.id.rawValue.uuidString }
+      return try RecipeReconciliation(
+        kitchenID: kitchenID, revisions: revisions, observedSelectionIDs: selectionHeads(for: recipeID)
+      )
+    }
+  }
+
   public func recipes(in kitchenID: Kitchen.ID) throws -> [StoredRecipe] {
     let identifier = kitchenID.rawValue
     let recipeIDs = try recipeIdentifiers(in: identifier)
     return try recipeIDs
-      .compactMap { try recipe(id: .init(rawValue: $0)) }
+      .compactMap { identifier -> StoredRecipe? in
+        let id = Recipe.ID(rawValue: identifier)
+        if case .recovery(.competingSelections) = try recipeAuthority(id: id) { return nil }
+        return try recipe(id: id)
+      }
       .sorted {
         $0.revision.title.localizedStandardCompare($1.revision.title) == .orderedAscending
       }
