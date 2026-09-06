@@ -8,6 +8,9 @@ import Foundation
 @MainActor
 final class SessionRecipeRepository: RecipeRepository {
   func reconciliations(in kitchenID: Kitchen.ID) throws -> [RecipeReconciliation] { [] }
+  func delete(_ command: RecipeDeleteCommand) throws { throw RecipeDispositionError.unavailable }
+  func restore(_ command: RecipeRestoreCommand) throws { throw RecipeDispositionError.unavailable }
+  func deletedRecipes(in kitchenID: Kitchen.ID) throws -> [DeletedRecipe] { [] }
 
   func save(_ command: RecipeSaveCommand) throws {
     throw KitchenMemoryPersistenceError.recipeSaveUnsupported

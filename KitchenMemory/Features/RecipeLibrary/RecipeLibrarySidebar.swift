@@ -60,7 +60,7 @@ struct RecipeLibrarySidebar: View {
 
       Button(action: showDeletedItems) {
         Label(.deletedItemsTitle, systemImage: "trash")
-          .badge(sessionModel.deletedItemCount)
+          .badge(sessionModel.deletedItemCount + model.deletedRecipes.count)
       }
       .accessibilityIdentifier("deleted-items-destination")
 

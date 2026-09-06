@@ -10,11 +10,13 @@ import Foundation
 public struct RecipeLibraryContents: Equatable, Sendable {
   public let recipes: [StoredRecipe]
   public let reconciliations: [RecipeReconciliation]
+  public let deletedRecipes: [DeletedRecipe]
   public let samplePresence: SampleRecipePresence
 
   public init(recipes: [StoredRecipe], samplePresence: SampleRecipePresence,
-              reconciliations: [RecipeReconciliation] = []) {
+              reconciliations: [RecipeReconciliation] = [], deletedRecipes: [DeletedRecipe] = []) {
     self.reconciliations = reconciliations
+    self.deletedRecipes = deletedRecipes
     self.recipes = recipes
     self.samplePresence = samplePresence
   }
@@ -66,8 +68,11 @@ public struct RecipeLibrary {
     } catch {
       samplePresence = .unavailable
     }
-    return RecipeLibraryContents(recipes: recipes, samplePresence: samplePresence,
-                                 reconciliations: try repository.reconciliations(in: kitchenID))
+    return RecipeLibraryContents(
+      recipes: recipes, samplePresence: samplePresence,
+      reconciliations: try repository.reconciliations(in: kitchenID),
+      deletedRecipes: try repository.deletedRecipes(in: kitchenID)
+    )
   }
 
   public func create(from draft: RecipeDraft) throws -> StoredRecipe {
@@ -112,6 +117,29 @@ public struct RecipeLibrary {
   ) throws -> RecipeSaveCommand {
     guard comparison.kitchenID == kitchenID else { throw RecipeReconciliationError.invalidParents }
     return try editor.prepareReconciliationSave(comparison, session: session)
+  }
+
+  public func prepareDeletion(of recipeID: Recipe.ID) -> RecipeDeleteCommand {
+    RecipeDeleteCommand(kitchenID: kitchenID, recipeID: recipeID)
+  }
+
+  public func prepareRestoration(of item: DeletedRecipe) throws -> RecipeRestoreCommand {
+    guard item.recoverableRecipe != nil, !item.observedDeletionIDs.isEmpty else {
+      throw RecipeDispositionError.unavailable
+    }
+    return RecipeRestoreCommand(
+      kitchenID: kitchenID, recipeID: item.id, observedDeletionIDs: item.observedDeletionIDs
+    )
+  }
+
+  public func delete(_ command: RecipeDeleteCommand) throws {
+    guard command.kitchenID == kitchenID else { throw RecipeDispositionError.invalidCommand }
+    try repository.delete(command)
+  }
+
+  public func restore(_ command: RecipeRestoreCommand) throws {
+    guard command.kitchenID == kitchenID else { throw RecipeDispositionError.invalidCommand }
+    try repository.restore(command)
   }
 
   public func installSamples() throws {

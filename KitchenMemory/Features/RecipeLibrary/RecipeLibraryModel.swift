@@ -38,6 +38,8 @@ final class RecipeLibraryModel {
   private(set) var reconciliations: [RecipeReconciliation] = []
   var reconciliationFailed = false
   var reconciliationFailureMessage: LocalizedStringResource = .recipeComparisonStorageFailure
+  private(set) var deletedRecipes: [DeletedRecipe] = []
+  private(set) var pendingDisposition: RecipeDispositionRequest?
   var selectedRecipeID: Recipe.ID? {
     get { navigation.selectedRecipeID }
     set { navigation.selectRecipe(newValue) }
@@ -130,7 +132,9 @@ final class RecipeLibraryModel {
   }
 
   func retryCurrentIssue() {
-    if issue == .samples {
+    if pendingDisposition != nil {
+      performPendingDisposition()
+    } else if issue == .samples {
       acceptSampleRecipes()
     } else {
       reload()
@@ -143,6 +147,7 @@ final class RecipeLibraryModel {
       let contents = try library.load()
       recipes = contents.recipes
       reconciliations = contents.reconciliations
+      deletedRecipes = contents.deletedRecipes
       samplePresence = contents.samplePresence
       if let preferredRecipeID,
          recipes.contains(where: { $0.recipe.id == preferredRecipeID }) {
@@ -150,18 +155,44 @@ final class RecipeLibraryModel {
       } else if !recipes.contains(where: { $0.recipe.id == selectedRecipeID }) {
         navigation.reconcileRecipeSelection(recipes.first?.recipe.id)
       }
-      issue = nil
+      issue = pendingDisposition == nil ? nil : .disposition
       hasLoaded = true
       if !recipes.isEmpty { hasEstablishedKitchenEvidence = true }
       return true
     } catch {
       recipes = []
       reconciliations = []
+      deletedRecipes = []
       navigation.reconcileRecipeSelection(nil)
       samplePresence = .unavailable
       issue = .read
       hasLoaded = true
       return false
+    }
+  }
+
+  func deleteRecipe(_ command: RecipeDeleteCommand) {
+    pendingDisposition = .delete(command)
+    performPendingDisposition()
+  }
+
+  func restoreRecipe(_ command: RecipeRestoreCommand) {
+    pendingDisposition = .restore(command)
+    performPendingDisposition()
+  }
+
+  private func performPendingDisposition() {
+    guard let pendingDisposition else { return }
+    do {
+      switch pendingDisposition {
+      case let .delete(command): try library.delete(command)
+      case let .restore(command): try library.restore(command)
+      }
+      self.pendingDisposition = nil
+      reload()
+      navigation.move(to: .deletedItems)
+    } catch {
+      issue = .disposition
     }
   }
 
@@ -219,6 +250,7 @@ final class RecipeLibraryModel {
       if case .editor = navigation.destination { navigation.move(to: .recipe) }
       if isShowingDrafts { navigation.move(to: .recipe) }
       try library.reset()
+      pendingDisposition = nil
       navigation.move(to: .recipe)
       resetPresentationState()
       samplePreferences.sampleRecipeOnboardingResponse = .accepted
@@ -239,4 +271,9 @@ final class RecipeLibraryModel {
       return false
     }
   }
+}
+
+enum RecipeDispositionRequest {
+  case delete(RecipeDeleteCommand)
+  case restore(RecipeRestoreCommand)
 }

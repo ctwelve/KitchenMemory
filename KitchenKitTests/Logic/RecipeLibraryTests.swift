@@ -182,6 +182,31 @@ final class RecipeLibraryTests: XCTestCase {
     XCTAssertEqual(contents.samplePresence, .unavailable)
   }
 
+  func testLibraryDispositionCommandsRetainScopeAndObservedFrontier() throws {
+    let kitchen = Kitchen(name: "Home")
+    let repository = SwiftDataRecipeRepository(
+      modelContainer: try KitchenMemorySchema.makeContainer(inMemory: true)
+    )
+    try repository.save(kitchen)
+    let library = makeLibrary(kitchen: kitchen, repository: repository)
+    let recipe = try library.create(from: RecipeDraft(title: "Soup"))
+    let command = library.prepareDeletion(of: recipe.id)
+    try library.delete(command)
+    let contents = try library.load()
+    XCTAssertTrue(contents.recipes.isEmpty)
+    let deleted = try XCTUnwrap(contents.deletedRecipes.first)
+    let restore = try library.prepareRestoration(of: deleted)
+    XCTAssertEqual(restore.observedDeletionIDs, [command.id])
+    let foreign = makeLibrary(kitchen: Kitchen(name: "Other"), repository: repository)
+    XCTAssertThrowsError(try foreign.delete(command))
+    XCTAssertThrowsError(try foreign.restore(restore))
+    XCTAssertThrowsError(try library.prepareRestoration(of: DeletedRecipe(
+      id: recipe.id, authority: .unavailable(.noSaveEvidence), observedDeletionIDs: [command.id]
+    )))
+    try library.restore(restore)
+    XCTAssertEqual(try library.load().recipes, [recipe])
+  }
+
   private func makeLibrary(
     kitchen: Kitchen,
     repository: any RecipeRepository,
@@ -252,6 +277,9 @@ private struct FailingSampleProvider: SampleRecipeProviding {
 @MainActor
 private final class InMemoryRecipeRepository: RecipeRepository {
   func reconciliations(in kitchenID: Kitchen.ID) throws -> [RecipeReconciliation] { [] }
+  func delete(_ command: RecipeDeleteCommand) throws { throw RecipeDispositionError.unavailable }
+  func restore(_ command: RecipeRestoreCommand) throws { throw RecipeDispositionError.unavailable }
+  func deletedRecipes(in kitchenID: Kitchen.ID) throws -> [DeletedRecipe] { [] }
 
   func save(_ command: RecipeSaveCommand) throws {
     throw KitchenMemoryPersistenceError.recipeSaveUnsupported
