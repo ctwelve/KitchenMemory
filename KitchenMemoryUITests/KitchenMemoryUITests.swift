@@ -22,7 +22,7 @@ final class KitchenMemoryUITests: XCTestCase {
       $0.contains("Locked") || $0.contains("OnConsole") || $0.contains("LoginDone")
     }.map { "\($0)=\(session[$0]!)" }.joined(separator: ", ")
     let frontmost = NSWorkspace.shared.frontmostApplication?.bundleIdentifier ?? "none"
-    print("[DEBUG-155] frontmost=\(frontmost); session=[\(sessionState)]")
+    XCTContext.runActivity(named: "[DEBUG-155] frontmost=\(frontmost); session=[\(sessionState)]") { _ in }
   }
 #endif
 
