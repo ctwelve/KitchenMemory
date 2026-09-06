@@ -10,6 +10,9 @@ import AppKit
 final class UITestApplicationDelegate: NSObject, NSApplicationDelegate {
   func applicationDidFinishLaunching(_ notification: Notification) {
     guard ProcessInfo.processInfo.arguments.contains("--ui-testing") else { return }
+    // Cloud can finish launching a regular application with a window while
+    // leaving it in the background. Request the foreground handoff here:
+    // XCUIApplication.launch() must complete before test-side recovery runs.
     NSApplication.shared.activate()
   }
 }

@@ -315,6 +315,14 @@ cannot launch a host application carrying those restricted entitlements.
 Development and production configurations retain the complete entitlement set;
 the testing exception does not alter a shipped application.
 
+On macOS, the disposable UI-test application also requests activation from its
+native launch-completion callback. Xcode Cloud can finish launching the app and
+create its window without bringing it to the foreground; `XCUIApplication.launch()`
+then fails before any test-side window recovery can execute. The delegate exists
+only in `TESTING` builds and requests activation only for `--ui-testing`, keeping
+hosted unit-test processes from competing for focus. The existing four UI tests
+remain the regression gate; they must pass in Cloud as well as local Xcode.
+
 Application-hosted XCTest processes also select an in-memory store in those two
 testing configurations by detecting Xcode's hosted-test environment. This keeps
 the saved application plan disposable without relying on a plan-level launch

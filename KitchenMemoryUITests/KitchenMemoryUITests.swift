@@ -3,9 +3,6 @@
 // SPDX-License-Identifier: MIT
 
 import XCTest
-#if os(macOS)
-import AppKit
-#endif
 
 /// Accessibility-oriented checks for the durable application shell.
 ///
@@ -13,38 +10,6 @@ import AppKit
 /// accessibility hierarchy with meaningful names. Product behavior belongs in
 /// the domain, Logic, persistence, and hosted application suites.
 final class KitchenMemoryUITests: XCTestCase {
-#if os(macOS)
-  override func record(_ issue: XCTIssue) {
-    guard issue.compactDescription.contains("Failed to activate application") else {
-      super.record(issue)
-      return
-    }
-    let applications = NSRunningApplication.runningApplications(
-      withBundleIdentifier: "net.ctwelve.KitchenMemory"
-    )
-    let windows = CGWindowListCopyWindowInfo(.optionAll, kCGNullWindowID)
-      as? [[String: Any]] ?? []
-    let details = applications.map { application in
-      let ownedWindows = windows.filter {
-        ($0[kCGWindowOwnerPID as String] as? Int32) == application.processIdentifier
-      }
-      return "pid=\(application.processIdentifier), active=\(application.isActive), "
-        + "finished=\(application.isFinishedLaunching), policy=\(application.activationPolicy.rawValue), "
-        + "windows=\(ownedWindows.count)"
-    }.joined(separator: "; ")
-    let frontmost = NSWorkspace.shared.frontmostApplication?.bundleIdentifier ?? "none"
-    let session = CGSessionCopyCurrentDictionary() as? [String: Any] ?? [:]
-    let sessionState = session.keys.sorted().filter {
-      $0.contains("Locked") || $0.contains("OnConsole") || $0.contains("LoginDone")
-    }.map { "\($0)=\(session[$0]!)" }.joined(separator: ", ")
-    let diagnostic = XCTMutableIssue(type: issue.type, compactDescription:
-      issue.compactDescription + " [DEBUG-155] frontmost=\(frontmost); apps=[\(details)]; session=[\(sessionState)]")
-    diagnostic.sourceCodeContext = issue.sourceCodeContext
-    diagnostic.attachments = issue.attachments
-    super.record(diagnostic as XCTIssue)
-  }
-#endif
-
   override func setUpWithError() throws {
     continueAfterFailure = false
   }
