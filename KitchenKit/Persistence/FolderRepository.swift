@@ -32,7 +32,6 @@ public final class SwiftDataFolderRepository: FolderRepository {
       let kitchenID = command.kitchenID.rawValue
       guard try !context.fetch(FetchDescriptor<KitchenRecord>(predicate: #Predicate { $0.id == kitchenID })).isEmpty
       else { throw KitchenMemoryPersistenceError.missingKitchen }
-      try validateAssignment(command, context: context, requireRecipe: true)
       let identifier = command.id
       let matching = try context.fetch(FetchDescriptor<OrganizationActionRecord>(predicate: #Predicate {
         $0.id == identifier
@@ -44,7 +43,11 @@ public final class SwiftDataFolderRepository: FolderRepository {
       _ = try FolderLibrary(kitchenID: command.kitchenID,
                             commands: snapshot.commands + [command], checkpoints: snapshot.checkpoints)
       let covered = snapshot.checkpoints.flatMap { $0.evidence.receipts }.contains { $0.id == command.id }
-      if matching.isEmpty && !covered { context.insert(try OrganizationActionRecord(command: command)) }
+      try validateAssignment(command, context: context, requireRecipe: false)
+      if matching.isEmpty && !covered {
+        try validateAssignment(command, context: context, requireRecipe: true)
+        context.insert(try OrganizationActionRecord(command: command))
+      }
     }
   }
 

@@ -99,4 +99,45 @@ final class SwiftDataFolderRepositoryTests: XCTestCase {
     XCTAssertThrowsError(try folders.library(in: kitchen.id))
   }
 
+  func testAcceptedAssignmentRetrySurvivesRecipePruningWithRawOrCheckpointedEvidence() throws {
+    for compacted in [false, true] {
+      let container = try KitchenMemorySchema.makeContainer(inMemory: true)
+      let kitchen = Kitchen(name: "Home")
+      let recipes = SwiftDataRecipeRepository(modelContainer: container)
+      try recipes.save(kitchen)
+      let recipe = try RecipeEditor(repository: recipes).create(in: kitchen.id, from: RecipeDraft(title: "Soup"))
+      let folders = SwiftDataFolderRepository(modelContainer: container)
+      let assignment = try folders.library(in: kitchen.id).prepare(.assign(recipeID: recipe.id, folderID: nil),
+                                                                   at: Date(timeIntervalSince1970: 0))
+      try folders.append(assignment)
+      if compacted { try folders.compact(in: kitchen.id, at: Date(timeIntervalSince1970: 40 * 86_400)) }
+      try recipes.delete(RecipeDeleteCommand(kitchenID: kitchen.id, recipeID: recipe.id,
+                                             deletedAt: Date(timeIntervalSince1970: 0)))
+      _ = try recipes.maintainDeletedRecipes(in: kitchen.id, at: Date(timeIntervalSince1970: 30 * 86_400))
+      XCTAssertEqual(try recipes.recipeAuthority(id: recipe.id), .pruned)
+      XCTAssertNoThrow(try folders.append(assignment))
+      let newAssignment = try folders.library(in: kitchen.id).prepare(.assign(recipeID: recipe.id, folderID: nil))
+      XCTAssertThrowsError(try folders.append(newAssignment))
+    }
+  }
+
+  func testActionIdentityCannotBeReusedAcrossKitchens() throws {
+    let container = try KitchenMemorySchema.makeContainer(inMemory: true)
+    let recipes = SwiftDataRecipeRepository(modelContainer: container)
+    let folders = SwiftDataFolderRepository(modelContainer: container)
+    let home = Kitchen(name: "Home")
+    let away = Kitchen(name: "Away")
+    try recipes.save(home)
+    try recipes.save(away)
+    let command = try folders.library(in: home.id).prepare(.create(id: Folder.ID(), name: "Home", parentID: nil))
+    try folders.append(command)
+    let impostor = try folders.library(in: away.id).prepare(.create(id: Folder.ID(), name: "Away", parentID: nil),
+                                                            id: command.id)
+    XCTAssertThrowsError(try folders.append(impostor)) { error in
+      XCTAssertEqual(error as? FolderError, .wrongKitchen)
+    }
+    XCTAssertEqual(try folders.library(in: home.id).folders.map(\.name), ["Home"])
+    XCTAssertTrue(try folders.library(in: away.id).folders.isEmpty)
+  }
+
 }
