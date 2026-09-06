@@ -187,10 +187,7 @@ final class RecipeReconciliationTests: XCTestCase {
     let session = RecipeEditSession(draft: try XCTUnwrap(comparison.draft))
     let command = try editor.prepareReconciliationSave(comparison, session: session)
     let result = command.revision
-    XCTAssertEqual(result.title, " Soup ")
-    XCTAssertEqual(result.summary, "  Notes  ")
-    XCTAssertEqual(result.authorName, "  Cook  ")
-    XCTAssertEqual(result.source, first.source)
+    assertAuthoredMetadata(result)
     XCTAssertEqual(result.recipeYield, first.recipeYield)
     XCTAssertEqual(result.prepDuration?.seconds, 91)
     XCTAssertEqual(result.media, first.media)
@@ -216,6 +213,11 @@ final class RecipeReconciliationTests: XCTestCase {
     XCTAssertThrowsError(try editor.prepareReconciliationSave(invalid, session: RecipeEditSession()))
   }
 
+  private func assertAuthoredMetadata(_ result: RecipeRevision) {
+    XCTAssertEqual(result.title, " Soup ")
+    XCTAssertEqual(result.summary, "  Notes  ")
+    XCTAssertEqual(result.authorName, "  Cook  ")
+  }
 }
 
 private struct ComparisonSamples: SampleRecipeProviding {
