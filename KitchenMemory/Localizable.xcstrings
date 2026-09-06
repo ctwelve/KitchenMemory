@@ -3,6 +3,7 @@
   "strings" : {
 
   "recipe.comparison.thumbnail": {
+    "comment": "Role of a retained thumbnail image in revision comparison.",
     "extractionState": "manual",
     "localizations": {
       "en-US": {
@@ -27,7 +28,8 @@
   }
 ,
 
-  "recipe.comparison.storageFailure": {
+  "recipe.comparison.storage.failure": {
+    "comment": "Recovery advice when a local comparison draft cannot be opened or saved.",
     "extractionState": "manual",
     "localizations": {
       "en-US": {
