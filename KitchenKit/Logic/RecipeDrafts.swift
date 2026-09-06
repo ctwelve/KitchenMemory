@@ -42,6 +42,16 @@ public final class RecipeDrafts {
     return draft
   }
 
+  public func beginRecovery(recipeID: Recipe.ID, revisionID: RecipeRevision.ID) throws -> RecipeEditingDraft {
+    guard storageIsAvailable else { throw FileRecipeEditingStore.Failure.invalidDocument }
+    let content = try library.prepareRecoveryDraft(recipeID: recipeID, revisionID: revisionID)
+    let draft = RecipeEditingDraft(original: nil, draft: content)
+    drafts.append(draft)
+    observe(draft)
+    guard persist() else { throw CocoaError(.fileWriteUnknown) }
+    return draft
+  }
+
   public func beginReconciliation(_ comparison: RecipeReconciliation) throws -> RecipeEditingDraft {
     guard storageIsAvailable else { throw FileRecipeEditingStore.Failure.invalidDocument }
     if let retained = drafts.first(where: { $0.original?.id == comparison.recipeID }) {
