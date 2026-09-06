@@ -33,8 +33,12 @@ final class KitchenMemoryUITests: XCTestCase {
         + "windows=\(ownedWindows.count)"
     }.joined(separator: "; ")
     let frontmost = NSWorkspace.shared.frontmostApplication?.bundleIdentifier ?? "none"
+    let session = CGSessionCopyCurrentDictionary() as? [String: Any] ?? [:]
+    let sessionState = session.keys.sorted().filter {
+      $0.contains("Locked") || $0.contains("OnConsole") || $0.contains("LoginDone")
+    }.map { "\($0)=\(session[$0]!)" }.joined(separator: ", ")
     let diagnostic = XCTMutableIssue(type: issue.type, compactDescription:
-      issue.compactDescription + " [DEBUG-155] frontmost=\(frontmost); apps=[\(details)]")
+      issue.compactDescription + " [DEBUG-155] frontmost=\(frontmost); apps=[\(details)]; session=[\(sessionState)]")
     diagnostic.sourceCodeContext = issue.sourceCodeContext
     diagnostic.attachments = issue.attachments
     super.record(diagnostic as XCTIssue)
