@@ -33,7 +33,9 @@ and reject any warm-library sample missing `fixtureLocallyReadable`.
 `--replica` name, and a new `--output` path outside the repository. For Mac, supply
 `--products` pointing to the framework products directory. For physical devices,
 supply the discovered CoreDevice UUID with `--device`. Keep devices unlocked.
-Use `--debugger` for LLDB-attached launches; omitted means detached. Device runs
+Use `--debugger` for LLDB-attached launches; omitted means detached.
+Attachment resolves the exact installed Develop bundle before selecting a PID;
+it never selects Production by a shared executable name. Device runs
 wait for an actual debugger stop before continuing. The probe independently
 reports `debuggerAttached` or `debuggerDetached`; mismatches invalidate the run.
 
@@ -84,3 +86,17 @@ Record toolchain, OS/device classes, exact source and overlay hashes, signing
 configuration, sample counts/ranges, and ownership limits in a conclusions
 document. Keep raw logs and timing JSON outside the repository. A successful
 launch alone does not prove a complete matrix or an observed cloud import.
+
+## Failed runs
+
+Queries and controller cleanup have explicit subprocess timeouts. Every launch
+path enters unconditional cleanup; a known failed device probe is killed by its
+exact PID, and host controllers are terminated and reaped. An unknown suspended
+PID is reported as `devicePIDUnknownInspectBeforeRetry`: inspect the named
+Develop installation or reinstall the ordinary Develop app before continuing.
+A timeout or an unconfirmed cleanup cannot be reported as a completed sample.
+No broad process-name cleanup is performed. Retained failure diagnostics contain
+only exception classes and fixed cleanup codes, not private error messages.
+
+Run `PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s
+Tools/StartupMeasurements -p 'test_*.py'` for record and process-cleanup checks.

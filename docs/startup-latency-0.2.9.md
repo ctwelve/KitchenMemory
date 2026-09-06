@@ -133,9 +133,22 @@ debugger-associated startup delay remains outside this narrow optimization.
 The candidate passes 522 standalone framework tests and the exact
 12,407/12,407 business-logic executable-line coverage gate (118 runtime-adapter
 lines excluded). Xcode's iOS application/UI plan passes all 162 tests on the
-iPhone 17 Pro Max simulator. Four measurement-record tests reject missing actual
+iPhone 17 Pro Max simulator. Seven measurement-tool tests reject missing actual
 reads, absent fixtures, requested-but-unverified debugger modes, duplicate or
-out-of-order milestones, malformed output, and unexpected/private fields.
-Project-structure and version-contract checks pass. Final Mac UI validation and
-device restoration are recorded when completed.
+out-of-order milestones, malformed output, and unexpected/private fields. They also verify controller reaping after a
+device-cleanup timeout and exact Develop-bundle identification.
+Xcode’s native Mac application/UI plan also passes all 164 tests.
+Project-structure, software-inventory, and version-contract checks pass.
 
+Both physical devices were restored to the ordinary signed Develop 0.2.9 app
+from the real checkout after measurements. The restored executable contains no
+`KM_STARTUP` or `StartupMeasurement` symbols/strings. The final controller also
+passed a signed Mac smoke launch after its timeout/cleanup fix; its additional
+sample is excluded from the performance comparison. A later locked-device
+controller check timed out, correctly returned incomplete with an unknown-PID
+cleanup flag, and was followed by reinstallation of the ordinary Develop app.
+No unknown PID was killed by executable name.
+
+Independent Standards and Spec reviews found no application or spec defects.
+The Standards review's bounded-controller cleanup finding was fixed and
+re-reviewed. No native source changed after the validated optimization commit.
