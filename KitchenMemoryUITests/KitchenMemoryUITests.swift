@@ -3,6 +3,9 @@
 // SPDX-License-Identifier: MIT
 
 import XCTest
+#if os(macOS)
+import AppKit
+#endif
 
 /// Accessibility-oriented checks for the durable application shell.
 ///
@@ -10,6 +13,19 @@ import XCTest
 /// accessibility hierarchy with meaningful names. Product behavior belongs in
 /// the domain, Logic, persistence, and hosted application suites.
 final class KitchenMemoryUITests: XCTestCase {
+#if os(macOS)
+  override func record(_ issue: XCTIssue) {
+    defer { super.record(issue) }
+    guard issue.compactDescription.contains("Failed to activate application") else { return }
+    let session = CGSessionCopyCurrentDictionary() as? [String: Any] ?? [:]
+    let sessionState = session.keys.sorted().filter {
+      $0.contains("Locked") || $0.contains("OnConsole") || $0.contains("LoginDone")
+    }.map { "\($0)=\(session[$0]!)" }.joined(separator: ", ")
+    let frontmost = NSWorkspace.shared.frontmostApplication?.bundleIdentifier ?? "none"
+    print("[DEBUG-155] frontmost=\(frontmost); session=[\(sessionState)]")
+  }
+#endif
+
   override func setUpWithError() throws {
     continueAfterFailure = false
   }
