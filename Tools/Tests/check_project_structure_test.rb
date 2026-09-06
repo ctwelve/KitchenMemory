@@ -309,6 +309,9 @@ class CheckProjectStructureTest < Minitest::Test
       KitchenMemory::ProjectStructure::SCHEMES.each_with_object({}) do |(name, expectation), result|
         product = expectation.fetch(:product)
         plan = expectation.fetch(:plan)
+        additional_plans = expectation.fetch(:additional_plans, []).map do |extra|
+          %(<TestPlanReference reference="container:#{extra}"/>)
+        end.join("\n")
         action_configurations = KitchenMemory::ProjectStructure::SCHEME_ACTION_CONFIGURATIONS.fetch(name)
         runnable = if expectation[:runnable]
                      <<~RUNNABLE
@@ -343,6 +346,7 @@ class CheckProjectStructureTest < Minitest::Test
             <TestAction buildConfiguration="#{action_configurations.fetch('TestAction')}">
               <TestPlans>
                 <TestPlanReference reference="container:#{plan}" default="YES"/>
+                #{additional_plans}
               </TestPlans>
             </TestAction>
             <LaunchAction buildConfiguration="#{action_configurations.fetch('LaunchAction')}">
@@ -366,7 +370,7 @@ class CheckProjectStructureTest < Minitest::Test
 
     assert_equal 5, result[:target_count]
     assert_equal 2, result[:scheme_count]
-    assert_equal 2, result[:plan_count]
+    assert_equal 3, result[:plan_count]
     expected_core_groups = {
       "KitchenKit" => ["KitchenKit"],
       "KitchenKitTests" => ["KitchenKitTests"]
@@ -863,6 +867,35 @@ class CheckProjectStructureTest < Minitest::Test
     error = assert_contract_error { validate(fixture) }
 
     assert_includes error.message, "KitchenMemory TestAction must use Testing"
+  end
+
+  def test_rejects_ui_tests_in_cloud_plan
+    fixture = Fixture.new
+    local = JSON.parse(fixture.plans.fetch("KitchenMemory.xctestplan"))
+    cloud = JSON.parse(fixture.plans.fetch("KitchenMemoryCloud.xctestplan"))
+    cloud["testTargets"] = local.fetch("testTargets")
+    fixture.plans["KitchenMemoryCloud.xctestplan"] = JSON.generate(cloud)
+
+    error = assert_contract_error { validate(fixture) }
+
+    assert_includes error.message, "KitchenMemoryCloud.xctestplan test targets"
+    assert_includes error.message, "KitchenMemoryUITests"
+  end
+
+  def test_rejects_cloud_plan_as_local_default
+    fixture = Fixture.new
+    fixture.schemes["KitchenMemory.xcscheme"] = fixture.schemes.fetch("KitchenMemory.xcscheme").sub(
+      'reference="container:KitchenMemory.xctestplan" default="YES"',
+      'reference="container:KitchenMemory.xctestplan"'
+    )
+    fixture.schemes["KitchenMemory.xcscheme"] = fixture.schemes.fetch("KitchenMemory.xcscheme").sub(
+      'reference="container:KitchenMemoryCloud.xctestplan"',
+      'reference="container:KitchenMemoryCloud.xctestplan" default="YES"'
+    )
+
+    error = assert_contract_error { validate(fixture) }
+
+    assert_includes error.message, "only default test plan"
   end
 
   def test_rejects_kitchenkit_plan_without_framework_test_target

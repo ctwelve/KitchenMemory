@@ -6,24 +6,25 @@ Copyright © 2026 the Kitchen Memory contributors.
 SPDX-License-Identifier: MIT
 -->
 
-Xcode Cloud is Kitchen Memory's continuous-integration system. The repository
-checks in one `KitchenMemory` scheme and plan so local and cloud Test actions
-select the same hosted and top-level accessibility targets on iOS and macOS destinations. It
-also checks in a minimal `KitchenKit` scheme and plan for the unhosted framework
-suite. Every shared scheme references one explicit plan.
+Xcode Cloud is Kitchen Memory's continuous-integration system. Local Xcode
+uses the full `KitchenMemory` test plan. Cloud Test actions explicitly select
+`KitchenMemoryCloud`, which runs hosted correctness tests while UI testing is
+temporarily suspended. The `KitchenKit` scheme and plan retain unhosted framework
+coverage.
 
 ## Scheme, plan, and destination contract
 
 | Scheme and plan | Scheme build product | Plan test targets | Native destination |
 | --- | --- | --- | --- |
 | `KitchenKit` with `KitchenKit.xctestplan` | `KitchenKit` | `KitchenKitTests` | native macOS for canonical coverage; iOS as needed |
+| `KitchenMemory` with `KitchenMemoryCloud.xctestplan` | `KitchenMemory` | `KitchenMemoryTests` | Cloud iOS or native macOS |
 | `KitchenMemory` with `KitchenMemory.xctestplan` | `KitchenMemory` | `KitchenMemoryTests`, `KitchenMemoryUITests` | iOS device, Simulator, or native macOS |
 
 Each shared scheme has one top-level product buildable; Xcode adds dependencies
-through ordinary resolution. Its saved plan is the sole owner of test-target
+through ordinary resolution. Its selected plan is the sole owner of test-target
 membership: `KitchenKit.xctestplan` contains the unhosted framework target,
-while the application plan contains its multiplatform hosted-test target and the shared
-top-level accessibility target. The schemes default Test and Analyze to `Testing`; Xcode Cloud
+while the default local application plan includes hosted and UI tests, and the
+Cloud application plan includes hosted tests only. The schemes default Test and Analyze to `Testing`; Xcode Cloud
 may still select a configuration and destination explicitly without introducing
 duplicate scheme names.
 
@@ -55,8 +56,8 @@ The development workflow starts for meaningful project changes pushed to
 perform separate iOS and macOS Build, Analyze, and Test actions using the same
 `KitchenMemory` scheme, plus the macOS-destination `KitchenKit` lane, but never
 archive a product. Those actions use `Testing`; each destination Test action runs
-its hosted correctness target and the small accessible top-level navigation
-suite. Local
+its hosted correctness target using `KitchenMemoryCloud`. UI navigation tests
+are required locally through Xcode before merge while Cloud UI testing is paused. Local
 developer runs use the
 same application scheme with the `Develop` configuration. The distinct
 development bundle identifier keeps local stores,
@@ -314,6 +315,18 @@ privilege on iOS and is also required because Xcode Cloud's macOS test runner
 cannot launch a host application carrying those restricted entitlements.
 Development and production configurations retain the complete entitlement set;
 the testing exception does not alter a shipped application.
+
+Cloud UI testing is temporarily suspended on both native platforms following
+macOS foreground-activation failures (issue #155). Configure every application
+Test action in Cloud to use **Specific Test Plans > KitchenMemoryCloud**. Keep
+`KitchenMemory` as the local default; its four UI tests and their assertions are
+unchanged. A green Cloud run does not replace local UI validation. The speculative
+activation delegate and diagnostic probes have been removed.
+
+To restore Cloud UI coverage after the platform issue is resolved, select the
+full `KitchenMemory` plan in those Cloud actions and verify repeated passes on
+macOS and iOS. Track the upstream investigation separately from this temporary
+mitigation; see [the activation research](research/macos-cloud-ui-test-activation.md).
 
 Application-hosted XCTest processes also select an in-memory store in those two
 testing configurations by detecting Xcode's hosted-test environment. This keeps
