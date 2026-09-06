@@ -115,3 +115,11 @@ _Avoid_: Root Folder, default Folder
 **Folder Collision**:
 Separate live Folder identities sharing the same normalized sibling name and awaiting a person's Merge or Rename decision.
 _Avoid_: Duplicate Recipe, automatic deduplication
+
+**Tag**:
+A flat Kitchen-owned classification identity that may be assigned to many stable Recipes, each of which may have many Tags.
+_Avoid_: Folder, Recipe keyword, cuisine, category
+
+**Tag Collision**:
+Separate live Tag identities sharing the same normalized Kitchen-wide name and awaiting a person's Merge or Rename decision.
+_Avoid_: Automatic deduplication, duplicate Recipe
