@@ -42,6 +42,24 @@ public final class RecipeDrafts {
     return draft
   }
 
+  public func beginReconciliation(_ comparison: RecipeReconciliation) throws -> RecipeEditingDraft {
+    guard storageIsAvailable else { throw FileRecipeEditingStore.Failure.invalidDocument }
+    if let retained = drafts.first(where: { $0.original?.id == comparison.recipeID }) {
+      guard retained.reconciliation != nil else { throw RecipeReconciliationError.existingDraft }
+      return retained
+    }
+    guard let first = comparison.revisions.first else { throw RecipeReconciliationError.invalidParents }
+    let original = StoredRecipe(
+      recipe: Recipe(id: first.recipeID, kitchenID: comparison.kitchenID, currentRevisionID: first.id), revision: first
+    )
+    let draft = RecipeEditingDraft(original: original, draft: RecipeDraft(), reconciliation: comparison)
+    draft.observedSelectionIDs = comparison.observedSelectionIDs
+    drafts.append(draft)
+    observe(draft)
+    guard persist() else { throw CocoaError(.fileWriteUnknown) }
+    return draft
+  }
+
   private func restore() {
     do {
       drafts = try store.load().map(RecipeEditingDraft.init(record:))
@@ -131,10 +149,14 @@ public final class RecipeDrafts {
     guard let draft = drafts.first(where: { $0.id == id }), !draft.isImportCandidate else { return nil }
     do {
       if draft.pendingSave == nil {
-        draft.phase = .saving(try library.prepareSave(
-          from: draft.session.validatedDraft(), original: draft.original,
-          observedSelectionIDs: draft.observedSelectionIDs
-        ))
+        if let comparison = draft.reconciliation {
+          draft.phase = .saving(try library.prepareReconciliationSave(comparison, session: draft.session))
+        } else {
+          draft.phase = .saving(try library.prepareSave(
+            from: draft.session.validatedDraft(), original: draft.original,
+            observedSelectionIDs: draft.observedSelectionIDs
+          ))
+        }
       }
       guard persist(), let command = draft.pendingSave else { return nil }
       try library.save(command)

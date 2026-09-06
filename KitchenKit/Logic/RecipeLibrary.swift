@@ -9,12 +9,13 @@ import Foundation
 /// The durable content and bundled-sample state of one Kitchen's library.
 public struct RecipeLibraryContents: Equatable, Sendable {
   public let recipes: [StoredRecipe]
+  public let reconciliations: [RecipeReconciliation]
   public let deletedRecipes: [DeletedRecipe]
   public let samplePresence: SampleRecipePresence
 
-  public init(
-    recipes: [StoredRecipe], samplePresence: SampleRecipePresence, deletedRecipes: [DeletedRecipe] = []
-  ) {
+  public init(recipes: [StoredRecipe], samplePresence: SampleRecipePresence,
+              reconciliations: [RecipeReconciliation] = [], deletedRecipes: [DeletedRecipe] = []) {
+    self.reconciliations = reconciliations
     self.deletedRecipes = deletedRecipes
     self.recipes = recipes
     self.samplePresence = samplePresence
@@ -69,6 +70,7 @@ public struct RecipeLibrary {
     }
     return RecipeLibraryContents(
       recipes: recipes, samplePresence: samplePresence,
+      reconciliations: try repository.reconciliations(in: kitchenID),
       deletedRecipes: try repository.deletedRecipes(in: kitchenID)
     )
   }
@@ -108,6 +110,13 @@ public struct RecipeLibrary {
       throw KitchenMemoryPersistenceError.inconsistentRecipeIdentity
     }
     try repository.save(command)
+  }
+
+  public func prepareReconciliationSave(
+    _ comparison: RecipeReconciliation, session: RecipeEditSession
+  ) throws -> RecipeSaveCommand {
+    guard comparison.kitchenID == kitchenID else { throw RecipeReconciliationError.invalidParents }
+    return try editor.prepareReconciliationSave(comparison, session: session)
   }
 
   public func prepareDeletion(of recipeID: Recipe.ID) -> RecipeDeleteCommand {

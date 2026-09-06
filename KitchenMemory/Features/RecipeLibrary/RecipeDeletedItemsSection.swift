@@ -28,6 +28,8 @@ struct RecipeDeletedItemsSection: View {
           }
           .disabled(model.pendingDisposition != nil)
           .accessibilityIdentifier("restore-recipe-\(item.id.rawValue.uuidString)")
+        } else if let comparison = model.reconciliations.first(where: { $0.recipeID == item.id }) {
+          Button(.recipeComparisonTitle) { model.beginReconciliation(comparison) }
         } else {
           Button(.actionTryAgain) { model.reload() }
         }

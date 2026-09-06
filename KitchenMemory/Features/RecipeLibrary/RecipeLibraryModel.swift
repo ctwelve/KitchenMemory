@@ -35,6 +35,12 @@ final class RecipeLibraryModel {
   private var resetPresentationState: () -> Void = {}
 
   private(set) var recipes: [StoredRecipe] = []
+  private(set) var reconciliations: [RecipeReconciliation] = []
+  var visibleReconciliations: [RecipeReconciliation] {
+    reconciliations.filter { comparison in !deletedRecipes.contains { $0.id == comparison.recipeID } }
+  }
+  var reconciliationFailed = false
+  var reconciliationFailureMessage: LocalizedStringResource = .recipeComparisonStorageFailure
   private(set) var deletedRecipes: [DeletedRecipe] = []
   private(set) var pendingDisposition: RecipeDispositionRequest?
   var selectedRecipeID: Recipe.ID? {
@@ -143,6 +149,7 @@ final class RecipeLibraryModel {
     do {
       let contents = try library.load()
       recipes = contents.recipes
+      reconciliations = contents.reconciliations
       deletedRecipes = contents.deletedRecipes
       samplePresence = contents.samplePresence
       if let preferredRecipeID,
@@ -157,6 +164,7 @@ final class RecipeLibraryModel {
       return true
     } catch {
       recipes = []
+      reconciliations = []
       deletedRecipes = []
       navigation.reconcileRecipeSelection(nil)
       samplePresence = .unavailable

@@ -1,6 +1,7 @@
 {
   "sourceLanguage" : "en-US",
   "strings" : {
+
   "recipe.action.delete": {
     "comment": "Recipe deletion or restoration control and status.",
     "extractionState": "manual",
@@ -237,6 +238,779 @@
         "stringUnit": {
           "state": "translated",
           "value": "Impossible de supprimer ou de restaurer la recette. Réessayez pour reprendre la même action."
+        }
+      }
+    }
+  }
+,
+
+  "recipe.comparison.thumbnail": {
+    "comment": "Role of a retained thumbnail image in revision comparison.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Thumbnail"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Miniatura"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Vignette"
+        }
+      }
+    }
+  }
+,
+
+  "recipe.comparison.storage.failure": {
+    "comment": "Recovery advice when a local comparison draft cannot be opened or saved.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The comparison draft could not be opened or saved. Retry after local draft storage is available."
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "No se pudo abrir o guardar el borrador de comparación. Vuelve a intentarlo cuando esté disponible el almacenamiento local."
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Impossible d’ouvrir ou d’enregistrer le brouillon de comparaison. Réessayez lorsque le stockage local sera disponible."
+        }
+      }
+    }
+  }
+,
+  "recipe.comparison.title": {
+    "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Compare revisions"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Comparar revisiones"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Comparer les révisions"
+        }
+      }
+    }
+  },
+  "recipe.comparison.explanation": {
+    "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Choose a starting revision, then keep fields or individual ingredients from any revision. Save Revision creates a new revision reconciling every revision shown here. Nothing is selected automatically."
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Elige una revisión inicial y conserva campos o ingredientes de cualquier revisión. Guardar revisión crea una nueva revisión que concilia todas las revisiones mostradas. Nada se selecciona automáticamente."
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Choisissez une révision de départ, puis conservez des champs ou des ingrédients de chaque révision. Enregistrer la révision crée une nouvelle révision qui concilie toutes les révisions affichées. Rien n’est sélectionné automatiquement."
+        }
+      }
+    }
+  },
+  "recipe.comparison.choose-start": {
+    "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Choose a starting revision"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Elige una revisión inicial"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Choisissez une révision de départ"
+        }
+      }
+    }
+  },
+  "recipe.comparison.use-revision": {
+    "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Use this whole revision"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Usar esta revisión completa"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Utiliser cette révision complète"
+        }
+      }
+    }
+  },
+  "recipe.comparison.use-field": {
+    "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Use this field"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Usar este campo"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Utiliser ce champ"
+        }
+      }
+    }
+  },
+  "recipe.comparison.different": {
+    "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Different"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Diferente"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Différent"
+        }
+      }
+    }
+  },
+  "recipe.comparison.unavailable": {
+    "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Comparison unavailable"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Comparación no disponible"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Comparaison indisponible"
+        }
+      }
+    }
+  },
+  "recipe.comparison.existing-draft": {
+    "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Finish or discard any existing editing draft for this Recipe before starting a comparison. If local storage failed, retry it first."
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Termina o descarta el borrador existente de esta receta antes de comparar. Si falló el almacenamiento local, vuelve a intentarlo primero."
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Terminez ou abandonnez le brouillon existant de cette recette avant de commencer la comparaison. Si le stockage local a échoué, réessayez d’abord."
+        }
+      }
+    }
+  },
+  "recipe.comparison.correct-fields": {
+    "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Correct the invalid editing fields before changing comparison choices."
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Corrige los campos no válidos antes de cambiar las opciones de comparación."
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Corrigez les champs invalides avant de modifier les choix de comparaison."
+        }
+      }
+    }
+  },
+  "recipe.comparison.choose-ingredient": {
+    "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Choose this ingredient"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Elegir este ingrediente"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Choisir cet ingrédient"
+        }
+      }
+    }
+  },
+  "recipe.comparison.add-ingredient": {
+    "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Add to this section"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Agregar a esta sección"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ajouter à cette section"
+        }
+      }
+    }
+  },
+  "recipe.comparison.replace-ingredient": {
+    "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Or replace an ingredient:"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "O reemplazar un ingrediente:"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ou remplacer un ingrédient :"
+        }
+      }
+    }
+  },
+  "recipe.comparison.unknown": {
+    "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Not specified"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Sin especificar"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Non précisé"
+        }
+      }
+    }
+  },
+  "recipe.comparison.seconds-unit": {
+    "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "seconds"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "segundos"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "secondes"
+        }
+      }
+    }
+  },
+  "recipe.comparison.field.title": {
+    "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Title"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Título"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Titre"
+        }
+      }
+    }
+  },
+  "recipe.comparison.field.summary": {
+    "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Summary"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Resumen"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Résumé"
+        }
+      }
+    }
+  },
+  "recipe.comparison.field.author": {
+    "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Author"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Autoría"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Auteur"
+        }
+      }
+    }
+  },
+  "recipe.comparison.field.language": {
+    "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Language"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Idioma"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Langue"
+        }
+      }
+    }
+  },
+  "recipe.comparison.field.source": {
+    "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Source and provenance"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Fuente y procedencia"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Source et provenance"
+        }
+      }
+    }
+  },
+  "recipe.comparison.field.yield": {
+    "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Yield"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Rendimiento"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Rendement"
+        }
+      }
+    }
+  },
+  "recipe.comparison.field.preparation": {
+    "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Preparation time"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Tiempo de preparación"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Temps de préparation"
+        }
+      }
+    }
+  },
+  "recipe.comparison.field.cooking": {
+    "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Cooking time"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Tiempo de cocción"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Temps de cuisson"
+        }
+      }
+    }
+  },
+  "recipe.comparison.field.total": {
+    "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Total time"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Tiempo total"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Temps total"
+        }
+      }
+    }
+  },
+  "recipe.comparison.field.cuisines": {
+    "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Cuisines"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Cocinas"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Cuisines"
+        }
+      }
+    }
+  },
+  "recipe.comparison.field.categories": {
+    "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Categories"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Categorías"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Catégories"
+        }
+      }
+    }
+  },
+  "recipe.comparison.field.keywords": {
+    "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Keywords"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Palabras clave"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Mots-clés"
+        }
+      }
+    }
+  },
+  "recipe.comparison.field.ingredients": {
+    "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ingredient sections"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Secciones de ingredientes"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Sections d’ingrédients"
+        }
+      }
+    }
+  },
+  "recipe.comparison.field.instructions": {
+    "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Instruction sections"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Secciones de instrucciones"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Sections d’instructions"
+        }
+      }
+    }
+  },
+  "recipe.comparison.field.equipment": {
+    "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Equipment"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Utensilios"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Matériel"
+        }
+      }
+    }
+  },
+  "recipe.comparison.field.media": {
+    "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Images and references"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Imágenes y referencias"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Images et références"
         }
       }
     }

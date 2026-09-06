@@ -78,3 +78,17 @@ extension RecipeLibraryModel {
     return publication.removedDraft
   }
 }
+
+extension RecipeLibraryModel {
+  func beginReconciliation(_ comparison: RecipeReconciliation) {
+    guard navigation.canLeave() else { return }
+    do {
+      let draft = try drafts.beginReconciliation(comparison)
+      navigation.move(to: .editor(draft.id))
+    } catch {
+      reconciliationFailureMessage = error as? RecipeReconciliationError == .existingDraft
+        ? .recipeComparisonExistingDraft : .recipeComparisonStorageFailure
+      reconciliationFailed = true
+    }
+  }
+}
