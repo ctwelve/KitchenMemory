@@ -49,6 +49,8 @@ public protocol RecipeRepository: AnyObject {
   func recipe(id: Recipe.ID) throws -> StoredRecipe?
   /// Projects immutable authority evidence for one Recipe without consulting the V1 pointer.
   func recipeAuthority(id: Recipe.ID) throws -> RecipeAuthorityProjection?
+  func recoveryRecipes(in kitchenID: Kitchen.ID) throws -> [RecipeRecovery]
+  func maintainDeletedRecipes(in kitchenID: Kitchen.ID, at now: Date) throws -> RecipeRetentionResult
   func reconciliations(in kitchenID: Kitchen.ID) throws -> [RecipeReconciliation]
   func recipes(in kitchenID: Kitchen.ID) throws -> [StoredRecipe]
   /// Atomically adds recipes whose stable identities are not already present.
@@ -397,6 +399,16 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
         ))
       }
     }
+    if !pruneRecords.isEmpty {
+      let retained = RecipeAuthorityProjector.project(RecipeAuthorityEvidence(
+        kitchenID: .init(rawValue: kitchenIdentifier), recipeID: id,
+        saves: [], selections: [], revisions: [], prunes: pruneRecords.map(recipePruneEvidence)
+      ))
+      guard retained == .pruned else { return retained }
+      let hasLateRows = !recipeRecords.isEmpty || !revisionRecords.isEmpty || !saveRecords.isEmpty
+        || !selectionRecords.isEmpty || !deletionRecords.isEmpty || !restorationRecords.isEmpty
+      return try hasLateRows || hasLatePayload(behind: pruneRecords) ? .recovery(.lateEvidenceAfterPrune) : .pruned
+    }
     let revisions: [RecipeRevision]
     do {
       revisions = try revisionRecords.map(domainRevision)
@@ -549,7 +561,7 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     return try recipeIDs
       .compactMap { identifier -> StoredRecipe? in
         let id = Recipe.ID(rawValue: identifier)
-        if case .recovery(.competingSelections) = try recipeAuthority(id: id) { return nil }
+        if case .recovery = try recipeAuthority(id: id) { return nil }
         return try recipe(id: id)
       }
       .sorted {
@@ -557,7 +569,7 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
       }
   }
 
-  private func recipeIdentifiers(in kitchenID: UUID) throws -> [UUID] {
+  func recipeIdentifiers(in kitchenID: UUID) throws -> [UUID] {
     var identifiers = Set(try context.fetch(
       FetchDescriptor<RecipeRecord>(predicate: #Predicate { $0.kitchenID == kitchenID })
     ).map(\.id))
@@ -1504,7 +1516,7 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
   }
 
   // swiftlint:disable:next function_body_length
-  private func domainRevision(from record: RecipeRevisionRecord) throws -> RecipeRevision {
+  func domainRevision(from record: RecipeRevisionRecord) throws -> RecipeRevision {
     let storedSource = try decodeSource(record.sourceData)
     let revisionID = record.id
     let mediaRecords = try coalescedPayloadRows(context.fetch(
@@ -1687,7 +1699,7 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
       && lhs.scalingBehavior == rhs.scalingBehavior && lhs.parseState == rhs.parseState
   }
 
-  private func deleteRevisionRows(revisionID: UUID) throws {
+  func deleteRevisionRows(revisionID: UUID) throws {
     for record in try context.fetch(FetchDescriptor<RecipeImagePayloadRecord>(
       predicate: #Predicate { $0.revisionID == revisionID }
     )) { context.delete(record) }

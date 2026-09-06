@@ -2,6 +2,176 @@
   "sourceLanguage" : "en-US",
   "strings" : {
 
+  "recipe.recovery.title": {
+    "comment": "Recipe Recovery: incomplete evidence and explicitly lossy creation of a new local draft.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Recipe evidence needs recovery"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "La receta necesita recuperación"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Récupération de recette nécessaire"
+        }
+      }
+    }
+  },
+  "recipe.recovery.explanation": {
+    "comment": "Recipe Recovery: incomplete evidence and explicitly lossy creation of a new local draft.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Retained or late-arriving evidence cannot currently reconstruct this Recipe. Retry after more evidence arrives, or start a new Recipe from the available content."
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Los datos conservados o recibidos tarde no permiten reconstruir esta receta. Inténtalo de nuevo cuando lleguen más datos o crea una receta nueva con el contenido disponible."
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Les données conservées ou reçues en retard ne permettent pas de reconstruire cette recette. Réessayez après réception de données supplémentaires ou créez une recette avec le contenu disponible."
+        }
+      }
+    }
+  },
+  "recipe.recovery.new-draft": {
+    "comment": "Recipe Recovery: incomplete evidence and explicitly lossy creation of a new local draft.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Start a new Recipe"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Crear una receta nueva"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Créer une recette"
+        }
+      }
+    }
+  },
+  "recipe.recovery.confirmation": {
+    "comment": "Recipe Recovery: incomplete evidence and explicitly lossy creation of a new local draft.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Start a new Recipe from this evidence?"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "¿Crear una receta nueva con estos datos?"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Créer une recette à partir de ces données?"
+        }
+      }
+    }
+  },
+  "recipe.recovery.loss-warning": {
+    "comment": "Recipe Recovery: incomplete evidence and explicitly lossy creation of a new local draft.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "This may lose missing content, history, and relationships. It creates an editable local draft with a new identity; it does not restore the original Recipe. Review it before saving."
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Podrían perderse contenido, historial y relaciones faltantes. Se creará un borrador local editable con una identidad nueva; no se restaurará la receta original. Revísalo antes de guardarlo."
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Du contenu, de l’historique et des liens manquants pourraient être perdus. Un brouillon local modifiable avec une nouvelle identité sera créé; la recette originale ne sera pas restaurée. Vérifiez-le avant de l’enregistrer."
+        }
+      }
+    }
+  },
+  "recipe.recovery.unavailable": {
+    "comment": "Recipe Recovery: incomplete evidence and explicitly lossy creation of a new local draft.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Recovery draft unavailable"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Borrador de recuperación no disponible"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Brouillon de récupération indisponible"
+        }
+      }
+    }
+  },
+  "recipe.recovery.retry": {
+    "comment": "Recipe Recovery: incomplete evidence and explicitly lossy creation of a new local draft.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The evidence may have changed or local draft storage may be unavailable. Refresh and try again."
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Los datos pueden haber cambiado o el almacenamiento local no está disponible. Actualiza e inténtalo de nuevo."
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Les données ont peut-être changé ou le stockage local est indisponible. Actualisez et réessayez."
+        }
+      }
+    }
+  }
+,
+
   "recipe.action.delete": {
     "comment": "Recipe deletion or restoration control and status.",
     "extractionState": "manual",

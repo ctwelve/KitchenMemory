@@ -338,3 +338,13 @@ public struct RecipeEditor {
     }
   }
 }
+
+extension RecipeEditor {
+  func copyForRecovery(_ revision: RecipeRevision) -> RecipeDraft {
+    var draft = RecipeDraft(revision: revision)
+    draft.ingredientSections = reidentified(revision.ingredientSections)
+    draft.instructionSections = reidentified(revision.instructionSections)
+    draft.equipment = reidentifiedEquipment(revision.equipment)
+    return draft
+  }
+}

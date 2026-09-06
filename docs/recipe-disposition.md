@@ -33,4 +33,5 @@ action creates a new command.
 The existing [V5 authority contract](recipe-authority-v5-schema.md) owns the
 scalar disposition rows. This feature adds no schema version and no pruning,
 automatic sample removal, or permanent-erasure operation. Dependency-aware
-pruning and recovery of evidence arriving after pruning remain separate work.
+pruning and recovery of evidence arriving after pruning are documented in
+[Recipe payload retention](recipe-retention.md).

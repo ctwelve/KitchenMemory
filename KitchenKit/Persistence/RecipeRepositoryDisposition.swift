@@ -77,7 +77,7 @@ extension SwiftDataRecipeRepository {
       let id = Recipe.ID(rawValue: identifier)
       guard let authority = try recipeAuthority(id: id) else { return nil }
       switch authority {
-      case .available, .pruned: return nil
+      case .available, .pruned, .recovery(.lateEvidenceAfterPrune): return nil
       case .deleted, .unavailable, .recovery:
         let resolved = Set(restorations.filter { $0.recipeID == identifier }.map(\.deletionID))
         let observed = Set(deletions.filter { $0.recipeID == identifier }.map(\.id))
