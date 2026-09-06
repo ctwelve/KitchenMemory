@@ -207,6 +207,9 @@ final class RecipeReconciliationTests: XCTestCase {
     XCTAssertEqual(edited.source?.authorName, "  Cook  ")
     XCTAssertEqual(edited.source?.publisherName, " Press ")
     XCTAssertEqual(edited.recipeYield?.originalText, "  a pot  ")
+    changed.equipment = nil
+    let withoutEquipment = try editor.prepareReconciliationSave(comparison, session: changed)
+    XCTAssertTrue(withoutEquipment.revision.equipment.isEmpty)
     let maximum = RecipeRevision(recipeID: recipeID, revisionNumber: Int.max, title: "Overflow")
     let invalid = try RecipeReconciliation(kitchenID: Kitchen.ID(), revisions: [first, maximum],
                                           observedSelectionIDs: [])
