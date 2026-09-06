@@ -20,27 +20,13 @@ struct FolderOrder {
   }
 
   var manualIDs: [Folder.ID] {
-    let live = Set(folders.map(\.id))
-    var candidates: [Folder.ID: [OrganizationAction<FolderChange>]] = [:]
-    for action in evidence.actions {
-      if case let .reorder(id, _) = action.payload { candidates[id, default: []].append(action) }
-    }
-    let winners = Set(candidates.values.compactMap { evidence.winner(in: $0)?.id })
-    var result: [Folder.ID] = []
-    for action in evidence.replayOrder {
-      switch action.payload {
-      case let .create(id, _, _) where live.contains(id):
-        if !result.contains(id) { result.append(id) }
-      case let .reorder(id, anchor) where live.contains(id) && winners.contains(action.id):
-        result.removeAll { $0 == id }
-        if let anchor {
-          let index = result.firstIndex(of: anchor).map { $0 + 1 } ?? result.endIndex
-          result.insert(id, at: index)
-        } else { result.insert(id, at: 0) }
-      default: break
-      }
-    }
-    return result
+    evidence.manualOrder(live: Set(folders.map(\.id)), creation: {
+      if case let .create(id, _, _) = $0 { return id }
+      return nil
+    }, reorder: {
+      if case let .reorder(id, anchor) = $0 { return (id, anchor) }
+      return nil
+    })
   }
 }
 

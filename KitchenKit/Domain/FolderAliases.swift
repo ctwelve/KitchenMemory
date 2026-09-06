@@ -9,42 +9,19 @@ struct FolderAliases {
   let evidence: OrganizationEvidence<FolderChange>
   var deleted: Set<Folder.ID> = []
 
-  var resolved: [Folder.ID: Folder.ID] {
-    var candidates: [Folder.ID: [OrganizationAction<FolderChange>]] = [:]
-    for action in evidence.actions {
-      if case let .merge(ids, survivor, _) = action.payload {
-        for id in ids where id != survivor && !deleted.contains(id) { candidates[id, default: []].append(action) }
-      }
-    }
-    let edges = candidates.mapValues { actions -> Folder.ID in
-      // Each group is nonempty in an acyclic graph and contains only Merge payloads.
-      // swiftlint:disable:next force_unwrapping
-      return evidence.winner(in: actions)!.payload.folderID!
-    }
-    var result: [Folder.ID: Folder.ID] = [:]
-    for source in edges.keys {
-      var path: [Folder.ID] = []
-      var current = source
-      while let next = edges[current] {
-        if let index = path.firstIndex(of: current) {
-          // Opposite concurrent merges may form a cycle. Keep an existing oldest identity.
-          current = oldest(in: Set(path[index...])) ?? current
-          break
-        }
-        path.append(current)
-        current = next
-      }
-      if source != current { result[source] = current }
-    }
-    return result
+  private var shared: OrganizationAliases<Folder.ID, FolderChange> {
+    OrganizationAliases(evidence: evidence, deleted: deleted, creation: {
+      if case let .create(id, _, _) = $0 { return id }
+      return nil
+    }, merge: {
+      if case let .merge(ids, survivor, _) = $0 { return (ids, survivor) }
+      return nil
+    })
   }
 
-  func oldest(in ids: Set<Folder.ID>) -> Folder.ID? {
-    for action in evidence.actions {
-      if case let .create(id, _, _) = action.payload, ids.contains(id) { return id }
-    }
-    return nil
-  }
+  var resolved: [Folder.ID: Folder.ID] { shared.resolved }
+  func oldest(in ids: Set<Folder.ID>) -> Folder.ID? { shared.oldest(in: ids) }
+
 }
 
 extension FolderLibrary {

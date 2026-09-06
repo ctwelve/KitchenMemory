@@ -57,7 +57,7 @@ account-convergence transaction to rehome both record families. Reset owns both.
 | `OrganizationCheckpointRecord` | `id`, `kitchenID`, `namespace`, `createdAt`, `antiResurrectionUntil`, `formatVersion`, `checkpointData`, `checkpointDigest` |
 
 The Folder namespace is `folders`; the shared internal evidence, codec, and
-record families are available to the distinct Tag policy in #115. Format version
+record families also serve the distinct [Tag policy](tags.md). Format version
 1 uses canonical JSON and SHA-256 payload digests. The SwiftData adapter checks
 envelope identity, format, canonical bytes, and digest before projection, and
 uses fresh contexts to see partial personal-iCloud arrivals. Production CloudKit
