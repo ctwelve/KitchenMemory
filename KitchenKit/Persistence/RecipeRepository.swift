@@ -303,7 +303,11 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
   }
 
   public func recipe(id: Recipe.ID) throws -> StoredRecipe? {
-    guard let authority = try recipeAuthority(id: id) else { return nil }
+    try storedRecipe(from: recipeAuthority(id: id))
+  }
+
+  private func storedRecipe(from authority: RecipeAuthorityProjection?) throws -> StoredRecipe? {
+    guard let authority else { return nil }
     switch authority {
     case let .available(projected):
       return StoredRecipe(recipe: projected.recipe, revision: projected.current)
@@ -561,8 +565,9 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     return try recipeIDs
       .compactMap { identifier -> StoredRecipe? in
         let id = Recipe.ID(rawValue: identifier)
-        if case .recovery = try recipeAuthority(id: id) { return nil }
-        return try recipe(id: id)
+        let authority = try recipeAuthority(id: id)
+        if case .recovery = authority { return nil }
+        return try storedRecipe(from: authority)
       }
       .sorted {
         $0.revision.title.localizedStandardCompare($1.revision.title) == .orderedAscending
