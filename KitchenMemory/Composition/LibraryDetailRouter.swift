@@ -31,7 +31,8 @@ struct LibraryDetailRouter: View {
         RecipeDeletedItemsSection(model: libraryModel)
       }
     case .recovery:
-      CookingSessionRecoveryView(model: sessionModel)
+      CookingSessionRecoveryView(recipeCount: libraryModel.recoveryRecipes.count,
+                                 recipeContent: { RecipeRecoverySection(model: libraryModel) }, model: sessionModel)
     case .history, .session(_, history: .some):
       CookingSessionHistoryView(model: sessionModel)
     case .session:

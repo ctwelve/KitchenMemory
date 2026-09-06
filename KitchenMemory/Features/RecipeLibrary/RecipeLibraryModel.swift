@@ -41,6 +41,7 @@ final class RecipeLibraryModel {
   }
   var reconciliationFailed = false
   var reconciliationFailureMessage: LocalizedStringResource = .recipeComparisonStorageFailure
+  private(set) var recoveryRecipes: [RecipeRecovery] = []
   private(set) var deletedRecipes: [DeletedRecipe] = []
   private(set) var pendingDisposition: RecipeDispositionRequest?
   var selectedRecipeID: Recipe.ID? {
@@ -151,6 +152,7 @@ final class RecipeLibraryModel {
       recipes = contents.recipes
       reconciliations = contents.reconciliations
       deletedRecipes = contents.deletedRecipes
+      recoveryRecipes = contents.recoveryRecipes
       samplePresence = contents.samplePresence
       if let preferredRecipeID,
          recipes.contains(where: { $0.recipe.id == preferredRecipeID }) {
@@ -166,6 +168,7 @@ final class RecipeLibraryModel {
       recipes = []
       reconciliations = []
       deletedRecipes = []
+      recoveryRecipes = []
       navigation.reconcileRecipeSelection(nil)
       samplePresence = .unavailable
       issue = .read

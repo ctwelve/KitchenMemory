@@ -114,7 +114,9 @@ struct CookingSessionDeletedItemsView<RecipeContent: View>: View {
   }
 }
 
-struct CookingSessionRecoveryView: View {
+struct CookingSessionRecoveryView<RecipeContent: View>: View {
+  let recipeCount: Int
+  @ViewBuilder var recipeContent: () -> RecipeContent
   @Bindable var model: CookingSessionPresentationModel
   @State private var pendingSelection: ClosureSelectionRequest?
 
@@ -126,13 +128,14 @@ struct CookingSessionRecoveryView: View {
           .accessibilityHeading(.h1)
           .accessibilityIdentifier("session-recovery")
         Text(.recoveryMessage).foregroundStyle(.secondary)
+        recipeContent()
         ForEach(model.waitingSessions, id: \.evidence.sessionID) { item in
           recoveryWaitingRow(item)
         }
         ForEach(model.recoverySessions, id: \.evidence.sessionID) { item in
           recoveryRow(item)
         }
-        if model.recoveryItemCount == 0 {
+        if model.recoveryItemCount == 0, recipeCount == 0 {
           ContentUnavailableView(
             .recoveryEmptyTitle,
             systemImage: "wrench.and.screwdriver",

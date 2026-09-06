@@ -67,7 +67,7 @@ struct RecipeLibrarySidebar: View {
       if sessionModel.showsRecoveryDestination {
         Button(action: showRecovery) {
           Label(.recoveryTitle, systemImage: "wrench.and.screwdriver")
-            .badge(sessionModel.recoveryItemCount)
+            .badge(sessionModel.recoveryItemCount + model.recoveryRecipes.count)
         }
         .accessibilityIdentifier("recovery-destination")
       }

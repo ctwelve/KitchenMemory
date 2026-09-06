@@ -10,11 +10,14 @@ import Foundation
 public struct RecipeLibraryContents: Equatable, Sendable {
   public let recipes: [StoredRecipe]
   public let reconciliations: [RecipeReconciliation]
+  public let recoveryRecipes: [RecipeRecovery]
   public let deletedRecipes: [DeletedRecipe]
   public let samplePresence: SampleRecipePresence
 
   public init(recipes: [StoredRecipe], samplePresence: SampleRecipePresence,
-              reconciliations: [RecipeReconciliation] = [], deletedRecipes: [DeletedRecipe] = []) {
+              reconciliations: [RecipeReconciliation] = [], deletedRecipes: [DeletedRecipe] = [],
+              recoveryRecipes: [RecipeRecovery] = []) {
+    self.recoveryRecipes = recoveryRecipes
     self.reconciliations = reconciliations
     self.deletedRecipes = deletedRecipes
     self.recipes = recipes
@@ -71,7 +74,8 @@ public struct RecipeLibrary {
     return RecipeLibraryContents(
       recipes: recipes, samplePresence: samplePresence,
       reconciliations: try repository.reconciliations(in: kitchenID),
-      deletedRecipes: try repository.deletedRecipes(in: kitchenID)
+      deletedRecipes: try repository.deletedRecipes(in: kitchenID),
+      recoveryRecipes: try repository.recoveryRecipes(in: kitchenID)
     )
   }
 
@@ -117,6 +121,14 @@ public struct RecipeLibrary {
   ) throws -> RecipeSaveCommand {
     guard comparison.kitchenID == kitchenID else { throw RecipeReconciliationError.invalidParents }
     return try editor.prepareReconciliationSave(comparison, session: session)
+  }
+
+  public func prepareRecoveryDraft(recipeID: Recipe.ID, revisionID: RecipeRevision.ID) throws -> RecipeDraft {
+    guard let recovery = try repository.recoveryRecipes(in: kitchenID).first(where: { $0.id == recipeID }),
+          let revision = recovery.revisions.first(where: { $0.id == revisionID }) else {
+      throw RecipeDispositionError.unavailable
+    }
+    return editor.copyForRecovery(revision)
   }
 
   public func prepareDeletion(of recipeID: Recipe.ID) -> RecipeDeleteCommand {
