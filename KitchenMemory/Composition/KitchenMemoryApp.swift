@@ -11,9 +11,6 @@ import SwiftUI
 /// the macOS window, and the macOS Settings scene.
 @main
 struct KitchenMemoryApp: App {
-#if os(macOS) && TESTING
-  @NSApplicationDelegateAdaptor(UITestApplicationDelegate.self) private var uiTestDelegate
-#endif
   @StateObject private var startup: AppStartupCoordinator
 
   init() {
