@@ -3,9 +3,6 @@
 // SPDX-License-Identifier: MIT
 
 import XCTest
-#if os(macOS)
-import AppKit
-#endif
 
 /// Accessibility-oriented checks for the durable application shell.
 ///
