@@ -61,6 +61,19 @@ final class RecipeRetentionEvidenceTests: XCTestCase {
   }
 
   func testLateChildOnlyDeliveryKeepsTombstoneAndOffersRecovery() throws {
+    let deliveries: [(ModelContext, UUID) -> Void] = [
+      { $0.insert(RecipeImagePayloadRecord(revisionID: $1, mediaID: UUID(), imageData: Data([1, 2]))) },
+      { $0.insert(RecipeMediaRecord(id: UUID(), revisionID: $1, sortIndex: 0, role: "hero",
+                                    assetName: "image", accessibilityLabel: nil)) },
+      { $0.insert(EquipmentRecord(id: UUID(), revisionID: $1, sortIndex: 0, originalText: "pot",
+                                  quantityData: nil, name: "pot", isOptional: false)) },
+      { $0.insert(IngredientSectionRecord(id: UUID(), revisionID: $1, sortIndex: 0, title: nil)) },
+      { $0.insert(InstructionSectionRecord(id: UUID(), revisionID: $1, sortIndex: 0, title: nil)) },
+    ]
+    for delivery in deliveries { try assertLatePayloadRequiresRecovery(delivery) }
+  }
+
+  private func assertLatePayloadRequiresRecovery(_ delivery: (ModelContext, UUID) -> Void) throws {
     let container = try KitchenMemorySchema.makeContainer(inMemory: true)
     let repository = SwiftDataRecipeRepository(modelContainer: container)
     let kitchen = Kitchen(name: "Kitchen")
@@ -71,8 +84,7 @@ final class RecipeRetentionEvidenceTests: XCTestCase {
                                               deletedAt: now.addingTimeInterval(-31 * 86_400)))
     _ = try repository.maintainDeletedRecipes(in: kitchen.id, at: now)
     let replica = ModelContext(container)
-    replica.insert(RecipeImagePayloadRecord(revisionID: recipe.revision.id.rawValue,
-                                            mediaID: UUID(), imageData: Data([1, 2])))
+    delivery(replica, recipe.revision.id.rawValue)
     try replica.save()
     XCTAssertEqual(try repository.recipeAuthority(id: recipe.id), .recovery(.lateEvidenceAfterPrune))
     XCTAssertEqual(try repository.recoveryRecipes(in: kitchen.id).map(\.id), [recipe.id])
@@ -88,6 +100,7 @@ final class RecipeRetentionEvidenceTests: XCTestCase {
     var ids: [Recipe.ID] = []
     for title in ["Soup", "Stew"] {
       let recipe = try RecipeEditor(repository: repository).create(in: kitchen.id, from: RecipeDraft(title: title,
+        equipment: [EquipmentItem(originalText: "pot", name: "pot")],
         instructionSections: [InstructionSection(steps: [InstructionStep(text: "Stir")])]))
       ids.append(recipe.id)
       let deletion = RecipeDeleteCommand(kitchenID: kitchen.id, recipeID: recipe.id,
@@ -119,6 +132,24 @@ final class RecipeRetentionEvidenceTests: XCTestCase {
                                               deletedAt: now.addingTimeInterval(-31 * 86_400)))
     XCTAssertTrue(try repository.maintainDeletedRecipes(in: kitchen.id, at: now).prunedRecipeIDs.isEmpty)
     XCTAssertEqual(try repository.revisions(for: recipe.id).first?.instructionSections, [section])
+  }
+
+  func testUnownedSharedIngredientSectionBlocksPruningUntilItsOwnershipIsKnown() throws {
+    let container = try KitchenMemorySchema.makeContainer(inMemory: true)
+    let repository = SwiftDataRecipeRepository(modelContainer: container)
+    let kitchen = Kitchen(name: "Kitchen")
+    try repository.save(kitchen)
+    let section = IngredientSection(ingredients: [RecipeIngredient(originalText: "salt")])
+    let recipe = try RecipeEditor(repository: repository).create(in: kitchen.id,
+      from: RecipeDraft(title: "Soup", ingredientSections: [section]))
+    let replica = ModelContext(container)
+    replica.insert(IngredientSectionRecord(id: section.id.rawValue, revisionID: UUID(), sortIndex: 0, title: nil))
+    try replica.save()
+    let now = Date(timeIntervalSince1970: 1_700_000_000)
+    try repository.delete(RecipeDeleteCommand(kitchenID: kitchen.id, recipeID: recipe.id,
+                                              deletedAt: now.addingTimeInterval(-31 * 86_400)))
+    XCTAssertTrue(try repository.maintainDeletedRecipes(in: kitchen.id, at: now).prunedRecipeIDs.isEmpty)
+    XCTAssertEqual(try repository.revisions(for: recipe.id).first?.ingredientSections, [section])
   }
 
 }
