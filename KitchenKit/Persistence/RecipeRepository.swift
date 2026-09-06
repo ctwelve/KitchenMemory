@@ -407,7 +407,7 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
       guard retained == .pruned else { return retained }
       let hasLateRows = !recipeRecords.isEmpty || !revisionRecords.isEmpty || !saveRecords.isEmpty
         || !selectionRecords.isEmpty || !deletionRecords.isEmpty || !restorationRecords.isEmpty
-      return hasLateRows ? .recovery(.lateEvidenceAfterPrune) : .pruned
+      return try hasLateRows || hasLatePayload(behind: pruneRecords) ? .recovery(.lateEvidenceAfterPrune) : .pruned
     }
     let revisions: [RecipeRevision]
     do {

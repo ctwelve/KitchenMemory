@@ -39,9 +39,8 @@ extension SwiftDataRecipeRepository {
   }
 
   private func retentionHorizon(after date: Date) -> Date {
-    var calendar = Calendar(identifier: .gregorian)
-    calendar.timeZone = .gmt
-    return calendar.date(byAdding: .year, value: 5, to: date) ?? .distantFuture
+    // A conservative fixed horizon covers five years even across leap years.
+    date.addingTimeInterval(5 * 366 * 86_400)
   }
 
   private func retentionWindowHasElapsed(_ item: DeletedRecipe, at now: Date) throws -> Bool {
@@ -60,12 +59,19 @@ extension SwiftDataRecipeRepository {
     let recipeID = authority.recipe.id.rawValue
     let revisions = Set(authority.revisions.map { $0.revision.id.rawValue })
     let media = Set(authority.revisions.flatMap { $0.revision.media.map { $0.id.rawValue } })
+    let requiredPayload = Set(authority.revisions.flatMap {
+      payloadReferences(RecipePayloadManifest(revision: $0.revision))
+    })
     // A malformed cross-aggregate edge must not turn cleanup into further evidence loss.
     for save in try context.fetch(FetchDescriptor<RecipeSaveRecord>()) where save.recipeID != recipeID {
       guard let parents = try? RecipeIdentifierSetCodec.decode(
         formatVersion: save.ancestryFormatVersion, data: save.parentRevisionIDsData
       ) else { return true }
       if !revisions.isDisjoint(with: parents) { return true }
+      guard let manifest = try? RecipePayloadManifestCodec.decode(
+        formatVersion: save.payloadManifestFormatVersion, data: save.payloadManifestData
+      ) else { return true }
+      if !requiredPayload.isDisjoint(with: payloadReferences(manifest)) { return true }
     }
     for row in try context.fetch(FetchDescriptor<RecipeMediaRecord>()) where !revisions.contains(row.revisionID) {
       if media.contains(row.id) { return true }
@@ -79,6 +85,12 @@ extension SwiftDataRecipeRepository {
     for row in try context.fetch(FetchDescriptor<InstructionSectionRecord>())
       where !revisions.contains(row.revisionID) && instructionSections.contains(row.id) { return true }
     return try sessionsRetain(media: media, in: authority.recipe.kitchenID)
+  }
+
+  private func payloadReferences(_ manifest: RecipePayloadManifest) -> [UUID] {
+    manifest.mediaIDs.map(\.rawValue) + manifest.equipmentIDs.map(\.rawValue)
+      + manifest.ingredientSectionIDs.map(\.rawValue) + manifest.ingredientIDs.map(\.rawValue)
+      + manifest.instructionSectionIDs.map(\.rawValue) + manifest.instructionStepIDs.map(\.rawValue)
   }
 
   private func sessionsRetain(media: Set<UUID>, in kitchenID: Kitchen.ID) throws -> Bool {

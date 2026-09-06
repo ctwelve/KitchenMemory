@@ -15,11 +15,13 @@ window.
 Pruning removes the Recipe root, all its revision payload families, and the
 covered Save, Selection, Deletion, and Restoration rows. It records revision
 heads, selection heads, and disposition identities in the V5 frontier codec.
-The tombstone promises at least five calendar years of retention. Expiration
+The tombstone promises at least five years of retention, using a conservative
+1,830-day horizon that covers leap years. Expiration
 requires both the stored promise and that minimum horizon to have passed, and
 no late evidence may remain. Multiple tombstones must all be eligible.
 
-References from surviving revisions, shared section identities, and media keep
+References from surviving revisions (including partially delivered manifests),
+shared section identities, and media keep
 payloads retained. A Cooking Session's self-contained Execution Snapshot does
 not pin its source Recipe or Revision solely for provenance. Its media references
 remain hard dependencies. Unreadable dependency evidence blocks pruning rather

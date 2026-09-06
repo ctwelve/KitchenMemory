@@ -19,6 +19,19 @@ extension SwiftDataRecipeRepository {
     }
   }
 
+  func hasLatePayload(behind prunes: [RecipePruneRecord]) throws -> Bool {
+    let revisions = try Set(prunes.flatMap {
+      try RecipeAuthorityFrontierCodec.decode(formatVersion: $0.frontierFormatVersion, data: $0.frontierData)
+        .revisionHeads.map(\.rawValue)
+    })
+    var referenced = Set(try context.fetch(FetchDescriptor<RecipeMediaRecord>()).map(\.revisionID))
+    referenced.formUnion(try context.fetch(FetchDescriptor<RecipeImagePayloadRecord>()).map(\.revisionID))
+    referenced.formUnion(try context.fetch(FetchDescriptor<EquipmentRecord>()).map(\.revisionID))
+    referenced.formUnion(try context.fetch(FetchDescriptor<IngredientSectionRecord>()).map(\.revisionID))
+    referenced.formUnion(try context.fetch(FetchDescriptor<InstructionSectionRecord>()).map(\.revisionID))
+    return !revisions.isDisjoint(with: referenced)
+  }
+
   private func recoveryPayloads(id: Recipe.ID, kitchenID: Kitchen.ID) throws -> [RecipeRevision] {
     let identifier = id.rawValue
     let owners = try context.fetch(FetchDescriptor<RecipeRecord>(predicate: #Predicate { $0.id == identifier }))

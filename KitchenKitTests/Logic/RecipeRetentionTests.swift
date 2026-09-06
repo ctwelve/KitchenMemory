@@ -63,15 +63,19 @@ final class RecipeRetentionTests: XCTestCase {
     let command = try editor.prepareSave(in: kitchen.id, from: RecipeDraft(title: "Soup"), original: nil,
                                          observedSelectionIDs: [])
     try repository.save(command)
+    let laterSave = try editor.prepareSave(in: kitchen.id, from: RecipeDraft(title: "Stew"),
+      original: StoredRecipe(recipe: command.recipe, revision: command.revision),
+      observedSelectionIDs: repository.selectionHeads(for: command.recipe.id))
     let date = Date(timeIntervalSince1970: 1_700_000_000)
     try repository.delete(RecipeDeleteCommand(kitchenID: kitchen.id, recipeID: command.recipe.id, deletedAt: date))
     _ = try repository.maintainDeletedRecipes(in: kitchen.id, at: date.addingTimeInterval(31 * 86_400))
     try repository.save(command)
+    try repository.save(laterSave)
     XCTAssertEqual(try repository.recipeAuthority(id: command.recipe.id), .recovery(.lateEvidenceAfterPrune))
     XCTAssertTrue(try repository.recipes(in: kitchen.id).isEmpty)
     let recovery = try XCTUnwrap(repository.recoveryRecipes(in: kitchen.id).first)
     XCTAssertEqual(recovery.id, command.recipe.id)
-    XCTAssertEqual(recovery.revisions.map(\.title), ["Soup"])
+    XCTAssertEqual(Set(recovery.revisions.map(\.title)), ["Soup", "Stew"])
     let muchLater = date.addingTimeInterval(10 * 366 * 86_400)
     XCTAssertTrue(try repository.maintainDeletedRecipes(in: kitchen.id, at: muchLater)
       .expiredTombstoneRecipeIDs.isEmpty)
@@ -119,6 +123,7 @@ final class RecipeRetentionTests: XCTestCase {
     XCTAssertNil(recovered.original)
     let restored = RecipeDrafts(library: library, store: store)
     XCTAssertEqual(restored.drafts.first?.id, recovered.id)
+    XCTAssertThrowsError(try library.prepareRecoveryDraft(recipeID: Recipe.ID(), revisionID: command.revision.id))
     let draft = try library.prepareRecoveryDraft(recipeID: command.recipe.id, revisionID: command.revision.id)
     let save = try library.prepareSave(from: draft, original: nil, observedSelectionIDs: [])
     XCTAssertNotEqual(save.recipe.id, command.recipe.id)

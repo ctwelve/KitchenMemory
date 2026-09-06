@@ -37,4 +37,88 @@ final class RecipeRetentionEvidenceTests: XCTestCase {
     XCTAssertTrue(try repository.maintainDeletedRecipes(in: kitchen.id, at: now).prunedRecipeIDs.isEmpty)
     XCTAssertEqual(try repository.recipe(id: live.id)?.revision.ingredientSections, live.revision.ingredientSections)
   }
+  func testManifestBeforeSharedSectionPayloadStillRetainsItsDependency() throws {
+    let container = try KitchenMemorySchema.makeContainer(inMemory: true)
+    let repository = SwiftDataRecipeRepository(modelContainer: container)
+    let kitchen = Kitchen(name: "Kitchen")
+    try repository.save(kitchen)
+    let editor = RecipeEditor(repository: repository)
+    let sections = [IngredientSection(ingredients: [RecipeIngredient(originalText: "salt")])]
+    let source = try editor.create(in: kitchen.id, from: RecipeDraft(title: "Soup", ingredientSections: sections))
+    let retained = try editor.create(in: kitchen.id, from: RecipeDraft(title: "Stew", ingredientSections: sections))
+    let replica = ModelContext(container)
+    let retainedRevision = retained.revision.id.rawValue
+    for row in try replica.fetch(FetchDescriptor<IngredientSectionRecord>(
+      predicate: #Predicate { $0.revisionID == retainedRevision }
+    )) { replica.delete(row) }
+    try replica.save()
+    let now = Date(timeIntervalSince1970: 1_700_000_000)
+    try repository.delete(RecipeDeleteCommand(kitchenID: kitchen.id, recipeID: source.id,
+                                              deletedAt: now.addingTimeInterval(-31 * 86_400)))
+    XCTAssertTrue(try repository.maintainDeletedRecipes(in: kitchen.id, at: now).prunedRecipeIDs.isEmpty)
+    XCTAssertEqual(try repository.revisions(for: source.id).first?.ingredientSections,
+                   source.revision.ingredientSections)
+  }
+
+  func testLateChildOnlyDeliveryKeepsTombstoneAndOffersRecovery() throws {
+    let container = try KitchenMemorySchema.makeContainer(inMemory: true)
+    let repository = SwiftDataRecipeRepository(modelContainer: container)
+    let kitchen = Kitchen(name: "Kitchen")
+    try repository.save(kitchen)
+    let recipe = try RecipeEditor(repository: repository).create(in: kitchen.id, from: RecipeDraft(title: "Soup"))
+    let now = Date(timeIntervalSince1970: 1_700_000_000)
+    try repository.delete(RecipeDeleteCommand(kitchenID: kitchen.id, recipeID: recipe.id,
+                                              deletedAt: now.addingTimeInterval(-31 * 86_400)))
+    _ = try repository.maintainDeletedRecipes(in: kitchen.id, at: now)
+    let replica = ModelContext(container)
+    replica.insert(RecipeImagePayloadRecord(revisionID: recipe.revision.id.rawValue,
+                                            mediaID: UUID(), imageData: Data([1, 2])))
+    try replica.save()
+    XCTAssertEqual(try repository.recipeAuthority(id: recipe.id), .recovery(.lateEvidenceAfterPrune))
+    XCTAssertEqual(try repository.recoveryRecipes(in: kitchen.id).map(\.id), [recipe.id])
+    XCTAssertTrue(try repository.maintainDeletedRecipes(in: kitchen.id, at: now.addingTimeInterval(10 * 366 * 86_400))
+      .expiredTombstoneRecipeIDs.isEmpty)
+  }
+
+  func testBatchExpirationAndRestorationHistoryRemainDeterministic() throws {
+    let repository = SwiftDataRecipeRepository(modelContainer: try KitchenMemorySchema.makeContainer(inMemory: true))
+    let kitchen = Kitchen(name: "Kitchen")
+    try repository.save(kitchen)
+    let now = Date(timeIntervalSince1970: 1_700_000_000)
+    var ids: [Recipe.ID] = []
+    for title in ["Soup", "Stew"] {
+      let recipe = try RecipeEditor(repository: repository).create(in: kitchen.id, from: RecipeDraft(title: title,
+        instructionSections: [InstructionSection(steps: [InstructionStep(text: "Stir")])]))
+      ids.append(recipe.id)
+      let deletion = RecipeDeleteCommand(kitchenID: kitchen.id, recipeID: recipe.id,
+                                         deletedAt: now.addingTimeInterval(-40 * 86_400))
+      try repository.delete(deletion)
+      try repository.restore(RecipeRestoreCommand(kitchenID: kitchen.id, recipeID: recipe.id,
+                                                  observedDeletionIDs: [deletion.id]))
+      try repository.delete(RecipeDeleteCommand(kitchenID: kitchen.id, recipeID: recipe.id,
+                                                deletedAt: now.addingTimeInterval(-31 * 86_400)))
+    }
+    XCTAssertEqual(Set(try repository.maintainDeletedRecipes(in: kitchen.id, at: now).prunedRecipeIDs), Set(ids))
+    let expired = try repository.maintainDeletedRecipes(in: kitchen.id, at: now.addingTimeInterval(1_830 * 86_400))
+    XCTAssertEqual(Set(expired.expiredTombstoneRecipeIDs), Set(ids))
+  }
+
+  func testUnownedSharedInstructionSectionBlocksPruningUntilItsOwnershipIsKnown() throws {
+    let container = try KitchenMemorySchema.makeContainer(inMemory: true)
+    let repository = SwiftDataRecipeRepository(modelContainer: container)
+    let kitchen = Kitchen(name: "Kitchen")
+    try repository.save(kitchen)
+    let section = InstructionSection(steps: [InstructionStep(text: "Stir")])
+    let recipe = try RecipeEditor(repository: repository).create(in: kitchen.id,
+      from: RecipeDraft(title: "Soup", instructionSections: [section]))
+    let replica = ModelContext(container)
+    replica.insert(InstructionSectionRecord(id: section.id.rawValue, revisionID: UUID(), sortIndex: 0, title: nil))
+    try replica.save()
+    let now = Date(timeIntervalSince1970: 1_700_000_000)
+    try repository.delete(RecipeDeleteCommand(kitchenID: kitchen.id, recipeID: recipe.id,
+                                              deletedAt: now.addingTimeInterval(-31 * 86_400)))
+    XCTAssertTrue(try repository.maintainDeletedRecipes(in: kitchen.id, at: now).prunedRecipeIDs.isEmpty)
+    XCTAssertEqual(try repository.revisions(for: recipe.id).first?.instructionSections, [section])
+  }
+
 }
