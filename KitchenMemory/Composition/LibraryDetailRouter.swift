@@ -27,7 +27,9 @@ struct LibraryDetailRouter: View {
         FinishedCookingSessionView(model: sessionModel, session: finishedSession)
       }
     case .deletedItems:
-      CookingSessionDeletedItemsView(model: sessionModel)
+      CookingSessionDeletedItemsView(recipeCount: libraryModel.deletedRecipes.count, model: sessionModel) {
+        RecipeDeletedItemsSection(model: libraryModel)
+      }
     case .recovery:
       CookingSessionRecoveryView(model: sessionModel)
     case .history, .session(_, history: .some):
@@ -46,6 +48,7 @@ struct LibraryDetailRouter: View {
     if let selectedRecipe = libraryModel.selectedRecipe {
       RecipeDetailView(storedRecipe: selectedRecipe)
         .id(selectedRecipe.revision.id)
+        .modifier(RecipeDeletionPresentation(model: libraryModel, recipe: selectedRecipe))
         .toolbar {
           ToolbarItem(placement: .primaryAction) {
             Button { actions.perform(.recipeHistory) } label: {

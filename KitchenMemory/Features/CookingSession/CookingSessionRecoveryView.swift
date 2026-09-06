@@ -5,8 +5,10 @@
 import KitchenKit
 import SwiftUI
 
-struct CookingSessionDeletedItemsView: View {
+struct CookingSessionDeletedItemsView<RecipeContent: View>: View {
+  let recipeCount: Int
   @Bindable var model: CookingSessionPresentationModel
+  @ViewBuilder var recipeContent: () -> RecipeContent
   @State private var pendingRestore: CookingSessionProjection?
 
   var body: some View {
@@ -18,13 +20,14 @@ struct CookingSessionDeletedItemsView: View {
           .accessibilityIdentifier("deleted-items")
         Text(.deletedItemsRetentionMessage)
           .foregroundStyle(.secondary)
+        recipeContent()
         ForEach(model.deletedSessions, id: \.id) { session in
           deletedSession(session)
         }
         ForEach(model.waitingDeletedSessions, id: \.evidence.sessionID) { item in
           waitingSession(item)
         }
-        if model.deletedItemCount == 0 {
+        if model.deletedItemCount + recipeCount == 0 {
           ContentUnavailableView(
             .deletedItemsEmptyTitle,
             systemImage: "trash",
