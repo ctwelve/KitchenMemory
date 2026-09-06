@@ -147,12 +147,18 @@ module KitchenMemory
     }.freeze
     PLANS = {
       "KitchenKit.xctestplan" => %w[KitchenKitTests],
-      "KitchenMemory.xctestplan" => %w[KitchenMemoryTests KitchenMemoryUITests]
+      "KitchenMemory.xctestplan" => %w[KitchenMemoryTests KitchenMemoryUITests],
+      "KitchenMemoryCloud.xctestplan" => %w[KitchenMemoryTests]
     }.freeze
     PLAN_POLICIES = {
       "KitchenKit.xctestplan" => {
         configuration: "Test Scheme Action",
         parallel_targets: %w[KitchenKitTests]
+      },
+      "KitchenMemoryCloud.xctestplan" => {
+        configuration: "Test Scheme Action",
+        parallel_targets: %w[KitchenMemoryTests],
+        variable_expansion_target: "KitchenMemory"
       },
       "KitchenMemory.xctestplan" => {
         configuration: "Test Scheme Action",
@@ -185,6 +191,7 @@ module KitchenMemory
       "KitchenMemory" => {
         product: "KitchenMemory",
         plan: "KitchenMemory.xctestplan",
+        additional_plans: %w[KitchenMemoryCloud.xctestplan],
         runnable: true
       }
     }.freeze
@@ -845,9 +852,11 @@ module KitchenMemory
           "/Scheme/TestAction/TestPlans/TestPlanReference"
         )
         expected_reference = "container:#{expected[:plan]}"
-        unless references.length == 1 &&
-               references.first.attributes["reference"] == expected_reference &&
-               references.first.attributes["default"] == "YES"
+        expected_plans = [expected[:plan]] + expected.fetch(:additional_plans, [])
+        actual_references = references.map { |reference| reference.attributes["reference"] }
+        defaults = references.select { |reference| reference.attributes["default"] == "YES" }
+        unless actual_references.sort == expected_plans.map { |plan| "container:#{plan}" }.sort &&
+               defaults.length == 1 && defaults.first.attributes["reference"] == expected_reference
           raise ContractError,
                 "#{scheme_name} must use #{expected_reference} as its only default test plan"
         end

@@ -33,6 +33,9 @@
             reference = "container:KitchenMemory.xctestplan"
             default = "YES">
          </TestPlanReference>
+         <TestPlanReference
+            reference = "container:KitchenMemoryCloud.xctestplan">
+         </TestPlanReference>
       </TestPlans>
    </TestAction>
    <LaunchAction
