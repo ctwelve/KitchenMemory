@@ -437,6 +437,31 @@ final class SwiftDataRecipeAuthoritySaveTests: XCTestCase {
     assertAuthorityCounts(container: container, saves: 0, selections: 0, revisions: 0)
   }
 
+  func testLibraryReadsUseFreshAuthorityAfterSaveDeleteAndRestore() throws {
+    let container = try KitchenMemorySchema.makeContainer(inMemory: true)
+    let repository = SwiftDataRecipeRepository(modelContainer: container)
+    let kitchen = Kitchen(name: "Home")
+    try repository.save(kitchen)
+    let first = makeCommand(kitchenID: kitchen.id, number: 1, title: "Soup")
+    try repository.save(first)
+    XCTAssertEqual(try repository.recipes(in: kitchen.id).map(\.revision), [first.revision])
+
+    let second = makeCommand(
+      kitchenID: kitchen.id, recipeID: first.recipe.id, number: 2, title: "Better Soup",
+      parents: [first.revision.id], observedSelections: [first.selection.id]
+    )
+    try repository.save(second)
+    XCTAssertEqual(try repository.recipes(in: kitchen.id).map(\.revision), [second.revision])
+
+    let deletion = RecipeDeleteCommand(kitchenID: kitchen.id, recipeID: first.recipe.id)
+    try repository.delete(deletion)
+    XCTAssertTrue(try repository.recipes(in: kitchen.id).isEmpty)
+    try repository.restore(RecipeRestoreCommand(
+      kitchenID: kitchen.id, recipeID: first.recipe.id, observedDeletionIDs: [deletion.id]
+    ))
+    XCTAssertEqual(try repository.recipes(in: kitchen.id).map(\.revision), [second.revision])
+  }
+
   private func makeCommand(
     kitchenID: Kitchen.ID,
     recipeID: Recipe.ID = Recipe.ID(),
