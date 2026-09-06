@@ -31,7 +31,7 @@ public struct FolderCommand: Codable, Equatable, Sendable {
   let action: OrganizationAction<FolderChange>
 }
 
-enum FolderChange: Codable, Equatable, Sendable {
+enum FolderChange: OrganizationPayload {
   case create(id: Folder.ID, name: String, parentID: Folder.ID?)
   case move(id: Folder.ID, parentID: Folder.ID?)
   case rename(id: Folder.ID, name: String)
@@ -58,12 +58,14 @@ enum FolderChange: Codable, Equatable, Sendable {
 }
 
 public enum FolderError: Error, Equatable {
+  case invalidEvidence
   case invalidOrder
   case invalidMerge
   case invalidName
   case duplicateName
   case identityCollision(Folder.ID)
   case missingFolder(Folder.ID)
+  case missingRecipe(Recipe.ID)
   case hierarchyCycle
   case causalCycle
   case wrongKitchen
@@ -79,11 +81,25 @@ public struct FolderLibrary: Equatable, Sendable {
   let manualIDs: [Folder.ID]
   let aliases: [Folder.ID: Folder.ID]
   let memberships: [Recipe.ID: Folder.ID]
+  let checkpointEvidence: [OrganizationCheckpoint<FolderChange>]
+  let rawActionIDs: Set<UUID>
   let actions: [OrganizationAction<FolderChange>]
 
-  public init(kitchenID: Kitchen.ID, commands: [FolderCommand]) throws {
+  public init(kitchenID: Kitchen.ID, commands: [FolderCommand], checkpoints: [FolderCheckpoint] = []) throws {
     guard commands.allSatisfy({ $0.kitchenID == kitchenID }) else { throw FolderError.wrongKitchen }
-    let evidence = try OrganizationEvidence(commands.map(\.action))
+    guard checkpoints.allSatisfy({ $0.kitchenID == kitchenID }) else { throw FolderError.wrongKitchen }
+    var retained: [UUID: FolderCheckpoint] = [:]
+    for checkpoint in checkpoints {
+      guard checkpoint.antiResurrectionUntil >= checkpoint.createdAt.addingTimeInterval(1_827 * 86_400) else {
+        throw FolderError.invalidEvidence
+      }
+      if let prior = retained[checkpoint.id], prior != checkpoint { throw FolderError.actionCollision(checkpoint.id) }
+      retained[checkpoint.id] = checkpoint
+    }
+    checkpointEvidence = retained.values.sorted { $0.id.uuidString < $1.id.uuidString }.map(\.evidence)
+    rawActionIDs = Set(commands.map(\.id)).subtracting(checkpointEvidence.flatMap(\.receipts).map(\.id))
+    let evidence = try OrganizationEvidence(commands.map(\.action), checkpoints: checkpointEvidence)
+    try FolderEvidenceValidation.validate(evidence.actions)
     self.kitchenID = kitchenID
     actions = evidence.actions
     let projection = FolderProjection(evidence: evidence)
@@ -147,7 +163,7 @@ public struct FolderLibrary: Equatable, Sendable {
       change = try prepareOrder(id: folderID, afterID: afterID)
     case let .ordering(mode): change = .ordering(mode)
     }
-    let evidence = try OrganizationEvidence(actions)
+    let evidence = try OrganizationEvidence(actions, checkpoints: checkpointEvidence)
     return FolderCommand(kitchenID: kitchenID,
                          action: OrganizationAction(id: id, authoredAt: date,
                                                     observed: evidence.heads, payload: change))

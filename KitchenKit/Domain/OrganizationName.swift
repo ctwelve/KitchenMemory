@@ -10,7 +10,9 @@ struct OrganizationName {
   var key: String { Self.comparisonKey(value) }
 
   init(_ entered: String) throws {
-    guard !entered.unicodeScalars.contains(where: { CharacterSet.controlCharacters.contains($0) }) else {
+    guard !entered.unicodeScalars.contains(where: {
+      CharacterSet.controlCharacters.contains($0) || CharacterSet.newlines.contains($0)
+    }) else {
       throw FolderError.invalidName
     }
     let trimmed = entered.trimmingCharacters(in: .whitespacesAndNewlines)

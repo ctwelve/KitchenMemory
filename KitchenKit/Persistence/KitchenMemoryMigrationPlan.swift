@@ -88,6 +88,15 @@ public enum KitchenMemorySchemaV6: VersionedSchema {
   ]
 }
 
+/// Adds shared organization actions and reconstructive checkpoints without changing V6 rows.
+public enum KitchenMemorySchemaV7: VersionedSchema {
+  public static let versionIdentifier = Schema.Version(7, 0, 0)
+  public static let models: [any PersistentModel.Type] = KitchenMemorySchemaV6.models + [
+    OrganizationActionRecord.self,
+    OrganizationCheckpointRecord.self,
+  ]
+}
+
 /// The ordered migration path for Kitchen Memory's private local store.
 ///
 /// Released V1 stores migrate additively to V2; neither existing recipe rows
@@ -100,6 +109,7 @@ public enum KitchenMemoryMigrationPlan: SchemaMigrationPlan {
     KitchenMemorySchemaV4.self,
     KitchenMemorySchemaV5.self,
     KitchenMemorySchemaV6.self,
+    KitchenMemorySchemaV7.self,
   ]
 
   public static let stages: [MigrationStage] = [
@@ -108,5 +118,6 @@ public enum KitchenMemoryMigrationPlan: SchemaMigrationPlan {
     .lightweight(fromVersion: KitchenMemorySchemaV3.self, toVersion: KitchenMemorySchemaV4.self),
     .lightweight(fromVersion: KitchenMemorySchemaV4.self, toVersion: KitchenMemorySchemaV5.self),
     .lightweight(fromVersion: KitchenMemorySchemaV5.self, toVersion: KitchenMemorySchemaV6.self),
+    .lightweight(fromVersion: KitchenMemorySchemaV6.self, toVersion: KitchenMemorySchemaV7.self),
   ]
 }

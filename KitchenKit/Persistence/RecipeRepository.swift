@@ -1345,6 +1345,7 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     }
     try rehomeRecipeRecords(to: kitchen.id.rawValue)
     try rehomeSessionRecords(to: kitchen.id.rawValue)
+    try rehomeOrganizationRecords(to: kitchen.id.rawValue)
     try replaceKitchenRecords(with: kitchen, ownedBy: ownerID, existing: kitchenRecords)
   }
 
@@ -1373,6 +1374,13 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     where record.kitchenID != destinationID {
       record.kitchenID = destinationID
     }
+  }
+
+  private func rehomeOrganizationRecords(to destinationID: UUID) throws {
+    for record in try context.fetch(FetchDescriptor<OrganizationActionRecord>())
+    where record.kitchenID != destinationID { record.kitchenID = destinationID }
+    for record in try context.fetch(FetchDescriptor<OrganizationCheckpointRecord>())
+    where record.kitchenID != destinationID { record.kitchenID = destinationID }
   }
 
   private func rehomeSessionRecords(to destinationID: UUID) throws {

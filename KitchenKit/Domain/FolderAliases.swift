@@ -7,17 +7,19 @@ import Foundation
 /// Directed Merge promises survive payload compaction and old replica arrivals.
 struct FolderAliases {
   let evidence: OrganizationEvidence<FolderChange>
+  var deleted: Set<Folder.ID> = []
 
   var resolved: [Folder.ID: Folder.ID] {
     var candidates: [Folder.ID: [OrganizationAction<FolderChange>]] = [:]
     for action in evidence.actions {
       if case let .merge(ids, survivor, _) = action.payload {
-        for id in ids where id != survivor { candidates[id, default: []].append(action) }
+        for id in ids where id != survivor && !deleted.contains(id) { candidates[id, default: []].append(action) }
       }
     }
-    let edges = candidates.compactMapValues { actions -> Folder.ID? in
-      if case let .merge(_, survivor, _) = evidence.winner(in: actions)?.payload { return survivor }
-      return nil
+    let edges = candidates.mapValues { actions -> Folder.ID in
+      // Each group is nonempty in an acyclic graph and contains only Merge payloads.
+      // swiftlint:disable:next force_unwrapping
+      return evidence.winner(in: actions)!.payload.folderID!
     }
     var result: [Folder.ID: Folder.ID] = [:]
     for source in edges.keys {
@@ -52,7 +54,7 @@ extension FolderLibrary {
     for id in selected { try validateParent(id) }
     let parents = Set(folders.filter { selected.contains($0.id) }.map(\.parentID))
     guard parents.count == 1 else { throw FolderError.invalidMerge }
-    let evidence = try OrganizationEvidence(actions)
+    let evidence = try OrganizationEvidence(actions, checkpoints: checkpointEvidence)
     guard let survivor = survivorID ?? FolderAliases(evidence: evidence).oldest(in: selected),
           selected.contains(survivor) else { throw FolderError.invalidMerge }
     let displayName = try OrganizationName(name)

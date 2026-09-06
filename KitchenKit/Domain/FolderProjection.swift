@@ -7,13 +7,14 @@ import Foundation
 struct FolderProjection {
   let evidence: OrganizationEvidence<FolderChange>
 
-  var aliases: [Folder.ID: Folder.ID] { FolderAliases(evidence: evidence).resolved }
+  var aliases: [Folder.ID: Folder.ID] { FolderAliases(evidence: evidence, deleted: deleted).resolved }
 
   var folders: [Folder] {
     let aliases = aliases
+    let disposed = deleted
     var grouped: [Folder.ID: [OrganizationAction<FolderChange>]] = [:]
     for action in evidence.actions {
-      if let id = action.payload.folderID, !deleted.contains(id), aliases[id] == nil {
+      if let id = action.payload.folderID, !disposed.contains(id), aliases[id] == nil {
         grouped[id, default: []].append(action)
       }
     }
@@ -42,11 +43,13 @@ struct FolderProjection {
       }
     }
     var parents: [Folder.ID: Folder.ID] = [:]
-    let choices = parentActions.values.compactMap { evidence.winner(in: $0) }
-      .sorted(by: OrganizationEvidence<FolderChange>.precedes)
+    let winnerIDs = Set(parentActions.values.compactMap { evidence.winner(in: $0)?.id })
+    let choices = evidence.replayOrder.filter { winnerIDs.contains($0.id) }
     for choice in choices {
       guard let child = choice.payload.folderID, names[child] != nil else { continue }
-      var remaining = parentActions[child] ?? []
+      // Each selected choice came from this retained parent-action dictionary.
+      // swiftlint:disable:next force_unwrapping
+      var remaining = parentActions[child]!
       while let candidate = evidence.winner(in: remaining) {
         guard let requested = candidate.payload.parentID else { break }
         let parent = aliases[requested] ?? requested

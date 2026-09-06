@@ -14,6 +14,30 @@ import XCTest
 @MainActor
 // swiftlint:disable:next type_body_length
 final class KitchenMemorySchemaSynchronizationTests: XCTestCase {
+  func testV7AddsOnlyScalarOrganizationEvidenceAndPreservesV6Entities() throws {
+    let previous = try XCTUnwrap(NSManagedObjectModel.makeManagedObjectModel(for: KitchenMemorySchemaV6.models))
+    let current = try XCTUnwrap(NSManagedObjectModel.makeManagedObjectModel(for: KitchenMemorySchemaV7.models))
+    let fields: [String: Set<String>] = [
+      "OrganizationActionRecord": [
+        "id", "kitchenID", "namespace", "authoredAt", "formatVersion", "payloadData", "payloadDigest",
+      ],
+      "OrganizationCheckpointRecord": [
+        "id", "kitchenID", "namespace", "createdAt", "antiResurrectionUntil",
+        "formatVersion", "checkpointData", "checkpointDigest",
+      ],
+    ]
+    XCTAssertEqual(Set(current.entitiesByName.keys).subtracting(previous.entitiesByName.keys), Set(fields.keys))
+    for entity in previous.entities {
+      XCTAssertEqual(current.entitiesByName[try XCTUnwrap(entity.name)]?.versionHash, entity.versionHash)
+    }
+    for (name, expected) in fields {
+      let entity = try XCTUnwrap(current.entitiesByName[name])
+      XCTAssertEqual(Set(entity.attributesByName.keys), expected)
+      XCTAssertTrue(entity.relationshipsByName.isEmpty)
+      XCTAssertTrue(entity.uniquenessConstraints.isEmpty)
+    }
+  }
+
   func testV6AddsOnlyOptionalExternalImagePayloads() throws {
     let old = Set(KitchenMemorySchemaV5.models.map { String(describing: $0) })
     let current = Set(KitchenMemorySchemaV6.models.map { String(describing: $0) })
@@ -446,7 +470,7 @@ final class KitchenMemorySchemaSynchronizationTests: XCTestCase {
       repository.recipe(id: Recipe.ID(rawValue: fixture.recipeID))
     )
 
-    XCTAssertEqual(migratedContainer.schema.version, Schema.Version(6, 0, 0))
+    XCTAssertEqual(migratedContainer.schema.version, Schema.Version(7, 0, 0))
     XCTAssertEqual(stored.revision.title, "V1 Soup")
     try assertFixtureGraph(repository, fixture: fixture, title: "V1 Soup")
     XCTAssertTrue(
@@ -462,7 +486,7 @@ final class KitchenMemorySchemaSynchronizationTests: XCTestCase {
     let migratedContainer = try KitchenMemorySchema.makeContainer(storeURL: fixture.storeURL)
     let repository = SwiftDataRecipeRepository(modelContainer: migratedContainer)
 
-    XCTAssertEqual(migratedContainer.schema.version, Schema.Version(6, 0, 0))
+    XCTAssertEqual(migratedContainer.schema.version, Schema.Version(7, 0, 0))
     XCTAssertEqual(
       try repository.recipe(id: Recipe.ID(rawValue: fixture.recipeID))?.revision.title,
       "V2 Soup"
@@ -504,7 +528,7 @@ final class KitchenMemorySchemaSynchronizationTests: XCTestCase {
     let migrated = try KitchenMemorySchema.makeContainer(storeURL: storeURL)
     let repository = SwiftDataRecipeRepository(modelContainer: migrated)
 
-    XCTAssertEqual(migrated.schema.version, Schema.Version(6, 0, 0))
+    XCTAssertEqual(migrated.schema.version, Schema.Version(7, 0, 0))
     XCTAssertEqual(
       try repository.kitchen(id: Kitchen.ID(rawValue: kitchenID)),
       Kitchen(id: Kitchen.ID(rawValue: kitchenID), name: "V3 Kitchen")
@@ -553,7 +577,7 @@ final class KitchenMemorySchemaSynchronizationTests: XCTestCase {
     }
 
     let migratedContainer = try KitchenMemorySchema.makeContainer(storeURL: fixture.storeURL)
-    XCTAssertEqual(migratedContainer.schema.version, Schema.Version(6, 0, 0))
+    XCTAssertEqual(migratedContainer.schema.version, Schema.Version(7, 0, 0))
   }
 
   private func assertFixtureGraph(

@@ -20,7 +20,9 @@ final class FoldersTests: XCTestCase {
   }
   func testNamesRejectInvalidInputAndCompareCanonicalCaseWithoutRemovingDiacritics() throws {
     let empty = try FolderLibrary(kitchenID: Kitchen.ID(), commands: [])
-    for invalid in ["", "   ", "Soup\n", "Soup\u{0000}", String(repeating: "a", count: 257)] {
+    for invalid in [
+      "", "   ", "Soup\n", "Soup\u{2028}B", "Soup\u{2029}B", "Soup\u{0000}", String(repeating: "a", count: 257),
+    ] {
       XCTAssertThrowsError(try empty.prepare(.create(id: Folder.ID(), name: invalid, parentID: nil)))
     }
     let create = try empty.prepare(.create(id: Folder.ID(), name: "Café", parentID: nil))
@@ -196,6 +198,31 @@ final class FoldersTests: XCTestCase {
     commands.append(try library.prepare(.ordering(.manual)))
     library = try FolderLibrary(kitchenID: kitchenID, commands: commands)
     XCTAssertEqual(library.children(of: nil).map(\.id), [betaID, alphaID, gammaID])
+  }
+
+  func testCycleResolutionRespectsCausalityDespiteReversedClock() throws {
+    let kitchenID = Kitchen.ID()
+    let firstID = Folder.ID()
+    let secondID = Folder.ID()
+    let thirdID = Folder.ID()
+    var commands: [FolderCommand] = []
+    for (id, name) in [(firstID, "A"), (secondID, "B"), (thirdID, "C")] {
+      let library = try FolderLibrary(kitchenID: kitchenID, commands: commands)
+      commands.append(try library.prepare(.create(id: id, name: name, parentID: nil),
+                                          at: Date(timeIntervalSince1970: -1)))
+    }
+    let baseline = try FolderLibrary(kitchenID: kitchenID, commands: commands)
+    let first = try baseline.prepare(.move(id: firstID, parentID: secondID),
+                                     at: Date(timeIntervalSince1970: 100))
+    let observed = try FolderLibrary(kitchenID: kitchenID, commands: commands + [first])
+    let second = try observed.prepare(.move(id: secondID, parentID: thirdID),
+                                      at: Date(timeIntervalSince1970: 0))
+    let third = try baseline.prepare(.move(id: thirdID, parentID: firstID),
+                                     at: Date(timeIntervalSince1970: 50))
+    let merged = try FolderLibrary(kitchenID: kitchenID, commands: commands + [first, second, third])
+    XCTAssertEqual(merged.folders.first(where: { $0.id == firstID })?.parentID, secondID)
+    XCTAssertNil(merged.folders.first(where: { $0.id == secondID })?.parentID)
+    XCTAssertEqual(merged.folders.first(where: { $0.id == thirdID })?.parentID, firstID)
   }
 
 }
