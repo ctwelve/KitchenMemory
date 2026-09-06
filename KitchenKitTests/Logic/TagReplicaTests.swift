@@ -14,7 +14,8 @@ final class TagReplicaTests: XCTestCase {
     let recipeID = Recipe.ID()
     var commands: [TagCommand] = []
     for intent in [TagIntent.create(id: tagID, name: "Soup"), .assign(recipeID: recipeID, tagID: tagID),
-                   .rename(id: tagID, name: "Meals"), .remove(recipeID: recipeID, tagID: tagID)] {
+                   .rename(id: tagID, name: "Meals"), .remove(recipeID: recipeID, tagID: tagID),
+    ] {
       let baseline = try TagLibrary(kitchenID: kitchenID, commands: commands)
       commands.append(try baseline.prepare(intent, at: Date(timeIntervalSince1970: Double(commands.count))))
     }
@@ -73,7 +74,8 @@ final class TagReplicaTests: XCTestCase {
       id: commands[4].id, authoredAt: commands[4].action.authoredAt, observed: commands[4].action.observed,
       payload: .rename(id: first, name: "Tampered")
     ))
-    XCTAssertThrowsError(try TagLibrary(kitchenID: kitchenID, commands: [conflicting], checkpoints: [decoded])) { error in
+    XCTAssertThrowsError(try TagLibrary(kitchenID: kitchenID, commands: [conflicting],
+                                         checkpoints: [decoded])) { error in
       XCTAssertEqual(error as? TagError, .actionCollision(conflicting.id))
     }
   }
@@ -103,7 +105,8 @@ final class TagReplicaTests: XCTestCase {
     let library = try TagLibrary(kitchenID: kitchenID, commands: [create])
     for intent in [TagIntent.rename(id: Tag.ID(), name: "Missing"), .reorder(id: tagID, afterID: tagID),
                    .merge(ids: [tagID], survivorID: nil, name: "No"),
-                   .merge(ids: [tagID, tagID], survivorID: tagID, name: "No")] {
+                   .merge(ids: [tagID, tagID], survivorID: tagID, name: "No"),
+    ] {
       XCTAssertThrowsError(try library.prepare(intent))
     }
     XCTAssertThrowsError(try TagLibrary(kitchenID: Kitchen.ID(), commands: [create])) { error in
@@ -123,7 +126,7 @@ final class TagReplicaTests: XCTestCase {
     let malformed: [TagChange] = [
       .create(id: Tag.ID(), name: "#StoredHash"), .reorder(id: tagID, afterID: tagID),
       .merge(ids: [tagID], survivorID: tagID, name: "Invalid"),
-      .remove(recipeID: Recipe.ID(), tagID: tagID, assignments: [create.id]),
+      .remove(recipeID: Recipe.ID(), assignments: [create.id]),
     ]
     for payload in malformed {
       let command = TagCommand(kitchenID: kitchenID, action: OrganizationAction(

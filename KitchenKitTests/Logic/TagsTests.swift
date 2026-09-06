@@ -156,8 +156,10 @@ final class TagsTests: XCTestCase {
     XCTAssertEqual(try TagLibrary(kitchenID: kitchenID, commands: commands).orderedTags().map(\.id), [alpha, beta])
     try append(.create(id: newer, name: "Aardvark"))
     try append(.ordering(.manual))
-    XCTAssertEqual(try TagLibrary(kitchenID: kitchenID, commands: commands).orderedTags().map(\.id), [beta, alpha, newer])
+    XCTAssertEqual(try TagLibrary(kitchenID: kitchenID, commands: commands).orderedTags().map(\.id),
+                   [beta, alpha, newer])
     try append(.reorder(id: beta, afterID: newer))
-    XCTAssertEqual(try TagLibrary(kitchenID: kitchenID, commands: commands).orderedTags().map(\.id), [alpha, newer, beta])
+    XCTAssertEqual(try TagLibrary(kitchenID: kitchenID, commands: commands).orderedTags().map(\.id),
+                   [alpha, newer, beta])
   }
 }

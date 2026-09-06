@@ -39,7 +39,7 @@ enum TagChange: OrganizationPayload {
   case create(id: Tag.ID, name: String)
   case rename(id: Tag.ID, name: String)
   case assign(recipeID: Recipe.ID, tagID: Tag.ID)
-  case remove(recipeID: Recipe.ID, tagID: Tag.ID, assignments: [UUID])
+  case remove(recipeID: Recipe.ID, assignments: [UUID])
   case delete(id: Tag.ID)
   case merge(ids: [Tag.ID], survivorID: Tag.ID, name: String)
   case reorder(id: Tag.ID, afterID: Tag.ID?)

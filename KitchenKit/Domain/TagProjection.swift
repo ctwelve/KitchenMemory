@@ -6,15 +6,9 @@ import Foundation
 
 struct TagProjection {
   let evidence: OrganizationEvidence<TagChange>
-  var observedBy: UUID?
-
-  private var policyActions: [OrganizationAction<TagChange>] {
-    guard let observedBy else { return evidence.actions }
-    return evidence.actions.filter { evidence.graph.isAncestor($0.id, of: observedBy) }
-  }
 
   var deleted: Set<Tag.ID> {
-    Set(policyActions.compactMap { if case let .delete(id) = $0.payload { return id }; return nil })
+    Set(evidence.actions.compactMap { if case let .delete(id) = $0.payload { return id }; return nil })
   }
 
   var aliasPolicy: OrganizationAliases<Tag.ID, TagChange> {
@@ -24,7 +18,7 @@ struct TagProjection {
     }, merge: {
       if case let .merge(ids, survivor, _) = $0 { return (ids, survivor) }
       return nil
-    }, actions: policyActions)
+    })
   }
 
   var aliases: [Tag.ID: Tag.ID] { aliasPolicy.resolved }
@@ -53,7 +47,7 @@ struct TagProjection {
 
   var removed: Set<UUID> {
     Set(evidence.actions.flatMap { action -> [UUID] in
-      if case let .remove(_, _, dots) = action.payload { return dots }
+      if case let .remove(_, dots) = action.payload { return dots }
       return []
     })
   }

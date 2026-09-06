@@ -12,8 +12,8 @@ enum TagEvidenceValidation {
       if case let .create(id, _) = action.payload, !creations.insert(id).inserted {
         throw TagError.identityCollision(id)
       }
-      if case let .remove(recipe, tag, dots) = action.payload {
-        try validateRemoval(recipe: recipe, tag: tag, dots: dots, action: action, evidence: evidence)
+      if case let .remove(recipe, dots) = action.payload {
+        try validateRemoval(recipe: recipe, dots: dots, action: action, evidence: evidence)
       }
     }
   }
@@ -32,19 +32,19 @@ enum TagEvidenceValidation {
     }
   }
 
-  private static func validateRemoval(recipe: Recipe.ID, tag: Tag.ID, dots: [UUID],
+  private static func validateRemoval(recipe: Recipe.ID, dots: [UUID],
                                       action: OrganizationAction<TagChange>,
                                       evidence: OrganizationEvidence<TagChange>) throws {
     guard Set(dots).count == dots.count else { throw TagError.invalidEvidence }
     let known = Set(evidence.receipts.map(\.id))
     let complete = evidence.graph.reachableNodes(from: [action.id]).allSatisfy { known.contains($0) }
     let byID = Dictionary(uniqueKeysWithValues: evidence.actions.map { ($0.id, $0) })
-    let aliases = TagProjection(evidence: evidence, observedBy: action.id).aliases
     for dot in dots {
       guard !complete || evidence.graph.isAncestor(dot, of: action.id) else { throw TagError.invalidEvidence }
       if let observed = byID[dot] {
-        guard case let .assign(assignedRecipe, assignedTag) = observed.payload, assignedRecipe == recipe,
-              !complete || (aliases[assignedTag] ?? assignedTag) == tag else { throw TagError.invalidEvidence }
+        guard case let .assign(assignedRecipe, _) = observed.payload, assignedRecipe == recipe else {
+          throw TagError.invalidEvidence
+        }
       }
     }
   }

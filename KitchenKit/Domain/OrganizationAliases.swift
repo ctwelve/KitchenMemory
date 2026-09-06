@@ -10,17 +10,14 @@ struct OrganizationAliases<ID: Hashable, Payload: OrganizationPayload> {
   let deleted: Set<ID>
   let creation: (Payload) -> ID?
   let merge: (Payload) -> (ids: [ID], survivor: ID)?
-  var actions: [OrganizationAction<Payload>]?
-
-  private var selectedActions: [OrganizationAction<Payload>] { actions ?? evidence.actions }
 
   func oldest(in ids: Set<ID>) -> ID? {
-    selectedActions.compactMap { creation($0.payload) }.first { ids.contains($0) }
+    evidence.actions.compactMap { creation($0.payload) }.first { ids.contains($0) }
   }
 
   var resolved: [ID: ID] {
     var candidates: [ID: [OrganizationAction<Payload>]] = [:]
-    for action in selectedActions {
+    for action in evidence.actions {
       if let value = merge(action.payload) {
         for id in value.ids where id != value.survivor && !deleted.contains(id) {
           candidates[id, default: []].append(action)

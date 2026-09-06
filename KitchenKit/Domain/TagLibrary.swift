@@ -72,13 +72,7 @@ public struct TagLibrary: Equatable, Sendable {
   private func prepareChange(_ intent: TagIntent, evidence: OrganizationEvidence<TagChange>) throws -> TagChange {
     switch intent {
     case let .create(tagID, name):
-      guard !actions.contains(where: {
-        if case let .create(existing, _) = $0.payload { return existing == tagID }
-        return false
-      }) else { throw TagError.identityCollision(tagID) }
-      let displayName = try TagName(name).value
-      try validateName(displayName)
-      return .create(id: tagID, name: displayName)
+      return try prepareCreation(id: tagID, name: name)
     case let .rename(tagID, name):
       try requireTag(tagID)
       let displayName = try TagName(name).value
@@ -90,7 +84,7 @@ public struct TagLibrary: Equatable, Sendable {
     case let .remove(recipeID, tagID):
       try requireTag(tagID)
       let dots = TagProjection(evidence: evidence).assignments(recipeID: recipeID, tagID: tagID)
-      return .remove(recipeID: recipeID, tagID: tagID, assignments: dots.sorted { $0.uuidString < $1.uuidString })
+      return .remove(recipeID: recipeID, assignments: dots.sorted { $0.uuidString < $1.uuidString })
     case let .delete(tagID):
       try requireTag(tagID)
       return .delete(id: tagID)
@@ -103,6 +97,16 @@ public struct TagLibrary: Equatable, Sendable {
       return .reorder(id: tagID, afterID: afterID)
     case let .ordering(mode): return .ordering(mode)
     }
+  }
+
+  private func prepareCreation(id tagID: Tag.ID, name: String) throws -> TagChange {
+      guard !actions.contains(where: {
+        if case let .create(existing, _) = $0.payload { return existing == tagID }
+        return false
+      }) else { throw TagError.identityCollision(tagID) }
+      let displayName = try TagName(name).value
+      try validateName(displayName)
+      return .create(id: tagID, name: displayName)
   }
 
   private func prepareMerge(ids: [Tag.ID], survivorID: Tag.ID?, name: String,
