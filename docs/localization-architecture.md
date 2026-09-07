@@ -129,6 +129,10 @@ requires deleting development stores; no fictional migration path is retained.
 
 ## Sample onboarding and future delivery
 
+The [reversible sample-pack setting](sample-pack.md) now owns explicit installation
+and removal, organization identities, and observed-versus-requested state. The
+following onboarding and language boundaries remain in force.
+
 The current release ships the localized sample pack inside the application, but
 first startup does not install it implicitly. A separate durable preference
 records `undecided`, `accepted`, or `declined` so onboarding is not repeated.

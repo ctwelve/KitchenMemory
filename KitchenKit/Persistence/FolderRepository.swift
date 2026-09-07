@@ -28,6 +28,10 @@ public final class SwiftDataFolderRepository: FolderRepository {
     try library(store.load(in: kitchenID), in: kitchenID)
   }
 
+  func library(in kitchenID: Kitchen.ID, context: ModelContext) throws -> FolderLibrary {
+    try library(store.load(in: kitchenID, context: context), in: kitchenID)
+  }
+
   public func append(_ command: FolderCommand) throws {
     try store.append(command.action, in: command.kitchenID) { snapshot in
       _ = try library(snapshot, in: command.kitchenID)

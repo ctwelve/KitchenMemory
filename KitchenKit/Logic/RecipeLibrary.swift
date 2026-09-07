@@ -38,6 +38,10 @@ public struct RecipeLibrary {
   private let organization: (any RecipeOrganizationRepository)?
   private let editor: RecipeEditor
   private let importer: any RecipeImportServing
+  private let samplePack: (any SamplePackRepository)?
+  private let samples: any SampleRecipeProviding
+  private let sampleFolderName: String
+  private let sampleTagName: String
   private let sampleInstaller: SampleRecipeInstallService
   private let resetter: KitchenResetService
 
@@ -47,8 +51,14 @@ public struct RecipeLibrary {
     samples: any SampleRecipeProviding,
     importer: any RecipeImportServing,
     resetRepository: (any KitchenResetRepository)? = nil,
-    organizationRepository: (any RecipeOrganizationRepository)? = nil
+    organizationRepository: (any RecipeOrganizationRepository)? = nil,
+    samplePackRepository: (any SamplePackRepository)? = nil,
+    sampleFolderName: String = "Sample Pack", sampleTagName: String = "samples"
   ) {
+    self.samplePack = samplePackRepository
+    self.samples = samples
+    self.sampleFolderName = sampleFolderName
+    self.sampleTagName = sampleTagName
     self.kitchenID = kitchenID
     self.repository = repository
     organization = organizationRepository
@@ -173,8 +183,29 @@ public struct RecipeLibrary {
     try repository.restore(command)
   }
 
+  public func samplePackStatus() throws -> SamplePackStatus? {
+    try samplePack?.status(in: kitchenID, samples: samples.recipes(in: kitchenID))
+  }
+
+  public func prepareSamplePack(enabled: Bool) throws -> SamplePackCommand {
+    guard let samplePack else { throw RecipeDispositionError.unavailable }
+    let values = try samples.recipes(in: kitchenID)
+    let status = try samplePack.status(in: kitchenID, samples: values)
+    return SamplePackCommand(kitchenID: kitchenID, enabled: enabled, samples: values,
+      removalIDs: enabled ? [] : status.removableIDs, folderName: sampleFolderName, tagName: sampleTagName)
+  }
+
+  public func setSamplePack(_ command: SamplePackCommand) throws {
+    guard let samplePack, command.kitchenID == kitchenID else { throw RecipeDispositionError.invalidCommand }
+    try samplePack.accept(command)
+  }
+
   public func installSamples() throws {
-    try sampleInstaller.install(in: kitchenID)
+    if samplePack != nil {
+      try setSamplePack(prepareSamplePack(enabled: true))
+    } else {
+      try sampleInstaller.install(in: kitchenID)
+    }
   }
 
   public func reset() throws {

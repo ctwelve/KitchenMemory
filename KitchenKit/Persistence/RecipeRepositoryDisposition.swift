@@ -7,60 +7,64 @@ import SwiftData
 
 extension SwiftDataRecipeRepository {
   public func delete(_ command: RecipeDeleteCommand) throws {
-    try performIsolatedWrite { writer in
-      let identifier = command.id
-      let existing = try writer.context.fetch(FetchDescriptor<RecipeDeletionRecord>(
-        predicate: #Predicate { $0.id == identifier }
-      ))
-      guard existing.allSatisfy({
-        $0.recipeID == command.recipeID.rawValue && $0.kitchenID == command.kitchenID.rawValue
-          && $0.deletedAt == command.deletedAt
-      }) else { throw RecipeDispositionError.identityCollision }
-      if !existing.isEmpty { return }
-      try writer.backfillLegacyAuthority(in: command.kitchenID)
-      try writer.requireDispositionAuthority(recipeID: command.recipeID, kitchenID: command.kitchenID)
-      writer.context.insert(RecipeDeletionRecord(
-        id: command.id, recipeID: command.recipeID.rawValue,
-        kitchenID: command.kitchenID.rawValue, deletedAt: command.deletedAt
-      ))
-    }
+    try performIsolatedWrite { try $0.acceptDeletion(command) }
+  }
+
+  func acceptDeletion(_ command: RecipeDeleteCommand) throws {
+    let identifier = command.id
+    let existing = try self.context.fetch(FetchDescriptor<RecipeDeletionRecord>(
+      predicate: #Predicate { $0.id == identifier }
+    ))
+    guard existing.allSatisfy({
+      $0.recipeID == command.recipeID.rawValue && $0.kitchenID == command.kitchenID.rawValue
+        && $0.deletedAt == command.deletedAt
+    }) else { throw RecipeDispositionError.identityCollision }
+    if !existing.isEmpty { return }
+    try self.backfillLegacyAuthority(in: command.kitchenID)
+    try self.requireDispositionAuthority(recipeID: command.recipeID, kitchenID: command.kitchenID)
+    self.context.insert(RecipeDeletionRecord(
+      id: command.id, recipeID: command.recipeID.rawValue,
+      kitchenID: command.kitchenID.rawValue, deletedAt: command.deletedAt
+    ))
   }
 
   public func restore(_ command: RecipeRestoreCommand) throws {
+    try performIsolatedWrite { try $0.acceptRestoration(command) }
+  }
+
+  func acceptRestoration(_ command: RecipeRestoreCommand) throws {
     guard !command.observedDeletionIDs.isEmpty,
           Set(command.observedDeletionIDs).count == command.observedDeletionIDs.count,
           Set(command.restorations.map(\.id)).count == command.restorations.count
     else { throw RecipeDispositionError.invalidCommand }
-    try performIsolatedWrite { writer in
-      let rows = command.restorations.map { restoration in
-        RecipeDeletionResolutionRecord(
-          id: restoration.id,
-          deletionID: restoration.deletionID, recipeID: command.recipeID.rawValue,
-          kitchenID: command.kitchenID.rawValue, restoredAt: command.restoredAt
-        )
-      }
-      let identifiers = Set(rows.map(\.id))
-      let existing = try writer.context.fetch(FetchDescriptor<RecipeDeletionResolutionRecord>())
-        .filter { identifiers.contains($0.id) }
-      for row in existing {
-        guard rows.contains(where: {
-          $0.id == row.id && $0.deletionID == row.deletionID && $0.recipeID == row.recipeID
-            && $0.kitchenID == row.kitchenID && $0.restoredAt == row.restoredAt
-        }) else { throw RecipeDispositionError.identityCollision }
-      }
-      let existingIDs = Set(existing.map(\.id))
-      if existingIDs == identifiers { return }
-      try writer.backfillLegacyAuthority(in: command.kitchenID)
-      try writer.requireDispositionAuthority(recipeID: command.recipeID, kitchenID: command.kitchenID)
-      let observed = Set(command.observedDeletionIDs)
-      let deletions = try writer.context.fetch(FetchDescriptor<RecipeDeletionRecord>())
-        .filter { observed.contains($0.id) }
-      guard Set(deletions.map(\.id)) == observed,
-            deletions.allSatisfy({
-        $0.recipeID == command.recipeID.rawValue && $0.kitchenID == command.kitchenID.rawValue
-      }) else { throw RecipeDispositionError.invalidCommand }
-      for row in rows where !existingIDs.contains(row.id) { writer.context.insert(row) }
+    let rows = command.restorations.map { restoration in
+      RecipeDeletionResolutionRecord(
+        id: restoration.id,
+        deletionID: restoration.deletionID, recipeID: command.recipeID.rawValue,
+        kitchenID: command.kitchenID.rawValue, restoredAt: command.restoredAt
+      )
     }
+    let identifiers = Set(rows.map(\.id))
+    let existing = try self.context.fetch(FetchDescriptor<RecipeDeletionResolutionRecord>())
+      .filter { identifiers.contains($0.id) }
+    for row in existing {
+      guard rows.contains(where: {
+        $0.id == row.id && $0.deletionID == row.deletionID && $0.recipeID == row.recipeID
+          && $0.kitchenID == row.kitchenID && $0.restoredAt == row.restoredAt
+      }) else { throw RecipeDispositionError.identityCollision }
+    }
+    let existingIDs = Set(existing.map(\.id))
+    if existingIDs == identifiers { return }
+    try self.backfillLegacyAuthority(in: command.kitchenID)
+    try self.requireDispositionAuthority(recipeID: command.recipeID, kitchenID: command.kitchenID)
+    let observed = Set(command.observedDeletionIDs)
+    let deletions = try self.context.fetch(FetchDescriptor<RecipeDeletionRecord>())
+      .filter { observed.contains($0.id) }
+    guard Set(deletions.map(\.id)) == observed,
+          deletions.allSatisfy({
+      $0.recipeID == command.recipeID.rawValue && $0.kitchenID == command.kitchenID.rawValue
+    }) else { throw RecipeDispositionError.invalidCommand }
+    for row in rows where !existingIDs.contains(row.id) { self.context.insert(row) }
   }
 
   public func deletedRecipes(in kitchenID: Kitchen.ID) throws -> [DeletedRecipe] {

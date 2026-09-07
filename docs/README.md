@@ -43,6 +43,7 @@ For implementation work, begin with:
 
 - [Recipe revision reconciliation](recipe-reconciliation.md) — explicit comparisons, local choices, and multi-parent Save.
 - [Recipe payload retention](recipe-retention.md) — dependency-aware pruning, tombstone horizons, and explicit Recovery.
+- [Reversible bundled sample pack](sample-pack.md) — explicit installation, ordinary deletion, and edited-Recipe preservation.
 - [Records maintenance](records-maintenance.md) — bounded opportunities, retained Session dependencies, and honest sync-risk observations.
 - [Recipe deletion and restoration](recipe-disposition.md) — reversible aggregate disposition and retry behavior.
 
@@ -173,3 +174,6 @@ milestones and must not be mistaken for the live engineering contract above.
 - [0.1 release engineering](release-engineering.md)
 - [0.1 release evidence](release-evidence-0.1.md)
 - [0.1 release notes](release-notes-0.1.md)
+
+The [0.3 coverage audit](coverage-audit-0.3.md) records separate durable,
+persistence-adapter, and native application evidence with reproduction steps.

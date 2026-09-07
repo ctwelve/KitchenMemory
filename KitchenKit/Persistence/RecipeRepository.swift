@@ -1120,7 +1120,7 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     }
   }
 
-  private func legacyAuthorityCommand(for stored: StoredRecipe) -> RecipeSaveCommand {
+  func legacyAuthorityCommand(for stored: StoredRecipe) -> RecipeSaveCommand {
     RecipeSaveCommand(
       id: .init(rawValue: stored.revision.id.rawValue),
       recipe: stored.recipe,

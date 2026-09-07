@@ -72,6 +72,8 @@ struct KitchenCommands: Commands {
 #endif
 
 struct KitchenSettingsView: View {
+  @State private var sampleRemoval: SamplePackCommand?
+
   @Bindable var model: RecipeLibraryModel
   let cloudSyncSettings: CloudSyncSettings?
   @State private var isShowingResetConfirmation = false
@@ -144,19 +146,43 @@ struct KitchenSettingsView: View {
         Text(.settingsSamplesInstallationMessage)
           .foregroundStyle(.secondary)
 
-        Button(action: model.acceptSampleRecipes) {
-          if model.issue == .samples {
-            Text(.actionTryAgain)
-          } else if model.samplePresence == .partial {
-            Text(.settingsSamplesActionInstallMissing)
-          } else if model.samplePresence == .complete {
-            Text(.settingsSamplesActionInstalled)
-          } else {
-            Text(.settingsSamplesActionInstall)
+        Toggle(.settingsSamplesEnabled, isOn: Binding(
+          get: { model.samplePackStatus?.isEnabled ?? false },
+          set: { enabled in
+            if enabled { model.acceptSampleRecipes() } else { sampleRemoval = model.prepareSamplePackRemoval() }
+          }
+        ))
+        .disabled(model.samplePackStatus == nil || model.pendingSamplePack != nil)
+        .accessibilityIdentifier("sample-pack-enabled")
+        if let status = model.samplePackStatus {
+          LabeledContent(.settingsSamplesEdited, value: status.edited.formatted())
+          LabeledContent(.settingsSamplesDeleted, value: status.deleted.formatted())
+          LabeledContent(.settingsSamplesUnavailable, value: status.unavailable.formatted())
+          if status.isEnabled, status.installed < status.total {
+            Button(.settingsSamplesActionInstallMissing, action: model.acceptSampleRecipes)
+              .disabled(model.pendingSamplePack != nil)
           }
         }
-        .disabled(model.samplePresence == .complete && model.issue != .samples)
-        .accessibilityIdentifier("add-sample-recipes")
+        if model.issue == .samples {
+          Button(.actionTryAgain, action: model.retryCurrentIssue)
+        } else if model.samplePackStatus == nil {
+          Button(.actionTryAgain, action: model.reload)
+        }
+        Text(.settingsSamplesIntentMessage).foregroundStyle(.secondary)
+          .confirmationDialog(.settingsSamplesRemoveTitle, isPresented: Binding(
+            get: { sampleRemoval != nil }, set: { if !$0 { sampleRemoval = nil } }
+          )) {
+            Button(.settingsSamplesRemoveAction, role: .destructive) {
+              if let sampleRemoval { model.confirmSamplePackRemoval(sampleRemoval) }
+              sampleRemoval = nil
+            }
+          } message: {
+            if let sampleRemoval {
+              Text(String(localized: .settingsSamplesRemoveMessage) + "\n\n"
+                + sampleRemoval.removalIDs.count.formatted())
+            }
+          }
+
       }
 
       Section(.settingsDataSection) {
