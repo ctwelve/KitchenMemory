@@ -259,10 +259,9 @@ and the current workflow in
 [Preparing your interface for localization](https://developer.apple.com/documentation/xcode/preparing-your-interface-for-localization).
 Follow [String Catalog guidance](https://developer.apple.com/documentation/xcode/localizing-and-varying-text-with-a-string-catalog)
 when adding locale-specific variants; extend the inventory, compiled resource
-checks and authored family variants together. The current inventory and compiled resource checks must advance together.
+checks and authored family variants together.
 
 ## Sample image specifications
-
 
 Place each rendition in its own Single Scale image set. Different aspect ratios
 are semantic assets, not 1x, 2x, and 3x density variants of one image.

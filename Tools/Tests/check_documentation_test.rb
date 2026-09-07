@@ -75,6 +75,29 @@ class DocumentationContractTest < Minitest::Test
     end
   end
 
+  def test_unused_definition_does_not_make_a_page_reachable
+    files = {
+      "README.md" => "[map](docs/README.md)",
+      "docs/README.md" => "[history](history.md) [decisions](adr/README.md) [research](research/README.md)\n[unused]: orphan.md\n",
+      "docs/history.md" => "# History", "docs/adr/README.md" => "# Decisions",
+      "docs/research/README.md" => "# Research", "docs/orphan.md" => "# Orphan"
+    }
+    with_tree(files) do |root, docs|
+      errors = Contract.navigation_errors(docs, root)
+      assert_includes errors, "docs/orphan.md: classify in docs/README.md or docs/history.md"
+      assert_includes errors, "unreachable documentation: docs/orphan.md"
+    end
+  end
+
+  def test_missing_references_and_unused_broken_definitions_fail
+    with_tree("README.md" => "[missing][absent]\n[unused]: gone.md\n") do |root, docs|
+      errors = Contract.link_errors(docs, root)
+      assert_equal 2, errors.length
+      assert errors.any? { |error| error.include?("undefined link reference: absent") }
+      assert errors.any? { |error| error.include?("gone.md") }
+    end
+  end
+
   def with_topology
     paths = %w[docs/implementation-architecture.md docs/localization-architecture.md
       docs/continuous-integration.md KitchenMemory.xcodeproj/project.pbxproj
@@ -136,8 +159,10 @@ class DocumentationContractTest < Minitest::Test
 
   def test_obsolete_names_in_current_guidance_fail
     with_topology do |root, docs|
-      docs[File.join(root, "docs/current.md")] = "Use KitchenMemoryIOS for current work."
-      assert_includes Contract.topology_errors(root, docs), "docs/current.md: obsolete current-topology wording"
+      %w[KitchenMemoryIOS KitchenMemoryMacOS KitchenMemoryDomain KitchenMemoryImport KitchenMemoryLogic KitchenMemoryPersistence].each do |name|
+        docs[File.join(root, "docs/current.md")] = "Use #{name} for current work."
+        assert_includes Contract.topology_errors(root, docs), "docs/current.md: obsolete current-topology wording"
+      end
     end
   end
 end

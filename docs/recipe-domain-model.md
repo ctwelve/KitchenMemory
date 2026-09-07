@@ -8,9 +8,9 @@ SPDX-License-Identifier: MIT
 
 
 This is the conceptual domain model, not a persistence schema. The implemented
-recipe foundation follows these names and ownership boundaries; future pantry,
-planning, and cooking-session types remain design direction until their slices
-land.
+recipe foundation follows these names and ownership boundaries. Pantry and
+planning remain future direction; implemented [Cooking Sessions](cooking-sessions.md)
+have their own evidence contract.
 
 ## Design goals
 

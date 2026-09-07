@@ -205,8 +205,8 @@ only repository permission.
 GitHub applies required status checks to the protected target branch rather
 than conditionally interpreting the pull request's source name. Consequently,
 an ineligible pull request may still display the Xcode Cloud result as expected
-until it is renamed or closed. Do not weaken the required check's Xcode Cloud
-GitHub App binding or fabricate its status to hide that platform limitation.
+until it is renamed or closed. When restoring enforcement, preserve the Cloud check's
+Xcode Cloud GitHub App binding or fabricate its status to hide that platform limitation.
 
 Xcode Cloud reports the aggregate `KitchenMemory | PR to main from governed
 branches` result. Project policy requires it to pass; inspect the actual
@@ -458,6 +458,8 @@ ruby Tools/Tests/check_release_version_test.rb
 ruby Tools/Tests/check_project_structure_test.rb
 ruby Tools/Tests/check_software_inventory_test.rb
 ruby Tools/Tests/check_localization_test.rb
+ruby Tools/Tests/check_documentation_test.rb
+ruby Tools/check-documentation.rb
 ruby Tools/check-localization.rb
 ruby Tools/check-project-structure.rb
 ruby Tools/check-software-inventory.rb
@@ -472,7 +474,7 @@ that same version.
 The structure contract also pins each project configuration to its matching
 xcconfig and automatic merged-binary mode; the development and production
 bundle namespaces; platform plist, entitlement, and synchronized-folder
-ownership; the two shared schemes and two explicit plans; and exclusive
+ownership; the shared schemes and explicit plans listed above; and exclusive
 plan ownership of test-target membership. It also requires each
 localization-catalog embedding phase to run first in its hosted-test target,
 preventing a dependency cycle between that test-bundle output and KitchenKit

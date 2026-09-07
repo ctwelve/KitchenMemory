@@ -15,7 +15,7 @@ require "rexml/xpath"
 module KitchenMemory
   # A bounded Markdown contract, not a renderer or a network link checker.
   module DocumentationContract
-    OBSOLETE_TOPOLOGY = /\b(?:KitchenMemoryIOS|KitchenMemoryMacOS|KitchenDomain|KitchenImport|KitchenLogic|KitchenPersistence)\b|both app targets|both platform application-test targets|all three locales/
+    OBSOLETE_TOPOLOGY = /\b(?:KitchenMemoryIOS|KitchenMemoryMacOS|Kitchen(?:Memory)?Domain|Kitchen(?:Memory)?Import|Kitchen(?:Memory)?Logic|Kitchen(?:Memory)?Persistence)\b|both app targets|both platform application-test targets|all three locales/
     module_function
 
     def prose(text)
@@ -41,11 +41,15 @@ module KitchenMemory
       text = text.gsub(/(`+).*?\1/m, "")
       definitions = text.scan(/^\s*\[([^\]]+)\]:\s*(<[^>]+>|\S+)/).to_h.transform_keys(&:downcase)
       inline = text.scan(/!?\[[^\]\n]*\]\(\s*(<[^>]+>|(?:[^\s()]|\([^()]*\))+)\s*(?:"[^"]*"\s*)?\)/).flatten
-      references = text.scan(/\[([^\]\n]+)\]\[([^\]\n]*)\]/).map do |label, key|
-        definitions[(key.empty? ? label : key).downcase]
+      keys = text.scan(/\[([^\]\n]+)\]\[([^\]\n]*)\]/).map do |label, key|
+        (key.empty? ? label : key).downcase
       end
-      # Definitions are checked too, even when no longer referenced.
-      (inline + references.compact + definitions.values).map { |link| link.delete_prefix("<").delete_suffix(">") }.uniq
+      normalize = ->(values) { values.map { |link| link.delete_prefix("<").delete_suffix(">") }.uniq }
+      {
+        targets: normalize.call(inline + keys.map { |key| definitions[key] }.compact),
+        definitions: normalize.call(definitions.values),
+        undefined_references: keys.reject { |key| definitions.key?(key) }.uniq
+      }
     end
 
     def destination(source, link)
@@ -77,10 +81,13 @@ module KitchenMemory
 
     def link_errors(documents, root)
       documents.flat_map do |source, contents|
-        links(contents).map do |link|
+        parsed = links(contents)
+        label = Pathname.new(source).relative_path_from(Pathname.new(root))
+        missing = parsed.fetch(:undefined_references).map { |key| "#{label}: undefined link reference: #{key}" }
+        # Even unused definitions must resolve, but only rendered links establish navigation.
+        missing + (parsed.fetch(:targets) + parsed.fetch(:definitions)).uniq.map do |link|
           target, fragment = destination(source, link)
           next unless target
-          label = Pathname.new(source).relative_path_from(Pathname.new(root))
           if !target.start_with?(root + "/") || !File.exist?(target)
             "#{label}: missing or outside-repository link: #{link}"
           elsif fragment && !fragment.empty? && File.extname(target) == ".md" && !anchors(File.read(target)).include?(fragment)
@@ -91,7 +98,7 @@ module KitchenMemory
     end
 
     def linked_paths(documents, source)
-      links(documents.fetch(source)).map { |link| destination(source, link)&.first }.compact
+      links(documents.fetch(source)).fetch(:targets).map { |link| destination(source, link)&.first }.compact
     end
 
     def navigation_errors(documents, root)
