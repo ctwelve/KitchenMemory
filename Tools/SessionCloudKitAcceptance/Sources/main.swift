@@ -342,7 +342,7 @@ struct SessionCloudKitAcceptance {
       at: directory,
       withIntermediateDirectories: true
     )
-    let schema = Schema(versionedSchema: KitchenMemorySchemaV3.self)
+    let schema = Schema(versionedSchema: CurrentKitchenMemorySchema.self)
     let database: ModelConfiguration.CloudKitDatabase
     switch store {
     case .local: database = .none
