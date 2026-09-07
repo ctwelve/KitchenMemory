@@ -49,16 +49,22 @@ public final class PersonalCloudStatusMonitor: NSObject {
   private let notificationCenter: NotificationCenter
   private let accountChecker: any PersonalCloudAccountChecking
   private let onStatusChange: @MainActor (PersonalCloudStatus) -> Void
+  private let relevantStoreIdentifiers: Set<String>
+  private let onSuccessfulTransfer: @MainActor (Date) -> Void
   private var state = PersonalCloudStatusState()
   private var accountCheckGeneration = 0
 
   public init(
     notificationCenter: NotificationCenter = .default,
     accountChecker: any PersonalCloudAccountChecking,
+    relevantStoreIdentifiers: Set<String> = [],
+    onSuccessfulTransfer: @escaping @MainActor (Date) -> Void = { _ in },
     onStatusChange: @escaping @MainActor (PersonalCloudStatus) -> Void
   ) {
     self.notificationCenter = notificationCenter
     self.accountChecker = accountChecker
+    self.relevantStoreIdentifiers = relevantStoreIdentifiers
+    self.onSuccessfulTransfer = onSuccessfulTransfer
     self.onStatusChange = onStatusChange
     super.init()
     notificationCenter.addObserver(
@@ -98,7 +104,9 @@ public final class PersonalCloudStatusMonitor: NSObject {
         id: event.identifier,
         type: event.type.rawValue,
         ended: event.endDate != nil,
-        succeeded: event.succeeded
+        succeeded: event.succeeded,
+        storeIdentifier: event.storeIdentifier,
+        endDate: event.endDate
       )
     )
   }
@@ -116,6 +124,12 @@ public final class PersonalCloudStatusMonitor: NSObject {
       ended: event.ended,
       succeeded: event.succeeded
     )
+    if event.ended, event.succeeded, let date = event.endDate,
+       let identifier = event.storeIdentifier, relevantStoreIdentifiers.contains(identifier),
+       event.type == NSPersistentCloudKitContainer.EventType.import.rawValue
+        || event.type == NSPersistentCloudKitContainer.EventType.export.rawValue {
+      onSuccessfulTransfer(date)
+    }
     publishStatus()
   }
 

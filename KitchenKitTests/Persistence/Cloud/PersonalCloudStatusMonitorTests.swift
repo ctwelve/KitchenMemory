@@ -35,6 +35,29 @@ final class PersonalCloudStatusMonitorTests: XCTestCase {
     }
   }
 
+  func testOnlySuccessfulTransfersForThisStoreRefreshTheObservation() async {
+    let delivered = expectation(description: "Every event reduced")
+    delivered.expectedFulfillmentCount = 6
+    var dates: [Date] = []
+    let monitor = PersonalCloudStatusMonitor(
+      notificationCenter: NotificationCenter(), accountChecker: AccountChecker(),
+      relevantStoreIdentifiers: ["this-store"], onSuccessfulTransfer: { dates.append($0) },
+      onStatusChange: { _ in delivered.fulfill() }
+    )
+    let date = Date(timeIntervalSince1970: 1_700_000_000)
+    let events: [PersonalCloudEventSnapshot] = [
+      .init(id: UUID(), type: 0, ended: true, succeeded: true, storeIdentifier: "this-store", endDate: date),
+      .init(id: UUID(), type: 1, ended: true, succeeded: true, storeIdentifier: "other-store", endDate: date),
+      .init(id: UUID(), type: 1, ended: false, succeeded: true, storeIdentifier: "this-store", endDate: date),
+      .init(id: UUID(), type: 1, ended: true, succeeded: false, storeIdentifier: "this-store", endDate: date),
+      .init(id: UUID(), type: 1, ended: true, succeeded: true, storeIdentifier: "this-store", endDate: date),
+      .init(id: UUID(), type: 2, ended: true, succeeded: true, storeIdentifier: "this-store", endDate: date),
+    ]
+    for event in events { monitor.receiveCloudEvent(event) }
+    await fulfillment(of: [delivered], timeout: 1)
+    XCTAssertEqual(dates, [date, date])
+  }
+
   func testAccountStatusesMapToPresentationNeutralStates() {
     XCTAssertEqual(CloudKitAccountChecker.status(for: .available), .available)
     XCTAssertEqual(CloudKitAccountChecker.status(for: .noAccount), .noAccount)

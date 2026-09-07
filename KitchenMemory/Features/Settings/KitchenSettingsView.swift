@@ -125,6 +125,12 @@ struct KitchenSettingsView: View {
             .foregroundStyle(.secondary)
           } else if cloudSyncSettings.isEnabled {
             personalCloudStatusLabel
+            if model.synchronizationEvidenceIsStale {
+              Label(.settingsIcloudStaleEvidence,
+                    systemImage: "exclamationmark.triangle")
+                .foregroundStyle(.orange)
+                .accessibilityIdentifier("icloud-stale-evidence-warning")
+            }
           } else {
             Label(.settingsIcloudStatusDisabled, systemImage: "icloud.slash")
               .foregroundStyle(.secondary)
