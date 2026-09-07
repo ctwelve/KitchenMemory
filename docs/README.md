@@ -183,3 +183,6 @@ milestones and must not be mistaken for the live engineering contract above.
 
 The [0.3 coverage audit](coverage-audit-0.3.md) records separate durable,
 persistence-adapter, and native application evidence with reproduction steps.
+
+The [alpha Recipe Library accessibility evidence](accessibility-alpha-library-evidence.md)
+records the bounded Mac validation of the candidate identified in that record.
