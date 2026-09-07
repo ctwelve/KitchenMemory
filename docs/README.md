@@ -39,6 +39,9 @@ For implementation work, begin with:
 - [Continuous integration](continuous-integration.md) for the current validation
   contract and [post-merge branch cleanup](continuous-integration.md#branch-cleanup).
 
+- [Release preparation loop](release-preparation.md) for evidence-based architecture,
+  dead-code, validation, and adversarial review before release.
+
 ## Current product guidance
 
 - [Recipe revision reconciliation](recipe-reconciliation.md) — explicit comparisons, local choices, and multi-parent Save.
@@ -115,6 +118,8 @@ amends them.
 - [0015: Adopt the MIT License](adr/0015-adopt-mit-license.md)
 - [0016: Alpha data contract and beta stabilization](adr/0016-alpha-data-contract-and-beta-stabilization.md)
 - [0017: Additive Recipe authority evidence](adr/0017-use-additive-recipe-authority-evidence.md)
+
+- [0018: Converge release preparation on evidence](adr/0018-converge-release-preparation-on-evidence.md)
 
 ### Superseded architecture decisions
 
