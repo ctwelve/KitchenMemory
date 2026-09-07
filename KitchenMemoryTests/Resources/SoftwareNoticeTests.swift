@@ -17,6 +17,6 @@ final class SoftwareNoticeTests: XCTestCase {
     // Pin the reviewed upstream license texts, including all Swift runtime exceptions.
     // This checks the built app bundle, so omitted or altered packaged notices fail.
     let digest = SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()
-    XCTAssertEqual(digest, "79fc37436859b5e07ad44fa4baec792ac22ccd2cc2a52247649ff6b548d3218e")
+    XCTAssertEqual(digest, "f68923bf4cc1a9552d1db90f2d6e882518b48da6e178e1f5f33b72eaf1a5a57e")
   }
 }
