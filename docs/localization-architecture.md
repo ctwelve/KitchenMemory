@@ -6,15 +6,21 @@ Copyright © 2026 the Kitchen Memory contributors.
 SPDX-License-Identifier: MIT
 -->
 
-- Status: 0.3 translation seam contract (#117)
-- Date: 2026-08-23
+The supported locale set is owned by
+[LocalizationContract.json](../Configurations/LocalizationContract.json).
+Regional recipe vocabulary is intentional. American English (`en-US`) is the
+source language and universal fallback.
 
-Kitchen Memory's first localization set is American English (`en-US`), Canadian
-French (`fr-CA`), and Mexican Spanish (`es-MX`). American English is the
-development language and universal fallback. The regional identifiers are
-intentional because recipe vocabulary, measurements, and ordinary kitchen
-language vary by market. German, Italian, and additional locales may follow
-without changing the architectural boundary.
+## Supported locales
+
+| Locale | Language |
+| --- | --- |
+| `en-US` | American English |
+| `en-GB` | British English |
+| `es-MX` | Mexican Spanish |
+| `fr-CA` | Canadian French |
+| `de-DE` | German |
+| `it-IT` | Italian |
 
 Internationalization has two distinct resource problems:
 
@@ -38,9 +44,9 @@ responsibilities do not look up interface strings.
 
 ### Localization-key lifecycle
 
-The frozen 0.1 interface has graduated to semantic localization identifiers such
-as `recipe.editor.save-revision`. Every catalog entry provides explicit `en-US`,
-`fr-CA`, and `es-MX` values, and English sentences are no longer embedded in
+Interface copy uses semantic localization identifiers such as
+`recipe.editor.save-revision`. Every catalog entry provides explicit values for
+every supported locale. English sentences are not embedded in
 application code or used as durable keys. Application code uses Xcode's generated
 `LocalizedStringResource` symbols, including generated functions with named
 operands for formatted messages. Each entry carries translator context that
@@ -48,7 +54,7 @@ explains its screen, purpose, tone, placeholders, plural operands, or
 accessibility role where those details are not already obvious.
 
 This makes product meaning the stable layer while allowing layout to change. A
-0.2 redesign should reuse an existing key when the control still expresses the
+redesign should reuse an existing key when the control still expresses the
 same meaning, add a new semantic key when meaning or translator context changes,
 and remove an obsolete key only after no supported release or retained surface
 uses it. Moving a Save action from a toolbar to a menu does not rename its key;
@@ -56,21 +62,13 @@ turning Save into a different operation does. Sentence fragments are not
 introduced merely to reuse a key, and source-authored recipe wording remains
 outside this interface-copy abstraction.
 
-`LocalizationCatalogTests` enforces the 0.1 catalog contract. Keys must be
-semantic and manually managed; translator comments and all three locales are
+`LocalizationCatalogTests` enforces the compiled catalog contract. Keys must be
+semantic and manually managed; translator comments and all supported locales are
 required; every value must be reviewed and nonempty; plural structures must
 match; and formatted values must use named placeholders with identical
-signatures in every locale. Both platform application-test targets embed an
+signatures in every locale. The multiplatform application-test target embeds an
 exact JSON copy of the raw catalog at build time so this source-level contract
 remains available when CI builds and runs tests on separate hosts.
-
-This boundary is now enforced. The former English-oriented `renderedText`,
-`structuredDisplayText`, and `effectiveDisplayText` domain helpers are gone.
-Semantic predicates identify meaningful and structured ingredient content;
-`RecipePresentationFormatter` owns locale-sensitive composition such as
-“about,” “optional,” durations, quantities, and the fallback “Ingredient.”
-Authored source wording remains in the domain; generated interface wording does
-not.
 
 KitchenKit continues to return semantic values such as quantities,
 counts, workflow states, and typed failures. For example,
@@ -86,7 +84,7 @@ rational quantities or source-faithful ingredient text.
 
 The standard macOS About panel is the intentional resource-level exception.
 AppKit reads `Credits.rtf` as formatted bundle content, so the complete document
-has `en-US`, `fr-CA`, and `es-MX` resource variants rather than flattening its
+has a resource variant for each supported locale rather than flattening its
 formatting and links into String Catalog entries.
 
 ## Bundled recipe packs
@@ -173,7 +171,7 @@ changing the application locale.
 
 Localization proof remains layered and deterministic:
 
-- select `en`, `fr-CA`, and `es-MX` explicitly rather than inheriting the host;
+- select every supported locale explicitly rather than inheriting the host;
 - exercise every pluralized formatter with representative values for each
   locale;
 - verify locale fallback and sample-manifest selection as pure operations;
@@ -183,25 +181,22 @@ Localization proof remains layered and deterministic:
 - keep the top-level UI suite independent of translated copy.
 
 The catalog and presentation tests own deterministic localization proof. Native
-review of the three locales, doubled and long text, right-to-left direction,
+review of supported locales, doubled and long text, right-to-left direction,
 Dynamic Type, and assistive technologies remains part of release hardening.
 The constrained automation boundary from
 [ADR 0007](adr/0007-business-logic-coverage-and-ui-smoke-tests.md) still applies:
 localization is not a reason to restore interaction-heavy scripts or encode a
 provisional visual hierarchy in UI tests.
 
-## Current alpha additions
+See [alpha translation validation](localization-alpha-validation.md) for the
+regional content choices and the maintainer's device/layout-check waiver for
+#118–#120. It is retained evidence, not a waiver for later candidates.
 
-British English (`en-GB`), German (`de-DE`), and Italian (`it-IT`) are explicit
-supported locales alongside en-US, es-MX, and fr-CA. See [alpha translation validation](localization-alpha-validation.md)
-for the regional content choices and the maintainer's device/layout-check waiver
-for #118–#120. The following checks apply to all currently supported locales.
-
-## 0.3 verification contract
+## Verification contract
 
 `Configurations/LocalizationContract.json` is the source-language and supported-
 locale inventory for repository verification. Its explicit `retainedKeys` map
-records why four historical keys remain despite having no current interface
+records why historical keys remain despite having no current interface
 reference. Retention preserves earlier meanings; it is not a baseline for new
 unused keys. Reusing a retained key requires removing its retention entry.
 
@@ -264,5 +259,25 @@ and the current workflow in
 [Preparing your interface for localization](https://developer.apple.com/documentation/xcode/preparing-your-interface-for-localization).
 Follow [String Catalog guidance](https://developer.apple.com/documentation/xcode/localizing-and-varying-text-with-a-string-catalog)
 when adding locale-specific variants; extend the inventory, compiled resource
-checks and authored family variants together. Issues #118–#120 own the additional
-locales and their authored content.
+checks and authored family variants together.
+
+## Sample image specifications
+
+Place each rendition in its own Single Scale image set. Different aspect ratios
+are semantic assets, not 1x, 2x, and 3x density variants of one image.
+
+| Role | Preferred dimensions | Aspect ratio | Purpose |
+| --- | ---: | ---: | --- |
+| `hero` | 2400 × 1800 | 4:3 landscape | Recipe detail headers and prominent cards |
+| `thumbnail` | 900 × 900 | 1:1 | Library rows, compact cards, and search results |
+| `gallery` | 2400 × 1600 | 3:2 landscape | Additional process, ingredient, or finished-dish photographs |
+
+Gallery photographs may instead use 1600 × 2400 at 2:3 when the original
+composition is portrait. Runtime gallery presentation must accommodate both
+orientations rather than forcing every user photograph into a landscape crop.
+
+Use HEIC when preserving Apple-native wide-color or HDR photography is useful;
+use JPEG when broader external-tool compatibility matters. Both are supported
+source formats. Prefer sRGB or Display P3, omit transparency, keep the subject
+away from crop-sensitive edges, and do not bake interface decoration or text
+into recipe photographs.

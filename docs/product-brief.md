@@ -30,48 +30,10 @@ remains. The system should preserve that varying level of confidence.
 
 ## Product principles
 
-### Local first
-
-Reading, editing, and cooking from saved recipes must work from local data.
-Synchronization is a collaboration feature, not a prerequisite for opening the
-app.
-
-### Source faithful
-
-An import must never discard the publisher's ingredient or instruction text.
-Structured interpretations are stored alongside the source representation and
-may be corrected or regenerated.
-
-### Honest about uncertainty
-
-Failed parsing is data, not an exceptional state. “A handful of parsley” is a
-valid recipe ingredient even when it cannot be converted into grams.
-
-### Calm collaboration
-
-The top-level shared object is a **Kitchen**. People join a kitchen and share its
-recipes; collaboration should not require thinking about servers, databases, or
-permissions during ordinary use.
-
-### Progressive structure
-
-A pasted recipe should be immediately usable. Structure can be added by an
-importer, by the cook, or over time. The application should reward cleanup but
-never hold a recipe hostage until cleanup is complete.
-
-### Record reality without rewriting intent
-
-A recipe describes what someone intends to cook. A cooking session records what
-actually happened: progress, working-scale changes, and exact authored Session
-Entries. Selected Entries may later inform an explicit revision, variant, or new
-Recipe; they do not silently mutate the maintained Recipe.
-
-### Reconcile when knowledge matters
-
-A planned cook compares scaled recipe requirements with pantry evidence before
-cooking. The person may confirm availability, purchase, check, substitute, or
-skip. This moment supplies useful pantry corrections without requiring routine
-inventory maintenance.
+The [product doctrine](product-doctrine.md) owns the durable principles:
+local-first operation, source fidelity, honest uncertainty, progressive
+structure, and explicit separation of maintained intent from cooking evidence.
+Kitchen is the ownership boundary; multi-person sharing remains future work.
 
 ## Primary users
 
@@ -82,40 +44,13 @@ inventory maintenance.
 - Later: a cook reviewing a pantry suggestion based on several exact and fuzzy
   holdings of the same ingredient.
 
-## First useful release — 0.1.0 public alpha
+## Product maturity
 
-The first useful release artifact was accepted and published on 2026-08-25 as a
-signed and notarized direct-download macOS application in a GitHub prerelease.
-The same source contains native iPhone and iPad targets, but public iOS
-distribution and TestFlight remain deferred. The alpha proves the core recipe
-loop with a deliberately smaller acceptance set than the one required for 1.0.
-
-### In scope
-
-- Local recipe library.
-- Manual recipe editor.
-- Local, reversible suggestions during manual ingredient entry.
-- Recipe and ingredient sections.
-- Structured ingredient rows with retained original text.
-- URL import from Schema.org `Recipe` JSON-LD.
-- Import review that highlights uncertain interpretations.
-- Serving/yield scaling where quantities permit it.
-- Clear full-recipe reading views.
-- Private iCloud synchronization across one person's devices.
-- Source attribution and a link back to the webpage.
-
-### Explicitly deferred
-
-- Pantry state.
-- Shopping lists and meal planning.
-- Nutrition calculation.
-- Barcode and commercial-product databases.
-- OCR and image-based import.
-- AI-generated recipes.
-- Public recipe discovery or social feeds.
-- Cooking-session progress, Session Entries, and history.
-- Multi-person Kitchen sharing and live collaboration.
-- True peer-to-peer synchronization.
+The [public README](../README.md) owns published capability and distribution
+status. Current source also includes Recipe authority, recoverable drafts,
+private media, Folder/Tag organization, and records maintenance; use the
+[documentation map](README.md) for their contracts. Historical 0.1 scope and
+acceptance remain in the [milestone records](history.md).
 
 ## Alpha evidence and 1.0 success signals
 

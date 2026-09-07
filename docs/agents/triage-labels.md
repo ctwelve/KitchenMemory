@@ -12,7 +12,7 @@ The skills speak in terms of five canonical triage roles. This file maps those r
 
 When a skill mentions a role, use the corresponding label string from this table.
 
-Edit the right-hand column to match the vocabulary used by the issue tracker.
+The default labels are canonical here; do not rename them as part of ordinary triage.
 
 ## Upstream parking
 

@@ -81,96 +81,12 @@ app.
 
 ## Architectural aim
 
-The current SwiftUI application crosses durable product boundaries through
-`RecipeLibraryModel`, which delegates to the same KitchenKit Logic operations
-that future automation and platform-specific interfaces will use:
-
-```text
-SwiftUI views
-   ↓
-RecipeLibraryModel
-   ├── RecipeLibrary ────────┐
-   ├── RecipeEditor ────────├──→ RecipeRepository
-   ├── KitchenResetService ──┘
-   └── RecipeImportService ───→ Import responsibility
-```
-
-`RecipeLibraryModel` is application glue, not the only permitted client. A
-Safari share extension, file importer, AppleScript command, Shortcut, or batch
-tool should call the relevant Logic operation directly and exchange domain
-values or structured results. Automation must not manipulate persistence
-objects or UI elements. This keeps every client independent of SwiftData,
-CloudKit, and a particular window layout.
-
-## KitchenKit responsibility seams
-
-### Domain
-
-Plain Swift domain values and rules:
-
-- Kitchens, recipes and revisions, ingredients, pantry knowledge, plans,
-  sessions, sources, media, and organization.
-- Scaling and validation.
-- Stable application identities independent of persistence and sync frameworks.
-- No SwiftUI, SwiftData, CloudKit, document scanning, or Apple Events.
-
-The domain should be usable from the app, extensions, tests, and a potential
-command-line companion.
-
-### Import
-
-The deterministic and bounded web import pipeline:
-
-- Discovers and decodes Schema.org `Recipe` JSON-LD.
-- Normalizes recipe candidates and preserves bounded source evidence.
-- Conservatively interprets ingredient lines without discarding original text.
-- Fetches person-entered URLs through a bounded, ephemeral URLSession adapter.
-- Produces reviewable candidates without saving them.
-
-Import produces a draft. Saving that draft is a separate product-logic decision.
-This distinction is essential for unattended batch processing: ambiguous cards
-can land in an inbox rather than being silently turned into bad recipes.
-
-### Persistence
-
-Repository interfaces and mapping expressed in domain terms. The first
-implementation uses SwiftData, but callers do not receive storage-framework
-model objects. CloudKit integration remains behind the application boundary.
-
-### Logic
-
-Product operations and presentation-independent workflow state that coordinate
-the domain, importer, and store. The implemented boundary includes:
-
-```text
-RecipeLibrary          Kitchen-scoped reads and revision history
-RecipeEditor           create and revise immutable recipes
-RecipeImportService    interpret URL-import results for review
-KitchenBootstrapService / KitchenResetService
-RecipeEditSession      transient structured edit state
-RecipeImportSession    transient import and candidate-selection state
-RecipeScalingState     transient working-yield selection
-```
-
-File import, search, export, batch work, and cooking sessions will extend this
-same boundary when their slices arrive.
-
-### KitchenMemory application layer and native target
-
-The `KitchenMemory/` layer contains the SwiftUI interface,
-`RecipeLibraryModel` composition glue, bundled sample resources, localization
-catalogs, separate editor-friendly iOS and macOS property lists, four
-entitlement files, and the iOS-only launch resources. All belong to the native
-multiplatform app target; SDK-qualified settings and file-level platform
-filters preserve native differences. Reusable recipe behavior belongs in
-`KitchenKit`.
-See [implementation architecture](implementation-architecture.md) and
-[localization architecture](localization-architecture.md).
-
-An eventual tvOS target should import `KitchenKit` and consume its read/cook-oriented
-Logic operations while supplying its own focused presentation layer. Its
-future existence must not force television interaction constraints into the
-Mac, iPhone, or iPad interface.
+Current source and module ownership live in
+[implementation architecture](implementation-architecture.md). Recipe and Session
+intentions cross separate KitchenKit Logic interfaces; future automation should
+consume those interfaces instead of reproducing view state or storage rules.
+An eventual tvOS client would provide its own read/cook presentation over the
+same core, without constraining Mac or mobile interaction.
 
 ## Comprehension and modularity
 
@@ -286,21 +202,10 @@ shared KitchenKit Logic operations allow all three to coexist:
 
 ## Current foundation and next implications
 
-The implemented 0.1 feature baseline already provides UI-independent domain
-values, reviewable import drafts, stable recipe/source identities, SwiftData and
-personal iCloud synchronization behind the persistence boundary, localized
-sample content, and shared Logic operations. Release engineering should preserve
-those boundaries while it:
-
-1. proves the existing private, local-first iCloud path on real devices and
-   rehearses production schema promotion;
-2. verifies the established String Catalogs and localized asset-backed recipe
-   packs under release conditions;
-3. produces signed, installable, diagnosable iOS and macOS candidates; and
-4. records a repeatable release procedure before 0.2 feature development.
-
-After that baseline is established, platform feature work can replace
-provisional modal editing with interaction models suited to Mac and mobile, add
-cooking sessions without mutating maintained recipe revisions, introduce
-batch-capable import interfaces before scan/OCR inputs, and keep fixtures
-extensible to files and scans as well as webpages.
+The app already implements Recipe and Cooking Session authority, recoverable
+editing drafts, private Recipe images, Folder/Tag organization, localized
+sample content, and private managed synchronization. Batch import, scanning,
+AppleScript, Shortcuts, and tvOS remain direction, not shipped interfaces.
+[Current contracts](README.md#product-contracts) and the live issue graph define
+the next accepted scope. The comprehensive UI design pass and beta acceptance
+follow [the accessibility policy](accessibility-engineering.md).

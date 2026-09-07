@@ -65,11 +65,10 @@ Kitchen
 └── Tag[]
 ```
 
-Kitchen, Recipe, RecipeRevision, and the persistence-independent Cooking Session
-evidence model are implemented today. The remaining branches are accepted
-ownership direction for later product slices, not claims about current source
-types or persistence tables. Cooking Session persistence is intentionally still
-outside the implemented storage schema.
+Kitchen, Recipe, RecipeRevision, Cooking Session evidence and persistence,
+Folder and Tag organization, source capture, and private Recipe media are
+implemented. Membership, pantry, and planned-cook branches remain future
+ownership direction; the diagram is not a list of current storage tables.
 
 `KitchenMember` represents product-level attribution and household behavior.
 CloudKit share participation and permission remain authoritative in the sync
@@ -161,19 +160,13 @@ queries, migrations, performance, or CloudKit compatibility. In particular,
 domain invariants should not be weakened merely because a storage framework
 requires optional relationships or cannot enforce uniqueness.
 
-The implemented persistence slice remains:
-
-```text
-Kitchen → Recipe → RecipeRevision
-```
-
-The current repository still uses that payload graph and its legacy mutable
-current pointer. V5 registers the authority record families as the current
-alpha schema, but repository commands and projection remain a later
-implementation slice. Earlier alpha stores may be reset under ADR 0016.
-
-The remaining aggregates establish ownership and identity seams now but are
-implemented only as their product workflows arrive.
+Recipe Save and Selection evidence now owns authority; the old mutable current
+pointer is compatibility data. See [V5 authority](recipe-authority-v5-schema.md),
+[Session V3 evidence](cooking-session-v3-schema.md), [private media](recipe-media.md),
+and [Folder](folders.md)/[Tag](tags.md) contracts for their additive record families.
+The current store includes these families through V7. Historical schema
+definitions remain frozen; alpha reset permission follows ADR 0016 and does not
+authorize rewriting a published schema.
 
 ## Synchronization boundary
 
@@ -206,36 +199,10 @@ dependencies among capabilities that every store client consumes together.
 Architectural seams remain explicit in interfaces and source organization
 without becoming separately linked products.
 
-The implemented Domain responsibility begins with the
-`Kitchen → Recipe → RecipeRevision` slice. The shared `KitchenMemory/`
-application layer owns deterministic starter resources and their loader, and
-the native multiplatform app target compiles that layer for iOS and Mac. This keeps Apple resource APIs out
-of Domain without creating a framework for app-specific data.
-
-The Persistence responsibility supplies SwiftData adapters behind that seam.
-Recipe rows use application-owned UUID foreign keys and explicit ordering
-columns behind `RecipeRepository`. Cooking Sessions use a separate
-`CookingSessionRepository`: five immutable document-evidence record families,
-scalar UUID associations, complete append transactions, and classified reads
-through the deterministic evidence projector. Neither callers nor domain values
-depend on SwiftData model identity or CloudKit metadata.
-
-The initial store uses SwiftData's standard location. Slice 10 adds private
-cross-device synchronization behind the same repository boundary after a
-focused prototype selects the CloudKit integration and proves recovery behavior.
-Shared-Kitchen collaboration remains a separate problem involving participants,
-permissions, and shared database scope. The database is not the export format.
-The store evolves through immutable schema definitions and an ordered migration
-plan. Released V1 remains unchanged, V2 adds recipe deletion disposition, and V3
-adds Cooking Session evidence through a second lightweight stage. Production
-CloudKit evolution is additive: new feature aggregates may add types and fields,
-while published schema elements keep their original meaning.
-
-The Logic responsibility supplies the product operations. `RecipeLibrary` is the
-Kitchen-scoped service for loading library content, creating and revising recipes,
-interpreting imports, managing bundled samples, and performing an explicitly
-confirmed reset without exposing SwiftData records. Scaling state and bootstrap
-remain separate because they have different lifecycles. The app's observable
-model projects library outcomes into selection and presentation state; the
-recipe view then reads the persistent current revision through ordered
-ingredients and steps.
+The [implementation guide](implementation-architecture.md) owns current source,
+resource, configuration, schema, and module topology. The application composes
+separate Recipe and Cooking Session interfaces over the same private local store;
+managed CloudKit transports records without becoming product identity or
+lifecycle authority. [Personal synchronization](personal-icloud-synchronization.md)
+is implemented; shared-Kitchen membership remains future work. The database is
+not the portable export format.

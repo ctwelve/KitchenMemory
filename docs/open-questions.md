@@ -7,8 +7,11 @@ SPDX-License-Identifier: MIT
 -->
 
 
-These are decisions to explore through prototypes and real recipes rather than
-settle abstractly.
+These are future design questions, not a parallel issue backlog. Consult the
+[live issue graph](https://github.com/ctwelve/KitchenMemory/issues) before opening
+work. Recipe revisions, separate ingredient/instruction sections, Session
+Entries, flat Tags, and causal organization conflicts have current contracts
+in the [documentation map](README.md); do not reopen them as unanswered questions.
 
 ## Product
 
@@ -16,13 +19,9 @@ settle abstractly.
 - Should an imported recipe be a private snapshot, a linked copy, or explicitly
   selectable between the two?
 - How prominent should source updates be after a user has edited an import?
-- Are personal notes part of the recipe or a separate per-cook annotation?
-- Do family edits overwrite one shared recipe, create revisions, or create forks?
 
 ## Recipe model
 
-- Can ingredient and instruction sections share one hierarchy, or should they
-  remain independent as websites commonly publish them?
 - Do we need alternate ingredient groups such as “either A or B” in the initial
   model?
 - How should component yields work—for example, a sauce recipe embedded in a
@@ -44,9 +43,7 @@ settle abstractly.
 
 ## Organization
 
-- Are tags flat identities presented in groups, or truly hierarchical objects?
 - Which recipe classifications deserve structured fields in addition to tags?
-- How should shared kitchens resolve folder and tag renames concurrently?
 
 ## Platform
 

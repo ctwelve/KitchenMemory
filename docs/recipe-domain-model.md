@@ -8,9 +8,9 @@ SPDX-License-Identifier: MIT
 
 
 This is the conceptual domain model, not a persistence schema. The implemented
-recipe foundation follows these names and ownership boundaries; future pantry,
-planning, and cooking-session types remain design direction until their slices
-land.
+recipe foundation follows these names and ownership boundaries. Pantry and
+planning remain future direction; implemented [Cooking Sessions](cooking-sessions.md)
+have their own evidence contract.
 
 ## Design goals
 
@@ -60,9 +60,8 @@ model.
 An immutable authored version of one recipe. Editing appends a new revision; an
 explicit Recipe Selection chooses the Revision presented as current without
 overwriting history. The accepted authority and migration contract is
-[Recipe authority V5](recipe-authority-v5-schema.md). Its physical schema is
-registered, while current repository behavior still uses the compatibility
-pointer until the authority implementation slices land.
+[Recipe authority V5](recipe-authority-v5-schema.md). Repository commands and projections implement this authority; the mutable
+pointer remains compatibility data and does not decide the current Revision.
 
 | Field | Meaning |
 | --- | --- |
@@ -74,7 +73,7 @@ pointer until the authority implementation slices land.
 | `authorName` | Human-readable attribution |
 | `source` | Provenance for imported or transcribed material |
 | `sourceCapture` | Bounded immutable evidence retained from import |
-| `contentLanguage` | Planned optional BCP 47 authored-language tag; existing content may be unknown |
+| `contentLanguage` | Optional BCP 47 authored-language tag; existing content may be unknown |
 | `recipeYield` | What the base recipe produces |
 | `prepDuration` | Active preparation time, when known |
 | `cookDuration` | Cooking time, when known |

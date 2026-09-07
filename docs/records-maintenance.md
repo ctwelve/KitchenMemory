@@ -61,6 +61,13 @@ once it defines the surviving compact evidence, dependency checks and recovery
 behavior for late arrivals. Until then, age alone never authorizes Session expiry
 or erasure of ambiguous orphan payload. See [Cooking Sessions](cooking-sessions.md).
 
+## Device retirement boundary
+
+Device retirement and any stronger cross-device retention guarantee belong to
+beta wayfinding. The implementation has no device roster or retirement protocol;
+a recent local transfer event cannot prove that another device has received
+evidence or authorize erasing history it may still need.
+
 ## Platform opportunities
 
 On iOS, the scene registers one app-refresh task before launch completes and
