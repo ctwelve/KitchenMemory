@@ -71,8 +71,9 @@ resources, dependency pins, and frozen ADR/schema records are unchanged.
 
 #85 remains open for reconciliation after #125 advances version/dependency
 inputs. Device retirement remains beta-wayfinder work, not an implemented
-retention guarantee. The [temporary CI enforcement exception](continuous-integration.md#github-enforcement-boundary)
-is intentional during Cloud UI runner trouble; restoring it remains a separate
-maintainer operation. This cleanup does not change
-GitHub protection or Cloud workflow settings. Keep review evidence and validation
+retention guarantee. The CI enforcement exception was intentional during Cloud
+UI runner trouble; the maintainer subsequently restored the Cloud PR requirement.
+The [current CI boundary](continuous-integration.md#github-enforcement-boundary)
+records the required statuses. The cleanup itself did not change GitHub
+protection or Cloud workflow settings. Keep review evidence and validation
 results in the cleanup PR, using synthetic data and no private debugging material.

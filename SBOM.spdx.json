@@ -2,18 +2,22 @@
   "spdxVersion": "SPDX-2.3",
   "dataLicense": "CC0-1.0",
   "SPDXID": "SPDXRef-DOCUMENT",
-  "name": "Kitchen Memory 0.2.16 source dependency inventory",
-  "documentNamespace": "https://github.com/ctwelve/KitchenMemory/sbom/0.2.16/2026-09-06",
+  "name": "Kitchen Memory 0.3.0 source dependency inventory",
+  "documentNamespace": "https://github.com/ctwelve/KitchenMemory/sbom/0.3.0/2026-09-07",
   "creationInfo": {
-    "created": "2026-09-05T03:09:52Z",
-    "creators": ["Organization: Kitchen Memory contributors"]
+    "created": "2026-09-07T21:58:13Z",
+    "creators": [
+      "Organization: Kitchen Memory contributors"
+    ]
   },
-  "documentDescribes": ["SPDXRef-Package-KitchenMemory"],
+  "documentDescribes": [
+    "SPDXRef-Package-KitchenMemory"
+  ],
   "packages": [
     {
       "name": "Kitchen Memory",
       "SPDXID": "SPDXRef-Package-KitchenMemory",
-      "versionInfo": "0.2.16",
+      "versionInfo": "0.3.0",
       "downloadLocation": "https://github.com/ctwelve/KitchenMemory",
       "filesAnalyzed": false,
       "licenseConcluded": "NOASSERTION",
@@ -24,7 +28,7 @@
         {
           "referenceCategory": "PACKAGE-MANAGER",
           "referenceType": "purl",
-          "referenceLocator": "pkg:github/ctwelve/KitchenMemory@0.2.16"
+          "referenceLocator": "pkg:github/ctwelve/KitchenMemory@0.3.0"
         }
       ]
     },
@@ -176,13 +180,13 @@
     {
       "name": "SwiftLintPlugins",
       "SPDXID": "SPDXRef-Package-SwiftLintPlugins",
-      "versionInfo": "0.65.0",
+      "versionInfo": "0.65.1",
       "downloadLocation": "https://github.com/SimplyDanny/SwiftLintPlugins",
       "filesAnalyzed": false,
       "checksums": [
         {
           "algorithm": "SHA1",
-          "checksumValue": "3292bab28e6e92000161348003fdef8edc4e582d"
+          "checksumValue": "ef7d692fc6706e8f5628e26bcafaefa445c58a97"
         }
       ],
       "licenseConcluded": "NOASSERTION",
@@ -193,7 +197,7 @@
         {
           "referenceCategory": "PACKAGE-MANAGER",
           "referenceType": "purl",
-          "referenceLocator": "pkg:github/SimplyDanny/SwiftLintPlugins@0.65.0"
+          "referenceLocator": "pkg:github/SimplyDanny/SwiftLintPlugins@0.65.1"
         },
         {
           "referenceCategory": "OTHER",
@@ -205,24 +209,24 @@
     {
       "name": "SwiftLintBinary",
       "SPDXID": "SPDXRef-Package-SwiftLintBinary",
-      "versionInfo": "0.65.0",
-      "downloadLocation": "https://github.com/realm/SwiftLint/releases/download/0.65.0/SwiftLintBinary.artifactbundle.zip",
+      "versionInfo": "0.65.1",
+      "downloadLocation": "https://github.com/realm/SwiftLint/releases/download/0.65.1/SwiftLintBinary.artifactbundle.zip",
       "filesAnalyzed": false,
       "checksums": [
         {
           "algorithm": "SHA256",
-          "checksumValue": "eb333bd76dfb5f46d21fdf3615fe39bb938956ca0b8e94c241c4b2db6e696b90"
+          "checksumValue": "c3a1d77647ca18c1b7e9be7dbc6cd4490d26422f28814b76370244ff61970869"
         }
       ],
       "licenseConcluded": "NOASSERTION",
       "licenseDeclared": "MIT",
       "copyrightText": "NOASSERTION",
-      "primaryPackagePurpose": "SOURCE",
+      "primaryPackagePurpose": "APPLICATION",
       "externalRefs": [
         {
           "referenceCategory": "PACKAGE-MANAGER",
           "referenceType": "purl",
-          "referenceLocator": "pkg:github/realm/SwiftLint@0.65.0"
+          "referenceLocator": "pkg:github/realm/SwiftLint@0.65.1"
         }
       ]
     }
