@@ -63,17 +63,50 @@ Cloud settings or prove linguistic quality, accessibility, or global sync.
 
 ## Audit boundary, September 2026
 
-This consolidation follows merged release preparation #124 and supports #85.
-The audit covered documentation navigation/currentness, source ownership,
-schemes/plans, localization and dependency contracts, agent routing, skill
-mirrors, CI scripts, and retained evidence. Production source, data formats,
-resources, dependency pins, and frozen ADR/schema records are unchanged.
+The broad consolidation landed in [PR 173](https://github.com/ctwelve/KitchenMemory/pull/173)
+after release preparation #124. The final #85 reconciliation uses merged
+[PR 174](https://github.com/ctwelve/KitchenMemory/pull/174), commit
+`ac9095ba3b0cc20fb85227e50420c808f39175de`, after #125 completed the version,
+dependency, license, and signed-product review.
 
-#85 remains open for reconciliation after #125 advances version/dependency
-inputs. Device retirement remains beta-wayfinder work, not an implemented
-retention guarantee. The CI enforcement exception was intentional during Cloud
-UI runner trouble; the maintainer subsequently restored the Cloud PR requirement.
-The [current CI boundary](continuous-integration.md#github-enforcement-boundary)
-records the required statuses. The cleanup itself did not change GitHub
-protection or Cloud workflow settings. Keep review evidence and validation
-results in the cleanup PR, using synthetic data and no private debugging material.
+The final pass checked current guidance against the implemented presentation
+folders, five targets, two shared schemes, three test plans, four KitchenKit
+responsibility roots, V7 schema alias, six supported locales, resource ownership,
+and committed package graph. [Implementation architecture](implementation-architecture.md),
+[localization](localization-architecture.md), and [the software inventory](../DEPENDENCIES.md)
+remain the owners of those details. The working source is 0.3.0; the root README
+continues to describe the published alpha rather than imply a new distribution.
+The [dependency evidence](release-dependencies-0.3.md) records the actual signed
+resources, privacy manifests, linkage, and archive-path correction.
+
+Current Recipe authority, Folder/Tag, and maintenance guidance agrees with the
+retained evidence and repository seams. [Device retirement](records-maintenance.md#device-retirement-boundary)
+remains beta-wayfinder work; no device roster or cross-device retirement
+protocol is claimed. Historical ADRs, research, schema declarations, and release
+records retain their paths and dated results through their indexes. Old version
+numbers in those records are evidence, not stale instructions to overwrite.
+
+The maintainer restored the strict Cloud PR requirement. The
+[current CI boundary](continuous-integration.md#github-enforcement-boundary)
+records the two trusted required checks; local UI validation remains applicable
+while Cloud UI tests are suspended. This reconciliation changes documentation
+only and performs no GitHub-protection or Cloud-workflow mutation.
+
+Fresh verification on September 7, 2026 passed all 92 Ruby contract tests
+(334 assertions), including the documentation guard's 13 tests (42 assertions),
+and all seven Python tool tests. Documentation, localization, project/resource,
+inventory, and ordinary untagged-release checks passed. SwiftLint 0.65.1 reported
+zero violations across 347 Swift files. The checked-in post-clone workflow runs
+the documentation guard and its tests during ordinary CI.
+
+No application, framework, test, resource, dependency, or build-setting input
+changes in this final pass. The native suites, exact coverage, static analysis,
+and signed-product checks from [#125](release-dependencies-0.3.md#validation-ledger)
+therefore remain applicable to the unchanged source. The comprehensive beta
+accessibility matrix is deferred under #168, not reported as passed. The
+remaining [#126 acceptance packet](https://github.com/ctwelve/KitchenMemory/issues/126)
+owns synthetic scenario assembly and final Mac-only alpha acceptance.
+
+This audit retains only repository metadata and concise validation results;
+private debugging material, account identifiers, Recipe content, and raw logs
+are excluded.

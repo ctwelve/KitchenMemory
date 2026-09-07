@@ -205,8 +205,8 @@ only repository permission.
 GitHub applies required status checks to the protected target branch rather
 than conditionally interpreting the pull request's source name. Consequently,
 an ineligible pull request may still display the Xcode Cloud result as expected
-until it is renamed or closed. When restoring enforcement, preserve the Cloud check's
-Xcode Cloud GitHub App binding. Never fabricate its status to hide that platform
+until it is renamed or closed. Preserve the required Cloud check's Xcode Cloud
+GitHub App binding when maintaining the rule. Never fabricate its status to hide that platform
 limitation.
 
 Xcode Cloud reports the aggregate `KitchenMemory | PR to main from governed
