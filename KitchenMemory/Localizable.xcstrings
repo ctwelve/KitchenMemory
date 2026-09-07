@@ -11403,7 +11403,7 @@
         "en-GB": {
           "stringUnit": {
             "state": "translated",
-            "value": "ounces, grams, milliliters…"
+            "value": "ounces, grams, millilitres…"
           }
         },
         "en-US" : {
@@ -11973,7 +11973,7 @@
         "en-GB": {
           "stringUnit": {
             "state": "translated",
-            "value": "e.g. Serves 4 or Makes one skillet"
+            "value": "e.g. Serves 4 or Makes one frying pan"
           }
         },
         "en-US" : {
@@ -12033,7 +12033,7 @@
         "en-GB": {
           "stringUnit": {
             "state": "translated",
-            "value": "servings, loaves, skillets…"
+            "value": "servings, loaves, frying pans…"
           }
         },
         "en-US" : {
