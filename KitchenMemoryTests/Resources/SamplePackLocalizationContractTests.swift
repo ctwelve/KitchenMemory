@@ -10,7 +10,7 @@ import XCTest
 
 @MainActor
 final class SamplePackLocalizationContractTests: XCTestCase {
-  private let locales = ["en-US", "es-MX", "fr-CA"]
+  private let locales = ["en-US", "en-GB", "es-MX", "fr-CA"]
 
   func testEveryAuthoredVariantPreservesStructureProvenanceAndDistinctStableIdentity() throws {
     let manifest = try SampleRecipeCatalog.loadManifest()

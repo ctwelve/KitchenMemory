@@ -190,6 +190,13 @@ The constrained automation boundary from
 localization is not a reason to restore interaction-heavy scripts or encode a
 provisional visual hierarchy in UI tests.
 
+## Current alpha additions
+
+British English (`en-GB`) is an explicit supported locale alongside en-US,
+es-MX, and fr-CA. See [alpha translation validation](localization-alpha-validation.md)
+for the regional content choices and the maintainer's device/layout-check waiver
+for #118–#120. The following checks apply to all currently supported locales.
+
 ## 0.3 verification contract
 
 `Configurations/LocalizationContract.json` is the source-language and supported-
@@ -218,7 +225,7 @@ owns generated-symbol availability and operand type checking; hosted tests own
 compiled catalog, bundle metadata, localized Credits, and authored asset checks.
 Neither a source scan nor a green build establishes linguistic quality.
 
-`SamplePackLocalizationContractTests` walks all three authored variants of each
+`SamplePackLocalizationContractTests` walks all authored variants of each
 sample family. It checks locale membership, structural shape, source kind, URL and
 author provenance, nonempty wording, stable reloading, and distinct Recipe,
 Revision and child identities. A translation retains the original family and
@@ -240,7 +247,7 @@ Recipes are not upgraded or replaced. Sample removal conservatively preserves
 an older baseline whose payload differs from the current bundled baseline, just
 as it preserves other changed sample content.
 
-The native shell smoke suite includes en-US, es-MX, and fr-CA with doubled strings
+The native shell smoke suite includes en-US, en-GB, es-MX, and fr-CA with doubled strings
 and forced right-to-left direction. Run it through Xcode on an iPhone simulator
 (compact) and My Mac (regular). It checks named, reachable shell and Settings
 structure without asserting translated copy, scrolling, or feature workflows.
@@ -257,5 +264,5 @@ and the current workflow in
 [Preparing your interface for localization](https://developer.apple.com/documentation/xcode/preparing-your-interface-for-localization).
 Follow [String Catalog guidance](https://developer.apple.com/documentation/xcode/localizing-and-varying-text-with-a-string-catalog)
 when adding locale-specific variants; extend the inventory, compiled resource
-checks and authored family variants together. Issues #118–#120 own additional
-locales; this ticket does not add them.
+checks and authored family variants together. Issues #118–#120 own the additional
+locales and their authored content.
