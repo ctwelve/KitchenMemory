@@ -41,6 +41,8 @@ For implementation work, begin with:
 
 - [Release preparation loop](release-preparation.md) for evidence-based architecture,
   dead-code, validation, and adversarial review before release.
+- [0.3 release preparation evidence](release-preparation-0.3.md) for the measured
+  findings, dispositions, and validation of Issue 124.
 
 ## Current product guidance
 
