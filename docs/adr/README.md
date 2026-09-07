@@ -40,4 +40,3 @@ implementation instructions; follow the linked replacement.
   superseded by ADR 0015.
 - [0009: Separate native app targets](0009-separate-native-app-targets.md) —
   superseded by ADR 0013.
-
