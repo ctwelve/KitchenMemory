@@ -61,6 +61,7 @@ harness build and scenario checks below are fresh.
 | Repository contracts | Fresh 92 Ruby tests / 334 assertions and seven Python tests passed; documentation, localization, project/resource membership, inventory/SBOM, and untagged release checks passed. |
 | Analyze | Native macOS and generic iOS passed on unchanged analyzed source. |
 | Signed payload | Both Production archives passed deep, strict signature verification; complete notices and the two expected privacy manifests match reviewed source. Runtime payload and linker inputs exclude build tools. |
+| Independent review | Standards and Spec reviews corrected two scenario-attribution claims; zero remaining actionable findings. |
 | Merged baseline CI | PR 175 checks and both actual-merge Production builds passed. Strict PR source-policy and trusted Xcode Cloud PR checks remain required. |
 
 Reproduce source gates with the checks invoked by
@@ -101,11 +102,14 @@ fresh receiver verified the exact expected evidence multiset and row content.
 Every store reported schema 7.0.0. Reopening the verified receiving store in a
 new process also passed exact retained evidence with zero new Cloud operations
 or remote-change notifications. The additional E3 foreground-notification phase
-ended **inconclusive after its 300-second observation window**; it did not
-establish live notification-driven refresh, and its follow-on E3 relaunch phase
-was not run. No receiving content mismatch was reported. The separately passed
-observer/composition tests and E4b retained-store relaunch retain only their
-stated scope. Earlier V3 runs are excluded from current-schema evidence.
+ended **inconclusive after its 300-second observation window**: callbacks
+arrived, but the expected synthetic Session was not observed. It did not
+establish live notification-driven refresh. A subsequent E3 relaunch of that
+same receiving store **passed exact evidence and content** after additional
+Cloud operations; this does not retroactively pass the foreground phase or
+establish that the evidence was already present before relaunch. The separately
+passed observer/composition tests and E4b retained-store relaunch retain only
+their stated scope. Earlier V3 runs are excluded from current-schema evidence.
 No Production schema initialization/promotion was performed. Development
 transport cannot establish Production schema readiness or physical multi-device
 behavior; the full historical transport/device matrix is not claimed as rerun.
