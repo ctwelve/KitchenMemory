@@ -96,6 +96,7 @@ public struct TagLibrary: Equatable, Sendable {
       guard tagID != afterID else { throw TagError.invalidOrder }
       return .reorder(id: tagID, afterID: afterID)
     case let .ordering(mode): return .ordering(mode)
+    case let .systemViewVisible(visible): return .systemViewVisible(visible)
     }
   }
 

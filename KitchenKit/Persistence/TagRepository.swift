@@ -36,6 +36,12 @@ public final class SwiftDataTagRepository: TagRepository {
     }
   }
 
+  func append(_ commands: [TagCommand], in kitchenID: Kitchen.ID, context: ModelContext) throws {
+    try store.append(commands.map(\.action), in: kitchenID, context: context) { snapshot in
+      _ = try library(snapshot, in: kitchenID)
+    }
+  }
+
   @discardableResult
   public func compact(in kitchenID: Kitchen.ID, at date: Date) throws -> TagCheckpoint? {
     try tagBoundary {

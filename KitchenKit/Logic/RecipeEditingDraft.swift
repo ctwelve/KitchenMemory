@@ -16,6 +16,16 @@ public final class RecipeEditingDraft: Identifiable {
   public internal(set) var observedSelectionIDs: [RecipeSelectionCommand.ID]
   public internal(set) var phase: RecipeAuthoringPhase
   public internal(set) var importIdentifier: String?
+  public internal(set) var pendingOrganization: RecipeOrganizationCommand?
+  private var organizationContents: PendingRecipeOrganization
+  public var organization: PendingRecipeOrganization {
+    get { organizationContents }
+    set {
+      guard original == nil, pendingSave == nil else { return }
+      organizationContents = newValue
+      changed()
+    }
+  }
   private var contents: RecipeEditSession
   @ObservationIgnored var changed: () -> Void = {}
 
@@ -41,10 +51,13 @@ public final class RecipeEditingDraft: Identifiable {
   var record: RecipeEditingRecord {
     RecipeEditingRecord(id: id, original: original, concerns: concerns, session: session,
                         observedSelectionIDs: observedSelectionIDs, importIdentifier: importIdentifier,
-                        phase: phase, reconciliation: reconciliation)
+                        phase: phase, reconciliation: reconciliation,
+                        organization: organization, pendingOrganization: pendingOrganization)
   }
 
   init(record: RecipeEditingRecord) {
+    organizationContents = record.organization ?? PendingRecipeOrganization()
+    pendingOrganization = record.pendingOrganization
     id = record.id
     reconciliation = record.reconciliation
     original = record.original
@@ -62,6 +75,8 @@ public final class RecipeEditingDraft: Identifiable {
   init(original: StoredRecipe? = nil, draft: RecipeDraft? = nil,
        concerns: [RecipeImportConcern] = [], phase: RecipeAuthoringPhase = .editing,
        reconciliation: RecipeReconciliation? = nil) {
+    organizationContents = PendingRecipeOrganization()
+    pendingOrganization = nil
     id = UUID()
     self.original = original
     self.reconciliation = reconciliation

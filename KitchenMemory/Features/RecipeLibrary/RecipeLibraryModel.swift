@@ -20,6 +20,7 @@ final class RecipeLibraryModel {
     case ready
   }
 
+  let organization: RecipeOrganizationModel?
   let library: RecipeLibrary
   let editingStore: any RecipeEditingStoring
   let drafts: RecipeDrafts
@@ -68,8 +69,10 @@ final class RecipeLibraryModel {
     samplePreferences: any SampleRecipeOnboardingStoring,
     kitchenWasCreated: Bool,
     editingStore: any RecipeEditingStoring = VolatileRecipeEditingStore(),
-    navigation: RecipeLibraryNavigation = RecipeLibraryNavigation()
+    navigation: RecipeLibraryNavigation = RecipeLibraryNavigation(),
+    organization: RecipeOrganizationModel? = nil
   ) {
+    self.organization = organization
     self.library = library
     self.editingStore = editingStore
     drafts = RecipeDrafts(library: library, store: editingStore)
@@ -147,6 +150,7 @@ final class RecipeLibraryModel {
 
   @discardableResult
   private func reload(selecting preferredRecipeID: Recipe.ID?) -> Bool {
+    organization?.refresh()
     do {
       let contents = try library.load()
       recipes = contents.recipes

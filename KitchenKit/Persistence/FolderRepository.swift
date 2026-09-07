@@ -34,6 +34,12 @@ public final class SwiftDataFolderRepository: FolderRepository {
     }
   }
 
+  func append(_ commands: [FolderCommand], in kitchenID: Kitchen.ID, context: ModelContext) throws {
+    try store.append(commands.map(\.action), in: kitchenID, context: context) { snapshot in
+      _ = try library(snapshot, in: kitchenID)
+    }
+  }
+
   @discardableResult
   public func compact(in kitchenID: Kitchen.ID, at date: Date) throws -> FolderCheckpoint? {
     let result = try store.compact(in: kitchenID) { snapshot in

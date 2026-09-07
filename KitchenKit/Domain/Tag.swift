@@ -26,6 +26,7 @@ public enum TagIntent: Equatable, Sendable {
   case merge(ids: [Tag.ID], survivorID: Tag.ID?, name: String)
   case reorder(id: Tag.ID, afterID: Tag.ID?)
   case ordering(TagOrdering)
+  case systemViewVisible(Bool)
 }
 
 /// Preserve the prepared command for exact retries, including observed assignment dots.
@@ -44,11 +45,13 @@ enum TagChange: OrganizationPayload {
   case merge(ids: [Tag.ID], survivorID: Tag.ID, name: String)
   case reorder(id: Tag.ID, afterID: Tag.ID?)
   case ordering(TagOrdering)
+  case systemViewVisible(Bool)
 
   var compactableRegister: String? {
     switch self {
     case let .rename(id, _): return "name:\(id.rawValue.uuidString)"
     case .ordering: return "tag-ordering"
+    case .systemViewVisible: return "tag-system-view"
     // Assignment dots and removal receipts remain reconstructive structural evidence.
     default: return nil
     }
@@ -58,7 +61,7 @@ enum TagChange: OrganizationPayload {
     switch self {
     case let .create(id, _), let .rename(id, _), let .delete(id), let .reorder(id, _): return id
     case let .merge(_, survivor, _): return survivor
-    case .assign, .remove, .ordering: return nil
+    case .assign, .remove, .ordering, .systemViewVisible: return nil
     }
   }
 }

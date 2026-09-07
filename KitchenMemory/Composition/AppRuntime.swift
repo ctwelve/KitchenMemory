@@ -252,7 +252,8 @@ struct PreparedCore {
       repository: recipeRepository,
       samples: samples,
       importer: RecipeImportService(),
-      resetRepository: SwiftDataKitchenResetRepository(modelContainer: modelContainer)
+      resetRepository: SwiftDataKitchenResetRepository(modelContainer: modelContainer),
+      organizationRepository: SwiftDataRecipeOrganizationRepository(modelContainer: modelContainer)
     )
     if plan.sampleFixture == .installed { try library.installSamples() }
     libraryModel = RecipeLibraryModel(
@@ -261,7 +262,12 @@ struct PreparedCore {
       kitchenWasCreated: initialKitchenWasCreatedOverride ?? preparedKitchen.wasCreated,
       editingStore: plan.store.isInMemory
         ? VolatileRecipeEditingStore()
-        : try FileRecipeEditingStore.deviceLocal(ownerID: ownerID)
+        : try FileRecipeEditingStore.deviceLocal(ownerID: ownerID),
+      organization: RecipeOrganizationModel(
+        repository: SwiftDataRecipeOrganizationRepository(modelContainer: modelContainer),
+        kitchenID: preparedKitchen.kitchen.id,
+        defaults: plan.store.isInMemory ? try organizationTestingDefaults() : .standard
+      )
     )
     cookingSessionRepository = SwiftDataCookingSessionRepository(
       modelContainer: modelContainer
@@ -367,4 +373,12 @@ struct PreparedApp {
       fatalError("Could not prepare the Kitchen Memory preview: \(error)")
     }
   }
+}
+
+@MainActor
+private func organizationTestingDefaults() throws -> UserDefaults {
+  guard let defaults = UserDefaults(suiteName: "organization-testing." + UUID().uuidString) else {
+    throw CocoaError(.fileWriteUnknown)
+  }
+  return defaults
 }

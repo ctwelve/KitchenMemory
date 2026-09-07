@@ -50,6 +50,20 @@ final class KitchenMemoryUITests: XCTestCase {
   }
 
   @MainActor
+  func testOrganizationDestinationExposesAccessibleManagement() {
+    let app = launchApp()
+    let destination = app.buttons["organization-management"].firstMatch
+    revealSidebar(in: app, exposing: destination)
+    XCTAssertTrue(destination.waitForExistence(timeout: 5))
+    assertAccessibleLabel(destination, description: "organization management")
+    activate(destination)
+    let content = app.descendants(matching: .any)["organization-management-content"]
+    XCTAssertTrue(content.waitForExistence(timeout: 5))
+    assertAccessibleLabel(content, description: "organization management content")
+    app.terminate()
+  }
+
+  @MainActor
   func testAttentionEvidenceExposesAccessibleRecoveryNavigation() {
     let app = launchApp(additionalArguments: ["--ui-testing-recovery-fixture"])
     visitTopLevelDestination(

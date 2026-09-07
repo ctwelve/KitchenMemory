@@ -35,6 +35,7 @@ public struct RecipeLibraryContents: Equatable, Sendable {
 public struct RecipeLibrary {
   private let kitchenID: Kitchen.ID
   private let repository: any RecipeRepository
+  private let organization: (any RecipeOrganizationRepository)?
   private let editor: RecipeEditor
   private let importer: any RecipeImportServing
   private let sampleInstaller: SampleRecipeInstallService
@@ -45,10 +46,12 @@ public struct RecipeLibrary {
     repository: any RecipeRepository,
     samples: any SampleRecipeProviding,
     importer: any RecipeImportServing,
-    resetRepository: (any KitchenResetRepository)? = nil
+    resetRepository: (any KitchenResetRepository)? = nil,
+    organizationRepository: (any RecipeOrganizationRepository)? = nil
   ) {
     self.kitchenID = kitchenID
     self.repository = repository
+    organization = organizationRepository
     editor = RecipeEditor(repository: repository)
     self.importer = importer
     sampleInstaller = SampleRecipeInstallService(repository: repository, samples: samples)
@@ -114,6 +117,22 @@ public struct RecipeLibrary {
       throw KitchenMemoryPersistenceError.inconsistentRecipeIdentity
     }
     try repository.save(command)
+  }
+
+  public func prepareOrganization(_ pending: PendingRecipeOrganization, for command: RecipeSaveCommand) throws
+    -> RecipeOrganizationCommand? {
+    guard let organization else {
+      guard pending == PendingRecipeOrganization() else { throw FolderError.invalidEvidence }
+      return nil
+    }
+    return try organization.load(in: kitchenID).prepare(pending, for: command.recipe.id,
+                                                       id: command.id.rawValue, at: command.savedAt)
+  }
+
+  public func save(_ command: RecipeSaveCommand, organization batch: RecipeOrganizationCommand?) throws {
+    guard let batch else { try save(command); return }
+    guard let organization, batch.kitchenID == kitchenID else { throw FolderError.wrongKitchen }
+    try organization.accept(batch, firstSave: command)
   }
 
   public func prepareReconciliationSave(
