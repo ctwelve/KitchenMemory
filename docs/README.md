@@ -82,6 +82,7 @@ For implementation work, begin with:
 - [Implementation architecture](implementation-architecture.md)
 - [Localization and recipe resources](localization-architecture.md)
 - [Accessibility engineering](accessibility-engineering.md)
+- [Alpha Recipe Library accessibility evidence](accessibility-alpha-library-evidence.md)
 - [Continuous integration](continuous-integration.md)
 - [Third-party dependency inventory](../DEPENDENCIES.md)
 - [Artificial intelligence use](../AI.md)
