@@ -23,7 +23,10 @@ Production schema.
 
 ## Build and local checks
 
-Build the signed Mac harness and run the deterministic fixture matrix:
+Build the signed Mac harness explicitly after source changes; `run.sh` only
+builds when the executable is absent. Store commands emit `store-schema` with
+the selected version (7.0.0 for this candidate). Run the deterministic fixture
+matrix:
 
 ```sh
 Tools/SessionCloudKitAcceptance/build.sh
