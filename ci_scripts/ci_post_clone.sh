@@ -14,6 +14,8 @@ ruby "$repository_path/Tools/Tests/check_release_version_test.rb"
 ruby "$repository_path/Tools/Tests/check_project_structure_test.rb"
 ruby "$repository_path/Tools/Tests/check_software_inventory_test.rb"
 ruby "$repository_path/Tools/Tests/check_localization_test.rb"
+ruby "$repository_path/Tools/Tests/check_documentation_test.rb"
+ruby "$repository_path/Tools/check-documentation.rb"
 ruby "$repository_path/Tools/check-localization.rb"
 
 # Keep the native multiplatform target, generated bundle metadata, platform

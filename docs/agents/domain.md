@@ -1,37 +1,23 @@
-# Domain docs
+# Find the relevant development guidance
 
-How the engineering skills consume this repository's domain documentation while exploring the codebase.
+Before changing domain concepts, architecture, or product behavior:
 
-## Before exploring, read these
+1. Use [the documentation map](../README.md) to find the affected contract.
+2. Read [CONTEXT.md](../../CONTEXT.md) when naming or changing domain concepts.
+3. Follow the relevant [accepted decisions](../adr/README.md), including their
+   amendment or supersession notices. Surface conflicts instead of silently
+   overriding a decision.
 
-- **`CONTEXT.md`** at the repository root when it exists.
-- **`docs/adr/`**: read ADRs that touch the area about to be changed.
-- **`docs/`**: read topical architecture and product articles relevant to the work.
+Read only the topical documents needed for the change. Research and milestone
+records supply evidence, not current instructions; the live GitHub issue graph
+owns implementation scope and prerequisites.
 
-If `CONTEXT.md` does not exist, proceed silently. The `/domain-modeling` skill creates it lazily when terms or decisions are resolved.
+Repository documentation owns architecture, product contracts, policy, and
+history. The existing [KitchenKit](../../KitchenKit/KitchenKit.docc/KitchenKit.md)
+and [application](../../KitchenMemory/Documentation.docc/Documentation.md) DocC
+catalogs explain actual symbols, ownership, and code entry points. Keep those
+small newcomer guides complementary to repository docs.
 
-## File structure
-
-Kitchen Memory is a single-context repository:
-
-```text
-/
-├── CONTEXT.md                  # Created lazily when needed
-└── docs/
-    ├── adr/                    # Architecture decision records
-    ├── agents/                 # Agent-specific repository guidance
-    └── *.md                    # Product and architecture articles
-```
-
-Keep development documentation in `docs/`. Reserve a future application DocC
-catalog for the completed internal design intended to accompany the mature app.
-
-## Use the glossary's vocabulary
-
-When output names a domain concept in an issue title, refactor proposal, hypothesis, or test name, use the term as defined in `CONTEXT.md`.
-
-If the needed concept is absent, reconsider whether the term belongs to the project or note the gap for `/domain-modeling`.
-
-## Flag ADR conflicts
-
-If output contradicts an existing ADR, surface the conflict explicitly rather than silently overriding it.
+The maintained skill library is `.agents/skills/`; `skills/` is a compatibility
+symlink to it. Edit only the maintained copy. For documentation routing or
+validation changes, see [the maintenance contract](../documentation-maintenance.md).

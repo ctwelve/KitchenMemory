@@ -65,11 +65,10 @@ Kitchen
 └── Tag[]
 ```
 
-Kitchen, Recipe, RecipeRevision, and the persistence-independent Cooking Session
-evidence model are implemented today. The remaining branches are accepted
-ownership direction for later product slices, not claims about current source
-types or persistence tables. Cooking Session persistence is intentionally still
-outside the implemented storage schema.
+Kitchen, Recipe, RecipeRevision, Cooking Session evidence and persistence,
+Folder and Tag organization, source capture, and private Recipe media are
+implemented. Membership, pantry, and planned-cook branches remain future
+ownership direction; the diagram is not a list of current storage tables.
 
 `KitchenMember` represents product-level attribution and household behavior.
 CloudKit share participation and permission remain authoritative in the sync
@@ -161,19 +160,13 @@ queries, migrations, performance, or CloudKit compatibility. In particular,
 domain invariants should not be weakened merely because a storage framework
 requires optional relationships or cannot enforce uniqueness.
 
-The implemented persistence slice remains:
-
-```text
-Kitchen → Recipe → RecipeRevision
-```
-
-The current repository still uses that payload graph and its legacy mutable
-current pointer. V5 registers the authority record families as the current
-alpha schema, but repository commands and projection remain a later
-implementation slice. Earlier alpha stores may be reset under ADR 0016.
-
-The remaining aggregates establish ownership and identity seams now but are
-implemented only as their product workflows arrive.
+Recipe Save and Selection evidence now owns authority; the old mutable current
+pointer is compatibility data. See [V5 authority](recipe-authority-v5-schema.md),
+[Session V3 evidence](cooking-session-v3-schema.md), [private media](recipe-media.md),
+and [Folder](folders.md)/[Tag](tags.md) contracts for their additive record families.
+The current store includes these families through V7. Historical schema
+definitions remain frozen; alpha reset permission follows ADR 0016 and does not
+authorize rewriting a published schema.
 
 ## Synchronization boundary
 

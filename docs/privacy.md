@@ -14,7 +14,7 @@ content exists to serve that person's kitchen, not to produce analytics,
 advertising profiles, engagement measurements, or saleable data.
 
 The shipped privacy manifest must describe the code in the current release. The
-0.1 application declares no tracking and no collected data. Its only declared
+application declares no tracking and no collected data. Its only declared
 required-reason API is `UserDefaults`, used to retain the app-local answer to the
 sample-recipe onboarding question and the device-local iCloud synchronization
 choice. One application preferences store owns both keys while preserving those
@@ -23,12 +23,14 @@ synchronization choice must not travel to another device. Private iCloud
 synchronization is a person-directed product function, not telemetry, and must
 never be repurposed as an analytics channel.
 
-Cooking Session Delete in 0.2 is reversible. The app retains the Session's
+Cooking Session Delete is reversible. The app retains the Session's
 authoritative evidence, deletion markers, and later Restore evidence in the
 person's local store and, when private iCloud synchronization is enabled, their
 private iCloud database. That retention is necessary to prevent a disconnected
 device from silently resurrecting deleted work and to keep Recovery honest.
-There is no automatic expiry, pruning, or Empty Deleted Items action in 0.2.
+Session evidence has no automatic expiry, pruning, or Empty Deleted Items
+action. Recipe payload and organization maintenance follow their separate
+[retention contracts](records-maintenance.md).
 The feature adds no analytics, telemetry, diagnostic upload, or third-party
 data recipient and does not change the no-collected-data privacy declaration.
 
@@ -36,7 +38,7 @@ data recipient and does not change the no-collected-data privacy declaration.
 
 Operational diagnostics are the one category the project may have a legitimate
 reason to collect in the future. There is no diagnostic collection service in
-the 0.1 application today. Before adding one, the implementation and release
+the application today. Before adding one, the implementation and release
 review must:
 
 - identify the specific failure that cannot be diagnosed adequately on-device;

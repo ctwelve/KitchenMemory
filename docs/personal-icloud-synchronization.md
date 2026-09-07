@@ -6,7 +6,7 @@ Copyright © 2026 the Kitchen Memory contributors.
 SPDX-License-Identifier: MIT
 -->
 
-Kitchen Memory 1.0 synchronizes one person's local recipe library between their
+Kitchen Memory synchronizes one person's local recipe library between their
 iPhone, iPad, and Mac through the private CloudKit database. Local SwiftData
 storage remains authoritative while offline; CloudKit transports changes when
 the person's iCloud account and network are available.
@@ -300,7 +300,9 @@ startup behavior.
    on at least two devices using the same development iCloud account.
 5. Reset the development environment only when a deliberate pre-release
    incompatible correction is authorized.
-6. Deploy the schema to production only as a deliberate release operation.
+6. Stop after validating the development container. Production promotion is a
+   separate, deliberate release operation in the production container as
+   described below; deploying the development container does not advance it.
 
 The Develop-and-macOS-only argument temporarily hands the Development app's
 default store to
@@ -334,6 +336,10 @@ project checker rejects either schema harness if its name enters the project.
 CloudKit Console remains the deliberate Production deployment surface.
 
 ## V4 Production deployment runbook
+
+> Retained 0.2.2 procedure, scoped to V4. Do not use its type allowlist to
+> administer the current V7 schema. Current release work requires a reviewed
+> candidate-specific schema comparison under the development workflow above.
 
 V4 Production promotion is part of the identified 0.2.2 repair release. Run it
 only after that candidate's automated, migration, privacy, and Development

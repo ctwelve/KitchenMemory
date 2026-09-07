@@ -293,7 +293,9 @@ follows a focused prototype; see ADRs 0003 and 0004.
 
 ## Capability horizons
 
-Horizons communicate dependency and focus, not dates or promises.
+Horizons communicate dependency and focus, not dates or promises. They are
+product groupings, not completion status; [current contracts](README.md#product-contracts)
+and the live issue graph identify implemented and remaining work.
 
 ### Foundation
 
@@ -332,9 +334,10 @@ foundation should be enjoyable and useful without requiring the advanced vision.
 ## Not yet decided
 
 - Exact CloudKit integration for multi-participant Kitchen sharing.
-- Exact revision and conflict-resolution mechanics.
+- Shared-Kitchen collaboration policy beyond the implemented Recipe authority
+  and Cooking Session evidence contracts.
 - Ingredient parser or assistance implementations.
-- Media storage and quality policy.
+- Broader Session media and video policy beyond current private Recipe images.
 - Pantry observation storage strategy.
 - Public distribution and App Store strategy.
 - Product-name availability, trademark research, and final bundle/repository

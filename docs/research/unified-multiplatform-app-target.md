@@ -32,7 +32,7 @@ identifiers. SDK-qualified settings select separate editable iOS and macOS
 property lists and entitlement files, while platform filters keep the localized
 launch-screen resources in iOS products only.
 [Current implementation architecture](../implementation-architecture.md)
-· [Shared app entry point](../../KitchenMemory/KitchenMemoryApp.swift)
+· [Shared app entry point](../../KitchenMemory/Composition/KitchenMemoryApp.swift)
 · [Xcode project](../../KitchenMemory.xcodeproj/project.pbxproj)
 
 The useful merge is therefore **one application target with platform-qualified
@@ -277,9 +277,9 @@ Kitchen Memory already defines `KitchenLoadingView`, but
 `KitchenMemoryApp.init()` synchronously calls `AppRuntime.prepare()` before the
 scene is constructed, so the loading case is not currently part of the
 startup-state enum and the view cannot cover that preparation interval.
-[App entry point](../../KitchenMemory/KitchenMemoryApp.swift)
-· [Startup view](../../KitchenMemory/KitchenStartupView.swift)
-· [Runtime preparation](../../KitchenMemory/AppRuntime.swift)
+[App entry point](../../KitchenMemory/Composition/KitchenMemoryApp.swift)
+· [Startup view](../../KitchenMemory/Features/Startup/KitchenStartupView.swift)
+· [Runtime preparation](../../KitchenMemory/Composition/AppRuntime.swift)
 
 The Mac-appropriate reuse is therefore:
 

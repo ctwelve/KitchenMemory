@@ -84,61 +84,22 @@ The recipe library comes first because planning, shopping, pantry knowledge,
 and cooking history are only trustworthy when the underlying recipe has not
 been flattened or silently rewritten.
 
-## Documentation
+## Documentation and contributing
 
-- [Development documentation](docs/README.md) — product,
-  architecture, workflows, and engineering guidance
-- [0.1 release notes](docs/release-notes-0.1.md)
-- [0.1 release evidence](docs/release-evidence-0.1.md)
-- [0.2 release evidence](docs/release-evidence-0.2.md)
-- [0.2.2 release evidence](docs/release-evidence-0.2.2.md)
-- [0.2.2 release notes](docs/release-notes-0.2.2.md)
-- [Rejected 0.2.1 candidate evidence](docs/release-evidence-0.2.1.md)
-- [0.1 release engineering](docs/release-engineering.md)
-- [Product doctrine](docs/product-doctrine.md)
-- [Product brief](docs/product-brief.md)
-- [Recipe domain model](docs/recipe-domain-model.md)
-- [Personal iCloud synchronization](docs/personal-icloud-synchronization.md)
-- [Localization architecture](docs/localization-architecture.md)
-- [Continuous integration](docs/continuous-integration.md)
-- [Architecture decisions](docs/README.md#accepted-architecture-decisions)
-- [Artificial intelligence use](AI.md)
+Start with the [development documentation map](docs/README.md) for current
+product contracts, engineering guidance, decisions, and historical evidence.
+[AI.md](AI.md) describes AI-assisted development; [AGENTS.md](AGENTS.md) routes
+repository instructions for coding agents.
 
-## Building from source
+Open `KitchenMemory.xcodeproj` in Xcode. Run the **KitchenMemory** scheme on
+an iPhone, iPad, iOS Simulator, or My Mac destination. Development builds use
+separate app sandboxes and `iCloud.net.ctwelve.dev.KitchenMemory`; the Production
+container is `iCloud.net.ctwelve.KitchenMemory`.
 
-Open `KitchenMemory.xcodeproj` in Xcode. Run the **KitchenMemory** scheme and
-choose an iPhone, iPad, iOS Simulator, or My Mac destination. The same checked-in
-application scheme and plan run the hosted and top-level accessibility tests on either native
-platform. The minimal **KitchenKit** scheme likewise references a checked-in
-plan for its unhosted test target. Each scheme builds only its primary product;
-its plan alone owns test-target membership.
-
-Development builds use the `net.ctwelve.dev` application namespace and the
-separate `iCloud.net.ctwelve.dev.KitchenMemory` container. They cannot read or
-administer the production app's iCloud data. Production and Development also
-use separate local application sandboxes.
-
-The repository contains one native multiplatform `KitchenMemory` app target.
-Shared presentation, localization, starter content, platform-specific
-entitlements, and iOS-only launch resources live in `KitchenMemory/`; Xcode
-selects the applicable files for the chosen SDK. Durable domain, import,
-product-logic, and persistence code lives in the native `KitchenKit` framework.
-
-KitchenKit tests run once through its shared scheme and explicit plan. The
-application plan runs the multiplatform composition and resource tests plus the
-shared accessible top-level navigation suite on each selected destination. For example:
-
-```sh
-xcodebuild test \
-  -project KitchenMemory.xcodeproj \
-  -scheme KitchenKit \
-  -destination 'platform=macOS'
-```
-
-The shared SwiftUI interface remains deliberately provisional. The business
-logic and native app boundaries are intended to survive deeper platform-specific
-interface work. See the [roadmap to 0.2](docs/roadmap-0.2.md) for the completed
-Cooking Session slices and their release boundary.
+The [implementation guide](docs/implementation-architecture.md) explains code
+ownership. The [CI contract](docs/continuous-integration.md) owns schemes, test
+plans, structural checks, and coverage. Run native application and UI tests
+through [Xcode's Test action](docs/agents/xcode.md) so Xcode signs the runner.
 
 ## License
 
