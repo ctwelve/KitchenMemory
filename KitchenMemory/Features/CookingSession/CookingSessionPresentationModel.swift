@@ -120,10 +120,6 @@ final class CookingSessionPresentationModel {
     return applyingPendingCommands(to: session)
   }
 
-  var hasPendingCommand: Bool {
-    !outbox.isEmpty
-  }
-
   var pendingCommands: [PendingCookingSessionCommand] {
     outbox.commands
   }

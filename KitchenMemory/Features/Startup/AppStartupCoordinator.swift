@@ -46,10 +46,6 @@ enum AppShellPresentation: Hashable {
       self = .recovery
     }
   }
-
-  var permitsKitchenActions: Bool {
-    self == .ready
-  }
 }
 
 enum AppStartupMilestone: Equatable {

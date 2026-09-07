@@ -230,28 +230,6 @@ final class RecipeLibraryModel {
       : .ready
   }
 
-  func createRecipe(from draft: RecipeDraft) -> Bool {
-    do {
-      let stored = try library.create(from: draft)
-      reload(selecting: stored.recipe.id)
-      return true
-    } catch {
-      issue = .save
-      return false
-    }
-  }
-
-  func reviseRecipe(id: Recipe.ID, from draft: RecipeDraft) -> Bool {
-    do {
-      let stored = try library.revise(recipeID: id, from: draft)
-      reload(selecting: stored.recipe.id)
-      return true
-    } catch {
-      issue = .save
-      return false
-    }
-  }
-
   func importRecipe(from url: URL) async throws -> [RecipeImportOption] {
     let options = try await library.importRecipe(from: url)
     try Task.checkCancellation()

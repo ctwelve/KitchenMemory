@@ -7,7 +7,6 @@ import AppKit
 #elseif canImport(UIKit)
 import UIKit
 #endif
-import DeveloperToolsSupport
 import Foundation
 import KitchenKit
 
@@ -120,15 +119,6 @@ public enum SampleRecipeCatalog {
             }
             return variant
         }
-    }
-
-    /// Locates an image in the bundled sample pack.
-    ///
-    /// Production media storage will eventually supply recipe images. This
-    /// bridge keeps deterministic sample media available to previews and the
-    /// first read-only recipe surface without exposing bundle lookup details.
-    public static func imageResource(named name: String) -> ImageResource {
-        ImageResource(name: name, bundle: resourceBundle)
     }
 
     private static func decodeAsset<Value: Decodable>(named name: String, as type: Value.Type) throws -> Value {

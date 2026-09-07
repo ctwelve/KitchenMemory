@@ -21,7 +21,10 @@ final class SamplePackSettingsTests: XCTestCase {
     XCTAssertEqual(installed.installed, installed.total)
     let command = try XCTUnwrap(model.prepareSamplePackRemoval())
     let sample = try XCTUnwrap(model.recipes.first)
-    XCTAssertTrue(model.reviseRecipe(id: sample.id, from: RecipeDraft(title: "Synthetic personal edit")))
+    model.beginEditing(sample)
+    let editor = try XCTUnwrap(model.editor)
+    editor.session.title = "Synthetic personal edit"
+    XCTAssertTrue(model.saveEditor())
     model.confirmSamplePackRemoval(command)
     let removed = try XCTUnwrap(model.samplePackStatus)
     XCTAssertFalse(removed.isEnabled)

@@ -69,9 +69,10 @@ final class RecipeLibraryStartupTests: XCTestCase {
     preparedApp.libraryModel.loadIfNeeded()
     XCTAssertEqual(preparedApp.libraryModel.startupState, .choosingSamples)
 
-    XCTAssertTrue(
-      preparedApp.libraryModel.createRecipe(from: RecipeDraft(title: "Synced Recipe"))
-    )
+    preparedApp.libraryModel.beginEditing()
+    let editor = try XCTUnwrap(preparedApp.libraryModel.editor)
+    editor.session.title = "Synced Recipe"
+    XCTAssertTrue(preparedApp.libraryModel.saveEditor())
     preparedApp.libraryModel.reloadAfterExternalStoreChange()
 
     XCTAssertEqual(preparedApp.libraryModel.startupState, .ready)
@@ -96,9 +97,10 @@ final class RecipeLibraryStartupTests: XCTestCase {
     let preferences = VolatileKitchenPreferencesStore()
     let preparedApp = try makePreparedApp(preferences: preferences)
     preparedApp.libraryModel.loadIfNeeded()
-    XCTAssertTrue(
-      preparedApp.libraryModel.createRecipe(from: RecipeDraft(title: "Keep Me"))
-    )
+    preparedApp.libraryModel.beginEditing()
+    let editor = try XCTUnwrap(preparedApp.libraryModel.editor)
+    editor.session.title = "Keep Me"
+    XCTAssertTrue(preparedApp.libraryModel.saveEditor())
 
     preparedApp.libraryModel.acceptSampleRecipes()
     let firstIDs = Set(preparedApp.libraryModel.recipes.map(\.recipe.id))
