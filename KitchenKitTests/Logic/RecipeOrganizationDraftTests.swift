@@ -18,7 +18,8 @@ final class RecipeOrganizationDraftTests: XCTestCase {
     let kitchen = Kitchen(name: "Home")
     try recipes.save(kitchen)
     let folder = Folder.ID(), tag = Tag.ID(), secondTag = Tag.ID()
-    try organization.accept(organization.load(in: kitchen.id).prepare(folder: .create(id: folder, name: "Dinner", parentID: nil)))
+    try organization.accept(
+      organization.load(in: kitchen.id).prepare(folder: .create(id: folder, name: "Dinner", parentID: nil)))
     try organization.accept(organization.load(in: kitchen.id).prepare(tag: .create(id: tag, name: "Quick")))
     try organization.accept(organization.load(in: kitchen.id).prepare(tag: .create(id: secondTag, name: "Family")))
     let library = RecipeLibrary(kitchenID: kitchen.id, repository: recipes, samples: OrganizationDraftSamples(),

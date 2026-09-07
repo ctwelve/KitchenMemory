@@ -58,7 +58,11 @@ struct RecipeOrganizationEditor: View {
         }
         if model.tagsEnabled {
           ForEach(snapshot.tags.orderedTags(locale: locale)) { tag in
-            Toggle(tag.displayName, isOn: Binding(get: { draft.organization.tagIDs.contains(tag.id) }, set: { selected in
+            Toggle(
+              tag.displayName,
+              isOn: Binding(
+                get: { draft.organization.tagIDs.contains(tag.id) },
+                set: { selected in
               if selected { draft.organization.tagIDs.insert(tag.id) } else { draft.organization.tagIDs.remove(tag.id) }
             }))
           }

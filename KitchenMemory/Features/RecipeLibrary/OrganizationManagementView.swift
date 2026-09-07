@@ -50,24 +50,42 @@ struct OrganizationManagementView: View {
                 Menu(.organizationManage) {
                   Button(.organizationRename) { edits = .init(folder: folder) }
                   Menu(.organizationParent) {
-                    Button(.organizationRoot) { model.perform { try $0.prepare(folder: .move(id: folder.id, parentID: nil)) } }
-                    ForEach(snapshot.folders.destinations(locale: locale).filter { !snapshot.folders.subtree(of: folder.id).contains($0.id) }) { parent in
-                      Button(parent.path) { model.perform { try $0.prepare(folder: .move(id: folder.id, parentID: parent.id)) } }
+                    Button(.organizationRoot) {
+                      model.perform { try $0.prepare(folder: .move(id: folder.id, parentID: nil)) }
+                    }
+                    ForEach(
+                      snapshot.folders.destinations(locale: locale).filter {
+                        !snapshot.folders.subtree(of: folder.id).contains($0.id)
+                      }
+                    ) { parent in
+                      Button(parent.path) {
+                        model.perform { try $0.prepare(folder: .move(id: folder.id, parentID: parent.id)) }
+                      }
                     }
                   }
                   if snapshot.folders.ordering == .manual {
-                    Button(.organizationFirst) { model.perform { try $0.prepare(folder: .reorder(id: folder.id, afterID: nil)) } }
+                    Button(.organizationFirst) {
+                      model.perform { try $0.prepare(folder: .reorder(id: folder.id, afterID: nil)) }
+                    }
                     Menu(.organizationAfter) {
-                      ForEach(snapshot.folders.children(of: folder.parentID, locale: locale).filter { $0.id != folder.id }) { anchor in
-                        Button(anchor.name) { model.perform { try $0.prepare(folder: .reorder(id: folder.id, afterID: anchor.id)) } }
+                      ForEach(
+                        snapshot.folders.children(of: folder.parentID, locale: locale).filter { $0.id != folder.id }
+                      ) { anchor in
+                        Button(anchor.name) {
+                          model.perform { try $0.prepare(folder: .reorder(id: folder.id, afterID: anchor.id)) }
+                        }
                       }
                     }
                   }
                   Menu(.organizationMerge) {
-                    ForEach(snapshot.folders.folders.filter { $0.id != folder.id && $0.parentID == folder.parentID }) { other in
+                    ForEach(
+                      snapshot.folders.folders.filter { $0.id != folder.id && $0.parentID == folder.parentID }
+                    ) { other in
                       Button(other.name) {
-                        do { merge = try snapshot.prepare(folder: .merge(ids: [folder.id, other.id], survivorID: nil, name: folder.name)) }
-                        catch { model.failed = true }
+                        do {
+                          merge = try snapshot.prepare(
+                            folder: .merge(ids: [folder.id, other.id], survivorID: nil, name: folder.name))
+                        } catch { model.failed = true }
                       }
                     }
                   }
@@ -97,22 +115,30 @@ struct OrganizationManagementView: View {
                 Menu(.organizationManage) {
                   Button(.organizationRename) { edits = .init(tag: tag) }
                   if snapshot.tags.ordering == .manual {
-                    Button(.organizationFirst) { model.perform { try $0.prepare(tag: .reorder(id: tag.id, afterID: nil)) } }
+                    Button(.organizationFirst) {
+                      model.perform { try $0.prepare(tag: .reorder(id: tag.id, afterID: nil)) }
+                    }
                     Menu(.organizationAfter) {
                       ForEach(snapshot.tags.orderedTags(locale: locale).filter { $0.id != tag.id }) { anchor in
-                        Button(anchor.displayName) { model.perform { try $0.prepare(tag: .reorder(id: tag.id, afterID: anchor.id)) } }
+                        Button(anchor.displayName) {
+                          model.perform { try $0.prepare(tag: .reorder(id: tag.id, afterID: anchor.id)) }
+                        }
                       }
                     }
                   }
                   Menu(.organizationMerge) {
                     ForEach(snapshot.tags.tags.filter { $0.id != tag.id }) { other in
                       Button(other.displayName) {
-                        do { merge = try snapshot.prepare(tag: .merge(ids: [tag.id, other.id], survivorID: nil, name: tag.name)) }
-                        catch { model.failed = true }
+                        do {
+                          merge = try snapshot.prepare(
+                            tag: .merge(ids: [tag.id, other.id], survivorID: nil, name: tag.name))
+                        } catch { model.failed = true }
                       }
                     }
                   }
-                  Button(.organizationDelete, role: .destructive) { deletion = try? snapshot.prepare(tag: .delete(id: tag.id)) }
+                  Button(.organizationDelete, role: .destructive) {
+                    deletion = try? snapshot.prepare(tag: .delete(id: tag.id))
+                  }
                 }
                 .accessibilityLabel(Text(tag.displayName))
               }
@@ -127,13 +153,17 @@ struct OrganizationManagementView: View {
       .accessibilityLabel(Text(.organizationTitle))
       .toolbar { ToolbarItem(placement: .confirmationAction) { Button(.organizationDone) { dismiss() } } }
       .sheet(item: $edits) { OrganizationNameEditor(model: model, edit: $0) }
-      .confirmationDialog(.organizationDelete, isPresented: Binding(get: { deletion != nil }, set: { if !$0 { deletion = nil } })) {
+      .confirmationDialog(
+        .organizationDelete, isPresented: Binding(get: { deletion != nil }, set: { if !$0 { deletion = nil } })
+      ) {
         Button(.organizationDelete, role: .destructive) {
           if let deletion { model.perform { _ in deletion } }
           deletion = nil
         }
       } message: { Text(.organizationDeleteMessage) }
-      .confirmationDialog(.organizationMergeConfirm, isPresented: Binding(get: { merge != nil }, set: { if !$0 { merge = nil } })) {
+      .confirmationDialog(
+        .organizationMergeConfirm, isPresented: Binding(get: { merge != nil }, set: { if !$0 { merge = nil } })
+      ) {
         Button(.organizationMerge) { if let merge { model.perform { _ in merge } }; merge = nil }
         Button(.actionCancel, role: .cancel) { merge = nil }
       } message: { Text(.organizationMergeMessage) }
@@ -170,7 +200,9 @@ private struct OrganizationNameEditor: View {
         if edit.isFolder, edit.folder == nil, let snapshot = model.snapshot {
           Picker(.organizationParent, selection: $parentID) {
             Text(.organizationRoot).tag(Folder.ID?.none)
-            ForEach(snapshot.folders.destinations(locale: locale)) { destination in Text(destination.path).tag(Optional(destination.id)) }
+            ForEach(snapshot.folders.destinations(locale: locale)) { destination in
+              Text(destination.path).tag(Optional(destination.id))
+            }
           }
         }
       }

@@ -18,7 +18,8 @@ final class RecipeOrganizationModelTests: XCTestCase {
     try recipes.save(kitchen)
     let recipe = try RecipeEditor(repository: recipes).create(in: kitchen.id, from: RecipeDraft(title: "Soup"))
     let stored = try XCTUnwrap(recipes.recipe(id: recipe.id))
-    var model = RecipeOrganizationModel(repository: repository, kitchenID: kitchen.id, scope: "owner-a", defaults: fixture.defaults)
+    var model = RecipeOrganizationModel(
+      repository: repository, kitchenID: kitchen.id, scope: "owner-a", defaults: fixture.defaults)
     XCTAssertTrue(model.foldersEnabled); XCTAssertTrue(model.tagsEnabled)
     let folder = Folder.ID(), tag = Tag.ID()
     model.perform { try $0.prepare(folder: .create(id: folder, name: "Dinner", parentID: nil)) }
@@ -34,7 +35,8 @@ final class RecipeOrganizationModelTests: XCTestCase {
     XCTAssertTrue(model.filter.tagIDs.isEmpty)
     model.expanded = [folder]
     model.foldersEnabled = false; model.tagsEnabled = false
-    model = RecipeOrganizationModel(repository: repository, kitchenID: kitchen.id, scope: "owner-a", defaults: fixture.defaults)
+    model = RecipeOrganizationModel(
+      repository: repository, kitchenID: kitchen.id, scope: "owner-a", defaults: fixture.defaults)
     XCTAssertFalse(model.foldersEnabled); XCTAssertFalse(model.tagsEnabled)
     XCTAssertEqual(model.expanded, [folder])
     XCTAssertEqual(model.snapshot?.folders.primaryFolder(for: recipe.id), folder)
@@ -58,7 +60,8 @@ final class RecipeOrganizationModelTests: XCTestCase {
     try repository.accept(observed.prepare(folder: .create(id: Folder.ID(), name: "meals", parentID: nil)))
     try repository.accept(observed.prepare(tag: .create(id: Tag.ID(), name: "Quick")))
     try repository.accept(observed.prepare(tag: .create(id: Tag.ID(), name: "quick")))
-    let model = RecipeOrganizationModel(repository: repository, kitchenID: kitchen.id, scope: "owner-a", defaults: fixture.defaults)
+    let model = RecipeOrganizationModel(
+      repository: repository, kitchenID: kitchen.id, scope: "owner-a", defaults: fixture.defaults)
     model.foldersEnabled = false; model.tagsEnabled = false
     XCTAssertEqual(model.collisionCount, 2)
     XCTAssertTrue(model.requiresRecovery)
@@ -112,18 +115,22 @@ final class RecipeOrganizationModelTests: XCTestCase {
     let container = try KitchenMemorySchema.makeContainer(inMemory: true)
     let kitchen = Kitchen(name: "Home")
     try SwiftDataRecipeRepository(modelContainer: container).save(kitchen)
-    let repository = UncertainOrganizationRepository(base: SwiftDataRecipeOrganizationRepository(modelContainer: container))
-    var model = RecipeOrganizationModel(repository: repository, kitchenID: kitchen.id, scope: "owner-a", defaults: fixture.defaults)
+    let repository = UncertainOrganizationRepository(
+      base: SwiftDataRecipeOrganizationRepository(modelContainer: container))
+    var model = RecipeOrganizationModel(
+      repository: repository, kitchenID: kitchen.id, scope: "owner-a", defaults: fixture.defaults)
     model.perform { try $0.prepare(tag: .create(id: Tag.ID(), name: "Retained")) }
     let pending = try XCTUnwrap(model.pending)
     XCTAssertTrue(model.requiresRecovery)
     model.perform { try $0.prepare(tag: .create(id: Tag.ID(), name: "Must wait")) }
     XCTAssertEqual(model.pending, pending)
-    model = RecipeOrganizationModel(repository: repository, kitchenID: kitchen.id, scope: "owner-a", defaults: fixture.defaults)
+    model = RecipeOrganizationModel(
+      repository: repository, kitchenID: kitchen.id, scope: "owner-a", defaults: fixture.defaults)
     XCTAssertEqual(model.pending, pending)
     let otherContainer = try KitchenMemorySchema.makeContainer(inMemory: true)
     try SwiftDataRecipeRepository(modelContainer: otherContainer).save(kitchen)
-    let otherOwner = RecipeOrganizationModel(repository: SwiftDataRecipeOrganizationRepository(modelContainer: otherContainer),
+    let otherOwner = RecipeOrganizationModel(
+      repository: SwiftDataRecipeOrganizationRepository(modelContainer: otherContainer),
       kitchenID: kitchen.id, scope: "owner-b", defaults: fixture.defaults)
     XCTAssertNil(otherOwner.pending)
     otherOwner.retry()
@@ -134,7 +141,8 @@ final class RecipeOrganizationModelTests: XCTestCase {
     XCTAssertEqual(model.snapshot?.tags.tags.map(\.name), ["Retained"])
     model.retry()
     fixture.defaults.set(Data([0xff]), forKey: "organization.owner-a." + kitchen.id.rawValue.uuidString + ".pending")
-    model = RecipeOrganizationModel(repository: repository, kitchenID: kitchen.id, scope: "owner-a", defaults: fixture.defaults)
+    model = RecipeOrganizationModel(
+      repository: repository, kitchenID: kitchen.id, scope: "owner-a", defaults: fixture.defaults)
     XCTAssertTrue(model.storageInvalid)
     model.retry()
     XCTAssertTrue(model.failed)

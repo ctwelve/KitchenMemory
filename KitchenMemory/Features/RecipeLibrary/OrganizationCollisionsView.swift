@@ -45,7 +45,9 @@ struct OrganizationCollisionsView: View {
       if offersManagement { OrganizationManagementButton(model: model) }
     } header: { Text(.organizationCollisions).accessibilityHeading(.h2) }
     .accessibilityIdentifier("organization-collisions")
-    .confirmationDialog(.organizationMergeConfirm, isPresented: Binding(get: { merge != nil }, set: { if !$0 { merge = nil } })) {
+    .confirmationDialog(
+      .organizationMergeConfirm, isPresented: Binding(get: { merge != nil }, set: { if !$0 { merge = nil } })
+    ) {
       Button(.organizationMerge) { if let merge { model.perform { _ in merge } }; merge = nil }
       Button(.actionCancel, role: .cancel) { merge = nil }
     } message: { Text(.organizationMergeMessage) }

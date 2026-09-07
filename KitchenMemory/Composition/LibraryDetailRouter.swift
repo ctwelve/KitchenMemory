@@ -31,7 +31,8 @@ struct LibraryDetailRouter: View {
         RecipeDeletedItemsSection(model: libraryModel)
       }
     case .recovery:
-      CookingSessionRecoveryView(recipeCount: libraryModel.recoveryRecipes.count + (libraryModel.organization?.collisionCount ?? 0),
+      CookingSessionRecoveryView(
+        recipeCount: libraryModel.recoveryRecipes.count + (libraryModel.organization?.collisionCount ?? 0),
                                  recipeContent: {
         RecipeRecoverySection(model: libraryModel)
         if let organization = libraryModel.organization { OrganizationCollisionsView(model: organization) }

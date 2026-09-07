@@ -91,13 +91,17 @@ public struct TagLibrary: Equatable, Sendable {
     case let .merge(ids, survivorID, name):
       return try prepareMerge(ids: ids, survivorID: survivorID, name: name, evidence: evidence)
     case let .reorder(tagID, afterID):
-      try requireTag(tagID)
-      if let afterID { try requireTag(afterID) }
-      guard tagID != afterID else { throw TagError.invalidOrder }
-      return .reorder(id: tagID, afterID: afterID)
+      return try prepareReordering(id: tagID, afterID: afterID)
     case let .ordering(mode): return .ordering(mode)
     case let .systemViewVisible(visible): return .systemViewVisible(visible)
     }
+  }
+
+  private func prepareReordering(id tagID: Tag.ID, afterID: Tag.ID?) throws -> TagChange {
+    try requireTag(tagID)
+    if let afterID { try requireTag(afterID) }
+    guard tagID != afterID else { throw TagError.invalidOrder }
+    return .reorder(id: tagID, afterID: afterID)
   }
 
   private func prepareCreation(id tagID: Tag.ID, name: String) throws -> TagChange {

@@ -27,7 +27,10 @@ final class RecipeOrganizationModel {
   private(set) var showsUnfiled = true
   private(set) var showsUntagged = true
 
-  init(repository: any RecipeOrganizationRepository, kitchenID: Kitchen.ID, scope: String, defaults: UserDefaults = .standard) {
+  init(
+    repository: any RecipeOrganizationRepository, kitchenID: Kitchen.ID, scope: String,
+    defaults: UserDefaults = .standard
+  ) {
     self.repository = repository
     self.kitchenID = kitchenID
     self.defaults = defaults
@@ -41,8 +44,7 @@ final class RecipeOrganizationModel {
         let command = try JSONDecoder().decode(RecipeOrganizationCommand.self, from: data)
         guard command.kitchenID == kitchenID else { throw FolderError.wrongKitchen }
         pending = command
-      }
-      catch { storageInvalid = true; failed = true }
+      } catch { storageInvalid = true; failed = true }
     }
     refresh()
   }

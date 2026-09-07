@@ -17,7 +17,8 @@ final class RecipeOrganizationRepositoryTests: XCTestCase {
     try recipes.save(kitchen)
     let folderID = Folder.ID()
     let tagID = Tag.ID()
-    try repository.accept(repository.load(in: kitchen.id).prepare(folder: .create(id: folderID, name: "Meals", parentID: nil)))
+    try repository.accept(
+      repository.load(in: kitchen.id).prepare(folder: .create(id: folderID, name: "Meals", parentID: nil)))
     try repository.accept(repository.load(in: kitchen.id).prepare(tag: .create(id: tagID, name: "Quick")))
     let save = try RecipeEditor(repository: recipes).prepareSave(in: kitchen.id, from: RecipeDraft(title: "Soup"),
                                                                original: nil, observedSelectionIDs: [])
@@ -44,7 +45,8 @@ final class RecipeOrganizationRepositoryTests: XCTestCase {
     let wrong = RecipeOrganizationCommand(id: UUID(), kitchenID: foreign.id, authoredAt: Date(),
                                          folders: batch.folders, tags: batch.tags)
     XCTAssertThrowsError(try repository.accept(wrong))
-    let wrongSave = RecipeOrganizationCommand(id: UUID(), kitchenID: foreign.id, authoredAt: Date(), folders: [], tags: [])
+    let wrongSave = RecipeOrganizationCommand(
+      id: UUID(), kitchenID: foreign.id, authoredAt: Date(), folders: [], tags: [])
     XCTAssertThrowsError(try repository.accept(wrongSave, firstSave: save))
   }
 
@@ -55,7 +57,8 @@ final class RecipeOrganizationRepositoryTests: XCTestCase {
     let kitchen = Kitchen(name: "Home")
     try recipes.save(kitchen)
     let folder = Folder.ID(), tag = Tag.ID()
-    try repository.accept(repository.load(in: kitchen.id).prepare(folder: .create(id: folder, name: "Meals", parentID: nil)))
+    try repository.accept(
+      repository.load(in: kitchen.id).prepare(folder: .create(id: folder, name: "Meals", parentID: nil)))
     try repository.accept(repository.load(in: kitchen.id).prepare(tag: .create(id: tag, name: "Weeknight")))
     var ids: Set<Recipe.ID> = []
     for index in 0..<20 {

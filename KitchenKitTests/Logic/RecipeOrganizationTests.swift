@@ -23,12 +23,15 @@ final class RecipeOrganizationTests: XCTestCase {
     let later = Date(timeIntervalSince1970: 40 * 86_400)
     let folderCheckpoint = try XCTUnwrap(hiddenFolders.checkpoint(at: later))
     let tagCheckpoint = try XCTUnwrap(hiddenTags.checkpoint(at: later))
-    XCTAssertFalse(try FolderLibrary(kitchenID: kitchen, commands: [], checkpoints: [folderCheckpoint]).systemViewVisible)
+    XCTAssertFalse(
+      try FolderLibrary(kitchenID: kitchen, commands: [], checkpoints: [folderCheckpoint]).systemViewVisible)
     XCTAssertFalse(try TagLibrary(kitchenID: kitchen, commands: [], checkpoints: [tagCheckpoint]).systemViewVisible)
     XCTAssertTrue(try FolderLibrary(kitchenID: kitchen, commands: [folderCommand,
-      hiddenFolders.prepare(.systemViewVisible(true))]).systemViewVisible)
+      hiddenFolders.prepare(.systemViewVisible(true)),
+    ]).systemViewVisible)
     XCTAssertTrue(try TagLibrary(kitchenID: kitchen, commands: [tagCommand,
-      hiddenTags.prepare(.systemViewVisible(true))]).systemViewVisible)
+      hiddenTags.prepare(.systemViewVisible(true)),
+    ]).systemViewVisible)
   }
 
   func testFolderSubtreeTagsSearchAndDisabledPresentationIntersect() throws {
@@ -84,7 +87,8 @@ final class RecipeOrganizationTests: XCTestCase {
     let intents: [FolderIntent] = [.create(id: home, name: "Home", parentID: nil),
       .create(id: camping, name: "Camping", parentID: nil),
       .create(id: homeMeals, name: "Meals", parentID: home),
-      .create(id: campingMeals, name: "Meals", parentID: camping)]
+      .create(id: campingMeals, name: "Meals", parentID: camping),
+    ]
     for intent in intents {
       commands.append(try FolderLibrary(kitchenID: kitchen, commands: commands).prepare(intent))
     }
@@ -95,7 +99,8 @@ final class RecipeOrganizationTests: XCTestCase {
     let duplicate = Folder.ID()
     commands.append(try empty.prepare(.create(id: duplicate, name: "Home", parentID: nil)))
     let collided = try FolderLibrary(kitchenID: kitchen, commands: commands).outline(expanded: [], locale: .current)
-    XCTAssertEqual(Array(collided.map(\.id).suffix(2)), [home, duplicate].sorted { $0.rawValue.uuidString < $1.rawValue.uuidString })
+    XCTAssertEqual(
+      Array(collided.map(\.id).suffix(2)), [home, duplicate].sorted { $0.rawValue.uuidString < $1.rawValue.uuidString })
   }
 
   func testOutlinePreservesOrderAndHandlesDeepHierarchyIteratively() throws {
@@ -107,11 +112,14 @@ final class RecipeOrganizationTests: XCTestCase {
     for index in 0..<300 {
       let id = Folder.ID()
       let action = OrganizationAction(id: UUID(), authoredAt: Date(timeIntervalSince1970: 0),
-        observed: commands.last.map { [$0.id] } ?? [], payload: FolderChange.create(id: id, name: "Level \(index)", parentID: parent))
+        observed: commands.last.map { [$0.id] } ?? [],
+        payload: FolderChange.create(id: id, name: "Level \(index)", parentID: parent))
       commands.append(FolderCommand(kitchenID: kitchen, action: action)); ids.insert(id); parent = id
     }
     let rootSibling = Folder.ID()
-    commands.append(try FolderLibrary(kitchenID: kitchen, commands: commands).prepare(.create(id: rootSibling, name: "A", parentID: nil)))
+    commands.append(
+      try FolderLibrary(kitchenID: kitchen, commands: commands).prepare(
+        .create(id: rootSibling, name: "A", parentID: nil)))
     let library = try FolderLibrary(kitchenID: kitchen, commands: commands)
     let rows = library.outline(expanded: ids, locale: Locale(identifier: "en_US"))
     XCTAssertEqual(library.destinations(locale: .current).last?.path.components(separatedBy: " / ").count, 300)
