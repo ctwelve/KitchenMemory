@@ -68,14 +68,14 @@ final class IdentityCollectionTests: XCTestCase {
 
 final class CausalGraphTests: XCTestCase {
   func testEmptyAndDisconnectedGraphsHaveDeterministicMaximalNodes() {
-    let empty = graph([(node: Int, parents: [Int])](), orderedBy: <)
+    let empty = CausalGraph<Int>(parentsByNode: [:], orderedBy: <)
     XCTAssertEqual(empty.maximalNodes, [])
     XCTAssertFalse(empty.containsCycle)
 
-    let graph = graph([
-      (node: 7, parents: []),
-      (node: 3, parents: []),
-      (node: 5, parents: []),
+    let graph = CausalGraph(parentsByNode: [
+      7: [],
+      3: [],
+      5: [],
     ], orderedBy: <)
 
     XCTAssertEqual(graph.maximalNodes, [3, 5, 7])
@@ -83,12 +83,12 @@ final class CausalGraphTests: XCTestCase {
   }
 
   func testBranchingConvergingAndMultiParentGraphsExposeAncestryAndMaximalHeads() {
-    let graph = graph([
-      (node: "root", parents: []),
-      (node: "left", parents: ["root"]),
-      (node: "right", parents: ["root"]),
-      (node: "merge", parents: ["left", "right"]),
-      (node: "island", parents: []),
+    let graph = CausalGraph(parentsByNode: [
+      "root": [],
+      "left": ["root"],
+      "right": ["root"],
+      "merge": ["left", "right"],
+      "island": [],
     ], orderedBy: <)
 
     XCTAssertTrue(graph.isAncestor("root", of: "merge"))
@@ -105,12 +105,12 @@ final class CausalGraphTests: XCTestCase {
   }
 
   func testReachabilityIsOrderedDeduplicatedAndIncludesMissingDependencies() {
-    let graph = graph([
-      (node: "root", parents: []),
-      (node: "left", parents: ["root", "root"]),
-      (node: "right", parents: ["root", "missing"]),
-      (node: "merge", parents: ["left", "right", "left"]),
-      (node: "disconnected", parents: []),
+    let graph = CausalGraph(parentsByNode: [
+      "root": [],
+      "left": ["root", "root"],
+      "right": ["root", "missing"],
+      "merge": ["left", "right", "left"],
+      "disconnected": [],
     ], orderedBy: <)
 
     XCTAssertEqual(
@@ -120,17 +120,17 @@ final class CausalGraphTests: XCTestCase {
   }
 
   func testEquivalentArrivalOrdersProduceTheSameCanonicalGraphResults() {
-    let first = graph([
-      (node: "root", parents: []),
-      (node: "right", parents: ["root"]),
-      (node: "left", parents: ["root"]),
-      (node: "merge", parents: ["right", "left"]),
+    let first = CausalGraph(parentsByNode: [
+      "root": [],
+      "right": ["root"],
+      "left": ["root"],
+      "merge": ["right", "left"],
     ], orderedBy: <)
-    let second = graph([
-      (node: "merge", parents: ["left", "right"]),
-      (node: "left", parents: ["root"]),
-      (node: "root", parents: []),
-      (node: "right", parents: ["root"]),
+    let second = CausalGraph(parentsByNode: [
+      "merge": ["left", "right"],
+      "left": ["root"],
+      "root": [],
+      "right": ["root"],
     ], orderedBy: <)
 
     XCTAssertEqual(first.maximalNodes, second.maximalNodes)
@@ -140,33 +140,13 @@ final class CausalGraphTests: XCTestCase {
     )
   }
 
-  func testGraphConstructionCoalescesExactDefinitionsAndReportsCollisions() {
-    let exact = graph([
-      (node: "merge", parents: ["right", "left", "right"]),
-      (node: "merge", parents: ["left", "right"]),
-      (node: "left", parents: []),
-      (node: "right", parents: []),
-    ], orderedBy: <)
-    XCTAssertEqual(exact.reachableNodes(from: ["merge"]), ["merge", "left", "right"])
-
-    switch CausalGraph.coalescing([
-      (node: "merge", parents: ["left"]),
-      (node: "merge", parents: ["right"]),
-    ], orderedBy: <) {
-    case .graph:
-      XCTFail("Expected conflicting parent definitions to remain visible")
-    case let .collision(node):
-      XCTAssertEqual(node, "merge")
-    }
-  }
-
   func testReachabilityIdentifiesAllAndOnlyDependenciesRequiredForRetention() {
-    let graph = graph([
-      (node: "selected", parents: ["payload", "metadata"]),
-      (node: "payload", parents: ["source"]),
-      (node: "metadata", parents: []),
-      (node: "source", parents: []),
-      (node: "prunable", parents: []),
+    let graph = CausalGraph(parentsByNode: [
+      "selected": ["payload", "metadata"],
+      "payload": ["source"],
+      "metadata": [],
+      "source": [],
+      "prunable": [],
     ], orderedBy: <)
 
     let retained = graph.reachableNodes(from: ["selected"])
@@ -176,11 +156,11 @@ final class CausalGraphTests: XCTestCase {
   }
 
   func testCyclesTerminateAndAreDetected() {
-    let graph = graph([
-      (node: "a", parents: ["b"]),
-      (node: "b", parents: ["c"]),
-      (node: "c", parents: ["a"]),
-      (node: "self", parents: ["self"]),
+    let graph = CausalGraph(parentsByNode: [
+      "a": ["b"],
+      "b": ["c"],
+      "c": ["a"],
+      "self": ["self"],
     ], orderedBy: <)
 
     XCTAssertTrue(graph.containsCycle)
@@ -190,29 +170,15 @@ final class CausalGraphTests: XCTestCase {
 
   func testDeepAcyclicGraphUsesStackSafeTraversal() {
     let depth = 10_000
-    let graph = graph((0..<depth).map { node in
-      (node: node, parents: node == 0 ? [] : [node - 1])
-    }, orderedBy: <)
+    let parents = Dictionary(uniqueKeysWithValues: (0..<depth).map { node in
+      (node, node == 0 ? [] : [node - 1])
+    })
+    let graph = CausalGraph(parentsByNode: parents, orderedBy: <)
 
     XCTAssertFalse(graph.containsCycle)
     XCTAssertTrue(graph.isAncestor(0, of: depth - 1))
     XCTAssertEqual(graph.maximalNodes, [depth - 1])
     XCTAssertEqual(graph.reachableNodes(from: [depth - 1]).count, depth)
-  }
-
-  private func graph<Node: Hashable>(
-    _ parentLists: [(node: Node, parents: [Node])],
-    orderedBy order: @escaping (Node, Node) -> Bool,
-    file: StaticString = #filePath,
-    line: UInt = #line
-  ) -> CausalGraph<Node> {
-    switch CausalGraph.coalescing(parentLists, orderedBy: order) {
-    case let .graph(graph):
-      return graph
-    case let .collision(node):
-      XCTFail("Unexpected conflicting definitions for \(node)", file: file, line: line)
-      fatalError("A failed graph construction cannot supply a test value")
-    }
   }
 }
 

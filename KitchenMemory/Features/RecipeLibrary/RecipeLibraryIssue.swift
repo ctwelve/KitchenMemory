@@ -6,7 +6,6 @@ import Foundation
 
 enum RecipeLibraryIssue: Equatable {
   case read
-  case save
   case reset
   case samples
   case disposition
@@ -15,8 +14,6 @@ enum RecipeLibraryIssue: Equatable {
     switch self {
     case .read:
       LocalizedStringResource.libraryFailureRead.localized(for: locale)
-    case .save:
-      LocalizedStringResource.libraryFailureSave.localized(for: locale)
     case .reset:
       LocalizedStringResource.libraryFailureReset.localized(for: locale)
     case .disposition:

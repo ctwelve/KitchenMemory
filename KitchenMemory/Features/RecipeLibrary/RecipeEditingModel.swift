@@ -61,9 +61,6 @@ extension RecipeLibraryModel {
 
   func retryEditingStorage() { drafts.retryStorage() }
 
-  @discardableResult
-  func persistEditingDrafts() -> Bool { drafts.persist() }
-
   func discardEditor(confirmed: Bool) {
     guard confirmed, let editor else { return }
     if drafts.discard(editor.id) { navigation.move(to: .recipe) }

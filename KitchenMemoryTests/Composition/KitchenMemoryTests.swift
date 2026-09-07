@@ -59,10 +59,10 @@ final class KitchenMemoryTests: XCTestCase {
     let preparedApp = try AppRuntime.testing()
     preparedApp.libraryModel.loadIfNeeded()
     let manifest = try SampleRecipeCatalog.loadManifest()
-
-    XCTAssertTrue(
-      preparedApp.libraryModel.createRecipe(from: RecipeDraft(title: "Temporary Recipe"))
-    )
+    preparedApp.libraryModel.beginEditing()
+    let editor = try XCTUnwrap(preparedApp.libraryModel.editor)
+    editor.session.title = "Temporary Recipe"
+    XCTAssertTrue(preparedApp.libraryModel.saveEditor())
     let temporaryRecipeID = try XCTUnwrap(preparedApp.libraryModel.selectedRecipeID)
     XCTAssertEqual(preparedApp.libraryModel.recipes.count, manifest.recipes.count + 1)
 
@@ -74,9 +74,7 @@ final class KitchenMemoryTests: XCTestCase {
         preferredLanguages: Locale.preferredLanguages
       ).map(\.recipeID))
     )
-    XCTAssertFalse(
-      preparedApp.libraryModel.recipes.contains { $0.recipe.id == temporaryRecipeID }
-    )
+    XCTAssertFalse(preparedApp.libraryModel.recipes.contains { $0.recipe.id == temporaryRecipeID })
   }
 
   func testResetLeavesOnlySamplesAndClearsAllSessionStateAcrossRelaunch() throws {
@@ -124,7 +122,10 @@ final class KitchenMemoryTests: XCTestCase {
       sessionPresentationStore: store
     ))
     preparedApp.libraryModel.loadIfNeeded()
-    XCTAssertTrue(preparedApp.libraryModel.createRecipe(from: RecipeDraft(title: "Keep Me")))
+    preparedApp.libraryModel.beginEditing()
+    let editor = try XCTUnwrap(preparedApp.libraryModel.editor)
+    editor.session.title = "Keep Me"
+    XCTAssertTrue(preparedApp.libraryModel.saveEditor())
     preparedApp.sessionModel.loadIfNeeded()
     let recipe = try XCTUnwrap(preparedApp.libraryModel.selectedRecipe)
     XCTAssertTrue(preparedApp.sessionModel.start(from: recipe))
@@ -137,8 +138,7 @@ final class KitchenMemoryTests: XCTestCase {
     XCTAssertFalse(preparedApp.libraryModel.resetKitchen())
 
     XCTAssertEqual(preparedApp.libraryModel.recipes.map(\.revision.title), ["Keep Me"])
-    XCTAssertEqual(try preparedApp.cookingSessionRepository
-      .sessions(in: recipe.recipe.kitchenID).count, 1)
+    XCTAssertEqual(try preparedApp.cookingSessionRepository.sessions(in: recipe.recipe.kitchenID).count, 1)
     XCTAssertEqual(store.currentSessionID, sessionID)
     XCTAssertEqual(store.entryDrafts.map(\.text), ["Keep this too"])
     XCTAssertEqual(preparedApp.sessionModel.currentSessionID, sessionID)

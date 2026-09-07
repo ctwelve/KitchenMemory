@@ -12,7 +12,9 @@
     "session.shell.foundation.message": "Historical Session shell explanation retained from the 0.1 interface contract.",
     "session.shell.foundation.title": "Historical Session shell heading retained from the 0.1 interface contract.",
     "settings.samples.action.installed": "Historical installation-only Settings state, superseded by the reversible pack setting in #88.",
-    "settings.samples.action.install": "Historical installation-only Settings action, superseded by the reversible pack setting in #88."
+    "settings.samples.action.install": "Historical installation-only Settings action, superseded by the reversible pack setting in #88.",
+    "recipe.editor.create.action.save": "Historical create-only Save action retained from the 0.1 interface contract; current draft authoring uses the shared revision Save action.",
+    "library.failure.save": "Historical direct library Save failure retained from the 0.1 interface contract; recoverable draft authoring now owns Save failure presentation."
   },
   "literalExceptions": [
     {

@@ -18,12 +18,6 @@ struct RecipeEditorView: View {
       case .importReview: .recipeEditorImportReviewTitle
       }
     }
-
-    var saveLabel: LocalizedStringResource {
-      self == .revise
-        ? .recipeEditorReviseActionSave
-        : .recipeEditorCreateActionSave
-    }
   }
 
   let organization: RecipeOrganizationModel?
