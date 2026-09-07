@@ -178,8 +178,8 @@ struct KitchenSettingsView: View {
             }
           } message: {
             if let sampleRemoval {
-              Text(.settingsSamplesRemoveMessage)
-              Text(sampleRemoval.removalIDs.count.formatted())
+              Text(String(localized: .settingsSamplesRemoveMessage) + "\n\n"
+                + sampleRemoval.removalIDs.count.formatted())
             }
           }
 

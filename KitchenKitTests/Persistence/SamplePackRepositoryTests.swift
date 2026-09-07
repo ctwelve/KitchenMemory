@@ -164,6 +164,45 @@ final class SamplePackRepositoryTests: XCTestCase {
     XCTAssertTrue(try fixture.tags.library(in: fixture.kitchen.id).tags.isEmpty)
   }
 
+  func testConcurrentMatchingNamesChooseTheSameOrdinaryIdentitiesInEitherArrivalOrder() throws {
+    let folderIDs = [Folder.ID(), Folder.ID()].sorted { $0.rawValue.uuidString < $1.rawValue.uuidString }
+    let tagIDs = [Tag.ID(), Tag.ID()].sorted { $0.rawValue.uuidString < $1.rawValue.uuidString }
+    for arrival in [[0, 1], [1, 0]] {
+      let fixture = try Fixture()
+      let emptyFolders = try fixture.folders.library(in: fixture.kitchen.id)
+      let emptyTags = try fixture.tags.library(in: fixture.kitchen.id)
+      let folderCommands = try folderIDs.map {
+        try emptyFolders.prepare(.create(id: $0, name: "Recettes exemples", parentID: nil))
+      }
+      let tagCommands = try tagIDs.map { try emptyTags.prepare(.create(id: $0, name: "exemples")) }
+      for index in arrival {
+        try fixture.folders.append(folderCommands[index])
+        try fixture.tags.append(tagCommands[index])
+      }
+      try fixture.pack.accept(fixture.command(true))
+      XCTAssertEqual(try fixture.status().folderID, folderIDs[0])
+      XCTAssertEqual(try fixture.status().tagID, tagIDs[0])
+      XCTAssertEqual(try fixture.folders.library(in: fixture.kitchen.id).folders.count, 2)
+      XCTAssertEqual(try fixture.tags.library(in: fixture.kitchen.id).tags.count, 2)
+    }
+  }
+
+  func testIncompleteRemoteEvidenceIsCountedWithoutInstallingOverIt() throws {
+    let fixture = try Fixture()
+    let context = ModelContext(fixture.container)
+    context.insert(RecipeDeletionRecord(id: UUID(), recipeID: fixture.samples[0].id.rawValue,
+      kitchenID: fixture.kitchen.id.rawValue))
+    try context.save()
+    XCTAssertEqual(try fixture.status().unavailable, 1)
+    try fixture.pack.accept(fixture.command(true))
+    let result = try fixture.status()
+    XCTAssertTrue(result.isEnabled)
+    XCTAssertEqual(result.installed, 1)
+    XCTAssertEqual(result.unavailable, 1)
+    XCTAssertEqual(result.removableIDs, [fixture.samples[1].id])
+    XCTAssertNil(try fixture.recipes.recipe(id: fixture.samples[0].id))
+  }
+
   @MainActor
   private struct Fixture {
     let container: ModelContainer

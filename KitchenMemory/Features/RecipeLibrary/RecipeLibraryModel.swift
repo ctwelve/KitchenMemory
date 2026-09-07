@@ -175,7 +175,7 @@ final class RecipeLibraryModel {
       } else if !recipes.contains(where: { $0.recipe.id == selectedRecipeID }) {
         navigation.reconcileRecipeSelection(recipes.first?.recipe.id)
       }
-      issue = pendingDisposition == nil ? nil : .disposition
+      issue = pendingSamplePack != nil ? .samples : (pendingDisposition == nil ? nil : .disposition)
       hasLoaded = true
       if !recipes.isEmpty { hasEstablishedKitchenEvidence = true }
       return true
@@ -273,6 +273,7 @@ final class RecipeLibraryModel {
       organization?.clearForReset()
       try library.reset()
       pendingDisposition = nil
+      pendingSamplePack = nil
       navigation.move(to: .recipe)
       resetPresentationState()
       samplePreferences.sampleRecipeOnboardingResponse = .accepted
