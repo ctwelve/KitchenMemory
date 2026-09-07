@@ -1,0 +1,145 @@
+{
+  "nonshipping": true,
+  "profile_limits": {
+    "json_bytes": 65536,
+    "json_depth": 24,
+    "identities": 128,
+    "edges": 256,
+    "name_bytes": 128,
+    "folder_depth": 16,
+    "zip_bytes": 131072,
+    "entries": 16,
+    "entry_bytes": 65536,
+    "expanded_bytes": 131072,
+    "ratio": 50
+  },
+  "cases": [
+    {
+      "case": "recipe unknown-field semantic roundtrip",
+      "result": "accepted",
+      "peak_python_bytes": 16053
+    },
+    {
+      "case": "Kitchen semantic roundtrip",
+      "result": "accepted",
+      "peak_python_bytes": 16800
+    },
+    {
+      "case": "opaque future evidence byte roundtrip",
+      "result": "accepted",
+      "peak_python_bytes": 13157
+    },
+    {
+      "case": "malformed JSON",
+      "result": "Expecting property name enclosed in double quotes: line 1 column 2 (char 1)",
+      "peak_python_bytes": 2682
+    },
+    {
+      "case": "duplicate JSON keys",
+      "result": "duplicate JSON key",
+      "peak_python_bytes": 2594
+    },
+    {
+      "case": "unknown major",
+      "result": "unsupported major",
+      "peak_python_bytes": 14155
+    },
+    {
+      "case": "unknown required feature",
+      "result": "unknown required feature",
+      "peak_python_bytes": 11694
+    },
+    {
+      "case": "nonfinite JSON",
+      "result": "nonfinite number",
+      "peak_python_bytes": 2142
+    },
+    {
+      "case": "JSON nesting",
+      "result": "JSON nesting budget",
+      "peak_python_bytes": 394
+    },
+    {
+      "case": "JSON bytes",
+      "result": "JSON byte budget",
+      "peak_python_bytes": 65961
+    },
+    {
+      "case": "Folder depth",
+      "result": "folder depth budget",
+      "peak_python_bytes": 19875
+    },
+    {
+      "case": "Folder cycle",
+      "result": "folder cycle",
+      "peak_python_bytes": 12865
+    },
+    {
+      "case": "name bytes",
+      "result": "name budget",
+      "peak_python_bytes": 10820
+    },
+    {
+      "case": "identity count",
+      "result": "identity budget",
+      "peak_python_bytes": 107544
+    },
+    {
+      "case": "relationship count",
+      "result": "edge budget",
+      "peak_python_bytes": 139930
+    },
+    {
+      "case": "dangling relationship",
+      "result": "dangling edge",
+      "peak_python_bytes": 10458
+    },
+    {
+      "case": "maximum admitted identities",
+      "result": "accepted",
+      "peak_python_bytes": 57818
+    },
+    {
+      "case": "ZIP streaming and media integrity",
+      "result": "accepted",
+      "peak_python_bytes": 71331
+    },
+    {
+      "case": "ZIP path traversal",
+      "result": "unsafe archive path",
+      "peak_python_bytes": 286390
+    },
+    {
+      "case": "ZIP hash mismatch",
+      "result": "media digest mismatch",
+      "peak_python_bytes": 286382
+    },
+    {
+      "case": "ZIP expansion ratio",
+      "result": "expansion ratio",
+      "peak_python_bytes": 346527
+    },
+    {
+      "case": "ZIP entry byte budget",
+      "result": "expanded entry budget",
+      "peak_python_bytes": 352064
+    },
+    {
+      "case": "ZIP entry count",
+      "result": "archive entry budget",
+      "peak_python_bytes": 297353
+    },
+    {
+      "case": "ZIP aggregate expanded byte budget",
+      "result": "stream byte budget",
+      "peak_python_bytes": 299036
+    }
+  ],
+  "passed": 24,
+  "limitations": [
+    "No real image decode",
+    "No domain codecs or persistent commit",
+    "Python allocation peaks are not a production RAM guarantee",
+    "ZIP central directory allocation bounded only by compressed input cap"
+  ]
+}
