@@ -100,22 +100,6 @@ final class CookingSessionPresentationModel {
   var sessionVisits: [CookingSessionVisit]
 
   init(
-    sessions: CookingSessions,
-    store: any CookingSessionPresentationStoring,
-    now: @escaping () -> Date = Date.init,
-    navigation: RecipeLibraryNavigation = RecipeLibraryNavigation()
-  ) {
-    service = sessions
-    self.store = store
-    self.now = now
-    self.navigation = navigation
-    navigation.installSessionStore(store)
-    outbox = CookingSessionOutbox(persistedCommands: store.pendingCommands)
-    entryDrafts = store.entryDrafts
-    sessionVisits = store.sessionVisits
-  }
-
-  init(
     sessions: any CookingSessionServing,
     store: any CookingSessionPresentationStoring,
     now: @escaping () -> Date = Date.init,
