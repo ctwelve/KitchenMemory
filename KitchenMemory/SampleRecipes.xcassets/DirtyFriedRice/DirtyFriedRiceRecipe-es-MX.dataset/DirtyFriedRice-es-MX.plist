@@ -1,9 +1,739 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0"><dict><key>formatVersion</key><integer>1</integer><key>recipeID</key><string>F2020000-0000-4000-8000-000000000002</string><key>revision</key><dict>
-<key>id</key><string>F2210000-0000-4000-8000-000000000002</string><key>recipeID</key><string>F2020000-0000-4000-8000-000000000002</string><key>revisionNumber</key><integer>1</integer><key>title</key><string>Arroz frito «sucio»</string><key>summary</key><string>Arroz salteado con res, verduras, huevo y chile Hatch, con un toque picante y abundante pimienta.</string><key>authorName</key><string>cTwelve</string><key>contentLanguage</key><string>es-MX</string>
-<key>recipeYield</key><dict><key>quantity</key><dict><key>kind</key><string>exact</string><key>lowerBound</key><dict><key>numerator</key><integer>6</integer><key>denominator</key><integer>1</integer></dict></dict><key>unitText</key><string>porciones</string><key>originalText</key><string>Rinde aproximadamente 6 porciones</string></dict><key>prepDuration</key><dict><key>seconds</key><integer>900</integer></dict><key>cookDuration</key><dict><key>seconds</key><integer>900</integer></dict><key>cuisines</key><array><string>Fusión norteamericana</string></array><key>categories</key><array><string>Cena</string></array><key>keywords</key><array><string>arroz</string><string>res</string><string>chile Hatch</string></array>
-<key>media</key><array><dict><key>id</key><string>F2220000-0000-4000-8000-000000000002</string><key>role</key><string>hero</string><key>assetName</key><string>DirtyFriedRiceHero</string><key>accessibilityLabel</key><string>Tazón de arroz frito con res, huevo y verduras</string></dict></array><key>equipment</key><array/>
-<key>ingredientSections</key><array><dict><key>id</key><string>F2230000-0000-4000-8000-000000000002</string><key>title</key><string>Arroz</string><key>ingredients</key><array><dict><key>id</key><string>F2240000-0000-4000-8000-000000000001</string><key>originalText</key><string>3 tazas de arroz japonés cocido y frío</string><key>presentationMode</key><string>original</string><key>quantity</key><dict><key>kind</key><string>exact</string><key>lowerBound</key><dict><key>numerator</key><integer>3</integer><key>denominator</key><integer>1</integer></dict></dict><key>unitText</key><string>tazas</string><key>ingredientText</key><string>arroz japonés</string><key>preparation</key><string>cocido y frío</string><key>isOptional</key><false/><key>scalingBehavior</key><string>linear</string><key>parseState</key><string>reviewed</string></dict><dict><key>id</key><string>F2240000-0000-4000-8000-000000000002</string><key>originalText</key><string>3 huevos grandes revueltos</string><key>presentationMode</key><string>original</string><key>quantity</key><dict><key>kind</key><string>exact</string><key>lowerBound</key><dict><key>numerator</key><integer>3</integer><key>denominator</key><integer>1</integer></dict></dict><key>unitText</key><string>grandes</string><key>ingredientText</key><string>huevos</string><key>preparation</key><string>revueltos</string><key>isOptional</key><false/><key>scalingBehavior</key><string>linear</string><key>parseState</key><string>reviewed</string></dict></array></dict></array>
-<key>instructionSections</key><array><dict><key>id</key><string>F2250000-0000-4000-8000-000000000002</string><key>title</key><string>Cocción</string><key>steps</key><array><dict><key>id</key><string>F2260000-0000-4000-8000-000000000001</string><key>text</key><string>Dora la carne y las verduras en un sartén grande muy caliente.</string></dict><dict><key>id</key><string>F2260000-0000-4000-8000-000000000002</string><key>text</key><string>Agrega el arroz frío y saltéalo hasta que esté bien caliente.</string></dict><dict><key>id</key><string>F2260000-0000-4000-8000-000000000003</string><key>text</key><string>Incorpora el huevo y los chiles, sazona y sirve de inmediato.</string></dict></array></dict></array>
-</dict></dict></plist>
+<plist version="1.0">
+<dict>
+	<key>formatVersion</key>
+	<integer>1</integer>
+	<key>recipeID</key>
+	<string>F2020000-0000-4000-8000-000000000002</string>
+	<key>revision</key>
+	<dict>
+		<key>id</key>
+		<string>B673B92B-D0A1-5EEB-AACB-7E6F57DEA850</string>
+		<key>recipeID</key>
+		<string>F2020000-0000-4000-8000-000000000002</string>
+		<key>revisionNumber</key>
+		<integer>2</integer>
+		<key>title</key>
+		<string>Arroz frito «sucio»</string>
+		<key>summary</key>
+		<string>No es «dirty rice». Tampoco es exactamente arroz frito. Un asalto a la despensa con res, mucha pimienta, un picor suave, chiles Hatch, huevo, verduras y pasaporte de Bismarck, Dakota del Norte. Calcula unos 20–30 minutos.</string>
+		<key>authorName</key>
+		<string>cTwelve</string>
+		<key>contentLanguage</key>
+		<string>es-MX</string>
+		<key>source</key>
+		<dict>
+			<key>kind</key>
+			<string>webpage</string>
+			<key>title</key>
+			<string>Arroz frito «sucio» en X</string>
+			<key>authorName</key>
+			<string>cTwelve</string>
+			<key>publisherName</key>
+			<string>X</string>
+			<key>canonicalURL</key>
+			<dict>
+				<key>relative</key>
+				<string>https://x.com/theCTwelve/status/2089465462723682809</string>
+			</dict>
+		</dict>
+		<key>recipeYield</key>
+		<dict>
+			<key>originalText</key>
+			<string>Rinde un sartén enorme</string>
+		</dict>
+		<key>cuisines</key>
+		<array>
+			<string>De Dakota del Norte</string>
+		</array>
+		<key>categories</key>
+		<array>
+			<string>Cena</string>
+			<string>Arroz frito</string>
+			<string>Cocina económica</string>
+		</array>
+		<key>keywords</key>
+		<array>
+			<string>carne molida de res</string>
+			<string>arroz</string>
+			<string>chiles Hatch</string>
+			<string>asalto a la despensa</string>
+			<string>tanda grande</string>
+		</array>
+		<key>media</key>
+		<array>
+			<dict>
+				<key>id</key>
+				<string>4265DF08-6A4E-5454-A33F-6B8439C4598A</string>
+				<key>role</key>
+				<string>hero</string>
+				<key>assetName</key>
+				<string>DirtyFriedRiceHero</string>
+				<key>accessibilityLabel</key>
+				<string>Un tazón colmado de arroz frito con res, huevo, elote, zanahorias, chícharos y ejotes, frente al enorme sartén en el que se preparó</string>
+			</dict>
+		</array>
+		<key>equipment</key>
+		<array>
+			<dict>
+				<key>id</key>
+				<string>395AF79A-0DFC-5C4E-BA6E-DF413203EFBF</string>
+				<key>originalText</key>
+				<string>Un sartén muy grande que soporte temperaturas altas</string>
+				<key>quantity</key>
+				<dict>
+					<key>kind</key>
+					<string>exact</string>
+					<key>lowerBound</key>
+					<dict>
+						<key>numerator</key>
+						<integer>1</integer>
+						<key>denominator</key>
+						<integer>1</integer>
+					</dict>
+				</dict>
+				<key>name</key>
+				<string>sartén muy grande para temperaturas altas</string>
+				<key>isOptional</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>CA21E2D5-C1C6-546C-95E8-F5CBBBEAB148</string>
+				<key>originalText</key>
+				<string>Una espatuladora™ con suficiente poderío para manejar la Cocina a lo Grande</string>
+				<key>quantity</key>
+				<dict>
+					<key>kind</key>
+					<string>exact</string>
+					<key>lowerBound</key>
+					<dict>
+						<key>numerator</key>
+						<integer>1</integer>
+						<key>denominator</key>
+						<integer>1</integer>
+					</dict>
+				</dict>
+				<key>name</key>
+				<string>espátula resistente</string>
+				<key>isOptional</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>FB68A3ED-2ED2-5B60-BEF5-929B144FA67F</string>
+				<key>originalText</key>
+				<string>Tazón y tenedor para batir los huevos</string>
+				<key>name</key>
+				<string>tazón y tenedor</string>
+				<key>isOptional</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>F1C9192D-6688-5068-8B5A-CBB28F22EECE</string>
+				<key>originalText</key>
+				<string>Cuchillo y tabla para encargarse de la cebolla</string>
+				<key>name</key>
+				<string>cuchillo y tabla</string>
+				<key>isOptional</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>A41CFC15-CB02-5179-8EB9-187F34B5B462</string>
+				<key>originalText</key>
+				<string>Abrelatas para liberar el Ro-Tel de su prisión metálica</string>
+				<key>name</key>
+				<string>abrelatas</string>
+				<key>isOptional</key>
+				<false/>
+			</dict>
+		</array>
+		<key>ingredientSections</key>
+		<array>
+			<dict>
+				<key>id</key>
+				<string>94C3B070-FF8F-56E5-824F-11BAD0586B32</string>
+				<key>title</key>
+				<string>Sartén principal</string>
+				<key>ingredients</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>1DD681BF-61E8-58D0-8502-B6DC2AF90AEF</string>
+						<key>originalText</key>
+						<string>1.3 lb de carne molida de res</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>13</integer>
+								<key>denominator</key>
+								<integer>10</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>libras</string>
+						<key>ingredientText</key>
+						<string>carne molida de res</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>A4DF789E-F6C2-51D0-B7F5-896566586F27</string>
+						<key>originalText</key>
+						<string>1 cucharada estadounidense de aceite vegetal, solo si la carne lo necesita</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>1</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>cucharada estadounidense</string>
+						<key>ingredientText</key>
+						<string>aceite vegetal</string>
+						<key>note</key>
+						<string>Puedes usar otro aceite que resista temperaturas altas; no uses aceite de oliva.</string>
+						<key>isOptional</key>
+						<true/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>60D74BFB-7FBF-55B2-94C6-F9A115CE4FAE</string>
+						<key>originalText</key>
+						<string>1 cebolla amarilla más bien pequeña, picada en trozos grandes</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>1</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>más bien pequeña</string>
+						<key>ingredientText</key>
+						<string>cebolla amarilla</string>
+						<key>preparation</key>
+						<string>picada en trozos grandes</string>
+						<key>note</key>
+						<string>Un poco más no le hace daño.</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>8DDD2B9D-3385-52D9-BFF5-76ED18055DA9</string>
+						<key>originalText</key>
+						<string>Bastante pimienta negra recién molida</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>bastante</string>
+						</dict>
+						<key>ingredientText</key>
+						<string>pimienta negra</string>
+						<key>preparation</key>
+						<string>recién molida</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>66B1C437-C892-587F-BC08-67FE6146A711</string>
+						<key>originalText</key>
+						<string>Sazonador Montreal para carne, al gusto</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>al gusto</string>
+						</dict>
+						<key>ingredientText</key>
+						<string>sazonador Montreal para carne</string>
+						<key>note</key>
+						<string>Si no tienes, sazona al gusto con sal gruesa, pimienta negra, cayena, ajo, paprika, cebolla, cilantro, eneldo o especias parecidas.</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>F0397CFB-FECF-5243-9385-3749C59B97E2</string>
+						<key>originalText</key>
+						<string>1 lata de 10 oz de tomates picados y chiles Hatch asados Ro-Tel Hatch</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>1</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>lata</string>
+						<key>package</key>
+						<dict>
+							<key>quantity</key>
+							<dict>
+								<key>kind</key>
+								<string>exact</string>
+								<key>lowerBound</key>
+								<dict>
+									<key>numerator</key>
+									<integer>10</integer>
+									<key>denominator</key>
+									<integer>1</integer>
+								</dict>
+							</dict>
+							<key>unitText</key>
+							<string>onzas</string>
+						</dict>
+						<key>ingredientText</key>
+						<string>tomates picados y chiles Hatch asados Ro-Tel Hatch</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>6DAE74D2-330B-5CBE-B1C8-762162974535</string>
+						<key>originalText</key>
+						<string>3 medidas de arrocera de arroz japonés, cocido</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>3</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>medidas de arrocera</string>
+						<key>ingredientText</key>
+						<string>arroz japonés</string>
+						<key>preparation</key>
+						<string>cocido</string>
+						<key>note</key>
+						<string>Una tanda pequeña de Zojirushi, o una olla de tamaño pequeño a mediano.</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>3490BE4A-B0EC-56FE-B17E-3B55CC34BB36</string>
+						<key>originalText</key>
+						<string>3 huevos grandes batidos</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>3</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>grandes</string>
+						<key>ingredientText</key>
+						<string>huevos</string>
+						<key>preparation</key>
+						<string>batidos</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+				</array>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>13742D75-F37D-58B3-BF46-8C86886F1C5A</string>
+				<key>title</key>
+				<string>Sazón y acabado</string>
+				<key>ingredients</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>EED60326-E5BA-59CB-A255-39E23D4B539C</string>
+						<key>originalText</key>
+						<string>1 sobre de 0.74 oz / 21 g de sazonador para arroz frito Sun-Bird</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>1</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>sobre</string>
+						<key>package</key>
+						<dict>
+							<key>quantity</key>
+							<dict>
+								<key>kind</key>
+								<string>exact</string>
+								<key>lowerBound</key>
+								<dict>
+									<key>numerator</key>
+									<integer>21</integer>
+									<key>denominator</key>
+									<integer>1</integer>
+								</dict>
+							</dict>
+							<key>unitText</key>
+							<string>gramos</string>
+						</dict>
+						<key>ingredientText</key>
+						<string>sazonador para arroz frito Sun-Bird</string>
+						<key>note</key>
+						<string>0.74 onzas</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>51635992-F780-55D8-85EC-27EDFD239E1E</string>
+						<key>originalText</key>
+						<string>Un chorrito de salsa inglesa</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>un chorrito</string>
+						</dict>
+						<key>ingredientText</key>
+						<string>salsa inglesa</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>FE185ADF-1127-555D-B634-0B32D6F4F90F</string>
+						<key>originalText</key>
+						<string>Una buena sacudida de pimienta de cayena</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>una buena sacudida</string>
+						</dict>
+						<key>ingredientText</key>
+						<string>pimienta de cayena</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>25000C7E-2D1A-552D-8C46-81B4C0CBF63C</string>
+						<key>originalText</key>
+						<string>1 bolsa de 10 oz de verduras mixtas congeladas</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>1</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>bolsa</string>
+						<key>package</key>
+						<dict>
+							<key>quantity</key>
+							<dict>
+								<key>kind</key>
+								<string>exact</string>
+								<key>lowerBound</key>
+								<dict>
+									<key>numerator</key>
+									<integer>10</integer>
+									<key>denominator</key>
+									<integer>1</integer>
+								</dict>
+							</dict>
+							<key>unitText</key>
+							<string>onzas</string>
+						</dict>
+						<key>ingredientText</key>
+						<string>verduras mixtas congeladas</string>
+						<key>note</key>
+						<string>Elote, chícharos, zanahorias y ejotes; o usa lo que quieras, no soy tu mamá.</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>B964F28A-1C46-574A-ADDC-C3B6A13668FC</string>
+						<key>originalText</key>
+						<string>Salsa de soya, al gusto y probablemente más de la que piensas al principio</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>al gusto</string>
+						</dict>
+						<key>ingredientText</key>
+						<string>salsa de soya</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>94F96031-2E38-5509-B9B6-9DB5652AF12C</string>
+						<key>originalText</key>
+						<string>Aceite de ajonjolí tostado, para terminar</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>ingredientText</key>
+						<string>aceite de ajonjolí tostado</string>
+						<key>preparation</key>
+						<string>para terminar</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+				</array>
+			</dict>
+		</array>
+		<key>instructionSections</key>
+		<array>
+			<dict>
+				<key>id</key>
+				<string>8B0A1573-D3B3-5C3D-96FC-E4A90C4C7759</string>
+				<key>title</key>
+				<string>Dorar la carne</string>
+				<key>steps</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>C4A32A62-6D0B-537F-A269-351E06D28459</string>
+						<key>name</key>
+						<string>Dorar intensamente</string>
+						<key>text</key>
+						<string>Calienta muchísimo el sartén grande. Agrega la carne molida y usa aceite vegetal solo si hace falta. Sazona con sazonador Montreal para carne y bastante pimienta negra recién molida; dora intensamente sin dejar de mover. Los restos dorados en el fondo del sartén son importantes.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>F24F75E4-397B-59F8-90D1-6174D116B8C9</string>
+						<key>name</key>
+						<string>Desglasar con la cebolla</string>
+						<key>text</key>
+						<string>Cuando la carne esté deliciosamente dorada, agrega la cebolla. Sigue cocinando hasta que se ablande un poco y usa su humedad para despegar los restos dorados del sartén.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>2FB9CF8A-FEA7-53D9-A931-BA6D5A646306</string>
+						<key>name</key>
+						<string>Evaporar el líquido del tomate</string>
+						<key>text</key>
+						<string>Vacía toda la lata de Ro-Tel Hatch, con todo y líquido. Sigue cocinando hasta que la carne esté bien dorada, la cebolla tan suave como te guste y casi todo el líquido de tomate se haya evaporado. El fuego alto importa: queremos carne dorada, no hervida. Cuando se vea bien, baja un poco el fuego.</string>
+					</dict>
+				</array>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>257E479E-85E3-55B6-88AB-B9E6B0506D1B</string>
+				<key>title</key>
+				<string>Freír el arroz</string>
+				<key>steps</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>E35EEA16-B7C2-540F-92DF-9781D6BA30B7</string>
+						<key>name</key>
+						<string>Incorporar el arroz</string>
+						<key>text</key>
+						<string>Agrega el arroz japonés cocido e integra todo mientras deshaces los grumos. El arroz recién hecho funciona perfectamente; no hace falta el ritual de encontrar arroz sobrante en el refrigerador. Dale uno o dos minutos para que el calor acumulado fría de verdad el arroz.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>F3BC6C8F-8EC6-5213-9AB0-2CC0F47275CE</string>
+						<key>name</key>
+						<string>Sazonar</string>
+						<key>text</key>
+						<string>Agrega el sazonador para arroz frito Sun-Bird, un chorrito de salsa inglesa y una buena dosis de cayena. Mezcla bien y vuelve a bajar el fuego.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>BAA7BA8D-2D9D-572F-B7AB-361B38106BE1</string>
+						<key>name</key>
+						<string>Incorporar los huevos</string>
+						<key>text</key>
+						<string>Agrega los 3 huevos batidos. Incorpóralos al arroz y la carne calientes, volteando y revolviendo hasta que el huevo esté cocido y repartido en trocitos por todo el arroz.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>C49CB01C-EEA3-5782-A4FE-BA716E117A7F</string>
+						<key>name</key>
+						<string>Freírlo de verdad</string>
+						<key>text</key>
+						<string>Sigue moviendo la mezcla a fuego reducido el tiempo suficiente para integrarlo todo y lograr que parte del arroz, la carne, la cebolla y el huevo se frían y se doren un poco de verdad.</string>
+					</dict>
+				</array>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>F022BFE5-96D0-5A58-B207-D4AA9ECE1481</string>
+				<key>title</key>
+				<string>Terminar y dejar reposar</string>
+				<key>steps</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>F1675581-7AAF-568F-8011-227F3A1B2196</string>
+						<key>name</key>
+						<string>APAGA EL FUEGO</string>
+						<key>text</key>
+						<string>Vacía toda la bolsa de verduras congeladas directamente en el sartén; no las descongeles ni las calientes en microondas. Revuelve bien y deja que la enorme masa de carne y arroz ardientes, junto con el calor acumulado del sartén, cocine las verduras.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>8A23DECF-4D4D-5A03-987D-ACD8EF6BA45F</string>
+						<key>name</key>
+						<string>Probar y agregar soya</string>
+						<key>text</key>
+						<string>Prueba. Añade salsa de soya hasta que el sabor de pronto cobre sentido. Si cuesta distribuirla, regresa el sartén a fuego alto solo unos 15 segundos mientras revuelves vigorosamente, lo justo para repartir la soya y evaporar un poco de agua.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>2652B03D-DBC6-5CD1-8289-2A94F3203901</string>
+						<key>name</key>
+						<string>Apagar el fuego otra vez</string>
+						<key>text</key>
+						<string>Apaga el fuego otra vez. Termina con un chorrito de aceite de ajonjolí tostado y mezcla. La cantidad exacta de soya queda abierta a propósito, porque los otros sazonadores y las distintas salsas aportan cantidades diferentes de sal. Y la cayena es un asunto entre tú y Dios.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>37EE1901-CA3B-5828-8EA3-F4BB7B191058</string>
+						<key>name</key>
+						<string>La maniobra del sartén gigante</string>
+						<key>text</key>
+						<string>Si el arroz parece seco, no agregues líquido de inmediato. Mueve todo el sartén a un quemador completamente frío y tapa. El sartén y las varias libras de comida son una reserva térmica: su energía termina de cocinar las verduras mientras el vapor atrapado redistribuye la humedad por el arroz. Mover físicamente el sartén importa en una parrilla vitrocerámica radiante, donde «APAGADO» y «FRÍO» son conceptos distintos.</string>
+					</dict>
+				</array>
+			</dict>
+		</array>
+	</dict>
+</dict>
+</plist>

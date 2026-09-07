@@ -510,6 +510,8 @@ the same checks locally with:
 ruby Tools/Tests/check_release_version_test.rb
 ruby Tools/Tests/check_project_structure_test.rb
 ruby Tools/Tests/check_software_inventory_test.rb
+ruby Tools/Tests/check_localization_test.rb
+ruby Tools/check-localization.rb
 ruby Tools/check-project-structure.rb
 ruby Tools/check-software-inventory.rb
 ruby Tools/check-release-version.rb

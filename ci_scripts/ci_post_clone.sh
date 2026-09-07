@@ -13,6 +13,8 @@ repository_path=$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)
 ruby "$repository_path/Tools/Tests/check_release_version_test.rb"
 ruby "$repository_path/Tools/Tests/check_project_structure_test.rb"
 ruby "$repository_path/Tools/Tests/check_software_inventory_test.rb"
+ruby "$repository_path/Tools/Tests/check_localization_test.rb"
+ruby "$repository_path/Tools/check-localization.rb"
 
 # Keep the native multiplatform target, generated bundle metadata, platform
 # plist adapters, project-owned sandbox capabilities, signing entitlements,

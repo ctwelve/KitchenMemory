@@ -1,17 +1,928 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0"><dict>
-<key>formatVersion</key><integer>1</integer><key>recipeID</key><string>F1010000-0000-4000-8000-000000000001</string>
-<key>revision</key><dict>
-<key>id</key><string>F1110000-0000-4000-8000-000000000001</string><key>recipeID</key><string>F1010000-0000-4000-8000-000000000001</string><key>revisionNumber</key><integer>1</integer>
-<key>title</key><string>Gratin de nouilles au thon</string><key>summary</key><string>Un gratin réconfortant aux nouilles, au thon et aux petits pois, garni de chapelure croustillante.</string><key>authorName</key><string>Contributeurs de Mémoire de cuisine</string><key>contentLanguage</key><string>fr-CA</string>
-<key>recipeYield</key><dict><key>quantity</key><dict><key>kind</key><string>exact</string><key>lowerBound</key><dict><key>numerator</key><integer>8</integer><key>denominator</key><integer>1</integer></dict></dict><key>unitText</key><string>portions</string><key>originalText</key><string>Donne 8 portions généreuses</string></dict>
-<key>prepDuration</key><dict><key>seconds</key><integer>1800</integer></dict><key>cookDuration</key><dict><key>seconds</key><integer>1200</integer></dict><key>totalDuration</key><dict><key>seconds</key><integer>3600</integer></dict><key>cuisines</key><array><string>Midwest américain</string></array><key>categories</key><array><string>Souper</string><string>Gratin</string></array><key>keywords</key><array><string>thon</string><string>nouilles</string></array>
-<key>media</key><array><dict><key>id</key><string>F1120000-0000-4000-8000-000000000001</string><key>role</key><string>hero</string><key>assetName</key><string>TunaNoodleHotdishHero</string><key>accessibilityLabel</key><string>Gratin de nouilles au thon avec une garniture bien dorée</string></dict></array><key>equipment</key><array/>
-<key>ingredientSections</key><array><dict><key>id</key><string>F1130000-0000-4000-8000-000000000001</string><key>title</key><string>Gratin</string><key>ingredients</key><array>
-<dict><key>id</key><string>F1140000-0000-4000-8000-000000000001</string><key>originalText</key><string>4 boîtes de 142 g de thon pâle en morceaux</string><key>presentationMode</key><string>original</string><key>quantity</key><dict><key>kind</key><string>exact</string><key>lowerBound</key><dict><key>numerator</key><integer>4</integer><key>denominator</key><integer>1</integer></dict></dict><key>unitText</key><string>boîtes</string><key>ingredientText</key><string>thon pâle en morceaux</string><key>isOptional</key><false/><key>scalingBehavior</key><string>linear</string><key>parseState</key><string>reviewed</string></dict>
-<dict><key>id</key><string>F1140000-0000-4000-8000-000000000002</string><key>originalText</key><string>450 g de nouilles aux œufs ondulées</string><key>presentationMode</key><string>original</string><key>quantity</key><dict><key>kind</key><string>exact</string><key>lowerBound</key><dict><key>numerator</key><integer>450</integer><key>denominator</key><integer>1</integer></dict></dict><key>unitText</key><string>g</string><key>ingredientText</key><string>nouilles aux œufs ondulées</string><key>isOptional</key><false/><key>scalingBehavior</key><string>linear</string><key>parseState</key><string>reviewed</string></dict>
-</array></dict></array>
-<key>instructionSections</key><array><dict><key>id</key><string>F1150000-0000-4000-8000-000000000001</string><key>title</key><string>Préparation</string><key>steps</key><array>
-<dict><key>id</key><string>F1160000-0000-4000-8000-000000000001</string><key>text</key><string>Cuire les nouilles jusqu’à ce qu’elles soient al dente, puis les égoutter.</string></dict><dict><key>id</key><string>F1160000-0000-4000-8000-000000000002</string><key>text</key><string>Mélanger les nouilles, le thon, les petits pois et la sauce dans un plat de cuisson.</string></dict><dict><key>id</key><string>F1160000-0000-4000-8000-000000000003</string><key>text</key><string>Garnir de chapelure et cuire à 200 °C jusqu’à ce que le gratin bouillonne et soit doré.</string></dict>
-</array></dict></array></dict></dict></plist>
+<plist version="1.0">
+<dict>
+	<key>formatVersion</key>
+	<integer>1</integer>
+	<key>recipeID</key>
+	<string>F1010000-0000-4000-8000-000000000001</string>
+	<key>revision</key>
+	<dict>
+		<key>id</key>
+		<string>9A4A8C47-45FA-523C-8F3F-9C8F314B2D99</string>
+		<key>recipeID</key>
+		<string>F1010000-0000-4000-8000-000000000001</string>
+		<key>revisionNumber</key>
+		<integer>2</integer>
+		<key>title</key>
+		<string>Gratin de nouilles au thon</string>
+		<key>summary</key>
+		<string>Un gratin de nouilles au thon du Midwest, riche en saveurs, avec des petits pois et une garniture de croûtons et de craquelins au beurre.</string>
+		<key>authorName</key>
+		<string>Contributeurs de Mémoire de cuisine</string>
+		<key>contentLanguage</key>
+		<string>fr-CA</string>
+		<key>source</key>
+		<dict>
+			<key>kind</key>
+			<string>original</string>
+			<key>title</key>
+			<string>Préparé pour le souper du 10 août 2026</string>
+		</dict>
+		<key>recipeYield</key>
+		<dict>
+			<key>quantity</key>
+			<dict>
+				<key>kind</key>
+				<string>exact</string>
+				<key>lowerBound</key>
+				<dict>
+					<key>numerator</key>
+					<integer>8</integer>
+					<key>denominator</key>
+					<integer>1</integer>
+				</dict>
+			</dict>
+			<key>unitText</key>
+			<string>portions</string>
+			<key>originalText</key>
+			<string>Donne 8 portions généreuses</string>
+		</dict>
+		<key>prepDuration</key>
+		<dict>
+			<key>seconds</key>
+			<integer>1800</integer>
+		</dict>
+		<key>cookDuration</key>
+		<dict>
+			<key>seconds</key>
+			<integer>1200</integer>
+		</dict>
+		<key>totalDuration</key>
+		<dict>
+			<key>seconds</key>
+			<integer>3600</integer>
+		</dict>
+		<key>cuisines</key>
+		<array>
+			<string>Du Midwest</string>
+		</array>
+		<key>categories</key>
+		<array>
+			<string>Souper</string>
+			<string>Gratin</string>
+		</array>
+		<key>keywords</key>
+		<array>
+			<string>gratin</string>
+			<string>cuisine réconfortante</string>
+			<string>thon</string>
+			<string>nouilles</string>
+		</array>
+		<key>media</key>
+		<array>
+			<dict>
+				<key>id</key>
+				<string>AA5C1EE3-B2A3-5185-A79E-DBECB4D9B57F</string>
+				<key>role</key>
+				<string>hero</string>
+				<key>assetName</key>
+				<string>TunaNoodleHotdishHero</string>
+				<key>accessibilityLabel</key>
+				<string>Gratin de nouilles au thon avec une garniture bien dorée de croûtons et de craquelins</string>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>19F82332-9A61-55E4-8600-91BE952117CE</string>
+				<key>role</key>
+				<string>thumbnail</string>
+				<key>assetName</key>
+				<string>TunaNoodleHotdishThumbnail</string>
+				<key>accessibilityLabel</key>
+				<string>Détail carré du gratin de nouilles au thon et de sa garniture dorée de croûtons et de craquelins</string>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>D6B91FC5-D8D7-54F6-89D4-FA39F4CAF218</string>
+				<key>role</key>
+				<string>gallery</string>
+				<key>assetName</key>
+				<string>TunaNoodleHotdishGallery0</string>
+				<key>accessibilityLabel</key>
+				<string>Vue de côté d’une portion de gratin montrant les nouilles, le thon, les petits pois et la garniture croustillante</string>
+			</dict>
+		</array>
+		<key>equipment</key>
+		<array>
+			<dict>
+				<key>id</key>
+				<string>5407A3EA-54F6-53DE-9A93-4603B7D9FFB1</string>
+				<key>originalText</key>
+				<string>1 plat de cuisson de 9 × 13 po</string>
+				<key>quantity</key>
+				<dict>
+					<key>kind</key>
+					<string>exact</string>
+					<key>lowerBound</key>
+					<dict>
+						<key>numerator</key>
+						<integer>1</integer>
+						<key>denominator</key>
+						<integer>1</integer>
+					</dict>
+				</dict>
+				<key>name</key>
+				<string>plat de cuisson de 9 × 13 po</string>
+				<key>isOptional</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>28A9FA32-07A2-50FB-9675-43A8F4891274</string>
+				<key>originalText</key>
+				<string>1 marmite de 8 pintes américaines</string>
+				<key>quantity</key>
+				<dict>
+					<key>kind</key>
+					<string>exact</string>
+					<key>lowerBound</key>
+					<dict>
+						<key>numerator</key>
+						<integer>1</integer>
+						<key>denominator</key>
+						<integer>1</integer>
+					</dict>
+				</dict>
+				<key>name</key>
+				<string>marmite de 8 pintes américaines</string>
+				<key>isOptional</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>BBABD28A-2DEA-5C8C-987F-202220C90DF1</string>
+				<key>originalText</key>
+				<string>1 passoire</string>
+				<key>quantity</key>
+				<dict>
+					<key>kind</key>
+					<string>exact</string>
+					<key>lowerBound</key>
+					<dict>
+						<key>numerator</key>
+						<integer>1</integer>
+						<key>denominator</key>
+						<integer>1</integer>
+					</dict>
+				</dict>
+				<key>name</key>
+				<string>passoire</string>
+				<key>isOptional</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>AE2794D5-7798-5E8F-94A4-5A1DE931C094</string>
+				<key>originalText</key>
+				<string>1 plaque à rebord, recommandée</string>
+				<key>quantity</key>
+				<dict>
+					<key>kind</key>
+					<string>exact</string>
+					<key>lowerBound</key>
+					<dict>
+						<key>numerator</key>
+						<integer>1</integer>
+						<key>denominator</key>
+						<integer>1</integer>
+					</dict>
+				</dict>
+				<key>name</key>
+				<string>plaque à rebord</string>
+				<key>isOptional</key>
+				<true/>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>96960444-954C-5510-9E81-D1FD8F285BCB</string>
+				<key>originalText</key>
+				<string>râpe à fromage, facultative</string>
+				<key>name</key>
+				<string>râpe à fromage</string>
+				<key>isOptional</key>
+				<true/>
+			</dict>
+		</array>
+		<key>ingredientSections</key>
+		<array>
+			<dict>
+				<key>id</key>
+				<string>2CCF0673-B5B5-5128-98CE-2A4FBE41A9A0</string>
+				<key>title</key>
+				<string>Gratin</string>
+				<key>ingredients</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>0DDE4D24-8D51-5D88-9F1F-E93DCF263895</string>
+						<key>originalText</key>
+						<string>4 boîtes de 5 oz de thon pâle en morceaux</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>4</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>boîtes</string>
+						<key>package</key>
+						<dict>
+							<key>quantity</key>
+							<dict>
+								<key>kind</key>
+								<string>exact</string>
+								<key>lowerBound</key>
+								<dict>
+									<key>numerator</key>
+									<integer>5</integer>
+									<key>denominator</key>
+									<integer>1</integer>
+								</dict>
+							</dict>
+							<key>unitText</key>
+							<string>onces</string>
+						</dict>
+						<key>ingredientText</key>
+						<string>thon pâle en morceaux</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>A9F8C5BD-224C-547C-9ECA-99CCC671A29A</string>
+						<key>originalText</key>
+						<string>1 sac de 1 lb de nouilles aux œufs ondulées</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>1</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>sac</string>
+						<key>package</key>
+						<dict>
+							<key>quantity</key>
+							<dict>
+								<key>kind</key>
+								<string>exact</string>
+								<key>lowerBound</key>
+								<dict>
+									<key>numerator</key>
+									<integer>1</integer>
+									<key>denominator</key>
+									<integer>1</integer>
+								</dict>
+							</dict>
+							<key>unitText</key>
+							<string>livre</string>
+						</dict>
+						<key>ingredientText</key>
+						<string>nouilles aux œufs ondulées</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>00B0C2C1-F117-51CC-AC67-5D8BA68FFF76</string>
+						<key>originalText</key>
+						<string>1 boîte de 28 oz de crème de champignons condensée</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>1</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>boîte</string>
+						<key>package</key>
+						<dict>
+							<key>quantity</key>
+							<dict>
+								<key>kind</key>
+								<string>exact</string>
+								<key>lowerBound</key>
+								<dict>
+									<key>numerator</key>
+									<integer>28</integer>
+									<key>denominator</key>
+									<integer>1</integer>
+								</dict>
+							</dict>
+							<key>unitText</key>
+							<string>onces</string>
+						</dict>
+						<key>ingredientText</key>
+						<string>crème de champignons condensée</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>A1870474-4006-5B79-8B6B-0E9537FF7E33</string>
+						<key>originalText</key>
+						<string>2 tasses américaines de lait</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>2</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>tasses américaines</string>
+						<key>ingredientText</key>
+						<string>lait</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>47A52D4B-6E93-5F94-A874-E013D43332C4</string>
+						<key>originalText</key>
+						<string>1 sac de petits pois surgelés pour cuisson à la vapeur</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>1</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>sac pour cuisson à la vapeur</string>
+						<key>ingredientText</key>
+						<string>petits pois surgelés</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>D6E18778-5ACD-55F6-8CAD-14A138A736C8</string>
+						<key>originalText</key>
+						<string>2 oignons jaunes moyens (ou l’équivalent)</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>2</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>moyens</string>
+						<key>ingredientText</key>
+						<string>oignons jaunes</string>
+						<key>preparation</key>
+						<string>en petits dés</string>
+						<key>note</key>
+						<string>ou l’équivalent</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+				</array>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>567E52CC-04B6-5240-9CCB-E087E1B6C085</string>
+				<key>title</key>
+				<string>Cuisson et assaisonnement</string>
+				<key>ingredients</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>83B6874F-8B93-5789-BE05-9EE66613EAA5</string>
+						<key>originalText</key>
+						<string>beurre non salé</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>approximate</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>6</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>cuillères à soupe américaines</string>
+						<key>ingredientText</key>
+						<string>beurre non salé</string>
+						<key>preparation</key>
+						<string>divisé</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>edited</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>74D6B6DD-4981-5E08-8107-28C527E4850F</string>
+						<key>originalText</key>
+						<string>huile d’olive</string>
+						<key>ingredientText</key>
+						<string>huile d’olive</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>edited</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>C6F5FC5D-0BF2-503D-B585-EBC14DB1917F</string>
+						<key>originalText</key>
+						<string>sel</string>
+						<key>ingredientText</key>
+						<string>sel</string>
+						<key>note</key>
+						<string>plus 1 cuillère à soupe comble pour l’eau des pâtes</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>edited</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>F4C01B42-65C9-521A-9170-44C174003587</string>
+						<key>originalText</key>
+						<string>poivre</string>
+						<key>ingredientText</key>
+						<string>poivre noir</string>
+						<key>preparation</key>
+						<string>fraîchement moulu</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>edited</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>F91EE388-6A0E-5191-8236-68911C4B43F6</string>
+						<key>originalText</key>
+						<string>poudre d’oignon</string>
+						<key>ingredientText</key>
+						<string>poudre d’oignon</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>edited</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>8C091D2B-62BC-5E18-9E14-649931FEC99A</string>
+						<key>originalText</key>
+						<string>poudre d’ail</string>
+						<key>ingredientText</key>
+						<string>poudre d’ail</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>edited</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>8E17111F-4C63-5377-B7E7-3C9834889256</string>
+						<key>originalText</key>
+						<string>piment de Cayenne</string>
+						<key>ingredientText</key>
+						<string>piment de Cayenne</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>edited</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>5C6B882D-9ADA-54B9-B524-A2DBD2955714</string>
+						<key>originalText</key>
+						<string>assaisonnement italien</string>
+						<key>ingredientText</key>
+						<string>assaisonnement italien</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>edited</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>AE1936BD-DDC9-5008-BEAF-42EABE6B1B9D</string>
+						<key>originalText</key>
+						<string>sauce Worcestershire</string>
+						<key>ingredientText</key>
+						<string>sauce Worcestershire</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>edited</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>943EC3F0-2E8F-5850-8C3C-68F683F94C40</string>
+						<key>originalText</key>
+						<string>épices à bifteck de Montréal</string>
+						<key>ingredientText</key>
+						<string>épices à bifteck de Montréal</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>edited</string>
+					</dict>
+				</array>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>ABD96029-CAEA-59B2-8679-A8F88DB31D3E</string>
+				<key>title</key>
+				<string>Garniture</string>
+				<key>ingredients</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>90103FAF-296D-5FBE-B803-EB3E58DC7208</string>
+						<key>originalText</key>
+						<string>1 sac de 5 oz de croûtons assaisonnés</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>1</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>sac</string>
+						<key>package</key>
+						<dict>
+							<key>quantity</key>
+							<dict>
+								<key>kind</key>
+								<string>exact</string>
+								<key>lowerBound</key>
+								<dict>
+									<key>numerator</key>
+									<integer>5</integer>
+									<key>denominator</key>
+									<integer>1</integer>
+								</dict>
+							</dict>
+							<key>unitText</key>
+							<string>onces</string>
+						</dict>
+						<key>ingredientText</key>
+						<string>croûtons assaisonnés</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>5897ED65-683B-527D-B437-5F22A73FAC34</string>
+						<key>originalText</key>
+						<string>1 demi-paquet intérieur de craquelins Ritz</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>1</integer>
+								<key>denominator</key>
+								<integer>2</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>paquet intérieur</string>
+						<key>ingredientText</key>
+						<string>craquelins Ritz</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>6AFDF3D8-1940-5FB9-BA4C-38781C9F4558</string>
+						<key>originalText</key>
+						<string>pecorino fraîchement râpé</string>
+						<key>ingredientText</key>
+						<string>pecorino</string>
+						<key>preparation</key>
+						<string>fraîchement râpé</string>
+						<key>note</key>
+						<string>facultatif, mais fortement recommandé</string>
+						<key>isOptional</key>
+						<true/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>edited</string>
+					</dict>
+				</array>
+			</dict>
+		</array>
+		<key>instructionSections</key>
+		<array>
+			<dict>
+				<key>id</key>
+				<string>B8EB1E39-865E-5DC9-948F-C3C3D7780F96</string>
+				<key>title</key>
+				<string>Nouilles</string>
+				<key>steps</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>33EA3C00-BEC9-5FB4-93B5-5E55BBA0BCA9</string>
+						<key>text</key>
+						<string>Remplir la marmite de 8 pintes américaines d’eau froide fraîche jusqu’à 1 po du bord.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>D6FBC016-D0E1-57C4-8773-63C7BB6B2C17</string>
+						<key>text</key>
+						<string>Ajouter une cuillère à soupe comble de sel et porter l’eau à gros bouillons.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>3D5CA0F5-FC9B-5628-A5F6-526D464F1FBE</string>
+						<key>text</key>
+						<string>Ajouter les nouilles et les cuire selon les indications du paquet pour une texture ferme ou al dente, habituellement environ 6 minutes.</string>
+						<key>duration</key>
+						<dict>
+							<key>seconds</key>
+							<integer>360</integer>
+						</dict>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>F1A9E275-8C6C-5ABD-B38C-9FC5A73DFF18</string>
+						<key>text</key>
+						<string>Égoutter immédiatement les nouilles et les transférer dans le plat de cuisson.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>D5F6E3DD-D504-5325-B0B7-7688DE275D24</string>
+						<key>text</key>
+						<string>Mélanger les nouilles avec un peu d’huile d’olive, 2 cuillères à soupe de beurre, du poivre noir, de l’assaisonnement italien, de la poudre d’ail et de la poudre d’oignon, au goût.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>5514A117-87AB-5D07-B6D3-2FA386B29E6B</string>
+						<key>text</key>
+						<string>Réserver les nouilles pendant la préparation de la sauce.</string>
+					</dict>
+				</array>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>043D4EBE-F7F0-5B0F-A5BC-E048145B35B2</string>
+				<key>title</key>
+				<string>Sauce et assemblage</string>
+				<key>steps</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>11DC9A3C-22FD-58E6-BA4B-00BEC8B33032</string>
+						<key>text</key>
+						<string>Préchauffer le four à 400 °F.</string>
+						<key>temperature</key>
+						<dict>
+							<key>value</key>
+							<dict>
+								<key>numerator</key>
+								<integer>400</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+							<key>unit</key>
+							<string>fahrenheit</string>
+						</dict>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>53F6EA4F-5DEB-53E0-97F9-B94AB827E0F0</string>
+						<key>text</key>
+						<string>Couper finement les oignons. Les faire revenir dans une quantité généreuse de beurre, environ 2 cuillères à soupe, avec des épices à bifteck de Montréal, du sel et du poivre au goût.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>1E3D9E79-7F53-5287-820E-E94913E70AC9</string>
+						<key>text</key>
+						<string>Cuire jusqu’à ce qu’ils soient tendres ou très légèrement dorés. Une forte caramélisation n’est pas nécessaire; les petits pois apporteront amplement de douceur.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>795D3D6D-0055-507A-A26B-D3628F344502</string>
+						<key>text</key>
+						<string>Ajouter la crème de champignons, le lait et le thon. Réchauffer le tout, puis ajouter un trait de sauce Worcestershire et du piment de Cayenne au goût.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>326B0702-9B63-5F79-A226-A0090D9A25A8</string>
+						<key>text</key>
+						<string>Goûter la sauce. Elle devrait alors être un peu « trop » : légèrement trop salée, trop savoureuse et dominée par le thon. Elle devrait autrement être équilibrée et paraître un peu liquide. C’est idéal; les nouilles absorberont et adouciront la sauce.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>458A0AEF-55CA-57F0-8CA3-E048CF7C02DE</string>
+						<key>text</key>
+						<string>Cuire seulement jusqu’au frémissement. ATTENTION : cette sauce brûle très facilement! Un léger fond est agréable, mais à feu vif, environ 15 secondes séparent les sucs savoureux d’un goût de « fil électrique brûlé ». Baisser le feu ou surveiller attentivement.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>8A6E2E14-0BA2-5EE6-BE0C-C57F4F8273C7</string>
+						<key>text</key>
+						<string>Verser immédiatement la sauce sur les nouilles. Ajouter les petits pois surgelés et mélanger délicatement en soulevant.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>85701DE6-DC5A-5084-8738-BFD20C7D53C3</string>
+						<key>text</key>
+						<string>Placer le plat au centre du four préchauffé, de préférence sur une plaque à rebord pour recueillir les débordements. Vérifier après 10 minutes; le gratin devrait tout juste commencer à bouillonner.</string>
+						<key>duration</key>
+						<dict>
+							<key>seconds</key>
+							<integer>600</integer>
+						</dict>
+						<key>temperature</key>
+						<dict>
+							<key>value</key>
+							<dict>
+								<key>numerator</key>
+								<integer>400</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+							<key>unit</key>
+							<string>fahrenheit</string>
+						</dict>
+					</dict>
+				</array>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>AB4D942E-B27C-51F4-882D-E6E84F951FC3</string>
+				<key>title</key>
+				<string>Garniture</string>
+				<key>steps</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>D911DD98-0F32-5AE2-B08B-7E03A9519A09</string>
+						<key>text</key>
+						<string>Pendant que le gratin commence à cuire, écraser les croûtons et les craquelins Ritz en chapelure grossière.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>A4942C3F-6A82-5F7F-A50E-21385947E49B</string>
+						<key>text</key>
+						<string>Faire fondre 2 cuillères à soupe de beurre et les incorporer à la garniture.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>62A39FA3-0AEF-5A5C-97D4-4E92B7E969E0</string>
+						<key>text</key>
+						<string>Poivrer. Il ne sera pas nécessaire de saler.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>8A4326F0-E88E-5131-975E-00584707F7EF</string>
+						<key>text</key>
+						<string>Si désiré — mais c’est fortement recommandé — râper du pecorino dans la garniture et mélanger.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>A56F2D72-0752-5364-9181-934A9D2D0914</string>
+						<key>text</key>
+						<string>Lorsque le gratin commence à bouillonner, répartir la garniture uniformément et remettre au four pour la faire dorer.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>A37290BB-AAB2-5D04-A43F-83F6063DD1F0</string>
+						<key>text</key>
+						<string>Vérifier après 8 minutes, puis toutes les 2 minutes.</string>
+						<key>duration</key>
+						<dict>
+							<key>seconds</key>
+							<integer>480</integer>
+						</dict>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>CD68FC73-4EE1-5655-882B-AB0F6B54A7B7</string>
+						<key>text</key>
+						<string>Faire dorer au degré désiré et retirer rapidement du four.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>EA222BC8-50AE-539A-AC72-2DEB0AF298A8</string>
+						<key>text</key>
+						<string>Laisser reposer le gratin environ 10 minutes avant de servir.</string>
+						<key>duration</key>
+						<dict>
+							<key>seconds</key>
+							<integer>600</integer>
+						</dict>
+					</dict>
+				</array>
+			</dict>
+		</array>
+	</dict>
+</dict>
+</plist>

@@ -23,19 +23,84 @@
 			<string>Fusion italo-américaine</string>
 		</array>
 		<key>equipment</key>
-		<array/>
+		<array>
+			<dict>
+				<key>id</key>
+				<string>204C51CC-BC30-5036-A70C-6CBA7D7BBBFF</string>
+				<key>isOptional</key>
+				<false/>
+				<key>name</key>
+				<string>grande poêle large ou sauteuse</string>
+				<key>originalText</key>
+				<string>Une grande poêle large ou sauteuse</string>
+				<key>quantity</key>
+				<dict>
+					<key>kind</key>
+					<string>exact</string>
+					<key>lowerBound</key>
+					<dict>
+						<key>denominator</key>
+						<integer>1</integer>
+						<key>numerator</key>
+						<integer>1</integer>
+					</dict>
+				</dict>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>9F383A82-D93A-58D7-86DB-486FB5D4CA5A</string>
+				<key>isOptional</key>
+				<false/>
+				<key>name</key>
+				<string>grande marmite à pâtes</string>
+				<key>originalText</key>
+				<string>Une grande marmite pour les rigatonis</string>
+				<key>quantity</key>
+				<dict>
+					<key>kind</key>
+					<string>exact</string>
+					<key>lowerBound</key>
+					<dict>
+						<key>denominator</key>
+						<integer>1</integer>
+						<key>numerator</key>
+						<integer>1</integer>
+					</dict>
+				</dict>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>27EA097D-35F9-506C-A270-ACBB2198778E</string>
+				<key>isOptional</key>
+				<false/>
+				<key>name</key>
+				<string>couteau et planche à découper</string>
+				<key>originalText</key>
+				<string>Couteau et planche à découper</string>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>1223F42B-DE1B-56E9-B527-17506B08C875</string>
+				<key>isOptional</key>
+				<true/>
+				<key>name</key>
+				<string>moulin à épices ou mortier et pilon</string>
+				<key>originalText</key>
+				<string>Moulin à poivre long ou mortier et pilon</string>
+			</dict>
+		</array>
 		<key>id</key>
-		<string>F1300000-0000-4000-8000-000000000003</string>
+		<string>1B3348D2-BDB5-5F7C-8E54-7D717B954B63</string>
 		<key>ingredientSections</key>
 		<array>
 			<dict>
 				<key>id</key>
-				<string>F1350001-0000-4000-8000-000000000001</string>
+				<string>BA3BBD00-9F6F-5388-9DAB-AAD0EE9737E9</string>
 				<key>ingredients</key>
 				<array>
 					<dict>
 						<key>id</key>
-						<string>F1360001-0000-4000-8000-000000000001</string>
+						<string>F7251985-2EA2-5B1E-A5EE-E296C21B16F8</string>
 						<key>ingredientText</key>
 						<string>rigatonis</string>
 						<key>isOptional</key>
@@ -65,7 +130,7 @@
 					</dict>
 					<dict>
 						<key>id</key>
-						<string>F1360002-0000-4000-8000-000000000002</string>
+						<string>BA8939B9-B1FB-5271-9D91-EFF6EE5D9743</string>
 						<key>ingredientText</key>
 						<string>saucisse de bœuf</string>
 						<key>isOptional</key>
@@ -97,7 +162,7 @@
 					</dict>
 					<dict>
 						<key>id</key>
-						<string>F1360003-0000-4000-8000-000000000003</string>
+						<string>021FB6BE-1DBF-5C6F-B3E0-2E246C83F8AD</string>
 						<key>ingredientText</key>
 						<string>oignon</string>
 						<key>isOptional</key>
@@ -131,7 +196,7 @@
 					</dict>
 					<dict>
 						<key>id</key>
-						<string>F1360004-0000-4000-8000-000000000004</string>
+						<string>23A0BF51-B01C-5A44-815B-ED159FCD9B59</string>
 						<key>ingredientText</key>
 						<string>beurre</string>
 						<key>isOptional</key>
@@ -161,7 +226,7 @@
 					</dict>
 					<dict>
 						<key>id</key>
-						<string>F1360005-0000-4000-8000-000000000005</string>
+						<string>3DB39C27-C5AB-5540-8D76-2148E0A4CFB5</string>
 						<key>ingredientText</key>
 						<string>assaisonnement à steak de Montréal</string>
 						<key>isOptional</key>
@@ -184,7 +249,7 @@
 					</dict>
 					<dict>
 						<key>id</key>
-						<string>F1360006-0000-4000-8000-000000000006</string>
+						<string>BCCCB2AE-2788-5957-AE63-48FD99C7A1BD</string>
 						<key>ingredientText</key>
 						<string>sel</string>
 						<key>isOptional</key>
@@ -207,7 +272,7 @@
 					</dict>
 					<dict>
 						<key>id</key>
-						<string>F1360007-0000-4000-8000-000000000007</string>
+						<string>6F600474-CDF1-5C58-B0DF-C07B6832F567</string>
 						<key>ingredientText</key>
 						<string>pâte de tomate</string>
 						<key>isOptional</key>
@@ -237,7 +302,7 @@
 					</dict>
 					<dict>
 						<key>id</key>
-						<string>F1360008-0000-4000-8000-000000000008</string>
+						<string>512F9859-2390-5A82-87CA-2B9FBD93DD29</string>
 						<key>ingredientText</key>
 						<string>vodka</string>
 						<key>isOptional</key>
@@ -260,7 +325,7 @@
 					</dict>
 					<dict>
 						<key>id</key>
-						<string>F1360009-0000-4000-8000-000000000009</string>
+						<string>0E2248F3-B2E9-5AAF-A8C2-8334F277D758</string>
 						<key>ingredientText</key>
 						<string>tomates Ro-Tel avec piments verts</string>
 						<key>isOptional</key>
@@ -292,7 +357,7 @@
 					</dict>
 					<dict>
 						<key>id</key>
-						<string>F136000A-0000-4000-8000-00000000000A</string>
+						<string>7E2AE2E2-88D5-5B8C-8DC0-763C46B629D0</string>
 						<key>ingredientText</key>
 						<string>sauce préparée à la viande pour pâtes</string>
 						<key>isOptional</key>
@@ -324,7 +389,7 @@
 					</dict>
 					<dict>
 						<key>id</key>
-						<string>F136000B-0000-4000-8000-00000000000B</string>
+						<string>295800C4-AEFD-5D5A-932A-7B1873473491</string>
 						<key>ingredientText</key>
 						<string>ail</string>
 						<key>isOptional</key>
@@ -353,12 +418,12 @@
 			</dict>
 			<dict>
 				<key>id</key>
-				<string>F1350002-0000-4000-8000-000000000002</string>
+				<string>8E477255-8139-5B4A-9BAB-CC4F6D1945B4</string>
 				<key>ingredients</key>
 				<array>
 					<dict>
 						<key>id</key>
-						<string>F136000C-0000-4000-8000-00000000000C</string>
+						<string>EAC0FDAF-7F54-5424-92E3-38EFE8B19D2E</string>
 						<key>ingredientText</key>
 						<string>pecorino romano</string>
 						<key>isOptional</key>
@@ -383,7 +448,7 @@
 					</dict>
 					<dict>
 						<key>id</key>
-						<string>F136000D-0000-4000-8000-00000000000D</string>
+						<string>4C26D46C-E0ED-5439-A742-737F91AAA5A0</string>
 						<key>ingredientText</key>
 						<string>feuille de laurier</string>
 						<key>isOptional</key>
@@ -413,7 +478,7 @@
 					</dict>
 					<dict>
 						<key>id</key>
-						<string>F136000E-0000-4000-8000-00000000000E</string>
+						<string>6C329871-EA57-5259-A3AC-2F70942A442D</string>
 						<key>ingredientText</key>
 						<string>origan séché</string>
 						<key>isOptional</key>
@@ -436,7 +501,7 @@
 					</dict>
 					<dict>
 						<key>id</key>
-						<string>F136000F-0000-4000-8000-00000000000F</string>
+						<string>E5E482D9-BAA3-5120-B2C6-0F2ECC2181A8</string>
 						<key>ingredientText</key>
 						<string>basilic lyophilisé</string>
 						<key>isOptional</key>
@@ -459,7 +524,7 @@
 					</dict>
 					<dict>
 						<key>id</key>
-						<string>F1360010-0000-4000-8000-000000000010</string>
+						<string>753817D2-D1A6-59EE-B2AB-38F70246210B</string>
 						<key>ingredientText</key>
 						<string>flocons de piment rouge</string>
 						<key>isOptional</key>
@@ -482,7 +547,7 @@
 					</dict>
 					<dict>
 						<key>id</key>
-						<string>F1360011-0000-4000-8000-000000000011</string>
+						<string>1C867478-A843-5E67-899E-EA59F2D24220</string>
 						<key>ingredientText</key>
 						<string>poivre long</string>
 						<key>isOptional</key>
@@ -514,7 +579,7 @@
 					</dict>
 					<dict>
 						<key>id</key>
-						<string>F1360012-0000-4000-8000-000000000012</string>
+						<string>6B05FA62-153B-59DD-99DD-47022C3CAE4E</string>
 						<key>ingredientText</key>
 						<string>clou de girofle moulu</string>
 						<key>isOptional</key>
@@ -539,7 +604,7 @@
 					</dict>
 					<dict>
 						<key>id</key>
-						<string>F1360013-0000-4000-8000-000000000013</string>
+						<string>2594522E-82F9-5AD5-993D-D28C2A2A26C0</string>
 						<key>ingredientText</key>
 						<string>sucre</string>
 						<key>isOptional</key>
@@ -571,7 +636,7 @@
 					</dict>
 					<dict>
 						<key>id</key>
-						<string>F1360014-0000-4000-8000-000000000014</string>
+						<string>7BB01DAD-5D71-5DE9-98B8-D75E0259B005</string>
 						<key>ingredientText</key>
 						<string>sauce Worcestershire</string>
 						<key>isOptional</key>
@@ -594,7 +659,7 @@
 					</dict>
 					<dict>
 						<key>id</key>
-						<string>F1360015-0000-4000-8000-000000000015</string>
+						<string>909FAF82-62F0-57C2-A909-BB6E1ED5ED46</string>
 						<key>ingredientText</key>
 						<string>poivre noir</string>
 						<key>isOptional</key>
@@ -624,12 +689,12 @@
 		<array>
 			<dict>
 				<key>id</key>
-				<string>F1370001-0000-4000-8000-000000000001</string>
+				<string>08B5D489-13FB-5ED2-9607-666842E317AE</string>
 				<key>steps</key>
 				<array>
 					<dict>
 						<key>id</key>
-						<string>F1380001-0000-4000-8000-000000000001</string>
+						<string>014A95BA-A701-5F57-8501-722E9A60B701</string>
 						<key>name</key>
 						<string>Atteindre ONYO</string>
 						<key>text</key>
@@ -637,7 +702,7 @@
 					</dict>
 					<dict>
 						<key>id</key>
-						<string>F1380002-0000-4000-8000-000000000002</string>
+						<string>BFBD2537-3718-542F-A165-6A9DC8F2CEC1</string>
 						<key>name</key>
 						<string>Déployer SOSIG</string>
 						<key>text</key>
@@ -645,7 +710,7 @@
 					</dict>
 					<dict>
 						<key>id</key>
-						<string>F1380003-0000-4000-8000-000000000003</string>
+						<string>D33CAF2C-B202-5A72-B637-491B274D8FEE</string>
 						<key>name</key>
 						<string>Cuire la pâte de tomate sans pitié</string>
 						<key>text</key>
@@ -657,12 +722,12 @@
 			</dict>
 			<dict>
 				<key>id</key>
-				<string>F1370002-0000-4000-8000-000000000002</string>
+				<string>ECB9A3E4-0F70-5E17-9F56-6C8882CECE1C</string>
 				<key>steps</key>
 				<array>
 					<dict>
 						<key>id</key>
-						<string>F1380004-0000-4000-8000-000000000004</string>
+						<string>F2A0C784-1BB6-579F-8DBA-9ED8B4906099</string>
 						<key>name</key>
 						<string>Assembler la sauce</string>
 						<key>text</key>
@@ -675,7 +740,7 @@
 							<integer>1800</integer>
 						</dict>
 						<key>id</key>
-						<string>F1380005-0000-4000-8000-000000000005</string>
+						<string>538A535F-4D49-5740-AC96-76BBAB9D8BA3</string>
 						<key>name</key>
 						<string>Arrêter de jouer dedans</string>
 						<key>text</key>
@@ -687,12 +752,12 @@
 			</dict>
 			<dict>
 				<key>id</key>
-				<string>F1370003-0000-4000-8000-000000000003</string>
+				<string>DA812354-E232-5A27-9492-CDF49A56735C</string>
 				<key>steps</key>
 				<array>
 					<dict>
 						<key>id</key>
-						<string>F1380006-0000-4000-8000-000000000006</string>
+						<string>9F328768-7C9B-524F-B866-ED9019D2718A</string>
 						<key>name</key>
 						<string>Rigatonis</string>
 						<key>text</key>
@@ -719,7 +784,7 @@
 				<key>assetName</key>
 				<string>RedEngineGallery0</string>
 				<key>id</key>
-				<string>F1320000-0000-4000-8000-000000000003</string>
+				<string>BD0D14F2-568C-593B-862C-7D45B4681C50</string>
 				<key>role</key>
 				<string>gallery</string>
 			</dict>
@@ -732,7 +797,7 @@
 			<string>Donne une très grosse quantité et beaucoup de restes</string>
 		</dict>
 		<key>revisionNumber</key>
-		<integer>1</integer>
+		<integer>2</integer>
 		<key>source</key>
 		<dict>
 			<key>authorName</key>
