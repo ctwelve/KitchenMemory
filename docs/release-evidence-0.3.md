@@ -79,10 +79,10 @@ old-schema fixtures, or controlled clocks; no ordinary personal library is reset
 
 | Scenario | Evidence and bounded result |
 | --- | --- |
-| Fresh install | RecipeLibraryStartupTests exercise undecided empty startup, accepting/declining bundled content, explicit fixture installation, retry, and remote content arriving before the first-run choice. The fresh Mac walkthrough below also passed. |
+| Fresh install | RecipeLibraryStartupTests exercise undecided empty startup, accepting/declining bundled content, explicit fixture installation, retry, and the pending first-run choice becoming irrelevant after a local Recipe is saved and explicitly refreshed (a simulation, not remote delivery). The fresh Mac walkthrough below also passed. |
 | Migrated store | KitchenMemorySchemaSynchronizationTests create real V1/V2/V3 schema stores and reopen through the current V7 migration plan: Recipe content and deletion/restoration evidence survive; no owner is invented. Interrupted V2 migration remains recoverable. Authority-save tests verify idempotent backfill and reject unknown/cross-owned graphs. This does not promise survival of every historical alpha store; ADR 0016 remains the alpha reset boundary. |
 | Offline | Durable local transaction/history tests and Session/Recipe draft relaunch tests preserve pending evidence. Managed reconnection is recorded separately below. |
-| External refresh | SwiftDataCookingSessionRepositoryTests read every classification from an external writer. Hosted CookingSessionExternalRefreshTests prove the remote callback reaches the main actor and composition reloads the read context. Live transport evidence is bounded below. |
+| External refresh | SwiftDataCookingSessionRepositoryTests read every classification from an external writer. PersistentStoreChangeObserverTests prove the persistence-queue callback reaches the main actor; hosted CookingSessionExternalRefreshTests separately prove composition reloads the read context. Live transport evidence is bounded below. |
 | Deletion aging | RecipeRetentionTests and RecipeRetentionEvidenceTests advance controlled clocks through expiry and the five-year tombstone horizon; unknown/recent dates remain recoverable, late children preserve recovery, shared media is retained, and late evidence becomes a new Recovery draft rather than silently resurrecting content. |
 | Recovery | Partial Session closure/restoration fixtures classify as Unavailable until complete; conflicting roots classify as Recovery. Authority and retention tests reject malformed or unavailable graphs. Startup failure/retry is exercised in the Mac walkthrough. |
 | Relaunch | RecipeDraftRelaunchTests, CookingSessionRelaunchTests, Folder/Tag persistence and checkpoint tests reopen persisted state; retained local outbox work remains retryable. These are persistent-store checks, distinct from the volatile ordinary-use fixture. |
@@ -98,8 +98,14 @@ receiving-store evidence and row content can do so.
 Fresh managed V7 E4b runs passed in both orders (A offline/B online, then
 B offline/A online). Each offline replica reopened with managed CloudKit; each
 fresh receiver verified the exact expected evidence multiset and row content.
-Every store reported schema 7.0.0. The live E3 notification/relaunch phase is
-pending completion. Earlier V3 runs are excluded from current-schema evidence.
+Every store reported schema 7.0.0. Reopening the verified receiving store in a
+new process also passed exact retained evidence with zero new Cloud operations
+or remote-change notifications. The additional E3 foreground-notification phase
+ended **inconclusive after its 300-second observation window**; it did not
+establish live notification-driven refresh, and its follow-on E3 relaunch phase
+was not run. No receiving content mismatch was reported. The separately passed
+observer/composition tests and E4b retained-store relaunch retain only their
+stated scope. Earlier V3 runs are excluded from current-schema evidence.
 No Production schema initialization/promotion was performed. Development
 transport cannot establish Production schema readiness or physical multi-device
 behavior; the full historical transport/device matrix is not claimed as rerun.
