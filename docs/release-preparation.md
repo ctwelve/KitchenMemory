@@ -10,7 +10,9 @@ This runbook implements [ADR 0018](adr/0018-converge-release-preparation-on-evid
 Use it when the release's prerequisite work is complete. For 0.3, the execution
 belongs to [#124](https://github.com/ctwelve/KitchenMemory/issues/124); its live
 issue dependencies remain the gate. Recording this workflow does not start the
-refactor, resolve the accessibility decisions in #132, or authorize distribution.
+refactor or authorize distribution. The accessibility gates are the alpha or beta
+obligations in [accessibility engineering](accessibility-engineering.md); the 0.3
+alpha pass does not require the deferred beta matrix.
 
 ## Start and retain evidence
 

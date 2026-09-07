@@ -120,6 +120,7 @@ amends them.
 - [0017: Additive Recipe authority evidence](adr/0017-use-additive-recipe-authority-evidence.md)
 
 - [0018: Converge release preparation on evidence](adr/0018-converge-release-preparation-on-evidence.md)
+- [0019: Stage accessibility acceptance at beta](adr/0019-stage-accessibility-acceptance-at-beta.md)
 
 ### Superseded architecture decisions
 
