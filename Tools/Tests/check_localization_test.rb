@@ -47,6 +47,16 @@ class LocalizationContractTest < Minitest::Test
     end
   end
 
+  def test_unsupported_and_unnamed_printf_conversions_are_rejected
+    ["%1$(amount)f", "%1$(other).2f", "%f", "%1$llu"].each do |value|
+      catalog = fixture
+      catalog["strings"]["screen.title"]["localizations"].each_value do |localized|
+        localized["stringUnit"]["value"] = value
+      end
+      refute_empty Contract.catalog_errors(catalog, policy), value
+    end
+  end
+
   def test_history_requires_a_reason_and_comments_do_not_count_as_live_usage
     entries = fixture["strings"]
     source = {"View.swift" => "// Text(.screenTitle)\n/* .screenTitle */"}
@@ -62,6 +72,8 @@ class LocalizationContractTest < Minitest::Test
      'Label("English", systemImage: "book")', 'view.accessibilityValue("English")'].each do |source|
       refute_empty Contract.source_errors({"View.swift" => source}, {}, {}), source
     end
+    assert_empty Contract.source_errors({"View.swift" => 'let title = "internal"; func row(title: String) { Text(title) }'}, {}, {})
+    refute_empty Contract.source_errors({"View.swift" => "let title = \"English\"\nText(title)"}, {}, {})
     assert_empty Contract.source_errors({"View.swift" => 'Text(recipe.title) // Text("Old example")'}, {}, {})
     assert_empty Contract.source_errors({"View.swift" => 'let url = "https://example.com"; Text(.screenTitle)'}, fixture["strings"], {})
   end

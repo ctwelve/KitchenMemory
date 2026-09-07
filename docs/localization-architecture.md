@@ -202,8 +202,10 @@ Run `ruby Tools/check-localization.rb` during ordinary verification. Xcode Cloud
 post-clone script runs it and its synthetic contract tests before the build. It
 checks both catalogs for locale completeness, reviewed nonempty values, matching
 variant and named-placeholder structure, intentional manual extraction state,
-translator context, and generated-symbol collisions. It also rejects new orphan
-interface keys, direct literal UI copy, simple literal-variable UI indirection,
+translator context, and generated-symbol collisions. Named object and integer
+operands (`@`, `d`, `lld`) are supported; other printf conversions are rejected
+until their parsing and compiled formatter tests are deliberately extended. It also rejects new orphan
+interface keys, direct literal UI copy, immediately preceding literal bindings,
 and raw localization-key lookups. The two exact nonprose exceptions are an
 example HTTPS URL and an accessibility-hidden fraction separator, each with a
 source path and reason. Historical documents and authored Recipe assets are not

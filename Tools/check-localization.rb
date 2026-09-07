@@ -13,6 +13,9 @@ module KitchenMemory
   module LocalizationContract
     SEMANTIC_KEY = /\A[a-z][a-z0-9]*(?:\.[a-z0-9][a-z0-9-]*)+\z/
     PLACEHOLDER = /%(\d+)\$\(([^)]+)\)(ll)?([@d])/
+    # Other printf conversions must be deliberately added with compiled formatter
+    # coverage; silently ignoring an unfamiliar conversion loses operand safety.
+    OTHER_PLACEHOLDER = /%(?:\d+\$)?(?:\([^)]+\))?[-+#0']*(?:\d+|\*)?(?:\.(?:\d+|\*))?(?:hh|h|ll|l|L|q|z|t|j)?[A-Za-z@]/
     UI_CALL = /\b(?:Text|Label|Button|Toggle|Section|LabeledContent|ContentUnavailableView|TextField|SecureField|Picker|Menu|GroupBox|DisclosureGroup|ProgressView|Link|DatePicker|Stepper|Slider|NavigationLink|navigationSubtitle|help|navigationTitle|accessibilityLabel|accessibilityValue|accessibilityHint|alert|confirmationDialog)\s*\(\s*(?:verbatim:\s*)?/
     # Swift comments and complete ordinary/raw/multiline string tokens. Keeping
     # strings intact avoids treating URL slashes or comment-like copy as comments.
@@ -65,7 +68,7 @@ module KitchenMemory
             source_text = source_units.fetch(path, {}).fetch("value", "")
             errors << "placeholder mismatch: #{key}/#{locale}" unless text.scan(PLACEHOLDER).sort == source_text.scan(PLACEHOLDER).sort
             stripped = text.gsub(PLACEHOLDER, "").gsub("%%", "")
-            errors << "unnamed placeholder: #{key}/#{locale}" if stripped.match?(/%(?:\d+\$)?(?:ll)?[@d]/)
+            errors << "unsupported or unnamed placeholder: #{key}/#{locale}" if stripped.match?(OTHER_PLACEHOLDER)
           end
         end
       end
@@ -89,17 +92,17 @@ module KitchenMemory
         source.to_enum(:scan, TOKEN).each do
           string_ranges << (Regexp.last_match.begin(0)...Regexp.last_match.end(0))
         end
-        literals = {}
-        source.scan(/\b(?:let|var)\s+(\w+)(?:\s*:\s*(?:String|LocalizedStringResource|LocalizedStringKey))?\s*=\s*(\#*"(?:""|[^\n])?)/) do |name, _|
-          literals[name] = true
-        end
         source.to_enum(:scan, UI_CALL).each do
           match = Regexp.last_match
           next if string_ranges.any? { |range| range.cover?(match.begin(0)) }
           argument = source[match.end(0)..]
           literal = argument.match?(/\A\#*"/)
           identifier = argument[/\A([A-Za-z_]\w*)\s*[,)]/, 1]
-          next unless literal || literals[identifier]
+          # Only an immediately preceding binding is unambiguous without Swift
+          # scope/type analysis. Never treat a file-wide name as literal provenance.
+          prefix = source[0...match.begin(0)]
+          binding = identifier && prefix.match?(/\b(?:let|var)\s+#{Regexp.escape(identifier)}(?:\s*:\s*(?:String|LocalizedStringResource|LocalizedStringKey))?\s*=\s*(?:#{TOKEN.source})\s*;?\s*\z/m)
+          next unless literal || binding
           exception = exceptions.find do |item|
             path.end_with?(item.fetch("path")) && argument.start_with?(item.fetch("literal").dump) &&
               !item.fetch("reason", "").strip.empty?
