@@ -1,0 +1,821 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>formatVersion</key>
+	<integer>1</integer>
+	<key>recipeID</key>
+	<string>73A370B1-8B9B-5AB8-A095-86A6D9FF0121</string>
+	<key>revision</key>
+	<dict>
+		<key>authorName</key>
+		<string>cTwelve</string>
+		<key>categories</key>
+		<array>
+			<string>Cena</string>
+			<string>Pasta</string>
+			<string>Cucina dalla dispensa</string>
+		</array>
+		<key>contentLanguage</key>
+		<string>it-IT</string>
+		<key>cuisines</key>
+		<array>
+			<string>Fusione italoamericana</string>
+		</array>
+		<key>equipment</key>
+		<array>
+			<dict>
+				<key>id</key>
+				<string>8E1DC930-ED3F-580C-BEA5-41116039169D</string>
+				<key>isOptional</key>
+				<false/>
+				<key>name</key>
+				<string>padella grande e larga o casseruola svasata</string>
+				<key>originalText</key>
+				<string>Una padella grande e larga o una casseruola svasata</string>
+				<key>quantity</key>
+				<dict>
+					<key>kind</key>
+					<string>exact</string>
+					<key>lowerBound</key>
+					<dict>
+						<key>denominator</key>
+						<integer>1</integer>
+						<key>numerator</key>
+						<integer>1</integer>
+					</dict>
+				</dict>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>543AA636-29E3-5499-83FA-EBEA439AD7E8</string>
+				<key>isOptional</key>
+				<false/>
+				<key>name</key>
+				<string>pentola grande per la pasta</string>
+				<key>originalText</key>
+				<string>Una pentola grande per i rigatoni</string>
+				<key>quantity</key>
+				<dict>
+					<key>kind</key>
+					<string>exact</string>
+					<key>lowerBound</key>
+					<dict>
+						<key>denominator</key>
+						<integer>1</integer>
+						<key>numerator</key>
+						<integer>1</integer>
+					</dict>
+				</dict>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>E1E57011-3925-5D6E-829D-8338FCA6C172</string>
+				<key>isOptional</key>
+				<false/>
+				<key>name</key>
+				<string>coltello e tagliere</string>
+				<key>originalText</key>
+				<string>Coltello e tagliere</string>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>56C4364C-D35B-554C-9061-5A0F02D4DCF4</string>
+				<key>isOptional</key>
+				<true/>
+				<key>name</key>
+				<string>macinaspezie o mortaio con pestello</string>
+				<key>originalText</key>
+				<string>Macina per pepe lungo o mortaio con pestello</string>
+			</dict>
+		</array>
+		<key>id</key>
+		<string>0A2B81AC-A7C6-5085-AA4D-315B48C0EAED</string>
+		<key>ingredientSections</key>
+		<array>
+			<dict>
+				<key>id</key>
+				<string>40BE0D16-8513-5B84-9D1D-44B1D383A051</string>
+				<key>ingredients</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>156D49B1-7789-5D96-B022-B23B3ECD033F</string>
+						<key>ingredientText</key>
+						<string>rigatoni</string>
+						<key>isOptional</key>
+						<false/>
+						<key>originalText</key>
+						<string>1 libbra statunitense di rigatoni</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>denominator</key>
+								<integer>1</integer>
+								<key>numerator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>unitText</key>
+						<string>libbra statunitense</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>9706A0A3-4F2B-5C06-A94B-36639906C701</string>
+						<key>ingredientText</key>
+						<string>salsiccia di manzo</string>
+						<key>isOptional</key>
+						<false/>
+						<key>originalText</key>
+						<string>1 libbra statunitense di salsiccia di manzo, tagliata a rondelle</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>preparation</key>
+						<string>tagliata a rondelle</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>denominator</key>
+								<integer>1</integer>
+								<key>numerator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>unitText</key>
+						<string>libbra statunitense</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>F6D2364E-5689-5384-BC44-2E81AF98B593</string>
+						<key>ingredientText</key>
+						<string>cipolla</string>
+						<key>isOptional</key>
+						<false/>
+						<key>note</key>
+						<string>Due cipolle medie sono equivalenti.</string>
+						<key>originalText</key>
+						<string>1 cipolla comicamente grande, a dadini, oppure 2 cipolle medie</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>preparation</key>
+						<string>a dadini</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>denominator</key>
+								<integer>1</integer>
+								<key>numerator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>unitText</key>
+						<string>comicamente grande</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>7FEF16C0-3C51-59C5-856F-0D6321AF62BD</string>
+						<key>ingredientText</key>
+						<string>burro</string>
+						<key>isOptional</key>
+						<false/>
+						<key>originalText</key>
+						<string>2 cucchiai statunitensi di burro, ¼ di stick statunitense</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>denominator</key>
+								<integer>1</integer>
+								<key>numerator</key>
+								<integer>2</integer>
+							</dict>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>unitText</key>
+						<string>cucchiai statunitensi</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>77EE224C-91E8-5822-83D5-8E619E697B1A</string>
+						<key>ingredientText</key>
+						<string>miscela Montreal per bistecche</string>
+						<key>isOptional</key>
+						<false/>
+						<key>originalText</key>
+						<string>Miscela Montreal per bistecche, con moderazione</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>con moderazione</string>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>CB514C8B-3300-5713-A618-8E1345E9E218</string>
+						<key>ingredientText</key>
+						<string>sale</string>
+						<key>isOptional</key>
+						<false/>
+						<key>note</key>
+						<string>Le cipolle hanno bisogno di sale anche se la miscela Montreal ne contiene già.</string>
+						<key>originalText</key>
+						<string>Sale, soprattutto se il burro non è salato</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>quanto basta</string>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>572A8009-2618-5D17-AD43-3816485A713A</string>
+						<key>ingredientText</key>
+						<string>concentrato di pomodoro</string>
+						<key>isOptional</key>
+						<false/>
+						<key>originalText</key>
+						<string>1 lattina piccola di concentrato di pomodoro</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>denominator</key>
+								<integer>1</integer>
+								<key>numerator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>unitText</key>
+						<string>lattina piccola</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>D14C67BA-A66C-524A-A23D-7F9A6336FB67</string>
+						<key>ingredientText</key>
+						<string>vodka</string>
+						<key>isOptional</key>
+						<true/>
+						<key>originalText</key>
+						<string>Un piccolo sorso di vodka</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>un piccolo sorso</string>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>50540FDF-7BD1-53FB-AC05-DBBC35B2075B</string>
+						<key>ingredientText</key>
+						<string>pomodori a dadini Ro-Tel con peperoncini verdi</string>
+						<key>isOptional</key>
+						<false/>
+						<key>note</key>
+						<string>L’originale usava la variante con peperoncini Hatch.</string>
+						<key>originalText</key>
+						<string>1 lattina di pomodori a dadini Ro-Tel con peperoncini verdi, liquido compreso</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>denominator</key>
+								<integer>1</integer>
+								<key>numerator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>unitText</key>
+						<string>lattina</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>0B58BB68-0DD6-51BE-8166-9E0A53BD98A2</string>
+						<key>ingredientText</key>
+						<string>sugo pronto per pasta con carne Hunt's</string>
+						<key>isOptional</key>
+						<false/>
+						<key>note</key>
+						<string>Usa un sugo pronto per pasta a base di pomodoro, non semplice salsa di pomodoro.</string>
+						<key>originalText</key>
+						<string>2 lattine di sugo pronto per pasta con carne Hunt's</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>denominator</key>
+								<integer>1</integer>
+								<key>numerator</key>
+								<integer>2</integer>
+							</dict>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>unitText</key>
+						<string>scatolette</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>56B9C0D0-7863-5268-8F9A-555888519C7D</string>
+						<key>ingredientText</key>
+						<string>aglio</string>
+						<key>isOptional</key>
+						<false/>
+						<key>note</key>
+						<string>Se il cucchiaio è in mano a Keen, rinuncia al controllo di questa variabile.</string>
+						<key>originalText</key>
+						<string>Aglio, tanto; fresco o in vasetto</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>tanto</string>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+					</dict>
+				</array>
+				<key>title</key>
+				<string>Rigatoni e motore rosso</string>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>CFDF7145-900D-58B2-A385-90C3B957D5F1</string>
+				<key>ingredients</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>2DADDCFF-0DD7-5D24-ADCC-BC07423A6B7F</string>
+						<key>ingredientText</key>
+						<string>Pecorino Romano</string>
+						<key>isOptional</key>
+						<false/>
+						<key>originalText</key>
+						<string>Pecorino Romano, grattugiato generosamente</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>preparation</key>
+						<string>grattugiato</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>generosamente</string>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>A66B0DFB-A7F9-5786-B75B-3B804D464100</string>
+						<key>ingredientText</key>
+						<string>foglia di alloro</string>
+						<key>isOptional</key>
+						<false/>
+						<key>originalText</key>
+						<string>1 foglia di alloro</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>denominator</key>
+								<integer>1</integer>
+								<key>numerator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>fixed</string>
+						<key>unitText</key>
+						<string>foglia</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>9965D79B-4EA9-58BF-A01A-1E4B3D977EF6</string>
+						<key>ingredientText</key>
+						<string>origano secco</string>
+						<key>isOptional</key>
+						<false/>
+						<key>originalText</key>
+						<string>Origano secco a piacere</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>quanto basta</string>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>63C2F597-9CE9-54EB-A1DD-2B3082B0DF71</string>
+						<key>ingredientText</key>
+						<string>basilico liofilizzato</string>
+						<key>isOptional</key>
+						<false/>
+						<key>originalText</key>
+						<string>Basilico liofilizzato a piacere</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>quanto basta</string>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>23C73A81-9A34-5A15-A03F-828E7AEEE8AA</string>
+						<key>ingredientText</key>
+						<string>peperoncino in fiocchi</string>
+						<key>isOptional</key>
+						<false/>
+						<key>originalText</key>
+						<string>Peperoncino in fiocchi a piacere</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>quanto basta</string>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>7D1043AC-9F5C-590B-B133-1581745DD201</string>
+						<key>ingredientText</key>
+						<string>pepe lungo</string>
+						<key>isOptional</key>
+						<true/>
+						<key>originalText</key>
+						<string>Circa ½ infruttescenza di pepe lungo, macinata al momento</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>preparation</key>
+						<string>macinato al momento</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>approximate</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>denominator</key>
+								<integer>2</integer>
+								<key>numerator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>unitText</key>
+						<string>infruttescenza</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>D7177CF3-D2BC-5EF0-BB5C-241C4509FCF2</string>
+						<key>ingredientText</key>
+						<string>chiodo di garofano macinato</string>
+						<key>isOptional</key>
+						<true/>
+						<key>note</key>
+						<string>Se qualcuno riesce a riconoscere il chiodo di garofano, ne hai usato troppo.</string>
+						<key>originalText</key>
+						<string>Un pizzico minuscolo di chiodo di garofano macinato</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>un pizzico minuscolo</string>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>DCEBEB6F-D533-5007-80AC-5027D93FF193</string>
+						<key>ingredientText</key>
+						<string>zucchero</string>
+						<key>isOptional</key>
+						<true/>
+						<key>note</key>
+						<string>Aggiungilo solo se il sugo finito resta spiccatamente acidulo di pomodoro; non renderlo dolce.</string>
+						<key>originalText</key>
+						<string>Circa 1 cucchiaino statunitense di zucchero, solo se il sugo lo richiede</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>approximate</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>denominator</key>
+								<integer>1</integer>
+								<key>numerator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>unitText</key>
+						<string>cucchiaino statunitense</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>EE263386-D615-5B5A-B31D-420B844E2505</string>
+						<key>ingredientText</key>
+						<string>salsa Worcestershire</string>
+						<key>isOptional</key>
+						<true/>
+						<key>originalText</key>
+						<string>Qualche goccia di salsa Worcestershire</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>qualche goccia</string>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>E76533C3-3E7D-5F30-A442-D15455018BAC</string>
+						<key>ingredientText</key>
+						<string>pepe nero</string>
+						<key>isOptional</key>
+						<false/>
+						<key>originalText</key>
+						<string>Pepe nero secondo necessità</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>secondo necessità</string>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+					</dict>
+				</array>
+				<key>title</key>
+				<string>Condimento e finitura</string>
+			</dict>
+		</array>
+		<key>instructionSections</key>
+		<array>
+			<dict>
+				<key>id</key>
+				<string>B8E549F3-C085-5C5E-8508-A89EE0D00119</string>
+				<key>steps</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>E84C0A01-F1EC-5C16-9853-915DEB93E49E</string>
+						<key>name</key>
+						<string>Raggiungi lo stato CIPOLLA</string>
+						<key>text</key>
+						<string>Sciogli il burro in una padella grande e larga a fuoco medio. Aggiungi cipolla a dadini, sale e una modesta spolverata di miscela Montreal. Cuoci con pazienza finché è completamente morbida, traslucida e dolce, poi continua finché compaiono bordi dorati e qualche pezzetto croccante. Assaggia un pezzetto di cipolla. Se la risposta è «sì, decisamente sì», procedi.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>BCF4DCFB-B8FD-51E2-AFF0-FA0793A66A96</string>
+						<key>name</key>
+						<string>Schiera la SALSICCIA</string>
+						<key>text</key>
+						<string>Aggiungi la salsiccia a rondelle. Distribuisci tutto il più possibile e lascia riposare fra una mescolata e l’altra affinché alcune superfici della salsiccia rosolino bene. Mescola e ridistribuisci ogni tanto, formando grasso fuso e fondo rosolato senza sacrificare le cipolle.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>151D4AFE-D7A9-5126-8BA6-39B25795A3CF</string>
+						<key>name</key>
+						<string>Cuoci il concentrato con decisione</string>
+						<key>text</key>
+						<string>Incorpora bene il concentrato di pomodoro nel grasso e cuocilo dal rosso vivo verso un rosso mattone intenso o aranciato. Lascia che una parte tocchi direttamente la padella. Aggiungi il piccolo sorso di vodka, stacca il fondo e cuoci finché l’evidente odore di alcol è quasi scomparso.</string>
+					</dict>
+				</array>
+				<key>title</key>
+				<string>Costruisci le fondamenta</string>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>EC8752BC-5C04-588C-BF6B-5E751C709EAA</string>
+				<key>steps</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>FBD78139-AC24-58E6-86CF-F31542712FB3</string>
+						<key>name</key>
+						<string>Assembla il sugo</string>
+						<key>text</key>
+						<string>Aggiungi il Ro-Tel, liquido compreso, e raschia bene il fondo della padella. Fallo cuocere nel composto concentrato di pomodoro per qualche minuto. Aggiungi aglio, entrambe le lattine di sugo pronto Hunt's con carne, alloro, origano, basilico, peperoncino in fiocchi, pepe lungo e il più piccolo pizzico immaginabile di chiodo di garofano. Porta a un leggero sobbollire.</string>
+					</dict>
+					<dict>
+						<key>duration</key>
+						<dict>
+							<key>seconds</key>
+							<integer>1800</integer>
+						</dict>
+						<key>id</key>
+						<string>5A8347AA-F02E-5521-8833-A04C9DA7A2C4</string>
+						<key>name</key>
+						<string>Smetti di armeggiarci</string>
+						<key>text</key>
+						<string>Lascia in pace la dispensa delle spezie e fai sobbollire dolcemente per almeno 30 minuti, meglio più a lungo, mescolando e raschiando periodicamente il fondo. Assaggia. Se è equilibrato ma ancora acidulo di pomodoro, aggiungi circa 1 cucchiaino statunitense di zucchero all’intera quantità. Verso la fine aggiungi poche gocce di Worcestershire per una profondità saporita discreta. Correggi solo ciò che il sugo chiede davvero, poi togli l’alloro.</string>
+					</dict>
+				</array>
+				<key>title</key>
+				<string>Costruisci il motore rosso</string>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>9C926DCC-51C9-5C46-AF35-63F6A9550A15</string>
+				<key>steps</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>63893D4A-1EDB-5BFF-8D2D-D26C4FE3BED9</string>
+						<key>name</key>
+						<string>Rigatoni</string>
+						<key>text</key>
+						<string>Cuoci i rigatoni in acqua ben salata finché sono appena al dente, tenendo da parte un po’ d’acqua di cottura prima di scolarli. Unisci pasta e sugo, poi aggiungi abbastanza Pecorino grattugiato da farlo diventare parte del sugo, non soltanto una guarnizione. Se serve, allenta con acqua di cottura. Il sugo deve aderire con decisione alle righe e penetrare nei tubi, non formare una pozza sotto la pasta.</string>
+					</dict>
+				</array>
+				<key>title</key>
+				<string>Finisci la pasta</string>
+			</dict>
+		</array>
+		<key>keywords</key>
+		<array>
+			<string>rigatoni</string>
+			<string>salsiccia di manzo</string>
+			<string>salsa di pomodoro</string>
+			<string>pepe lungo</string>
+			<string>grande quantità</string>
+			<string>razzia in dispensa</string>
+		</array>
+		<key>media</key>
+		<array>
+			<dict>
+				<key>accessibilityLabel</key>
+				<string>Un piatto di rigatoni con un sugo rosso intenso di salsiccia e pomodoro, con broccoli accanto</string>
+				<key>assetName</key>
+				<string>RedEngineGallery0</string>
+				<key>id</key>
+				<string>B395FF58-2879-5195-B551-2AA4378E27F3</string>
+				<key>role</key>
+				<string>gallery</string>
+			</dict>
+		</array>
+		<key>recipeID</key>
+		<string>73A370B1-8B9B-5AB8-A095-86A6D9FF0121</string>
+		<key>recipeYield</key>
+		<dict>
+			<key>originalText</key>
+			<string>Produce una quantità molto grande con abbondanti avanzi</string>
+		</dict>
+		<key>revisionNumber</key>
+		<integer>1</integer>
+		<key>source</key>
+		<dict>
+			<key>authorName</key>
+			<string>cTwelve</string>
+			<key>kind</key>
+			<string>webpage</string>
+			<key>publisherName</key>
+			<string>ChatGPT</string>
+			<key>title</key>
+			<string>Il motore rosso, ricostruito da «Forensic Pantry Cuisine» e «Red Sauce Concoction»</string>
+		</dict>
+		<key>summary</key>
+		<string>Rigatoni con salsiccia di manzo rosolata, pomodoro cotto a fondo, pepe lungo, Pecorino Romano e il principio guida che la lingua resta al comando.</string>
+		<key>title</key>
+		<string>Il motore rosso</string>
+	</dict>
+</dict>
+</plist>

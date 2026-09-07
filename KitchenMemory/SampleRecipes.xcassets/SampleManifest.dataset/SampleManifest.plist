@@ -65,6 +65,16 @@
 					<key>heroImageAssetName</key>
 					<string>TunaNoodleHotdishHero</string>
 				</dict>
+				<dict>
+					<key>localeIdentifier</key>
+					<string>it-IT</string>
+					<key>recipeID</key>
+					<string>0B7D83BC-75AA-55FF-9286-EF007BEB3F63</string>
+					<key>dataAssetName</key>
+					<string>TunaNoodleHotdishRecipe-it-IT</string>
+					<key>heroImageAssetName</key>
+					<string>TunaNoodleHotdishHero</string>
+				</dict>
 			</array>
 		</dict>
 		<dict>
@@ -122,6 +132,16 @@
 					<key>heroImageAssetName</key>
 					<string>DirtyFriedRiceHero</string>
 				</dict>
+				<dict>
+					<key>localeIdentifier</key>
+					<string>it-IT</string>
+					<key>recipeID</key>
+					<string>FF3B1739-078D-5861-969E-6DE1BCA2AB34</string>
+					<key>dataAssetName</key>
+					<string>DirtyFriedRiceRecipe-it-IT</string>
+					<key>heroImageAssetName</key>
+					<string>DirtyFriedRiceHero</string>
+				</dict>
 			</array>
 		</dict>
 		<dict>
@@ -168,6 +188,14 @@
 					<string>DFA68566-83E8-5431-AC6A-4E05A7585287</string>
 					<key>dataAssetName</key>
 					<string>RedEngineRecipe-de-DE</string>
+				</dict>
+				<dict>
+					<key>localeIdentifier</key>
+					<string>it-IT</string>
+					<key>recipeID</key>
+					<string>73A370B1-8B9B-5AB8-A095-86A6D9FF0121</string>
+					<key>dataAssetName</key>
+					<string>RedEngineRecipe-it-IT</string>
 				</dict>
 			</array>
 		</dict>

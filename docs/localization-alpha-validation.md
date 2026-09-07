@@ -60,3 +60,19 @@ metric conversions. Fahrenheit temperatures remain Fahrenheit. Brands, original
 source URLs, source authors, and quoted source-document titles retain their
 identity. Shared photography and artwork remain intentional, with German Recipe
 image descriptions. Each Recipe variant has distinct stable identities.
+
+## Italian
+
+`it-IT` supplies every catalog entry, product metadata and Credits under the name
+Memoria di cucina, plus all three sample Recipes. Sessione di cucina retains the
+Cooking Session concept; Attiva, Interrotta, and Conclusa distinguish its states.
+Riprendi resumes an interrupted Session, while Prosegui la cucina creates a new
+Session from a completed one. Optional ingredient presentation uses the
+invariant adjective “opzionale” to avoid assuming the ingredient's gender.
+
+Recipe prose uses Italian terminology and decimal commas while retaining source
+quantities and factual meaning. Cup, spoons, pounds, and quarts are explicitly
+identified as US measures; no metric conversions or substituted ingredients are
+invented. Fahrenheit temperatures remain unchanged. Distinct authored identities,
+source and brand preservation, and intentionally shared artwork follow the same
+contract as the other locales.

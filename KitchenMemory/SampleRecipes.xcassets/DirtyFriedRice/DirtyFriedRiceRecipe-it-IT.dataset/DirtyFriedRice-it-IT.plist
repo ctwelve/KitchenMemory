@@ -1,0 +1,739 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>formatVersion</key>
+	<integer>1</integer>
+	<key>recipeID</key>
+	<string>FF3B1739-078D-5861-969E-6DE1BCA2AB34</string>
+	<key>revision</key>
+	<dict>
+		<key>id</key>
+		<string>07128836-4A27-5262-A145-DB481C9D4170</string>
+		<key>recipeID</key>
+		<string>FF3B1739-078D-5861-969E-6DE1BCA2AB34</string>
+		<key>revisionNumber</key>
+		<integer>1</integer>
+		<key>title</key>
+		<string>Dirty Fried Rice – riso saltato saporito</string>
+		<key>summary</key>
+		<string>Non è dirty rice. Non è proprio riso saltato classico. Una razzia in dispensa ricca di manzo, pepata e leggermente piccante, con peperoncini Hatch, uova, verdure e un passaporto di Bismarck, North Dakota. Calcola circa 20–30 minuti.</string>
+		<key>authorName</key>
+		<string>cTwelve</string>
+		<key>contentLanguage</key>
+		<string>it-IT</string>
+		<key>source</key>
+		<dict>
+			<key>kind</key>
+			<string>webpage</string>
+			<key>title</key>
+			<string>Dirty Fried Rice su X</string>
+			<key>authorName</key>
+			<string>cTwelve</string>
+			<key>publisherName</key>
+			<string>X</string>
+			<key>canonicalURL</key>
+			<dict>
+				<key>relative</key>
+				<string>https://x.com/theCTwelve/status/2089465462723682809</string>
+			</dict>
+		</dict>
+		<key>recipeYield</key>
+		<dict>
+			<key>originalText</key>
+			<string>Riempie una padella enorme</string>
+		</dict>
+		<key>cuisines</key>
+		<array>
+			<string>North Dakota</string>
+		</array>
+		<key>categories</key>
+		<array>
+			<string>Cena</string>
+			<string>Riso saltato</string>
+			<string>Cucina economica</string>
+		</array>
+		<key>keywords</key>
+		<array>
+			<string>macinato di manzo</string>
+			<string>riso</string>
+			<string>peperoncini Hatch</string>
+			<string>razzia in dispensa</string>
+			<string>grande quantità</string>
+		</array>
+		<key>media</key>
+		<array>
+			<dict>
+				<key>id</key>
+				<string>862F9C30-E688-5456-89B8-99DBEFB030DF</string>
+				<key>role</key>
+				<string>hero</string>
+				<key>assetName</key>
+				<string>DirtyFriedRiceHero</string>
+				<key>accessibilityLabel</key>
+				<string>Una ciotola colma di riso saltato con manzo, uova, mais, carote, piselli e fagiolini, tenuta davanti all’enorme padella da cui proviene</string>
+			</dict>
+		</array>
+		<key>equipment</key>
+		<array>
+			<dict>
+				<key>id</key>
+				<string>8A19E705-5704-55DC-87DA-0A1DAF5F1CCF</string>
+				<key>originalText</key>
+				<string>Una padella molto grande, adatta alle alte temperature</string>
+				<key>quantity</key>
+				<dict>
+					<key>kind</key>
+					<string>exact</string>
+					<key>lowerBound</key>
+					<dict>
+						<key>numerator</key>
+						<integer>1</integer>
+						<key>denominator</key>
+						<integer>1</integer>
+					</dict>
+				</dict>
+				<key>name</key>
+				<string>padella molto grande per alte temperature</string>
+				<key>isOptional</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>329DB25A-B0D8-5513-8949-3778269A9BED</string>
+				<key>originalText</key>
+				<string>Una spatolatrice™ abbastanza forte e possente per cucinare in grande</string>
+				<key>quantity</key>
+				<dict>
+					<key>kind</key>
+					<string>exact</string>
+					<key>lowerBound</key>
+					<dict>
+						<key>numerator</key>
+						<integer>1</integer>
+						<key>denominator</key>
+						<integer>1</integer>
+					</dict>
+				</dict>
+				<key>name</key>
+				<string>spatola robusta</string>
+				<key>isOptional</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>FD9A4A33-2F63-56C5-9228-9E7EFFECD7E7</string>
+				<key>originalText</key>
+				<string>Ciotola e forchetta per sbattere le uova</string>
+				<key>name</key>
+				<string>ciotola e forchetta</string>
+				<key>isOptional</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>40931BDE-6BD3-587F-B208-58A8EE5FE19F</string>
+				<key>originalText</key>
+				<string>Coltello e tagliere per sistemare la cipolla</string>
+				<key>name</key>
+				<string>coltello e tagliere</string>
+				<key>isOptional</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>54B9C489-4C78-5F15-AACC-2CCA485545D5</string>
+				<key>originalText</key>
+				<string>Apriscatole per liberare il tuo Ro-Tel dalla sua prigione metallica</string>
+				<key>name</key>
+				<string>apriscatole</string>
+				<key>isOptional</key>
+				<false/>
+			</dict>
+		</array>
+		<key>ingredientSections</key>
+		<array>
+			<dict>
+				<key>id</key>
+				<string>49E024C1-B95A-5FBE-8872-4F7DCF818795</string>
+				<key>title</key>
+				<string>Padella principale</string>
+				<key>ingredients</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>D39772B1-C167-51CA-B604-FE4CBA2D9F2A</string>
+						<key>originalText</key>
+						<string>1,3 libbre statunitensi di macinato di manzo</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>13</integer>
+								<key>denominator</key>
+								<integer>10</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>libbre statunitensi</string>
+						<key>ingredientText</key>
+						<string>macinato di manzo</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>C1D92745-13A0-5CA7-97BB-9BB9AD070E0C</string>
+						<key>originalText</key>
+						<string>1 cucchiaio statunitense di olio vegetale, solo se necessario per il macinato</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>1</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>cucchiaio statunitense</string>
+						<key>ingredientText</key>
+						<string>olio vegetale</string>
+						<key>note</key>
+						<string>Se preferisci, usa un altro olio adatto alle alte temperature; non usare olio d’oliva.</string>
+						<key>isOptional</key>
+						<true/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>84997CD9-8CD1-5ED4-8288-903BCA2DC614</string>
+						<key>originalText</key>
+						<string>1 cipolla gialla piuttosto piccola, tritata grossolanamente</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>1</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>piuttosto piccola</string>
+						<key>ingredientText</key>
+						<string>cipolla gialla</string>
+						<key>preparation</key>
+						<string>tritata grossolanamente</string>
+						<key>note</key>
+						<string>Un po’ di più non farebbe male.</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>EC370AF9-3824-5F23-8111-468499D35BED</string>
+						<key>originalText</key>
+						<string>Abbondante pepe nero macinato al momento</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>abbondante</string>
+						</dict>
+						<key>ingredientText</key>
+						<string>pepe nero</string>
+						<key>preparation</key>
+						<string>macinato al momento</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>46689551-F515-5022-B8A0-64BFF09A04A0</string>
+						<key>originalText</key>
+						<string>Miscela Montreal per bistecche, a piacere</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>quanto basta</string>
+						</dict>
+						<key>ingredientText</key>
+						<string>miscela Montreal per bistecche</string>
+						<key>note</key>
+						<string>Se non disponibile, condisci a piacere con sale grosso, pepe nero, Cayenna, aglio, paprica, cipolla, coriandolo, aneto o spezie simili.</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>A6D070FB-4EE4-59AD-8637-FB1B3C410AF4</string>
+						<key>originalText</key>
+						<string>1 lattina da 10 once di Ro-Tel Hatch Diced Tomatoes &amp; Fire Roasted Hatch Chilies</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>1</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>lattina</string>
+						<key>package</key>
+						<dict>
+							<key>quantity</key>
+							<dict>
+								<key>kind</key>
+								<string>exact</string>
+								<key>lowerBound</key>
+								<dict>
+									<key>numerator</key>
+									<integer>10</integer>
+									<key>denominator</key>
+									<integer>1</integer>
+								</dict>
+							</dict>
+							<key>unitText</key>
+							<string>once</string>
+						</dict>
+						<key>ingredientText</key>
+						<string>Ro-Tel Hatch Diced Tomatoes &amp; Fire Roasted Hatch Chilies</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>FE86D724-9409-55AE-BDDC-AE1DD4679702</string>
+						<key>originalText</key>
+						<string>3 misurini da cuociriso di riso giapponese, cotto</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>3</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>misurini da cuociriso</string>
+						<key>ingredientText</key>
+						<string>riso giapponese</string>
+						<key>preparation</key>
+						<string>cotto</string>
+						<key>note</key>
+						<string>Una piccola dose Zojirushi oppure una dose in una casseruola piccola o media.</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>DA8089DA-971F-5EA9-9730-FD40995C9209</string>
+						<key>originalText</key>
+						<string>3 uova grandi, sbattute</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>3</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>grandi</string>
+						<key>ingredientText</key>
+						<string>uova</string>
+						<key>preparation</key>
+						<string>sbattute</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+				</array>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>8E348177-2D73-5F96-85A3-BDA9759BEF8C</string>
+				<key>title</key>
+				<string>Condimento e finitura</string>
+				<key>ingredients</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>E9FB4103-FF11-5FE4-8519-1505606E5D97</string>
+						<key>originalText</key>
+						<string>1 bustina da 0,74 once / 21 g di Sun-Bird Fried Rice Seasoning Mix</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>1</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>bustina</string>
+						<key>package</key>
+						<dict>
+							<key>quantity</key>
+							<dict>
+								<key>kind</key>
+								<string>exact</string>
+								<key>lowerBound</key>
+								<dict>
+									<key>numerator</key>
+									<integer>21</integer>
+									<key>denominator</key>
+									<integer>1</integer>
+								</dict>
+							</dict>
+							<key>unitText</key>
+							<string>grammi</string>
+						</dict>
+						<key>ingredientText</key>
+						<string>Sun-Bird Fried Rice Seasoning Mix</string>
+						<key>note</key>
+						<string>0,74 once</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>EE8B444A-6EA7-5B38-A455-CAFBD3DC2DD4</string>
+						<key>originalText</key>
+						<string>Un goccio di salsa Worcestershire</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>un goccio</string>
+						</dict>
+						<key>ingredientText</key>
+						<string>salsa Worcestershire</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>44592113-B4E7-54F2-896C-853969F0B85B</string>
+						<key>originalText</key>
+						<string>Una generosa spolverata di Cayenna</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>una generosa spolverata</string>
+						</dict>
+						<key>ingredientText</key>
+						<string>pepe di Cayenna</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>3DF3CF1A-FC28-5F16-9B9F-2E4B0362E3D6</string>
+						<key>originalText</key>
+						<string>1 confezione da 10 once di verdure miste surgelate</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>1</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>confezione</string>
+						<key>package</key>
+						<dict>
+							<key>quantity</key>
+							<dict>
+								<key>kind</key>
+								<string>exact</string>
+								<key>lowerBound</key>
+								<dict>
+									<key>numerator</key>
+									<integer>10</integer>
+									<key>denominator</key>
+									<integer>1</integer>
+								</dict>
+							</dict>
+							<key>unitText</key>
+							<string>once</string>
+						</dict>
+						<key>ingredientText</key>
+						<string>verdure miste surgelate</string>
+						<key>note</key>
+						<string>Mais, piselli, carote e fagiolini; oppure usa quello che vuoi, non sono tua madre.</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>45C33AA0-3E02-50DF-8B89-327E3624ECD9</string>
+						<key>originalText</key>
+						<string>Salsa di soia, a piacere e probabilmente più di quanto pensi all’inizio</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>quanto basta</string>
+						</dict>
+						<key>ingredientText</key>
+						<string>salsa di soia</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>846FE184-37D2-5AFE-AB6A-7F991B5CC1B5</string>
+						<key>originalText</key>
+						<string>Olio di sesamo tostato, per finire</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>ingredientText</key>
+						<string>olio di sesamo tostato</string>
+						<key>preparation</key>
+						<string>per finire</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+				</array>
+			</dict>
+		</array>
+		<key>instructionSections</key>
+		<array>
+			<dict>
+				<key>id</key>
+				<string>B348AF1B-3566-58E0-8BBF-B819187A388D</string>
+				<key>title</key>
+				<string>Rosola il manzo</string>
+				<key>steps</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>673EB915-268C-5A1C-A7CE-23C8E7142AC3</string>
+						<key>name</key>
+						<string>Rosola con decisione</string>
+						<key>text</key>
+						<string>Scalda moltissimo la padella grande. Aggiungi il macinato, usando l’olio vegetale solo se necessario. Condisci con miscela Montreal e abbondante pepe nero macinato al momento, poi rosola energicamente continuando a muovere tutto. I residui dorati sul fondo della padella sono importanti.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>CF36F3EB-CB7B-5B0F-8CBF-6ED20F1D2049</string>
+						<key>name</key>
+						<string>Usa la cipolla per staccare il fondo</string>
+						<key>text</key>
+						<string>Quando il manzo è deliziosamente rosolato, aggiungi la cipolla. Continua a cuocere finché si ammorbidisce un po’, usando la sua umidità per staccare i residui dorati dal fondo.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>76E403C6-B94F-577F-8A14-E35C55BF4F70</string>
+						<key>name</key>
+						<string>Fai evaporare il liquido dei pomodori</string>
+						<key>text</key>
+						<string>Versa tutta la lattina di Hatch Ro-Tel, liquido compreso. Continua a cuocere finché il manzo è ben rosolato, la cipolla è morbida a tuo gusto e gran parte del liquido in eccesso è evaporata. Il calore alto conta: vogliamo macinato rosolato, non bollito. Quando l’aspetto è giusto, abbassa un po’ il fuoco.</string>
+					</dict>
+				</array>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>E47BDDB8-C815-5385-8022-914B6E5845FF</string>
+				<key>title</key>
+				<string>Salta il riso</string>
+				<key>steps</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>BA64BC33-8A2F-5E0E-AE32-D62407F1447D</string>
+						<key>name</key>
+						<string>Incorpora il riso</string>
+						<key>text</key>
+						<string>Aggiungi il riso giapponese cotto e mescola tutto, sgranandolo man mano. Il riso appena cotto va benissimo: non serve la cerimonia tradizionale di scoprire avanzi di riso in frigorifero. Dagli un minuto o due affinché il calore residuo possa davvero farlo saltare.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>C5B0742C-A501-56A7-B825-F8D5986CF8AE</string>
+						<key>name</key>
+						<string>Condisci</string>
+						<key>text</key>
+						<string>Aggiungi il condimento Sun-Bird per riso saltato, un goccio di Worcestershire e una generosa dose di Cayenna. Mescola e abbassa di nuovo il fuoco.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>9B29A7FA-E0FE-5854-A681-1DD5F9DD81F8</string>
+						<key>name</key>
+						<string>Incorpora le uova</string>
+						<key>text</key>
+						<string>Aggiungi le 3 uova sbattute. Incorporale nel riso e nel manzo caldi, continuando a girare e mescolare finché l’uovo è cotto e distribuito nel riso in piccoli pezzi.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>E6505EF2-2B9C-50EA-ABCB-B1500468E2F4</string>
+						<key>name</key>
+						<string>Fallo davvero rosolare</string>
+						<key>text</key>
+						<string>Continua a lavorare il composto a fuoco ridotto abbastanza a lungo da amalgamare tutto e far rosolare un po’ di riso, manzo, cipolla e uovo.</string>
+					</dict>
+				</array>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>042167C6-4EA3-5A76-91FC-2FEDA30A286F</string>
+				<key>title</key>
+				<string>Finisci e lascia riposare</string>
+				<key>steps</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>0CECD84E-8FEA-5908-9E3F-1B9D455FA5DA</string>
+						<key>name</key>
+						<string>SPEGNI IL FUOCO</string>
+						<key>text</key>
+						<string>Versa l’intera confezione di verdure surgelate direttamente in padella: non scongelarle né scaldarle prima al microonde. Mescola bene e lascia che l’enorme massa di manzo e riso roventi, insieme al calore accumulato nella padella, cuocia le verdure.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>7F5D1783-276C-5642-A44B-B104F9CB941A</string>
+						<key>name</key>
+						<string>Assaggia e aggiungi soia</string>
+						<key>text</key>
+						<string>Assaggia. Aggiungi salsa di soia finché il sapore va improvvisamente a fuoco. Se fatica a distribuirsi, rimetti la padella a fuoco alto per circa 15 secondi soltanto, mescolando energicamente: quanto basta per incorporare la soia e far evaporare un po’ d’acqua.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>622411AC-77EC-5B0E-B392-24D36C64A7CD</string>
+						<key>name</key>
+						<string>Spegni di nuovo</string>
+						<key>text</key>
+						<string>Spegni di nuovo il fuoco. Termina con un filo di olio di sesamo tostato e incorporalo. La quantità esatta di soia è volutamente indefinita, perché gli altri condimenti e le diverse salse di soia apportano quantità di sale differenti. Allo stesso modo, la Cayenna è una faccenda fra te e Dio.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>FE1CC46B-3427-5509-83E5-C650F2CE1E13</string>
+						<key>name</key>
+						<string>La manovra della padella gigante</string>
+						<key>text</key>
+						<string>Se il riso sembra asciutto, non aggiungere subito liquido. Sposta l’intera padella su un fornello completamente freddo e coprila. La padella e le diverse libbre statunitensi di cibo sono un volano termico: l’energia accumulata finisce di cuocere le verdure mentre il vapore intrappolato ridistribuisce l’umidità nel riso. Spostare fisicamente la padella conta su un piano radiante in vetroceramica, dove «SPENTO» e «FREDDO» sono concetti diversi.</string>
+					</dict>
+				</array>
+			</dict>
+		</array>
+	</dict>
+</dict>
+</plist>
