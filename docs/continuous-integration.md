@@ -210,9 +210,8 @@ Xcode Cloud GitHub App binding. Never fabricate its status to hide that platform
 limitation.
 
 Xcode Cloud reports the aggregate `KitchenMemory | PR to main from governed
-branches` result. Project policy requires it to pass; inspect the actual
-candidate result before merge. The enforcement limitation below matters even
-when GitHub displays the merge button as available.
+branches` result. It is required for PRs; inspect the actual candidate result
+before merge.
 
 ### GitHub enforcement boundary
 
@@ -220,18 +219,24 @@ Xcode Cloud supplies build and action results but does not provide all of the
 repository controls required by the release policy. GitHub owns that boundary.
 
 As inspected on 2026-09-07, classic protection on `main` requires a pull request,
-the GitHub Actions-owned `PR source policy` check, an up-to-date branch, and
-resolved review conversations. It applies to administrators, blocks force-push
+the GitHub Actions-owned `PR source policy` check, the Xcode Cloud-owned
+`KitchenMemory | PR to main from governed branches` aggregate, an up-to-date
+branch, and resolved review conversations. It applies to administrators, blocks force-push
 and deletion, allows merge commits, and requires zero approving reviews while
 there is one release operator.
 
-**Temporary enforcement exception:** the release maintainer removed the Cloud
-aggregate from required checks to keep work moving during repeated Cloud UI
-runner failures. It still reports to GitHub. The intended restored gate is the strict
-aggregate bound to the Xcode Cloud GitHub App, alongside `PR source policy`.
-Until the maintainer restores enforcement after CI is reliable, the maintainer must
-verify both platform tests and the aggregate explicitly before merging. Do not
-fabricate a status or weaken its trusted-source binding to hide a missing run.
+The maintainer restored the Cloud PR requirement on 2026-09-07 after the hosted
+Cloud lanes became reliable with UI testing suspended. The earlier exception
+allowed progress during repeated Cloud UI runner failures; it did not waive the
+local semantic tests or the obligation to inspect real Cloud results.
+
+The PR rule should require exactly `PR source policy` from GitHub Actions and
+`KitchenMemory | PR to main from governed branches` from the Xcode Cloud GitHub
+App, with strict/up-to-date mode enabled. `KitchenMemory | Development Workflow`
+is a separate branch workflow, and `KitchenMemory | Merge to main` runs after
+merge. Requiring that post-merge status on a PR creates a circular gate. Its
+release-tag requirement below remains separate. Do not fabricate a status or
+weaken its trusted-source binding to hide a missing run.
 
 Three active tag rulesets target `release/*`:
 
