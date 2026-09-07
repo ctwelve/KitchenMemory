@@ -260,7 +260,11 @@ struct PreparedCore {
       sampleFolderName: String(localized: .settingsSamplesFolderName),
       sampleTagName: String(localized: .settingsSamplesTagName)
     )
-    if plan.sampleFixture == .installed { try library.installSamples() }
+    // Seed the minimal shell fixture without simulating a user's explicit pack request.
+    // Pack behavior is exercised by hosted tests starting from an empty Kitchen.
+    if plan.sampleFixture == .installed {
+      try SampleRecipeInstallService(repository: recipeRepository, samples: samples).install(in: kitchenID)
+    }
     libraryModel = RecipeLibraryModel(
       library: library,
       samplePreferences: preferences,
