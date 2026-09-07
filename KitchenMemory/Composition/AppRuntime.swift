@@ -266,6 +266,7 @@ struct PreparedCore {
       organization: RecipeOrganizationModel(
         repository: SwiftDataRecipeOrganizationRepository(modelContainer: modelContainer),
         kitchenID: preparedKitchen.kitchen.id,
+        scope: ownerID.rawValue + "." + (plan.store.personalCloudContainerIdentifier ?? "local"),
         defaults: plan.store.isInMemory ? try organizationTestingDefaults() : .standard
       )
     )

@@ -42,7 +42,8 @@ public final class SwiftDataRecipeOrganizationRepository: RecipeOrganizationRepo
       let receipts = OrganizationStore<BatchReceipt>(modelContainer: container,
                                                      namespace: "organization-batches", recipeID: { _ in nil })
       try receipts.append(receipt, in: command.kitchenID, context: context) { snapshot in
-        _ = try OrganizationEvidence(snapshot.actions, checkpoints: snapshot.checkpoints.map(\.evidence))
+        guard snapshot.checkpoints.isEmpty else { throw FolderError.invalidEvidence }
+        _ = try OrganizationEvidence(snapshot.actions)
       }
       let folders = SwiftDataFolderRepository(modelContainer: container)
       try folders.append(command.folders, in: command.kitchenID, context: context)

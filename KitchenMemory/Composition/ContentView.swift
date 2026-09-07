@@ -69,6 +69,10 @@ struct ContentView: View {
       Text(.sessionEntryDetachedMessage)
     }
     .modifier(RecipeDraftFailureAlert(model: preparedApp?.libraryModel))
+    .alert(.organizationFailed, isPresented: Binding(
+      get: { preparedApp?.libraryModel.organization?.failed == true },
+      set: { preparedApp?.libraryModel.organization?.failed = $0 }
+    )) { Button(.actionCancel, role: .cancel) {} } message: { Text(.organizationFailureMessage) }
     .modifier(LibraryMenuBridge(
       actions: libraryActions, isAvailable: activeSheet == nil && !isShowingResetConfirmation
     ))

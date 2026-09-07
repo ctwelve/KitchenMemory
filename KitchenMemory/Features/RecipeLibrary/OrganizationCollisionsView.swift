@@ -14,6 +14,7 @@ struct OrganizationCollisionsView: View {
       if model.snapshot == nil || model.pending != nil || model.storageInvalid {
         Button(.organizationRetry) { model.retry() }
       }
+      if model.changeRejected { Button(.organizationDiscardRejected) { model.discardRejectedChange() } }
       if let snapshot = model.snapshot {
         ForEach(snapshot.folders.collisions, id: \.folderIDs) { collision in
           let names = snapshot.folders.folders.filter { collision.folderIDs.contains($0.id) }.map(\.name)

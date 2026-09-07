@@ -16,6 +16,7 @@ final class RecipeOrganizationModel {
   private(set) var snapshot: RecipeOrganization?
   private(set) var pending: RecipeOrganizationCommand?
   private(set) var storageInvalid = false
+  private(set) var changeRejected = false
   var failed = false
   var filter = RecipeOrganizationFilter()
   var selectedRecipes: Set<Recipe.ID> = []
@@ -26,17 +27,21 @@ final class RecipeOrganizationModel {
   private(set) var showsUnfiled = true
   private(set) var showsUntagged = true
 
-  init(repository: any RecipeOrganizationRepository, kitchenID: Kitchen.ID, defaults: UserDefaults = .standard) {
+  init(repository: any RecipeOrganizationRepository, kitchenID: Kitchen.ID, scope: String, defaults: UserDefaults = .standard) {
     self.repository = repository
     self.kitchenID = kitchenID
     self.defaults = defaults
-    prefix = "organization." + kitchenID.rawValue.uuidString
+    prefix = "organization." + scope + "." + kitchenID.rawValue.uuidString
     foldersEnabled = defaults.object(forKey: "organization.folders.enabled") as? Bool ?? true
     tagsEnabled = defaults.object(forKey: "organization.tags.enabled") as? Bool ?? true
     expanded = Set((defaults.stringArray(forKey: prefix + ".expanded") ?? []).compactMap(UUID.init(uuidString:))
       .map(Folder.ID.init(rawValue:)))
     if let data = defaults.data(forKey: prefix + ".pending") {
-      do { pending = try JSONDecoder().decode(RecipeOrganizationCommand.self, from: data) }
+      do {
+        let command = try JSONDecoder().decode(RecipeOrganizationCommand.self, from: data)
+        guard command.kitchenID == kitchenID else { throw FolderError.wrongKitchen }
+        pending = command
+      }
       catch { storageInvalid = true; failed = true }
     }
     refresh()
@@ -51,6 +56,10 @@ final class RecipeOrganizationModel {
       showsUnfiled = try value.folders.systemViewVisible
       showsUntagged = try value.tags.systemViewVisible
       snapshot = value
+      filter.tagIDs = Set(filter.tagIDs.compactMap { value.tags.canonicalTagID(for: $0) })
+      if case let .folder(id) = filter.location {
+        filter.location = value.folders.canonicalFolderID(for: id).map(RecipeOrganizationFilter.Location.folder) ?? .all
+      }
       if !showsUnfiled, filter.location == .unfiled { filter.location = .all }
       if !showsUntagged || value.tags.tags.isEmpty { filter.untagged = false }
     } catch { snapshot = nil; failed = true }
@@ -81,8 +90,64 @@ final class RecipeOrganizationModel {
       defaults.removeObject(forKey: prefix + ".pending")
       self.pending = nil
       failed = false
+      changeRejected = false
       refresh()
-    } catch { failed = true }
+    } catch {
+      changeRejected = error is FolderError || error is TagError
+      failed = true
+    }
+  }
+
+  func reorderFolder(from offsets: IndexSet, to destination: Int, locale: Locale) {
+    guard let snapshot, snapshot.folders.ordering == .manual,
+          offsets.count == 1, let source = offsets.first else { return }
+    let rows = snapshot.folders.outline(expanded: expanded, locale: locale)
+    guard rows.indices.contains(source), (0...rows.count).contains(destination) else { return }
+    let folder = rows[source].folder
+    var reordered = rows.map(\.folder)
+    reordered.remove(at: source)
+    let insertion = destination > source ? destination - 1 : destination
+    reordered.insert(folder, at: insertion)
+    let anchor = reordered.prefix(insertion).last { $0.parentID == folder.parentID }
+    perform { try $0.prepare(folder: .reorder(id: folder.id, afterID: anchor?.id)) }
+  }
+
+  func discardRejectedChange() {
+    guard changeRejected else { return }
+    defaults.removeObject(forKey: prefix + ".pending")
+    pending = nil
+    changeRejected = false
+    failed = false
+    refresh()
+  }
+
+  func dropFolder(_ values: [String], recipes: [StoredRecipe], onto folderID: Folder.ID) -> Bool {
+    if values.count == 1, let id = identifier(values[0], prefix: "km-folder:") {
+      perform { try $0.prepare(folder: .move(id: Folder.ID(rawValue: id), parentID: folderID)) }
+      return !failed
+    }
+    return dropRecipes(values, recipes: recipes, to: folderID)
+  }
+
+  func dropTag(_ values: [String], recipes: [StoredRecipe], onto tagID: Tag.ID) -> Bool {
+    if values.count == 1, snapshot?.tags.ordering == .manual, let id = identifier(values[0], prefix: "km-tag:") {
+      perform { try $0.prepare(tag: .reorder(id: Tag.ID(rawValue: id), afterID: tagID)) }
+      return !failed
+    }
+    guard let ids = recipeIDs(values, recipes: recipes) else { return false }
+    classify(ids, tagID: tagID, adding: true)
+    return !failed
+  }
+
+  func clearForReset() {
+    defaults.removeObject(forKey: prefix + ".pending")
+    pending = nil
+    storageInvalid = false
+    changeRejected = false
+    failed = false
+    expanded = []
+    filter = RecipeOrganizationFilter()
+    selectedRecipes = []
   }
 
   func move(_ ids: Set<Recipe.ID>, to folderID: Folder.ID?) {

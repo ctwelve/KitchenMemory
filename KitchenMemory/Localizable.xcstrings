@@ -1,6 +1,30 @@
 {
   "sourceLanguage" : "en-US",
   "strings" : {
+  "organization.discard-rejected": {
+    "comment": "Discard only a definitively rejected local organization command; accepted organization is not undone.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Discard Rejected Change"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Abandonner la modification refusée"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Descartar cambio rechazado"
+        }
+      }
+    }
+  },
   "organization.add-tag": {
     "comment": "Recipe Library organization: Add Tag. Folder location and Tag classification are independent of Recipe content.",
     "extractionState": "manual",

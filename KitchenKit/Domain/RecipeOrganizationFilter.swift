@@ -47,15 +47,18 @@ public struct FolderOutlineRow: Equatable, Identifiable, Sendable {
 extension FolderLibrary {
   /// Iterative outline construction avoids call-stack limits for deep imported hierarchies.
   public func outline(expanded: Set<Folder.ID>, locale: Locale) -> [FolderOutlineRow] {
-    let ranks = Dictionary(uniqueKeysWithValues: manualIDs.enumerated().map { ($0.element, $0.offset) })
-    let groups = Dictionary(grouping: folders, by: \.parentID).mapValues { siblings in
-      siblings.sorted { left, right in
-        if ordering == .manual { return (ranks[left.id] ?? 0) < (ranks[right.id] ?? 0) }
+    let ordered: [Folder]
+    if ordering == .manual {
+      let byID = Dictionary(uniqueKeysWithValues: folders.map { ($0.id, $0) })
+      ordered = manualIDs.compactMap { byID[$0] }
+    } else {
+      ordered = folders.sorted { left, right in
         let comparison = left.name.compare(right.name, options: .caseInsensitive, locale: locale)
         return comparison == .orderedSame ? left.id.rawValue.uuidString < right.id.rawValue.uuidString
           : comparison == .orderedAscending
       }
     }
+    let groups = Dictionary(grouping: ordered, by: \.parentID)
     var pending = (groups[nil] ?? []).reversed().map { ($0, 0) }
     var rows: [FolderOutlineRow] = []
     while let (folder, depth) = pending.popLast() {
@@ -65,4 +68,23 @@ extension FolderLibrary {
     }
     return rows
   }
+}
+
+extension FolderLibrary {
+  /// Complete hierarchical destinations, including collapsed descendants, in presentation order.
+  public func destinations(locale: Locale) -> [FolderDestination] {
+    let rows = outline(expanded: Set(folders.map(\.id)), locale: locale)
+    var ancestry: [String] = []
+    return rows.map { row in
+      ancestry = Array(ancestry.prefix(row.depth))
+      ancestry.append(row.folder.name)
+      return FolderDestination(folder: row.folder, path: ancestry.joined(separator: " / "))
+    }
+  }
+}
+
+public struct FolderDestination: Equatable, Identifiable, Sendable {
+  public var id: Folder.ID { folder.id }
+  public let folder: Folder
+  public let path: String
 }

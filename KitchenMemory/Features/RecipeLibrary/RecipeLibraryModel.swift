@@ -259,6 +259,7 @@ final class RecipeLibraryModel {
       editingPresentations = [:]
       if case .editor = navigation.destination { navigation.move(to: .recipe) }
       if isShowingDrafts { navigation.move(to: .recipe) }
+      organization?.clearForReset()
       try library.reset()
       pendingDisposition = nil
       navigation.move(to: .recipe)

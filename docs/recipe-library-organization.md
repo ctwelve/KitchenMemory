@@ -22,6 +22,10 @@ one transaction. Cleanup failure preserves the same frozen commands for retry.
 Existing Recipe organization commits separately while content editing remains a
 device-local draft.
 
+Pending bulk commands and Folder expansion are scoped by owner and store as well
+as Kitchen identity. Explicit Kitchen reset clears retained local commands before
+resetting shared evidence, preventing later retries from restoring old organization.
+
 The existing V7 scalar record family also stores digest receipts in the
 `organization-batches` namespace. A receipt binds a batch identity to its complete
 command and optional first Save, rejecting identity reuse with a changed selection

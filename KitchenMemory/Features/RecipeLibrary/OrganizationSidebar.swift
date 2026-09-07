@@ -42,16 +42,14 @@ struct OrganizationSidebar: View {
               Button(row.folder.name, systemImage: "folder") { model.filter.location = .folder(row.folder.id) }
                 .accessibilityIdentifier("folder-\(row.folder.id.rawValue.uuidString)")
             }
+            .moveDisabled(snapshot.folders.ordering != .manual)
             .padding(.leading, CGFloat(min(row.depth, 8)) * 12)
             .draggable("km-folder:" + row.folder.id.rawValue.uuidString)
             .dropDestination(for: String.self) { values, _ in
-              if values.count == 1, let id = model.identifier(values[0], prefix: "km-folder:") {
-                model.perform { try $0.prepare(folder: .move(id: Folder.ID(rawValue: id), parentID: row.folder.id)) }
-                return !model.failed
-              }
-              return model.dropRecipes(values, recipes: recipes, to: row.folder.id)
+              model.dropFolder(values, recipes: recipes, onto: row.folder.id)
             }
           }
+          .onMove { offsets, destination in model.reorderFolder(from: offsets, to: destination, locale: locale) }
         } header: { Text(.organizationFolders) }
       }
       if model.tagsEnabled {
@@ -64,13 +62,7 @@ struct OrganizationSidebar: View {
               .accessibilityIdentifier("tag-\(tag.id.rawValue.uuidString)")
               .draggable("km-tag:" + tag.id.rawValue.uuidString)
               .dropDestination(for: String.self) { values, _ in
-                if values.count == 1, snapshot.tags.ordering == .manual, let id = model.identifier(values[0], prefix: "km-tag:") {
-                  model.perform { try $0.prepare(tag: .reorder(id: Tag.ID(rawValue: id), afterID: tag.id)) }
-                  return !model.failed
-                }
-                guard let ids = model.recipeIDs(values, recipes: recipes) else { return false }
-                model.classify(ids, tagID: tag.id, adding: true)
-                return !model.failed
+                model.dropTag(values, recipes: recipes, onto: tag.id)
               }
           }
         } header: { Text(.organizationTags) }

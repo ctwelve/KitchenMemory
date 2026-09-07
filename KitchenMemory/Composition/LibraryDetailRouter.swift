@@ -52,6 +52,11 @@ struct LibraryDetailRouter: View {
     if let selectedRecipe = libraryModel.selectedRecipe {
       RecipeDetailView(storedRecipe: selectedRecipe)
         .id(selectedRecipe.revision.id)
+        .safeAreaInset(edge: .top, alignment: .leading) {
+          if let organization = libraryModel.organization {
+            RecipeOrganizationSummary(model: organization, recipeID: selectedRecipe.id).padding(.horizontal)
+          }
+        }
         .modifier(RecipeDeletionPresentation(model: libraryModel, recipe: selectedRecipe))
         .toolbar {
           if let organization = libraryModel.organization {

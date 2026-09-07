@@ -75,6 +75,29 @@ final class RecipeOrganizationTests: XCTestCase {
     XCTAssertEqual(result(folders: false, tags: false), recipes.map(\.id))
   }
 
+  func testFolderDestinationsDisambiguatePathsAndKeepStableCollisionOrder() throws {
+    let kitchen = Kitchen.ID()
+    let empty = try FolderLibrary(kitchenID: kitchen, commands: [])
+    XCTAssertTrue(empty.outline(expanded: [], locale: .current).isEmpty)
+    var commands: [FolderCommand] = []
+    let home = Folder.ID(), camping = Folder.ID(), homeMeals = Folder.ID(), campingMeals = Folder.ID()
+    let intents: [FolderIntent] = [.create(id: home, name: "Home", parentID: nil),
+      .create(id: camping, name: "Camping", parentID: nil),
+      .create(id: homeMeals, name: "Meals", parentID: home),
+      .create(id: campingMeals, name: "Meals", parentID: camping)]
+    for intent in intents {
+      commands.append(try FolderLibrary(kitchenID: kitchen, commands: commands).prepare(intent))
+    }
+    let library = try FolderLibrary(kitchenID: kitchen, commands: commands)
+    let destinations = library.destinations(locale: .current)
+    XCTAssertEqual(destinations.map(\.path), ["Camping", "Camping / Meals", "Home", "Home / Meals"])
+    XCTAssertEqual(destinations.map(\.id), [camping, campingMeals, home, homeMeals])
+    let duplicate = Folder.ID()
+    commands.append(try empty.prepare(.create(id: duplicate, name: "Home", parentID: nil)))
+    let collided = try FolderLibrary(kitchenID: kitchen, commands: commands).outline(expanded: [], locale: .current)
+    XCTAssertEqual(Array(collided.map(\.id).suffix(2)), [home, duplicate].sorted { $0.rawValue.uuidString < $1.rawValue.uuidString })
+  }
+
   func testOutlinePreservesOrderAndHandlesDeepHierarchyIteratively() throws {
     let kitchen = Kitchen.ID()
     var commands: [FolderCommand] = []
@@ -91,6 +114,7 @@ final class RecipeOrganizationTests: XCTestCase {
     commands.append(try FolderLibrary(kitchenID: kitchen, commands: commands).prepare(.create(id: rootSibling, name: "A", parentID: nil)))
     let library = try FolderLibrary(kitchenID: kitchen, commands: commands)
     let rows = library.outline(expanded: ids, locale: Locale(identifier: "en_US"))
+    XCTAssertEqual(library.destinations(locale: .current).last?.path.components(separatedBy: " / ").count, 300)
     XCTAssertEqual(rows.count, 301)
     XCTAssertEqual(rows.first?.id, rootSibling)
     XCTAssertEqual(rows.last?.depth, 299)

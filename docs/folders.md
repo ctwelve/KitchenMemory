@@ -3,9 +3,8 @@
 Issue [#114](https://github.com/ctwelve/KitchenMemory/issues/114) implements the
 Folder policy settled in [#113](https://github.com/ctwelve/KitchenMemory/issues/113).
 Folder organization belongs to stable Recipes, independently of Revisions and
-Cooking Sessions. The native organization interface is tracked by
-[#116](https://github.com/ctwelve/KitchenMemory/issues/116); this slice does not
-add sidebar management, filtering, drag and drop, or pending-draft assignment.
+Cooking Sessions. The [native organization interface](recipe-library-organization.md) supplies sidebar
+management, filtering, drag and drop, and atomic pending-draft assignment.
 
 ## Entry points
 

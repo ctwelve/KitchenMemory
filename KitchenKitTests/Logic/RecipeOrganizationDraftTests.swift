@@ -17,16 +17,17 @@ final class RecipeOrganizationDraftTests: XCTestCase {
     let organization = SwiftDataRecipeOrganizationRepository(modelContainer: container)
     let kitchen = Kitchen(name: "Home")
     try recipes.save(kitchen)
-    let folder = Folder.ID(), tag = Tag.ID()
+    let folder = Folder.ID(), tag = Tag.ID(), secondTag = Tag.ID()
     try organization.accept(organization.load(in: kitchen.id).prepare(folder: .create(id: folder, name: "Dinner", parentID: nil)))
     try organization.accept(organization.load(in: kitchen.id).prepare(tag: .create(id: tag, name: "Quick")))
+    try organization.accept(organization.load(in: kitchen.id).prepare(tag: .create(id: secondTag, name: "Family")))
     let library = RecipeLibrary(kitchenID: kitchen.id, repository: recipes, samples: OrganizationDraftSamples(),
       importer: RecipeImportService(), organizationRepository: organization)
     let store = OrganizationDraftStore(url: directory.appendingPathComponent("Drafts.json"))
     var drafts = RecipeDrafts(library: library, store: store)
     let first = try XCTUnwrap(drafts.begin())
     first.session.title = "Soup"
-    first.organization = .init(folderID: folder, tagIDs: [tag])
+    first.organization = .init(folderID: folder, tagIDs: [tag, secondTag])
     drafts = RecipeDrafts(library: library, store: store)
     let restored = try XCTUnwrap(drafts.drafts.first)
     XCTAssertEqual(restored.organization, first.organization)
@@ -41,7 +42,7 @@ final class RecipeOrganizationDraftTests: XCTestCase {
     store.refusesRemoval = false
     XCTAssertTrue(try XCTUnwrap(drafts.save(restored.id)).removedDraft)
     XCTAssertEqual(try organization.load(in: kitchen.id).folders.primaryFolder(for: save.recipe.id), folder)
-    XCTAssertEqual(try organization.load(in: kitchen.id).tags.tagIDs(for: save.recipe.id), [tag])
+    XCTAssertEqual(try organization.load(in: kitchen.id).tags.tagIDs(for: save.recipe.id), [tag, secondTag])
     let original = try XCTUnwrap(recipes.recipe(id: save.recipe.id))
     let editing = try XCTUnwrap(drafts.begin(original))
     editing.organization = .init(folderID: folder)
@@ -50,7 +51,7 @@ final class RecipeOrganizationDraftTests: XCTestCase {
     editing.session.title = "Revised soup"
     XCTAssertNotNil(drafts.save(editing.id))
     XCTAssertNil(try organization.load(in: kitchen.id).folders.primaryFolder(for: save.recipe.id))
-    XCTAssertEqual(try organization.load(in: kitchen.id).tags.tagIDs(for: save.recipe.id), [tag])
+    XCTAssertEqual(try organization.load(in: kitchen.id).tags.tagIDs(for: save.recipe.id), [tag, secondTag])
   }
 
   func testAbsentAdapterCannotSilentlyDiscardPendingOrganization() throws {

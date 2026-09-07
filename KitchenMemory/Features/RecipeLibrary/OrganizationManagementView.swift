@@ -42,16 +42,17 @@ struct OrganizationManagementView: View {
               model.perform { try $0.prepare(folder: .systemViewVisible(visible)) }
             }))
             Button(.organizationNewFolder) { edits = .init(folder: nil) }
-            ForEach(snapshot.folders.folders.sorted { $0.name < $1.name }) { folder in
+            ForEach(snapshot.folders.destinations(locale: locale)) { destination in
+              let folder = destination.folder
               HStack {
-                Text(folder.name)
+                Text(destination.path)
                 Spacer()
                 Menu(.organizationManage) {
                   Button(.organizationRename) { edits = .init(folder: folder) }
                   Menu(.organizationParent) {
                     Button(.organizationRoot) { model.perform { try $0.prepare(folder: .move(id: folder.id, parentID: nil)) } }
-                    ForEach(snapshot.folders.folders.filter { !snapshot.folders.subtree(of: folder.id).contains($0.id) }) { parent in
-                      Button(parent.name) { model.perform { try $0.prepare(folder: .move(id: folder.id, parentID: parent.id)) } }
+                    ForEach(snapshot.folders.destinations(locale: locale).filter { !snapshot.folders.subtree(of: folder.id).contains($0.id) }) { parent in
+                      Button(parent.path) { model.perform { try $0.prepare(folder: .move(id: folder.id, parentID: parent.id)) } }
                     }
                   }
                   if snapshot.folders.ordering == .manual {
@@ -145,18 +146,21 @@ struct OrganizationManagementView: View {
 }
 
 struct OrganizationNameEdit: Identifiable {
+  enum Target { case folder(Folder?), tag(Tag?) }
   let id = UUID()
-  let isFolder: Bool
-  let folder: Folder?
-  let tag: Tag?
-  init(folder: Folder?) { isFolder = true; self.folder = folder; tag = nil }
-  init(tag: Tag?) { isFolder = false; self.tag = tag; folder = nil }
+  let target: Target
+  var isFolder: Bool { if case .folder = target { return true }; return false }
+  var folder: Folder? { if case let .folder(value) = target { return value }; return nil }
+  var tag: Tag? { if case let .tag(value) = target { return value }; return nil }
+  init(folder: Folder?) { target = .folder(folder) }
+  init(tag: Tag?) { target = .tag(tag) }
 }
 
 private struct OrganizationNameEditor: View {
   @Bindable var model: RecipeOrganizationModel
   let edit: OrganizationNameEdit
   @Environment(\.dismiss) private var dismiss
+  @Environment(\.locale) private var locale
   @State private var name = ""
   @State private var parentID: Folder.ID?
   var body: some View {
@@ -166,7 +170,7 @@ private struct OrganizationNameEditor: View {
         if edit.isFolder, edit.folder == nil, let snapshot = model.snapshot {
           Picker(.organizationParent, selection: $parentID) {
             Text(.organizationRoot).tag(Folder.ID?.none)
-            ForEach(snapshot.folders.folders) { folder in Text(folder.name).tag(Optional(folder.id)) }
+            ForEach(snapshot.folders.destinations(locale: locale)) { destination in Text(destination.path).tag(Optional(destination.id)) }
           }
         }
       }
