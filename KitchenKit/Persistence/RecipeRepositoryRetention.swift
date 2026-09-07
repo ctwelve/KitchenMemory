@@ -9,9 +9,17 @@ import SwiftData
 extension SwiftDataRecipeRepository {
   /// Revalidates eligibility and commits payload removal with its tombstone atomically.
   public func maintainDeletedRecipes(in kitchenID: Kitchen.ID, at now: Date) throws -> RecipeRetentionResult {
+    try maintainRecipeEvidence(in: kitchenID, at: now, expireCompactEvidence: true)
+  }
+
+  func maintainRecipeEvidence(
+    in kitchenID: Kitchen.ID, at now: Date, expireCompactEvidence: Bool
+  ) throws -> RecipeRetentionResult {
     var result = RecipeRetentionResult()
     try performIsolatedWrite { writer in
-      result.expiredTombstoneRecipeIDs = try writer.expireTombstones(in: kitchenID, at: now)
+      if expireCompactEvidence {
+        result.expiredTombstoneRecipeIDs = try writer.expireTombstones(in: kitchenID, at: now)
+      }
       for item in try writer.deletedRecipes(in: kitchenID) {
         guard let authority = item.recoverableRecipe,
               try writer.retentionWindowHasElapsed(item, at: now),
@@ -21,6 +29,12 @@ extension SwiftDataRecipeRepository {
       }
     }
     return result
+  }
+
+  func maintainRecipeTombstones(in kitchenID: Kitchen.ID, at now: Date) throws {
+    try performIsolatedWrite { writer in
+      _ = try writer.expireTombstones(in: kitchenID, at: now)
+    }
   }
 
   private func expireTombstones(in kitchenID: Kitchen.ID, at now: Date) throws -> [Recipe.ID] {

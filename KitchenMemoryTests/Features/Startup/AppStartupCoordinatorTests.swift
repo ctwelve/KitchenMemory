@@ -20,6 +20,20 @@ final class AppStartupCoordinatorTests: XCTestCase {
     }
   }
 
+  func testBackgroundPreparationIsReusedWhenTheFirstWindowAppears() async throws {
+    let app = try AppRuntime.testing(.init(library: .empty))
+    var attempts = 0
+    let coordinator = AppStartupCoordinator(prepareApplication: {
+      attempts += 1
+      return .ready(app)
+    }, recordMilestone: { _ in })
+    await coordinator.performBackgroundMaintenance()
+    XCTAssertNotNil(coordinator.state.preparedApp)
+    coordinator.startupSurfacePresented()
+    await coordinator.performBackgroundMaintenance()
+    XCTAssertEqual(attempts, 1)
+  }
+
   func testFailureIsRetryableWithoutReadingPrivateDetails() async throws {
     let recorder = DescriptionRecorder()
     var shouldFail = true

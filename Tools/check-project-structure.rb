@@ -136,6 +136,7 @@ module KitchenMemory
     ].freeze
     IOS_INFO_PLIST_KEYS = %w[
       UIBackgroundModes
+      BGTaskSchedulerPermittedIdentifiers
       UIApplicationSceneManifest
       UIApplicationSupportsIndirectInputEvents
       UILaunchStoryboardName
@@ -368,10 +369,14 @@ module KitchenMemory
         SHARED_SOURCE_INFO_PLIST_KEYS + IOS_INFO_PLIST_KEYS
       )
       background_modes = ios_values.fetch("UIBackgroundModes").elements.to_a.map(&:text)
-      return if background_modes == ["remote-notification"]
+      identifiers = ios_values.fetch("BGTaskSchedulerPermittedIdentifiers").elements.to_a.map(&:text)
+      unless identifiers == ["net.ctwelve.KitchenMemory.maintenance"]
+        raise ContractError, "source iOS Info.plist must register the records maintenance task"
+      end
+      return if background_modes == ["remote-notification", "fetch"]
 
       raise ContractError,
-            "source iOS Info.plist UIBackgroundModes must contain only remote-notification"
+            "source iOS Info.plist UIBackgroundModes must contain remote-notification and fetch"
     end
 
     def info_plist_values(contents, platform)

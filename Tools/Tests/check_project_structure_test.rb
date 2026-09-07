@@ -739,7 +739,7 @@ class CheckProjectStructureTest < Minitest::Test
       )
     end
 
-    assert_includes error.message, "UIBackgroundModes must contain only remote-notification"
+    assert_includes error.message, "UIBackgroundModes must contain remote-notification and fetch"
   end
 
   def test_rejects_non_native_application_platform

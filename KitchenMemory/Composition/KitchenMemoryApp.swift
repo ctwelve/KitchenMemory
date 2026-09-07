@@ -11,6 +11,7 @@ import SwiftUI
 /// the macOS window, and the macOS Settings scene.
 @main
 struct KitchenMemoryApp: App {
+  @Environment(\.scenePhase) private var scenePhase
   @StateObject private var startup: AppStartupCoordinator
 
   init() {
@@ -43,6 +44,13 @@ struct KitchenMemoryApp: App {
 #else
     WindowGroup {
       applicationContent
+    }
+    .backgroundTask(.appRefresh(BackgroundMaintenance.identifier)) {
+      await BackgroundMaintenance.requestOpportunity()
+      await startup.performBackgroundMaintenance()
+    }
+    .onChange(of: scenePhase) { _, phase in
+      if phase == .background { BackgroundMaintenance.requestOpportunity() }
     }
 #endif
   }

@@ -3765,6 +3765,30 @@
       "comment" : "Confirmation action that opts a previously local-only device back into iCloud synchronization.",
       "extractionState" : "manual"
     },
+    "settings.icloud.stale-evidence" : {
+      "comment" : "Settings warning after seven days without a successful managed import or export observed for this local store. This reports risk only; never implies that all devices are synchronized.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This device has not observed a successful iCloud transfer for about a week. Future synchronization may be less reliable, and the risk of losing data may increase."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este dispositivo no ha observado una transferencia de iCloud exitosa en aproximadamente una semana. La sincronización futura podría ser menos confiable y el riesgo de perder datos podría aumentar."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cet appareil n’a pas observé de transfert iCloud réussi depuis environ une semaine. La synchronisation pourrait devenir moins fiable et le risque de perte de données pourrait augmenter."
+          }
+        }
+      }
+    },
     "settings.icloud.status.disabled" : {
       "localizations" : {
         "es-MX" : {

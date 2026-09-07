@@ -40,9 +40,9 @@ Digest receipts preserve action identity and causal ancestry after value payload
 are removed, including validation and suppression of late exact retries.
 
 Checkpoints promise at least five years of anti-resurrection retention (1,827
-days). This change does not automatically expire checkpoints or claim global
-replica settlement. Background maintenance scheduling and further bounded
-retention work belong to [#112](https://github.com/ctwelve/KitchenMemory/issues/112).
+days). The shared [records-maintenance boundary](records-maintenance.md) schedules
+compaction and removes only expired checkpoints covered by newer evidence. It
+never discards the last reconstructive checkpoint or claims global replica settlement.
 
 ## Additive V7 physical contract
 

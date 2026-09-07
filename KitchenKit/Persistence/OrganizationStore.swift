@@ -75,6 +75,41 @@ struct OrganizationStore<Payload: OrganizationPayload> {
     return result
   }
 
+  /// Removes only redundant envelopes; identity receipts and live reconstruction stay retained.
+  func maintainCoveredEvidence(in kitchenID: Kitchen.ID, at date: Date, removeOldRaw: Bool) throws {
+    let context = ModelContext(modelContainer)
+    try context.transaction {
+      let snapshot = try load(in: kitchenID, context: context)
+      // Validate collisions and complete checkpoint ancestry before using coverage as deletion authority.
+      _ = try OrganizationEvidence(snapshot.actions, checkpoints: snapshot.checkpoints.map(\.evidence))
+      let identifier = kitchenID.rawValue
+      let policy = namespace
+      if removeOldRaw {
+        let receipts = snapshot.checkpoints.flatMap { $0.evidence.receipts }
+        for row in try context.fetch(FetchDescriptor<OrganizationActionRecord>(predicate: #Predicate {
+          $0.kitchenID == identifier && $0.namespace == policy
+        })) where date.timeIntervalSince(row.authoredAt) >= 366 * 86_400 {
+          let receipt = try decode(row).receipt()
+          if receipts.contains(receipt) { context.delete(row) }
+        }
+      } else {
+        for row in try context.fetch(FetchDescriptor<OrganizationCheckpointRecord>(predicate: #Predicate {
+          $0.kitchenID == identifier && $0.namespace == policy
+        })) {
+          let old = try decode(row)
+          guard date >= old.antiResurrectionUntil else { continue }
+          // Five years is a minimum, never permission to erase aliases still needed by replay.
+          let replacement = snapshot.checkpoints.contains { newer in
+            newer.createdAt > old.createdAt
+              && newer.antiResurrectionUntil >= old.antiResurrectionUntil
+              && old.evidence.receipts.allSatisfy(newer.evidence.receipts.contains)
+          }
+          if replacement { context.delete(row) }
+        }
+      }
+    }
+  }
+
   private func load(in kitchenID: Kitchen.ID, context: ModelContext) throws -> Snapshot {
     let identifier = kitchenID.rawValue
     let policy = namespace

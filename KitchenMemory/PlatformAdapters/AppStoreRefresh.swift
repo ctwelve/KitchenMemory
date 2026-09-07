@@ -8,7 +8,8 @@ import KitchenKit
 func makePersistentStoreChangeObserver(
   plan: AppLaunchPlan,
   core: PreparedCore,
-  sessionModel: CookingSessionPresentationModel
+  sessionModel: CookingSessionPresentationModel,
+  afterRefresh: @escaping () -> Void = {}
 ) -> PersistentStoreChangeObserver? {
   guard plan.store.personalCloudContainerIdentifier != nil else { return nil }
   return PersistentStoreChangeObserver {
@@ -21,6 +22,7 @@ func makePersistentStoreChangeObserver(
       sessionRepository: core.cookingSessionRepository,
       sessionModel: sessionModel
     )
+    afterRefresh()
   }
 }
 
