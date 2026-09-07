@@ -61,6 +61,8 @@ final class RecipeLibraryModel {
   private(set) var hasLoaded = false
   private(set) var startupState: StartupState = .loading
   private(set) var sampleOnboardingResponse: SampleRecipeOnboardingResponse
+  private(set) var samplePackStatus: SamplePackStatus?
+  private(set) var pendingSamplePack: SamplePackCommand?
   private(set) var samplePresence: SampleRecipePresence = .unavailable
   var synchronizationEvidenceIsStale = false
   private(set) var personalCloudStatus: PersonalCloudStatus = .notConfigured
@@ -127,7 +129,12 @@ final class RecipeLibraryModel {
     samplePreferences.sampleRecipeOnboardingResponse = .accepted
     sampleOnboardingResponse = .accepted
     startupState = .loading
-    let sampleInstallFailed = !installSamples()
+    let sampleInstallFailed: Bool
+    if samplePackStatus != nil || pendingSamplePack != nil {
+      sampleInstallFailed = !setSamplePackEnabled(true)
+    } else {
+      sampleInstallFailed = !installSamples()
+    }
     reload()
     if sampleInstallFailed { issue = .samples }
     startupState = .ready
@@ -140,7 +147,9 @@ final class RecipeLibraryModel {
   }
 
   func retryCurrentIssue() {
-    if pendingDisposition != nil {
+    if pendingSamplePack != nil {
+      _ = performPendingSamplePack()
+    } else if pendingDisposition != nil {
       performPendingDisposition()
     } else if issue == .samples {
       acceptSampleRecipes()
@@ -159,6 +168,7 @@ final class RecipeLibraryModel {
       deletedRecipes = contents.deletedRecipes
       recoveryRecipes = contents.recoveryRecipes
       samplePresence = contents.samplePresence
+      samplePackStatus = try? library.samplePackStatus()
       if let preferredRecipeID,
          recipes.contains(where: { $0.recipe.id == preferredRecipeID }) {
         navigation.reconcileRecipeSelection(preferredRecipeID)
@@ -288,4 +298,41 @@ final class RecipeLibraryModel {
 enum RecipeDispositionRequest {
   case delete(RecipeDeleteCommand)
   case restore(RecipeRestoreCommand)
+}
+
+extension RecipeLibraryModel {
+  @discardableResult
+  func setSamplePackEnabled(_ enabled: Bool) -> Bool {
+    do {
+      if pendingSamplePack == nil { pendingSamplePack = try library.prepareSamplePack(enabled: enabled) }
+      return performPendingSamplePack()
+    } catch {
+      issue = .samples
+      return false
+    }
+  }
+
+  func prepareSamplePackRemoval() -> SamplePackCommand? {
+    do { return try library.prepareSamplePack(enabled: false) } catch { issue = .samples; return nil }
+  }
+
+  func confirmSamplePackRemoval(_ command: SamplePackCommand) {
+    guard pendingSamplePack == nil else { return }
+    pendingSamplePack = command
+    _ = performPendingSamplePack()
+  }
+
+  private func performPendingSamplePack() -> Bool {
+    guard let pendingSamplePack else { return false }
+    do {
+      try library.setSamplePack(pendingSamplePack)
+      self.pendingSamplePack = nil
+      reload()
+      return true
+    } catch {
+      issue = .samples
+      return false
+    }
+  }
+
 }

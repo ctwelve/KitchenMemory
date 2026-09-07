@@ -255,7 +255,10 @@ struct PreparedCore {
       samples: samples,
       importer: RecipeImportService(),
       resetRepository: SwiftDataKitchenResetRepository(modelContainer: modelContainer),
-      organizationRepository: SwiftDataRecipeOrganizationRepository(modelContainer: modelContainer)
+      organizationRepository: SwiftDataRecipeOrganizationRepository(modelContainer: modelContainer),
+      samplePackRepository: SwiftDataSamplePackRepository(modelContainer: modelContainer),
+      sampleFolderName: String(localized: "settings.samples.folder-name", defaultValue: "Sample Pack"),
+      sampleTagName: String(localized: "settings.samples.tag-name", defaultValue: "samples")
     )
     if plan.sampleFixture == .installed { try library.installSamples() }
     libraryModel = RecipeLibraryModel(

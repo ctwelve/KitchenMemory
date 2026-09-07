@@ -149,7 +149,7 @@ struct OrganizationStore<Payload: OrganizationPayload> {
     return continuation
   }
 
-  private func load(in kitchenID: Kitchen.ID, context: ModelContext) throws -> Snapshot {
+  func load(in kitchenID: Kitchen.ID, context: ModelContext) throws -> Snapshot {
     let identifier = kitchenID.rawValue
     let policy = namespace
     let actions = try context.fetch(FetchDescriptor<OrganizationActionRecord>(predicate: #Predicate {

@@ -28,6 +28,10 @@ public final class SwiftDataTagRepository: TagRepository {
     try tagBoundary { try library(store.load(in: kitchenID), in: kitchenID) }
   }
 
+  func library(in kitchenID: Kitchen.ID, context: ModelContext) throws -> TagLibrary {
+    try library(store.load(in: kitchenID, context: context), in: kitchenID)
+  }
+
   public func append(_ command: TagCommand) throws {
     try tagBoundary {
     try store.append(command.action, in: command.kitchenID) { snapshot in

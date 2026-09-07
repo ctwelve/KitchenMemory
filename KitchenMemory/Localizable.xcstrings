@@ -1,6 +1,246 @@
 {
   "sourceLanguage" : "en-US",
   "strings" : {
+    "settings.samples.folder-name": {
+      "extractionState": "manual",
+      "comment": "Sample pack setting. Organization names are ordinary user-editable names; the Tag name excludes the display hash.",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sample Pack"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recettes exemples"
+          }
+        },
+        "es-MX": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recetas de ejemplo"
+          }
+        }
+      }
+    },
+    "settings.samples.tag-name": {
+      "extractionState": "manual",
+      "comment": "Sample pack setting. Organization names are ordinary user-editable names; the Tag name excludes the display hash.",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "samples"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "exemples"
+          }
+        },
+        "es-MX": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ejemplos"
+          }
+        }
+      }
+    },
+    "settings.samples.enabled": {
+      "extractionState": "manual",
+      "comment": "Sample pack setting. Organization names are ordinary user-editable names; the Tag name excludes the display hash.",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Install bundled sample pack"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Installer les recettes exemples incluses"
+          }
+        },
+        "es-MX": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Instalar las recetas de ejemplo incluidas"
+          }
+        }
+      }
+    },
+    "settings.samples.edited": {
+      "extractionState": "manual",
+      "comment": "Sample pack setting. Organization names are ordinary user-editable names; the Tag name excludes the display hash.",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Edited Recipes preserved"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recettes modifiées conservées"
+          }
+        },
+        "es-MX": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recetas editadas conservadas"
+          }
+        }
+      }
+    },
+    "settings.samples.deleted": {
+      "extractionState": "manual",
+      "comment": "Sample pack setting. Organization names are ordinary user-editable names; the Tag name excludes the display hash.",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Samples in Deleted Items"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exemples dans les éléments supprimés"
+          }
+        },
+        "es-MX": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ejemplos en elementos eliminados"
+          }
+        }
+      }
+    },
+    "settings.samples.unavailable": {
+      "extractionState": "manual",
+      "comment": "Sample pack setting. Organization names are ordinary user-editable names; the Tag name excludes the display hash.",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Samples awaiting evidence"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exemples en attente de données"
+          }
+        },
+        "es-MX": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ejemplos en espera de datos"
+          }
+        }
+      }
+    },
+    "settings.samples.intent-message": {
+      "extractionState": "manual",
+      "comment": "Sample pack setting. Organization names are ordinary user-editable names; the Tag name excludes the display hash.",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This setting records your last request. Changes on other devices never install or remove Recipes automatically."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ce réglage indique votre dernière demande. Les changements sur d’autres appareils n’installent ni ne suppriment automatiquement des recettes."
+          }
+        },
+        "es-MX": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Este ajuste registra tu última solicitud. Los cambios en otros dispositivos nunca instalan ni eliminan recetas automáticamente."
+          }
+        }
+      }
+    },
+    "settings.samples.remove-title": {
+      "extractionState": "manual",
+      "comment": "Sample pack setting. Organization names are ordinary user-editable names; the Tag name excludes the display hash.",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remove untouched samples?"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retirer les exemples non modifiés?"
+          }
+        },
+        "es-MX": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Quitar los ejemplos sin modificar?"
+          }
+        }
+      }
+    },
+    "settings.samples.remove-action": {
+      "extractionState": "manual",
+      "comment": "Sample pack setting. Organization names are ordinary user-editable names; the Tag name excludes the display hash.",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Move Samples to Deleted Items"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Déplacer les exemples vers les éléments supprimés"
+          }
+        },
+        "es-MX": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mover ejemplos a elementos eliminados"
+          }
+        }
+      }
+    },
+    "settings.samples.remove-message": {
+      "extractionState": "manual",
+      "comment": "Sample pack setting. Organization names are ordinary user-editable names; the Tag name excludes the display hash.",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Only the untouched samples counted below will move to Deleted Items. Edited Recipes, Folders and Tags stay. You can restore deleted samples later."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seuls les exemples non modifiés comptés ci-dessous seront déplacés vers les éléments supprimés. Les recettes modifiées, dossiers et étiquettes restent. Vous pourrez restaurer les exemples supprimés."
+          }
+        },
+        "es-MX": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Solo los ejemplos sin modificar contados abajo se moverán a elementos eliminados. Las recetas editadas, carpetas y etiquetas se conservan. Puedes restaurar los ejemplos después."
+          }
+        }
+      }
+    },
   "organization.discard-rejected": {
     "comment": "Discard only a definitively rejected local organization command; accepted organization is not undone.",
     "extractionState": "manual",
