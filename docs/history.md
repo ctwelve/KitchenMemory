@@ -28,6 +28,7 @@ Historical paths remain stable for links from issues and pull requests.
 - [Kitchen Memory 0.2.2](release-notes-0.2.2.md)
 - [0.3 durable coverage audit](coverage-audit-0.3.md)
 - [0.3 release preparation evidence](release-preparation-0.3.md)
+- [0.3 dependency and signed-product evidence](release-dependencies-0.3.md)
 - [Startup latency investigation (#72)](startup-latency-0.2.9.md)
 - [Alpha Recipe Library accessibility evidence](accessibility-alpha-library-evidence.md)
 - [Alpha shell and Cooking Session accessibility evidence](accessibility-alpha-shell-evidence.md)

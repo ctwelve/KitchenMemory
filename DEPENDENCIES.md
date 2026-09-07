@@ -41,8 +41,10 @@ Cooking Session command outbox while preserving arrays at the presentation-store
 codec boundary. `KitchenKit` links `DequeModule`, `OrderedCollections`, and
 `Algorithms`; the Collections products implement causal-graph worklists,
 first-seen identity semantics, and dependency traversal, while Algorithms
-coalesces duplicate immutable rows inside the owned Recipe repository. The umbrella
-`Collections` product and unrelated collection modules are not linked. Package
+coalesces duplicate immutable rows inside the owned Recipe repository. Their
+transitive implementation modules include `InternalCollectionsUtilities` and
+`ContainersPreview`. The umbrella `Collections` product and unrelated collection
+modules are not linked. Package
 types remain implementation details behind Kitchen
 Memory-owned presentation, Domain, Logic, and repository interfaces. Swift Async
 Algorithms is not present in the graph.
@@ -82,8 +84,9 @@ The application now bundles `Resources/ThirdPartyNotices.txt`, containing the
 complete MIT texts for Kitchen Memory and Defaults and the upstream license,
 copyright, and Swift Runtime Library Exception texts for Collections,
 Algorithms, and Numerics. A hosted test checks the compiled resource against the
-reviewed digest. Signed archive inspection verifies the actual distribution
-payload; passing source checks alone does not prove notices were packaged.
+reviewed digest. The [0.3 signed-product inspection](docs/release-dependencies-0.3.md)
+records actual linkage, privacy manifests, and packaged notices; passing source
+checks alone does not prove those files were packaged.
 
 ## Build and resolution components
 
