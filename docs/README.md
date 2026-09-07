@@ -130,6 +130,9 @@ Research records preserve the question, evidence, and conclusion available at
 the time. They are not current implementation instructions unless an accepted
 ADR or current guidance document adopts their conclusion.
 
+- [Privacy-preserving AI assistance](research/privacy-preserving-ai-assistance.md) — optional assistance boundaries and synthetic on-device evidence.
+- [Recipe photo and scan acquisition](research/recipe-photo-and-scan-acquisition.md) — capture, recognition, preservation, and review recommendations.
+- [Recipe documents and Kitchen archives](research/recipe-and-kitchen-interchange.md) — scope, identity, bounded admission, and synthetic interchange fixtures.
 - [Alamofire for recipe retrieval](research/alamofire-for-recipe-retrieval.md) —
   research complete; do not adopt for the current fetcher.
 - [CloudKit production schema evolution](research/cloudkit-production-schema-evolution.md)
