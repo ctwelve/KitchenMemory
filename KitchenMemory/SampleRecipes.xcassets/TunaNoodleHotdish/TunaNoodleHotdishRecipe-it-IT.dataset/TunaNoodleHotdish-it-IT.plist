@@ -1,0 +1,928 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>formatVersion</key>
+	<integer>1</integer>
+	<key>recipeID</key>
+	<string>0B7D83BC-75AA-55FF-9286-EF007BEB3F63</string>
+	<key>revision</key>
+	<dict>
+		<key>id</key>
+		<string>FB0F6951-089E-5FCE-8D1B-3A221F486BF0</string>
+		<key>recipeID</key>
+		<string>0B7D83BC-75AA-55FF-9286-EF007BEB3F63</string>
+		<key>revisionNumber</key>
+		<integer>1</integer>
+		<key>title</key>
+		<string>Hotdish di tonno e noodles</string>
+		<key>summary</key>
+		<string>Un ricco sformato di tonno e noodles del Midwest americano, con piselli e una copertura burrosa di crostini e cracker.</string>
+		<key>authorName</key>
+		<string>Collaboratori di Memoria di cucina</string>
+		<key>contentLanguage</key>
+		<string>it-IT</string>
+		<key>source</key>
+		<dict>
+			<key>kind</key>
+			<string>original</string>
+			<key>title</key>
+			<string>Preparato per cena il 10 agosto 2026</string>
+		</dict>
+		<key>recipeYield</key>
+		<dict>
+			<key>quantity</key>
+			<dict>
+				<key>kind</key>
+				<string>exact</string>
+				<key>lowerBound</key>
+				<dict>
+					<key>numerator</key>
+					<integer>8</integer>
+					<key>denominator</key>
+					<integer>1</integer>
+				</dict>
+			</dict>
+			<key>unitText</key>
+			<string>porzioni</string>
+			<key>originalText</key>
+			<string>Per 8 porzioni abbondanti</string>
+		</dict>
+		<key>prepDuration</key>
+		<dict>
+			<key>seconds</key>
+			<integer>1800</integer>
+		</dict>
+		<key>cookDuration</key>
+		<dict>
+			<key>seconds</key>
+			<integer>1200</integer>
+		</dict>
+		<key>totalDuration</key>
+		<dict>
+			<key>seconds</key>
+			<integer>3600</integer>
+		</dict>
+		<key>cuisines</key>
+		<array>
+			<string>Midwest americano</string>
+		</array>
+		<key>categories</key>
+		<array>
+			<string>Cena</string>
+			<string>Hotdish</string>
+		</array>
+		<key>keywords</key>
+		<array>
+			<string>sformato</string>
+			<string>cucina del conforto</string>
+			<string>tonno</string>
+			<string>noodles</string>
+		</array>
+		<key>media</key>
+		<array>
+			<dict>
+				<key>id</key>
+				<string>036126C5-0776-58B2-8CE8-A0F55A5981BB</string>
+				<key>role</key>
+				<string>hero</string>
+				<key>assetName</key>
+				<string>TunaNoodleHotdishHero</string>
+				<key>accessibilityLabel</key>
+				<string>Hotdish di tonno e noodles con una copertura ben dorata di crostini e cracker</string>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>CC63B57D-428B-5053-B942-6B8D16A4E45E</string>
+				<key>role</key>
+				<string>thumbnail</string>
+				<key>assetName</key>
+				<string>TunaNoodleHotdishThumbnail</string>
+				<key>accessibilityLabel</key>
+				<string>Dettaglio quadrato dell’hotdish di tonno e noodles con copertura dorata di crostini e cracker</string>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>CE716E4E-A011-5F31-BE0B-41B8C5468487</string>
+				<key>role</key>
+				<string>gallery</string>
+				<key>assetName</key>
+				<string>TunaNoodleHotdishGallery0</string>
+				<key>accessibilityLabel</key>
+				<string>Vista laterale di una porzione di hotdish con noodles, tonno, piselli e copertura croccante</string>
+			</dict>
+		</array>
+		<key>equipment</key>
+		<array>
+			<dict>
+				<key>id</key>
+				<string>3F7628E0-A7AB-5854-B47E-1F3D3225468A</string>
+				<key>originalText</key>
+				<string>1 pirofila da 9 × 13 pollici</string>
+				<key>quantity</key>
+				<dict>
+					<key>kind</key>
+					<string>exact</string>
+					<key>lowerBound</key>
+					<dict>
+						<key>numerator</key>
+						<integer>1</integer>
+						<key>denominator</key>
+						<integer>1</integer>
+					</dict>
+				</dict>
+				<key>name</key>
+				<string>pirofila da 9 × 13 pollici</string>
+				<key>isOptional</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>7A6C0BAA-A526-529C-9C45-A2C65AD69D49</string>
+				<key>originalText</key>
+				<string>1 pentola da 8 quarti statunitensi</string>
+				<key>quantity</key>
+				<dict>
+					<key>kind</key>
+					<string>exact</string>
+					<key>lowerBound</key>
+					<dict>
+						<key>numerator</key>
+						<integer>1</integer>
+						<key>denominator</key>
+						<integer>1</integer>
+					</dict>
+				</dict>
+				<key>name</key>
+				<string>pentola da 8 quarti statunitensi</string>
+				<key>isOptional</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>8262846F-9DE3-59C2-95BF-094982EC5754</string>
+				<key>originalText</key>
+				<string>1 colino</string>
+				<key>quantity</key>
+				<dict>
+					<key>kind</key>
+					<string>exact</string>
+					<key>lowerBound</key>
+					<dict>
+						<key>numerator</key>
+						<integer>1</integer>
+						<key>denominator</key>
+						<integer>1</integer>
+					</dict>
+				</dict>
+				<key>name</key>
+				<string>colino</string>
+				<key>isOptional</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>D16FAD75-20E6-53DC-AAD7-3C4B4B3B335D</string>
+				<key>originalText</key>
+				<string>1 teglia con bordo rialzato, consigliata</string>
+				<key>quantity</key>
+				<dict>
+					<key>kind</key>
+					<string>exact</string>
+					<key>lowerBound</key>
+					<dict>
+						<key>numerator</key>
+						<integer>1</integer>
+						<key>denominator</key>
+						<integer>1</integer>
+					</dict>
+				</dict>
+				<key>name</key>
+				<string>teglia con bordo rialzato</string>
+				<key>isOptional</key>
+				<true/>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>C7154D49-97A0-50AD-886B-E4734A2B19E5</string>
+				<key>originalText</key>
+				<string>grattugia per formaggio, facoltativa</string>
+				<key>name</key>
+				<string>grattugia per formaggio</string>
+				<key>isOptional</key>
+				<true/>
+			</dict>
+		</array>
+		<key>ingredientSections</key>
+		<array>
+			<dict>
+				<key>id</key>
+				<string>A798BD78-EF79-5D6E-B441-269C371F94E2</string>
+				<key>title</key>
+				<string>Hotdish</string>
+				<key>ingredients</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>93DF97A1-3338-5156-AA84-1050D75A1AB5</string>
+						<key>originalText</key>
+						<string>4 scatolette da 5 once di tonno chiaro a pezzi</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>4</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>scatolette</string>
+						<key>package</key>
+						<dict>
+							<key>quantity</key>
+							<dict>
+								<key>kind</key>
+								<string>exact</string>
+								<key>lowerBound</key>
+								<dict>
+									<key>numerator</key>
+									<integer>5</integer>
+									<key>denominator</key>
+									<integer>1</integer>
+								</dict>
+							</dict>
+							<key>unitText</key>
+							<string>once</string>
+						</dict>
+						<key>ingredientText</key>
+						<string>tonno chiaro a pezzi</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>27F6FB9A-F01D-5A9F-A58F-8060E087FFC5</string>
+						<key>originalText</key>
+						<string>1 confezione da 1 libbra statunitense di noodles ondulati all’uovo</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>1</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>confezione</string>
+						<key>package</key>
+						<dict>
+							<key>quantity</key>
+							<dict>
+								<key>kind</key>
+								<string>exact</string>
+								<key>lowerBound</key>
+								<dict>
+									<key>numerator</key>
+									<integer>1</integer>
+									<key>denominator</key>
+									<integer>1</integer>
+								</dict>
+							</dict>
+							<key>unitText</key>
+							<string>libbra statunitense</string>
+						</dict>
+						<key>ingredientText</key>
+						<string>noodles ondulati all’uovo</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>2E71F6DA-B7B3-5BE5-91F0-5B1D40C197A7</string>
+						<key>originalText</key>
+						<string>1 lattina da 28 once di crema di funghi condensata</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>1</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>lattina</string>
+						<key>package</key>
+						<dict>
+							<key>quantity</key>
+							<dict>
+								<key>kind</key>
+								<string>exact</string>
+								<key>lowerBound</key>
+								<dict>
+									<key>numerator</key>
+									<integer>28</integer>
+									<key>denominator</key>
+									<integer>1</integer>
+								</dict>
+							</dict>
+							<key>unitText</key>
+							<string>once</string>
+						</dict>
+						<key>ingredientText</key>
+						<string>crema di funghi condensata</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>28B3310B-6573-5579-B961-7E095F7FC48F</string>
+						<key>originalText</key>
+						<string>2 cup statunitensi di latte</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>2</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>cup statunitensi</string>
+						<key>ingredientText</key>
+						<string>latte</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>A19027AF-DFF8-5FAD-ACB5-C6FCC8928A50</string>
+						<key>originalText</key>
+						<string>1 busta per cottura a vapore di piselli surgelati</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>1</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>busta per cottura a vapore</string>
+						<key>ingredientText</key>
+						<string>piselli surgelati</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>A6437B76-127B-536B-8FC8-F38E58AE7A97</string>
+						<key>originalText</key>
+						<string>2 cipolle gialle medie o quantità equivalente</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>2</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>medie</string>
+						<key>ingredientText</key>
+						<string>cipolle gialle</string>
+						<key>preparation</key>
+						<string>a dadini piccoli</string>
+						<key>note</key>
+						<string>o quantità equivalente</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+				</array>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>CFC76E61-0D75-5BA9-9302-26C965A5C19C</string>
+				<key>title</key>
+				<string>Cottura e condimento</string>
+				<key>ingredients</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>44AAB9EA-5D2E-52D6-8AC2-686EB13EFFF7</string>
+						<key>originalText</key>
+						<string>burro non salato</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>approximate</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>6</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>cucchiai statunitensi</string>
+						<key>ingredientText</key>
+						<string>burro non salato</string>
+						<key>preparation</key>
+						<string>suddiviso</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>edited</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>195E5907-207B-5276-B81E-498F802A1419</string>
+						<key>originalText</key>
+						<string>olio d’oliva</string>
+						<key>ingredientText</key>
+						<string>olio d’oliva</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>edited</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>15870155-C706-5E3A-B535-3D01B68E6F3C</string>
+						<key>originalText</key>
+						<string>sale</string>
+						<key>ingredientText</key>
+						<string>sale</string>
+						<key>note</key>
+						<string>più 1 cucchiaio statunitense colmo per l’acqua dei noodles</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>edited</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>8C04A8D4-3C46-5B28-826C-4BA1F0370BE1</string>
+						<key>originalText</key>
+						<string>pepe</string>
+						<key>ingredientText</key>
+						<string>pepe nero</string>
+						<key>preparation</key>
+						<string>macinato al momento</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>edited</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>D1685EBD-4E3B-5506-AB1C-D13F508F4286</string>
+						<key>originalText</key>
+						<string>cipolla in polvere</string>
+						<key>ingredientText</key>
+						<string>cipolla in polvere</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>edited</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>7AE0863A-2FEC-50D4-924A-99B1A34B8BA4</string>
+						<key>originalText</key>
+						<string>aglio in polvere</string>
+						<key>ingredientText</key>
+						<string>aglio in polvere</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>edited</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>49177AB6-BDB1-5BC1-B1D5-1EBC3EC10467</string>
+						<key>originalText</key>
+						<string>pepe di Cayenna</string>
+						<key>ingredientText</key>
+						<string>pepe di Cayenna</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>edited</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>D1BADF88-653F-5DE0-8707-41BE4885C983</string>
+						<key>originalText</key>
+						<string>miscela di erbe all’italiana</string>
+						<key>ingredientText</key>
+						<string>Miscela di erbe all’italiana</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>edited</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>F3AE83BC-7624-556E-9E07-EAE705997673</string>
+						<key>originalText</key>
+						<string>salsa Worcestershire</string>
+						<key>ingredientText</key>
+						<string>salsa Worcestershire</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>edited</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>F36DAAC6-D96D-5321-8097-8A853BD9E761</string>
+						<key>originalText</key>
+						<string>miscela Montreal per bistecche</string>
+						<key>ingredientText</key>
+						<string>miscela Montreal per bistecche</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>edited</string>
+					</dict>
+				</array>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>5ECEE636-69C1-57F6-9991-9006F79BEA8F</string>
+				<key>title</key>
+				<string>Copertura</string>
+				<key>ingredients</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>51F2ACF5-F334-525E-9034-04297A3B2F38</string>
+						<key>originalText</key>
+						<string>1 confezione da 5 once di crostini già conditi</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>1</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>confezione</string>
+						<key>package</key>
+						<dict>
+							<key>quantity</key>
+							<dict>
+								<key>kind</key>
+								<string>exact</string>
+								<key>lowerBound</key>
+								<dict>
+									<key>numerator</key>
+									<integer>5</integer>
+									<key>denominator</key>
+									<integer>1</integer>
+								</dict>
+							</dict>
+							<key>unitText</key>
+							<string>once</string>
+						</dict>
+						<key>ingredientText</key>
+						<string>crostini già conditi</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>CBA6E993-2C28-5748-9ADD-9520F9D07A00</string>
+						<key>originalText</key>
+						<string>½ pacchetto interno di cracker Ritz</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>1</integer>
+								<key>denominator</key>
+								<integer>2</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>pacchetto interno</string>
+						<key>ingredientText</key>
+						<string>cracker Ritz</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>90C20E8F-B626-5CB7-AF16-0ADCE7B67EF6</string>
+						<key>originalText</key>
+						<string>pecorino grattugiato al momento</string>
+						<key>ingredientText</key>
+						<string>pecorino</string>
+						<key>preparation</key>
+						<string>grattugiato al momento</string>
+						<key>note</key>
+						<string>facoltativo ma vivamente consigliato</string>
+						<key>isOptional</key>
+						<true/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>edited</string>
+					</dict>
+				</array>
+			</dict>
+		</array>
+		<key>instructionSections</key>
+		<array>
+			<dict>
+				<key>id</key>
+				<string>37B6377E-D9AF-5BD0-BA65-1E2696E49C88</string>
+				<key>title</key>
+				<string>Noodles</string>
+				<key>steps</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>5CD1917E-808B-5CEF-9789-6B042DC68F49</string>
+						<key>text</key>
+						<string>Riempi la pentola da 8 quarti statunitensi con acqua fredda fresca fino a 1 pollice sotto il bordo.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>2F287135-CA38-56F5-8F29-0A6A01483396</string>
+						<key>text</key>
+						<string>Sala l’acqua con un cucchiaio statunitense colmo di sale e portala a bollore vivace.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>83FF2AB4-2966-56BC-98DD-5C67119100A9</string>
+						<key>text</key>
+						<string>Aggiungi i noodles e cuocili seguendo le indicazioni della confezione per una consistenza soda o al dente, di solito circa 6 minuti.</string>
+						<key>duration</key>
+						<dict>
+							<key>seconds</key>
+							<integer>360</integer>
+						</dict>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>DC0495CF-924B-5D79-962D-AB2CBE732373</string>
+						<key>text</key>
+						<string>Scola subito i noodles e trasferiscili nella pirofila.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>E5E10852-F9A3-5E32-8631-7B9EE8440865</string>
+						<key>text</key>
+						<string>Condisci i noodles con un po’ d’olio d’oliva, 2 cucchiai statunitensi di burro, pepe nero, miscela di erbe all’italiana, aglio e cipolla in polvere a piacere.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>302BB28D-2F5D-576E-A50B-84AE340AF6DB</string>
+						<key>text</key>
+						<string>Metti da parte i noodles mentre prepari la salsa.</string>
+					</dict>
+				</array>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>B2F2E9E8-A91B-52F9-8947-316E21F4265E</string>
+				<key>title</key>
+				<string>Salsa e assemblaggio</string>
+				<key>steps</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>63F2FE98-AC7E-597C-8AE3-05B56B8C443F</string>
+						<key>text</key>
+						<string>Preriscalda il forno a 400 °F.</string>
+						<key>temperature</key>
+						<dict>
+							<key>value</key>
+							<dict>
+								<key>numerator</key>
+								<integer>400</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+							<key>unit</key>
+							<string>fahrenheit</string>
+						</dict>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>4250C7B0-281C-562D-9257-AEFDD8112FC9</string>
+						<key>text</key>
+						<string>Taglia finemente le cipolle a dadini. Falle appassire in abbondante burro, circa 2 cucchiai statunitensi, condendo con miscela Montreal, sale e pepe a piacere.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>DE39B66B-526E-5982-A854-0E0E0024FD6F</string>
+						<key>text</key>
+						<string>Cuoci finché sono morbide o appena dorate. Non serve caramellarle molto: i piselli daranno dolcezza in abbondanza.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>5A5F0816-AA48-582E-BDF1-5BC56E1D9887</string>
+						<key>text</key>
+						<string>Aggiungi la crema di funghi, il latte e il tonno. Scalda bene, poi aggiungi un goccio di Worcestershire e pepe di Cayenna a piacere.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>9F47E9A4-D1DB-5728-936D-9D5696B84C49</string>
+						<key>text</key>
+						<string>Assaggia la salsa. A questo punto dovrebbe essere un po’ «troppo»: appena troppo salata, troppo saporita e con il tonno in primo piano. Per il resto deve essere equilibrata e sembrare piuttosto fluida. È l’ideale: i noodles assorbiranno e attenueranno la salsa.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>9A1F2EC7-93E7-5879-A4C9-789F35603C86</string>
+						<key>text</key>
+						<string>Cuoci solo fino a un leggero sobbollire. ATTENZIONE: questa salsa brucia molto facilmente! Un lieve fondo rosolato è piacevole, ma a fuoco alto bastano circa 15 secondi per passare dal «fondo» al sapore di «cavo elettrico bruciato». Quindi modera la fiamma o presta attenzione.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>5CE7F804-3254-516C-9CAB-153E0A1D2BB7</string>
+						<key>text</key>
+						<string>Versa subito la salsa sui noodles. Aggiungi i piselli surgelati e incorpora tutto delicatamente.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>54A091BA-78F3-55EE-BDFC-BBE54706D546</string>
+						<key>text</key>
+						<string>Metti la pirofila al centro del forno preriscaldato, preferibilmente su una teglia con bordo rialzato per raccogliere eventuali gocce. Controlla dopo 10 minuti: lo sformato dovrebbe appena iniziare a bollire ai bordi.</string>
+						<key>duration</key>
+						<dict>
+							<key>seconds</key>
+							<integer>600</integer>
+						</dict>
+						<key>temperature</key>
+						<dict>
+							<key>value</key>
+							<dict>
+								<key>numerator</key>
+								<integer>400</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+							<key>unit</key>
+							<string>fahrenheit</string>
+						</dict>
+					</dict>
+				</array>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>CA73110B-554A-5333-AF57-AA0473B60D9E</string>
+				<key>title</key>
+				<string>Copertura</string>
+				<key>steps</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>965D24A5-AA76-5C76-BA32-A972EB4B02E6</string>
+						<key>text</key>
+						<string>Mentre lo sformato inizia a cuocere, sbriciola grossolanamente i crostini e i cracker Ritz.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>68B813CF-FC20-57FD-8669-46BF995C41A7</string>
+						<key>text</key>
+						<string>Sciogli 2 cucchiai statunitensi di burro e mescolali alla copertura.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>4C044825-86BB-577D-98B8-9423AEF564F5</string>
+						<key>text</key>
+						<string>Condisci con pepe. Non servirà sale.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>745B5F12-B37B-5348-B4B5-B81599654C3C</string>
+						<key>text</key>
+						<string>Facoltativo, ma vivamente consigliato: grattugia del pecorino nella copertura e mescola.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>A4B24049-8AE9-5C8B-85FF-B2F3D63D31A2</string>
+						<key>text</key>
+						<string>Quando lo sformato inizia a bollire, distribuisci uniformemente la copertura e rimettilo in forno a dorare.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>80602C1E-1CAC-55C6-80FC-FC34D93F9CAE</string>
+						<key>text</key>
+						<string>Controlla dopo 8 minuti, poi ogni 2 minuti.</string>
+						<key>duration</key>
+						<dict>
+							<key>seconds</key>
+							<integer>480</integer>
+						</dict>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>94E18970-8D99-55D2-B716-A7F083EACC73</string>
+						<key>text</key>
+						<string>Fai dorare quanto desideri e sforna prontamente.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>A6AFF24E-B87A-5628-9DDA-561E9DBF2BFA</string>
+						<key>text</key>
+						<string>Lascia riposare lo sformato per circa 10 minuti prima di servire.</string>
+						<key>duration</key>
+						<dict>
+							<key>seconds</key>
+							<integer>600</integer>
+						</dict>
+					</dict>
+				</array>
+			</dict>
+		</array>
+	</dict>
+</dict>
+</plist>

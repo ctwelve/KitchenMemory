@@ -5,6 +5,12 @@
       "extractionState": "manual",
       "comment": "Sample pack setting. Organization names are ordinary user-editable names; the Tag name excludes the display hash.",
       "localizations": {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Raccolta di esempi"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -41,6 +47,12 @@
       "extractionState": "manual",
       "comment": "Sample pack setting. Organization names are ordinary user-editable names; the Tag name excludes the display hash.",
       "localizations": {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "esempi"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -77,6 +89,12 @@
       "extractionState": "manual",
       "comment": "Sample pack setting. Organization names are ordinary user-editable names; the Tag name excludes the display hash.",
       "localizations": {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Installa la raccolta di esempi inclusa"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -113,6 +131,12 @@
       "extractionState": "manual",
       "comment": "Sample pack setting. Organization names are ordinary user-editable names; the Tag name excludes the display hash.",
       "localizations": {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ricette modificate conservate"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -149,6 +173,12 @@
       "extractionState": "manual",
       "comment": "Sample pack setting. Organization names are ordinary user-editable names; the Tag name excludes the display hash.",
       "localizations": {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esempi in Elementi eliminati"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -185,6 +215,12 @@
       "extractionState": "manual",
       "comment": "Sample pack setting. Organization names are ordinary user-editable names; the Tag name excludes the display hash.",
       "localizations": {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esempi in attesa di dati probatori"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -221,6 +257,12 @@
       "extractionState": "manual",
       "comment": "Sample pack setting. Organization names are ordinary user-editable names; the Tag name excludes the display hash.",
       "localizations": {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Questa impostazione registra la tua ultima richiesta. Le modifiche su altri dispositivi non installano né rimuovono mai le Ricette automaticamente."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -257,6 +299,12 @@
       "extractionState": "manual",
       "comment": "Sample pack setting. Organization names are ordinary user-editable names; the Tag name excludes the display hash.",
       "localizations": {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rimuovere gli esempi non modificati?"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -293,6 +341,12 @@
       "extractionState": "manual",
       "comment": "Sample pack setting. Organization names are ordinary user-editable names; the Tag name excludes the display hash.",
       "localizations": {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sposta gli esempi in Elementi eliminati"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -329,6 +383,12 @@
       "extractionState": "manual",
       "comment": "Sample pack setting. Organization names are ordinary user-editable names; the Tag name excludes the display hash.",
       "localizations": {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Solo gli esempi non modificati conteggiati qui sotto verranno spostati in Elementi eliminati. Le Ricette modificate, le Cartelle e i Tag rimangono. Potrai ripristinare gli esempi eliminati in seguito."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -365,6 +425,12 @@
     "comment": "Discard only a definitively rejected local organization command; accepted organization is not undone.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Scarta la modifica rifiutata"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -401,6 +467,12 @@
     "comment": "Recipe Library organization: Add Tag. Folder location and Tag classification are independent of Recipe content.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Aggiungi tag"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -437,6 +509,12 @@
     "comment": "Recipe Library organization: Move After. Folder location and Tag classification are independent of Recipe content.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Sposta dopo"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -473,6 +551,12 @@
     "comment": "Recipe Library organization: All Recipes. Folder location and Tag classification are independent of Recipe content.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Tutte le ricette"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -509,6 +593,12 @@
     "comment": "Recipe Library organization: Alphabetical. Folder location and Tag classification are independent of Recipe content.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Alfabetico"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -545,6 +635,12 @@
     "comment": "Recipe Library organization: Apply. Folder location and Tag classification are independent of Recipe content.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Applica"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -581,6 +677,12 @@
     "comment": "Recipe Library organization: Collapse Folder. Folder location and Tag classification are independent of Recipe content.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Comprimi cartella"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -617,6 +719,12 @@
     "comment": "Recipe Library organization: Organization Collisions. Folder location and Tag classification are independent of Recipe content.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Conflitti di organizzazione"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -653,6 +761,12 @@
     "comment": "Recipe Library organization: Delete Organization. Folder location and Tag classification are independent of Recipe content.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Elimina organizzazione"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -689,6 +803,12 @@
     "comment": "Recipe Library organization: Folders and Tags disappear immediately. Recipes are kept.. Folder location and Tag classification are independent of Recipe content.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Cartelle e Tag scompaiono immediatamente. Le Ricette vengono conservate."
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -725,6 +845,12 @@
     "comment": "Recipe Library organization: Done. Folder location and Tag classification are independent of Recipe content.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Fine"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -761,6 +887,12 @@
     "comment": "Recipe Library organization: Expand Folder. Folder location and Tag classification are independent of Recipe content.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Espandi cartella"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -797,6 +929,12 @@
     "comment": "Recipe Library organization: Organization Needs Attention. Folder location and Tag classification are independent of Recipe content.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "L’organizzazione richiede attenzione"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -833,6 +971,12 @@
     "comment": "Recipe Library organization: The change could not be completed. Check names and destinations, or retry any retained change in Recovery.. Folder location and Tag classification are independent of Recipe content.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Non è stato possibile completare la modifica. Controlla nomi e destinazioni oppure riprova una modifica conservata in Recupero."
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -869,6 +1013,12 @@
     "comment": "Recipe Library organization: Move to Beginning. Folder location and Tag classification are independent of Recipe content.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Sposta all’inizio"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -905,6 +1055,12 @@
     "comment": "Recipe Library organization: Folders. Folder location and Tag classification are independent of Recipe content.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Cartelle"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -941,6 +1097,12 @@
     "comment": "Recipe Library organization: Changes apply immediately. Folder location and Tag classification are independent of Recipe content.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Le modifiche si applicano subito"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -977,6 +1139,12 @@
     "comment": "Recipe Library organization: Manage Organization. Folder location and Tag classification are independent of Recipe content.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Gestisci organizzazione"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -1013,6 +1181,12 @@
     "comment": "Recipe Library organization: Manual. Folder location and Tag classification are independent of Recipe content.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Manuale"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -1049,6 +1223,12 @@
     "comment": "Recipe Library organization: Merge. Folder location and Tag classification are independent of Recipe content.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Unisci"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -1085,6 +1265,12 @@
     "comment": "Recipe Library organization: Merge these identities?. Folder location and Tag classification are independent of Recipe content.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Unire queste identità?"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -1121,6 +1307,12 @@
     "comment": "Recipe Library organization: Assignments are combined under the oldest identity. Recipes are kept.. Folder location and Tag classification are independent of Recipe content.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Le assegnazioni vengono unite sotto l’identità più vecchia. Le Ricette vengono conservate."
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -1157,6 +1349,12 @@
     "comment": "Recipe Library organization: Move to Folder. Folder location and Tag classification are independent of Recipe content.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Sposta nella cartella"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -1193,6 +1391,12 @@
     "comment": "Recipe Library organization: Name. Folder location and Tag classification are independent of Recipe content.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Nome"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -1229,6 +1433,12 @@
     "comment": "Recipe Library organization: New Folder. Folder location and Tag classification are independent of Recipe content.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Nuova cartella"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -1265,6 +1475,12 @@
     "comment": "Recipe Library organization: New Tag. Folder location and Tag classification are independent of Recipe content.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Nuovo tag"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -1301,6 +1517,12 @@
     "comment": "Recipe Library organization: Ordering. Folder location and Tag classification are independent of Recipe content.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ordinamento"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -1337,6 +1559,12 @@
     "comment": "Recipe Library organization: Parent Folder. Folder location and Tag classification are independent of Recipe content.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Cartella superiore"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -1373,6 +1601,12 @@
     "comment": "Recipe Library organization: Saved with the new Recipe. Folder location and Tag classification are independent of Recipe content.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Salvato con la nuova Ricetta"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -1409,6 +1643,12 @@
     "comment": "Recipe Library organization: Remove Tag. Folder location and Tag classification are independent of Recipe content.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Rimuovi tag"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -1445,6 +1685,12 @@
     "comment": "Recipe Library organization: Rename. Folder location and Tag classification are independent of Recipe content.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Rinomina"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -1481,6 +1727,12 @@
     "comment": "Recipe Library organization: Retry Organization Change. Folder location and Tag classification are independent of Recipe content.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Riprova la modifica all’organizzazione"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -1517,6 +1769,12 @@
     "comment": "Recipe Library organization: Kitchen Root. Folder location and Tag classification are independent of Recipe content.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Livello principale della Cucina"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -1553,6 +1811,12 @@
     "comment": "Recipe Library organization: Search Recipes. Folder location and Tag classification are independent of Recipe content.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Cerca ricette"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -1589,6 +1853,12 @@
     "comment": "Recipe Library organization: Select Recipes. Folder location and Tag classification are independent of Recipe content.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Seleziona ricette"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -1625,6 +1895,12 @@
     "comment": "Recipe Library organization: Show Folders on This Device. Folder location and Tag classification are independent of Recipe content.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Mostra cartelle su questo dispositivo"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -1661,6 +1937,12 @@
     "comment": "Recipe Library organization: Show Tags on This Device. Folder location and Tag classification are independent of Recipe content.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Mostra tag su questo dispositivo"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -1697,6 +1979,12 @@
     "comment": "Recipe Library organization: Show Unfiled. Folder location and Tag classification are independent of Recipe content.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Mostra Senza cartella"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -1733,6 +2021,12 @@
     "comment": "Recipe Library organization: Show Untagged. Folder location and Tag classification are independent of Recipe content.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Mostra Senza tag"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -1769,6 +2063,12 @@
     "comment": "Recipe Library organization: Tags. Folder location and Tag classification are independent of Recipe content.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Tag"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -1805,6 +2105,12 @@
     "comment": "Recipe Library organization: Organization. Folder location and Tag classification are independent of Recipe content.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Organizzazione"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -1841,6 +2147,12 @@
     "comment": "Recipe Library organization: Unfiled. Folder location and Tag classification are independent of Recipe content.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Senza cartella"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -1877,6 +2189,12 @@
     "comment": "Recipe Library organization: Untagged. Folder location and Tag classification are independent of Recipe content.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Senza tag"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -1914,6 +2232,12 @@
     "comment": "Recipe Recovery: incomplete evidence and explicitly lossy creation of a new local draft.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "I dati probatori della Ricetta richiedono recupero"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -1950,6 +2274,12 @@
     "comment": "Recipe Recovery: incomplete evidence and explicitly lossy creation of a new local draft.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "I dati probatori conservati o arrivati in ritardo non permettono al momento di ricostruire questa Ricetta. Riprova dopo l’arrivo di altri dati oppure inizia una nuova Ricetta con il contenuto disponibile."
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -1986,6 +2316,12 @@
     "comment": "Recipe Recovery: incomplete evidence and explicitly lossy creation of a new local draft.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Inizia una nuova Ricetta"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -2022,6 +2358,12 @@
     "comment": "Recipe Recovery: incomplete evidence and explicitly lossy creation of a new local draft.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Iniziare una nuova Ricetta da questi dati probatori?"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -2058,6 +2400,12 @@
     "comment": "Recipe Recovery: incomplete evidence and explicitly lossy creation of a new local draft.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Potrebbero andare persi contenuti mancanti, cronologia e relazioni. Verrà creata una bozza locale modificabile con una nuova identità; la Ricetta originale non verrà ripristinata. Controllala prima di salvarla."
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -2094,6 +2442,12 @@
     "comment": "Recipe Recovery: incomplete evidence and explicitly lossy creation of a new local draft.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Bozza di recupero non disponibile"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -2130,6 +2484,12 @@
     "comment": "Recipe Recovery: incomplete evidence and explicitly lossy creation of a new local draft.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "I dati probatori potrebbero essere cambiati oppure l’archivio locale delle bozze potrebbe non essere disponibile. Aggiorna e riprova."
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -2168,6 +2528,12 @@
     "comment": "Recipe deletion or restoration control and status.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Elimina ricetta"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -2204,6 +2570,12 @@
     "comment": "Recipe deletion or restoration control and status.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ripristina ricetta"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -2240,6 +2612,12 @@
     "comment": "Recipe deletion or restoration control and status.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Eliminare questa Ricetta?"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -2276,6 +2654,12 @@
     "comment": "Recipe deletion or restoration control and status.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "La Ricetta viene spostata in Elementi eliminati. La cronologia, le bozze locali e le Sessioni di cucina vengono conservate."
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -2312,6 +2696,12 @@
     "comment": "Recipe deletion or restoration control and status.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ripristinare questa Ricetta nella raccolta?"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -2348,6 +2738,12 @@
     "comment": "Recipe deletion or restoration control and status.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ricetta eliminata"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -2384,6 +2780,12 @@
     "comment": "Recipe deletion or restoration control and status.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ricetta"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -2420,6 +2822,12 @@
     "comment": "Recipe deletion or restoration control and status.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "In attesa del contenuto della Ricetta. Riprova dopo l’arrivo di altri dati probatori."
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -2456,6 +2864,12 @@
     "comment": "Recipe deletion or restoration control and status.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "I dati probatori della Ricetta devono essere recuperati prima del ripristino."
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -2492,6 +2906,12 @@
     "comment": "Recipe deletion or restoration control and status.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Non è stato possibile eliminare o ripristinare la Ricetta. Riprova la stessa azione."
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -2530,6 +2950,12 @@
     "comment": "Role of a retained thumbnail image in revision comparison.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Miniatura"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -2568,6 +2994,12 @@
     "comment": "Recovery advice when a local comparison draft cannot be opened or saved.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Non è stato possibile aprire o salvare la bozza di confronto. Riprova quando l’archivio locale delle bozze sarà disponibile."
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -2605,6 +3037,12 @@
     "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Confronta revisioni"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -2641,6 +3079,12 @@
     "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Scegli una revisione iniziale, poi conserva campi o singoli ingredienti da qualsiasi revisione. Salva revisione crea una nuova revisione che riconcilia tutte quelle mostrate qui. Non viene selezionato nulla automaticamente."
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -2677,6 +3121,12 @@
     "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Scegli una revisione iniziale"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -2713,6 +3163,12 @@
     "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Usa l’intera revisione"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -2749,6 +3205,12 @@
     "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Usa questo campo"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -2785,6 +3247,12 @@
     "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Diverso"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -2821,6 +3289,12 @@
     "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Confronto non disponibile"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -2857,6 +3331,12 @@
     "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Completa o scarta l’eventuale bozza di modifica di questa Ricetta prima di iniziare un confronto. Se l’archiviazione locale non è riuscita, riprova prima quella operazione."
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -2893,6 +3373,12 @@
     "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Correggi i campi di modifica non validi prima di cambiare le scelte del confronto."
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -2929,6 +3415,12 @@
     "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Scegli questo ingrediente"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -2965,6 +3457,12 @@
     "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Aggiungi a questa sezione"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -3001,6 +3499,12 @@
     "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Oppure sostituisci un ingrediente:"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -3037,6 +3541,12 @@
     "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Non specificato"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -3073,6 +3583,12 @@
     "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "secondi"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -3109,6 +3625,12 @@
     "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Titolo"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -3145,6 +3667,12 @@
     "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Riepilogo"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -3181,6 +3709,12 @@
     "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Autore"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -3217,6 +3751,12 @@
     "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Lingua"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -3253,6 +3793,12 @@
     "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Fonte e provenienza"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -3289,6 +3835,12 @@
     "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Resa"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -3325,6 +3877,12 @@
     "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Tempo di preparazione"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -3361,6 +3919,12 @@
     "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Tempo di cottura"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -3397,6 +3961,12 @@
     "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Tempo totale"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -3433,6 +4003,12 @@
     "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Tipi di cucina"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -3469,6 +4045,12 @@
     "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Categorie"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -3505,6 +4087,12 @@
     "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Parole chiave"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -3541,6 +4129,12 @@
     "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Sezioni degli ingredienti"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -3577,6 +4171,12 @@
     "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Sezioni delle istruzioni"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -3613,6 +4213,12 @@
     "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Utensili"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -3649,6 +4255,12 @@
     "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Immagini e riferimenti"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -3685,6 +4297,12 @@
     "comment": "Recipe gallery heading, control, or unavailable payload message.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Galleria"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -3721,6 +4339,12 @@
     "comment": "Recipe gallery heading, control, or unavailable payload message.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Aggiungi immagini alla galleria"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -3757,6 +4381,12 @@
     "comment": "Recipe gallery heading, control, or unavailable payload message.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Rimuovi immagine dalla galleria"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -3793,6 +4423,12 @@
     "comment": "Recipe gallery heading, control, or unavailable payload message.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Immagine non disponibile"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -3829,6 +4465,12 @@
     "comment": "Recipe media editor control or private image failure.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Immagine principale"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -3865,6 +4507,12 @@
     "comment": "Recipe media editor control or private image failure.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Descrizione dell’immagine"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -3901,6 +4549,12 @@
     "comment": "Recipe media editor control or private image failure.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Rimuovi immagine principale"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -3937,6 +4591,12 @@
     "comment": "Recipe media editor control or private image failure.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Scegli o sostituisci l’immagine principale"
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -3973,6 +4633,12 @@
     "comment": "Recipe media editor control or private image failure.",
     "extractionState": "manual",
     "localizations": {
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Non è stato possibile aprire questa immagine. Scegline una inferiore a 20 MB."
+        }
+      },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
@@ -4009,6 +4675,12 @@
       "comment": "macOS menu containing actions for the currently selected Recipe.",
       "extractionState": "manual",
       "localizations": {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ricetta"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -4045,6 +4717,12 @@
       "comment": "Adds a blank Equipment item to the local Recipe draft.",
       "extractionState": "manual",
       "localizations": {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aggiungi utensile"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -4081,6 +4759,12 @@
       "comment": "Fallback title for an empty Equipment item.",
       "extractionState": "manual",
       "localizations": {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Utensile"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -4117,6 +4801,12 @@
       "comment": "Editable original Equipment wording; incomplete human text is valid.",
       "extractionState": "manual",
       "localizations": {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Testo originale"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -4153,6 +4843,12 @@
       "comment": "Optional structured Equipment name, separate from original wording.",
       "extractionState": "manual",
       "localizations": {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nome dell’utensile"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -4189,6 +4885,12 @@
       "comment": "Choose a local HTML or JSON-LD document for staged recipe import.",
       "extractionState": "manual",
       "localizations": {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importa documento HTML o JSON-LD"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -4225,6 +4927,12 @@
       "comment": "macOS Window menu command that opens a new recipe library window, including when all library windows are closed.",
       "extractionState": "manual",
       "localizations": {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nuova finestra della raccolta di ricette"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -4261,6 +4969,12 @@
       "comment": "Hint below the local document import button. Choosing a file opens the file picker and does not require a webpage URL. Use device-neutral wording for Mac, iPhone, and iPad.",
       "extractionState": "manual",
       "localizations": {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hai un file HTML o JSON-LD? Sceglilo qui: non serve un URL."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -4297,6 +5011,12 @@
       "comment": "Accept a staged Import Candidate into editing; does not save a shared Recipe.",
       "extractionState": "manual",
       "localizations": {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Accetta nella bozza"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -4333,6 +5053,12 @@
       "comment": "Distinguishes an unaccepted local import from a Recipe editing draft.",
       "extractionState": "manual",
       "localizations": {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importazione in attesa di accettazione · Solo su questo dispositivo"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -4369,6 +5095,12 @@
       "comment": "Destination containing device-local unfinished Recipe work.",
       "extractionState": "manual",
       "localizations": {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bozze"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -4405,6 +5137,12 @@
       "comment": "A draft with no authored title yet.",
       "extractionState": "manual",
       "localizations": {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ricetta senza titolo"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -4441,6 +5179,12 @@
       "comment": "Clarifies that unfinished editing is stored only on this device.",
       "extractionState": "manual",
       "localizations": {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Solo su questo dispositivo"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -4477,6 +5221,12 @@
       "comment": "Title for an unsuccessful local draft or Recipe save.",
       "extractionState": "manual",
       "localizations": {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossibile salvare il tuo lavoro"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -4513,6 +5263,12 @@
       "comment": "Explains a local read/write failure without promising durability.",
       "extractionState": "manual",
       "localizations": {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Non è stato possibile leggere o salvare i dati di modifica. Mantieni qui il lavoro aperto e riprova. I file delle bozze esistenti non sono stati scartati."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -4549,6 +5305,12 @@
       "comment": "Close editor while retaining its local draft.",
       "extractionState": "manual",
       "localizations": {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chiudi"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -4585,6 +5347,12 @@
       "comment": "Explicit destructive action abandoning a Recipe editing draft.",
       "extractionState": "manual",
       "localizations": {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scarta"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -4621,6 +5389,12 @@
       "comment": "Confirmation before removing an editing draft; maintained Recipe history is unaffected.",
       "extractionState": "manual",
       "localizations": {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scartare questa bozza?"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -4657,6 +5431,12 @@
       "comment": "Inline explanation that saving a Recipe Revision requires a title.",
       "extractionState": "manual",
       "localizations": {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inserisci un titolo prima di salvare."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -4693,6 +5473,12 @@
       "comment" : "Deleted Items empty-state explanation.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le sessioni di cucina eliminate appariranno qui finché non le ripristini."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -4714,6 +5500,12 @@
       "comment" : "Deleted Items empty-state title.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nessun elemento eliminato"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -4735,6 +5527,12 @@
       "comment" : "Status for concurrent delete and restore evidence.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Richiede attenzione"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -4756,6 +5554,12 @@
       "comment" : "Explains reversible deletion without storage vocabulary.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gli elementi eliminati restano recuperabili e mantengono lo stato di cucina originale. Non è ancora possibile svuotare Elementi eliminati."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -4777,6 +5581,12 @@
       "comment" : "Fallback title when a deleted session snapshot has not arrived.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sessione di cucina"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -4798,6 +5608,12 @@
       "comment" : "Title for reversible deleted items.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elementi eliminati"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -4819,6 +5635,12 @@
       "comment" : "Status for deleted evidence awaiting dependencies.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In attesa dei dati della Sessione"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -4840,6 +5662,12 @@
       "comment" : "Explains that Closure selection preserves evidence.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memoria di cucina conserva ogni registrazione di conclusione osservata e usa questa scelta per ricostruire la sessione."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -4861,6 +5689,12 @@
       "comment" : "Confirmation title for choosing among competing session Closures.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Usare questa conclusione?"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -4882,6 +5716,12 @@
       "comment" : "Action confirming a competing Closure selection.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Usa questa conclusione"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -4903,6 +5743,12 @@
       "comment" : "Heading above complete competing Closure choices.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scegli la conclusione che corrisponde a quanto è accaduto"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -4924,6 +5770,12 @@
       "comment" : "Explains competing finish evidence.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Questa sessione ha più conclusioni complete. Scegline una solo se corrisponde a quanto è accaduto."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -4945,6 +5797,12 @@
       "comment" : "Recovery empty-state explanation.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le sessioni che richiedono altri dati o una scelta attenta appariranno qui."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -4966,6 +5824,12 @@
       "comment" : "Recovery empty-state title.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nessun recupero necessario"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -4987,6 +5851,12 @@
       "comment" : "Title for a session with positive evidence invariant violations.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La Sessione richiede recupero"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -5008,6 +5878,12 @@
       "comment" : "Safe next action for malformed or conflicting evidence.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "I dati probatori disponibili della sessione non concordano in modo sicuro. Non è stato scartato nulla. Riprova dopo che la sincronizzazione avrà portato gli eventuali dati mancanti."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -5029,6 +5905,12 @@
       "comment" : "Recovery destination introduction.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Queste sessioni restano fuori dalla cronologia ordinaria finché i loro dati probatori non sono completi e sicuri da ricostruire."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -5050,6 +5932,12 @@
       "comment" : "Title for Cooking Session recovery.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recupero"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -5071,6 +5959,12 @@
       "comment" : "Explanation for an unavailable non-deleted session.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alcuni dati necessari della sessione non sono ancora arrivati. Riprova dopo la sincronizzazione; non ricreare né modificare questa sessione."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -5092,6 +5986,12 @@
       "comment" : "Title for a session waiting for dependencies.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In attesa dei dati della Sessione"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -5113,6 +6013,12 @@
       "comment" : "User-facing reversible deletion action; do not use storage vocabulary.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elimina"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -5134,6 +6040,12 @@
       "comment" : "Standard reversible session deletion warning.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Questa sessione verrà spostata in Elementi eliminati senza cambiare il suo stato: Attiva, Interrotta o Conclusa. Il suo resoconto di cucina resta recuperabile."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -5155,6 +6067,12 @@
       "comment" : "Confirmation title for reversible session deletion.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eliminare questa Sessione?"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -5176,6 +6094,12 @@
       "comment" : "Deletion warning when later sessions continue from this one.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Altre sessioni di cucina proseguono da questa. Esse, le loro note e le ricette acquisite resteranno intatte. Solo questa sessione viene spostata in Elementi eliminati, dove rimane recuperabile."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -5197,6 +6121,12 @@
       "comment" : "Action to causally restore observed deletion markers.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ripristina"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -5218,6 +6148,12 @@
       "comment" : "Explains observed-only causal restoration.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il ripristino risolve tutte le eliminazioni attualmente visibili su questo dispositivo. Se ne arriva un’altra in seguito, la sessione resterà in Elementi eliminati e richiederà la tua attenzione."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -5239,6 +6175,12 @@
       "comment" : "Restore confirmation title.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ripristinare questa Sessione?"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -5260,6 +6202,12 @@
       "comment" : "Heading for ingredient progress in a Cooking Session.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ingredienti"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -5281,6 +6229,12 @@
       "comment" : "Heading for instruction progress in a Cooking Session.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Istruzioni"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -5302,6 +6256,12 @@
       "comment" : "Label on the first open instruction in authored order.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prossimo"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -5323,6 +6283,12 @@
       "comment" : "Accessibility value for an accounted-for session ingredient.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Considerato"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -5344,6 +6310,12 @@
       "comment" : "Accessibility value for an open session ingredient.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aperto"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -5365,6 +6337,12 @@
       "comment" : "Accessibility value for a completed session instruction.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Completata"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -5386,6 +6364,12 @@
       "comment" : "Accessibility value and action label for a skipped session instruction.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saltata"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -5407,6 +6391,12 @@
       "comment" : "Accessibility value for an open session instruction.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aperta"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -5428,6 +6418,12 @@
       "comment" : "Action that marks an open session instruction complete.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Completa"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -5449,6 +6445,12 @@
       "comment" : "Action that marks an open session instruction skipped.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Salta"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -5470,6 +6472,12 @@
       "comment" : "Action that returns a completed or skipped instruction to open.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Riapri"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -5491,6 +6499,12 @@
       "comment" : "Accessibility label for the menu of instruction progress actions.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Altre azioni per l’istruzione"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -5512,6 +6526,12 @@
       "comment" : "Message when a Cooking Session snapshot has no ingredients.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Questa istantanea non contiene ingredienti."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -5533,6 +6553,12 @@
       "comment" : "Message when a Cooking Session snapshot has no instructions.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Questa istantanea non contiene istruzioni."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -5554,6 +6580,12 @@
       "comment" : "Heading for the working scale retained by a Cooking Session.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Resa di cucina"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -5575,6 +6607,12 @@
       "comment" : "Explains that session scaling does not edit the maintained recipe.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cambia solo questa Sessione di cucina. La ricetta salvata resta invariata."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -5596,6 +6634,12 @@
       "comment" : "Explains that concurrent Session Entry evidence needs an explicit retained choice.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scegli la versione della voce da conservare come dato probatorio della Sessione."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -5617,6 +6661,12 @@
       "comment" : "Explains that concurrent Session Outcome evidence needs an explicit retained choice.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scegli l’esito da conservare come dato probatorio della Sessione."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -5638,6 +6688,12 @@
       "comment" : "Heading for explicit resolution of concurrent Session Entry or Outcome evidence.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "I dati probatori della Sessione richiedono attenzione"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -5659,6 +6715,12 @@
       "comment" : "Action that begins a causal revision of a submitted Session Entry.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Modifica"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -5680,6 +6742,12 @@
       "comment" : "Action that changes a submitted Session Entry target without changing its text.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cambia riferimento"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -5701,6 +6769,12 @@
       "comment" : "Action that submits a causal revision of a Session Entry.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Salva modifica"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -5722,6 +6796,12 @@
       "comment" : "Action that turns the exact local draft text into immutable Session evidence.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aggiungi voce"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -5743,6 +6823,12 @@
       "comment" : "Action that causally withdraws a submitted Session Entry.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ritira"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -5764,6 +6850,12 @@
       "comment" : "Choice that resolves concurrent Session Entry evidence in favor of withdrawal.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mantieni ritirata"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -5785,6 +6877,12 @@
       "comment" : "Action that continues a remotely Finished Session and moves its local draft there.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prosegui in una nuova Sessione"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -5806,6 +6904,12 @@
       "comment" : "Action that copies a detached draft before removing its local retained state.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copia e rimuovi la bozza"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -5827,6 +6931,12 @@
       "comment" : "Destructive action that removes a draft belonging to a remotely Finished Session.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scarta bozza"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -5848,6 +6958,12 @@
       "comment" : "Explains explicit choices when remote evidence Finishes a Session that still has a local draft.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Questa Sessione è stata conclusa altrove. Proseguila per continuare a scrivere, copia la bozza oppure scartala. Una bozza proseguita conserva il riferimento corrispondente, se esiste; altrimenti diventa una bozza per l’intera Sessione."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -5869,6 +6985,12 @@
       "comment" : "Title for resolving a local draft after remote Finish evidence arrives.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Una bozza locale cerca ancora posto"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -5890,6 +7012,12 @@
       "comment" : "Explains the device-local and unsubmitted nature of a Session Entry draft.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Questa bozza resta sul dispositivo e non è un dato probatorio della Sessione finché non la aggiungi."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -5911,6 +7039,12 @@
       "comment" : "Placeholder inviting text-first observation capture during a Cooking Session.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Che cosa è successo mentre cucinavi?"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -5932,6 +7066,12 @@
       "comment" : "Heading for authored Session Entries and the device-local draft.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Note della sessione"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -5953,6 +7093,12 @@
       "comment" : "Label for an optional ingredient or instruction target on a Session Entry.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Passaggio correlato"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -5974,6 +7120,12 @@
       "comment" : "Stable Session Entry target label with snapshot section and ingredient position.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ingrediente %1$(section)lld.%2$(position)lld — %3$(label)@"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -5995,6 +7147,12 @@
       "comment" : "Stable Session Entry target label with snapshot section and instruction position.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Istruzione %1$(section)lld.%2$(position)lld — %3$(label)@"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -6016,6 +7174,12 @@
       "comment" : "Choice for a Session Entry that is not targeted to an ingredient or instruction.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Intera Sessione"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -6037,6 +7201,12 @@
       "comment" : "Fallback label when a retained Session Entry target cannot be displayed.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Passaggio non disponibile"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -6058,6 +7228,12 @@
       "comment" : "Action that copies a meaningful local draft and then Finishes the Session.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copia la bozza e concludi"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -6079,6 +7255,12 @@
       "comment" : "Destructive action that discards a meaningful local draft and Finishes the Session.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scarta la bozza e concludi"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -6100,6 +7282,12 @@
       "comment" : "Explains that a meaningful local draft must be handled before Finish.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La bozza è ancora locale. Aggiungila come dato probatorio della Sessione, copiala, scartala oppure annulla la conclusione."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -6121,6 +7309,12 @@
       "comment" : "Action that submits a meaningful local draft and then Finishes the Session.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aggiungi la voce e concludi"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -6142,6 +7336,12 @@
       "comment" : "Title for explicit meaningful-draft choices before Finish.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gestisci questa bozza prima di concludere"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -6163,6 +7363,12 @@
       "comment" : "Coarse Session Outcome meaning the cook went great.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ottimo"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -6184,6 +7390,12 @@
       "comment" : "Choice that leaves the optional Session Outcome unset.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Non impostato"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -6205,6 +7417,12 @@
       "comment" : "Coarse Session Outcome meaning the cook went okay.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discreto"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -6226,6 +7444,12 @@
       "comment" : "Heading and accessible label for the optional coarse Session Outcome.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Com’è andata?"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -6247,6 +7471,12 @@
       "comment" : "Coarse Session Outcome meaning the cook was unsuccessful.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Non riuscito"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -6268,6 +7498,12 @@
       "comment" : "Action that asks to finish the current Cooking Session.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Concludi"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -6289,6 +7525,12 @@
       "comment" : "Action that leaves the Session presentation without changing lifecycle.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Torna alle ricette"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -6310,6 +7552,12 @@
       "comment" : "Action that explicitly resumes a Stopped Session.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Riprendi"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -6331,6 +7579,12 @@
       "comment" : "Action that starts a Cooking Session from the exact visible Recipe Revision.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inizia a cucinare"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -6352,6 +7606,12 @@
       "comment" : "Action that explicitly makes an Active Session dormant.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Interrompi"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -6373,6 +7633,12 @@
       "comment" : "Action that creates a new Active continuation from an immutable Finished Session.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prosegui la cucina"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -6394,6 +7660,12 @@
       "comment" : "Sidebar section containing maintained recipes.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ricette"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -6415,6 +7687,12 @@
       "comment" : "Sidebar section containing Active and Stopped Cooking Sessions.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sessioni di cucina"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -6436,6 +7714,12 @@
       "comment" : "Action that returns from one observed Finished Session to Session history.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Torna alle sessioni"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -6457,6 +7741,12 @@
       "comment" : "Heading for the device-local current Cooking Session convenience.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Attuale"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -6478,6 +7768,12 @@
       "comment" : "Explains that Session history appears after cooking begins.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inizia a cucinare da una Ricetta per creare una cronologia indipendente della Sessione."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -6499,6 +7795,12 @@
       "comment" : "Title for empty Cooking Session history.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ancora nessuna Sessione di cucina"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -6520,6 +7822,12 @@
       "comment" : "Observational value when a Finished Session has no Entries.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nessuna voce registrata."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -6541,6 +7849,12 @@
       "comment" : "Heading for immutable Finished Session history.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cronologia"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -6562,6 +7876,12 @@
       "comment" : "Explains that observed Finished Session evidence cannot be edited.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Questo è un resoconto immutabile di quanto è accaduto. Prosegui la cucina crea una nuova Sessione."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -6583,6 +7903,12 @@
       "comment" : "Heading for immediate Session continuation lineage.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Catena delle continuazioni"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -6604,6 +7930,12 @@
       "comment" : "Label for the exact source Closure of a continuation.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Conclusione di origine"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -6625,6 +7957,12 @@
       "comment" : "Label for an immediate continuation created from this Session.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Proseguita come Sessione"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -6646,6 +7984,12 @@
       "comment" : "Value for a Session that was not itself a continuation.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Questa Sessione non prosegue da una precedente."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -6667,6 +8011,12 @@
       "comment" : "Label for the immediate source Session of a continuation.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Proseguita dalla Sessione"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -6688,6 +8038,12 @@
       "comment" : "Heading for other Active and Stopped Sessions.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recenti"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -6709,6 +8065,12 @@
       "comment" : "Title and action for Cooking Session history associated with one Recipe provenance.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sessioni della ricetta"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -6730,6 +8092,12 @@
       "comment" : "Primary Sessions navigation destination and history title.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sessioni"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -6751,6 +8119,12 @@
       "comment" : "Dismisses a device-local stale-Session nudge without changing Session evidence.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chiudi"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -6772,6 +8146,12 @@
       "comment" : "Leaves an old Session unchanged and returns to Recipes to start another Session.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Iniziane un’altra"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -6793,6 +8173,12 @@
       "comment" : "Explains that an old Session remains unchanged until the person acts.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "È passato del tempo dall’apertura di questa Sessione. Non è cambiato nulla automaticamente."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -6814,6 +8200,12 @@
       "comment" : "Title for a subtle device-local stale-Session nudge.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stai ancora cucinando?"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -6835,6 +8227,12 @@
       "comment" : "Destructive confirmation action that immutably Finishes a Cooking Session.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Concludi sessione"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -6856,6 +8254,12 @@
       "comment" : "Warning that a Finished Session is immutable.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Una Sessione conclusa non può essere ripresa né riaperta."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -6877,6 +8281,12 @@
       "comment" : "Title for the careful Finish confirmation.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Concludere questa Sessione di cucina?"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -6898,6 +8308,12 @@
       "comment" : "Visible lifecycle value for an Active Session.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Attiva"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -6919,6 +8335,12 @@
       "comment" : "Visible lifecycle value for a Finished Session.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Conclusa"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -6940,6 +8362,12 @@
       "comment" : "Visible lifecycle value for a Stopped Session.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Interrotta"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -6961,6 +8389,12 @@
       "comment" : "Explains that retained Cooking Session evidence needs explicit attention and the pending action remains available to retry.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Questa Sessione di cucina richiede attenzione prima di accettare la modifica. La stessa azione resta disponibile per riprovare."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -6982,6 +8416,12 @@
       "comment" : "Explains a local Cooking Session command failure while preserving the stable retry identity.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Non è stato possibile salvare la modifica in locale. Riprova; Memoria di cucina ripeterà la stessa azione."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -7003,6 +8443,12 @@
       "comment" : "Explains that a Session Entry draft could not be copied and remains local.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Non è stato possibile copiare la Voce. La bozza è ancora locale; riprova a copiarla o scegli un’altra opzione."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -7024,6 +8470,12 @@
       "comment" : "Explains that retained Cooking Session evidence could not be loaded.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Non è stato possibile aggiornare le Sessioni di cucina dai dati probatori conservati. Riprova."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -7045,6 +8497,12 @@
       "comment" : "Title for a Cooking Session read, clipboard, command, or retained-evidence attention alert.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La Sessione di cucina richiede attenzione"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -7066,6 +8524,12 @@
       "comment" : "Navigation title for the bounded Cooking Session shell.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cucina"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -7087,6 +8551,12 @@
       "comment" : "Explains the deliberately bounded 0.1.3 lifecycle shell.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "I progressi e le note di cucina arriveranno nelle prossime fasi di sviluppo."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -7108,6 +8578,12 @@
       "comment" : "Title for the deliberately bounded 0.1.3 lifecycle shell.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sessione di cucina"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -7129,6 +8605,12 @@
       "comment" : "Navigation title and Settings row label for the app privacy summary.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Privacy"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -7163,6 +8645,12 @@
     },
     "library.title" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ricette"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -7199,6 +8687,12 @@
     },
     "library.action.new-recipe" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nuova ricetta…"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -7235,6 +8729,12 @@
     },
     "library.action.import-recipe" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importa ricetta…"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -7271,6 +8771,12 @@
     },
     "settings.title" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impostazioni"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -7307,6 +8813,12 @@
     },
     "library.sidebar.action.show" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostra barra laterale"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -7343,6 +8855,12 @@
     },
     "library.sidebar.action.hide" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nascondi barra laterale"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -7379,6 +8897,12 @@
     },
     "library.unavailable.title" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ricette non disponibili"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -7415,6 +8939,12 @@
     },
     "action.try-again" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Riprova"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -7451,6 +8981,12 @@
     },
     "library.empty.title" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nessuna ricetta"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -7487,6 +9023,12 @@
     },
     "library.empty.message" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le ricette salvate in questa Cucina appariranno qui."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -7523,6 +9065,12 @@
     },
     "library.accessibility.label" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Raccolta di ricette"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -7559,6 +9107,12 @@
     },
     "library.loading" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Caricamento delle ricette"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -7595,6 +9149,12 @@
     },
     "recipe.action.edit" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Modifica"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -7631,6 +9191,12 @@
     },
     "library.selection.empty.title" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seleziona una ricetta"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -7667,6 +9233,12 @@
     },
     "library.selection.empty.message" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scegli una ricetta per leggerne gli ingredienti e le istruzioni."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -7703,6 +9275,12 @@
     },
     "startup.unavailable.title" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossibile aprire Memoria di cucina"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -7739,6 +9317,12 @@
     },
     "startup.unavailable.message" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Non è stato possibile preparare la raccolta di ricette. Riprova. Se il problema continua, chiudi e riapri l’app."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -7775,6 +9359,12 @@
     },
     "startup.loading" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preparazione della tua Cucina…"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -7811,6 +9401,12 @@
     },
     "startup.samples.title" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aggiungere ricette di esempio?"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -7847,6 +9443,12 @@
     },
     "startup.samples.message" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memoria di cucina include una piccola raccolta di ricette di esempio. Vuoi aggiungerle alla tua raccolta?"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -7883,6 +9485,12 @@
     },
     "action.not-now" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Non ora"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -7919,6 +9527,12 @@
     },
     "samples.action.add" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aggiungi ricette di esempio"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -7955,6 +9569,12 @@
     },
     "startup.samples.later-message" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Potrai aggiungerle in seguito dalle Impostazioni."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -7991,6 +9611,12 @@
     },
     "settings.reset.confirmation.title" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reimpostare la Cucina?"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -8027,6 +9653,12 @@
     },
     "settings.reset.confirmation.message" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tutte le ricette, le modifiche, la cronologia delle revisioni, le acquisizioni delle fonti importate e i metadati delle ricette in questa Cucina verranno eliminati definitivamente. Memoria di cucina ripristinerà solo le ricette di esempio incluse in questa versione. L’operazione non può essere annullata."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -8063,6 +9695,12 @@
     },
     "menu.kitchen.title" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cucina"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -8099,6 +9737,12 @@
     },
     "settings.reset.action" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reimposta Cucina…"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -8135,6 +9779,12 @@
     },
     "settings.icloud.section" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sincronizzazione iCloud"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -8171,6 +9821,12 @@
     },
     "settings.icloud.toggle" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sincronizza ricette con iCloud"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -8207,6 +9863,12 @@
     },
     "settings.icloud.summary" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mantiene la raccolta di ricette di questo dispositivo nel tuo database iCloud privato e la rende disponibile in Memoria di cucina sugli altri dispositivi."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -8243,6 +9905,12 @@
     },
     "settings.icloud.pending-enable" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La sincronizzazione verrà attivata alla prossima apertura di Memoria di cucina."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -8279,6 +9947,12 @@
     },
     "settings.icloud.pending-disable" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La sincronizzazione verrà disattivata alla prossima apertura di Memoria di cucina. Le ricette già presenti su questo dispositivo rimarranno qui."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -8315,6 +9989,12 @@
     },
     "settings.icloud.reconnect.title" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ricollegare questo dispositivo a iCloud?"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -8351,6 +10031,12 @@
     },
     "settings.icloud.reconnect.message" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alla prossima apertura di Memoria di cucina, le ricette e la cronologia delle revisioni di questo dispositivo verranno unite a iCloud. Le modifiche o le rimozioni effettuate in una delle raccolte durante la disconnessione possono influire sulla raccolta risultante. Controllala al termine della sincronizzazione."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -8387,6 +10073,12 @@
     },
     "settings.icloud.reconnect.action" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unisci e sincronizza"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -8425,6 +10117,12 @@
       "comment" : "Settings warning after seven days without a successful managed import or export observed for this local store. This reports risk only; never implies that all devices are synchronized.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Questo dispositivo non osserva un trasferimento iCloud riuscito da circa una settimana. La sincronizzazione futura potrebbe essere meno affidabile e il rischio di perdita dei dati potrebbe aumentare."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -8459,6 +10157,12 @@
     },
     "settings.icloud.status.disabled" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La sincronizzazione iCloud è disattivata su questo dispositivo."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -8495,6 +10199,12 @@
     },
     "settings.samples.section" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ricette di esempio"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -8531,6 +10241,12 @@
     },
     "settings.samples.installation.message" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "L’installazione controlla le identità stabili delle ricette e aggiunge solo gli esempi mancanti."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -8567,6 +10283,12 @@
     },
     "settings.samples.action.install-missing" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Installa ricette di esempio mancanti"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -8603,6 +10325,12 @@
     },
     "settings.samples.action.installed" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ricette di esempio installate"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -8641,6 +10369,12 @@
       "comment" : "Action that installs the bundled sample recipes.",
       "isCommentAutoGenerated" : true,
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Installa ricette di esempio"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -8676,6 +10410,12 @@
     },
     "settings.data.section" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dati della Cucina"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -8712,6 +10452,12 @@
     },
     "settings.reset.summary" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Riporta questa Cucina alle ricette di esempio incluse nella versione attuale di Memoria di cucina."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -8748,6 +10494,12 @@
     },
     "settings.privacy.summary" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nessun tracciamento né raccolta di dati."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -8784,6 +10536,12 @@
     },
     "action.done" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fine"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -8820,6 +10578,12 @@
     },
     "settings.icloud.status.checking" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verifica dello stato di iCloud…"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -8856,6 +10620,12 @@
     },
     "settings.icloud.status.available" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La sincronizzazione iCloud è disponibile."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -8892,6 +10662,12 @@
     },
     "settings.icloud.status.syncing" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memoria di cucina si sta sincronizzando con iCloud."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -8928,6 +10704,12 @@
     },
     "settings.icloud.status.no-account" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Accedi a iCloud per sincronizzare le ricette."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -8964,6 +10746,12 @@
     },
     "settings.icloud.status.restricted" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "L’accesso a iCloud è limitato su questo dispositivo."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -9000,6 +10788,12 @@
     },
     "settings.icloud.status.temporarily-unavailable" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La sincronizzazione iCloud non è temporaneamente disponibile."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -9036,6 +10830,12 @@
     },
     "settings.icloud.status.failed" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La sincronizzazione iCloud richiede attenzione."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -9072,6 +10872,12 @@
     },
     "settings.samples.status.complete" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tutte le ricette di esempio sono installate."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -9108,6 +10914,12 @@
     },
     "settings.samples.status.partial" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mancano alcune ricette di esempio."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -9144,6 +10956,12 @@
     },
     "settings.samples.status.none" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nessuna ricetta di esempio installata."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -9180,6 +10998,12 @@
     },
     "settings.samples.status.unavailable" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lo stato delle ricette di esempio non è disponibile."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -9216,6 +11040,12 @@
     },
     "action.cancel" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Annulla"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -9252,6 +11082,12 @@
     },
     "settings.reset.confirmation.action" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reimposta Cucina"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -9288,6 +11124,12 @@
     },
     "privacy.summary.title" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nessun dato raccolto"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -9324,6 +11166,12 @@
     },
     "privacy.summary.message" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memoria di cucina non raccoglie dati da questa app."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -9360,6 +11208,12 @@
     },
     "privacy.practice.no-tracking" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nessun tracciamento"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -9396,6 +11250,12 @@
     },
     "privacy.practice.no-analytics" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nessuna analisi d’uso"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -9432,6 +11292,12 @@
     },
     "privacy.practice.no-advertising" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nessuna pubblicità"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -9468,6 +11334,12 @@
     },
     "privacy.manifest.note" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Questa schermata riflette il manifesto della privacy incluso in questa versione di Memoria di cucina."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -9504,6 +11376,12 @@
     },
     "privacy.recipes.section" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le tue ricette"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -9540,6 +11418,12 @@
     },
     "privacy.recipes.message" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le ricette restano su questo dispositivo e, quando la sincronizzazione iCloud è disponibile, nel tuo database iCloud privato."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -9576,6 +11460,12 @@
     },
     "privacy.debugging.section" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diagnosi e assistenza"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -9612,6 +11502,12 @@
     },
     "privacy.debugging.inspection" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esaminiamo informazioni private solo quando le fornisci deliberatamente per diagnosticare un problema."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -9648,6 +11544,12 @@
     },
     "privacy.debugging.retention" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il materiale diagnostico privato viene eliminato quando termina la necessità immediata. Non viene mai pubblicato né conservato come dato di prova."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -9686,6 +11588,24 @@
       "comment" : "Count of review notes reported after a web-recipe import. The integer controls plural selection.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$(count)lld nota di verifica"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$(count)lld note di verifica"
+                }
+              }
+            }
+          }
+        },
         "de-DE": {
           "variations": {
             "plural": {
@@ -9780,6 +11700,12 @@
     },
     "recipe.detail.equipment.section" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Utensili"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -9816,6 +11742,12 @@
     },
     "recipe.detail.equipment.scaling-note" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gli utensili non si adattano automaticamente. Verifica che siano adatti alla resa di lavoro."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -9852,6 +11784,12 @@
     },
     "recipe.detail.ingredients.section" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ingredienti"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -9888,6 +11826,12 @@
     },
     "recipe.detail.instructions.section" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Istruzioni"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -9924,6 +11868,12 @@
     },
     "recipe.metadata.yield" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Resa"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -9960,6 +11910,12 @@
     },
     "recipe.metadata.prep" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preparazione"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -9996,6 +11952,12 @@
     },
     "recipe.metadata.cook" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cottura"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -10032,6 +11994,12 @@
     },
     "recipe.metadata.total" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Totale"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -10068,6 +12036,12 @@
     },
     "recipe.source.action.open" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apri fonte"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -10104,6 +12078,12 @@
     },
     "recipe.source.link-unavailable" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Link non disponibile"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -10140,6 +12120,12 @@
     },
     "recipe.source.label" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fonte"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -10176,6 +12162,12 @@
     },
     "recipe.image.fallback-accessibility-label" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Immagine della ricetta"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -10212,6 +12204,12 @@
     },
     "recipe.scaling.base-yield" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Resa di base"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -10248,6 +12246,12 @@
     },
     "recipe.scaling.section" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adatta quantità della ricetta"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -10284,6 +12288,12 @@
     },
     "recipe.scaling.working-yield" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Resa di lavoro"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -10320,6 +12330,12 @@
     },
     "recipe.scaling.action.decrease" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Riduci resa di lavoro"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -10356,6 +12372,12 @@
     },
     "recipe.scaling.action.increase" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aumenta resa di lavoro"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -10392,6 +12414,12 @@
     },
     "recipe.scaling.reading-only-note" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le quantità degli ingredienti si aggiornano solo per la lettura. La ricetta salvata resta invariata."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -10428,6 +12456,12 @@
     },
     "action.reset" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reimposta"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -10464,6 +12498,12 @@
     },
     "recipe.scaling.action.reset-accessibility-label" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ripristina resa di base"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -10500,6 +12540,12 @@
     },
     "recipe.scaling.status.manual-review" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verifica manualmente questa quantità quando cambi la resa."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -10536,6 +12582,12 @@
     },
     "recipe.scaling.status.fixed" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quantità fissa; invariata."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -10572,6 +12624,12 @@
     },
     "recipe.scaling.status.written" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quantità descritta a parole; invariata."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -10608,6 +12666,12 @@
     },
     "recipe.scaling.status.presentation-override" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Non è stato possibile adattare con sicurezza il testo visualizzato; resta invariato."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -10644,6 +12708,12 @@
     },
     "recipe.scaling.status.arithmetic-failure" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Non è stato possibile adattare con sicurezza questa quantità; resta invariata."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -10680,6 +12750,12 @@
     },
     "recipe.ingredient.fallback-name" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ingrediente"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -10716,6 +12792,12 @@
     },
     "recipe.editor.yield.scaling-note" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La resa numerica è la base usata per adattare le quantità degli ingredienti."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -10752,6 +12834,12 @@
     },
     "recipe.editor.yield.scaling-toggle" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abilita adattamento delle quantità"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -10788,6 +12876,12 @@
     },
     "recipe.detail.accessibility.label" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ricetta %1$(title)@"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -10824,6 +12918,12 @@
     },
     "recipe.detail.author" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Di %1$(author)@"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -10860,6 +12960,12 @@
     },
     "recipe.metadata.accessibility.value" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$(label)@, %2$(value)@"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -10896,6 +13002,12 @@
     },
     "recipe.instruction.duration" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Durata %1$(duration)@."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -10932,6 +13044,12 @@
     },
     "recipe.instruction.step" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Passaggio %1$(number)lld."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -10968,6 +13086,12 @@
     },
     "recipe.scaling.displayed-yield" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$(workingYield)@ (base: %2$(baseYield)@)"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -11004,6 +13128,12 @@
     },
     "recipe.scaling.basis.approximate" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Circa %1$(value)@"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -11040,6 +13170,12 @@
     },
     "recipe.scaling.basis.lower-estimate" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stima inferiore: %1$(value)@"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -11076,6 +13212,12 @@
     },
     "recipe.scaling.basis.upper-estimate" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stima superiore: %1$(value)@"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -11112,6 +13254,12 @@
     },
     "recipe.presentation.quantity.approximate" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "circa %1$(value)@"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -11148,6 +13296,12 @@
     },
     "recipe.presentation.duration.hours-minutes" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$(hours)lld h %2$(minutes)lld min"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -11184,6 +13338,12 @@
     },
     "recipe.presentation.duration.hours" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$(hours)lld h"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -11220,6 +13380,12 @@
     },
     "recipe.presentation.duration.minutes" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$(minutes)lld min"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -11256,6 +13422,12 @@
     },
     "recipe.presentation.ingredient.optional" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$(ingredient)@ (opzionale)"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -11292,6 +13464,12 @@
     },
     "recipe.editor.create.title" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nuova ricetta"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -11328,6 +13506,12 @@
     },
     "recipe.editor.revise.title" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Modifica ricetta"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -11364,6 +13548,12 @@
     },
     "recipe.editor.import-review.title" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verifica importazione"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -11400,6 +13590,12 @@
     },
     "recipe.editor.revise.action.save" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Salva revisione"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -11436,6 +13632,12 @@
     },
     "recipe.editor.create.action.save" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Crea ricetta"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -11472,6 +13674,12 @@
     },
     "recipe.editor.import-review.ready" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "L’importazione è pronta per la verifica"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -11508,6 +13716,12 @@
     },
     "recipe.editor.import-review.section" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verifica dell’importazione"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -11544,6 +13758,12 @@
     },
     "recipe.editor.import-review.footer" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Controlla il testo importato e la struttura prima di accettare la bozza. La verifica e il salvataggio non ricontattano la fonte. Il riferimento alla fonte e i metadati JSON-LD limitati, inclusi i campi non mostrati qui, sono già conservati solo su questo dispositivo. Salva revisione li aggiunge alla cucina, dove potranno essere sincronizzati."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -11580,6 +13800,12 @@
     },
     "recipe.editor.recipe.section" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ricetta"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -11616,6 +13842,12 @@
     },
     "recipe.editor.title.field" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Titolo"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -11652,6 +13884,12 @@
     },
     "recipe.editor.summary.field" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Riepilogo"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -11688,6 +13926,12 @@
     },
     "recipe.editor.author.field" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Autore della ricetta"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -11724,6 +13968,12 @@
     },
     "recipe.editor.times.section" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tempi"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -11760,6 +14010,12 @@
     },
     "recipe.editor.time.preparation.field" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Minuti di preparazione"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -11796,6 +14052,12 @@
     },
     "recipe.editor.time.cooking.field" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Minuti di cottura"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -11832,6 +14094,12 @@
     },
     "recipe.editor.time.total.field" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Minuti totali"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -11868,6 +14136,12 @@
     },
     "recipe.editor.time.validation" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inserisci minuti interi da 0 a 527040."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -11904,6 +14178,12 @@
     },
     "recipe.editor.source.section" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fonte"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -11940,6 +14220,12 @@
     },
     "recipe.editor.source.kind.field" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tipo di fonte"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -11976,6 +14262,12 @@
     },
     "recipe.editor.source.title.field" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Titolo della fonte"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -12012,6 +14304,12 @@
     },
     "recipe.editor.source.author.field" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Autore della fonte"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -12048,6 +14346,12 @@
     },
     "recipe.editor.source.publisher.field" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Editore"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -12084,6 +14388,12 @@
     },
     "recipe.editor.source.url.field" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "URL della fonte"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -12120,6 +14430,12 @@
     },
     "recipe.editor.source.url.validation" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inserisci un URL http o https completo, senza credenziali incorporate."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -12156,6 +14472,12 @@
     },
     "recipe.editor.ingredients.action.add-section" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aggiungi sezione ingredienti"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -12192,6 +14514,12 @@
     },
     "recipe.editor.ingredients.section" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ingredienti"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -12228,6 +14556,12 @@
     },
     "recipe.editor.ingredients.original-wording-note" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il testo originale viene conservato separatamente dall’interpretazione strutturata."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -12264,6 +14598,12 @@
     },
     "recipe.editor.instructions.action.add-section" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aggiungi sezione istruzioni"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -12300,6 +14640,12 @@
     },
     "recipe.editor.instructions.section" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Istruzioni"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -12336,6 +14682,12 @@
     },
     "recipe.import.concern.missing-title" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il titolo richiede attenzione"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -12372,6 +14724,12 @@
     },
     "recipe.import.concern.missing-ingredients" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nessun ingrediente trovato"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -12408,6 +14766,12 @@
     },
     "recipe.import.concern.missing-instructions" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nessuna istruzione trovata"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -12444,6 +14808,12 @@
     },
     "recipe.source.kind.original" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Originale"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -12480,6 +14850,12 @@
     },
     "recipe.source.kind.webpage" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pagina web"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -12516,6 +14892,12 @@
     },
     "recipe.source.kind.book" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Libro"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -12552,6 +14934,12 @@
     },
     "recipe.source.kind.person" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Persona"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -12588,6 +14976,12 @@
     },
     "recipe.source.kind.imported" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importata"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -12624,6 +15018,12 @@
     },
     "recipe.editor.ingredient-section.fallback-title" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sezione ingredienti"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -12660,6 +15060,12 @@
     },
     "recipe.editor.section-name.field" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nome della sezione"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -12696,6 +15102,12 @@
     },
     "field.optional.prompt" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Facoltativo"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -12732,6 +15144,12 @@
     },
     "recipe.editor.ingredients.action.add" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aggiungi ingrediente"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -12768,6 +15186,12 @@
     },
     "action.move-up" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sposta su"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -12804,6 +15228,12 @@
     },
     "action.move-down" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sposta giù"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -12840,6 +15270,12 @@
     },
     "action.delete-section" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elimina sezione"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -12876,6 +15312,12 @@
     },
     "recipe.editor.ingredient.fallback-title" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nuovo ingrediente"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -12912,6 +15354,12 @@
     },
     "value.not-available" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Non disponibile"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -12948,6 +15396,12 @@
     },
     "recipe.editor.ingredient.original-wording.field" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Testo originale"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -12984,6 +15438,12 @@
     },
     "recipe.editor.ingredient.presentation.field" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Presentazione"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -13020,6 +15480,12 @@
     },
     "recipe.editor.ingredient.custom-text.field" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Testo personalizzato"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -13056,6 +15522,12 @@
     },
     "recipe.editor.ingredient.name.field" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nome dell’ingrediente"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -13092,6 +15564,12 @@
     },
     "recipe.editor.ingredient.unit.field" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unità"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -13128,6 +15606,12 @@
     },
     "recipe.editor.ingredient.preparation.field" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preparazione"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -13164,6 +15648,12 @@
     },
     "recipe.editor.ingredient.note.field" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nota"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -13200,6 +15690,12 @@
     },
     "recipe.editor.ingredient.scaling.field" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adattamento quantità"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -13236,6 +15732,12 @@
     },
     "action.delete" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elimina"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -13272,6 +15774,12 @@
     },
     "recipe.ingredient.scaling.linear" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lineare"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -13308,6 +15816,12 @@
     },
     "recipe.ingredient.scaling.fixed" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fissa"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -13344,6 +15858,12 @@
     },
     "recipe.ingredient.scaling.manual-review" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verifica manuale"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -13380,6 +15900,12 @@
     },
     "recipe.ingredient.presentation.structured" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Strutturata"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -13416,6 +15942,12 @@
     },
     "recipe.ingredient.presentation.custom" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Personalizzata"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -13452,6 +15984,12 @@
     },
     "recipe.editor.instruction-section.fallback-title" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sezione istruzioni"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -13488,6 +16026,12 @@
     },
     "recipe.editor.instructions.action.add-step" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aggiungi passaggio"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -13524,6 +16068,12 @@
     },
     "recipe.editor.instruction.fallback-title" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nuovo passaggio"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -13560,6 +16110,12 @@
     },
     "recipe.editor.instruction.title.field" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Titolo del passaggio"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -13596,6 +16152,12 @@
     },
     "recipe.editor.instruction.text.field" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Istruzione"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -13632,6 +16194,12 @@
     },
     "accessibility.disclosure.expanded-value" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Espanso"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -13668,6 +16236,12 @@
     },
     "accessibility.disclosure.collapsed-value" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Compresso"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -13704,6 +16278,12 @@
     },
     "accessibility.disclosure.collapse-hint" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comprimi"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -13740,6 +16320,12 @@
     },
     "accessibility.disclosure.expand-hint" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Espandi"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -13776,6 +16362,12 @@
     },
     "recipe.editor.quantity.amount.field" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quantità"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -13812,6 +16404,12 @@
     },
     "recipe.editor.quantity.simple-amount.prompt" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Facoltativo — 2, 1/2, quanto basta…"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -13848,6 +16446,12 @@
     },
     "recipe.editor.quantity.action.use-precise" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Usa quantità precisa…"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -13884,6 +16488,12 @@
     },
     "recipe.editor.quantity.action.edit-precise" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Modifica quantità precisa…"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -13920,6 +16530,12 @@
     },
     "recipe.editor.package.action.add" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aggiungi formato confezione"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -13956,6 +16572,12 @@
     },
     "recipe.editor.package.group" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Formato confezione (facoltativo)"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -13992,6 +16614,12 @@
     },
     "recipe.editor.package.unit.field" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unità della confezione"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -14028,6 +16656,12 @@
     },
     "recipe.editor.package.unit.prompt" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "once, grammi, millilitri…"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -14064,6 +16698,12 @@
     },
     "recipe.editor.package.action.remove" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rimuovi formato confezione"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -14100,6 +16740,12 @@
     },
     "recipe.editor.quantity.action.done" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Termina dettagli quantità"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -14136,6 +16782,12 @@
     },
     "value.not-specified" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Non specificato"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -14172,6 +16824,12 @@
     },
     "recipe.editor.quantity.kind.field" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tipo di quantità"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -14208,6 +16866,12 @@
     },
     "recipe.editor.quantity.none-message" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nessuna quantità specificata"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -14244,6 +16908,12 @@
     },
     "recipe.editor.quantity.exact.field" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quantità"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -14280,6 +16950,12 @@
     },
     "recipe.editor.quantity.range-lower.field" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Da"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -14316,6 +16992,12 @@
     },
     "recipe.editor.quantity.range-upper.field" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -14352,6 +17034,12 @@
     },
     "recipe.editor.quantity.approximate.field" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Circa"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -14388,6 +17076,12 @@
     },
     "recipe.editor.quantity.written.prompt" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "quanto basta, secondo necessità, una manciata…"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -14424,6 +17118,12 @@
     },
     "recipe.editor.quantity.numerator.field" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Numeratore"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -14460,6 +17160,12 @@
     },
     "recipe.editor.quantity.denominator.field" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Denominatore"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -14496,6 +17202,12 @@
     },
     "recipe.quantity.kind.none" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nessuna"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -14532,6 +17244,12 @@
     },
     "recipe.quantity.kind.exact" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esatta"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -14568,6 +17286,12 @@
     },
     "recipe.quantity.kind.range" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Intervallo"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -14604,6 +17328,12 @@
     },
     "recipe.quantity.kind.approximate" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Approssimativa"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -14640,6 +17370,12 @@
     },
     "recipe.quantity.kind.words" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A parole"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -14676,6 +17412,12 @@
     },
     "recipe.editor.yield.wording.field" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Testo visualizzato"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -14712,6 +17454,12 @@
     },
     "recipe.editor.yield.wording.prompt" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "es. Per 4 persone o Una padella"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -14748,6 +17496,12 @@
     },
     "recipe.editor.yield.unit.field" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unità della resa"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -14784,6 +17538,12 @@
     },
     "recipe.editor.yield.unit.prompt" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "porzioni, pagnotte, padelle…"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -14820,6 +17580,12 @@
     },
     "recipe.import.concern.preserved-metadata" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Metadati conservati — %1$(summary)@"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -14856,6 +17622,12 @@
     },
     "recipe.import.taxonomy.cuisine" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tipo di cucina: %1$(values)@"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -14892,6 +17664,12 @@
     },
     "recipe.import.taxonomy.categories" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Categorie: %1$(values)@"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -14928,6 +17706,12 @@
     },
     "recipe.import.taxonomy.keywords" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Parole chiave: %1$(values)@"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -14964,6 +17748,12 @@
     },
     "recipe.editor.quantity.package-summary" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Confezione: %1$(package)@"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -15000,6 +17790,12 @@
     },
     "recipe.editor.quantity.action.decrease" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Riduci %1$(field)@"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -15036,6 +17832,12 @@
     },
     "recipe.editor.quantity.action.increase" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aumenta %1$(field)@"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -15074,6 +17876,24 @@
       "comment" : "Count of imported ingredient lines preserved as authored text because they could not be parsed. The integer controls plural selection.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$(count)lld riga di ingredienti conservata ma non analizzata"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$(count)lld righe di ingredienti conservate ma non analizzate"
+                }
+              }
+            }
+          }
+        },
         "de-DE": {
           "variations": {
             "plural": {
@@ -15170,6 +17990,24 @@
       "comment" : "Count of provisional structured ingredient interpretations that need review. The integer controls plural selection.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$(count)lld interpretazione di ingrediente da verificare"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$(count)lld interpretazioni di ingredienti da verificare"
+                }
+              }
+            }
+          }
+        },
         "de-DE": {
           "variations": {
             "plural": {
@@ -15266,6 +18104,24 @@
       "comment" : "Count of malformed or unsupported source metadata blocks ignored during import. The integer controls plural selection.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$(count)lld blocco della fonte malformato o non supportato ignorato"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$(count)lld blocchi della fonte malformati o non supportati ignorati"
+                }
+              }
+            }
+          }
+        },
         "de-DE": {
           "variations": {
             "plural": {
@@ -15362,6 +18218,24 @@
       "comment" : "Count of source images referenced by imported metadata but intentionally not downloaded. The integer controls plural selection.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$(count)lld immagine della fonte referenziata ma non scaricata"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$(count)lld immagini della fonte referenziate ma non scaricate"
+                }
+              }
+            }
+          }
+        },
         "de-DE": {
           "variations": {
             "plural": {
@@ -15456,6 +18330,12 @@
     },
     "recipe.import.title" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importa ricetta"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -15492,6 +18372,12 @@
     },
     "recipe.import.choose.title" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scegli ricetta"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -15528,6 +18414,12 @@
     },
     "recipe.import.fetch.action" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recupera ricetta"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -15564,6 +18456,12 @@
     },
     "recipe.import.fetch.progress" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recupero della ricetta"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -15600,6 +18498,12 @@
     },
     "recipe.import.webpage.field" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pagina web della ricetta"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -15636,6 +18540,12 @@
     },
     "recipe.import.webpage.accessibility-label" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "URL della pagina web della ricetta"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -15672,6 +18582,12 @@
     },
     "recipe.import.privacy.fetching" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memoria di cucina segue i reindirizzamenti e scarica l’HTML risultante con una richiesta temporanea senza cookie né credenziali dell’app. Durante la verifica non esegue script della pagina né scarica immagini."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -15708,6 +18624,12 @@
     },
     "recipe.import.privacy.storage" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "L’importazione conserva subito il riferimento alla fonte e un blocco limitato di metadati JSON-LD in Memoria di cucina, inclusi i campi non mostrati nella verifica. Candidati e bozze restano solo su questo dispositivo finché non salvi una revisione nella cucina. I documenti locali vengono letti senza accesso alla rete."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -15744,6 +18666,12 @@
     },
     "recipe.import.candidate.untitled" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ricetta senza titolo"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -15780,6 +18708,12 @@
     },
     "recipe.import.candidate.review-hint" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verifica questa ricetta prima di salvarla"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -15816,6 +18750,12 @@
     },
     "recipe.import.candidates.section" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Questa pagina contiene più ricette"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -15852,6 +18792,12 @@
     },
     "recipe.import.action.different-url" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Usa un altro URL"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -15888,6 +18834,12 @@
     },
     "recipe.import.failure.no-candidates" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nessuna ricetta Schema.org trovata in questa pagina."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -15924,6 +18876,12 @@
     },
     "recipe.import.failure.disallowed-address" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Per sicurezza, Memoria di cucina non può recuperare questo indirizzo o reindirizzamento."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -15960,6 +18918,12 @@
     },
     "recipe.import.failure.page-too-large" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Questa pagina contiene troppi dati per un’importazione sicura."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -15996,6 +18960,12 @@
     },
     "recipe.import.failure.unsupported-page" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Questo indirizzo non ha restituito una pagina di ricetta HTML supportata."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -16032,6 +19002,12 @@
     },
     "recipe.import.failure.network" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Non è stato possibile scaricare la pagina web. Controlla la connessione e riprova."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -16068,6 +19044,12 @@
     },
     "recipe.import.failure.unknown" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memoria di cucina non ha potuto importare questa pagina web. Controlla l’URL e riprova."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -16104,6 +19086,12 @@
     },
     "library.failure.read" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memoria di cucina non ha potuto leggere questa raccolta di ricette."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -16140,6 +19128,12 @@
     },
     "library.failure.save" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memoria di cucina non ha potuto salvare questa ricetta."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -16176,6 +19170,12 @@
     },
     "library.failure.reset" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memoria di cucina non ha potuto reimpostare questa Cucina. Nessuna reimpostazione è stata completata."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -16212,6 +19212,12 @@
     },
     "library.failure.samples" : {
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memoria di cucina non ha potuto aggiungere le ricette di esempio. Le ricette esistenti non sono state modificate."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -16250,6 +19256,24 @@
       "comment" : "Accessibility announcement after multiple recipes are found. The integer controls plural selection.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$(count)lld ricetta trovata. Scegli una ricetta da verificare."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$(count)lld ricette trovate. Scegli una ricetta da verificare."
+                }
+              }
+            }
+          }
+        },
         "de-DE": {
           "variations": {
             "plural": {
@@ -16346,6 +19370,12 @@
       "comment" : "Accessibility announcement prefix followed by the localized import failure message.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importazione della ricetta non riuscita. %1$(message)@"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",

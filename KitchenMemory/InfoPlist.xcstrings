@@ -5,6 +5,12 @@
       "comment" : "The localized product name shown by the system.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memoria di cucina"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -41,6 +47,12 @@
       "comment" : "The localized short product name shown by the system.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memoria di cucina"
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
@@ -77,6 +89,12 @@
       "comment" : "The localized copyright shown by the system.",
       "extractionState" : "manual",
       "localizations" : {
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 collaboratori del progetto Memoria di cucina."
+          }
+        },
         "de-DE": {
           "stringUnit": {
             "state": "translated",

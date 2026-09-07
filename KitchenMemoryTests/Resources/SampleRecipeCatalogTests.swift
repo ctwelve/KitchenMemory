@@ -83,7 +83,7 @@ final class SampleRecipeCatalogTests: XCTestCase {
     func testTunaNoodleHotdishVariantsCarryObservedTimings() throws {
         let reference = try XCTUnwrap(SampleRecipeCatalog.loadManifest().recipes.first)
 
-        for localeIdentifier in ["en-US", "en-GB", "fr-CA", "es-MX", "de-DE"] {
+        for localeIdentifier in ["en-US", "en-GB", "fr-CA", "es-MX", "de-DE", "it-IT"] {
             let variant = try XCTUnwrap(
                 reference.variant(preferredLanguages: [localeIdentifier])
             )
@@ -101,6 +101,7 @@ final class SampleRecipeCatalogTests: XCTestCase {
             "en-US": "Kitchen Memory contributors",
             "en-GB": "Kitchen Memory contributors",
             "de-DE": "Mitwirkende von Küchengedächtnis",
+            "it-IT": "Collaboratori di Memoria di cucina",
             "es-MX": "Colaboradores de Memoria de cocina",
             "fr-CA": "Contributeurs de Mémoire de cuisine",
         ]
@@ -212,7 +213,7 @@ final class SampleRecipeCatalogTests: XCTestCase {
     func testLocalizedSamplesCarryMatchingAuthoredLanguageAndDistinctIdentity() throws {
         let manifest = try SampleRecipeCatalog.loadManifest()
 
-        for localeIdentifier in ["en-US", "en-GB", "fr-CA", "es-MX", "de-DE"] {
+        for localeIdentifier in ["en-US", "en-GB", "fr-CA", "es-MX", "de-DE", "it-IT"] {
             let references = try SampleRecipeCatalog.localizedRecipes(
                 in: manifest,
                 preferredLanguages: [localeIdentifier]
