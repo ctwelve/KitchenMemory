@@ -82,8 +82,12 @@ native semantics and tests were retained; this evidence-only slice does not
 allocate a new product version or change the SBOM.
 
 The walkthrough chose manual creation, satisfying the create-or-import path;
-network import was not exercised. iPhone/iPad walkthroughs, the full device and
-input matrix, VoiceOver focus/grouping/spoken behavior, platform audits,
+network import was not exercised. Ordinary iPhone/iPad use was not exercised in
+this Mac-only slice; an ordinary-use walkthrough on iOS remains required if an
+alpha candidate distributes that platform. This omission is separate from the
+deferred beta matrix.
+
+The full device and input matrix, VoiceOver focus/grouping/spoken behavior, platform audits,
 accessibility text sizes, appearance/contrast/motion combinations, and extensive
 shipping-language layout review remain unverified here. They belong to
 [beta acceptance](https://github.com/ctwelve/KitchenMemory/issues/168) after the
