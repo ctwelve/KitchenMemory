@@ -192,8 +192,8 @@ provisional visual hierarchy in UI tests.
 
 ## Current alpha additions
 
-British English (`en-GB`) is an explicit supported locale alongside en-US,
-es-MX, and fr-CA. See [alpha translation validation](localization-alpha-validation.md)
+British English (`en-GB`) and German (`de-DE`) are explicit supported locales
+alongside en-US, es-MX, and fr-CA. See [alpha translation validation](localization-alpha-validation.md)
 for the regional content choices and the maintainer's device/layout-check waiver
 for #118–#120. The following checks apply to all currently supported locales.
 
@@ -247,7 +247,7 @@ Recipes are not upgraded or replaced. Sample removal conservatively preserves
 an older baseline whose payload differs from the current bundled baseline, just
 as it preserves other changed sample content.
 
-The native shell smoke suite includes en-US, en-GB, es-MX, and fr-CA with doubled strings
+The native shell smoke suite includes en-US, en-GB, es-MX, fr-CA, and de-DE with doubled strings
 and forced right-to-left direction. Run it through Xcode on an iPhone simulator
 (compact) and My Mac (regular). It checks named, reachable shell and Settings
 structure without asserting translated copy, scrolling, or feature workflows.
