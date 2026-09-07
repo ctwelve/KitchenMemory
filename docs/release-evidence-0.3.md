@@ -148,9 +148,14 @@ all text sizes, window layouts, appearances, languages, or ordinary iOS use.
 The UI remains provisional. [The alpha policy](accessibility-engineering.md)
 requires any known core-path barrier to block distribution even if tests pass.
 
-**Maintainer acceptance: pending review of this versioned packet.** No release
-tag, App Store submission, tester group, beta distribution, or feature promise
-is made. Accepting this engineering record does not replace the eventual signed,
+**Maintainer acceptance: accepted September 7, 2026.** The maintainer explicitly
+accepted the Mac-only alpha engineering packet at
+`4b4f62859ba4e0913b0ea6da2d8db216a10ee58f`, including the recorded limits. The
+inconclusive foreground-delivery observation is accepted as nonblocking for
+this scoped packet; its result remains inconclusive, not a pass.
+
+No release tag, App Store submission, tester group, beta distribution, or feature
+promise is made. This acceptance does not replace the eventual signed,
 installed-artifact and Production-readiness checks in the release procedure.
 
 ## Explicit remaining boundaries
