@@ -5,12 +5,6 @@
 import DequeModule
 import OrderedCollections
 
-/// Distinguishes a usable graph from conflicting definitions of one node.
-enum CausalGraphConstructionResult<Node: Hashable> {
-  case graph(CausalGraph<Node>)
-  case collision(node: Node)
-}
-
 /// Iterative traversal mechanics shared by Kitchen Memory evidence families.
 ///
 /// Construction canonicalizes nodes and parent lists using the caller's stable
@@ -35,40 +29,6 @@ struct CausalGraph<Node: Hashable> {
     }
     self.parentsByNode = orderedParents
     self.areInIncreasingOrder = areInIncreasingOrder
-  }
-
-  private init(
-    parentsByNode: OrderedDictionary<Node, [Node]>,
-    orderedBy areInIncreasingOrder: @escaping (Node, Node) -> Bool
-  ) {
-    self.parentsByNode = parentsByNode
-    self.areInIncreasingOrder = areInIncreasingOrder
-  }
-
-  static func coalescing(
-    _ parentLists: [(node: Node, parents: [Node])],
-    orderedBy areInIncreasingOrder: @escaping (Node, Node) -> Bool
-  ) -> CausalGraphConstructionResult<Node> {
-    var orderedParents: OrderedDictionary<Node, [Node]> = [:]
-    for parentList in parentLists.sorted(by: {
-      areInIncreasingOrder($0.node, $1.node)
-    }) {
-      let canonicalParents = IdentityCollection.stableUnique(
-        parentList.parents.sorted(by: areInIncreasingOrder),
-        id: \.self
-      )
-      if let retainedParents = orderedParents[parentList.node] {
-        guard retainedParents == canonicalParents else {
-          return .collision(node: parentList.node)
-        }
-      } else {
-        orderedParents[parentList.node] = canonicalParents
-      }
-    }
-    return .graph(CausalGraph(
-      parentsByNode: orderedParents,
-      orderedBy: areInIncreasingOrder
-    ))
   }
 
   var containsCycle: Bool {
