@@ -5,97 +5,113 @@
 import Foundation
 import SwiftData
 
-/// One maintenance boundary for accepted Kitchen evidence and its retained dependencies.
-///
-/// A conservative admission budget bounds the existing aggregate reconstruction algorithms.
-/// Oversized evidence remains durable and due for a later opportunity; it is never truncated
-/// to make a destructive decision. No Session expiry policy is introduced here.
+/// One maintenance boundary for accepted Kitchen evidence and retained dependencies.
+/// Each opportunity limits complete aggregate transactions, never dependency evidence.
 @MainActor
 public final class RecordsMaintenanceRepository {
   private let container: ModelContainer
   private let kitchenID: Kitchen.ID
-  private let rowBudget: Int
+  private let batchSize: Int
 
-  public init(modelContainer: ModelContainer, kitchenID: Kitchen.ID, rowBudget: Int = 4_096) {
+  public init(modelContainer: ModelContainer, kitchenID: Kitchen.ID, batchSize: Int = 16) {
     container = modelContainer
     self.kitchenID = kitchenID
-    self.rowBudget = max(1, rowBudget)
+    self.batchSize = max(1, batchSize)
   }
 
-  /// Returns false when safe reconstruction exceeds this opportunity's admission budget.
-  public func run(_ job: RecordsMaintenanceJob, at date: Date) throws -> Bool {
+  /// Nil marks the end of a sweep. A continuation resumes after the last candidate,
+  /// including ineligible candidates; losing it safely repeats already committed work.
+  public func run(_ job: RecordsMaintenanceJob, at date: Date, after: String?) throws -> String? {
     try Task.checkCancellation()
-    guard try admitsReconstruction() else { return false }
-    let recipes = SwiftDataRecipeRepository(modelContainer: container)
     switch job {
-    case .deletedRecipes:
-      _ = try recipes.maintainRecipeEvidence(in: kitchenID, at: date, expireCompactEvidence: false)
+    case .deletedRecipes, .recipeTombstones:
+      return try maintainRecipes(at: date, after: after, expireTombstone: job == .recipeTombstones)
     case .folders:
-      _ = try SwiftDataFolderRepository(modelContainer: container).compact(in: kitchenID, at: date)
+      return try compactFolders(at: date)
     case .tags:
-      _ = try SwiftDataTagRepository(modelContainer: container).compact(in: kitchenID, at: date)
-    case .compactEvidence:
-      try recipes.maintainRecipeTombstones(in: kitchenID, at: date)
-      try maintainOrganization(at: date, removeOldRaw: false)
-    case .orphans:
-      // Late raw copies already represented by reconstructive checkpoints can be removed.
-      // Missing roots, Session evidence, and Recipe payload behind prune frontiers cannot:
-      // those may be incomplete delivery or user-visible Recovery, not disposable orphans.
-      try maintainOrganization(at: date, removeOldRaw: true)
+      return try compactTags(at: date)
+    case .folderCheckpoints, .folderOrphans:
+      return try OrganizationStore<FolderChange>(modelContainer: container, namespace: "folders", recipeID: {
+        if case let .assign(id, _) = $0 { return id }; return nil
+      }).maintainCoveredEvidence(in: kitchenID, at: date, removeOldRaw: job == .folderOrphans,
+                                 after: after, limit: batchSize)
+    case .tagCheckpoints, .tagOrphans:
+      return try OrganizationStore<TagChange>(modelContainer: container, namespace: "tags", recipeID: {
+        if case let .assign(id, _) = $0 { return id }; return nil
+      }).maintainCoveredEvidence(in: kitchenID, at: date, removeOldRaw: job == .tagOrphans,
+                                 after: after, limit: batchSize)
     }
-    return true
   }
 
-  private func maintainOrganization(at date: Date, removeOldRaw: Bool) throws {
-    try OrganizationStore<FolderChange>(modelContainer: container, namespace: "folders", recipeID: {
-      if case let .assign(id, _) = $0 { return id }; return nil
-    }).maintainCoveredEvidence(in: kitchenID, at: date, removeOldRaw: removeOldRaw)
-    try Task.checkCancellation()
-    try OrganizationStore<TagChange>(modelContainer: container, namespace: "tags", recipeID: {
-      if case let .assign(id, _) = $0 { return id }; return nil
-    }).maintainCoveredEvidence(in: kitchenID, at: date, removeOldRaw: removeOldRaw)
+  public func run(_ job: RecordsMaintenanceJob, at date: Date) throws -> Bool {
+    try run(job, at: date, after: nil) == nil
   }
 
-  private func admitsReconstruction() throws -> Bool {
+  private func maintainRecipes(at date: Date, after: String?, expireTombstone: Bool) throws -> String? {
     let context = ModelContext(container)
-    var remaining = rowBudget
-    func admit<T: PersistentModel>(_ type: T.Type) throws -> Bool {
-      var request = FetchDescriptor<T>()
-      request.fetchLimit = remaining + 1
-      let count = try context.fetch(request).count
-      remaining -= count
-      return remaining >= 0
+    let identifier = kitchenID.rawValue
+    let ids: [UUID]
+    if expireTombstone {
+      ids = try context.fetch(FetchDescriptor<RecipePruneRecord>(
+        predicate: #Predicate { $0.kitchenID == identifier }
+      )).map(\.recipeID)
+    } else {
+      ids = try context.fetch(FetchDescriptor<RecipeDeletionRecord>(
+        predicate: #Predicate { $0.kitchenID == identifier }
+      )).map(\.recipeID)
     }
-    let checks: [() throws -> Bool] = [
-      { try admit(KitchenRecord.self) },
-      { try admit(KitchenOwnershipRecord.self) },
-      { try admit(RecipeRecord.self) },
-      { try admit(RecipeDeletionRecord.self) },
-      { try admit(RecipeDeletionResolutionRecord.self) },
-      { try admit(RecipeRevisionRecord.self) },
-      { try admit(RecipeMediaRecord.self) },
-      { try admit(EquipmentRecord.self) },
-      { try admit(IngredientSectionRecord.self) },
-      { try admit(RecipeIngredientRecord.self) },
-      { try admit(InstructionSectionRecord.self) },
-      { try admit(InstructionStepRecord.self) },
-      { try admit(RecipeSaveRecord.self) },
-      { try admit(RecipeSelectionRecord.self) },
-      { try admit(RecipePruneRecord.self) },
-      { try admit(CookingSessionRecord.self) },
-      { try admit(SessionFactRecord.self) },
-      { try admit(SessionClosureRecord.self) },
-      { try admit(SessionDeletionRecord.self) },
-      { try admit(SessionDeletionResolutionRecord.self) },
-      { try admit(OrganizationActionRecord.self) },
-      { try admit(OrganizationCheckpointRecord.self) },
-    ]
-    guard try checks.allSatisfy({ try $0() }) else { return false }
-    // Bound encoded causal history too: one checkpoint can represent many physical rows.
-    let checkpoints = try context.fetch(FetchDescriptor<OrganizationCheckpointRecord>())
-    let actions = try context.fetch(FetchDescriptor<OrganizationActionRecord>())
-    guard checkpoints.reduce(0, { $0 + $1.checkpointData.count })
-      + actions.reduce(0, { $0 + $1.payloadData.count }) <= 512_000 else { return false }
-    return true
+    let repository = SwiftDataRecipeRepository(modelContainer: container)
+    return try maintainPage(ids, after: after, limit: batchSize) { id in
+      try repository.maintainRecipeCandidate(.init(rawValue: id), in: kitchenID, at: date,
+                                            expireTombstone: expireTombstone)
+    }
   }
+
+  private func compactFolders(at date: Date) throws -> String? {
+    let before = try rawCount(namespace: "folders")
+    _ = try SwiftDataFolderRepository(modelContainer: container)
+      .compact(in: kitchenID, at: date, maximumRemovals: batchSize)
+    let after = try rawCount(namespace: "folders")
+    return after > 0 && after < before ? "remaining" : nil
+  }
+
+  private func compactTags(at date: Date) throws -> String? {
+    let before = try rawCount(namespace: "tags")
+    _ = try SwiftDataTagRepository(modelContainer: container)
+      .compact(in: kitchenID, at: date, maximumRemovals: batchSize)
+    let after = try rawCount(namespace: "tags")
+    return after > 0 && after < before ? "remaining" : nil
+  }
+
+  private func rawCount(namespace: String) throws -> Int {
+    let identifier = kitchenID.rawValue
+    return try ModelContext(container).fetchCount(FetchDescriptor<OrganizationActionRecord>(predicate: #Predicate {
+      $0.kitchenID == identifier && $0.namespace == namespace
+    }))
+  }
+}
+
+/// Stable logical-identity continuation; concurrent arrivals behind it enter the next sweep.
+func maintenancePage(_ ids: [UUID], after: String?, limit: Int) -> (ids: Set<UUID>, continuation: String?) {
+  let candidates = Set(ids).sorted { $0.uuidString < $1.uuidString }
+    .filter { id in after.map { id.uuidString > $0 } ?? true }
+  let page = candidates.prefix(limit)
+  return (Set(page), candidates.count > page.count ? page.last?.uuidString : nil)
+}
+
+/// A failed aggregate remains retained and is retried next sweep without starving later identities.
+func maintainPage(_ ids: [UUID], after: String?, limit: Int,
+                  operation: (UUID) throws -> Void) throws -> String? {
+  let page = maintenancePage(ids, after: after, limit: limit)
+  for id in page.ids.sorted(by: { $0.uuidString < $1.uuidString }) {
+    try Task.checkCancellation()
+    do {
+      try operation(id)
+    } catch is CancellationError {
+      throw CancellationError()
+    } catch {
+      continue
+    }
+  }
+  return page.continuation
 }

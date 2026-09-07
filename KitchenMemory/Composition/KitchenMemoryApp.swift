@@ -62,6 +62,9 @@ struct KitchenMemoryApp: App {
       retryStartup: retryPreparation
     )
     .background(startupFrameObserver)
+    .task(id: AppShellPresentation(state: startup.state)) {
+      if scenePhase == .active { startup.state.preparedApp?.recordsMaintenance.launchOpportunity() }
+    }
   }
 
 #if os(macOS)

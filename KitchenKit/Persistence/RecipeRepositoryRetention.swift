@@ -9,17 +9,9 @@ import SwiftData
 extension SwiftDataRecipeRepository {
   /// Revalidates eligibility and commits payload removal with its tombstone atomically.
   public func maintainDeletedRecipes(in kitchenID: Kitchen.ID, at now: Date) throws -> RecipeRetentionResult {
-    try maintainRecipeEvidence(in: kitchenID, at: now, expireCompactEvidence: true)
-  }
-
-  func maintainRecipeEvidence(
-    in kitchenID: Kitchen.ID, at now: Date, expireCompactEvidence: Bool
-  ) throws -> RecipeRetentionResult {
     var result = RecipeRetentionResult()
     try performIsolatedWrite { writer in
-      if expireCompactEvidence {
-        result.expiredTombstoneRecipeIDs = try writer.expireTombstones(in: kitchenID, at: now)
-      }
+      result.expiredTombstoneRecipeIDs = try writer.expireTombstones(in: kitchenID, at: now)
       for item in try writer.deletedRecipes(in: kitchenID) {
         guard let authority = item.recoverableRecipe,
               try writer.retentionWindowHasElapsed(item, at: now),
@@ -31,17 +23,42 @@ extension SwiftDataRecipeRepository {
     return result
   }
 
-  func maintainRecipeTombstones(in kitchenID: Kitchen.ID, at now: Date) throws {
+  /// One complete authority aggregate per transaction; dependencies are never truncated.
+  func maintainRecipeCandidate(_ id: Recipe.ID, in kitchenID: Kitchen.ID, at now: Date,
+                               expireTombstone: Bool) throws {
     try performIsolatedWrite { writer in
-      _ = try writer.expireTombstones(in: kitchenID, at: now)
+      if expireTombstone {
+        _ = try writer.expireTombstones(in: kitchenID, at: now, recipeID: id.rawValue)
+        return
+      }
+      guard case let .deleted(authority) = try writer.recipeAuthority(id: id),
+            authority.recipe.kitchenID == kitchenID else { return }
+      let identifier = id.rawValue
+      let deletions = try writer.context.fetch(FetchDescriptor<RecipeDeletionRecord>(
+        predicate: #Predicate { $0.recipeID == identifier }
+      ))
+      let restored = try Set(writer.context.fetch(FetchDescriptor<RecipeDeletionResolutionRecord>(
+        predicate: #Predicate { $0.recipeID == identifier }
+      )).map(\.deletionID))
+      let item = DeletedRecipe(id: id, authority: .deleted(authority),
+        observedDeletionIDs: deletions.map(\.id).filter { !restored.contains($0) })
+      guard try writer.retentionWindowHasElapsed(item, at: now),
+            try !writer.hasRetainedDependencies(authority) else { return }
+      try writer.prune(authority, at: now)
     }
   }
 
-  private func expireTombstones(in kitchenID: Kitchen.ID, at now: Date) throws -> [Recipe.ID] {
+  private func expireTombstones(
+    in kitchenID: Kitchen.ID, at now: Date, recipeID: UUID? = nil
+  ) throws -> [Recipe.ID] {
     let identifier = kitchenID.rawValue
-    let rows = try context.fetch(FetchDescriptor<RecipePruneRecord>(
-      predicate: #Predicate { $0.kitchenID == identifier }
-    ))
+    let request: FetchDescriptor<RecipePruneRecord>
+    if let recipeID {
+      request = FetchDescriptor(predicate: #Predicate { $0.kitchenID == identifier && $0.recipeID == recipeID })
+    } else {
+      request = FetchDescriptor(predicate: #Predicate { $0.kitchenID == identifier })
+    }
+    let rows = try context.fetch(request)
     var expired: [Recipe.ID] = []
     for (recipeID, records) in Dictionary(grouping: rows, by: \.recipeID) {
       guard records.allSatisfy({ now >= $0.antiResurrectionUntil && now >= retentionHorizon(after: $0.prunedAt) }),

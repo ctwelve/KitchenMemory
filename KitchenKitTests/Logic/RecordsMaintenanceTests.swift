@@ -8,6 +8,23 @@ import XCTest
 final class RecordsMaintenanceTests: XCTestCase {
   private let start = Date(timeIntervalSince1970: 1_700_000_000)
 
+  func testFailedAggregateDoesNotStarveLaterCandidatesAndCancellationStopsThePage() throws {
+    enum Failure: Error { case unavailable }
+    let ids = (0..<3).map { _ in UUID() }.sorted { $0.uuidString < $1.uuidString }
+    var visited: [UUID] = []
+    XCTAssertNil(try maintainPage(ids, after: nil, limit: 3) { id in
+      visited.append(id)
+      if id == ids[0] { throw Failure.unavailable }
+    })
+    XCTAssertEqual(visited, ids)
+    visited = []
+    XCTAssertThrowsError(try maintainPage(ids, after: nil, limit: 3) { id in
+      visited.append(id)
+      throw CancellationError()
+    })
+    XCTAssertEqual(visited, [ids[0]])
+  }
+
   func testInterruptedJobsRemainDueAfterRelaunchWithoutStarvingOtherJobs() throws {
     var schedule = RecordsMaintenanceSchedule()
     XCTAssertEqual(schedule.next(at: start), .deletedRecipes)

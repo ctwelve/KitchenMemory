@@ -20,6 +20,31 @@ final class AppStartupCoordinatorTests: XCTestCase {
     }
   }
 
+  func testExpiredBackgroundPreparationCannotPublishOrStartMaintenance() async throws {
+    let app = try AppRuntime.testing(.init(library: .empty))
+    let started = expectation(description: "background preparation started")
+    var continuation: CheckedContinuation<AppStartupState, Never>?
+    var attempts = 0
+    let coordinator = AppStartupCoordinator(prepareApplication: {
+      attempts += 1
+      if attempts > 1 { return .ready(app) }
+      return await withCheckedContinuation {
+        continuation = $0
+        started.fulfill()
+      }
+    }, recordMilestone: { _ in })
+    let background = Task { await coordinator.performBackgroundMaintenance() }
+    await fulfillment(of: [started], timeout: 1)
+    background.cancel()
+    continuation?.resume(returning: .ready(app))
+    await background.value
+    XCTAssertNil(coordinator.state.preparedApp)
+    coordinator.startupSurfacePresented()
+    await coordinator.performBackgroundMaintenance()
+    XCTAssertNotNil(coordinator.state.preparedApp)
+    XCTAssertEqual(attempts, 2)
+  }
+
   func testBackgroundPreparationIsReusedWhenTheFirstWindowAppears() async throws {
     let app = try AppRuntime.testing(.init(library: .empty))
     var attempts = 0

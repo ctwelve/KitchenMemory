@@ -2,7 +2,8 @@
 
 `RecordsMaintenanceRepository` applies the existing evidence policies through one
 clock-driven boundary. `RecordsMaintenanceSchedule` keeps only local scheduling
-hints: the last completed opportunity for each job and the next job to consider.
+hints: the last completed opportunity for each job, its candidate continuation,
+and the next job to consider.
 Losing those hints repeats idempotent work. Evidence, never the hints, decides
 whether removal is safe.
 
@@ -24,16 +25,28 @@ execution deadlines. A Folder or Tag deletion never becomes a restorable item
 in Deleted Items. Five years is a minimum for aliases and suppression evidence,
 not a command to erase still-needed history.
 
-## Bounded admission
+## Bounded transactions and resumable progress
 
-Each job currently admits at most 4,096 physical records across the dependency
-store and 512,000 bytes of encoded organization history. The existing aggregate
-reconstruction algorithms require complete evidence, so an oversized store is
-left intact and the job remains due. Neither slicing an incomplete prefix nor
-ignoring dependencies is a safe substitute. This conservative admission limit
-bounds automatic work; it does not promise progress for arbitrarily large stores.
-A future maintenance implementation can add resumable aggregate indexing and
-larger-store processing behind the same boundary without changing retention law.
+Each Recipe job considers at most 16 logical identities per opportunity, with
+one isolated transaction per complete Recipe aggregate. A stable identity
+continuation advances past ineligible or failing candidates as well as completed
+ones. New arrivals behind a continuation are considered in the next sweep.
+Losing the continuation repeats safe work. No unrelated store-size threshold
+can disable maintenance.
+
+Folder and Tag each form a complete `(Kitchen, namespace)` causal aggregate.
+A compaction opportunity validates that aggregate, creates at most one
+checkpoint and removes at most 16 covered raw rows. Later opportunities reuse
+that checkpoint while draining covered rows. Compact-evidence and orphan sweeps
+also page by stable logical identity, considering at most 16 candidates each.
+
+The guarantee is a bounded transaction/candidate count, with cancellation
+between transactions and a yield between jobs. Candidate enumeration and work
+inside a transaction remain proportional to complete evidence and dependencies;
+this is not a constant CPU, memory or wall-clock bound. Format-1 checkpoints
+require complete ancestral receipts, so truncating a causal prefix to meet a
+byte cap would be unsafe. Strict size-independent processing would require a
+separately designed segmented evidence format, not a silent admission cliff.
 
 ## Session and deeper-clean boundary
 

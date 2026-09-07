@@ -9,14 +9,17 @@ public enum RecordsMaintenanceJob: String, CaseIterable, Codable, Sendable {
   case deletedRecipes
   case folders
   case tags
-  case compactEvidence
-  case orphans
+  case recipeTombstones
+  case folderCheckpoints
+  case tagCheckpoints
+  case folderOrphans
+  case tagOrphans
 
   public var interval: TimeInterval {
     switch self {
     case .deletedRecipes, .folders, .tags: 6 * 3_600
-    case .compactEvidence: 86_400
-    case .orphans: 7 * 86_400
+    case .recipeTombstones, .folderCheckpoints, .tagCheckpoints: 86_400
+    case .folderOrphans, .tagOrphans: 7 * 86_400
     }
   }
 }
@@ -25,6 +28,7 @@ public enum RecordsMaintenanceJob: String, CaseIterable, Codable, Sendable {
 public struct RecordsMaintenanceSchedule: Codable, Equatable, Sendable {
   private var completedAt: [RecordsMaintenanceJob: Date] = [:]
   private var nextIndex = 0
+  private var continuations: [RecordsMaintenanceJob: String] = [:]
 
   public init() {}
 
@@ -42,7 +46,12 @@ public struct RecordsMaintenanceSchedule: Codable, Equatable, Sendable {
     }
   }
 
-  public mutating func record(_ job: RecordsMaintenanceJob, at date: Date, completed: Bool) {
+  public func continuation(for job: RecordsMaintenanceJob) -> String? { continuations[job] }
+
+  public mutating func record(
+    _ job: RecordsMaintenanceJob, at date: Date, completed: Bool, continuation: String? = nil
+  ) {
+    continuations[job] = continuation
     if completed { completedAt[job] = date }
     nextIndex = (RecordsMaintenanceJob.allCases.firstIndex(of: job)! + 1)
       % RecordsMaintenanceJob.allCases.count

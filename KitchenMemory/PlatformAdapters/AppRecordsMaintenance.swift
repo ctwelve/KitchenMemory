@@ -22,6 +22,7 @@ final class AppRecordsMaintenance: NSObject {
   private var schedule: RecordsMaintenanceSchedule
   private var observation: SynchronizationObservation
   private let observesCloud: Bool
+  private let automaticallyRuns: Bool
   private let refresh: () -> Void
   private let showRisk: (Bool) -> Void
   private let now: () -> Date
@@ -45,6 +46,7 @@ final class AppRecordsMaintenance: NSObject {
       try? JSONDecoder().decode(SynchronizationObservation.self, from: $0)
     } ?? SynchronizationObservation(beganObservingAt: now())
     self.now = now
+    self.automaticallyRuns = automaticallyRuns
     self.observesCloud = observesCloud
     self.refresh = refresh
     self.showRisk = showRisk
@@ -69,7 +71,6 @@ final class AppRecordsMaintenance: NSObject {
     NotificationCenter.default.addObserver(self, selector: #selector(foreground),
       name: UIApplication.didBecomeActiveNotification, object: nil)
 #endif
-    opportunity()
   }
 
   isolated deinit {
@@ -98,12 +99,18 @@ final class AppRecordsMaintenance: NSObject {
     opportunity()
   }
 
+  func launchOpportunity() {
+    guard automaticallyRuns else { return }
+    opportunity()
+  }
+
   func performOpportunity() async {
     opportunity()
+    let runningTask = task
     await withTaskCancellationHandler {
-      await task?.value
+      await runningTask?.value
     } onCancel: {
-      Task { @MainActor [weak self] in self?.task?.cancel() }
+      runningTask?.cancel()
     }
   }
 
@@ -119,14 +126,18 @@ final class AppRecordsMaintenance: NSObject {
       for job in schedule.due(at: now()) {
         guard !Task.isCancelled else { break }
         let date = now()
-        let completed = (try? repository.run(job, at: date)) == true
-        schedule.record(job, at: date, completed: completed)
+        do {
+          let continuation = try repository.run(job, at: date, after: schedule.continuation(for: job))
+          schedule.record(job, at: date, completed: continuation == nil, continuation: continuation)
+        } catch {
+          schedule.record(job, at: date, completed: false, continuation: schedule.continuation(for: job))
+        }
         if let encoded = try? JSONEncoder().encode(schedule) {
           defaults?.set(encoded, forKey: key + ".schedule")
         }
         await Task.yield()
       }
-      refresh()
+      if !Task.isCancelled { refresh() }
     }
   }
 
