@@ -20,25 +20,25 @@ final class AppRecordsMaintenanceTests: XCTestCase {
         now: { date }, refresh: { refreshes += 1 }, showRisk: { warnings.append($0) })
     }
     var adapter: AppRecordsMaintenance? = makeAdapter()
-    XCTAssertTrue(adapter?.storeIdentifiers.isEmpty == true)
+    XCTAssertTrue(try XCTUnwrap(adapter).storeIdentifiers.isEmpty)
     await adapter?.performOpportunity()
-    XCTAssertEqual(warnings.last, false)
+    XCTAssertFalse(try XCTUnwrap(warnings.last))
     XCTAssertEqual(refreshes, 1)
     adapter = nil
     date = date.addingTimeInterval(8 * 86_400)
     adapter = makeAdapter()
     await adapter?.performOpportunity()
-    XCTAssertEqual(warnings.last, true)
+    XCTAssertTrue(try XCTUnwrap(warnings.last))
     adapter?.observedSuccessfulTransfer(at: date)
     await adapter?.performOpportunity()
-    XCTAssertEqual(warnings.last, false)
+    XCTAssertFalse(try XCTUnwrap(warnings.last))
     adapter = nil
     adapter = makeAdapter()
     await adapter?.performOpportunity()
-    XCTAssertEqual(warnings.last, false)
+    XCTAssertFalse(try XCTUnwrap(warnings.last))
     date = date.addingTimeInterval(8 * 86_400)
     adapter = makeAdapter(cloud: false)
     await adapter?.performOpportunity()
-    XCTAssertEqual(warnings.last, false)
+    XCTAssertFalse(try XCTUnwrap(warnings.last))
   }
 }
