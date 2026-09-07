@@ -32,6 +32,7 @@ extension FolderChange {
     case let .rename(id, _): return "name:\(id.rawValue.uuidString)"
     case let .assign(recipeID, _): return "membership:\(recipeID.rawValue.uuidString)"
     case .ordering: return "folder-ordering"
+    case .systemViewVisible: return "folder-system-view"
     default: return nil
     }
   }

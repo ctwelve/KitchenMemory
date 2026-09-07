@@ -26,6 +26,7 @@ struct RecipeEditorView: View {
     }
   }
 
+  let organization: RecipeOrganizationModel?
   let mode: Mode
   let save: () -> Bool
   let close: () -> Void
@@ -38,10 +39,12 @@ struct RecipeEditorView: View {
   init(
     mode: Mode,
     editor: RecipeEditingModel,
+    organization: RecipeOrganizationModel? = nil,
     close: @escaping () -> Void,
     discard: @escaping () -> Void,
     save: @escaping () -> Bool
   ) {
+    self.organization = organization
     self.mode = mode
     self.save = save
     self.reviewConcerns = editor.concerns
@@ -103,6 +106,10 @@ struct RecipeEditorView: View {
 private extension RecipeEditorView {
   @ViewBuilder
   private var editorSections: some View {
+    if let organization {
+      RecipeOrganizationEditor(model: organization, draft: editor.draft)
+      OrganizationManagementButton(model: organization)
+    }
     if editor.draft.reconciliation != nil {
       RecipeReconciliationView(editor: editor)
     }

@@ -31,8 +31,12 @@ struct LibraryDetailRouter: View {
         RecipeDeletedItemsSection(model: libraryModel)
       }
     case .recovery:
-      CookingSessionRecoveryView(recipeCount: libraryModel.recoveryRecipes.count,
-                                 recipeContent: { RecipeRecoverySection(model: libraryModel) }, model: sessionModel)
+      CookingSessionRecoveryView(
+        recipeCount: libraryModel.recoveryRecipes.count + (libraryModel.organization?.collisionCount ?? 0),
+                                 recipeContent: {
+        RecipeRecoverySection(model: libraryModel)
+        if let organization = libraryModel.organization { OrganizationCollisionsView(model: organization) }
+      }, model: sessionModel)
     case .history, .session(_, history: .some):
       CookingSessionHistoryView(model: sessionModel)
     case .session:
@@ -49,8 +53,21 @@ struct LibraryDetailRouter: View {
     if let selectedRecipe = libraryModel.selectedRecipe {
       RecipeDetailView(storedRecipe: selectedRecipe)
         .id(selectedRecipe.revision.id)
+        .safeAreaInset(edge: .top, alignment: .leading) {
+          if let organization = libraryModel.organization {
+            RecipeOrganizationSummary(model: organization, recipeID: selectedRecipe.id).padding(.horizontal)
+          }
+        }
         .modifier(RecipeDeletionPresentation(model: libraryModel, recipe: selectedRecipe))
         .toolbar {
+          if let organization = libraryModel.organization {
+            ToolbarItem(placement: .primaryAction) {
+              Menu(.organizationTitle, systemImage: "folder") {
+                RecipeOrganizationMenus(model: organization, recipeIDs: [selectedRecipe.id])
+              }
+            }
+            ToolbarItem(placement: .secondaryAction) { OrganizationManagementButton(model: organization) }
+          }
           if let comparison = libraryModel.reconciliations.first(where: { $0.recipeID == selectedRecipe.id }) {
             ToolbarItem(placement: .primaryAction) {
               Button { libraryModel.beginReconciliation(comparison) } label: {

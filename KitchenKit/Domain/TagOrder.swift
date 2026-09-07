@@ -40,3 +40,14 @@ extension TagLibrary {
   }
 
 }
+
+extension TagLibrary {
+  public var systemViewVisible: Bool {
+    get throws {
+      let evidence = try OrganizationEvidence(actions, checkpoints: checkpointEvidence)
+      let choices = evidence.actions.filter { if case .systemViewVisible = $0.payload { return true }; return false }
+      if case let .systemViewVisible(visible) = evidence.winner(in: choices)?.payload { return visible }
+      return true
+    }
+  }
+}

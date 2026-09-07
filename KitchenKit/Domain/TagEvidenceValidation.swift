@@ -28,7 +28,7 @@ enum TagEvidenceValidation {
       try validateName(name)
     case let .reorder(id, anchor):
       guard id != anchor else { throw TagError.invalidEvidence }
-    case .remove, .assign, .delete, .ordering: break
+    case .remove, .assign, .delete, .ordering, .systemViewVisible: break
     }
   }
 

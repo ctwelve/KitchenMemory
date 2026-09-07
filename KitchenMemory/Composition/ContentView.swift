@@ -69,6 +69,10 @@ struct ContentView: View {
       Text(.sessionEntryDetachedMessage)
     }
     .modifier(RecipeDraftFailureAlert(model: preparedApp?.libraryModel))
+    .alert(.organizationFailed, isPresented: Binding(
+      get: { preparedApp?.libraryModel.organization?.failed == true },
+      set: { preparedApp?.libraryModel.organization?.failed = $0 }
+    )) { Button(.actionCancel, role: .cancel) {} } message: { Text(.organizationFailureMessage) }
     .modifier(LibraryMenuBridge(
       actions: libraryActions, isAvailable: activeSheet == nil && !isShowingResetConfirmation
     ))
@@ -154,7 +158,12 @@ struct ContentView: View {
       if preparedApp?.libraryModel.editor != nil {
         persistentDetail
       } else {
-        NavigationStack { persistentDetail }
+        NavigationStack {
+          persistentDetail
+#if os(iOS)
+            .toolbar { detailSidebarNavigation }
+#endif
+        }
       }
     }
 #if os(macOS)
@@ -233,6 +242,9 @@ struct ContentView: View {
           sessionModel: dependencies.sessionModel,
           presentsEditor: false
         )
+#if os(iOS)
+        .toolbar { detailSidebarNavigation }
+#endif
       }
     }
     .sheet(item: $activeSheet) { _ in
@@ -266,6 +278,17 @@ private extension ContentView {
       set: { if !$0 { preparedApp?.libraryModel.closeEditor() } }
     )
   }
+
+#if os(iOS)
+  @ToolbarContentBuilder
+  var detailSidebarNavigation: some ToolbarContent {
+    if usesCustomSidebarToggle {
+      LibrarySidebarToggle(title: .librarySidebarActionShow) {
+        withAnimation { columnVisibility = .all }
+      }
+    }
+  }
+#endif
 
   @ToolbarContentBuilder
   var libraryToolbar: some ToolbarContent {

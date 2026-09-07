@@ -1,6 +1,1038 @@
 {
   "sourceLanguage" : "en-US",
   "strings" : {
+  "organization.discard-rejected": {
+    "comment": "Discard only a definitively rejected local organization command; accepted organization is not undone.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Discard Rejected Change"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Abandonner la modification refusée"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Descartar cambio rechazado"
+        }
+      }
+    }
+  },
+  "organization.add-tag": {
+    "comment": "Recipe Library organization: Add Tag. Folder location and Tag classification are independent of Recipe content.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Add Tag"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Agregar etiqueta"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ajouter une étiquette"
+        }
+      }
+    }
+  },
+  "organization.after": {
+    "comment": "Recipe Library organization: Move After. Folder location and Tag classification are independent of Recipe content.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Move After"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Mover después de"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Déplacer après"
+        }
+      }
+    }
+  },
+  "organization.all": {
+    "comment": "Recipe Library organization: All Recipes. Folder location and Tag classification are independent of Recipe content.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "All Recipes"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Todas las recetas"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Toutes les recettes"
+        }
+      }
+    }
+  },
+  "organization.alphabetical": {
+    "comment": "Recipe Library organization: Alphabetical. Folder location and Tag classification are independent of Recipe content.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Alphabetical"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Alfabético"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Alphabétique"
+        }
+      }
+    }
+  },
+  "organization.apply": {
+    "comment": "Recipe Library organization: Apply. Folder location and Tag classification are independent of Recipe content.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Apply"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Aplicar"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Appliquer"
+        }
+      }
+    }
+  },
+  "organization.collapse": {
+    "comment": "Recipe Library organization: Collapse Folder. Folder location and Tag classification are independent of Recipe content.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Collapse Folder"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Contraer carpeta"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Réduire le dossier"
+        }
+      }
+    }
+  },
+  "organization.collisions": {
+    "comment": "Recipe Library organization: Organization Collisions. Folder location and Tag classification are independent of Recipe content.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Organization Collisions"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Conflictos de organización"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Collisions d’organisation"
+        }
+      }
+    }
+  },
+  "organization.delete": {
+    "comment": "Recipe Library organization: Delete Organization. Folder location and Tag classification are independent of Recipe content.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Delete Organization"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Eliminar organización"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Supprimer l’organisation"
+        }
+      }
+    }
+  },
+  "organization.delete-message": {
+    "comment": "Recipe Library organization: Folders and Tags disappear immediately. Recipes are kept.. Folder location and Tag classification are independent of Recipe content.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Folders and Tags disappear immediately. Recipes are kept."
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Las carpetas y etiquetas desaparecen de inmediato. Las recetas se conservan."
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Les dossiers et les étiquettes disparaissent immédiatement. Les recettes sont conservées."
+        }
+      }
+    }
+  },
+  "organization.done": {
+    "comment": "Recipe Library organization: Done. Folder location and Tag classification are independent of Recipe content.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Done"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Listo"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Terminé"
+        }
+      }
+    }
+  },
+  "organization.expand": {
+    "comment": "Recipe Library organization: Expand Folder. Folder location and Tag classification are independent of Recipe content.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Expand Folder"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Expandir carpeta"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Développer le dossier"
+        }
+      }
+    }
+  },
+  "organization.failed": {
+    "comment": "Recipe Library organization: Organization Needs Attention. Folder location and Tag classification are independent of Recipe content.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Organization Needs Attention"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "La organización requiere atención"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "L’organisation nécessite votre attention"
+        }
+      }
+    }
+  },
+  "organization.failure-message": {
+    "comment": "Recipe Library organization: The change could not be completed. Check names and destinations, or retry any retained change in Recovery.. Folder location and Tag classification are independent of Recipe content.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The change could not be completed. Check names and destinations, or retry any retained change in Recovery."
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "No se pudo completar el cambio. Revisa los nombres y destinos, o reintenta un cambio conservado en Recuperación."
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "La modification n’a pas pu être effectuée. Vérifiez les noms et les destinations, ou réessayez une modification conservée dans Récupération."
+        }
+      }
+    }
+  },
+  "organization.first": {
+    "comment": "Recipe Library organization: Move to Beginning. Folder location and Tag classification are independent of Recipe content.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Move to Beginning"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Mover al principio"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Déplacer au début"
+        }
+      }
+    }
+  },
+  "organization.folders": {
+    "comment": "Recipe Library organization: Folders. Folder location and Tag classification are independent of Recipe content.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Folders"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Carpetas"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Dossiers"
+        }
+      }
+    }
+  },
+  "organization.immediate": {
+    "comment": "Recipe Library organization: Changes apply immediately. Folder location and Tag classification are independent of Recipe content.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Changes apply immediately"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Los cambios se aplican de inmediato"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Les modifications s’appliquent immédiatement"
+        }
+      }
+    }
+  },
+  "organization.manage": {
+    "comment": "Recipe Library organization: Manage Organization. Folder location and Tag classification are independent of Recipe content.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Manage Organization"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Administrar organización"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Gérer l’organisation"
+        }
+      }
+    }
+  },
+  "organization.manual": {
+    "comment": "Recipe Library organization: Manual. Folder location and Tag classification are independent of Recipe content.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Manual"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Manual"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Manuel"
+        }
+      }
+    }
+  },
+  "organization.merge": {
+    "comment": "Recipe Library organization: Merge. Folder location and Tag classification are independent of Recipe content.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Merge"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Fusionar"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Fusionner"
+        }
+      }
+    }
+  },
+  "organization.merge-confirm": {
+    "comment": "Recipe Library organization: Merge these identities?. Folder location and Tag classification are independent of Recipe content.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Merge these identities?"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "¿Fusionar estas identidades?"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Fusionner ces identités?"
+        }
+      }
+    }
+  },
+  "organization.merge-message": {
+    "comment": "Recipe Library organization: Assignments are combined under the oldest identity. Recipes are kept.. Folder location and Tag classification are independent of Recipe content.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Assignments are combined under the oldest identity. Recipes are kept."
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Las asignaciones se combinan bajo la identidad más antigua. Las recetas se conservan."
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Les attributions sont réunies sous l’identité la plus ancienne. Les recettes sont conservées."
+        }
+      }
+    }
+  },
+  "organization.move": {
+    "comment": "Recipe Library organization: Move to Folder. Folder location and Tag classification are independent of Recipe content.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Move to Folder"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Mover a una carpeta"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Déplacer vers un dossier"
+        }
+      }
+    }
+  },
+  "organization.name": {
+    "comment": "Recipe Library organization: Name. Folder location and Tag classification are independent of Recipe content.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Name"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Nombre"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Nom"
+        }
+      }
+    }
+  },
+  "organization.new-folder": {
+    "comment": "Recipe Library organization: New Folder. Folder location and Tag classification are independent of Recipe content.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "New Folder"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Nueva carpeta"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Nouveau dossier"
+        }
+      }
+    }
+  },
+  "organization.new-tag": {
+    "comment": "Recipe Library organization: New Tag. Folder location and Tag classification are independent of Recipe content.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "New Tag"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Nueva etiqueta"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Nouvelle étiquette"
+        }
+      }
+    }
+  },
+  "organization.ordering": {
+    "comment": "Recipe Library organization: Ordering. Folder location and Tag classification are independent of Recipe content.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ordering"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Orden"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ordre"
+        }
+      }
+    }
+  },
+  "organization.parent": {
+    "comment": "Recipe Library organization: Parent Folder. Folder location and Tag classification are independent of Recipe content.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Parent Folder"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Carpeta superior"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Dossier parent"
+        }
+      }
+    }
+  },
+  "organization.pending": {
+    "comment": "Recipe Library organization: Saved with the new Recipe. Folder location and Tag classification are independent of Recipe content.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Saved with the new Recipe"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Se guarda con la nueva receta"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Enregistré avec la nouvelle recette"
+        }
+      }
+    }
+  },
+  "organization.remove-tag": {
+    "comment": "Recipe Library organization: Remove Tag. Folder location and Tag classification are independent of Recipe content.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Remove Tag"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Quitar etiqueta"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Retirer une étiquette"
+        }
+      }
+    }
+  },
+  "organization.rename": {
+    "comment": "Recipe Library organization: Rename. Folder location and Tag classification are independent of Recipe content.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Rename"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Cambiar nombre"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Renommer"
+        }
+      }
+    }
+  },
+  "organization.retry": {
+    "comment": "Recipe Library organization: Retry Organization Change. Folder location and Tag classification are independent of Recipe content.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Retry Organization Change"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Reintentar cambio de organización"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Réessayer la modification d’organisation"
+        }
+      }
+    }
+  },
+  "organization.root": {
+    "comment": "Recipe Library organization: Kitchen Root. Folder location and Tag classification are independent of Recipe content.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Kitchen Root"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Raíz de la cocina"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Racine de la cuisine"
+        }
+      }
+    }
+  },
+  "organization.search": {
+    "comment": "Recipe Library organization: Search Recipes. Folder location and Tag classification are independent of Recipe content.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Search Recipes"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Buscar recetas"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Rechercher des recettes"
+        }
+      }
+    }
+  },
+  "organization.select": {
+    "comment": "Recipe Library organization: Select Recipes. Folder location and Tag classification are independent of Recipe content.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Select Recipes"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Seleccionar recetas"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Sélectionner des recettes"
+        }
+      }
+    }
+  },
+  "organization.show-folders": {
+    "comment": "Recipe Library organization: Show Folders on This Device. Folder location and Tag classification are independent of Recipe content.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Show Folders on This Device"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Mostrar carpetas en este dispositivo"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Afficher les dossiers sur cet appareil"
+        }
+      }
+    }
+  },
+  "organization.show-tags": {
+    "comment": "Recipe Library organization: Show Tags on This Device. Folder location and Tag classification are independent of Recipe content.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Show Tags on This Device"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Mostrar etiquetas en este dispositivo"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Afficher les étiquettes sur cet appareil"
+        }
+      }
+    }
+  },
+  "organization.show-unfiled": {
+    "comment": "Recipe Library organization: Show Unfiled. Folder location and Tag classification are independent of Recipe content.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Show Unfiled"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Mostrar Sin carpeta"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Afficher Sans dossier"
+        }
+      }
+    }
+  },
+  "organization.show-untagged": {
+    "comment": "Recipe Library organization: Show Untagged. Folder location and Tag classification are independent of Recipe content.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Show Untagged"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Mostrar Sin etiquetas"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Afficher Sans étiquette"
+        }
+      }
+    }
+  },
+  "organization.tags": {
+    "comment": "Recipe Library organization: Tags. Folder location and Tag classification are independent of Recipe content.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Tags"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Etiquetas"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Étiquettes"
+        }
+      }
+    }
+  },
+  "organization.title": {
+    "comment": "Recipe Library organization: Organization. Folder location and Tag classification are independent of Recipe content.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Organization"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Organización"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Organisation"
+        }
+      }
+    }
+  },
+  "organization.unfiled": {
+    "comment": "Recipe Library organization: Unfiled. Folder location and Tag classification are independent of Recipe content.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Unfiled"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Sin carpeta"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Sans dossier"
+        }
+      }
+    }
+  },
+  "organization.untagged": {
+    "comment": "Recipe Library organization: Untagged. Folder location and Tag classification are independent of Recipe content.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Untagged"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Sin etiquetas"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Sans étiquette"
+        }
+      }
+    }
+  },
 
   "recipe.recovery.title": {
     "comment": "Recipe Recovery: incomplete evidence and explicitly lossy creation of a new local draft.",

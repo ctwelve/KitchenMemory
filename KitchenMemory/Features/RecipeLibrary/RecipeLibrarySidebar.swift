@@ -18,6 +18,9 @@ struct RecipeLibrarySidebar: View {
   var body: some View {
     List(selection: recipeSelection) {
       sessionSection
+      if let organization = model.organization {
+        OrganizationSidebar(model: organization, recipes: model.recipes)
+      }
       recipeSection
     }
     // This identifies the durable shell itself; a ready-only section marker
@@ -64,10 +67,11 @@ struct RecipeLibrarySidebar: View {
       }
       .accessibilityIdentifier("deleted-items-destination")
 
-      if sessionModel.showsRecoveryDestination {
+      if sessionModel.showsRecoveryDestination || model.organization?.requiresRecovery == true {
         Button(action: showRecovery) {
           Label(.recoveryTitle, systemImage: "wrench.and.screwdriver")
-            .badge(sessionModel.recoveryItemCount + model.recoveryRecipes.count)
+            .badge(
+              sessionModel.recoveryItemCount + model.recoveryRecipes.count + (model.organization?.collisionCount ?? 0))
         }
         .accessibilityIdentifier("recovery-destination")
       }
@@ -95,9 +99,28 @@ struct RecipeLibrarySidebar: View {
           }
           .accessibilityIdentifier("reconcile-recipe-\(comparison.recipeID.rawValue.uuidString)")
         }
-        ForEach(model.recipes, id: \.recipe.id) { storedRecipe in
+        ForEach(
+          model.organization?.recipes(model.recipes, locale: locale) ?? model.recipes, id: \.recipe.id
+        ) { storedRecipe in
+          if let organization = model.organization, organization.selecting {
+            Toggle(storedRecipe.revision.title, isOn: Binding(get: {
+              organization.selectedRecipes.contains(storedRecipe.id)
+            }, set: { selected in
+              if selected {
+                organization.selectedRecipes.insert(storedRecipe.id)
+              } else {
+                organization.selectedRecipes.remove(storedRecipe.id)
+              }
+            }))
+          }
           NavigationLink(value: storedRecipe.recipe.id) {
             RecipeRow(storedRecipe: storedRecipe)
+          }
+          .draggable("km-recipe:" + storedRecipe.id.rawValue.uuidString)
+          .contextMenu {
+            if let organization = model.organization {
+              RecipeOrganizationMenus(model: organization, recipeIDs: [storedRecipe.id])
+            }
           }
           .accessibilityIdentifier("recipe-row-\(storedRecipe.recipe.id.rawValue.uuidString)")
           ForEach(sessionModel.sidebarSessions(for: storedRecipe.recipe.id), id: \.id) { session in

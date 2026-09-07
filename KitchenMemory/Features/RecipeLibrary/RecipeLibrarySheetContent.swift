@@ -33,6 +33,7 @@ struct RecipeEditingDestination: View {
     RecipeEditorView(
       mode: editor.isImportCandidate ? .importReview : (editor.original == nil ? .create : .revise),
       editor: editor,
+      organization: model.organization,
       close: model.closeEditor,
       discard: { model.discardEditor(confirmed: true) },
       save: {

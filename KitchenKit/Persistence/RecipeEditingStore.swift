@@ -14,12 +14,15 @@ public struct RecipeEditingRecord: Codable, Equatable {
   public var isImportCandidate: Bool?
   public var importIdentifier: String?
   public var phase: RecipeAuthoringPhase?
+  public var organization: PendingRecipeOrganization?
+  public var pendingOrganization: RecipeOrganizationCommand?
   public var reconciliation: RecipeReconciliation?
 
   public init(id: UUID, original: StoredRecipe?, concerns: [RecipeImportConcern], session: RecipeEditSession,
               observedSelectionIDs: [RecipeSelectionCommand.ID], pendingSave: RecipeSaveCommand? = nil,
               isImportCandidate: Bool? = nil, importIdentifier: String? = nil, phase: RecipeAuthoringPhase? = nil,
-              reconciliation: RecipeReconciliation? = nil) {
+              reconciliation: RecipeReconciliation? = nil, organization: PendingRecipeOrganization? = nil,
+              pendingOrganization: RecipeOrganizationCommand? = nil) {
     self.id = id
     self.original = original
     self.concerns = concerns
@@ -30,6 +33,8 @@ public struct RecipeEditingRecord: Codable, Equatable {
     self.importIdentifier = importIdentifier
     self.phase = phase
     self.reconciliation = reconciliation
+    self.organization = organization
+    self.pendingOrganization = pendingOrganization
   }
 }
 
