@@ -83,7 +83,7 @@ final class SampleRecipeCatalogTests: XCTestCase {
     func testTunaNoodleHotdishVariantsCarryObservedTimings() throws {
         let reference = try XCTUnwrap(SampleRecipeCatalog.loadManifest().recipes.first)
 
-        for localeIdentifier in ["en-US", "fr-CA", "es-MX"] {
+        for localeIdentifier in ["en-US", "en-GB", "fr-CA", "es-MX"] {
             let variant = try XCTUnwrap(
                 reference.variant(preferredLanguages: [localeIdentifier])
             )
@@ -99,6 +99,7 @@ final class SampleRecipeCatalogTests: XCTestCase {
         let reference = try XCTUnwrap(SampleRecipeCatalog.loadManifest().recipes.first)
         let expectedAuthors = [
             "en-US": "Kitchen Memory contributors",
+            "en-GB": "Kitchen Memory contributors",
             "es-MX": "Colaboradores de Memoria de cocina",
             "fr-CA": "Contributeurs de Mémoire de cuisine",
         ]
@@ -200,6 +201,8 @@ final class SampleRecipeCatalogTests: XCTestCase {
             "fr-CA",
             "A same-language variant should win before a later exact preference."
         )
+        XCTAssertEqual(reference.variant(preferredLanguages: ["en-GB"])?.localeIdentifier, "en-GB")
+        XCTAssertEqual(reference.variant(preferredLanguages: ["en-AU"])?.localeIdentifier, "en-US")
         XCTAssertEqual(reference.variant(preferredLanguages: ["es-MX"])?.localeIdentifier, "es-MX")
         XCTAssertEqual(reference.variant(preferredLanguages: ["de-DE"])?.localeIdentifier, "en-US")
         XCTAssertEqual(reference.variant(preferredLanguages: [])?.localeIdentifier, "en-US")
@@ -208,7 +211,7 @@ final class SampleRecipeCatalogTests: XCTestCase {
     func testLocalizedSamplesCarryMatchingAuthoredLanguageAndDistinctIdentity() throws {
         let manifest = try SampleRecipeCatalog.loadManifest()
 
-        for localeIdentifier in ["en-US", "fr-CA", "es-MX"] {
+        for localeIdentifier in ["en-US", "en-GB", "fr-CA", "es-MX"] {
             let references = try SampleRecipeCatalog.localizedRecipes(
                 in: manifest,
                 preferredLanguages: [localeIdentifier]

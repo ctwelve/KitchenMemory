@@ -103,7 +103,7 @@ final class KitchenMemoryUITests: XCTestCase {
 
   @MainActor
   func testLocalizedShellSurvivesDoubledTextAndRightToLeftDirection() {
-    for language in ["en-US", "es-MX", "fr-CA"] {
+    for language in ["en-US", "en-GB", "es-MX", "fr-CA"] {
       let app = launchApp(additionalArguments: [
         "-AppleLanguages", "(\(language))", "-AppleLocale", language,
         "-NSDoubleLocalizedStrings", "YES",
