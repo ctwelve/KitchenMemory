@@ -60,5 +60,5 @@ at least five years of anti-resurrection evidence. Dominated rename and ordering
 mode payloads can be dropped. Assignment dots, observed-removal receipts,
 creation, deletion, aliases, and neighbor evidence remain reconstructive in the
 checkpoint. Old exact retries cannot restore removed membership. Automatic
-scheduling and further bounded retention belong to
-[#112](https://github.com/ctwelve/KitchenMemory/issues/112).
+scheduling and conservative retention share the
+[records-maintenance boundary](records-maintenance.md).

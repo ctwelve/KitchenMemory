@@ -132,6 +132,21 @@ final class AppStartupCoordinator: ObservableObject {
     prepareIfNeeded()
   }
 
+  /// A system-granted background launch need not present a window to prepare the same graph.
+  func performBackgroundMaintenance() async {
+    guard !Task.isCancelled else { return }
+    if state.preparedApp == nil { prepareIfNeeded() }
+    let preparation = preparationTask
+    let ownsPreparation = !startupSurfaceHasPresented
+    await withTaskCancellationHandler {
+      await preparation?.value
+    } onCancel: {
+      if ownsPreparation { preparation?.cancel() }
+    }
+    guard !Task.isCancelled else { return }
+    await state.preparedApp?.recordsMaintenance.performOpportunity()
+  }
+
   func retry() {
     state = .preparing
     guard let preparationTask else {
@@ -143,7 +158,7 @@ final class AppStartupCoordinator: ObservableObject {
   }
 
   private func prepareIfNeeded() {
-    guard preparationTask == nil else { return }
+    guard preparationTask == nil, state.preparedApp == nil else { return }
     recordMilestone(.preparationStarted)
     preparationTask = Task { [weak self] in
       guard let self else { return }
@@ -155,7 +170,11 @@ final class AppStartupCoordinator: ObservableObject {
         prepareIfNeeded()
         return
       }
-      guard !Task.isCancelled else { return }
+      guard !Task.isCancelled else {
+        preparationTask = nil
+        if startupSurfaceHasPresented { prepareIfNeeded() }
+        return
+      }
       state = preparedState
       preparationTask = nil
       switch preparedState {

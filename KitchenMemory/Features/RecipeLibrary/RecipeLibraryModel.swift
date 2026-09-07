@@ -62,6 +62,7 @@ final class RecipeLibraryModel {
   private(set) var startupState: StartupState = .loading
   private(set) var sampleOnboardingResponse: SampleRecipeOnboardingResponse
   private(set) var samplePresence: SampleRecipePresence = .unavailable
+  var synchronizationEvidenceIsStale = false
   private(set) var personalCloudStatus: PersonalCloudStatus = .notConfigured
 
   init(

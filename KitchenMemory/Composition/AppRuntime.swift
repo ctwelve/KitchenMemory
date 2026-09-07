@@ -225,6 +225,7 @@ enum AppRuntime {
 
 @MainActor
 struct PreparedCore {
+  let kitchenID: Kitchen.ID
   let modelContainer: ModelContainer
   let libraryModel: RecipeLibraryModel
   let cookingSessionRepository: SwiftDataCookingSessionRepository
@@ -247,6 +248,7 @@ struct PreparedCore {
     self.ownerID = ownerID
     let preparedKitchen = try KitchenBootstrapService(repository: recipeRepository)
       .prepareInitialKitchenWithStatus(ownerID: ownerID)
+    kitchenID = preparedKitchen.kitchen.id
     let library = RecipeLibrary(
       kitchenID: preparedKitchen.kitchen.id,
       repository: recipeRepository,
@@ -299,6 +301,7 @@ struct PreparedApp {
   let persistentStoreChangeObserver: PersistentStoreChangeObserver?
   let personalCloudStatusMonitor: PersonalCloudStatusMonitor?
   let cloudSyncSettings: CloudSyncSettings?
+  let recordsMaintenance: AppRecordsMaintenance
 
   init(
     plan: AppLaunchPlan,
@@ -338,19 +341,23 @@ struct PreparedApp {
         isEnabledAtLaunch: plan.cloudSyncIsEnabledAtLaunch
       )
       : nil
+    let recordsMaintenance = makeRecordsMaintenance(plan: plan, core: core, sessionModel: sessionModel)
+    self.recordsMaintenance = recordsMaintenance
     persistentStoreChangeObserver = makePersistentStoreChangeObserver(
       plan: plan,
       core: core,
-      sessionModel: sessionModel
+      sessionModel: sessionModel,
+      afterRefresh: { recordsMaintenance.opportunity() }
     )
     let personalCloudStatusMonitor = plan.store.personalCloudContainerIdentifier.map { containerIdentifier in
       PersonalCloudStatusMonitor(
         accountChecker: CloudKitAccountChecker(
           containerIdentifier: containerIdentifier
-        )
-      ) { status in
-        core.libraryModel.updatePersonalCloudStatus(status)
-      }
+        ),
+        relevantStoreIdentifiers: recordsMaintenance.storeIdentifiers,
+        onSuccessfulTransfer: { recordsMaintenance.observedSuccessfulTransfer(at: $0) },
+        onStatusChange: { core.libraryModel.updatePersonalCloudStatus($0) }
+      )
     }
     self.personalCloudStatusMonitor = personalCloudStatusMonitor
     personalCloudStatusMonitor?.start()

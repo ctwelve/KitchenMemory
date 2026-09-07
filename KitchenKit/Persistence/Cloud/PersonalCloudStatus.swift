@@ -64,4 +64,6 @@ struct PersonalCloudEventSnapshot: Sendable {
   let type: Int
   let ended: Bool
   let succeeded: Bool
+  var storeIdentifier: String?
+  var endDate: Date?
 }

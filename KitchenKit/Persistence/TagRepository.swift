@@ -44,8 +44,12 @@ public final class SwiftDataTagRepository: TagRepository {
 
   @discardableResult
   public func compact(in kitchenID: Kitchen.ID, at date: Date) throws -> TagCheckpoint? {
+    try compact(in: kitchenID, at: date, maximumRemovals: .max)
+  }
+
+  func compact(in kitchenID: Kitchen.ID, at date: Date, maximumRemovals: Int) throws -> TagCheckpoint? {
     try tagBoundary {
-    let result = try store.compact(in: kitchenID) { snapshot in
+    let result = try store.compact(in: kitchenID, at: date, maximumRemovals: maximumRemovals) { snapshot in
       try library(snapshot, in: kitchenID).checkpoint(at: date).map { checkpoint in
         OrganizationStore<TagChange>.Checkpoint(
           id: checkpoint.id, kitchenID: kitchenID, createdAt: checkpoint.createdAt,

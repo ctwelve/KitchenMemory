@@ -739,7 +739,21 @@ class CheckProjectStructureTest < Minitest::Test
       )
     end
 
-    assert_includes error.message, "UIBackgroundModes must contain only remote-notification"
+    assert_includes error.message, "UIBackgroundModes must contain remote-notification and fetch"
+  end
+
+  def test_rejects_mismatched_background_maintenance_identifier
+    ios_contents = File.read(File.expand_path("../../KitchenMemory/Info-iOS.plist", __dir__)).sub(
+      "net.ctwelve.KitchenMemory.maintenance", "net.ctwelve.KitchenMemory.wrong-task"
+    )
+    macos_contents = File.read(File.expand_path("../../KitchenMemory/Info-macOS.plist", __dir__))
+    error = assert_contract_error do
+      KitchenMemory::ProjectStructure.validate_info_plist_sources(
+        ios_contents: ios_contents,
+        macos_contents: macos_contents
+      )
+    end
+    assert_includes error.message, "must register the records maintenance task"
   end
 
   def test_rejects_non_native_application_platform

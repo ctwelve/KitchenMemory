@@ -1,5 +1,11 @@
 # Native Recipe Library organization
 
+<!--
+Kitchen Memory
+Copyright © 2026 the Kitchen Memory contributors.
+SPDX-License-Identifier: MIT
+-->
+
 Issue [#116](https://github.com/ctwelve/KitchenMemory/issues/116) connects the
 [Folder](folders.md) and [Tag](tags.md) policies to the native library. Organization
 belongs to stable Recipes and never changes their Revision content.

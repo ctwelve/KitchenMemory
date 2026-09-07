@@ -4,9 +4,14 @@
 <dict>
 	<key>KitchenMemoryCloudKitContainerIdentifier</key>
 	<string>$(KITCHEN_MEMORY_CLOUDKIT_CONTAINER)</string>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>net.ctwelve.KitchenMemory.maintenance</string>
+	</array>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>
+		<string>fetch</string>
 	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>

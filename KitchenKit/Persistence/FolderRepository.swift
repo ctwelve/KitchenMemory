@@ -42,7 +42,11 @@ public final class SwiftDataFolderRepository: FolderRepository {
 
   @discardableResult
   public func compact(in kitchenID: Kitchen.ID, at date: Date) throws -> FolderCheckpoint? {
-    let result = try store.compact(in: kitchenID) { snapshot in
+    try compact(in: kitchenID, at: date, maximumRemovals: .max)
+  }
+
+  func compact(in kitchenID: Kitchen.ID, at date: Date, maximumRemovals: Int) throws -> FolderCheckpoint? {
+    let result = try store.compact(in: kitchenID, at: date, maximumRemovals: maximumRemovals) { snapshot in
       try library(snapshot, in: kitchenID).checkpoint(at: date).map { checkpoint in
         OrganizationStore<FolderChange>.Checkpoint(
           id: checkpoint.id, kitchenID: kitchenID, createdAt: checkpoint.createdAt,

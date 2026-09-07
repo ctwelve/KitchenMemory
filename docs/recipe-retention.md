@@ -3,8 +3,8 @@
 `RecipeRepository.maintainDeletedRecipes(in:at:)` is the explicit, clock-driven
 maintenance boundary. It rechecks eligibility and commits payload removal and
 compact authority evidence in one isolated transaction. Repeating a completed
-pass is harmless. Scheduling these opportunities belongs to issue #112; this
-slice does not start background jobs or claim synchronization completion.
+pass is harmless. Automatic opportunities now use the shared
+[records-maintenance boundary](records-maintenance.md); they never claim synchronization completion.
 
 A complete deleted Recipe becomes eligible only after every unresolved deletion
 with a known date is at least 30 days old. Unknown legacy dates, incomplete
@@ -27,7 +27,7 @@ not pin its source Recipe or Revision solely for provenance. Its media reference
 remain hard dependencies. Unreadable dependency evidence blocks pruning rather
 than guessing. Unowned orphan rows with no recoverable ownership or age are not
 deleted speculatively; descendants owned by an eligible revision are removed
-with it. General long-horizon orphan scheduling remains in #112.
+with it. The shared long-horizon orphan sweep preserves these ambiguous rows.
 
 Any retained Recipe root or authority/payload arriving behind a tombstone enters
 Recovery, even before a full revision can be decoded. It cannot restore the old

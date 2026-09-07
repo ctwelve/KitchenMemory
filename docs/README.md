@@ -43,6 +43,7 @@ For implementation work, begin with:
 
 - [Recipe revision reconciliation](recipe-reconciliation.md) — explicit comparisons, local choices, and multi-parent Save.
 - [Recipe payload retention](recipe-retention.md) — dependency-aware pruning, tombstone horizons, and explicit Recovery.
+- [Records maintenance](records-maintenance.md) — bounded opportunities, retained Session dependencies, and honest sync-risk observations.
 - [Recipe deletion and restoration](recipe-disposition.md) — reversible aggregate disposition and retry behavior.
 
 - [Product doctrine](product-doctrine.md) — accepted durable principles.
@@ -62,6 +63,7 @@ For implementation work, begin with:
 - [Domain context and vocabulary](../CONTEXT.md)
 - [Domain architecture](domain-architecture.md)
 - [Web recipe import](web-import.md)
+- [Native Recipe Library organization](recipe-library-organization.md) — Folder and Tag browsing, filtering, and atomic changes.
 - [Cooking Sessions](cooking-sessions.md) — accepted 0.2 product contract.
 - [Cooking Session V3 persistence contract](cooking-session-v3-schema.md) —
   decision-frozen physical schema contract.
