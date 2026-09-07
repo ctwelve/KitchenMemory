@@ -13,11 +13,9 @@ stability of the interface being proved.
 The current shared SwiftUI interface is replaceable scaffolding. During this
 phase, use native semantics and avoid creating obvious barriers, but keep UI
 automation to the accessible top-level structure defined by
-[ADR 0007](adr/0007-business-logic-coverage-and-ui-smoke-tests.md). Comprehensive
-audits and interaction-specific accessibility tests resume when the relevant
-interface is stable enough to represent a shipping contract and
-[Issue 132](https://github.com/ctwelve/KitchenMemory/issues/132) defines the
-appropriate validation layers.
+[ADR 0007](adr/0007-business-logic-coverage-and-ui-smoke-tests.md). The accepted release policy from
+[Issue 132](https://github.com/ctwelve/KitchenMemory/issues/132) is recorded below
+and in [ADR 0019](adr/0019-stage-accessibility-acceptance-at-beta.md).
 
 ## Principles during prototyping
 
@@ -61,30 +59,89 @@ and Dynamic Type. A physical iPhone/iPad and Mac pass with keyboard and
 VoiceOver remains deliberate feature-acceptance work rather than evidence
 claimed by the hosted smoke suite.
 
-## Stabilization gate
+## Alpha release gate
 
-Before declaring an interface stable or release-ready:
+Alpha development must keep accessibility programming sound and avoid accumulating
+untracked accessibility debt. The current UI is a playground/proof of concept;
+comprehensive validation of its incidental layout would consume effort that
+belongs to the intended shipping interface. The current push defines policy and
+performs bounded alpha checks; it does not declare the UI stable. Releasing
+0.3-alpha does not commit the next milestone to beta rather than more features.
 
-1. define the supported keyboard, pointer, touch, VoiceOver, Dynamic Type, and
-   reduced-motion behavior for that workflow;
-2. establish the String Catalog and verify layouts with representative longer
-   translations and right-to-left presentation;
-3. manually inspect the workflow on each supported platform and input model;
-4. apply the layered automation strategy produced by Issue 132 to stable,
-   high-value semantic contracts;
-5. run platform accessibility audits and investigate each result against the
-   current Xcode toolchain; and
-6. document only the narrow exceptions that current evidence requires.
+Every published alpha requires the bounded semantic checks described above and
+a short ordinary-use walkthrough of core paths on the platforms actually
+distributed. Cover startup/recovery, finding and reading Recipes, creating or
+importing and saving one, starting/resuming a Cooking Session, and reaching
+Settings. Focus additional checks on changed interactions. Ordinary development
+slices use checks appropriate to their changes; the
+[alpha translation device-check waiver](localization-alpha-validation.md) remains
+in force.
 
-Do not restore broad UI assertions merely to increase a coverage percentage or
-to prove that standard controls respond to taps.
-Coverage goals apply to durable business logic; accessibility confidence for a
-stable interface requires semantic review, assistive-technology use, and focused
-automation together.
+The device-class, VoiceOver, and extensive accessibility/layout matrix below is
+deferred to beta. Alpha evidence must say what was omitted; deferred proof is
+unverified, not a pass. Known barriers that prevent a core path using a supported
+input method or assistive technology block alpha distribution. Examples include
+unreachable essential actions, unnamed essential controls, focus traps, and
+inaccessible recovery when they prevent completion.
 
-## Validation environment
+## Beta stabilization and acceptance
 
-Record Xcode, operating-system, simulator, and device versions with future audit
-evidence. SwiftUI can expose different accessibility structures on macOS and iOS,
-and toolchain behavior changes. An exception observed in one environment is not
-a permanent rule for later releases.
+[Issue 168](https://github.com/ctwelve/KitchenMemory/issues/168) holds this future
+work independently of the 0.3-alpha release graph.
+
+First approach the UI comprehensively. Only after that design pass may individual
+workflows be declared stable: navigation, controls, reading order, and supported
+interactions must be intended to ship. Today's provisional screens do not qualify
+merely because they have stopped changing. Beta requires every supported workflow
+to reach this point, including organization, editing, deletion, and restoration.
+
+Validate all supported workflows across Mac, iPhone, and iPad using a documented
+representative matrix rather than every possible combination:
+
+- VoiceOver and keyboard navigation where supported;
+- native touch and pointer operation;
+- accessibility text sizes, smaller screens, and constrained window sizes;
+- light/dark appearance, increased contrast, and reduced motion; and
+- every shipping language.
+
+Platform audits, Accessibility Inspector, and human assistive-technology
+walkthroughs determine accessibility acceptance. Check focus order, grouping,
+spoken coherence, and the ability to complete tasks. A populated accessibility
+tree and green UI tests cannot override an observed barrier. Missing required
+beta audit or walkthrough evidence blocks distribution.
+
+## Proof layers and automation
+
+Domain, Logic, persistence, and hosted tests own business behavior. UI automation
+proves durable accessibility semantics, not duplicate feature workflows or native
+button behavior. Add focused accessibility regression tests when they reliably
+catch a real barrier; do not expand automation to satisfy a coverage quota.
+
+Reliable automated semantic regressions block pull requests. Diagnose runner and
+toolchain failures and provide an alternate local check with evidence; a tooling
+failure cannot silently excuse a product regression. Cloud UI testing remains
+suspended under [Issue 155](https://github.com/ctwelve/KitchenMemory/issues/155).
+Local native tests use [Xcode-managed signing](agents/xcode.md). The ordinary CI
+and governed-branch gates remain in force; release acceptance additionally
+requires the human evidence appropriate to alpha or beta.
+
+## Findings and release evidence
+
+Use blocking tickets instead of a separate exception/assignment bureaucracy for
+this personal project. Core-path barriers block alpha; other accessibility
+findings block the relevant stabilization/beta gate. Visual polish alone is not
+an accessibility blocker. Record user impact, reproduction evidence, any usable
+workaround, and the applicable release gate so findings cannot silently become
+permanent debt. Alpha deferral does not carry into beta as acceptance.
+
+The release maintainer explicitly accepts a versioned release-evidence document
+before distribution. Identify the exact candidate, checks and workflows,
+Xcode/toolchain and OS versions, device/configuration matrix actually exercised,
+results, omissions, linked blocking tickets, and toolchain limitations. Keep
+records privacy-safe and retain prior release evidence permanently.
+
+Navigation, control semantics, focus behavior, layout, or relevant platform and
+toolchain changes reopen affected checks. Unchanged workflows may carry forward
+explicitly linked evidence with its scope and continuing applicability stated.
+Record false positives against the specific environment where they were
+established; never turn them into permanent toolchain folklore.

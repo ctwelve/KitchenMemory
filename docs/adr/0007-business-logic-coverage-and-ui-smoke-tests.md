@@ -25,6 +25,13 @@ Amended on 2026-09-02 to clarify that the current UI target proves only
 accessible top-level structure and navigation. It does not repeat feature
 behavior or claim comprehensive assistive-technology validation.
 
+Amended by [ADR 0019](0019-stage-accessibility-acceptance-at-beta.md): Issue 132
+has settled the staged alpha/beta accessibility policy. Its former future-decision
+references below are historical; the current protocol is in
+[accessibility engineering](../accessibility-engineering.md). Comprehensive
+validation follows a comprehensive UI design pass and gates beta, while bounded
+alpha checks and known core-path barriers remain release obligations.
+
 ## Context
 
 Kitchen Memory's domain rules, product operations, import behavior, and

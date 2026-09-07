@@ -302,7 +302,9 @@ checks. It does not re-prove feature workflows or standard control activation.
 Localization of durable copy and formatting proceeds independently, while
 comprehensive localized-layout assertions, accessibility audits, focus and
 grouping checks, and interaction-specific UI suites are deferred until the
-relevant interface is stable and the future strategy is defined. See
+comprehensive UI design pass and per-workflow stabilization required for beta.
+The accepted alpha/beta gates and alternate evidence for tooling failures are
+defined in ADR 0019. See
 [ADR 0007](adr/0007-business-logic-coverage-and-ui-smoke-tests.md) and
 [accessibility engineering](accessibility-engineering.md). Localization
 ownership and its non-UI testing boundary are described in

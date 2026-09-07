@@ -28,6 +28,16 @@ was merged. Focused fixes remained small and reviewable; the pass was not
 permission to redesign settled domain boundaries or quietly add deferred
 features.
 
+## Current accessibility policy
+
+The 0.1 results and plans below are historical. Subsequent releases use the
+[accepted alpha/beta accessibility policy](accessibility-engineering.md): bounded
+semantic checks and a short ordinary-use walkthrough for published alphas;
+comprehensive audits and assistive-technology validation after the comprehensive
+UI design pass, before beta. Known core-path barriers block alpha, and other
+accessibility findings block the applicable stabilization/beta gate. The release
+maintainer accepts candidate-specific evidence with omissions recorded explicitly.
+
 ## Versioned slice discipline
 
 The working application version now advances with every product slice. Version
