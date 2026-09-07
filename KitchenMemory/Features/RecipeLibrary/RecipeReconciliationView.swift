@@ -70,7 +70,7 @@ struct RecipeReconciliationView: View {
         ForEach(Array(section.ingredients.enumerated()), id: \.offset) { index, ingredient in
           Menu {
             ForEach(Array(editor.session.ingredientSections.enumerated()), id: \.offset) { target, section in
-              Section(section.title ?? String(localized: "recipe.comparison.field.ingredients")) {
+              Section(section.title ?? String(localized: .recipeComparisonFieldIngredients)) {
                 Button(.recipeComparisonAddIngredient) {
                   choose {
                     try editor.draft.chooseIngredient(from: revision.id, section: sectionIndex,

@@ -102,6 +102,24 @@ final class KitchenMemoryUITests: XCTestCase {
   }
 
   @MainActor
+  func testLocalizedShellSurvivesDoubledTextAndRightToLeftDirection() {
+    for language in ["en-US", "es-MX", "fr-CA"] {
+      let app = launchApp(additionalArguments: [
+        "-AppleLanguages", "(\(language))", "-AppleLocale", language,
+        "-NSDoubleLocalizedStrings", "YES",
+        "-AppleTextDirection", "YES", "-NSForceRightToLeftWritingDirection", "YES",
+      ], readyIdentifier: "sessions-destination")
+      let sessions = app.buttons["sessions-destination"]
+      assertAccessibleLabel(sessions, description: "localized Sessions destination")
+      openSettings(in: app)
+      let synchronization = app.switches["settings-icloud-sync"]
+      XCTAssertTrue(synchronization.waitForExistence(timeout: 5))
+      assertAccessibleLabel(synchronization, description: "localized Settings structure")
+      app.terminate()
+    }
+  }
+
+  @MainActor
   private func visitTopLevelDestination(
     _ identifier: String,
     revealing detailIdentifier: String,
@@ -124,7 +142,9 @@ final class KitchenMemoryUITests: XCTestCase {
   }
 
   @MainActor
-  private func launchApp(additionalArguments: [String] = []) -> XCUIApplication {
+  private func launchApp(
+    additionalArguments: [String] = [], readyIdentifier: String = "recipe-library-ready"
+  ) -> XCUIApplication {
 #if os(iOS)
     XCUIDevice.shared.orientation = .portrait
 #endif
@@ -138,7 +158,7 @@ final class KitchenMemoryUITests: XCTestCase {
     app.launchArguments.append(contentsOf: additionalArguments)
     app.launch()
 
-    let libraryReady = app.descendants(matching: .any)["recipe-library-ready"]
+    let libraryReady = app.descendants(matching: .any)[readyIdentifier]
     ensurePrimaryWindow(in: app, exposing: libraryReady)
     revealSidebar(in: app, exposing: libraryReady)
     XCTAssertTrue(libraryReady.waitForExistence(timeout: 5))
@@ -196,7 +216,7 @@ final class KitchenMemoryUITests: XCTestCase {
 #if os(macOS)
     if !element.waitForExistence(timeout: 2) {
       app.activate()
-      app.typeKey("n", modifierFlags: .command)
+      app.typeKey("n", modifierFlags: [.command, .shift])
     }
 #endif
   }

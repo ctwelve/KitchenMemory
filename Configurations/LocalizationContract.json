@@ -1,0 +1,26 @@
+{
+  "sourceLanguage": "en-US",
+  "locales": [
+    "en-US",
+    "es-MX",
+    "fr-CA"
+  ],
+  "retainedKeys": {
+    "session.shell.foundation.message": "Historical Session shell explanation retained from the 0.1 interface contract.",
+    "session.shell.foundation.title": "Historical Session shell heading retained from the 0.1 interface contract.",
+    "settings.samples.action.installed": "Historical installation-only Settings state, superseded by the reversible pack setting in #88.",
+    "settings.samples.action.install": "Historical installation-only Settings action, superseded by the reversible pack setting in #88."
+  },
+  "literalExceptions": [
+    {
+      "path": "Features/RecipeLibrary/RecipeURLImportView.swift",
+      "literal": "https://example.com/recipe",
+      "reason": "Non-translatable example HTTPS URL, intentionally rendered verbatim."
+    },
+    {
+      "path": "Features/RecipeLibrary/RecipeQuantityEditorViews.swift",
+      "literal": "/",
+      "reason": "Arithmetic fraction separator, hidden from accessibility because the fields have semantic names."
+    }
+  ]
+}

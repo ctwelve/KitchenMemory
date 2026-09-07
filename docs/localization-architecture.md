@@ -6,7 +6,7 @@ Copyright © 2026 the Kitchen Memory contributors.
 SPDX-License-Identifier: MIT
 -->
 
-- Status: Implemented 0.1 interface contract
+- Status: 0.3 translation seam contract (#117)
 - Date: 2026-08-23
 
 Kitchen Memory's first localization set is American English (`en-US`), Canadian
@@ -123,9 +123,9 @@ document.
 Authored content language is durable recipe metadata, not an inference from the
 current application locale. `RecipeRevision.contentLanguage` stores an optional
 canonical BCP 47 tag and carries it through drafts, sample documents, Schema.org
-`inLanguage` import mapping, and persistence. Because the app is still a
-single-user development toy, this pre-release change updates V1 directly and
-requires deleting development stores; no fictional migration path is retained.
+`inLanguage` import mapping, and persistence. The original pre-release introduction landed in V1. That historical schema is
+now frozen; adding a locale changes authored resources, not historical schema
+definitions or existing Recipe Revisions.
 
 ## Sample onboarding and future delivery
 
@@ -189,3 +189,71 @@ The constrained automation boundary from
 [ADR 0007](adr/0007-business-logic-coverage-and-ui-smoke-tests.md) still applies:
 localization is not a reason to restore interaction-heavy scripts or encode a
 provisional visual hierarchy in UI tests.
+
+## 0.3 verification contract
+
+`Configurations/LocalizationContract.json` is the source-language and supported-
+locale inventory for repository verification. Its explicit `retainedKeys` map
+records why four historical keys remain despite having no current interface
+reference. Retention preserves earlier meanings; it is not a baseline for new
+unused keys. Reusing a retained key requires removing its retention entry.
+
+Run `ruby Tools/check-localization.rb` during ordinary verification. Xcode Cloud's
+post-clone script runs it and its synthetic contract tests before the build. It
+checks both catalogs for locale completeness, reviewed nonempty values, matching
+variant and named-placeholder structure, intentional manual extraction state,
+translator context, and generated-symbol collisions. It also rejects new orphan
+interface keys, direct literal UI copy, simple literal-variable UI indirection,
+and raw localization-key lookups. The two exact nonprose exceptions are an
+example HTTPS URL and an accessibility-hidden fraction separator, each with a
+source path and reason. Historical documents and authored Recipe assets are not
+scanned as interface Swift code.
+
+This source guard recognizes a bounded set of SwiftUI label entry points. It is
+not whole-program data-flow analysis: dynamically assembled copy, new custom
+label APIs, and complex interpolation need source review. Xcode's compiler still
+owns generated-symbol availability and operand type checking; hosted tests own
+compiled catalog, bundle metadata, localized Credits, and authored asset checks.
+Neither a source scan nor a green build establishes linguistic quality.
+
+`SamplePackLocalizationContractTests` walks all three authored variants of each
+sample family. It checks locale membership, structural shape, source kind, URL and
+author provenance, nonempty wording, stable reloading, and distinct Recipe,
+Revision and child identities. A translation retains the original family and
+structure while owning distinct immutable identities; a later correction must
+not mutate an already-published identity's payload. The tests also exercise
+ordinary localized Sample Pack names and preservation of user spelling across
+refresh. Unfiled and Untagged remain generated presentation labels: neither is
+a reserved name nor a stored system Folder/Tag identity. Locale-aware Folder and
+Tag tests compare ordering with Foundation's collation without changing stored
+names.
+
+The six French and Spanish assets now carry revision 2 baselines. Hotdish and
+fried rice restore omitted ingredients, steps, equipment, media, and provenance;
+Red Engine restores its equipment. Numerical quantities, optionality, and source
+uncertainty follow the complete authored source rather than inventing simplified
+recipes. Recipe identities and manifest families stay stable, while corrected
+Revisions and their child records receive fresh identities. Existing installed
+Recipes are not upgraded or replaced. Sample removal conservatively preserves
+an older baseline whose payload differs from the current bundled baseline, just
+as it preserves other changed sample content.
+
+The native shell smoke suite includes en-US, es-MX, and fr-CA with doubled strings
+and forced right-to-left direction. Run it through Xcode on an iPhone simulator
+(compact) and My Mac (regular). It checks named, reachable shell and Settings
+structure without asserting translated copy, scrolling, or feature workflows.
+The existing minimal Recipe-only fixture keeps those tests independent of sample
+pack organization. Representative formatter tests exercise zero/singular/plural/
+large counts, durations, source-capture dates, and preserved authored measurement
+units with explicit locales and a fixed captured date. Structural smoke survival
+is not a clipping, typography, or assistive-technology sign-off; visual and native-
+speaker review remain release acceptance work.
+
+Apple documents the doubled-string and right-to-left launch controls in
+[Testing Your Internationalized App](https://developer.apple.com/library/archive/documentation/MacOSX/Conceptual/BPInternational/TestingYourInternationalApp/TestingYourInternationalApp.html),
+and the current workflow in
+[Preparing your interface for localization](https://developer.apple.com/documentation/xcode/preparing-your-interface-for-localization).
+Follow [String Catalog guidance](https://developer.apple.com/documentation/xcode/localizing-and-varying-text-with-a-string-catalog)
+when adding locale-specific variants; extend the inventory, compiled resource
+checks and authored family variants together. Issues #118–#120 own additional
+locales; this ticket does not add them.

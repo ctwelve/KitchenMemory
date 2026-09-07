@@ -1,10 +1,928 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0"><dict>
-<key>formatVersion</key><integer>1</integer><key>recipeID</key><string>F2010000-0000-4000-8000-000000000001</string><key>revision</key><dict>
-<key>id</key><string>F2110000-0000-4000-8000-000000000001</string><key>recipeID</key><string>F2010000-0000-4000-8000-000000000001</string><key>revisionNumber</key><integer>1</integer><key>title</key><string>Cazuela de fideos con atún</string><key>summary</key><string>Una cazuela reconfortante de fideos, atún y chícharos con una cubierta crujiente.</string><key>authorName</key><string>Colaboradores de Memoria de cocina</string><key>contentLanguage</key><string>es-MX</string>
-<key>recipeYield</key><dict><key>quantity</key><dict><key>kind</key><string>exact</string><key>lowerBound</key><dict><key>numerator</key><integer>8</integer><key>denominator</key><integer>1</integer></dict></dict><key>unitText</key><string>porciones</string><key>originalText</key><string>Rinde 8 porciones abundantes</string></dict><key>prepDuration</key><dict><key>seconds</key><integer>1800</integer></dict><key>cookDuration</key><dict><key>seconds</key><integer>1200</integer></dict><key>totalDuration</key><dict><key>seconds</key><integer>3600</integer></dict><key>cuisines</key><array><string>Medio Oeste de Estados Unidos</string></array><key>categories</key><array><string>Cena</string><string>Cazuela</string></array><key>keywords</key><array><string>atún</string><string>fideos</string></array>
-<key>media</key><array><dict><key>id</key><string>F2120000-0000-4000-8000-000000000001</string><key>role</key><string>hero</string><key>assetName</key><string>TunaNoodleHotdishHero</string><key>accessibilityLabel</key><string>Cazuela de fideos con atún y cubierta bien dorada</string></dict></array><key>equipment</key><array/>
-<key>ingredientSections</key><array><dict><key>id</key><string>F2130000-0000-4000-8000-000000000001</string><key>title</key><string>Cazuela</string><key>ingredients</key><array><dict><key>id</key><string>F2140000-0000-4000-8000-000000000001</string><key>originalText</key><string>4 latas de 142 g de atún claro en trozos</string><key>presentationMode</key><string>original</string><key>quantity</key><dict><key>kind</key><string>exact</string><key>lowerBound</key><dict><key>numerator</key><integer>4</integer><key>denominator</key><integer>1</integer></dict></dict><key>unitText</key><string>latas</string><key>ingredientText</key><string>atún claro en trozos</string><key>isOptional</key><false/><key>scalingBehavior</key><string>linear</string><key>parseState</key><string>reviewed</string></dict><dict><key>id</key><string>F2140000-0000-4000-8000-000000000002</string><key>originalText</key><string>450 g de fideos de huevo ondulados</string><key>presentationMode</key><string>original</string><key>quantity</key><dict><key>kind</key><string>exact</string><key>lowerBound</key><dict><key>numerator</key><integer>450</integer><key>denominator</key><integer>1</integer></dict></dict><key>unitText</key><string>g</string><key>ingredientText</key><string>fideos de huevo ondulados</string><key>isOptional</key><false/><key>scalingBehavior</key><string>linear</string><key>parseState</key><string>reviewed</string></dict></array></dict></array>
-<key>instructionSections</key><array><dict><key>id</key><string>F2150000-0000-4000-8000-000000000001</string><key>title</key><string>Preparación</string><key>steps</key><array><dict><key>id</key><string>F2160000-0000-4000-8000-000000000001</string><key>text</key><string>Cuece los fideos hasta que estén al dente y escúrrelos.</string></dict><dict><key>id</key><string>F2160000-0000-4000-8000-000000000002</string><key>text</key><string>Mezcla los fideos, el atún, los chícharos y la salsa en un refractario.</string></dict><dict><key>id</key><string>F2160000-0000-4000-8000-000000000003</string><key>text</key><string>Cubre con pan molido y hornea a 200 °C hasta que burbujee y se dore.</string></dict></array></dict></array>
-</dict></dict></plist>
+<plist version="1.0">
+<dict>
+	<key>formatVersion</key>
+	<integer>1</integer>
+	<key>recipeID</key>
+	<string>F2010000-0000-4000-8000-000000000001</string>
+	<key>revision</key>
+	<dict>
+		<key>id</key>
+		<string>408E68CF-6B32-5E04-B84D-C17037C8C8A6</string>
+		<key>recipeID</key>
+		<string>F2010000-0000-4000-8000-000000000001</string>
+		<key>revisionNumber</key>
+		<integer>2</integer>
+		<key>title</key>
+		<string>Cazuela de fideos con atún</string>
+		<key>summary</key>
+		<string>Una cazuela de fideos con atún al estilo del Medio Oeste, de sabor intenso, con chícharos y una cubierta de crutones y galletas saladas con mantequilla.</string>
+		<key>authorName</key>
+		<string>Colaboradores de Memoria de cocina</string>
+		<key>contentLanguage</key>
+		<string>es-MX</string>
+		<key>source</key>
+		<dict>
+			<key>kind</key>
+			<string>original</string>
+			<key>title</key>
+			<string>Preparado para la cena del 10 de agosto de 2026</string>
+		</dict>
+		<key>recipeYield</key>
+		<dict>
+			<key>quantity</key>
+			<dict>
+				<key>kind</key>
+				<string>exact</string>
+				<key>lowerBound</key>
+				<dict>
+					<key>numerator</key>
+					<integer>8</integer>
+					<key>denominator</key>
+					<integer>1</integer>
+				</dict>
+			</dict>
+			<key>unitText</key>
+			<string>porciones</string>
+			<key>originalText</key>
+			<string>Rinde 8 porciones generosas</string>
+		</dict>
+		<key>prepDuration</key>
+		<dict>
+			<key>seconds</key>
+			<integer>1800</integer>
+		</dict>
+		<key>cookDuration</key>
+		<dict>
+			<key>seconds</key>
+			<integer>1200</integer>
+		</dict>
+		<key>totalDuration</key>
+		<dict>
+			<key>seconds</key>
+			<integer>3600</integer>
+		</dict>
+		<key>cuisines</key>
+		<array>
+			<string>Del Medio Oeste</string>
+		</array>
+		<key>categories</key>
+		<array>
+			<string>Cena</string>
+			<string>Cazuela</string>
+		</array>
+		<key>keywords</key>
+		<array>
+			<string>cazuela</string>
+			<string>comida reconfortante</string>
+			<string>atún</string>
+			<string>fideos</string>
+		</array>
+		<key>media</key>
+		<array>
+			<dict>
+				<key>id</key>
+				<string>B11B43FB-9444-591F-9B3B-D6DC95EB6A54</string>
+				<key>role</key>
+				<string>hero</string>
+				<key>assetName</key>
+				<string>TunaNoodleHotdishHero</string>
+				<key>accessibilityLabel</key>
+				<string>Cazuela de fideos con atún y una cubierta bien dorada de crutones y galletas saladas</string>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>6BBDF99D-9DDF-5702-B4B3-E88BD38BD978</string>
+				<key>role</key>
+				<string>thumbnail</string>
+				<key>assetName</key>
+				<string>TunaNoodleHotdishThumbnail</string>
+				<key>accessibilityLabel</key>
+				<string>Detalle cuadrado de la cazuela de fideos con atún y su cubierta dorada de crutones y galletas saladas</string>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>80274E7D-A736-524B-8240-BE0136A3C1C6</string>
+				<key>role</key>
+				<string>gallery</string>
+				<key>assetName</key>
+				<string>TunaNoodleHotdishGallery0</string>
+				<key>accessibilityLabel</key>
+				<string>Vista lateral de una porción de cazuela que muestra los fideos, el atún, los chícharos y la cubierta crujiente</string>
+			</dict>
+		</array>
+		<key>equipment</key>
+		<array>
+			<dict>
+				<key>id</key>
+				<string>46447D93-CA13-5C2B-B824-963090899054</string>
+				<key>originalText</key>
+				<string>1 refractario de 9 × 13 pulgadas</string>
+				<key>quantity</key>
+				<dict>
+					<key>kind</key>
+					<string>exact</string>
+					<key>lowerBound</key>
+					<dict>
+						<key>numerator</key>
+						<integer>1</integer>
+						<key>denominator</key>
+						<integer>1</integer>
+					</dict>
+				</dict>
+				<key>name</key>
+				<string>refractario de 9 × 13 pulgadas</string>
+				<key>isOptional</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>FFAD23FA-08A9-538C-A4A3-46F76FFDFA89</string>
+				<key>originalText</key>
+				<string>1 olla de 8 cuartos estadounidenses</string>
+				<key>quantity</key>
+				<dict>
+					<key>kind</key>
+					<string>exact</string>
+					<key>lowerBound</key>
+					<dict>
+						<key>numerator</key>
+						<integer>1</integer>
+						<key>denominator</key>
+						<integer>1</integer>
+					</dict>
+				</dict>
+				<key>name</key>
+				<string>olla de 8 cuartos estadounidenses</string>
+				<key>isOptional</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>F139DBAD-2D6B-5845-849F-5CDBA76421D1</string>
+				<key>originalText</key>
+				<string>1 colador</string>
+				<key>quantity</key>
+				<dict>
+					<key>kind</key>
+					<string>exact</string>
+					<key>lowerBound</key>
+					<dict>
+						<key>numerator</key>
+						<integer>1</integer>
+						<key>denominator</key>
+						<integer>1</integer>
+					</dict>
+				</dict>
+				<key>name</key>
+				<string>colador</string>
+				<key>isOptional</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>004A8B5C-50CB-5E07-BAD4-11FE3EE22C69</string>
+				<key>originalText</key>
+				<string>1 charola con borde, recomendada</string>
+				<key>quantity</key>
+				<dict>
+					<key>kind</key>
+					<string>exact</string>
+					<key>lowerBound</key>
+					<dict>
+						<key>numerator</key>
+						<integer>1</integer>
+						<key>denominator</key>
+						<integer>1</integer>
+					</dict>
+				</dict>
+				<key>name</key>
+				<string>charola con borde</string>
+				<key>isOptional</key>
+				<true/>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>9A128852-EE32-5E90-86EC-B4FCC816B47D</string>
+				<key>originalText</key>
+				<string>rallador de queso, opcional</string>
+				<key>name</key>
+				<string>rallador de queso</string>
+				<key>isOptional</key>
+				<true/>
+			</dict>
+		</array>
+		<key>ingredientSections</key>
+		<array>
+			<dict>
+				<key>id</key>
+				<string>43847868-2BA9-57EB-9F04-770FB1ECDC2B</string>
+				<key>title</key>
+				<string>Cazuela</string>
+				<key>ingredients</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>83FA61F1-F1B2-53A3-9732-1D1C6545F891</string>
+						<key>originalText</key>
+						<string>4 latas de 5 oz de atún claro en trozos</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>4</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>latas</string>
+						<key>package</key>
+						<dict>
+							<key>quantity</key>
+							<dict>
+								<key>kind</key>
+								<string>exact</string>
+								<key>lowerBound</key>
+								<dict>
+									<key>numerator</key>
+									<integer>5</integer>
+									<key>denominator</key>
+									<integer>1</integer>
+								</dict>
+							</dict>
+							<key>unitText</key>
+							<string>onzas</string>
+						</dict>
+						<key>ingredientText</key>
+						<string>atún claro en trozos</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>8AD42F7B-4330-5F72-AE4B-9968BF1CF299</string>
+						<key>originalText</key>
+						<string>1 bolsa de 1 lb de fideos de huevo ondulados</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>1</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>bolsa</string>
+						<key>package</key>
+						<dict>
+							<key>quantity</key>
+							<dict>
+								<key>kind</key>
+								<string>exact</string>
+								<key>lowerBound</key>
+								<dict>
+									<key>numerator</key>
+									<integer>1</integer>
+									<key>denominator</key>
+									<integer>1</integer>
+								</dict>
+							</dict>
+							<key>unitText</key>
+							<string>libra</string>
+						</dict>
+						<key>ingredientText</key>
+						<string>fideos de huevo ondulados</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>4C799920-4817-556E-BE92-2F54AF5DE124</string>
+						<key>originalText</key>
+						<string>1 lata de 28 oz de crema de champiñones condensada</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>1</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>lata</string>
+						<key>package</key>
+						<dict>
+							<key>quantity</key>
+							<dict>
+								<key>kind</key>
+								<string>exact</string>
+								<key>lowerBound</key>
+								<dict>
+									<key>numerator</key>
+									<integer>28</integer>
+									<key>denominator</key>
+									<integer>1</integer>
+								</dict>
+							</dict>
+							<key>unitText</key>
+							<string>onzas</string>
+						</dict>
+						<key>ingredientText</key>
+						<string>crema de champiñones condensada</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>2464E6F1-52BF-5FCC-801A-D5044BC4A0E3</string>
+						<key>originalText</key>
+						<string>2 tazas estadounidenses de leche</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>2</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>tazas estadounidenses</string>
+						<key>ingredientText</key>
+						<string>leche</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>147CF10F-55AC-5B69-A98A-E8D5C827866B</string>
+						<key>originalText</key>
+						<string>1 bolsa de chícharos congelados para cocción al vapor</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>1</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>bolsa para cocción al vapor</string>
+						<key>ingredientText</key>
+						<string>chícharos congelados</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>82C0040E-4D71-5152-A769-2FEFEBBF7F34</string>
+						<key>originalText</key>
+						<string>2 cebollas amarillas medianas (o su equivalente)</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>2</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>medianas</string>
+						<key>ingredientText</key>
+						<string>cebollas amarillas</string>
+						<key>preparation</key>
+						<string>en cubitos finos</string>
+						<key>note</key>
+						<string>o su equivalente</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+				</array>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>4D230EE9-255A-5BD8-B2F6-E50DB7F512C4</string>
+				<key>title</key>
+				<string>Cocción y sazón</string>
+				<key>ingredients</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>4B54CF07-54DA-5615-B088-7AAB67C7124F</string>
+						<key>originalText</key>
+						<string>mantequilla sin sal</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>approximate</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>6</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>cucharadas estadounidenses</string>
+						<key>ingredientText</key>
+						<string>mantequilla sin sal</string>
+						<key>preparation</key>
+						<string>dividida</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>edited</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>C5AC58FE-2C9F-5E00-B088-9CEF3E3D248A</string>
+						<key>originalText</key>
+						<string>aceite de oliva</string>
+						<key>ingredientText</key>
+						<string>aceite de oliva</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>edited</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>FFA57755-216D-58AC-8FED-241F66EB36C8</string>
+						<key>originalText</key>
+						<string>sal</string>
+						<key>ingredientText</key>
+						<string>sal</string>
+						<key>note</key>
+						<string>más 1 cucharada copeteada para el agua de los fideos</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>edited</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>80D07486-F3A2-554E-BB4A-A1CD641A0500</string>
+						<key>originalText</key>
+						<string>pimienta</string>
+						<key>ingredientText</key>
+						<string>pimienta negra</string>
+						<key>preparation</key>
+						<string>recién molida</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>edited</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>28ADF5AF-0EFB-5FBD-9163-C8513E7DF0EA</string>
+						<key>originalText</key>
+						<string>cebolla en polvo</string>
+						<key>ingredientText</key>
+						<string>cebolla en polvo</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>edited</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>D58606F9-1309-5C50-965E-CCF1E18CD4C6</string>
+						<key>originalText</key>
+						<string>ajo en polvo</string>
+						<key>ingredientText</key>
+						<string>ajo en polvo</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>edited</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>5FFB7474-1D50-52A7-8116-196321105231</string>
+						<key>originalText</key>
+						<string>pimienta de cayena</string>
+						<key>ingredientText</key>
+						<string>pimienta de cayena</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>edited</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>1F461BEB-F6BD-52C5-994F-B71EC16708FC</string>
+						<key>originalText</key>
+						<string>hierbas italianas</string>
+						<key>ingredientText</key>
+						<string>hierbas italianas</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>edited</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>D906D867-7479-5418-86AC-0897E0A0CE33</string>
+						<key>originalText</key>
+						<string>salsa inglesa</string>
+						<key>ingredientText</key>
+						<string>salsa inglesa</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>edited</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>455F431B-85F9-5452-A729-F5D66799FFDE</string>
+						<key>originalText</key>
+						<string>sazonador Montreal para carne</string>
+						<key>ingredientText</key>
+						<string>sazonador Montreal para carne</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>edited</string>
+					</dict>
+				</array>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>653CDA13-72F5-550B-A214-3661BBB52392</string>
+				<key>title</key>
+				<string>Cubierta</string>
+				<key>ingredients</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>566C6642-CB5A-5D2E-8A14-BFCF223EF6D4</string>
+						<key>originalText</key>
+						<string>1 bolsa de 5 oz de crutones sazonados</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>1</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>bolsa</string>
+						<key>package</key>
+						<dict>
+							<key>quantity</key>
+							<dict>
+								<key>kind</key>
+								<string>exact</string>
+								<key>lowerBound</key>
+								<dict>
+									<key>numerator</key>
+									<integer>5</integer>
+									<key>denominator</key>
+									<integer>1</integer>
+								</dict>
+							</dict>
+							<key>unitText</key>
+							<string>onzas</string>
+						</dict>
+						<key>ingredientText</key>
+						<string>crutones sazonados</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>7514611E-5E7B-5B28-AEFD-F159CBED79C5</string>
+						<key>originalText</key>
+						<string>medio paquete interior de galletas Ritz</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>1</integer>
+								<key>denominator</key>
+								<integer>2</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>paquete interior</string>
+						<key>ingredientText</key>
+						<string>galletas Ritz</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>B26AC86F-A492-5F90-AEBB-2392EA23C44D</string>
+						<key>originalText</key>
+						<string>pecorino recién rallado</string>
+						<key>ingredientText</key>
+						<string>pecorino</string>
+						<key>preparation</key>
+						<string>recién rallado</string>
+						<key>note</key>
+						<string>opcional, pero muy recomendable</string>
+						<key>isOptional</key>
+						<true/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>edited</string>
+					</dict>
+				</array>
+			</dict>
+		</array>
+		<key>instructionSections</key>
+		<array>
+			<dict>
+				<key>id</key>
+				<string>58650F3F-D0E0-5418-9E7A-8857324076C7</string>
+				<key>title</key>
+				<string>Fideos</string>
+				<key>steps</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>3A108982-5913-5F7A-A7E0-C77CEDB63E76</string>
+						<key>text</key>
+						<string>Llena la olla de 8 cuartos estadounidenses con agua fría y fresca hasta 1 pulgada por debajo del borde.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>00947E7C-FF8A-5F1C-9929-30B1893299F6</string>
+						<key>text</key>
+						<string>Añade una cucharada copeteada de sal y lleva el agua a hervor fuerte.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>8D90DD4D-25CD-5BB8-B395-F1B352F0F6E1</string>
+						<key>text</key>
+						<string>Agrega los fideos y cuécelos según el paquete hasta que estén firmes o al dente, normalmente unos 6 minutos.</string>
+						<key>duration</key>
+						<dict>
+							<key>seconds</key>
+							<integer>360</integer>
+						</dict>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>AEF3554B-5FFB-531A-B0D5-2F7DA900CD37</string>
+						<key>text</key>
+						<string>Escurre los fideos de inmediato y pásalos al refractario.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>2D13F9BE-3C58-5B7B-9601-69B1DCC24118</string>
+						<key>text</key>
+						<string>Mezcla los fideos con un poco de aceite de oliva, 2 cucharadas de mantequilla, pimienta negra, hierbas italianas, ajo en polvo y cebolla en polvo al gusto.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>7302B9DB-3CB3-5655-B76E-683B3B3E7053</string>
+						<key>text</key>
+						<string>Reserva los fideos mientras preparas la salsa.</string>
+					</dict>
+				</array>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>D9D021F5-65A2-5028-AE08-855D71AAA81D</string>
+				<key>title</key>
+				<string>Salsa y armado</string>
+				<key>steps</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>CA94E0C0-E820-5132-BCE4-5F4E3D1EA79B</string>
+						<key>text</key>
+						<string>Precalienta el horno a 400 °F.</string>
+						<key>temperature</key>
+						<dict>
+							<key>value</key>
+							<dict>
+								<key>numerator</key>
+								<integer>400</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+							<key>unit</key>
+							<string>fahrenheit</string>
+						</dict>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>4E5DACE0-8DFD-52C1-A93D-A7DD3C112E7A</string>
+						<key>text</key>
+						<string>Pica finamente las cebollas. Saltéalas con una cantidad generosa de mantequilla, unas 2 cucharadas, y sazona con sazonador Montreal para carne, sal y pimienta al gusto.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>A93B4018-F231-5C4B-9361-E5D828514E4B</string>
+						<key>text</key>
+						<string>Cocina hasta que se suavicen o se doren apenas. No hace falta caramelizarlas mucho; los chícharos aportarán bastante dulzor.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>6E7E5A7D-753F-51DB-A7BB-F44575E7D1F9</string>
+						<key>text</key>
+						<string>Agrega la crema de champiñones, la leche y el atún. Calienta todo y después añade un chorrito de salsa inglesa y cayena al gusto.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>07F324A5-ADED-58FA-97FC-43A45A70B07B</string>
+						<key>text</key>
+						<string>Prueba la salsa. En este punto debe estar un poco «pasada»: apenas demasiado salada, intensa y con sabor marcado a atún. Por lo demás debe estar equilibrada y verse algo líquida. Así está bien; los fideos absorberán y suavizarán la salsa.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>BD0C25BA-1211-5CB0-8A81-49C39A020A33</string>
+						<key>text</key>
+						<string>Cocina solo hasta que hierva suavemente. ¡CUIDADO: esta salsa se quema muy fácilmente! Unos jugos ligeramente dorados son agradables, pero a fuego alto bastan unos 15 segundos para pasar de ese sabor al de «cable eléctrico quemado». Baja el fuego o presta mucha atención.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>D8DC2C77-B2E4-5657-AA02-9C5EA8DE3B76</string>
+						<key>text</key>
+						<string>Vierte de inmediato la salsa sobre los fideos. Añade los chícharos congelados e integra todo con movimientos suaves.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>19515368-2DEF-56CB-A5E8-1B50E1E79819</string>
+						<key>text</key>
+						<string>Coloca el refractario en el centro del horno precalentado, de preferencia sobre una charola con borde para atrapar derrames. Revisa a los 10 minutos; la cazuela apenas debe empezar a burbujear.</string>
+						<key>duration</key>
+						<dict>
+							<key>seconds</key>
+							<integer>600</integer>
+						</dict>
+						<key>temperature</key>
+						<dict>
+							<key>value</key>
+							<dict>
+								<key>numerator</key>
+								<integer>400</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+							<key>unit</key>
+							<string>fahrenheit</string>
+						</dict>
+					</dict>
+				</array>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>E0326E3E-1B16-51A0-A9DB-F7B56EED4BA4</string>
+				<key>title</key>
+				<string>Cubierta</string>
+				<key>steps</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>430F8540-2A2C-5202-91D4-DFCC54BAFDA4</string>
+						<key>text</key>
+						<string>Mientras la cazuela empieza a hornearse, tritura los crutones y las galletas Ritz hasta obtener migas gruesas.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>34D65231-30EF-5CDA-A52A-80E031403F6E</string>
+						<key>text</key>
+						<string>Derrite 2 cucharadas de mantequilla e incorpóralas a la cubierta.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>88E24B70-B521-5423-B05B-F78456F0C6B8</string>
+						<key>text</key>
+						<string>Sazona con pimienta. No hará falta sal.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>23B15CCA-5C07-5869-833F-120F317BD1BE</string>
+						<key>text</key>
+						<string>Si quieres —aunque es muy recomendable— ralla pecorino sobre la cubierta y mezcla.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>D1053F74-8F83-5DC4-9DE9-F08CBD228080</string>
+						<key>text</key>
+						<string>Cuando la cazuela empiece a burbujear, distribuye la cubierta de manera uniforme y vuelve a meterla al horno para dorarla.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>2D75D4B2-436E-5D56-BF64-A00BEE903402</string>
+						<key>text</key>
+						<string>Revisa a los 8 minutos y después cada 2 minutos.</string>
+						<key>duration</key>
+						<dict>
+							<key>seconds</key>
+							<integer>480</integer>
+						</dict>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>7612D8A5-93BD-5267-AAF7-46A00BD720C4</string>
+						<key>text</key>
+						<string>Dora al gusto y retira del horno enseguida.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>E4AB9916-7484-5F7F-8B9E-ECC082219A04</string>
+						<key>text</key>
+						<string>Deja reposar la cazuela unos 10 minutos antes de servir.</string>
+						<key>duration</key>
+						<dict>
+							<key>seconds</key>
+							<integer>600</integer>
+						</dict>
+					</dict>
+				</array>
+			</dict>
+		</array>
+	</dict>
+</dict>
+</plist>

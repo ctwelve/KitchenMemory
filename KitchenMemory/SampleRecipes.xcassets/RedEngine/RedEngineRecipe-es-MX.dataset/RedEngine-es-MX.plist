@@ -23,19 +23,84 @@
 			<string>Fusión italoestadounidense</string>
 		</array>
 		<key>equipment</key>
-		<array/>
+		<array>
+			<dict>
+				<key>id</key>
+				<string>C9E56EED-6D55-5AD5-8F6A-424B9A10EFAF</string>
+				<key>isOptional</key>
+				<false/>
+				<key>name</key>
+				<string>sartén grande y amplio o cacerola para salsas</string>
+				<key>originalText</key>
+				<string>Un sartén grande y amplio o una cacerola para salsas</string>
+				<key>quantity</key>
+				<dict>
+					<key>kind</key>
+					<string>exact</string>
+					<key>lowerBound</key>
+					<dict>
+						<key>denominator</key>
+						<integer>1</integer>
+						<key>numerator</key>
+						<integer>1</integer>
+					</dict>
+				</dict>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>C29FDEB5-245E-5A26-884D-1F5F71BF275E</string>
+				<key>isOptional</key>
+				<false/>
+				<key>name</key>
+				<string>olla grande para pasta</string>
+				<key>originalText</key>
+				<string>Una olla grande para los rigatoni</string>
+				<key>quantity</key>
+				<dict>
+					<key>kind</key>
+					<string>exact</string>
+					<key>lowerBound</key>
+					<dict>
+						<key>denominator</key>
+						<integer>1</integer>
+						<key>numerator</key>
+						<integer>1</integer>
+					</dict>
+				</dict>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>5EAFF92D-C9AA-5671-80EC-B84FE55018DB</string>
+				<key>isOptional</key>
+				<false/>
+				<key>name</key>
+				<string>cuchillo y tabla para picar</string>
+				<key>originalText</key>
+				<string>Cuchillo y tabla para picar</string>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>5382D983-82F5-51C8-807F-287152CB78CC</string>
+				<key>isOptional</key>
+				<true/>
+				<key>name</key>
+				<string>molino de especias o mortero con mano</string>
+				<key>originalText</key>
+				<string>Molino para pimienta larga o mortero con mano</string>
+			</dict>
+		</array>
 		<key>id</key>
-		<string>F2300000-0000-4000-8000-000000000003</string>
+		<string>02BF87A7-4020-5CD5-8700-C4D44562BE03</string>
 		<key>ingredientSections</key>
 		<array>
 			<dict>
 				<key>id</key>
-				<string>F2350001-0000-4000-8000-000000000001</string>
+				<string>4FCDAD27-D95F-5E14-BB3E-B391B6495688</string>
 				<key>ingredients</key>
 				<array>
 					<dict>
 						<key>id</key>
-						<string>F2360001-0000-4000-8000-000000000001</string>
+						<string>8E29A853-7C52-5085-B52E-CFD16DAD0C39</string>
 						<key>ingredientText</key>
 						<string>rigatoni</string>
 						<key>isOptional</key>
@@ -65,7 +130,7 @@
 					</dict>
 					<dict>
 						<key>id</key>
-						<string>F2360002-0000-4000-8000-000000000002</string>
+						<string>37FF2D0D-A11A-5F79-B6CE-FF8022501C5A</string>
 						<key>ingredientText</key>
 						<string>salchicha de res</string>
 						<key>isOptional</key>
@@ -97,7 +162,7 @@
 					</dict>
 					<dict>
 						<key>id</key>
-						<string>F2360003-0000-4000-8000-000000000003</string>
+						<string>91142816-841D-5FD2-AAC4-2AB8CE5D30DB</string>
 						<key>ingredientText</key>
 						<string>cebolla</string>
 						<key>isOptional</key>
@@ -131,7 +196,7 @@
 					</dict>
 					<dict>
 						<key>id</key>
-						<string>F2360004-0000-4000-8000-000000000004</string>
+						<string>D5BAE1CA-1363-58B1-8C49-AB96BEA600C6</string>
 						<key>ingredientText</key>
 						<string>mantequilla</string>
 						<key>isOptional</key>
@@ -161,7 +226,7 @@
 					</dict>
 					<dict>
 						<key>id</key>
-						<string>F2360005-0000-4000-8000-000000000005</string>
+						<string>392BA058-6248-526D-9D22-2E4484BC1FCA</string>
 						<key>ingredientText</key>
 						<string>sazonador Montreal para carne</string>
 						<key>isOptional</key>
@@ -184,7 +249,7 @@
 					</dict>
 					<dict>
 						<key>id</key>
-						<string>F2360006-0000-4000-8000-000000000006</string>
+						<string>08675E62-DDC4-5F72-96C6-32C07D89B4F2</string>
 						<key>ingredientText</key>
 						<string>sal</string>
 						<key>isOptional</key>
@@ -207,7 +272,7 @@
 					</dict>
 					<dict>
 						<key>id</key>
-						<string>F2360007-0000-4000-8000-000000000007</string>
+						<string>A30ECB48-F92A-5DCA-A5B1-A454539179B5</string>
 						<key>ingredientText</key>
 						<string>pasta de tomate</string>
 						<key>isOptional</key>
@@ -237,7 +302,7 @@
 					</dict>
 					<dict>
 						<key>id</key>
-						<string>F2360008-0000-4000-8000-000000000008</string>
+						<string>430E6869-006A-5E26-8094-C916A06BD03F</string>
 						<key>ingredientText</key>
 						<string>vodka</string>
 						<key>isOptional</key>
@@ -260,7 +325,7 @@
 					</dict>
 					<dict>
 						<key>id</key>
-						<string>F2360009-0000-4000-8000-000000000009</string>
+						<string>470417EF-DBB3-56F0-9EBB-412361FEDE04</string>
 						<key>ingredientText</key>
 						<string>tomates Ro-Tel con chiles verdes</string>
 						<key>isOptional</key>
@@ -292,7 +357,7 @@
 					</dict>
 					<dict>
 						<key>id</key>
-						<string>F236000A-0000-4000-8000-00000000000A</string>
+						<string>E05A8E4C-A2ED-5BB4-81DC-98B1115D840A</string>
 						<key>ingredientText</key>
 						<string>salsa preparada con carne para pasta</string>
 						<key>isOptional</key>
@@ -324,7 +389,7 @@
 					</dict>
 					<dict>
 						<key>id</key>
-						<string>F236000B-0000-4000-8000-00000000000B</string>
+						<string>E120DE6C-EF2F-5CE2-9309-3C27943CD06E</string>
 						<key>ingredientText</key>
 						<string>ajo</string>
 						<key>isOptional</key>
@@ -353,12 +418,12 @@
 			</dict>
 			<dict>
 				<key>id</key>
-				<string>F2350002-0000-4000-8000-000000000002</string>
+				<string>7CFEF440-15AE-5AF5-9655-7CB1144A96D8</string>
 				<key>ingredients</key>
 				<array>
 					<dict>
 						<key>id</key>
-						<string>F236000C-0000-4000-8000-00000000000C</string>
+						<string>877F8029-913C-57B4-B3F6-D9A5CE39EDD9</string>
 						<key>ingredientText</key>
 						<string>pecorino romano</string>
 						<key>isOptional</key>
@@ -383,7 +448,7 @@
 					</dict>
 					<dict>
 						<key>id</key>
-						<string>F236000D-0000-4000-8000-00000000000D</string>
+						<string>4E4568AA-E9E1-5064-81BB-B226DE98DD11</string>
 						<key>ingredientText</key>
 						<string>hoja de laurel</string>
 						<key>isOptional</key>
@@ -413,7 +478,7 @@
 					</dict>
 					<dict>
 						<key>id</key>
-						<string>F236000E-0000-4000-8000-00000000000E</string>
+						<string>8DF00761-35CA-56FB-8988-37D48FAB1516</string>
 						<key>ingredientText</key>
 						<string>orégano seco</string>
 						<key>isOptional</key>
@@ -436,7 +501,7 @@
 					</dict>
 					<dict>
 						<key>id</key>
-						<string>F236000F-0000-4000-8000-00000000000F</string>
+						<string>01E0A827-6CE1-57CF-8F95-2BAE1144F2AD</string>
 						<key>ingredientText</key>
 						<string>albahaca liofilizada</string>
 						<key>isOptional</key>
@@ -459,7 +524,7 @@
 					</dict>
 					<dict>
 						<key>id</key>
-						<string>F2360010-0000-4000-8000-000000000010</string>
+						<string>65EF61A1-8DC9-5C5F-82A5-274C3E4F9C88</string>
 						<key>ingredientText</key>
 						<string>hojuelas de chile rojo</string>
 						<key>isOptional</key>
@@ -482,7 +547,7 @@
 					</dict>
 					<dict>
 						<key>id</key>
-						<string>F2360011-0000-4000-8000-000000000011</string>
+						<string>7AB3A77B-53B6-50E2-9C1B-6CA1FDBBDF57</string>
 						<key>ingredientText</key>
 						<string>pimienta larga</string>
 						<key>isOptional</key>
@@ -514,7 +579,7 @@
 					</dict>
 					<dict>
 						<key>id</key>
-						<string>F2360012-0000-4000-8000-000000000012</string>
+						<string>1324015E-CEB3-5797-B23C-41195A620B7D</string>
 						<key>ingredientText</key>
 						<string>clavo molido</string>
 						<key>isOptional</key>
@@ -539,7 +604,7 @@
 					</dict>
 					<dict>
 						<key>id</key>
-						<string>F2360013-0000-4000-8000-000000000013</string>
+						<string>83A0C610-DF98-5439-947F-E02BEBCC8FA1</string>
 						<key>ingredientText</key>
 						<string>azúcar</string>
 						<key>isOptional</key>
@@ -571,7 +636,7 @@
 					</dict>
 					<dict>
 						<key>id</key>
-						<string>F2360014-0000-4000-8000-000000000014</string>
+						<string>4643C26E-845F-594A-A188-1A37B177E335</string>
 						<key>ingredientText</key>
 						<string>salsa Worcestershire</string>
 						<key>isOptional</key>
@@ -594,7 +659,7 @@
 					</dict>
 					<dict>
 						<key>id</key>
-						<string>F2360015-0000-4000-8000-000000000015</string>
+						<string>C1B62D5F-40A2-5C0A-B70D-3CA7E2E33D89</string>
 						<key>ingredientText</key>
 						<string>pimienta negra</string>
 						<key>isOptional</key>
@@ -624,12 +689,12 @@
 		<array>
 			<dict>
 				<key>id</key>
-				<string>F2370001-0000-4000-8000-000000000001</string>
+				<string>8E7A0D84-7ACD-508B-9547-D24ED58CE5AF</string>
 				<key>steps</key>
 				<array>
 					<dict>
 						<key>id</key>
-						<string>F2380001-0000-4000-8000-000000000001</string>
+						<string>97AD6FAE-5DE8-5163-AE87-B3F4FF8F9AD6</string>
 						<key>name</key>
 						<string>Logra ONYO</string>
 						<key>text</key>
@@ -637,7 +702,7 @@
 					</dict>
 					<dict>
 						<key>id</key>
-						<string>F2380002-0000-4000-8000-000000000002</string>
+						<string>ECA91A58-2DEE-561C-B066-0F38667B6F71</string>
 						<key>name</key>
 						<string>Despliega la SOSIG</string>
 						<key>text</key>
@@ -645,7 +710,7 @@
 					</dict>
 					<dict>
 						<key>id</key>
-						<string>F2380003-0000-4000-8000-000000000003</string>
+						<string>38F621FF-EE17-54D4-B408-C899187E26C6</string>
 						<key>name</key>
 						<string>Cocina la pasta de tomate con ganas</string>
 						<key>text</key>
@@ -657,12 +722,12 @@
 			</dict>
 			<dict>
 				<key>id</key>
-				<string>F2370002-0000-4000-8000-000000000002</string>
+				<string>314A06DC-0568-5811-A0CE-48C405BE1F62</string>
 				<key>steps</key>
 				<array>
 					<dict>
 						<key>id</key>
-						<string>F2380004-0000-4000-8000-000000000004</string>
+						<string>06550937-4C04-5372-B79E-EE7A5BF1DD28</string>
 						<key>name</key>
 						<string>Arma la salsa</string>
 						<key>text</key>
@@ -675,7 +740,7 @@
 							<integer>1800</integer>
 						</dict>
 						<key>id</key>
-						<string>F2380005-0000-4000-8000-000000000005</string>
+						<string>EA8CB2D0-865A-544A-A955-D73E6E15BC8D</string>
 						<key>name</key>
 						<string>Deja de estarle moviendo</string>
 						<key>text</key>
@@ -687,12 +752,12 @@
 			</dict>
 			<dict>
 				<key>id</key>
-				<string>F2370003-0000-4000-8000-000000000003</string>
+				<string>5B6D0C24-2BBB-5CBE-AE03-EE0DD414F8EA</string>
 				<key>steps</key>
 				<array>
 					<dict>
 						<key>id</key>
-						<string>F2380006-0000-4000-8000-000000000006</string>
+						<string>D7CB4687-9BA7-5351-A982-2E844E132DD4</string>
 						<key>name</key>
 						<string>Rigatoni</string>
 						<key>text</key>
@@ -719,7 +784,7 @@
 				<key>assetName</key>
 				<string>RedEngineGallery0</string>
 				<key>id</key>
-				<string>F2320000-0000-4000-8000-000000000003</string>
+				<string>3F8A429B-A34B-5F0C-9BD6-56DA2AB1789A</string>
 				<key>role</key>
 				<string>gallery</string>
 			</dict>
@@ -732,7 +797,7 @@
 			<string>Rinde una tanda enorme con bastantes sobras</string>
 		</dict>
 		<key>revisionNumber</key>
-		<integer>1</integer>
+		<integer>2</integer>
 		<key>source</key>
 		<dict>
 			<key>authorName</key>

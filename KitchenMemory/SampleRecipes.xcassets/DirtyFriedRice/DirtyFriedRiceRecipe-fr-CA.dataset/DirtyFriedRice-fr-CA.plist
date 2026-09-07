@@ -1,9 +1,739 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0"><dict><key>formatVersion</key><integer>1</integer><key>recipeID</key><string>F1020000-0000-4000-8000-000000000002</string><key>revision</key><dict>
-<key>id</key><string>F1210000-0000-4000-8000-000000000002</string><key>recipeID</key><string>F1020000-0000-4000-8000-000000000002</string><key>revisionNumber</key><integer>1</integer><key>title</key><string>Riz frit « sale »</string><key>summary</key><string>Un riz poêlé au bœuf, aux légumes, aux œufs et aux piments Hatch, relevé de poivre.</string><key>authorName</key><string>cTwelve</string><key>contentLanguage</key><string>fr-CA</string>
-<key>recipeYield</key><dict><key>quantity</key><dict><key>kind</key><string>exact</string><key>lowerBound</key><dict><key>numerator</key><integer>6</integer><key>denominator</key><integer>1</integer></dict></dict><key>unitText</key><string>portions</string><key>originalText</key><string>Donne environ 6 portions</string></dict><key>prepDuration</key><dict><key>seconds</key><integer>900</integer></dict><key>cookDuration</key><dict><key>seconds</key><integer>900</integer></dict><key>cuisines</key><array><string>Fusion nord-américaine</string></array><key>categories</key><array><string>Souper</string></array><key>keywords</key><array><string>riz</string><string>bœuf</string><string>piment Hatch</string></array>
-<key>media</key><array><dict><key>id</key><string>F1220000-0000-4000-8000-000000000002</string><key>role</key><string>hero</string><key>assetName</key><string>DirtyFriedRiceHero</string><key>accessibilityLabel</key><string>Bol de riz frit au bœuf, aux œufs et aux légumes</string></dict></array><key>equipment</key><array/>
-<key>ingredientSections</key><array><dict><key>id</key><string>F1230000-0000-4000-8000-000000000002</string><key>title</key><string>Riz</string><key>ingredients</key><array><dict><key>id</key><string>F1240000-0000-4000-8000-000000000001</string><key>originalText</key><string>3 tasses de riz japonais cuit et refroidi</string><key>presentationMode</key><string>original</string><key>quantity</key><dict><key>kind</key><string>exact</string><key>lowerBound</key><dict><key>numerator</key><integer>3</integer><key>denominator</key><integer>1</integer></dict></dict><key>unitText</key><string>tasses</string><key>ingredientText</key><string>riz japonais</string><key>preparation</key><string>cuit et refroidi</string><key>isOptional</key><false/><key>scalingBehavior</key><string>linear</string><key>parseState</key><string>reviewed</string></dict><dict><key>id</key><string>F1240000-0000-4000-8000-000000000002</string><key>originalText</key><string>3 gros œufs brouillés</string><key>presentationMode</key><string>original</string><key>quantity</key><dict><key>kind</key><string>exact</string><key>lowerBound</key><dict><key>numerator</key><integer>3</integer><key>denominator</key><integer>1</integer></dict></dict><key>unitText</key><string>gros</string><key>ingredientText</key><string>œufs</string><key>preparation</key><string>brouillés</string><key>isOptional</key><false/><key>scalingBehavior</key><string>linear</string><key>parseState</key><string>reviewed</string></dict></array></dict></array>
-<key>instructionSections</key><array><dict><key>id</key><string>F1250000-0000-4000-8000-000000000002</string><key>title</key><string>Cuisson</string><key>steps</key><array><dict><key>id</key><string>F1260000-0000-4000-8000-000000000001</string><key>text</key><string>Faire dorer le bœuf et les légumes dans une grande poêle très chaude.</string></dict><dict><key>id</key><string>F1260000-0000-4000-8000-000000000002</string><key>text</key><string>Ajouter le riz froid et le faire sauter jusqu’à ce qu’il soit bien chaud.</string></dict><dict><key>id</key><string>F1260000-0000-4000-8000-000000000003</string><key>text</key><string>Incorporer les œufs et les piments, assaisonner, puis servir immédiatement.</string></dict></array></dict></array>
-</dict></dict></plist>
+<plist version="1.0">
+<dict>
+	<key>formatVersion</key>
+	<integer>1</integer>
+	<key>recipeID</key>
+	<string>F1020000-0000-4000-8000-000000000002</string>
+	<key>revision</key>
+	<dict>
+		<key>id</key>
+		<string>FD922799-DC38-51E4-A499-974C86A34108</string>
+		<key>recipeID</key>
+		<string>F1020000-0000-4000-8000-000000000002</string>
+		<key>revisionNumber</key>
+		<integer>2</integer>
+		<key>title</key>
+		<string>Riz frit « sale »</string>
+		<key>summary</key>
+		<string>Ce n’est pas du « dirty rice ». Pas tout à fait du riz frit non plus. Un vide-garde-manger au bœuf, bien poivré et légèrement piquant, avec piments Hatch, œufs, légumes et un passeport de Bismarck, au Dakota du Nord. Prévoir environ 20 à 30 minutes.</string>
+		<key>authorName</key>
+		<string>cTwelve</string>
+		<key>contentLanguage</key>
+		<string>fr-CA</string>
+		<key>source</key>
+		<dict>
+			<key>kind</key>
+			<string>webpage</string>
+			<key>title</key>
+			<string>Riz frit « sale » sur X</string>
+			<key>authorName</key>
+			<string>cTwelve</string>
+			<key>publisherName</key>
+			<string>X</string>
+			<key>canonicalURL</key>
+			<dict>
+				<key>relative</key>
+				<string>https://x.com/theCTwelve/status/2089465462723682809</string>
+			</dict>
+		</dict>
+		<key>recipeYield</key>
+		<dict>
+			<key>originalText</key>
+			<string>Remplit une énorme poêle</string>
+		</dict>
+		<key>cuisines</key>
+		<array>
+			<string>Du Dakota du Nord</string>
+		</array>
+		<key>categories</key>
+		<array>
+			<string>Souper</string>
+			<string>Riz frit</string>
+			<string>Cuisine économique</string>
+		</array>
+		<key>keywords</key>
+		<array>
+			<string>bœuf haché</string>
+			<string>riz</string>
+			<string>piments Hatch</string>
+			<string>vide-garde-manger</string>
+			<string>grande quantité</string>
+		</array>
+		<key>media</key>
+		<array>
+			<dict>
+				<key>id</key>
+				<string>15DF7B72-8A13-5549-862C-C3B1F5704847</string>
+				<key>role</key>
+				<string>hero</string>
+				<key>assetName</key>
+				<string>DirtyFriedRiceHero</string>
+				<key>accessibilityLabel</key>
+				<string>Un bol rempli de riz frit au bœuf, aux œufs, au maïs, aux carottes, aux petits pois et aux haricots verts, tenu devant l’énorme poêle dont il provient</string>
+			</dict>
+		</array>
+		<key>equipment</key>
+		<array>
+			<dict>
+				<key>id</key>
+				<string>F5F393AB-821F-5EFC-AC9B-AF1B4AA4FA30</string>
+				<key>originalText</key>
+				<string>Une très grande poêle supportant une chaleur intense</string>
+				<key>quantity</key>
+				<dict>
+					<key>kind</key>
+					<string>exact</string>
+					<key>lowerBound</key>
+					<dict>
+						<key>numerator</key>
+						<integer>1</integer>
+						<key>denominator</key>
+						<integer>1</integer>
+					</dict>
+				</dict>
+				<key>name</key>
+				<string>très grande poêle pour chaleur intense</string>
+				<key>isOptional</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>CE3763E8-3914-5D1C-B0A4-EA506CA5F02D</string>
+				<key>originalText</key>
+				<string>Une spatulator™ assez puissante et robuste pour la Grande Cuisine en quantité</string>
+				<key>quantity</key>
+				<dict>
+					<key>kind</key>
+					<string>exact</string>
+					<key>lowerBound</key>
+					<dict>
+						<key>numerator</key>
+						<integer>1</integer>
+						<key>denominator</key>
+						<integer>1</integer>
+					</dict>
+				</dict>
+				<key>name</key>
+				<string>spatule robuste</string>
+				<key>isOptional</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>5D3F2746-8964-5DA2-AB96-F9981F78AACB</string>
+				<key>originalText</key>
+				<string>Bol et fourchette pour battre les œufs</string>
+				<key>name</key>
+				<string>bol et fourchette</string>
+				<key>isOptional</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>BCBDB4FE-A308-5673-808E-1E21DF9AEF03</string>
+				<key>originalText</key>
+				<string>Couteau et planche à découper pour s’occuper de l’oignon</string>
+				<key>name</key>
+				<string>couteau et planche à découper</string>
+				<key>isOptional</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>61B552DD-20FC-5438-B219-E9351EECBAEE</string>
+				<key>originalText</key>
+				<string>Ouvre-boîte pour libérer le Ro-Tel de sa prison métallique</string>
+				<key>name</key>
+				<string>ouvre-boîte</string>
+				<key>isOptional</key>
+				<false/>
+			</dict>
+		</array>
+		<key>ingredientSections</key>
+		<array>
+			<dict>
+				<key>id</key>
+				<string>CB665213-8852-5762-83CB-215895DBF6B4</string>
+				<key>title</key>
+				<string>Poêle principale</string>
+				<key>ingredients</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>1BB0531A-AAB4-5BE9-A9F0-662178337EC3</string>
+						<key>originalText</key>
+						<string>1,3 lb de bœuf haché</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>13</integer>
+								<key>denominator</key>
+								<integer>10</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>livres</string>
+						<key>ingredientText</key>
+						<string>bœuf haché</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>37FDC134-1AC5-5477-B2CF-F0C60961839A</string>
+						<key>originalText</key>
+						<string>1 cuillère à soupe américaine d’huile végétale, seulement si le bœuf en a besoin</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>1</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>cuillère à soupe américaine</string>
+						<key>ingredientText</key>
+						<string>huile végétale</string>
+						<key>note</key>
+						<string>Utiliser une autre huile supportant une chaleur intense au besoin; ne pas utiliser d’huile d’olive.</string>
+						<key>isOptional</key>
+						<true/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>3F01A2BC-43E3-5AAE-872F-128493783977</string>
+						<key>originalText</key>
+						<string>1 oignon jaune plutôt petit, haché grossièrement</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>1</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>plutôt petit</string>
+						<key>ingredientText</key>
+						<string>oignon jaune</string>
+						<key>preparation</key>
+						<string>haché grossièrement</string>
+						<key>note</key>
+						<string>En mettre davantage ne ferait pas de tort.</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>B6ABE46E-6E5C-5147-9C1D-E3107351B038</string>
+						<key>originalText</key>
+						<string>Beaucoup de poivre noir fraîchement moulu</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>beaucoup</string>
+						</dict>
+						<key>ingredientText</key>
+						<string>poivre noir</string>
+						<key>preparation</key>
+						<string>fraîchement moulu</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>A0F18B33-625D-5455-A718-F341C886C9F9</string>
+						<key>originalText</key>
+						<string>Épices à bifteck de Montréal, au goût</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>au goût</string>
+						</dict>
+						<key>ingredientText</key>
+						<string>épices à bifteck de Montréal</string>
+						<key>note</key>
+						<string>À défaut, assaisonner au goût avec du gros sel, du poivre noir, du piment de Cayenne, de l’ail, du paprika, de l’oignon, de la coriandre, de l’aneth ou des épices semblables.</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>6EF3E50C-605F-57FE-A5AB-8A5E591810C2</string>
+						<key>originalText</key>
+						<string>1 boîte de 10 oz de tomates en dés et piments Hatch grillés Ro-Tel Hatch</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>1</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>boîte</string>
+						<key>package</key>
+						<dict>
+							<key>quantity</key>
+							<dict>
+								<key>kind</key>
+								<string>exact</string>
+								<key>lowerBound</key>
+								<dict>
+									<key>numerator</key>
+									<integer>10</integer>
+									<key>denominator</key>
+									<integer>1</integer>
+								</dict>
+							</dict>
+							<key>unitText</key>
+							<string>onces</string>
+						</dict>
+						<key>ingredientText</key>
+						<string>tomates en dés et piments Hatch grillés Ro-Tel Hatch</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>35560D77-4E43-5909-9516-2BB30788DF72</string>
+						<key>originalText</key>
+						<string>3 mesures de cuiseur à riz de riz japonais, cuit</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>3</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>mesures de cuiseur à riz</string>
+						<key>ingredientText</key>
+						<string>riz japonais</string>
+						<key>preparation</key>
+						<string>cuit</string>
+						<key>note</key>
+						<string>Une petite cuisson de Zojirushi, ou une casserole petite à moyenne.</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>7D2A2CC4-A21D-5EAE-9E07-1E9382545FDC</string>
+						<key>originalText</key>
+						<string>3 gros œufs battus</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>3</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>gros</string>
+						<key>ingredientText</key>
+						<string>œufs</string>
+						<key>preparation</key>
+						<string>battus</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+				</array>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>D2EB50E2-372A-5686-A685-40C37865AAEE</string>
+				<key>title</key>
+				<string>Assaisonnement et finition</string>
+				<key>ingredients</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>F187C714-155A-5437-928B-11EB1F2445C3</string>
+						<key>originalText</key>
+						<string>1 sachet de 0,74 oz / 21 g d’assaisonnement pour riz frit Sun-Bird</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>1</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>sachet</string>
+						<key>package</key>
+						<dict>
+							<key>quantity</key>
+							<dict>
+								<key>kind</key>
+								<string>exact</string>
+								<key>lowerBound</key>
+								<dict>
+									<key>numerator</key>
+									<integer>21</integer>
+									<key>denominator</key>
+									<integer>1</integer>
+								</dict>
+							</dict>
+							<key>unitText</key>
+							<string>grammes</string>
+						</dict>
+						<key>ingredientText</key>
+						<string>assaisonnement pour riz frit Sun-Bird</string>
+						<key>note</key>
+						<string>0,74 once</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>A0F7A1F8-8231-5AEB-9501-E14286AF822F</string>
+						<key>originalText</key>
+						<string>Un trait de sauce Worcestershire</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>un trait</string>
+						</dict>
+						<key>ingredientText</key>
+						<string>sauce Worcestershire</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>EFDF2CCE-5DD0-535D-BF5B-F8EC8218081E</string>
+						<key>originalText</key>
+						<string>Une bonne pincée de piment de Cayenne</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>une bonne pincée</string>
+						</dict>
+						<key>ingredientText</key>
+						<string>piment de Cayenne</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>54DFCC3C-3656-5B7D-8943-617C33F841A8</string>
+						<key>originalText</key>
+						<string>1 sac de 10 oz de légumes mélangés surgelés</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>1</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>sac</string>
+						<key>package</key>
+						<dict>
+							<key>quantity</key>
+							<dict>
+								<key>kind</key>
+								<string>exact</string>
+								<key>lowerBound</key>
+								<dict>
+									<key>numerator</key>
+									<integer>10</integer>
+									<key>denominator</key>
+									<integer>1</integer>
+								</dict>
+							</dict>
+							<key>unitText</key>
+							<string>onces</string>
+						</dict>
+						<key>ingredientText</key>
+						<string>légumes mélangés surgelés</string>
+						<key>note</key>
+						<string>Maïs, petits pois, carottes et haricots verts — ou ce que vous voulez; je ne suis pas votre mère.</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>81CBD2A8-A2BF-5696-B23C-14851D66A17D</string>
+						<key>originalText</key>
+						<string>Sauce soya, au goût et probablement plus qu’on ne le croit au départ</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>au goût</string>
+						</dict>
+						<key>ingredientText</key>
+						<string>sauce soya</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>E27825B5-A618-598A-B717-8468FE370797</string>
+						<key>originalText</key>
+						<string>Huile de sésame grillé, pour finir</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>ingredientText</key>
+						<string>huile de sésame grillé</string>
+						<key>preparation</key>
+						<string>pour finir</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+				</array>
+			</dict>
+		</array>
+		<key>instructionSections</key>
+		<array>
+			<dict>
+				<key>id</key>
+				<string>65B8B5BC-10A5-56EF-837C-F7C3A41AF1C4</string>
+				<key>title</key>
+				<string>Faire dorer le bœuf</string>
+				<key>steps</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>FA278FB6-FF1E-53BF-AF37-53F725AA8AB5</string>
+						<key>name</key>
+						<string>Faire dorer franchement</string>
+						<key>text</key>
+						<string>Chauffer très fortement la très grande poêle. Ajouter le bœuf haché et n’utiliser l’huile végétale qu’au besoin. Assaisonner avec des épices à bifteck de Montréal et beaucoup de poivre noir fraîchement moulu, puis faire dorer franchement en remuant constamment. Les sucs bruns au fond de la poêle sont importants.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>1C62F1FF-157F-550F-99AF-D2AAF1694D61</string>
+						<key>name</key>
+						<string>Déglacer avec l’oignon</string>
+						<key>text</key>
+						<string>Lorsque le bœuf est bien doré, ajouter l’oignon. Poursuivre la cuisson jusqu’à ce qu’il s’attendrisse un peu, en utilisant son humidité pour décoller les sucs.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>66A931A6-52F4-5998-BFFE-A0B1FCF12E62</string>
+						<key>name</key>
+						<string>Faire évaporer le jus des tomates</string>
+						<key>text</key>
+						<string>Verser toute la boîte de Ro-Tel Hatch, jus compris. Poursuivre jusqu’à ce que le bœuf soit bien doré, l’oignon tendre à votre goût et la majeure partie du jus de tomate évaporée. Le feu vif compte : on veut du bœuf doré, pas bouilli. Quand le résultat vous plaît, réduire un peu le feu.</string>
+					</dict>
+				</array>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>BCD960F6-DA90-5C10-952D-9ECEB70141F7</string>
+				<key>title</key>
+				<string>Faire frire le riz</string>
+				<key>steps</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>DC328C62-04D5-53CD-82B6-048529257267</string>
+						<key>name</key>
+						<string>Incorporer le riz</string>
+						<key>text</key>
+						<string>Ajouter le riz japonais cuit et l’incorporer en défaisant les amas. Le riz fraîchement cuit convient parfaitement; nul besoin du rituel consistant à découvrir des restes de riz au réfrigérateur. Laisser une minute ou deux pour que la chaleur accumulée fasse vraiment frire le riz.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>97316BBC-D853-57DA-B080-8EA4DA4E5133</string>
+						<key>name</key>
+						<string>Assaisonner</string>
+						<key>text</key>
+						<string>Ajouter l’assaisonnement pour riz frit Sun-Bird, un trait de sauce Worcestershire et une bonne dose de piment de Cayenne. Bien mélanger, puis réduire encore le feu.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>D5FE3956-7BD9-5B00-A88A-1D3834B19113</string>
+						<key>name</key>
+						<string>Incorporer les œufs</string>
+						<key>text</key>
+						<string>Ajouter les 3 œufs battus. Les incorporer au riz et au bœuf chauds, en retournant et en remuant jusqu’à ce qu’ils soient cuits et répartis en petits morceaux dans le riz.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>9D2E9375-4600-5E25-B0F0-F5DF185BB058</string>
+						<key>name</key>
+						<string>Faire vraiment revenir le tout</string>
+						<key>text</key>
+						<string>Continuer de travailler le mélange à feu réduit assez longtemps pour bien l’unir et faire réellement revenir et dorer un peu de riz, de bœuf, d’oignon et d’œuf.</string>
+					</dict>
+				</array>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>C40716E2-D61A-5395-958C-B4DF7CD0E4C0</string>
+				<key>title</key>
+				<string>Finition et repos</string>
+				<key>steps</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>2448B543-02B3-5B6E-8191-ABA4C1CB5051</string>
+						<key>name</key>
+						<string>COUPER LE FEU</string>
+						<key>text</key>
+						<string>Verser tout le sac de légumes surgelés directement dans la poêle, sans les décongeler ni les passer au micro-ondes. Bien remuer et laisser l’énorme masse de bœuf et de riz brûlants, ainsi que la chaleur accumulée dans la poêle, cuire les légumes.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>C14C7369-420C-5812-A071-0241DC1F3CD7</string>
+						<key>name</key>
+						<string>Goûter et ajouter la sauce soya</string>
+						<key>text</key>
+						<string>Goûter. Ajouter de la sauce soya jusqu’à ce que les saveurs prennent soudainement tout leur sens. Au besoin, remettre la poêle à feu vif seulement environ 15 secondes en remuant vigoureusement, juste pour répartir la sauce et évaporer un peu d’eau.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>AD6A3483-8604-5B30-86BA-48C10C26EF5D</string>
+						<key>name</key>
+						<string>Couper de nouveau le feu</string>
+						<key>text</key>
+						<string>Couper de nouveau le feu. Terminer avec un filet d’huile de sésame grillé et mélanger. La quantité exacte de sauce soya est volontairement laissée ouverte, car les autres assaisonnements et les différentes sauces apportent des quantités de sel variables. Pour le Cayenne, c’est entre vous et le bon Dieu.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>F1F96A29-FB74-5C58-A0AE-E3C4107AB6F9</string>
+						<key>name</key>
+						<string>La manœuvre de la poêle géante</string>
+						<key>text</key>
+						<string>Si le riz semble sec, ne pas ajouter de liquide immédiatement. Déplacer la poêle entière sur un rond complètement froid et couvrir. La poêle et les quelques livres de nourriture forment une réserve thermique : leur chaleur termine la cuisson des légumes tandis que la vapeur emprisonnée redistribue l’humidité dans le riz. Déplacer physiquement la poêle est important sur une surface de cuisson vitrocéramique radiante, où « ÉTEINT » et « FROID » sont deux choses différentes.</string>
+					</dict>
+				</array>
+			</dict>
+		</array>
+	</dict>
+</dict>
+</plist>
