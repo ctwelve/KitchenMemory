@@ -20,7 +20,7 @@ final class LocalizationFormattingContractTests: XCTestCase {
       lowerBound: RationalQuantity(numerator: 3, denominator: 2)), unitText: "tasses", ingredientText: "farine")
     let retained = revision
     var dates: Set<String> = []
-    for language in ["en-US", "en-GB", "es-MX", "fr-CA"] {
+    for language in ["en-US", "en-GB", "es-MX", "fr-CA", "de-DE"] {
       let locale = Locale(identifier: language)
       let comparison = RecipeComparisonFormatter(locale: locale)
       let source = comparison.value(.source, revision: revision)

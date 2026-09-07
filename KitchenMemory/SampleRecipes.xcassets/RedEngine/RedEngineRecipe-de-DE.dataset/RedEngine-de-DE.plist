@@ -1,0 +1,821 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>formatVersion</key>
+	<integer>1</integer>
+	<key>recipeID</key>
+	<string>DFA68566-83E8-5431-AC6A-4E05A7585287</string>
+	<key>revision</key>
+	<dict>
+		<key>authorName</key>
+		<string>cTwelve</string>
+		<key>categories</key>
+		<array>
+			<string>Abendessen</string>
+			<string>Pasta</string>
+			<string>Aus dem Vorrat kochen</string>
+		</array>
+		<key>contentLanguage</key>
+		<string>de-DE</string>
+		<key>cuisines</key>
+		<array>
+			<string>Italienisch-amerikanische Fusion</string>
+		</array>
+		<key>equipment</key>
+		<array>
+			<dict>
+				<key>id</key>
+				<string>B2AA05BE-960A-5B2D-AA9F-003E482B93B4</string>
+				<key>isOptional</key>
+				<false/>
+				<key>name</key>
+				<string>große breite Pfanne oder Sauteuse</string>
+				<key>originalText</key>
+				<string>Eine große breite Pfanne oder Sauteuse</string>
+				<key>quantity</key>
+				<dict>
+					<key>kind</key>
+					<string>exact</string>
+					<key>lowerBound</key>
+					<dict>
+						<key>denominator</key>
+						<integer>1</integer>
+						<key>numerator</key>
+						<integer>1</integer>
+					</dict>
+				</dict>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>FCD43952-B2F4-5AA4-AF1B-5F3E80F5E471</string>
+				<key>isOptional</key>
+				<false/>
+				<key>name</key>
+				<string>großer Nudeltopf</string>
+				<key>originalText</key>
+				<string>Ein großer Topf für die Rigatoni</string>
+				<key>quantity</key>
+				<dict>
+					<key>kind</key>
+					<string>exact</string>
+					<key>lowerBound</key>
+					<dict>
+						<key>denominator</key>
+						<integer>1</integer>
+						<key>numerator</key>
+						<integer>1</integer>
+					</dict>
+				</dict>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>94EA8468-56FE-5DED-830D-58CB78798462</string>
+				<key>isOptional</key>
+				<false/>
+				<key>name</key>
+				<string>Messer und Schneidebrett</string>
+				<key>originalText</key>
+				<string>Messer und Schneidebrett</string>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>D7322827-14F7-584F-BA9D-045BAAFA0F4C</string>
+				<key>isOptional</key>
+				<true/>
+				<key>name</key>
+				<string>Gewürzmühle oder Mörser mit Stößel</string>
+				<key>originalText</key>
+				<string>Mühle für langen Pfeffer oder Mörser mit Stößel</string>
+			</dict>
+		</array>
+		<key>id</key>
+		<string>1FD47DC8-BE57-57FE-8746-6B050B8E9B16</string>
+		<key>ingredientSections</key>
+		<array>
+			<dict>
+				<key>id</key>
+				<string>E5416EA8-FAC2-5CAB-8904-423B69825F11</string>
+				<key>ingredients</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>B4679532-5594-5145-97EF-6FE854B16FC9</string>
+						<key>ingredientText</key>
+						<string>Rigatoni</string>
+						<key>isOptional</key>
+						<false/>
+						<key>originalText</key>
+						<string>1 US-Pfund Rigatoni</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>denominator</key>
+								<integer>1</integer>
+								<key>numerator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>unitText</key>
+						<string>US-Pfund</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>6EE4B4CE-06D6-5F8A-9D2B-16FC43BAE5D4</string>
+						<key>ingredientText</key>
+						<string>Rinderwurst</string>
+						<key>isOptional</key>
+						<false/>
+						<key>originalText</key>
+						<string>1 US-Pfund Rinderwurst, in Scheiben geschnitten</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>preparation</key>
+						<string>in Scheiben geschnitten</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>denominator</key>
+								<integer>1</integer>
+								<key>numerator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>unitText</key>
+						<string>US-Pfund</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>BFA23835-6598-59B8-85E4-A36EA765BCE9</string>
+						<key>ingredientText</key>
+						<string>Zwiebel</string>
+						<key>isOptional</key>
+						<false/>
+						<key>note</key>
+						<string>Zwei mittelgroße Zwiebeln entsprechen dieser Menge.</string>
+						<key>originalText</key>
+						<string>1 komisch große Zwiebel, gewürfelt, oder 2 mittelgroße Zwiebeln</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>preparation</key>
+						<string>gewürfelt</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>denominator</key>
+								<integer>1</integer>
+								<key>numerator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>unitText</key>
+						<string>komisch groß</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>901A8C52-6AAC-5623-9F51-E7D0CA42AA6B</string>
+						<key>ingredientText</key>
+						<string>Butter</string>
+						<key>isOptional</key>
+						<false/>
+						<key>originalText</key>
+						<string>2 US-Esslöffel Butter, ¼ US-Butterstick</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>denominator</key>
+								<integer>1</integer>
+								<key>numerator</key>
+								<integer>2</integer>
+							</dict>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>unitText</key>
+						<string>US-Esslöffel</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>9B31A8F6-CA45-5979-86FD-A81B5F61BECC</string>
+						<key>ingredientText</key>
+						<string>Montreal-Steakgewürz</string>
+						<key>isOptional</key>
+						<false/>
+						<key>originalText</key>
+						<string>Montreal-Steakgewürz, sparsam</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>sparsam</string>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>F413BC66-0024-5417-BA30-CDD70B48C404</string>
+						<key>ingredientText</key>
+						<string>Salz</string>
+						<key>isOptional</key>
+						<false/>
+						<key>note</key>
+						<string>Die Zwiebeln brauchen Salz, obwohl auch das Montreal-Gewürz welches enthält.</string>
+						<key>originalText</key>
+						<string>Salz, besonders bei ungesalzener Butter</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>nach Geschmack</string>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>428995A8-3802-5B9B-8CB9-16FC2CB8E84B</string>
+						<key>ingredientText</key>
+						<string>Tomatenmark</string>
+						<key>isOptional</key>
+						<false/>
+						<key>originalText</key>
+						<string>1 kleine Dose Tomatenmark</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>denominator</key>
+								<integer>1</integer>
+								<key>numerator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>unitText</key>
+						<string>kleine Dose</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>69F16CB6-3BFC-5B06-8E39-B70124211E77</string>
+						<key>ingredientText</key>
+						<string>Wodka</string>
+						<key>isOptional</key>
+						<true/>
+						<key>originalText</key>
+						<string>Ein kleiner Schuss Wodka</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>ein kleiner Schuss</string>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>FA727D98-FE23-5DD7-8E6F-40BAF2040174</string>
+						<key>ingredientText</key>
+						<string>Ro-Tel-Tomatenwürfel mit grünen Chilis</string>
+						<key>isOptional</key>
+						<false/>
+						<key>note</key>
+						<string>Im Original wurde die Sorte mit Hatch-Chilis verwendet.</string>
+						<key>originalText</key>
+						<string>1 Dose Ro-Tel-Tomatenwürfel mit grünen Chilis, samt Flüssigkeit</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>denominator</key>
+								<integer>1</integer>
+								<key>numerator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>unitText</key>
+						<string>Dose</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>F5E091F2-EA6E-5F23-A9EC-1DA082CD8A9E</string>
+						<key>ingredientText</key>
+						<string>fertige Fleisch-Pastasauce von Hunt's</string>
+						<key>isOptional</key>
+						<false/>
+						<key>note</key>
+						<string>Eine fertige Pastasauce auf Tomatenbasis verwenden, keine reine Tomatensauce.</string>
+						<key>originalText</key>
+						<string>2 Dosen fertige Fleisch-Pastasauce von Hunt's</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>denominator</key>
+								<integer>1</integer>
+								<key>numerator</key>
+								<integer>2</integer>
+							</dict>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>unitText</key>
+						<string>Dosen</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>46EAA72E-7D1E-5ABC-A45F-E927D20DD4D2</string>
+						<key>ingredientText</key>
+						<string>Knoblauch</string>
+						<key>isOptional</key>
+						<false/>
+						<key>note</key>
+						<string>Wenn Keen den Löffel hält, gib die Kontrolle über diese Variable auf.</string>
+						<key>originalText</key>
+						<string>Knoblauch – viel; frisch oder aus dem Glas</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>viel</string>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+					</dict>
+				</array>
+				<key>title</key>
+				<string>Rigatoni und roter Motor</string>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>56C182B7-D36C-5669-BEE1-1B568C64BA7D</string>
+				<key>ingredients</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>4B5CB819-A126-59C2-954F-00EA32EC56EE</string>
+						<key>ingredientText</key>
+						<string>Pecorino Romano</string>
+						<key>isOptional</key>
+						<false/>
+						<key>originalText</key>
+						<string>Pecorino Romano, großzügig gerieben</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>preparation</key>
+						<string>gerieben</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>großzügig</string>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>2FA71345-2C75-5FD7-8D69-7F0989B1B6B7</string>
+						<key>ingredientText</key>
+						<string>Lorbeerblatt</string>
+						<key>isOptional</key>
+						<false/>
+						<key>originalText</key>
+						<string>1 Lorbeerblatt</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>denominator</key>
+								<integer>1</integer>
+								<key>numerator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>fixed</string>
+						<key>unitText</key>
+						<string>Blatt</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>7012470E-F0A5-5A52-A758-738C5174D8C0</string>
+						<key>ingredientText</key>
+						<string>getrockneter Oregano</string>
+						<key>isOptional</key>
+						<false/>
+						<key>originalText</key>
+						<string>Getrockneter Oregano nach Geschmack</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>nach Geschmack</string>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>6D41990B-AE5C-5D4F-A654-4FAF351EFE0A</string>
+						<key>ingredientText</key>
+						<string>gefriergetrocknetes Basilikum</string>
+						<key>isOptional</key>
+						<false/>
+						<key>originalText</key>
+						<string>Gefriergetrocknetes Basilikum nach Geschmack</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>nach Geschmack</string>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>E98801BF-3E6F-5841-99C6-C74EC9CFC32E</string>
+						<key>ingredientText</key>
+						<string>Chiliflocken</string>
+						<key>isOptional</key>
+						<false/>
+						<key>originalText</key>
+						<string>Chiliflocken nach Geschmack</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>nach Geschmack</string>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>F950348F-F915-56B2-BBFC-AD2CA70EE7C4</string>
+						<key>ingredientText</key>
+						<string>langer Pfeffer</string>
+						<key>isOptional</key>
+						<true/>
+						<key>originalText</key>
+						<string>Etwa ½ Fruchtstand langer Pfeffer, frisch gemahlen</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>preparation</key>
+						<string>frisch gemahlen</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>approximate</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>denominator</key>
+								<integer>2</integer>
+								<key>numerator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>unitText</key>
+						<string>Fruchtstand</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>893277AE-5DE1-5EB6-925A-D91A7C67DAF3</string>
+						<key>ingredientText</key>
+						<string>gemahlene Gewürznelke</string>
+						<key>isOptional</key>
+						<true/>
+						<key>note</key>
+						<string>Wenn jemand die Nelke herausschmecken kann, war es zu viel.</string>
+						<key>originalText</key>
+						<string>Eine winzige Prise gemahlene Gewürznelke</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>eine winzige Prise</string>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>66B40C1C-DE79-51CF-A765-97ED9B8B5BB1</string>
+						<key>ingredientText</key>
+						<string>Zucker</string>
+						<key>isOptional</key>
+						<true/>
+						<key>note</key>
+						<string>Nur zugeben, wenn die fertige Sauce noch auffällig tomatensäuerlich schmeckt; nicht süß machen.</string>
+						<key>originalText</key>
+						<string>Etwa 1 US-Teelöffel Zucker, nur wenn die Sauce danach verlangt</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>approximate</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>denominator</key>
+								<integer>1</integer>
+								<key>numerator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>unitText</key>
+						<string>US-Teelöffel</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>01D4F477-3F89-50B6-9539-9453B634F4E0</string>
+						<key>ingredientText</key>
+						<string>Worcestershiresauce</string>
+						<key>isOptional</key>
+						<true/>
+						<key>originalText</key>
+						<string>Einige Tropfen Worcestershiresauce</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>einige Tropfen</string>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>1877BB96-A00E-59C3-B69F-EE5FB3ACA2CD</string>
+						<key>ingredientText</key>
+						<string>schwarzer Pfeffer</string>
+						<key>isOptional</key>
+						<false/>
+						<key>originalText</key>
+						<string>Schwarzer Pfeffer nach Bedarf</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>nach Bedarf</string>
+						</dict>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+					</dict>
+				</array>
+				<key>title</key>
+				<string>Würzen und Fertigstellen</string>
+			</dict>
+		</array>
+		<key>instructionSections</key>
+		<array>
+			<dict>
+				<key>id</key>
+				<string>3587FE7B-CA16-5EB2-A543-4AD7A5F4BD3E</string>
+				<key>steps</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>243860C2-5B7C-5B24-B785-6414237FA334</string>
+						<key>name</key>
+						<string>Zwiebelglück erreichen</string>
+						<key>text</key>
+						<string>Die Butter in einer großen breiten Pfanne bei mittlerer Hitze schmelzen. Gewürfelte Zwiebel, Salz und eine sparsame Prise Montreal-Gewürz hinzugeben. Geduldig garen, bis die Zwiebel ganz weich, glasig und süß ist; dann weitergaren, bis goldbraune Ränder und einzelne knusprige Stellen entstehen. Ein Zwiebelstück probieren. Lautet die Antwort „ja, sehr ja“, geht es weiter.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>24E0303A-C284-5B26-AC65-CE9297D7A1D4</string>
+						<key>name</key>
+						<string>Wurst einsetzen</string>
+						<key>text</key>
+						<string>Die Wurstscheiben hinzugeben. Alles möglichst breit verteilen und zeitweise unberührt lassen, damit einige Schnittflächen richtig bräunen. Gelegentlich umrühren und neu verteilen, sodass Fett austritt und Bratensatz entsteht, ohne die Zwiebeln zu opfern.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>26A109EE-0031-51B5-8E27-2BC388C1B296</string>
+						<key>name</key>
+						<string>Das Tomatenmark kräftig anrösten</string>
+						<key>text</key>
+						<string>Das Tomatenmark gründlich in das Fett einarbeiten und von leuchtendem Rot in Richtung tiefes Ziegelrot oder Orange rösten. Ein Teil soll direkten Pfannenkontakt haben. Den kleinen Schuss Wodka hinzugeben, den Bratensatz lösen und weitergaren, bis der deutliche Alkoholgeruch weitgehend verschwunden ist.</string>
+					</dict>
+				</array>
+				<key>title</key>
+				<string>Die Grundlage schaffen</string>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>83974E00-4743-51E7-8A75-E88D2B1FE5F2</string>
+				<key>steps</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>88DDA940-72CF-50F9-B707-44349A520488</string>
+						<key>name</key>
+						<string>Die Sauce zusammenstellen</string>
+						<key>text</key>
+						<string>Ro-Tel samt Flüssigkeit hinzugeben und den Pfannenboden freikratzen. Einige Minuten in die konzentrierte Tomatenmischung einkochen. Knoblauch, beide Dosen fertige Fleisch-Pastasauce von Hunt's, Lorbeerblatt, Oregano, Basilikum, Chiliflocken, langen Pfeffer und die winzigste vorstellbare Prise Nelke hinzugeben. Sanft aufköcheln lassen.</string>
+					</dict>
+					<dict>
+						<key>duration</key>
+						<dict>
+							<key>seconds</key>
+							<integer>1800</integer>
+						</dict>
+						<key>id</key>
+						<string>73C06175-B631-5D4B-A6F0-9C51D71EEE80</string>
+						<key>name</key>
+						<string>Nicht weiter daran herumspielen</string>
+						<key>text</key>
+						<string>Den Gewürzschrank in Ruhe lassen und mindestens 30 Minuten, gern länger, sanft köcheln lassen; dabei regelmäßig umrühren und den Pfannenboden abschaben. Probieren. Ist die Sauce ausgewogen, aber noch tomatensäuerlich, etwa 1 US-Teelöffel Zucker in die gesamte Menge geben. Gegen Ende einige Tropfen Worcestershiresauce für unauffällige herzhafte Tiefe hinzufügen. Nur anpassen, was die Sauce wirklich verlangt, dann das Lorbeerblatt entfernen.</string>
+					</dict>
+				</array>
+				<key>title</key>
+				<string>Den roten Motor aufbauen</string>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>1B409084-AC70-5A27-A445-5AD584AF3BA4</string>
+				<key>steps</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>0844FC33-2F98-519C-AE7C-18394B973245</string>
+						<key>name</key>
+						<string>Rigatoni</string>
+						<key>text</key>
+						<string>Die Rigatoni in gut gesalzenem Wasser gerade al dente kochen und vor dem Abgießen etwas Nudelwasser aufheben. Nudeln und Sauce vermengen und so viel geriebenen Pecorino hinzugeben, dass er Teil der Sauce und nicht nur eine Garnitur wird. Bei Bedarf mit Nudelwasser lockern. Die Sauce soll kräftig an den Rillen haften und in die Röhren gelangen, nicht darunter eine Pfütze bilden.</string>
+					</dict>
+				</array>
+				<key>title</key>
+				<string>Die Pasta fertigstellen</string>
+			</dict>
+		</array>
+		<key>keywords</key>
+		<array>
+			<string>Rigatoni</string>
+			<string>Rinderwurst</string>
+			<string>Tomatensauce</string>
+			<string>langer Pfeffer</string>
+			<string>große Menge</string>
+			<string>Vorratsplünderung</string>
+		</array>
+		<key>media</key>
+		<array>
+			<dict>
+				<key>accessibilityLabel</key>
+				<string>Ein Teller Rigatoni mit tiefroter Wurst-Tomatensauce und Brokkoli daneben</string>
+				<key>assetName</key>
+				<string>RedEngineGallery0</string>
+				<key>id</key>
+				<string>CC00C6AD-CD70-57A8-9587-48CE7DC4B977</string>
+				<key>role</key>
+				<string>gallery</string>
+			</dict>
+		</array>
+		<key>recipeID</key>
+		<string>DFA68566-83E8-5431-AC6A-4E05A7585287</string>
+		<key>recipeYield</key>
+		<dict>
+			<key>originalText</key>
+			<string>Ergibt eine sehr große Menge mit reichlich Resten</string>
+		</dict>
+		<key>revisionNumber</key>
+		<integer>1</integer>
+		<key>source</key>
+		<dict>
+			<key>authorName</key>
+			<string>cTwelve</string>
+			<key>kind</key>
+			<string>webpage</string>
+			<key>publisherName</key>
+			<string>ChatGPT</string>
+			<key>title</key>
+			<string>Der rote Motor, rekonstruiert aus „Forensic Pantry Cuisine“ und „Red Sauce Concoction“</string>
+		</dict>
+		<key>summary</key>
+		<string>Rigatoni mit gebräunter Rinderwurst, intensiv gegarten Tomaten, langem Pfeffer und Pecorino Romano – nach dem Grundsatz, dass die Zunge das Kommando behält.</string>
+		<key>title</key>
+		<string>Der rote Motor</string>
+	</dict>
+</dict>
+</plist>

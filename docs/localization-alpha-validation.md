@@ -40,3 +40,23 @@ Their accessible Recipe descriptions are authored per locale. `en-GB` resolves
 exactly; an unsupported English region uses the first English sample variant
 (currently en-US), and an unsupported language or empty preference list uses
 that development variant. Tests pin these fallback choices.
+
+Extensive interface validation is release-engineering work against the interface
+intended for release, which may be substantially reworked before beta. Content
+validation during alpha does not replace that later review.
+
+## German
+
+`de-DE` supplies every catalog entry, product metadata and Credits, and all three
+sample Recipes. The localized product name is Küchengedächtnis. Kochvorgang names
+a Cooking Session; Aktiv, Angehalten, and Abgeschlossen retain the distinct
+lifecycle meanings. Recipe Revision terminology remains distinct from a cooking
+record, and Wiederherstellung names Recovery.
+
+Ingredient prose uses German names and decimal commas without changing stored
+rational quantities. US-Pfund, US-Cups, US-Esslöffel, US-Teelöffel, and US-Quart
+explicitly retain the source measures; they are not German household measures or
+metric conversions. Fahrenheit temperatures remain Fahrenheit. Brands, original
+source URLs, source authors, and quoted source-document titles retain their
+identity. Shared photography and artwork remain intentional, with German Recipe
+image descriptions. Each Recipe variant has distinct stable identities.

@@ -6,10 +6,11 @@ import Foundation
 import XCTest
 
 final class LocalizationCatalogTests: XCTestCase {
-  private let supportedLocales = ["en-US", "en-GB", "es-MX", "fr-CA"]
+  private let supportedLocales = ["en-US", "en-GB", "es-MX", "fr-CA", "de-DE"]
   private let localizedProductNames = [
     "en-US": "Kitchen Memory",
     "en-GB": "Kitchen Memory",
+    "de-DE": "Küchengedächtnis",
     "es-MX": "Memoria de cocina",
     "fr-CA": "Mémoire de cuisine",
   ]

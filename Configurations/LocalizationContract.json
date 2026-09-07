@@ -4,7 +4,8 @@
     "en-US",
     "en-GB",
     "es-MX",
-    "fr-CA"
+    "fr-CA",
+    "de-DE"
   ],
   "retainedKeys": {
     "session.shell.foundation.message": "Historical Session shell explanation retained from the 0.1 interface contract.",

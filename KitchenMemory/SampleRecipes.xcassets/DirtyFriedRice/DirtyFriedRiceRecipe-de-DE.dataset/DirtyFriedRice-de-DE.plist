@@ -1,0 +1,739 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>formatVersion</key>
+	<integer>1</integer>
+	<key>recipeID</key>
+	<string>E9EAE42B-A28E-5710-B8F1-1D097DDB4907</string>
+	<key>revision</key>
+	<dict>
+		<key>id</key>
+		<string>BC8A3C3C-6E9C-565F-9059-A95F26D07060</string>
+		<key>recipeID</key>
+		<string>E9EAE42B-A28E-5710-B8F1-1D097DDB4907</string>
+		<key>revisionNumber</key>
+		<integer>1</integer>
+		<key>title</key>
+		<string>Dirty Fried Rice – würziger Bratreis</string>
+		<key>summary</key>
+		<string>Kein Dirty Rice. Nicht ganz klassischer Bratreis. Ein fleischiger, pfeffriger, leicht scharfer Vorratsplünderer mit Hatch-Chilis, Ei, Gemüse und einem Pass aus Bismarck, North Dakota. Etwa 20–30 Minuten einplanen.</string>
+		<key>authorName</key>
+		<string>cTwelve</string>
+		<key>contentLanguage</key>
+		<string>de-DE</string>
+		<key>source</key>
+		<dict>
+			<key>kind</key>
+			<string>webpage</string>
+			<key>title</key>
+			<string>Dirty Fried Rice auf X</string>
+			<key>authorName</key>
+			<string>cTwelve</string>
+			<key>publisherName</key>
+			<string>X</string>
+			<key>canonicalURL</key>
+			<dict>
+				<key>relative</key>
+				<string>https://x.com/theCTwelve/status/2089465462723682809</string>
+			</dict>
+		</dict>
+		<key>recipeYield</key>
+		<dict>
+			<key>originalText</key>
+			<string>Ergibt eine riesige Pfanne</string>
+		</dict>
+		<key>cuisines</key>
+		<array>
+			<string>North Dakota</string>
+		</array>
+		<key>categories</key>
+		<array>
+			<string>Abendessen</string>
+			<string>Bratreis</string>
+			<string>Preiswert kochen</string>
+		</array>
+		<key>keywords</key>
+		<array>
+			<string>Rinderhackfleisch</string>
+			<string>Reis</string>
+			<string>Hatch-Chilis</string>
+			<string>Vorratsplünderung</string>
+			<string>große Menge</string>
+		</array>
+		<key>media</key>
+		<array>
+			<dict>
+				<key>id</key>
+				<string>5456FEC2-A9F6-5384-9663-DC319B346C66</string>
+				<key>role</key>
+				<string>hero</string>
+				<key>assetName</key>
+				<string>DirtyFriedRiceHero</string>
+				<key>accessibilityLabel</key>
+				<string>Eine Schüssel voller Bratreis mit Rindfleisch, Ei, Mais, Möhren, Erbsen und grünen Bohnen, vor der riesigen Pfanne gehalten, aus der er stammt</string>
+			</dict>
+		</array>
+		<key>equipment</key>
+		<array>
+			<dict>
+				<key>id</key>
+				<string>CB25F62F-A375-5A8D-A390-23965F1EE8A0</string>
+				<key>originalText</key>
+				<string>Eine sehr große Pfanne, die hohe Temperaturen verträgt</string>
+				<key>quantity</key>
+				<dict>
+					<key>kind</key>
+					<string>exact</string>
+					<key>lowerBound</key>
+					<dict>
+						<key>numerator</key>
+						<integer>1</integer>
+						<key>denominator</key>
+						<integer>1</integer>
+					</dict>
+				</dict>
+				<key>name</key>
+				<string>sehr große, hoch erhitzbare Pfanne</string>
+				<key>isOptional</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>2A9C74C2-6CCA-5B8A-853F-96C4A68A2BC7</string>
+				<key>originalText</key>
+				<string>Ein Pfannenwender™ mit genügend Kraft und Macht für die große Kochaktion</string>
+				<key>quantity</key>
+				<dict>
+					<key>kind</key>
+					<string>exact</string>
+					<key>lowerBound</key>
+					<dict>
+						<key>numerator</key>
+						<integer>1</integer>
+						<key>denominator</key>
+						<integer>1</integer>
+					</dict>
+				</dict>
+				<key>name</key>
+				<string>stabiler Pfannenwender</string>
+				<key>isOptional</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>3B268C3A-0B1B-5F65-81E2-7E188D803E13</string>
+				<key>originalText</key>
+				<string>Schüssel und Gabel zum Verquirlen der Eier</string>
+				<key>name</key>
+				<string>Schüssel und Gabel</string>
+				<key>isOptional</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>F239D85E-E431-56C2-8FAD-0D6587353F50</string>
+				<key>originalText</key>
+				<string>Messer und Schneidebrett für die Zwiebel</string>
+				<key>name</key>
+				<string>Messer und Schneidebrett</string>
+				<key>isOptional</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>09491DDF-3BC3-5282-AC87-B0BB90CE996B</string>
+				<key>originalText</key>
+				<string>Dosenöffner, um dein Ro-Tel aus seinem metallenen Gefängnis zu befreien</string>
+				<key>name</key>
+				<string>Dosenöffner</string>
+				<key>isOptional</key>
+				<false/>
+			</dict>
+		</array>
+		<key>ingredientSections</key>
+		<array>
+			<dict>
+				<key>id</key>
+				<string>2DD9A48F-D326-5C52-856C-E157E10ED7E2</string>
+				<key>title</key>
+				<string>Hauptpfanne</string>
+				<key>ingredients</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>EEB5F5BB-6421-5301-AC77-99EF3AF4357A</string>
+						<key>originalText</key>
+						<string>1,3 US-Pfund Rinderhackfleisch</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>13</integer>
+								<key>denominator</key>
+								<integer>10</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>US-Pfund</string>
+						<key>ingredientText</key>
+						<string>Rinderhackfleisch</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>B0ECD555-BF92-57F3-A94A-DC02554D5A5B</string>
+						<key>originalText</key>
+						<string>1 US-Esslöffel Pflanzenöl, nur falls für dein Rinderhackfleisch nötig</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>1</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>US-Esslöffel</string>
+						<key>ingredientText</key>
+						<string>Pflanzenöl</string>
+						<key>note</key>
+						<string>Nach Wunsch ein anderes hoch erhitzbares Öl verwenden; kein Olivenöl verwenden.</string>
+						<key>isOptional</key>
+						<true/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>DB267AA8-67AE-5483-A2D7-72BC3CFB4F3E</string>
+						<key>originalText</key>
+						<string>1 eher kleine gelbe Zwiebel, grob gehackt</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>1</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>eher klein</string>
+						<key>ingredientText</key>
+						<string>gelbe Zwiebel</string>
+						<key>preparation</key>
+						<string>grob gehackt</string>
+						<key>note</key>
+						<string>Mehr würde nicht schaden.</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>302932FC-ECCB-562D-81D4-B64C38FA612C</string>
+						<key>originalText</key>
+						<string>Reichlich frisch gemahlener schwarzer Pfeffer</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>reichlich</string>
+						</dict>
+						<key>ingredientText</key>
+						<string>schwarzer Pfeffer</string>
+						<key>preparation</key>
+						<string>frisch gemahlen</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>DB7DA081-9708-5154-B545-4D7F15642B94</string>
+						<key>originalText</key>
+						<string>Montreal-Steakgewürz nach Geschmack</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>nach Geschmack</string>
+						</dict>
+						<key>ingredientText</key>
+						<string>Montreal-Steakgewürz</string>
+						<key>note</key>
+						<string>Falls nicht verfügbar, nach Geschmack mit grobem Salz, schwarzem Pfeffer, Cayenne, Knoblauch, Paprika, Zwiebel, Koriander, Dill oder ähnlichen Gewürzen würzen.</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>4FF77EFF-D9B7-5AB9-B673-08FF9723068F</string>
+						<key>originalText</key>
+						<string>1 Dose Ro-Tel Hatch Diced Tomatoes &amp; Fire Roasted Hatch Chilies, 10 Unzen</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>1</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>Dose</string>
+						<key>package</key>
+						<dict>
+							<key>quantity</key>
+							<dict>
+								<key>kind</key>
+								<string>exact</string>
+								<key>lowerBound</key>
+								<dict>
+									<key>numerator</key>
+									<integer>10</integer>
+									<key>denominator</key>
+									<integer>1</integer>
+								</dict>
+							</dict>
+							<key>unitText</key>
+							<string>Unzen</string>
+						</dict>
+						<key>ingredientText</key>
+						<string>Ro-Tel Hatch Diced Tomatoes &amp; Fire Roasted Hatch Chilies</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>41575528-5ABF-5228-89F0-FA8EC3E91548</string>
+						<key>originalText</key>
+						<string>3 Reiskocherbecher japanischer Reis, gekocht</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>3</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>Reiskocherbecher</string>
+						<key>ingredientText</key>
+						<string>japanischer Reis</string>
+						<key>preparation</key>
+						<string>gekocht</string>
+						<key>note</key>
+						<string>Eine kleine Zojirushi-Portion oder eine Portion aus einem kleinen bis mittelgroßen Topf.</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>AE8F12E6-057D-556A-8B64-68C8DD6E3F07</string>
+						<key>originalText</key>
+						<string>3 große Eier, verquirlt</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>3</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>groß</string>
+						<key>ingredientText</key>
+						<string>Eier</string>
+						<key>preparation</key>
+						<string>verquirlt</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+				</array>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>10BDD126-3C3C-55B2-91DE-2EE8B87F6C65</string>
+				<key>title</key>
+				<string>Würzen und Fertigstellen</string>
+				<key>ingredients</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>9F3BD271-9598-5BFF-800A-AFEC89F068C6</string>
+						<key>originalText</key>
+						<string>1 Päckchen Sun-Bird Fried Rice Seasoning Mix, 0,74 Unzen / 21 g</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>1</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>Päckchen</string>
+						<key>package</key>
+						<dict>
+							<key>quantity</key>
+							<dict>
+								<key>kind</key>
+								<string>exact</string>
+								<key>lowerBound</key>
+								<dict>
+									<key>numerator</key>
+									<integer>21</integer>
+									<key>denominator</key>
+									<integer>1</integer>
+								</dict>
+							</dict>
+							<key>unitText</key>
+							<string>Gramm</string>
+						</dict>
+						<key>ingredientText</key>
+						<string>Sun-Bird Fried Rice Seasoning Mix</string>
+						<key>note</key>
+						<string>0,74 Unzen</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>2C8C8655-A3F2-55AF-870F-EA14426FB2BE</string>
+						<key>originalText</key>
+						<string>Ein Schuss Worcestershiresauce</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>ein Schuss</string>
+						</dict>
+						<key>ingredientText</key>
+						<string>Worcestershiresauce</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>21C28D37-0F6A-5816-90AF-9117F56B24B6</string>
+						<key>originalText</key>
+						<string>Eine großzügige Prise Cayennepfeffer</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>eine großzügige Prise</string>
+						</dict>
+						<key>ingredientText</key>
+						<string>Cayennepfeffer</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>67FA8AE2-83D4-5A35-A9EC-A8361D608A04</string>
+						<key>originalText</key>
+						<string>1 Beutel tiefgekühltes Mischgemüse, 10 Unzen</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>exact</string>
+							<key>lowerBound</key>
+							<dict>
+								<key>numerator</key>
+								<integer>1</integer>
+								<key>denominator</key>
+								<integer>1</integer>
+							</dict>
+						</dict>
+						<key>unitText</key>
+						<string>Beutel</string>
+						<key>package</key>
+						<dict>
+							<key>quantity</key>
+							<dict>
+								<key>kind</key>
+								<string>exact</string>
+								<key>lowerBound</key>
+								<dict>
+									<key>numerator</key>
+									<integer>10</integer>
+									<key>denominator</key>
+									<integer>1</integer>
+								</dict>
+							</dict>
+							<key>unitText</key>
+							<string>Unzen</string>
+						</dict>
+						<key>ingredientText</key>
+						<string>tiefgekühltes Mischgemüse</string>
+						<key>note</key>
+						<string>Mais, Erbsen, Möhren und grüne Bohnen – oder nimm, was du möchtest; ich bin nicht deine Mutter.</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>linear</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>B6582113-B2A2-5D0C-8966-278C5CD4A45D</string>
+						<key>originalText</key>
+						<string>Sojasauce nach Geschmack und wahrscheinlich mehr, als du zunächst denkst</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>quantity</key>
+						<dict>
+							<key>kind</key>
+							<string>text</string>
+							<key>text</key>
+							<string>nach Geschmack</string>
+						</dict>
+						<key>ingredientText</key>
+						<string>Sojasauce</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>23DD3EA5-4E3E-5A07-AE16-CA19818D4523</string>
+						<key>originalText</key>
+						<string>Geröstetes Sesamöl zum Abschluss</string>
+						<key>presentationMode</key>
+						<string>original</string>
+						<key>ingredientText</key>
+						<string>geröstetes Sesamöl</string>
+						<key>preparation</key>
+						<string>zum Abschluss</string>
+						<key>isOptional</key>
+						<false/>
+						<key>scalingBehavior</key>
+						<string>manualReview</string>
+						<key>parseState</key>
+						<string>reviewed</string>
+					</dict>
+				</array>
+			</dict>
+		</array>
+		<key>instructionSections</key>
+		<array>
+			<dict>
+				<key>id</key>
+				<string>092BE5BC-815D-59FE-8E21-ABD7D4E3E189</string>
+				<key>title</key>
+				<string>Das Rindfleisch anbraten</string>
+				<key>steps</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>354D6350-8215-5001-9CE5-EC52C731565D</string>
+						<key>name</key>
+						<string>Kräftig anbraten</string>
+						<key>text</key>
+						<string>Die sehr große Pfanne richtig heiß werden lassen. Das Rinderhackfleisch hineingeben und das Pflanzenöl nur verwenden, falls nötig. Mit Montreal-Steakgewürz und reichlich frisch gemahlenem schwarzem Pfeffer würzen, dann unter ständigem Bewegen kräftig anbraten. Braune Röststellen am Pfannenboden sind wichtig.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>2A82DA78-9EAD-536E-A053-B7B572DCFDF6</string>
+						<key>name</key>
+						<string>Mit der Zwiebel den Bratensatz lösen</string>
+						<key>text</key>
+						<string>Wenn das Fleisch herrlich braun ist, die Zwiebel hinzugeben. Weitergaren, bis sie etwas weicher wird, und mit ihrer Feuchtigkeit den Bratensatz vom Pfannenboden lösen.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>0D138A1A-8BA8-5FC9-8C17-41C80A23627A</string>
+						<key>name</key>
+						<string>Die Tomatenflüssigkeit verkochen</string>
+						<key>text</key>
+						<string>Die ganze Dose Hatch Ro-Tel samt Flüssigkeit hineingeben. Weitergaren, bis das Fleisch vollständig gebräunt, die Zwiebel nach deinem Geschmack weich und die überschüssige Tomatenflüssigkeit größtenteils verdampft ist. Die starke Hitze ist entscheidend: Wir wollen gebräuntes, nicht gekochtes Hackfleisch. Wenn es gut aussieht, die Hitze etwas reduzieren.</string>
+					</dict>
+				</array>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>4839F341-68B4-504D-AD27-462A8A12397A</string>
+				<key>title</key>
+				<string>Den Reis braten</string>
+				<key>steps</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>F0C664C9-8CE6-562F-B4A1-DF8B749A43D0</string>
+						<key>name</key>
+						<string>Den Reis unterheben</string>
+						<key>text</key>
+						<string>Den gekochten japanischen Reis hinzugeben und alles vermengen; dabei den Reis auflockern. Frischer Reis ist völlig in Ordnung. Es braucht kein traditionelles Ritual, bei dem erst Reisreste im Kühlschrank entdeckt werden. Ein bis zwei Minuten geben, damit die gespeicherte Hitze den Reis tatsächlich braten kann.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>EA706AD9-3287-5FE4-A3B3-033D74648986</string>
+						<key>name</key>
+						<string>Würzen</string>
+						<key>text</key>
+						<string>Sun-Bird-Bratreisgewürz, einen Schuss Worcestershiresauce und eine großzügige Menge Cayennepfeffer hinzugeben. Vermengen und die Hitze erneut reduzieren.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>9F6CF209-EA7C-5449-853F-380C6414632A</string>
+						<key>name</key>
+						<string>Die Eier einarbeiten</string>
+						<key>text</key>
+						<string>Die 3 verquirlten Eier hinzugeben. Unter ständigem Wenden und Rühren in den heißen Reis und das Fleisch einarbeiten, bis das Ei gegart und in kleinen Stücken überall verteilt ist.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>D2508EB0-2756-5CC9-AB12-79AE9AEB5ECD</string>
+						<key>name</key>
+						<string>Tatsächlich braten lassen</string>
+						<key>text</key>
+						<string>Die Mischung bei reduzierter Hitze lange genug weiterbearbeiten, damit sich alles verbindet und Reis, Fleisch, Zwiebel und Ei tatsächlich etwas braten und bräunen.</string>
+					</dict>
+				</array>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>FC5B24D8-BA3A-582D-A5BD-080F427EFDEF</string>
+				<key>title</key>
+				<string>Fertigstellen und ruhen lassen</string>
+				<key>steps</key>
+				<array>
+					<dict>
+						<key>id</key>
+						<string>5C54824E-6731-5532-86DB-F262D3043A97</string>
+						<key>name</key>
+						<string>HITZE AUS</string>
+						<key>text</key>
+						<string>Den ganzen Beutel Tiefkühlgemüse direkt in die Pfanne geben – vorher weder auftauen noch in der Mikrowelle erwärmen. Gründlich umrühren und die riesige Masse aus glühend heißem Fleisch und Reis sowie die gespeicherte Pfannenhitze das Gemüse garen lassen.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>BF3EAFD7-FFEC-5761-9739-48A180D4CD81</string>
+						<key>name</key>
+						<string>Abschmecken und Sojasauce zugeben</string>
+						<key>text</key>
+						<string>Probieren. Sojasauce hinzugeben, bis der Geschmack plötzlich klar hervortritt. Falls sie sich schlecht verteilt, die Pfanne unter kräftigem Rühren nur etwa 15 Sekunden auf starke Hitze zurückstellen, gerade lange genug zum Verteilen und um etwas Wasser zu verdampfen.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>A79DD29E-FBD1-563A-90A9-CC0987C3D806</string>
+						<key>name</key>
+						<string>Hitze wieder aus</string>
+						<key>text</key>
+						<string>Die Hitze erneut ausschalten. Zum Abschluss etwas geröstetes Sesamöl darüberträufeln und unterrühren. Die genaue Sojasaucenmenge bleibt bewusst offen, weil die anderen Gewürze und verschiedene Sojasaucen unterschiedlich viel Salz mitbringen. Ebenso ist Cayenne eine Angelegenheit zwischen dir und Gott.</string>
+					</dict>
+					<dict>
+						<key>id</key>
+						<string>D7CA65CD-D36F-595C-B62D-C36EBB13A4A0</string>
+						<key>name</key>
+						<string>Das Riesenpfannen-Manöver</string>
+						<key>text</key>
+						<string>Wirkt der Reis trocken, nicht sofort Flüssigkeit zugeben. Die ganze Pfanne auf eine vollständig kalte Kochstelle ziehen und abdecken. Die Pfanne und mehrere US-Pfund Essen wirken wie ein thermischer Energiespeicher: Die gespeicherte Wärme gart das Gemüse fertig, während eingeschlossener Dampf die Feuchtigkeit im Reis verteilt. Das tatsächliche Umstellen ist bei einem strahlungsbeheizten Glaskeramikkochfeld wichtig, wo „AUS“ und „KALT“ verschiedene Dinge sind.</string>
+					</dict>
+				</array>
+			</dict>
+		</array>
+	</dict>
+</dict>
+</plist>
