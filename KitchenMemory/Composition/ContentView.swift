@@ -160,7 +160,9 @@ struct ContentView: View {
       } else {
         NavigationStack {
           persistentDetail
+#if os(iOS)
             .toolbar { detailSidebarNavigation }
+#endif
         }
       }
     }
@@ -240,7 +242,9 @@ struct ContentView: View {
           sessionModel: dependencies.sessionModel,
           presentsEditor: false
         )
+#if os(iOS)
         .toolbar { detailSidebarNavigation }
+#endif
       }
     }
     .sheet(item: $activeSheet) { _ in
@@ -275,16 +279,16 @@ private extension ContentView {
     )
   }
 
+#if os(iOS)
   @ToolbarContentBuilder
   var detailSidebarNavigation: some ToolbarContent {
-#if os(iOS)
     if usesCustomSidebarToggle {
       LibrarySidebarToggle(title: .librarySidebarActionShow) {
         withAnimation { columnVisibility = .all }
       }
     }
-#endif
   }
+#endif
 
   @ToolbarContentBuilder
   var libraryToolbar: some ToolbarContent {
