@@ -186,3 +186,6 @@ persistence-adapter, and native application evidence with reproduction steps.
 
 The [alpha Recipe Library accessibility evidence](accessibility-alpha-library-evidence.md)
 records the bounded Mac validation of the candidate identified in that record.
+
+The [alpha shell and Cooking Session accessibility evidence](accessibility-alpha-shell-evidence.md)
+records the companion Mac walkthrough and explicitly scoped reuse of native tests.
