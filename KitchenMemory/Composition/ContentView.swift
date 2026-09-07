@@ -158,7 +158,10 @@ struct ContentView: View {
       if preparedApp?.libraryModel.editor != nil {
         persistentDetail
       } else {
-        NavigationStack { persistentDetail }
+        NavigationStack {
+          persistentDetail
+            .toolbar { detailSidebarNavigation }
+        }
       }
     }
 #if os(macOS)
@@ -237,6 +240,7 @@ struct ContentView: View {
           sessionModel: dependencies.sessionModel,
           presentsEditor: false
         )
+        .toolbar { detailSidebarNavigation }
       }
     }
     .sheet(item: $activeSheet) { _ in
@@ -269,6 +273,17 @@ private extension ContentView {
       get: { !usesPersistentLibraryShell && preparedApp?.libraryModel.editor != nil },
       set: { if !$0 { preparedApp?.libraryModel.closeEditor() } }
     )
+  }
+
+  @ToolbarContentBuilder
+  var detailSidebarNavigation: some ToolbarContent {
+#if os(iOS)
+    if usesCustomSidebarToggle {
+      LibrarySidebarToggle(title: .librarySidebarActionShow) {
+        withAnimation { columnVisibility = .all }
+      }
+    }
+#endif
   }
 
   @ToolbarContentBuilder

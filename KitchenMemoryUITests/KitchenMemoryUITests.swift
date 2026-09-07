@@ -161,9 +161,15 @@ final class KitchenMemoryUITests: XCTestCase {
   private func revealSidebar(in app: XCUIApplication, exposing element: XCUIElement) {
 #if os(iOS)
     if !element.waitForExistence(timeout: 2) {
-      let backButton = app.buttons["BackButton"]
-      if backButton.waitForExistence(timeout: 3) {
-        activate(backButton)
+      let sidebarToggle = app.buttons["toggle-sidebar"].firstMatch
+      if sidebarToggle.exists {
+        assertAccessibleLabel(sidebarToggle, description: "sidebar navigation")
+        activate(sidebarToggle)
+      } else {
+        let backButton = app.buttons["BackButton"]
+        if backButton.waitForExistence(timeout: 3) {
+          activate(backButton)
+        }
       }
     }
 #else
