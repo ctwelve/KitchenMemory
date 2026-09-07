@@ -33,22 +33,35 @@ struct OrganizationStore<Payload: OrganizationPayload> {
               validate: (Snapshot) throws -> Void) throws {
     let context = ModelContext(modelContainer)
     try context.transaction {
-      let owner = kitchenID.rawValue
-      guard try !context.fetch(FetchDescriptor<KitchenRecord>(predicate: #Predicate { $0.id == owner })).isEmpty
-      else { throw KitchenMemoryPersistenceError.missingKitchen }
-      let identifier = action.id
-      let matching = try context.fetch(FetchDescriptor<OrganizationActionRecord>(predicate: #Predicate {
-        $0.id == identifier
-      }))
-      guard matching.allSatisfy({ $0.kitchenID == owner && $0.namespace == namespace }) else {
-        throw FolderError.wrongKitchen
-      }
-      var snapshot = try load(in: kitchenID, context: context)
-      snapshot.actions.append(action)
-      try validate(snapshot)
-      let covered = snapshot.checkpoints.flatMap { $0.evidence.receipts }.contains { $0.id == action.id }
+      try append(action, in: kitchenID, context: context, validate: validate)
+    }
+  }
+
+  func append(_ action: OrganizationAction<Payload>, in kitchenID: Kitchen.ID, context: ModelContext,
+              validate: (Snapshot) throws -> Void) throws {
+    try append([action], in: kitchenID, context: context, validate: validate)
+  }
+
+  func append(_ actions: [OrganizationAction<Payload>], in kitchenID: Kitchen.ID, context: ModelContext,
+              validate: (Snapshot) throws -> Void) throws {
+    let owner = kitchenID.rawValue
+    guard try !context.fetch(FetchDescriptor<KitchenRecord>(predicate: #Predicate { $0.id == owner })).isEmpty
+    else { throw KitchenMemoryPersistenceError.missingKitchen }
+    let identifiers = actions.map(\.id)
+    let matching = try context.fetch(FetchDescriptor<OrganizationActionRecord>(predicate: #Predicate {
+      identifiers.contains($0.id)
+    }))
+    guard matching.allSatisfy({ $0.kitchenID == owner && $0.namespace == namespace }) else {
+      throw FolderError.wrongKitchen
+    }
+    var snapshot = try load(in: kitchenID, context: context)
+    snapshot.actions.append(contentsOf: actions)
+    try validate(snapshot)
+    var retained = Set(matching.map(\.id))
+    retained.formUnion(snapshot.checkpoints.flatMap { $0.evidence.receipts }.map(\.id))
+    for action in actions {
       try validateAssignment(action.payload, in: kitchenID, context: context, requireRecipe: false)
-      if matching.isEmpty && !covered {
+      if retained.insert(action.id).inserted {
         try validateAssignment(action.payload, in: kitchenID, context: context, requireRecipe: true)
         context.insert(try OrganizationActionRecord(action: action, kitchenID: kitchenID, namespace: namespace))
       }

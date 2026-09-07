@@ -34,13 +34,7 @@ struct LibraryToolbar: ToolbarContent {
     }
 #if os(iOS)
     if showsSidebarToggle {
-      ToolbarItem(placement: .navigation) {
-        Button(action: toggleSidebar) {
-          ToolbarIconLabel(sidebarToggleTitle, systemImage: "sidebar.left")
-        }
-        .accessibilityIdentifier("toggle-sidebar")
-        .help(Text(sidebarToggleTitle))
-      }
+      LibrarySidebarToggle(title: sidebarToggleTitle, action: toggleSidebar)
     }
 #endif
 #if !os(macOS)
@@ -54,6 +48,21 @@ struct LibraryToolbar: ToolbarContent {
       }
     }
 #endif
+  }
+}
+
+struct LibrarySidebarToggle: ToolbarContent {
+  let title: LocalizedStringResource
+  let action: () -> Void
+
+  var body: some ToolbarContent {
+    ToolbarItem(placement: .navigation) {
+      Button(action: action) {
+        ToolbarIconLabel(title, systemImage: "sidebar.left")
+      }
+      .accessibilityIdentifier("toggle-sidebar")
+      .help(Text(title))
+    }
   }
 }
 

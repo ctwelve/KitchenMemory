@@ -29,7 +29,7 @@ enum FolderEvidenceValidation {
       try validateMerge(ids: ids, survivorID: survivorID, name: name)
     case let .delete(ids):
       guard !ids.isEmpty, Set(ids).count == ids.count else { throw FolderError.invalidEvidence }
-    case .assign, .ordering: break
+    case .assign, .ordering, .systemViewVisible: break
     }
   }
 

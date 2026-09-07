@@ -162,14 +162,18 @@ public final class RecipeDrafts {
         if let comparison = draft.reconciliation {
           draft.phase = .saving(try library.prepareReconciliationSave(comparison, session: draft.session))
         } else {
-          draft.phase = .saving(try library.prepareSave(
+          let command = try library.prepareSave(
             from: draft.session.validatedDraft(), original: draft.original,
             observedSelectionIDs: draft.observedSelectionIDs
-          ))
+          )
+          if draft.original == nil {
+            draft.pendingOrganization = try library.prepareOrganization(draft.organization, for: command)
+          }
+          draft.phase = .saving(command)
         }
       }
       guard persist(), let command = draft.pendingSave else { return nil }
-      try library.save(command)
+      try library.save(command, organization: draft.pendingOrganization)
       return Publication(recipeID: command.recipe.id, removedDraft: discard(id))
     } catch {
       storageFailed = true

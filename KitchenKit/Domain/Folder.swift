@@ -19,6 +19,7 @@ public enum FolderIntent: Equatable, Sendable {
   case rename(id: Folder.ID, name: String)
   case reorder(id: Folder.ID, afterID: Folder.ID?)
   case ordering(FolderOrdering)
+  case systemViewVisible(Bool)
   case assign(recipeID: Recipe.ID, folderID: Folder.ID?)
   case delete(id: Folder.ID)
   case merge(ids: [Folder.ID], survivorID: Folder.ID?, name: String)
@@ -37,6 +38,7 @@ enum FolderChange: OrganizationPayload {
   case rename(id: Folder.ID, name: String)
   case reorder(id: Folder.ID, afterID: Folder.ID?)
   case ordering(FolderOrdering)
+  case systemViewVisible(Bool)
   case assign(recipeID: Recipe.ID, folderID: Folder.ID?)
   case delete(observedSubtree: [Folder.ID])
   case merge(ids: [Folder.ID], survivorID: Folder.ID, name: String)
@@ -44,7 +46,7 @@ enum FolderChange: OrganizationPayload {
   var folderID: Folder.ID? {
     switch self {
     case let .create(id, _, _), let .move(id, _), let .rename(id, _), let .reorder(id, _): return id
-    case .assign, .delete, .ordering: return nil
+    case .assign, .delete, .ordering, .systemViewVisible: return nil
     case let .merge(_, survivorID, _): return survivorID
     }
   }
@@ -52,7 +54,7 @@ enum FolderChange: OrganizationPayload {
   var parentID: Folder.ID? {
     switch self {
     case let .create(_, _, parentID), let .move(_, parentID): return parentID
-    case .assign, .delete, .rename, .merge, .ordering, .reorder: return nil
+    case .assign, .delete, .rename, .merge, .ordering, .reorder, .systemViewVisible: return nil
     }
   }
 }
@@ -162,6 +164,7 @@ public struct FolderLibrary: Equatable, Sendable {
     case let .reorder(folderID, afterID):
       change = try prepareOrder(id: folderID, afterID: afterID)
     case let .ordering(mode): change = .ordering(mode)
+    case let .systemViewVisible(visible): change = .systemViewVisible(visible)
     }
     let evidence = try OrganizationEvidence(actions, checkpoints: checkpointEvidence)
     return FolderCommand(kitchenID: kitchenID,

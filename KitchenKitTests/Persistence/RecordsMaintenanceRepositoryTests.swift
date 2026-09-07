@@ -97,7 +97,8 @@ final class RecordsMaintenanceRepositoryTests: XCTestCase {
     try tags.append(tags.library(in: kitchen.id).prepare(.create(id: tag, name: "Meals"), at: date))
     try tags.append(tags.library(in: kitchen.id).prepare(.assign(recipeID: recipe.id, tagID: tag), at: date))
     let maintenance = RecordsMaintenanceRepository(modelContainer: container, kitchenID: kitchen.id)
-    try folders.append(folders.library(in: kitchen.id).prepare(.create(id: Folder.ID(), name: "Meals", parentID: nil), at: date))
+    try folders.append(
+      folders.library(in: kitchen.id).prepare(.create(id: Folder.ID(), name: "Meals", parentID: nil), at: date))
     let limited = RecordsMaintenanceRepository(modelContainer: container, kitchenID: kitchen.id, batchSize: 1)
     XCTAssertFalse(try limited.run(.folders, at: date.addingTimeInterval(40 * 86_400)))
     XCTAssertTrue(try limited.run(.folders, at: date.addingTimeInterval(40 * 86_400)))

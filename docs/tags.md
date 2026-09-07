@@ -3,9 +3,8 @@
 Issue [#115](https://github.com/ctwelve/KitchenMemory/issues/115) implements the
 Tag policy settled in [#113](https://github.com/ctwelve/KitchenMemory/issues/113).
 Tags classify stable Recipes independently of Folder location, Recipe Revisions,
-and Cooking Sessions. Native management, collision Recovery presentation,
-filtering, and pending-draft assignment belong to
-[#116](https://github.com/ctwelve/KitchenMemory/issues/116).
+and Cooking Sessions. The [native organization interface](recipe-library-organization.md) supplies
+management, collision Recovery, filtering, and atomic pending-draft assignment.
 
 ## Entry points
 

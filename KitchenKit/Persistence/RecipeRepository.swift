@@ -686,7 +686,7 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     }
   }
 
-  private func accept(_ command: RecipeSaveCommand) throws {
+  func accept(_ command: RecipeSaveCommand) throws {
     let encoded = try validateAndEncode(command)
     let saveID = command.id.rawValue
     let saved = try context.fetch(
