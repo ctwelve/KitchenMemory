@@ -50,8 +50,12 @@ Algorithms is not present in the graph.
 Xcode 26.6 does not propagate swift-algorithms' transitive `_NumericsShims` C
 module-map search path when an Xcode framework target imports `Algorithms`.
 Every KitchenKit configuration therefore adds the DerivedData-relative
-`swift-numerics/Sources/_NumericsShims/include` path. A pristine control build
-fails without that path and passes with it. Kitchen Memory neither imports nor
+`swift-numerics/Sources/_NumericsShims/include` path for both standard build and
+ArchiveIntermediates layouts. Normal builds place BUILD_DIR two levels below
+DerivedData; archives place it five levels below. The ordinary path alone fails
+when archiving; the additional archive path resolves the same pinned C headers.
+Use Xcode's standard SourcePackages location for these builds. A pristine control
+build fails without the module-map path and passes with it. Kitchen Memory neither imports nor
 directly links `RealModule`; remove this compatibility setting when Xcode or the
 resolved packages propagate the transitive module map correctly.
 
