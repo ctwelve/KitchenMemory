@@ -10,6 +10,7 @@ derived_data="$build_root/DerivedData"
 app="$build_root/CloudKitProductionSchemaAdmin.app"
 products="$derived_data/Build/Products/Develop"
 framework="$products/KitchenKit.framework"
+numerics_shims="$derived_data/SourcePackages/checkouts/swift-numerics/Sources/_NumericsShims/include"
 profile="$archive/Products/Applications/KitchenMemory.app/Contents/embedded.provisionprofile"
 executable="$app/Contents/MacOS/CloudKitProductionSchemaAdmin"
 
@@ -42,6 +43,9 @@ xcrun swiftc \
   -parse-as-library \
   -target arm64-apple-macos26.0 \
   -sdk "$sdk" \
+  -I "$products" \
+  -Xcc "-fmodule-map-file=$numerics_shims/module.modulemap" \
+  -Xcc "-I$numerics_shims" \
   -F "$products" \
   -framework KitchenKit \
   -framework CoreData \
