@@ -13,7 +13,7 @@ It preserves the recipe you meant to save, makes corrections inexpensive, and
 keeps useful cooking structure without pretending every ingredient can be
 reduced to a perfect database row.
 
-Version 0.2.2 is the current public alpha. A signed and notarized universal macOS
+Version 0.3.0 is the current public alpha. A signed and notarized universal macOS
 build is available from [GitHub Releases](https://github.com/ctwelve/KitchenMemory/releases).
 The iPhone and iPad application is present in the source tree, but this alpha
 does not yet have a public iOS download or TestFlight group.
@@ -23,7 +23,7 @@ does not yet have a public iOS download or TestFlight group.
 The macOS alpha requires macOS 26 or later and runs natively on Apple silicon
 and Intel Macs.
 
-1. Download `KitchenMemory-0.2.2-macOS.zip` from the 0.2.2 release.
+1. Download `KitchenMemory-0.3.0-macOS.zip` from the [0.3.0 release](https://github.com/ctwelve/KitchenMemory/releases/tag/release/0.3.0).
 2. Expand the archive and move **Kitchen Memory** to Applications.
 3. Launch it normally. The distributed app is signed with Developer ID,
    notarized by Apple, and carries a stapled notarization ticket.
@@ -46,7 +46,9 @@ foundational mistakes aggressively before promising beta-grade durability.
   saving.
 - Preserve original ingredient wording, source attribution, and uncertain or
   unscalable quantities instead of inventing precision.
-- Save edits as immutable revisions.
+- Save edits as immutable revisions with history and recovery evidence.
+- Organize recipes with Folders, Tags, and combined library filters.
+- Synchronize Recipe image payloads privately with the library.
 - Scale exact and ranged quantities for a working yield without changing the
   maintained recipe.
 - Present sectioned ingredients and instructions for reading while cooking.
@@ -54,8 +56,8 @@ foundational mistakes aggressively before promising beta-grade durability.
   history without rewriting the maintained recipe.
 - Keep one person's recipe library synchronized privately through their iCloud
   account while retaining a useful local store.
-- Run in English (United States), Canadian French, and Mexican Spanish, with a
-  localized starter-recipe pack.
+- Run in English (United States or United Kingdom), Canadian French, Mexican
+  Spanish, German, or Italian, with localized starter-recipe packs.
 
 Pantry knowledge, planning, shopping, household sharing, OCR, nutrition
 calculation, and public recipe discovery are deliberately not part of this
