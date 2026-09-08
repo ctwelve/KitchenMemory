@@ -6,8 +6,8 @@ Copyright © 2026 the Kitchen Memory contributors.
 SPDX-License-Identifier: MIT
 -->
 
-Kitchen Memory 0.3.0 expands the personal Recipe Library alpha. This candidate
-is prepared for macOS; iPhone/iPad distribution and TestFlight remain deferred.
+Kitchen Memory 0.3.0 expands the personal Recipe Library alpha. This release
+is available for macOS; iPhone/iPad distribution and TestFlight remain deferred.
 
 ## Changes
 
@@ -32,6 +32,7 @@ workflow matrix remains beta work. iCloud delivery has no immediate-delivery
 promise. The recorded foreground-delivery timeout is inconclusive; separate
 reconnection and relaunch checks passed, and the maintainer accepted that limit.
 
-The intended download is a Developer ID-signed, notarized universal Mac app for
-macOS 26 or later. Availability and the exact verified artifact/checksum belong
-to the matching [GitHub release](https://github.com/ctwelve/KitchenMemory/releases).
+The download is a Developer ID-signed, notarized universal Mac app, version
+0.3.0 (418), for macOS 26 or later. The verified ZIP and checksum are available
+from the [GitHub release](https://github.com/ctwelve/KitchenMemory/releases/tag/release/0.3.0).
+The [publication record](release-publication-0.3.md) preserves artifact validation.

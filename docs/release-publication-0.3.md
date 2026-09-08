@@ -87,8 +87,51 @@ private and uncommitted.
 
 ## Release submission and artifact
 
-Pending: merge the intentional RELEASE=0.3.0 commit through required checks, verify that
-merge's Production builds, and create the immutable annotated `release/0.3.0`
-tag. Archive, notarization, installed-artifact checks, checksums, and GitHub
-publication are recorded only after they complete. The existing public 0.2.2
-artifact remains the published release until then.
+[PR 178](https://github.com/ctwelve/KitchenMemory/pull/178) passed every governed
+PR check and merged as `492b6980e7b01e5107a619ffe0a639aa58e0ea68`. Both actual-merge
+Production builds passed before tag creation. The source marker is 0.3.0 and
+all five application configurations agree.
+
+The signed annotated `release/0.3.0` tag has object
+`913c2a0a41782474a568f1d83c1fa7fcfdd73ef0` and peels to that exact merge. Local
+signature verification passed; GitHub reports the signature valid and verified.
+Creation used the repository's configured maintainer allowlist; readiness and
+immutability protections remain unchanged. The tag was created once and its
+normal Xcode Cloud archive workflow started successfully.
+
+Xcode Cloud build **418** passed both tagged Archives and the Mac notarization
+post-action, using Xcode 26.6 (`17F113`). The downloaded products report version
+**0.3.0 (418)**, SDK `macosx26.5` / `iphoneos26.5`, and the expected Production
+CloudKit container and environment. The Mac product is universal (`arm64`,
+`x86_64`), Developer ID signed, hardened, and timestamped; deep/strict signature
+verification, Gatekeeper's Notarized Developer ID assessment, and stapled-ticket
+validation all passed. The iOS App Store export is `arm64`, Apple Distribution
+signed, and passes deep/strict verification. Neither permits debugger attachment.
+
+Both products contain one application Mach-O, no embedded frameworks, and only
+Apple system dynamic dependencies. Both retain the two reviewed privacy manifests
+(no collected data or tracking; UserDefaults reasons `CA92.1` and `C56D.1`) and
+identical third-party notices with SHA-256
+`f68923bf4cc1a9552d1db90f2d6e882518b48da6e178e1f5f33b72eaf1a5a57e`.
+All six localization bundles contain metadata, credits, and application strings;
+compiled assets/icons and the iOS launch storyboard are present. The tagged iOS
+archive emitted duplicate Swift Collections debug-map warnings; Archive passed,
+and signed-product inspection found no extra binaries or dynamic packages.
+
+Safari expanded the notarized Mac download. The unchanged application was packed
+with macOS resource metadata preserved, extracted into a fresh local directory,
+and verified again. Every extracted application file matches the notarized
+source byte-for-byte. The app launched normally outside Xcode into the Recipe
+Library; existing library content appeared, the new Recipe editor opened, its
+empty verification draft was discarded, and Settings opened. No store reset or
+existing Recipe mutation was performed. This is an ordinary launch/navigation
+check, not a claim of comprehensive clean-install/update or synchronization proof.
+
+The [0.3.0 GitHub prerelease](https://github.com/ctwelve/KitchenMemory/releases/tag/release/0.3.0)
+was published with the verified **KitchenMemory-0.3.0-macOS.zip** (11,787,749 bytes)
+and matching **KitchenMemory-0.3.0-macOS.zip.sha256**. GitHub's uploaded-asset digest
+matches the local ZIP SHA-256:
+`b5b125ea96c0ec6cc9660ebb7dc76a336b034aaebd827353f3045f409c5f9035`.
+The checksum was checked before publication. No iOS tester distribution or
+App Store review submission was performed. The accepted engineering limitations
+remain in the engineering packet and release notes.
