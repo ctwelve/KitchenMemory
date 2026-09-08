@@ -10,7 +10,11 @@ This separate signed harness exercises Cooking Session V3 evidence through
 SwiftData's managed private-CloudKit transport. It is intentionally absent from
 the Kitchen Memory project, schemes, archives, and Production binaries.
 Reusable reconstruction and classification remain in `KitchenKit`; this tool
-only stages synthetic evidence and records bounded observations.
+only stages synthetic evidence and records bounded observations. Replica stores
+use the same current schema as the application (V7 for 0.3); the `schema` command
+still inspects the frozen V3 Session record families. Use new disposable replicas
+when advancing the current schema rather than treating an old harness store as
+a migration fixture.
 
 The executable refuses any container except
 `iCloud.net.ctwelve.dev.KitchenMemory` and refuses to open a store unless the
@@ -19,7 +23,10 @@ Production schema.
 
 ## Build and local checks
 
-Build the signed Mac harness and run the deterministic fixture matrix:
+Build the signed Mac harness explicitly after source changes; `run.sh` only
+builds when the executable is absent. Store commands emit `store-schema` with
+the selected version (7.0.0 for this candidate). Run the deterministic fixture
+matrix:
 
 ```sh
 Tools/SessionCloudKitAcceptance/build.sh

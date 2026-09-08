@@ -4,7 +4,7 @@
 
 import Darwin
 import Foundation
-import KitchenKit
+@testable import KitchenKit
 import SwiftData
 #if os(macOS)
 import AppKit
@@ -342,7 +342,11 @@ struct SessionCloudKitAcceptance {
       at: directory,
       withIntermediateDirectories: true
     )
-    let schema = Schema(versionedSchema: KitchenMemorySchemaV3.self)
+    let schema = Schema(versionedSchema: CurrentKitchenMemorySchema.self)
+    AcceptanceOutput.emit([
+      "event": "store-schema",
+      "version": String(describing: schema.version),
+    ])
     let database: ModelConfiguration.CloudKitDatabase
     switch store {
     case .local: database = .none
