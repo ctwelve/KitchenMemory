@@ -75,14 +75,19 @@ summary names the expected eight affected types, 144 added index flags
 and the three standard roles gaining grants on the new types. All counts match
 the export comparison. The Console Diff View rendered an empty pane; the
 complete exported definitions and populated Changes summary provide the
-comparison evidence. Production deployment and its verification are pending.
+comparison evidence. The operator then deliberately deployed the reviewed changes. CloudKit Console
+reported “Changes Deployed.” A fresh export from the actual Production
+environment exactly matches the staged schema and working V7 reference. All
+three V7 exports have SHA-256
+`e531cafe311f83939ee138435ce92a4e21bdd826849d733cd33b604c24c4dc3e`.
+Production now has all 24 expected record types, including `Users`, with the
+accepted fields, indexes, and grants.
 Raw exports, account identifiers, store paths, and diagnostic logs remain
 private and uncommitted.
 
 ## Release submission and artifact
 
-Pending: deploy and verify Production,
-merge the intentional RELEASE=0.3.0 commit through required checks, verify that
+Pending: merge the intentional RELEASE=0.3.0 commit through required checks, verify that
 merge's Production builds, and create the immutable annotated `release/0.3.0`
 tag. Archive, notarization, installed-artifact checks, checksums, and GitHub
 publication are recorded only after they complete. The existing public 0.2.2
