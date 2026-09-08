@@ -14,8 +14,12 @@ promoting that schema to Production.
 For 0.3.0, compare the live deployed schema with the frozen V4 baseline and
 accepted V7 model. V5–V7 add six model families: `RecipeSaveRecord`,
 `RecipeSelectionRecord`, `RecipePruneRecord`, `RecipeImagePayloadRecord`,
-`OrganizationActionRecord`, and `OrganizationCheckpointRecord`. All 17 V4
-model families must remain unchanged. Review generated CloudKit fields, assets,
+`OrganizationActionRecord`, and `OrganizationCheckpointRecord`. The deployed
+V4 baseline additionally needs `CD_deletedAt` on
+`CD_RecipeDeletionRecord`, and `CD_kitchenID` plus `CD_restoredAt` on
+`CD_RecipeDeletionResolutionRecord`. Existing field definitions, indexes, roles,
+and encryption choices must remain unchanged; no existing type is removed.
+Review generated CloudKit fields, assets,
 indexes, and standard roles against the local model and deployment preview;
 any unexplained change stops the release. The V4 procedure remains historical
 evidence in `docs/release-evidence-0.2.2.md`.
