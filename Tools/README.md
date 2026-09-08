@@ -19,7 +19,7 @@ are not shipping product modules.
 | Native application/UI tests | [Xcode agent workflow](../docs/agents/xcode.md); Xcode manages runner signing |
 | Synthetic startup measurements | [StartupMeasurements](StartupMeasurements/README.md) |
 | Signed Session CloudKit acceptance | [SessionCloudKitAcceptance](SessionCloudKitAcceptance/README.md); device/service evidence, separate from deterministic tests |
-| Historical V4 schema initialization | [CloudKitProductionSchemaAdmin](CloudKitProductionSchemaAdmin/README.md); frozen 0.2.2 tool, production container's Development environment only |
+| V7 release schema initialization | [CloudKitProductionSchemaAdmin](CloudKitProductionSchemaAdmin/README.md); frozen 0.3.0 tool, production container's Development environment only |
 
 The CloudKit tools require their own named-candidate and signing instructions;
 they do not authorize Production deployment. Keep credentials, private records,

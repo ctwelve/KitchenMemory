@@ -6,14 +6,23 @@ Copyright © 2026 the Kitchen Memory contributors.
 SPDX-License-Identifier: MIT
 -->
 
-This one-shot Mac tool initializes Kitchen Memory's additive V4 model in the
+This one-shot Mac tool initializes Kitchen Memory's additive V7 model in the
 **Development environment of the Production container**. It exists only so a
 release operator can review an additive deployment preview before deliberately
 promoting that schema to Production.
 
-For 0.2.2, the only permitted delta from the deployed V3 baseline is
-`CD_KitchenOwnershipRecord` with its generated identity, Kitchen ID, and opaque
-owner ID fields and indexes. Any other unexplained change stops the release.
+For 0.3.0, compare the live deployed schema with the frozen V4 baseline and
+accepted V7 model. V5–V7 add six model families: `RecipeSaveRecord`,
+`RecipeSelectionRecord`, `RecipePruneRecord`, `RecipeImagePayloadRecord`,
+`OrganizationActionRecord`, and `OrganizationCheckpointRecord`. The deployed
+V4 baseline additionally needs `CD_deletedAt` on
+`CD_RecipeDeletionRecord`, and `CD_kitchenID` plus `CD_restoredAt` on
+`CD_RecipeDeletionResolutionRecord`. Existing field definitions, indexes, roles,
+and encryption choices must remain unchanged; no existing type is removed.
+Review generated CloudKit fields, assets,
+indexes, and standard roles against the local model and deployment preview;
+any unexplained change stops the release. The V4 procedure remains historical
+evidence in `docs/release-evidence-0.2.2.md`.
 
 The tool is absent from the Kitchen Memory project, shared schemes, test plans,
 archives, and product binaries. It uses a disposable temporary store, refuses
@@ -32,7 +41,7 @@ Run the one supported operation with the accepted product commit:
 
 ```sh
 Tools/CloudKitProductionSchemaAdmin/run.sh \
-  <accepted-0.2.2-source-commit>
+  <accepted-0.3.0-source-commit>
 ```
 
 Success means only that the Development server schema accepted the additive
