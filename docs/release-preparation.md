@@ -7,7 +7,10 @@ SPDX-License-Identifier: MIT
 -->
 
 This runbook implements [ADR 0018](adr/0018-converge-release-preparation-on-evidence.md).
-Use it when the release's prerequisite work is complete. For 0.3, the execution
+[ADR 0020](adr/0020-scale-release-assurance-to-scope.md) limits its mandatory
+scope to major-release assurance or explicitly requested broader audits; ordinary
+bug-fix publication uses the short path in [release engineering](release-engineering.md).
+When this loop is selected, use it once prerequisite work is complete. For 0.3, the execution
 belongs to [#124](https://github.com/ctwelve/KitchenMemory/issues/124); its live
 issue dependencies remain the gate. Recording this workflow does not start the
 refactor or authorize distribution. The accessibility gates are the alpha or beta

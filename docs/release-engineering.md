@@ -12,29 +12,66 @@ public artifact is recorded in the root [README](../README.md); source versions
 come from the Xcode project and the [software inventory](../DEPENDENCIES.md).
 The [0.1 runbook and outcome](release-engineering-0.1.md) are historical evidence.
 
-## Versioned slice discipline
+## Release tiers and versions
 
-Each product slice commits its next semantic `MARKETING_VERSION` when work
-begins. A patch may identify a bug fix or coherent feature work smaller than a
-minor release. An accepted version may be skipped publicly. Every application
-configuration must agree; the source `CURRENT_PROJECT_VERSION` remains `1` and
-Xcode Cloud assigns distributed build numbers.
+Use three-part `major.minor.patch` versions for the app, inventory, `RELEASE`,
+and `release/<major>.<minor>.<patch>` tags. Release scope determines the checks;
+a fourth version component is not used. This policy is recorded in
+[ADR 0020](adr/0020-scale-release-assurance-to-scope.md).
+
+| Tier | Version and purpose | Acceptance |
+| --- | --- | --- |
+| Major | Major increment, leaving beta, or post-beta major architectural change | Full tests, assurances, and release procedures; explicit human review and sign-off across every aspect. Complete localization, code review, stable and fully tested UI, product website, and App Store preparation are among the readiness requirements. LLM-performed localization is accepted; human locale reviewers can be added as the audience grows. |
+| Minor | Minor increment; post-beta feature release | Programmatic review is accepted and trusted. Validate the feature scope and affected integration, persistence, UI, localization, and distribution risks. Major architectural changes require a major release. |
+| Patch slice | Patch increment for each coherent slice; usually unpublished | Apply slice acceptance and normal integration checks. A breaking bug may justify publication at this level through the short urgent process. |
+| Patch bug fix | Patch increment strictly for a bug fix | Use the focused bug-fix release process below; do not rerun the full release-engineering audit solely because a release is being published. |
+
+The assurance level should fit this personal project; major releases still need
+complete preparation and explicit human acceptance, without importing an
+unrelated safety-critical or large-commercial-product process.
+
+Each slice or bug fix commits the next unused patch version when work begins;
+accepted versions may be skipped publicly. Every application configuration must
+agree. The source `CURRENT_PROJECT_VERSION` remains `1`; Xcode Cloud assigns
+distributed build numbers.
 
 The root `RELEASE` marker records the last submitted version and may trail an
-untagged working version. Only an intentional release commit advances it to the
-selected marketing version. Attach the matching annotated
-`release/<major>.<minor>.<patch>` tag to that exact commit and submit commit and
-tag together. `RELEASE` must remain build-visible: its change lets Xcode Cloud
-import a fresh source event for the Archive workflow.
+untagged working version. An intentional release commit advances it to the
+selected app version. Attach the matching annotated tag to that exact accepted
+commit. Keep `RELEASE` build-visible so Xcode Cloud imports the Archive event.
+`Tools/check-release-version.rb` requires the tag, marker, and all application
+versions to agree; untagged Archives, malformed tags, and mismatches fail.
 
-`Tools/check-release-version.rb` is read-only. Tagged Archive actions require
-`RELEASE`, all application marketing versions, and the numeric tag suffix to
-agree. Untagged branch actions skip the release-only check; untagged Archives,
-malformed tags, and mismatches fail. CI never writes versions back to `main`.
+## Focused bug-fix release
 
-## Candidate gates
+1. Keep product changes strictly within the fix. Retain a reproduction and
+   focused regression evidence; reuse still-applicable validation from the fix.
+   Version, release notes, and necessary release metadata accompany it.
+2. Align versions and inventory, pass structural and release checks, and ensure
+   affected products compile. Honor the existing required PR checks; no blanket
+   architecture/dead-code audit, exact-coverage rerun, or comprehensive UI matrix
+   is required solely for this release. Broaden checks when the changed risks
+   justify them, and record material omissions honestly.
+3. Merge through the governed PR lane, verify the exact merge's applicable
+   Production builds, and create its immutable annotated release tag.
+4. Verify the tagged archive and signed distribution product: version/build,
+   signing/notarization, expected entitlements, and a short launch check. Publish
+   the verified Mac download and checksum with concise bug-fix release notes.
+   An unchanged schema does not require new CloudKit administration.
 
-1. Pin the candidate and its live issue prerequisites. Apply the
+Post-beta, retain release branches for supported major, minor, and patch lines
+so fixes can be backported. The current set of supported lines determines which
+branches remain; do not treat these maintenance branches as disposable merged
+integration branches. Establish their exact names and CI routing when that
+support begins. Alpha does not require speculative backport branches.
+
+## Broader candidate gates
+
+These gates apply according to the release tier above. The full preparation
+loop belongs to major-release assurance or an explicitly requested broader
+audit; a minor release uses trusted programmatic review scoped to its changes.
+
+1. Pin the candidate and its live issue prerequisites. When required, apply the
    [release-preparation loop](release-preparation.md), preserving measured
    findings, dispositions, validation, and independent review in a draft PR.
 2. Pass the [CI contract](continuous-integration.md): structural and inventory
