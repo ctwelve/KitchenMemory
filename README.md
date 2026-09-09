@@ -13,7 +13,7 @@ It preserves the recipe you meant to save, makes corrections inexpensive, and
 keeps useful cooking structure without pretending every ingredient can be
 reduced to a perfect database row.
 
-Version 0.3.0 is the current public alpha. A signed and notarized universal macOS
+Version 0.3.1 is the current public alpha. A signed and notarized universal macOS
 build is available from [GitHub Releases](https://github.com/ctwelve/KitchenMemory/releases).
 The iPhone and iPad application is present in the source tree, but this alpha
 does not yet have a public iOS download or TestFlight group.
@@ -23,7 +23,7 @@ does not yet have a public iOS download or TestFlight group.
 The macOS alpha requires macOS 26 or later and runs natively on Apple silicon
 and Intel Macs.
 
-1. Download `KitchenMemory-0.3.0-macOS.zip` from the [0.3.0 release](https://github.com/ctwelve/KitchenMemory/releases/tag/release/0.3.0).
+1. Download `KitchenMemory-0.3.1-macOS.zip` from the [0.3.1 release](https://github.com/ctwelve/KitchenMemory/releases/tag/release/0.3.1).
 2. Expand the archive and move **Kitchen Memory** to Applications.
 3. Launch it normally. The distributed app is signed with Developer ID,
    notarized by Apple, and carries a stapled notarization ticket.
