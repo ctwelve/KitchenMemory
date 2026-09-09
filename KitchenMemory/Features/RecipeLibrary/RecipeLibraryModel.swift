@@ -254,8 +254,6 @@ final class RecipeLibraryModel {
       pendingSamplePack = nil
       navigation.move(to: .recipe)
       resetPresentationState()
-      samplePreferences.sampleRecipeOnboardingResponse = .accepted
-      sampleOnboardingResponse = .accepted
       reload()
       return true
     } catch {

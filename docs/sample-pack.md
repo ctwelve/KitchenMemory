@@ -58,3 +58,8 @@ localized matching, identity preservation, edited and late-edited histories,
 ordinary deletion/restoration, and refresh behavior. Hosted tests exercise the
 setting's confirmation and retry seams; UI automation remains limited to the
 existing accessible application shell.
+
+Kitchen reset reads the accepted sample-pack setting before erasing Kitchen
+contents. A disabled pack leaves the reset Kitchen empty; reset does not change
+the first-run sample response into consent. An enabled pack retains the existing
+reset behavior of restoring the bundled samples.
