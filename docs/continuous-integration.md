@@ -80,6 +80,9 @@ Published `slice/*`, `bugs/*`, and `release-eng/*` branches are governed
 integration lanes. GitHub automatically deletes their remote branches after
 merge. The merge commit, pull request, and protected `main` history preserve
 the accepted integration and its evidence; keeping a branch name is unnecessary.
+Post-beta maintenance release branches for supported major, minor, and patch
+lines are retained for backports under the [release-tier policy](release-engineering.md).
+They are distinct from these disposable integration lanes.
 Local integration branches, working branches such as `codex/*`, and completed
 worktrees are short-lived working state. Clean them up only after verifying
 their work on `main` and the required merge evidence, as described in

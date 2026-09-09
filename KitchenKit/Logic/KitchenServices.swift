@@ -131,7 +131,7 @@ public struct SampleRecipeInstallService {
   }
 }
 
-/// Replaces one Kitchen only after every bundled sample has been decoded.
+/// Replaces one Kitchen, decoding bundled samples only when installation is requested.
 @MainActor
 public struct KitchenResetService {
   private let repository: any KitchenResetRepository
@@ -149,8 +149,8 @@ public struct KitchenResetService {
     )
   }
 
-  public func reset(kitchenID: Kitchen.ID) throws {
-    let sampleRecipes = try samples.recipes(in: kitchenID)
+  public func reset(kitchenID: Kitchen.ID, installSamples: Bool = true) throws {
+    let sampleRecipes = try installSamples ? samples.recipes(in: kitchenID) : []
     try repository.reset(kitchenID: kitchenID, to: sampleRecipes)
   }
 }

@@ -31,6 +31,7 @@ Historical paths remain stable for links from issues and pull requests.
 - [0.3 dependency and signed-product evidence](release-dependencies-0.3.md)
 - [0.3 engineering evidence](release-evidence-0.3.md)
 - [0.3.0 publication record](release-publication-0.3.md)
+- [Kitchen Memory 0.3.1](release-notes-0.3.1.md)
 - [Kitchen Memory 0.3.0](release-notes-0.3.md)
 - [Startup latency investigation (#72)](startup-latency-0.2.9.md)
 - [Alpha Recipe Library accessibility evidence](accessibility-alpha-library-evidence.md)

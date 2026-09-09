@@ -167,17 +167,17 @@ final class RecipeLibraryStartupTests: XCTestCase {
     XCTAssertEqual(preparedApp.libraryModel.recipes.count, 3)
   }
 
-  func testResetRecordsAcceptedResponseAfterDecliningSamples() throws {
+  func testResetPreservesDeclinedSamples() throws {
     let preferences = VolatileKitchenPreferencesStore(sampleRecipeOnboardingResponse: .declined)
     let preparedApp = try makePreparedApp(preferences: preferences)
     preparedApp.libraryModel.loadIfNeeded()
 
     XCTAssertTrue(preparedApp.libraryModel.resetKitchen())
 
-    XCTAssertEqual(preparedApp.libraryModel.sampleOnboardingResponse, .accepted)
-    XCTAssertEqual(preparedApp.libraryModel.samplePresence, .complete)
-    XCTAssertEqual(preferences.sampleRecipeOnboardingResponse, .accepted)
-    XCTAssertEqual(preparedApp.libraryModel.recipes.count, 3)
+    XCTAssertEqual(preparedApp.libraryModel.sampleOnboardingResponse, .declined)
+    XCTAssertEqual(preparedApp.libraryModel.samplePresence, .none)
+    XCTAssertEqual(preferences.sampleRecipeOnboardingResponse, .declined)
+    XCTAssertEqual(preparedApp.libraryModel.recipes.count, 0)
   }
 
   private func makePreparedApp(

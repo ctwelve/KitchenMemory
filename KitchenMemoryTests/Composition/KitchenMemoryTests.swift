@@ -58,6 +58,7 @@ final class KitchenMemoryTests: XCTestCase {
   func testResetKitchenRemovesUserRecipesAndRestoresCurrentSamples() throws {
     let preparedApp = try AppRuntime.testing()
     preparedApp.libraryModel.loadIfNeeded()
+    try preparedApp.libraryModel.library.installSamples()
     let manifest = try SampleRecipeCatalog.loadManifest()
     preparedApp.libraryModel.beginEditing()
     let editor = try XCTUnwrap(preparedApp.libraryModel.editor)
@@ -81,6 +82,7 @@ final class KitchenMemoryTests: XCTestCase {
     let store = VolatileCookingSessionPresentationStore()
     let preparedApp = try AppRuntime.testing(.init(sessionPresentationStore: store))
     preparedApp.libraryModel.loadIfNeeded()
+    try preparedApp.libraryModel.library.installSamples()
     preparedApp.sessionModel.loadIfNeeded()
     let recipe = try XCTUnwrap(preparedApp.libraryModel.recipes.first)
     XCTAssertTrue(try preparedApp.cookingSessionRepository.sessions(in: recipe.recipe.kitchenID).isEmpty)
@@ -116,11 +118,14 @@ final class KitchenMemoryTests: XCTestCase {
 
   func testFailedResetPreservesDurableAndPresentationSessionState() throws {
     let store = VolatileCookingSessionPresentationStore()
+    let samples = FailingResetSampleProvider()
     let preparedApp = try AppRuntime.testing(.init(
       library: .empty,
-      sampleProvider: FailingResetSampleProvider(),
+      sampleProvider: samples,
       sessionPresentationStore: store
     ))
+    try preparedApp.libraryModel.library.installSamples()
+    samples.shouldFail = true
     preparedApp.libraryModel.loadIfNeeded()
     preparedApp.libraryModel.beginEditing()
     let editor = try XCTUnwrap(preparedApp.libraryModel.editor)
@@ -170,15 +175,6 @@ final class KitchenMemoryTests: XCTestCase {
     for value in rejected {
       XCTAssertNil(RecipeSourceURLPolicy.validatedURL(from: value), value)
     }
-  }
-}
-
-@MainActor
-private struct FailingResetSampleProvider: SampleRecipeProviding {
-  struct Failure: Error {}
-
-  func recipes(in kitchenID: Kitchen.ID) throws -> [StoredRecipe] {
-    throw Failure()
   }
 }
 

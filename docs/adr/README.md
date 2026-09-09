@@ -31,6 +31,8 @@ amends them.
 - [0018: Converge release preparation on evidence](0018-converge-release-preparation-on-evidence.md)
 - [0019: Stage accessibility acceptance at beta](0019-stage-accessibility-acceptance-at-beta.md)
 
+- [0020: Scale release assurance to scope](0020-scale-release-assurance-to-scope.md)
+
 ## Superseded architecture decisions
 
 These ADRs are retained as decision history. Do not treat them as current

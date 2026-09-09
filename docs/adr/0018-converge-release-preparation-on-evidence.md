@@ -6,7 +6,7 @@ Copyright © 2026 the Kitchen Memory contributors.
 SPDX-License-Identifier: MIT
 -->
 
-- Status: Accepted
+- Status: Accepted; scope amended by [ADR 0020](0020-scale-release-assurance-to-scope.md)
 - Date: 2026-09-07
 
 Release preparation uses a repeatable architecture-improvement and dead-code

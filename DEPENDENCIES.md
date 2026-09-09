@@ -104,7 +104,7 @@ of every dependency update.
 
 ## 0.3 source review
 
-The working application is **0.3.0**. Its source build-number seed remains **1**
+The working application is **0.3.1**. Its source build-number seed remains **1**
 under the [release contract](docs/release-engineering.md); Xcode Cloud owns
 advancing distributed build numbers. `RELEASE` still identifies the earlier
 submitted version. This source preparation creates no release tag or distribution.

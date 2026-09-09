@@ -9,6 +9,32 @@ import XCTest
 
 @MainActor
 final class SamplePackLibraryTests: XCTestCase {
+  func testResetDoesNotRestoreDisabledSamplesAfterManualDeletion() throws {
+    let kitchen = Kitchen(name: "Samples")
+    let container = try KitchenMemorySchema.makeContainer(inMemory: true)
+    let repository = SwiftDataRecipeRepository(modelContainer: container)
+    try repository.save(kitchen)
+    let library = RecipeLibrary(kitchenID: kitchen.id, repository: repository,
+      samples: LibrarySampleProvider(), importer: RecipeImportService(),
+      resetRepository: SwiftDataKitchenResetRepository(modelContainer: container),
+      samplePackRepository: SwiftDataSamplePackRepository(modelContainer: container))
+    try library.installSamples()
+    // Edited samples survive disabling the pack and are then deleted manually.
+    for recipe in try library.load().recipes {
+      _ = try library.revise(recipeID: recipe.id, from: RecipeDraft(title: "Edited sample"))
+    }
+    try library.setSamplePack(library.prepareSamplePack(enabled: false))
+    for recipe in try library.load().recipes {
+      try library.delete(library.prepareDeletion(of: recipe.id))
+    }
+    XCTAssertEqual(try library.samplePackStatus()?.isEnabled, false)
+    XCTAssertTrue(try library.load().recipes.isEmpty)
+    try library.reset()
+    XCTAssertTrue(try library.load().recipes.isEmpty,
+      "Reset must not reinstall a disabled sample pack")
+    XCTAssertEqual(try library.samplePackStatus()?.isEnabled, false)
+  }
+
   func testExplicitSampleRequestsFreezeRemovalAndValidateTheirKitchen() throws {
     let kitchen = Kitchen(name: "Samples")
     let container = try KitchenMemorySchema.makeContainer(inMemory: true)

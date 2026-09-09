@@ -9656,37 +9656,37 @@
         "it-IT": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tutte le ricette, le modifiche, la cronologia delle revisioni, le acquisizioni delle fonti importate e i metadati delle ricette in questa Cucina verranno eliminati definitivamente. Memoria di cucina ripristinerà solo le ricette di esempio incluse in questa versione. L’operazione non può essere annullata."
+            "value": "Tutte le ricette, le modifiche, la cronologia delle revisioni, le acquisizioni delle fonti importate e i metadati delle ricette in questa Cucina verranno eliminati definitivamente. Memoria di cucina ripristinerà le ricette di esempio incluse in questa versione solo se il pacchetto di ricette incluso è attivato. L’operazione non può essere annullata."
           }
         },
         "de-DE": {
           "stringUnit": {
             "state": "translated",
-            "value": "Alle Rezepte, Bearbeitungen, der Revisionsverlauf, importierte Quellaufzeichnungen und Rezeptmetadaten dieser Küche werden dauerhaft gelöscht. Küchengedächtnis stellt nur die Beispielrezepte dieser Version wieder her. Dies kann nicht rückgängig gemacht werden."
+            "value": "Alle Rezepte, Bearbeitungen, der Revisionsverlauf, importierte Quellaufzeichnungen und Rezeptmetadaten dieser Küche werden dauerhaft gelöscht. Küchengedächtnis stellt die Beispielrezepte dieser Version nur wieder her, wenn das mitgelieferte Rezeptpaket aktiviert ist. Dies kann nicht rückgängig gemacht werden."
           }
         },
         "en-GB": {
           "stringUnit": {
             "state": "translated",
-            "value": "All recipes, edits, revision history, imported source captures, and recipe metadata in this Kitchen will be permanently deleted. Kitchen Memory will restore only the sample recipes included with this version. This cannot be undone."
+            "value": "All recipes, edits, revision history, imported source captures, and recipe metadata in this Kitchen will be permanently deleted. Kitchen Memory will restore the sample recipes included with this version only if the bundled recipe pack is enabled. This cannot be undone."
           }
         },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Se eliminarán permanentemente todas las recetas, ediciones, historiales de revisión, capturas de origen importadas y metadatos de recetas de esta cocina. Memoria de cocina restaurará únicamente las recetas de muestra incluidas en esta versión. Esta acción no se puede deshacer."
+            "value" : "Se eliminarán permanentemente todas las recetas, ediciones, historiales de revisión, capturas de origen importadas y metadatos de recetas de esta cocina. Memoria de cocina restaurará las recetas de muestra incluidas en esta versión solo si el paquete de recetas incluido está activado. Esta acción no se puede deshacer."
           }
         },
         "fr-CA" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Toutes les recettes, modifications, historiques de révision, captures de sources importées et métadonnées de recettes de cette cuisine seront supprimés définitivement. Mémoire de cuisine restaurera uniquement les exemples de recettes inclus dans cette version. Cette action est irréversible."
+            "value" : "Toutes les recettes, modifications, historiques de révision, captures de sources importées et métadonnées de recettes de cette cuisine seront supprimés définitivement. Mémoire de cuisine restaurera les exemples de recettes inclus dans cette version seulement si le lot de recettes inclus est activé. Cette action est irréversible."
           }
         },
         "en-US" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "All recipes, edits, revision history, imported source captures, and recipe metadata in this Kitchen will be permanently deleted. Kitchen Memory will restore only the sample recipes included with this version. This cannot be undone."
+            "value" : "All recipes, edits, revision history, imported source captures, and recipe metadata in this Kitchen will be permanently deleted. Kitchen Memory will restore the sample recipes included with this version only if the bundled recipe pack is enabled. This cannot be undone."
           }
         }
       },

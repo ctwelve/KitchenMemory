@@ -209,6 +209,8 @@ public struct RecipeLibrary {
   }
 
   public func reset() throws {
-    try resetter.reset(kitchenID: kitchenID)
+    // Read accepted intent without requiring bundled content to be available.
+    let installSamples = try samplePack?.status(in: kitchenID, samples: []).isEnabled ?? true
+    try resetter.reset(kitchenID: kitchenID, installSamples: installSamples)
   }
 }
