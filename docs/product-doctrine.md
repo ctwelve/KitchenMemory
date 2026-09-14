@@ -52,7 +52,8 @@ rather than being identified with one mutable representation.
 ### Recipe revision
 
 One intended version of a recipe: metadata, yield, ingredients, instructions,
-organization, and recipe-level media. A revision may derive from an import,
+and recipe-level media. Folder and Tag organization belongs to the stable Recipe,
+separate from a Revision. A revision may derive from an import,
 manual editing, or selected discoveries from cooking sessions.
 
 ### Cooking session
@@ -132,7 +133,7 @@ progressive native understanding.
 A recipe initially has zero or one primary folder and any number of tags.
 
 - Folders provide a human navigational hierarchy and sense of place.
-- Tags provide overlapping many-to-many classification.
+- Tags provide flat, overlapping many-to-many classification.
 - Saved searches and smart collections may later project dynamic organization.
 
 Direct multi-folder membership is deferred. Aliases or smart collections may
@@ -293,11 +294,9 @@ follows a focused prototype; see ADRs 0003 and 0004.
 
 ## Capability horizons
 
-Horizons communicate dependency and focus, not dates or promises. They are
-product groupings, not completion status; [current contracts](README.md#product-contracts)
-and the live issue graph identify implemented and remaining work.
+Horizons communicate dependency and focus, not dates or promises. [Current contracts](README.md#product-contracts) identify implemented behavior; the [live roadmap](https://github.com/ctwelve/KitchenMemory/issues/190) identifies remaining work and its dependencies.
 
-### Foundation
+### Current foundation
 
 - Manual recipe entry and editing.
 - Recipe sections, ingredients, instructions, yield, and core metadata.
@@ -305,17 +304,18 @@ and the live issue graph identify implemented and remaining work.
 - Local recipe library with folders and tags.
 - Recipe reading and safe quantity scaling.
 - Private iCloud synchronization across one person's devices.
+- Cooking Sessions with progress, Session Entries, Outcome, continuation,
+  history, deletion, and recovery.
 - Domain, import, storage, and UI boundaries suitable for multiple Apple targets.
 
-### Expansion
+### Expansion candidates
 
-- Kitchen sharing and multi-person synchronization.
-- Basic cooking sessions with progress and Session Entries.
-- A basic planned cook that retains recipe revision and desired yield.
+- Kitchen sharing and multi-person synchronization after 1.0.
+- A first Planned Cook/readiness/shopping slice, selected before pantry storage.
 - Pantry items with multiple exact, fuzzy, presence, and uncertain holdings.
 - Ingredient readiness decisions, combined shopping, and weekly collections of
   planned cooks.
-- Session Entries, outcomes, media, and revision promotion.
+- Session media, timers, and deliberate recipe refinement from Session evidence.
 - Shopping suggestions and lightweight pantry cleanup.
 - Safari sharing, richer Mac workflows, and saved searches.
 

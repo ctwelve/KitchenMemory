@@ -18,7 +18,7 @@ how we got here. GitHub Issues owns the live plan and dependencies. The root
 | Understand the product | [Product brief](product-brief.md), then [doctrine](product-doctrine.md) |
 | Name or change concepts | [Domain vocabulary](../CONTEXT.md), [domain architecture](domain-architecture.md), relevant [decisions](adr/README.md) |
 | Find code ownership | [Implementation architecture](implementation-architecture.md), then the [KitchenKit](../KitchenKit/KitchenKit.docc/KitchenKit.md) or [app](../KitchenMemory/Documentation.docc/Documentation.md) DocC guide |
-| Build or validate | [CI and test contract](continuous-integration.md); [Xcode agent workflow](agents/xcode.md) for signed native tests |
+| Build or validate | [CI and test contract](continuous-integration.md); [Xcode agent workflow](agents/xcode.md) for signed native tests; [Tools](../Tools/README.md) for repository verification and scoped development utilities |
 | Prepare or publish a release | [Release engineering](release-engineering.md), [preparation loop](release-preparation.md) |
 | Maintain these docs | [Routing and validation contract](documentation-maintenance.md) |
 
@@ -42,8 +42,7 @@ how we got here. GitHub Issues owns the live plan and dependencies. The root
 ## Future direction
 
 These are design inputs, not claims about shipped features or implementation
-queues: [open questions](open-questions.md), [workflow exploration](workflows.md),
-[fuzzy pantry](fuzzy-pantry.md), and [planned cooks](planned-cooks.md).
+queues. The [live roadmap](https://github.com/ctwelve/KitchenMemory/issues/190) owns priority and dependencies: [open questions](open-questions.md), [workflow exploration](workflows.md), [fuzzy pantry](fuzzy-pantry.md), and [planned cooks](planned-cooks.md) describe the remaining design space.
 
 ## Accepted architecture decisions
 
