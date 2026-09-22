@@ -42,10 +42,12 @@ struct RecipeRow: View {
       VStack(alignment: .leading, spacing: 3) {
         Text(storedRecipe.revision.title)
           .font(.headline)
+          .lineLimit(2)
         if let summary = storedRecipe.revision.summary {
           Text(summary)
             .font(.caption)
-            .foregroundStyle(.primary)
+            .foregroundStyle(.secondary)
+            .lineLimit(2)
         }
       }
     }

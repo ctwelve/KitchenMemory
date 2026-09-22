@@ -22,9 +22,7 @@ struct RecipeLibrarySidebar: View {
       Section {
         Button(.organizationAll, systemImage: "books.vertical") {
           browse {
-            model.organization?.filter.location = .all
-            model.organization?.filter.tagIDs = []
-            model.organization?.filter.untagged = false
+            model.organization?.showAllRecipes()
           }
         }
         .accessibilityIdentifier("all-recipes-destination")

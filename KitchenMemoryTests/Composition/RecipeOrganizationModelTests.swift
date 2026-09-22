@@ -9,6 +9,31 @@ import XCTest
 
 @MainActor
 final class RecipeOrganizationModelTests: XCTestCase {
+  func testResetFiltersKeepsFolderAndAllRecipesKeepsUnrelatedFilters() throws {
+    let fixture = try makeTestUserDefaults(suiteNamePrefix: "organization-context")
+    let container = try KitchenMemorySchema.makeContainer(inMemory: true)
+    let kitchen = Kitchen(name: "Home")
+    try SwiftDataRecipeRepository(modelContainer: container).save(kitchen)
+    let model = RecipeOrganizationModel(
+      repository: SwiftDataRecipeOrganizationRepository(modelContainer: container),
+      kitchenID: kitchen.id, scope: "owner", defaults: fixture.defaults)
+    let folder = Folder.ID(), tag = Tag.ID()
+    model.filter.location = .folder(folder)
+    model.filter.search = "crème"
+    model.filter.tagIDs = [tag]
+    model.showAllRecipes()
+    XCTAssertEqual(model.filter.location, .all)
+    XCTAssertEqual(model.filter.search, "crème")
+    XCTAssertEqual(model.filter.tagIDs, [tag])
+    model.filter.location = .folder(folder)
+    model.filter.untagged = true
+    model.resetFilters()
+    XCTAssertEqual(model.filter.location, .folder(folder))
+    XCTAssertEqual(model.filter.search, "")
+    XCTAssertTrue(model.filter.tagIDs.isEmpty)
+    XCTAssertFalse(model.filter.untagged)
+  }
+
   func testSettingsKeepVisibilityLocalAndOrderingSynchronized() throws {
     let deviceA = try makeTestUserDefaults(suiteNamePrefix: "organization-settings-a")
     let deviceB = try makeTestUserDefaults(suiteNamePrefix: "organization-settings-b")

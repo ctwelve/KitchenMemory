@@ -86,8 +86,35 @@ the same draft-save veto as every other destination change.
 
 Settings groups local Show Folders/Tags separately from the Folder and Tag policy
 preferences. The latter continue to author the existing synchronized commands;
-moving their controls does not change ownership or persistence. Bulk organization
-and text filtering remain in the basic Recipe list for phase one.
+moving their controls does not change ownership or persistence.
+
+## Contextual browsing
+
+[#185](https://github.com/ctwelve/KitchenMemory/issues/185) pins the search,
+scope, active Tags and bulk controls above the scrolling Recipe rows. The scope
+shows the full Folder path, including a selected Folder's descendants. Reset
+Filters clears the query, Tags and Untagged constraint while retaining that
+location. All Recipes removes only the location constraint; search and Tags
+remain visible and active. Hidden organization features contribute no constraint
+and their inactive scope is not presented as active.
+
+The existing Foundation `String.range` matching searches the maintained title
+and short summary, case- and diacritic-insensitively using the presentation locale.
+It is a literal substring search, not stemming, fuzzy search, ingredient search
+or translation. Filtering runs synchronously over the loaded Recipe snapshot
+as the query changes; it performs no storage fetch or network request. There is
+no additional index, package, or debounce delay. Large-library latency has not
+been benchmarked.
+
+Apple's [native searchable interface](https://developer.apple.com/documentation/swiftui/adding-a-search-interface-to-your-app)
+was evaluated: its placement follows the navigation container and platform.
+The fixed top-of-middle-column requirement uses a native SwiftUI TextField
+outside the ScrollView instead, reusing the existing Foundation matching policy.
+The model retains the query across Folder/Tag changes and destination switches.
+Filtering never changes the selected Recipe or closes its editor. A named return
+action reveals the existing detail when its row is filtered out; Drafts also
+retains the existing recoverable-document route. Selection and list anchors
+remain in the navigation model across column reveal and resize.
 
 ## Validation boundary
 

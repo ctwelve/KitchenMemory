@@ -9,6 +9,29 @@ import XCTest
 
 @MainActor
 final class RecipeLibraryNavigationTests: XCTestCase {
+  func testFilteringAnEditedRecipePreservesDraftSelectionAndReturnContext() throws {
+    let app = try AppRuntime.testing()
+    let library = app.libraryModel
+    library.loadIfNeeded()
+    let organization = try XCTUnwrap(library.organization)
+    let recipe = try XCTUnwrap(library.selectedRecipe)
+    library.navigation.recipeListAnchor = recipe.id
+    library.beginEditing()
+    let editor = try XCTUnwrap(library.editor)
+    editor.session.title = "Still editing this recipe"
+    organization.filter.search = "a query with no matching recipe"
+    XCTAssertTrue(organization.recipes(library.recipes, locale: .current).isEmpty)
+    XCTAssertIdentical(library.editor, editor)
+    XCTAssertEqual(library.selectedRecipeID, recipe.id)
+    XCTAssertEqual(library.navigation.recipeListAnchor, recipe.id)
+    XCTAssertEqual(library.navigation.contentDestination, .recipes)
+    organization.resetFilters()
+    XCTAssertTrue(organization.recipes(library.recipes, locale: .current).contains { $0.id == recipe.id })
+    XCTAssertIdentical(library.editor, editor)
+    library.closeEditor()
+    XCTAssertEqual(library.drafts.drafts.first?.session.title, "Still editing this recipe")
+  }
+
   func testBrowsingOrganizationPreservesFiltersWhenDraftCannotBeSaved() throws {
     let app = try AppRuntime.testing()
     let store = NavigationDraftStore()

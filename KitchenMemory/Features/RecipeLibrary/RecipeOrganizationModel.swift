@@ -75,6 +75,16 @@ final class RecipeOrganizationModel {
                         foldersEnabled: foldersEnabled, tagsEnabled: tagsEnabled, locale: locale)
   }
 
+  func resetFilters() {
+    filter.search = ""
+    filter.tagIDs = []
+    filter.untagged = false
+  }
+
+  func showAllRecipes() {
+    filter.location = .all
+  }
+
   func perform(_ prepare: (RecipeOrganization) throws -> RecipeOrganizationCommand) {
     guard !storageInvalid, pending == nil, let snapshot else { failed = true; return }
     do {

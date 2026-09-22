@@ -13,28 +13,27 @@ struct RecipeLibraryList: View {
   let selectSession: (CookingSession.ID) -> Void
 
   var body: some View {
-    ScrollView {
-      LazyVStack(alignment: .leading, spacing: 8) {
-        if let organization = model.organization {
-          Section {
-            TextField(.organizationSearch, text: Binding(get: { organization.filter.search },
-                                                       set: { organization.filter.search = $0 }))
-              .accessibilityIdentifier("organization-search")
-            Toggle(.organizationSelect, isOn: Binding(get: { organization.selecting },
-                                                    set: { organization.selecting = $0 }))
-            if organization.selecting {
-              RecipeOrganizationMenus(model: organization, recipeIDs: organization.selectedRecipes)
-                .disabled(organization.selectedRecipes.isEmpty)
-            }
-          }
+    let recipes = model.organization?.recipes(model.recipes, locale: locale) ?? model.recipes
+    VStack(spacing: 0) {
+      if let organization = model.organization {
+        RecipeLibraryFilters(model: organization, locale: locale)
+        if model.editor != nil || model.selectedRecipeID.map({ id in !recipes.contains { $0.id == id } }) == true {
+          Button(.libraryReturnToDetail, action: focusDetail)
+            .padding(.bottom, 8)
+            .accessibilityIdentifier("return-to-recipe-detail")
         }
-        recipeSection
+        Divider()
       }
-      .scrollTargetLayout()
-      .padding(12)
+      ScrollView {
+        LazyVStack(alignment: .leading, spacing: 8) {
+          recipeSection(recipes)
+        }
+        .scrollTargetLayout()
+        .padding(12)
+      }
+      .scrollPosition(id: Binding(get: { model.navigation.recipeListAnchor },
+                                  set: { model.navigation.recipeListAnchor = $0 }), anchor: .top)
     }
-    .scrollPosition(id: Binding(get: { model.navigation.recipeListAnchor },
-                                set: { model.navigation.recipeListAnchor = $0 }), anchor: .top)
     .accessibilityIdentifier("recipe-list")
     .accessibilityLabel(Text(.libraryAccessibilityLabel))
     .navigationTitle(.libraryTitle)
@@ -51,7 +50,7 @@ struct RecipeLibraryList: View {
   }
 
   @ViewBuilder
-  private var recipeSection: some View {
+  private func recipeSection(_ recipes: [StoredRecipe]) -> some View {
     Section {
       if let issue = model.issue {
         unavailableLibrary(issue)
@@ -71,54 +70,61 @@ struct RecipeLibraryList: View {
           }
           .accessibilityIdentifier("reconcile-recipe-\(comparison.recipeID.rawValue.uuidString)")
         }
-        ForEach(
-          model.organization?.recipes(model.recipes, locale: locale) ?? model.recipes, id: \.recipe.id
-        ) { storedRecipe in
-          if let organization = model.organization, organization.selecting {
-            Toggle(storedRecipe.revision.title, isOn: Binding(get: {
-              organization.selectedRecipes.contains(storedRecipe.id)
-            }, set: { selected in
-              if selected {
-                organization.selectedRecipes.insert(storedRecipe.id)
-              } else {
-                organization.selectedRecipes.remove(storedRecipe.id)
-              }
-            }))
-          }
-          Button {
-            if model.selectRecipeForReading(storedRecipe.id) { focusDetail() }
-          } label: {
-            RecipeRow(storedRecipe: storedRecipe)
-              .frame(maxWidth: .infinity, alignment: .leading)
-              .padding(6)
-              .background(model.selectedRecipeID == storedRecipe.id ? Color.accentColor.opacity(0.15) : .clear,
-                          in: .rect(cornerRadius: 6))
-          }
-          .buttonStyle(.plain)
-          .accessibilityAddTraits(model.selectedRecipeID == storedRecipe.id ? .isSelected : [])
-          .id(storedRecipe.id)
-          .draggable("km-recipe:" + storedRecipe.id.rawValue.uuidString)
-          .contextMenu {
-            if let organization = model.organization {
-              RecipeOrganizationMenus(model: organization, recipeIDs: [storedRecipe.id])
-            }
-          }
-          .accessibilityIdentifier("recipe-row-\(storedRecipe.recipe.id.rawValue.uuidString)")
-          ForEach(sessionModel.sidebarSessions(for: storedRecipe.recipe.id), id: \.id) { session in
-            Button {
-              selectSession(session.id)
-            } label: {
-              CookingSessionRow(session: session)
-                .padding(.leading, 24)
-            }
-            .buttonStyle(.borderless)
-            .accessibilityIdentifier("session-row-\(session.id.rawValue.uuidString)")
-          }
+        if recipes.isEmpty {
+          ContentUnavailableView(.libraryNoMatchesTitle, systemImage: "line.3.horizontal.decrease",
+                                 description: Text(.libraryNoMatchesMessage))
+        }
+        ForEach(recipes, id: \.recipe.id) { storedRecipe in
+          recipeRow(storedRecipe)
         }
       }
     } header: {
       Text(.sessionDiscoveryRecipes)
         .accessibilityIdentifier("recipe-library-ready")
+    }
+  }
+
+  @ViewBuilder
+  private func recipeRow(_ storedRecipe: StoredRecipe) -> some View {
+    if let organization = model.organization, organization.selecting {
+      Toggle(storedRecipe.revision.title, isOn: Binding(get: {
+        organization.selectedRecipes.contains(storedRecipe.id)
+      }, set: { selected in
+        if selected {
+          organization.selectedRecipes.insert(storedRecipe.id)
+        } else {
+          organization.selectedRecipes.remove(storedRecipe.id)
+        }
+      }))
+    }
+    Button {
+      if model.selectRecipeForReading(storedRecipe.id) { focusDetail() }
+    } label: {
+      RecipeRow(storedRecipe: storedRecipe)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(6)
+        .background(model.selectedRecipeID == storedRecipe.id ? Color.accentColor.opacity(0.15) : .clear,
+                    in: .rect(cornerRadius: 6))
+    }
+    .buttonStyle(.plain)
+    .accessibilityAddTraits(model.selectedRecipeID == storedRecipe.id ? .isSelected : [])
+    .id(storedRecipe.id)
+    .draggable("km-recipe:" + storedRecipe.id.rawValue.uuidString)
+    .contextMenu {
+      if let organization = model.organization {
+        RecipeOrganizationMenus(model: organization, recipeIDs: [storedRecipe.id])
+      }
+    }
+    .accessibilityIdentifier("recipe-row-\(storedRecipe.recipe.id.rawValue.uuidString)")
+    ForEach(sessionModel.sidebarSessions(for: storedRecipe.recipe.id), id: \.id) { session in
+      Button {
+        selectSession(session.id)
+      } label: {
+        CookingSessionRow(session: session)
+          .padding(.leading, 24)
+      }
+      .buttonStyle(.borderless)
+      .accessibilityIdentifier("session-row-\(session.id.rawValue.uuidString)")
     }
   }
 

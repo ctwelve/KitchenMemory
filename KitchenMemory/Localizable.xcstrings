@@ -1,6 +1,174 @@
 {
   "sourceLanguage" : "en-US",
   "strings" : {
+  "organization.reset-filters": {
+    "comment": "Contextual Recipe library browsing control or filtered empty state. Reset keeps the folder; All Recipes keeps search and tags.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Reset Filters"
+        }
+      },
+      "en-GB": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Reset Filters"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Restablecer filtros"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Réinitialiser les filtres"
+        }
+      },
+      "de-DE": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Filter zurücksetzen"
+        }
+      },
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Reimposta filtri"
+        }
+      }
+    }
+  },
+  "library.return-to-detail": {
+    "comment": "Contextual Recipe library browsing control or filtered empty state. Reset keeps the folder; All Recipes keeps search and tags.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Return to Open Recipe"
+        }
+      },
+      "en-GB": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Return to Open Recipe"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Volver a la receta abierta"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Revenir à la recette ouverte"
+        }
+      },
+      "de-DE": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Zur geöffneten Rezeptansicht"
+        }
+      },
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Torna alla ricetta aperta"
+        }
+      }
+    }
+  },
+  "library.no-matches.title": {
+    "comment": "Contextual Recipe library browsing control or filtered empty state. Reset keeps the folder; All Recipes keeps search and tags.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "No Matching Recipes"
+        }
+      },
+      "en-GB": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "No Matching Recipes"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "No hay recetas que coincidan"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Aucune recette correspondante"
+        }
+      },
+      "de-DE": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Keine passenden Rezepte"
+        }
+      },
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Nessuna ricetta corrispondente"
+        }
+      }
+    }
+  },
+  "library.no-matches.message": {
+    "comment": "Contextual Recipe library browsing control or filtered empty state. Reset keeps the folder; All Recipes keeps search and tags.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Try another search or reset the filters. All Recipes expands the folder scope."
+        }
+      },
+      "en-GB": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Try another search or reset the filters. All Recipes expands the folder scope."
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Prueba otra búsqueda o restablece los filtros. Todas las recetas amplía el alcance de la carpeta."
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Essayez une autre recherche ou réinitialisez les filtres. Toutes les recettes élargit la portée du dossier."
+        }
+      },
+      "de-DE": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Versuche eine andere Suche oder setze die Filter zurück. Alle Rezepte erweitert die Suche über den Ordner hinaus."
+        }
+      },
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Prova un’altra ricerca o reimposta i filtri. Tutte le ricette estende la ricerca oltre la cartella."
+        }
+      }
+    }
+  },
     "library.organization.reveal": {
       "extractionState": "manual",
       "localizations": {
