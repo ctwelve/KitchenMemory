@@ -72,8 +72,33 @@ gate: **14,208/14,208 business-logic executable lines**, with the existing 130
 Apple-runtime adapter lines excluded. Fresh result bundle:
 `/private/tmp/KitchenMemoryCoreCoverage.kZIn0E/Tests.xcresult`.
 
+The full Xcode-managed Mac application plan passed **198/198 tests**, including
+the named editor-control check after adding explicit native field labels. Result:
+`Test-KitchenMemory-2026.09.22_18-33-36--0500.xcresult`
+(Xcode action artifacts, `RunAllTests`).
+
+The initial iPhone 17 / iOS 27 application plan passed **195/196 tests**. The
+expanded German/RTL Settings check failed because the new organization preferences
+pushed the lazily materialized iCloud switch below the visible form. The test
+helper now scrolls the identified Settings form before its unchanged native
+switch/name assertions. Initial result:
+`Test-KitchenMemory-2026.09.22_18-37-26--0500.xcresult`
+(in the project DerivedData `Logs/Test` directory). Xcode completed this run after
+the bridge’s five-minute response timeout; the finalized bundle supplied the result.
+The focused expanded-text/RTL check then passed all six shipping locales in
+`Test-KitchenMemory-2026.09.22_18-45-51--0500.xcresult`
+(Xcode action artifacts, `RunSomeTests`). Thus every one of the 196 iPhone tests
+has passed across the full run and focused correction; no single all-green
+iPhone full-plan rerun is claimed. The ordinary Settings semantics check also
+passed after helper cleanup on iPhone and Mac, respectively:
+`Test-KitchenMemory-2026.09.22_18-50-56--0500.xcresult` and
+`Test-KitchenMemory-2026.09.22_18-52-39--0500.xcresult`
+(Xcode action artifacts, `RunSomeTests`).
+
 Localization, documentation navigation, project structure, software inventory
-and changed Swift-source lint are checked independently.
+and changed Swift-source lint passed independently. Parallel Standards and Spec
+reviews against `26a1eb7` have no remaining code findings after correcting Save
+to retain precise values without requiring proposal acceptance.
 
 ## Acceptance boundary
 

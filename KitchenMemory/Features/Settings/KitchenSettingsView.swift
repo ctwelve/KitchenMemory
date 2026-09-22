@@ -222,6 +222,7 @@ struct KitchenSettingsView: View {
         .accessibilityIdentifier("settings-privacy")
       }
     }
+    .accessibilityIdentifier("settings-form")
     .alert(.organizationFailed, isPresented: Binding(
       get: { model.organization?.failed == true }, set: { model.organization?.failed = $0 }
     )) { Button(.actionCancel, role: .cancel) {} } message: { Text(.organizationFailureMessage) }

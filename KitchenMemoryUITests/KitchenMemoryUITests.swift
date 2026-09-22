@@ -252,18 +252,6 @@ final class KitchenMemoryUITests: XCTestCase {
   }
 
   @MainActor
-  private func openSettings(in app: XCUIApplication) {
-#if os(macOS)
-    app.typeKey(",", modifierFlags: .command)
-#else
-    let openSettings = app.buttons["open-settings"]
-    XCTAssertTrue(openSettings.waitForExistence(timeout: 2))
-    assertAccessibleLabel(openSettings, description: "Settings action")
-    activate(openSettings)
-#endif
-  }
-
-  @MainActor
   private func assertAccessibleLabel(_ element: XCUIElement, description: String) {
     let label = element.label.trimmingCharacters(in: .whitespacesAndNewlines)
     XCTAssertFalse(
@@ -281,5 +269,26 @@ final class KitchenMemoryUITests: XCTestCase {
       label.isEmpty && value.isEmpty,
       "Expected the \(description) to expose meaningful accessible text."
     )
+  }
+}
+
+extension KitchenMemoryUITests {
+  @MainActor
+  private func openSettings(in app: XCUIApplication) {
+#if os(macOS)
+    app.typeKey(",", modifierFlags: .command)
+#else
+    let openSettings = app.buttons["open-settings"]
+    XCTAssertTrue(openSettings.waitForExistence(timeout: 2))
+    assertAccessibleLabel(openSettings, description: "Settings action")
+    activate(openSettings)
+    let form = app.collectionViews["settings-form"]
+    XCTAssertTrue(form.waitForExistence(timeout: 5))
+    let synchronization = app.switches["settings-icloud-sync"]
+    // Expanded translations can place this lazily materialized row below the fold.
+    for _ in 0..<3 where !synchronization.exists {
+      form.swipeUp()
+    }
+#endif
   }
 }
