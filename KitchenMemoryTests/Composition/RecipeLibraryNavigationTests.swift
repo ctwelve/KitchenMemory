@@ -16,7 +16,7 @@ final class RecipeLibraryNavigationTests: XCTestCase {
     let organization = try XCTUnwrap(library.organization)
     let recipe = try XCTUnwrap(library.selectedRecipe)
     library.navigation.recipeListAnchor = recipe.id
-    library.beginEditing()
+    library.beginEditing(recipe)
     let editor = try XCTUnwrap(library.editor)
     editor.session.title = "Still editing this recipe"
     organization.filter.search = "a query with no matching recipe"
