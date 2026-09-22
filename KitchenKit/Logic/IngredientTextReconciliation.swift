@@ -6,7 +6,7 @@ import Foundation
 
 /// Lossless completed-line or paste reconciliation for one existing IngredientSection.
 ///
-/// Exact source matches retain their entire value, including identity and explicit precision.
+/// Callers retain line identities across text edits. Unchanged identified lines retain their entire value.
 /// Changed rows keep authored wording and retain explicit fields until the caller accepts a
 /// proposal. This value is Codable so unresolved proposals can accompany a local editing draft.
 public struct IngredientTextReconciliation: Codable, Equatable, Sendable {
@@ -18,25 +18,32 @@ public struct IngredientTextReconciliation: Codable, Equatable, Sendable {
     public let section: IngredientSection
     public let conflicts: [Conflict]
 
-    public static func reconcile(lines: [String], with section: IngredientSection,
-                                 locale: Locale = .current) -> Self {
-        var available = Dictionary(grouping: section.ingredients, by: \.originalText)
-        var used: Set<RecipeIngredient.ID> = []
-        let matched = lines.map { source -> RecipeIngredient? in
-            guard var candidates = available[source], !candidates.isEmpty else { return nil }
-            let ingredient = candidates.removeFirst()
-            available[source] = candidates
-            used.insert(ingredient.id)
-            return ingredient
+    public struct Line: Codable, Equatable, Sendable {
+        public let ingredientID: RecipeIngredient.ID?
+        public let source: String
+
+        public init(ingredientID: RecipeIngredient.ID? = nil, source: String) {
+            self.ingredientID = ingredientID
+            self.source = source
         }
-        var remaining = section.ingredients.filter { !used.contains($0.id) }.makeIterator()
+    }
+
+    /// Existing rows must carry their identity. New pasted lines have no identity; this method
+    /// never guesses a correspondence from similar wording or position. Duplicate/unknown IDs
+    /// are treated as new rows, so they cannot steal an existing ingredient's precise fields.
+    public static func reconcile(lines: [Line], with section: IngredientSection,
+                                 locale: Locale = .current) -> Self {
+        let existing = Dictionary(uniqueKeysWithValues: section.ingredients.map { ($0.id, $0) })
+        var used: Set<RecipeIngredient.ID> = []
         var ingredients: [RecipeIngredient] = []
         var conflicts: [Conflict] = []
-        for (index, source) in lines.enumerated() {
-            if let unchanged = matched[index] { ingredients.append(unchanged); continue }
+        for line in lines {
+            let source = line.source
+            let original = line.ingredientID.flatMap { used.insert($0).inserted ? existing[$0] : nil }
+            if let original, original.originalText == source { ingredients.append(original); continue }
             guard !source.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { continue }
             let parsed = IngredientLineParser.parse(source, locale: locale)
-            guard var previous = remaining.next() else { ingredients.append(parsed); continue }
+            guard var previous = original else { ingredients.append(parsed); continue }
             let protected = preservesPrecision(previous, locale: locale)
             var proposed = previous
             proposed.originalText = source

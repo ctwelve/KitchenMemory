@@ -133,6 +133,12 @@ final class IngredientLineParserTests: XCTestCase {
       "1000001½ cups flour",
       "1/1000001 cup flour",
       "1-two cups flour",
+      "-1-2 cups flour",
+      "- 1–2 cups flour",
+      "--1-2 cups flour",
+      "1--2 cups flour",
+      "/1/2 cups flour",
+      "1/2/3 cups flour",
     ]
 
     for source in rejected {

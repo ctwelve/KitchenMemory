@@ -104,7 +104,7 @@ public enum IngredientLineParser {
             return QuantityExpression(kind: .exact, lowerBound: word)
         }
         let normalized = token.replacingOccurrences(of: "-", with: "–")
-        let rangeParts = normalized.split(separator: "–", maxSplits: 1).map(String.init)
+        let rangeParts = normalized.split(separator: "–", maxSplits: 1, omittingEmptySubsequences: false).map(String.init)
         if rangeParts.count == 2,
            let lower = number(rangeParts[0]),
            let upper = number(rangeParts[1]),
@@ -199,7 +199,7 @@ public enum IngredientLineParser {
     }
 
     private static func fraction(_ source: String) -> RationalQuantity? {
-        let parts = source.split(separator: "/", maxSplits: 1)
+        let parts = source.split(separator: "/", maxSplits: 1, omittingEmptySubsequences: false)
         guard parts.count == 2,
               let numerator = Int(parts[0]),
               let denominator = Int(parts[1]),

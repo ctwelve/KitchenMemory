@@ -17,7 +17,9 @@ final class IngredientTextReconciliationTests: XCTestCase {
         let salt = IngredientLineParser.parse("salt to taste")
         let section = IngredientSection(title: "Sauce", ingredients: [reviewed, salt])
         let inserted = IngredientTextReconciliation.reconcile(
-            lines: ["2 tbsp oil", reviewed.originalText, salt.originalText],
+            lines: [.init(source: "2 tbsp oil"),
+                    .init(ingredientID: reviewed.id, source: reviewed.originalText),
+                    .init(ingredientID: salt.id, source: salt.originalText)],
             with: section, locale: .init(identifier: "en_US"))
         XCTAssertEqual(inserted.section.id, section.id)
         XCTAssertEqual(inserted.section.title, "Sauce")
@@ -25,10 +27,14 @@ final class IngredientTextReconciliationTests: XCTestCase {
         XCTAssertEqual(inserted.section.ingredients[2], salt)
         XCTAssertTrue(inserted.conflicts.isEmpty)
         let changed = IngredientTextReconciliation.reconcile(
-            lines: ["2 cans tomatoes", salt.originalText], with: section, locale: .init(identifier: "en_US"))
+            lines: [.init(source: "2 tbsp oil"), .init(ingredientID: reviewed.id, source: "2 cans tomatoes"),
+                    .init(ingredientID: salt.id, source: salt.originalText)],
+            with: section, locale: .init(identifier: "en_US"))
         var retained = reviewed
         retained.originalText = "2 cans tomatoes"
-        XCTAssertEqual(changed.section.ingredients.first, retained)
+        XCTAssertEqual(changed.section.ingredients[1], retained)
+        XCTAssertNotEqual(changed.section.ingredients[0].id, reviewed.id)
+        XCTAssertNil(changed.section.ingredients[0].note)
         let conflict = try XCTUnwrap(changed.conflicts.first)
         XCTAssertEqual(conflict.proposed.id, reviewed.id)
         XCTAssertEqual(conflict.proposed.quantity?.lowerBound, .init(numerator: 2))

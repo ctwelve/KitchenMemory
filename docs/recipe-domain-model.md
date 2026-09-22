@@ -165,9 +165,11 @@ the first implementation.
 ### Ingredient text reconciliation
 
 `IngredientTextReconciliation` applies completed source lines to one existing
-IngredientSection. Exact source matches preserve the complete ingredient value
-and identity, including repeated lines in occurrence order. Remaining changed
-lines pair with remaining old rows in order; additional lines receive new IDs.
+IngredientSection. Callers carry each existing line’s stable ingredient identity
+through text edits; new pasted lines have no identity. Unchanged identified lines
+preserve the complete ingredient value. Reconciliation never guesses identity
+from wording or position, so insertion plus editing cannot transfer precision
+to an unrelated row. Duplicate or unknown identities receive fresh IDs.
 The section identity and title are retained. Removed lines are explicit draft
 edits, not changes to maintained Recipe history.
 
