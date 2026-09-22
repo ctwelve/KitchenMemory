@@ -30,7 +30,9 @@ struct CookingSessionDeletedItemsView<RecipeContent: View>: View {
           deletedSession(session)
         }
         ForEach(
-          model.waitingDeletedSessions.filter { includesSessions && (selectedID == nil || $0.evidence.sessionID == selectedID) },
+          model.waitingDeletedSessions.filter {
+            includesSessions && (selectedID == nil || $0.evidence.sessionID == selectedID)
+          },
           id: \.evidence.sessionID
         ) { item in
           waitingSession(item)
@@ -140,13 +142,17 @@ struct CookingSessionRecoveryView<RecipeContent: View>: View {
         Text(.recoveryMessage).foregroundStyle(.secondary)
         recipeContent()
         ForEach(
-          model.waitingSessions.filter { includesSessions && (selectedID == nil || $0.evidence.sessionID == selectedID) },
+          model.waitingSessions.filter {
+            includesSessions && (selectedID == nil || $0.evidence.sessionID == selectedID)
+          },
           id: \.evidence.sessionID
         ) { item in
           recoveryWaitingRow(item)
         }
         ForEach(
-          model.recoverySessions.filter { includesSessions && (selectedID == nil || $0.evidence.sessionID == selectedID) },
+          model.recoverySessions.filter {
+            includesSessions && (selectedID == nil || $0.evidence.sessionID == selectedID)
+          },
           id: \.evidence.sessionID
         ) { item in
           recoveryRow(item)

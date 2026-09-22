@@ -8,6 +8,12 @@ import XCTest
 
 @MainActor
 final class LibraryNavigationPolicyTests: XCTestCase {
+  func testCompactStartupKeepsTheSampleDecisionReachable() {
+    XCTAssertEqual(LibraryNavigationPolicy.initialColumn(startup: .loading, destination: .recipe), .detail)
+    XCTAssertEqual(LibraryNavigationPolicy.initialColumn(startup: .choosingSamples, destination: .recipe), .detail)
+    XCTAssertEqual(LibraryNavigationPolicy.initialColumn(startup: .ready, destination: .recipe), .content)
+  }
+
   func testInitialVisibilityShowsMacSidebarAndKeepsIOSAdaptive() {
 #if os(macOS)
     XCTAssertEqual(LibraryNavigationPolicy.initialVisibility, .all)

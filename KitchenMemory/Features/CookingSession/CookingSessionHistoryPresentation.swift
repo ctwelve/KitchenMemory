@@ -18,10 +18,18 @@ extension CookingSessionPresentationModel {
     return available.first { $0.id == observedFinishedSessionID }
   }
 
+  /// The middle list keeps its context even when continuation opens a Session
+  /// whose detail has no history return destination.
+  var displayedHistoryScope: CookingSessionHistoryScope? {
+    guard case .history(let scope) = navigation.contentDestination else { return nil }
+    return scope
+  }
+
   var displayedHistorySessions: [CookingSessionProjection] {
-    switch historyScope {
+    switch displayedHistoryScope {
     case .all: sessions + finishedSessions
-    case .recipe: recipeHistorySessions
+    case .recipe:
+      (sessions + finishedSessions).filter { session in recipeHistorySessions.contains { $0.id == session.id } }
     case nil: []
     }
   }
@@ -96,18 +104,16 @@ extension CookingSessionPresentationModel {
 
   @discardableResult
   func selectSessionFromHistory(_ id: CookingSession.ID) -> Bool {
-    selectOrdinarySession(id)
+    guard let scope = displayedHistoryScope, sessions.contains(where: { $0.id == id }),
+          navigation.move(to: .session(id, history: scope)) else { return false }
+    recordVisit(to: id)
+    return true
   }
 
   @discardableResult
   func leaveCurrentSession() -> Bool {
     guard currentSessionID != nil else { return false }
     return select(nil, recordsVisit: false)
-  }
-
-  private func selectOrdinarySession(_ id: CookingSession.ID) -> Bool {
-    guard sessions.contains(where: { $0.id == id }) else { return false }
-    return select(id)
   }
 
   func showSessionHistory() {
@@ -117,15 +123,9 @@ extension CookingSessionPresentationModel {
   @discardableResult
   func showRecipeSessionHistory(for recipeID: Recipe.ID) -> Bool {
     do {
-      let results = try service.sessions(for: recipeID)
-      let matchingIDs = Set(results.compactMap { result -> CookingSession.ID? in
-        guard case let .session(session) = result, session.disposition == .ordinary
-        else { return nil }
-        return session.id
-      })
+      let matching = try recipeHistory(for: recipeID)
       guard navigation.move(to: .history(.recipe(recipeID))) else { return false }
-      recipeHistorySessions = sessions.filter { matchingIDs.contains($0.id) }
-        + finishedSessions.filter { matchingIDs.contains($0.id) }
+      recipeHistorySessions = matching
       return true
     } catch {
       present(.read)
@@ -142,7 +142,7 @@ extension CookingSessionPresentationModel {
     guard finishedSessions.contains(where: { $0.id == id })
             || recipeHistorySessions.contains(where: { $0.id == id })
     else { return false }
-    return navigation.move(to: .finished(id, history: historyScope ?? .all))
+    return navigation.move(to: .finished(id, history: displayedHistoryScope ?? .all))
   }
 
   func dismissObservedFinishedSession() {
@@ -174,9 +174,23 @@ extension CookingSessionPresentationModel {
       let classified = SessionHistoryClassification(try service.sessions())
       let finished = try ordinaryFinishedSessions()
       apply(classified: classified, finished: finished)
+      refreshRecipeHistory()
     } catch {
       present(.read)
     }
+  }
+
+  func refreshRecipeHistory() {
+    guard case .recipe(let id) = displayedHistoryScope else { return }
+    do { recipeHistorySessions = try recipeHistory(for: id) } catch { present(.read) }
+  }
+
+  private func recipeHistory(for recipeID: Recipe.ID) throws -> [CookingSessionProjection] {
+    let matchingIDs = Set(try service.sessions(for: recipeID).compactMap { result -> CookingSession.ID? in
+      guard case let .session(session) = result, session.disposition == .ordinary else { return nil }
+      return session.id
+    })
+    return (sessions + finishedSessions).filter { matchingIDs.contains($0.id) }
   }
 
   private func ordinaryFinishedSessions() throws -> [CookingSessionProjection] {

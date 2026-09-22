@@ -4,9 +4,6 @@
 
 import KitchenKit
 import SwiftUI
-#if os(iOS)
-import UIKit
-#endif
 
 /// The adaptive application shell for startup, library, and Cooking Session destinations.
 ///
@@ -132,12 +129,12 @@ struct ContentView: View {
     .kitchenResetConfirmation(isPresented: $isShowingResetConfirmation,
                              model: dependencies.libraryModel, locale: locale)
 #endif
+    .onChange(of: dependencies.libraryModel.startupState, initial: true) { _, startup in
+      preferredCompactColumn = LibraryNavigationPolicy.initialColumn(
+        startup: startup, destination: dependencies.libraryModel.navigation.destination)
+    }
     .onChange(of: dependencies.libraryModel.navigation.destination) { _, destination in
-      temporaryOrganization = false
-      switch destination {
-      case .history, .drafts, .deletedItems, .recovery: preferredCompactColumn = .content
-      default: preferredCompactColumn = .detail
-      }
+      focusChangedDestination(destination)
     }
     .sheet(item: $activeSheet) { _ in
       RecipeLibrarySheetContent(model: dependencies.libraryModel, close: { activeSheet = nil })
@@ -215,6 +212,15 @@ private extension ContentView {
         }
       }
     )
+  }
+
+  func focusChangedDestination(_ destination: RecipeLibraryNavigation.Destination) {
+    temporaryOrganization = false
+    switch destination {
+    case .history, .drafts, .deletedItems, .recovery: preferredCompactColumn = .content
+    case .recipe: break // The caller chooses list browsing versus opening a Recipe.
+    default: preferredCompactColumn = .detail
+    }
   }
 
   func focusSelectedDestination() {

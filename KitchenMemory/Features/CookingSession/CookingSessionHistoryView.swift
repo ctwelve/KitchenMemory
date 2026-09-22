@@ -76,7 +76,7 @@ struct CookingSessionHistoryView: View {
   }
 
   private var historyTitle: LocalizedStringResource {
-    switch model.historyScope {
+    switch model.displayedHistoryScope {
     case .recipe: .sessionHistoryRecipeTitle
     case .all, nil: .sessionHistoryTitle
     }

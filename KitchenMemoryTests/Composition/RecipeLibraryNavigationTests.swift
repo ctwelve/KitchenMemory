@@ -65,6 +65,29 @@ final class RecipeLibraryNavigationTests: XCTestCase {
     XCTAssertEqual(navigation.auxiliarySelection, .organization)
   }
 
+  func testContinuingFinishedSessionKeepsHistoryPopulatedAndScoped() throws {
+    for recipeScoped in [false, true] {
+      let app = try AppRuntime.testing()
+      let library = app.libraryModel, sessions = app.sessionModel
+      library.loadIfNeeded()
+      sessions.loadIfNeeded()
+      let recipe = try XCTUnwrap(library.selectedRecipe)
+      XCTAssertTrue(sessions.start(from: recipe))
+      let finishedID = try XCTUnwrap(sessions.currentSessionID)
+      XCTAssertTrue(sessions.finishCurrentSession())
+      if recipeScoped {
+        XCTAssertTrue(sessions.showRecipeSessionHistory(for: recipe.id))
+        XCTAssertTrue(sessions.observeFinishedSession(finishedID))
+      }
+      XCTAssertTrue(sessions.continueSession(finishedID))
+      let continuedID = try XCTUnwrap(sessions.currentSessionID)
+      XCTAssertNil(sessions.historyScope)
+      XCTAssertEqual(Set(sessions.displayedHistorySessions.map(\.id)), [finishedID, continuedID])
+      XCTAssertTrue(sessions.observeFinishedSession(finishedID))
+      XCTAssertEqual(sessions.historyScope, recipeScoped ? .recipe(recipe.id) : .all)
+    }
+  }
+
   func testSuccessfulDraftRemovalDoesNotAskForAnotherWriteBeforeLeaving() throws {
     for savesRecipe in [false, true] {
       let app = try AppRuntime.testing()

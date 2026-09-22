@@ -203,6 +203,7 @@ extension CookingSessionPresentationModel {
       navigation.move(to: .recovery)
     } else if case .continueSession = pending {
       selectSession(session.id)
+      refreshRecipeHistory()
     } else if session.lifecycle == .finished {
       sessions.removeAll { $0.id == session.id }
       navigation.move(to: .finished(session.id, history: .all))
