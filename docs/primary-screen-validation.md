@@ -61,15 +61,16 @@ this walkthrough. No Revision was published from it.
 ## Automated validation
 
 Framework and hosted tests cover retained reviewed fields, locale parsing,
-section/ingredient identities, active-text recovery, explicit conflict choices,
+section/ingredient identities, active-text recovery, saving retained precision
+without resolving proposals, explicit acceptance of replacement details,
 mode switching, and interleaving native text undo with later precision changes.
 The UI suite checks only named top-level destinations and editor controls;
 business workflows are not duplicated in UI automation.
 
 The standalone KitchenKit runner passed **584/584 tests** and the exact coverage
-gate: **14,209/14,209 business-logic executable lines**, with the existing 130
+gate: **14,208/14,208 business-logic executable lines**, with the existing 130
 Apple-runtime adapter lines excluded. Fresh result bundle:
-`/private/tmp/KitchenMemoryCoreCoverage.MFK8if/Tests.xcresult`.
+`/private/tmp/KitchenMemoryCoreCoverage.kZIn0E/Tests.xcresult`.
 
 Localization, documentation navigation, project structure, software inventory
 and changed Swift-source lint are checked independently.

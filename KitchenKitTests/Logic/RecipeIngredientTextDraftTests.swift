@@ -42,7 +42,7 @@ final class RecipeIngredientTextDraftTests: XCTestCase {
     XCTAssertEqual(text.sections[0].ingredients.first?.originalText, "Sauce")
   }
 
-  func testLocalDraftRecoversActiveTextAndPublishesOnlyAfterExplicitConflictChoice() throws {
+  func testLocalDraftRecoversActiveTextAndPublishesRetainedPrecisionWithoutConflictChoice() throws {
     var ingredient = IngredientLineParser.parse("1 tsp salt")
     ingredient.parseState = .reviewed
     var session = RecipeEditSession(draft: RecipeDraft(title: "Soup", ingredientSections: [
@@ -56,8 +56,13 @@ final class RecipeIngredientTextDraftTests: XCTestCase {
     session.updateIngredientText(text)
     var recovered = try JSONDecoder().decode(RecipeEditSession.self, from: JSONEncoder().encode(session))
     XCTAssertEqual(recovered.ingredientSections[0].ingredients[0].originalText, "2 tsp salt")
-    XCTAssertThrowsError(try recovered.validatedDraft())
+    XCTAssertTrue(recovered.canSave)
+    let retained = try recovered.validatedDraft()
+    XCTAssertEqual(retained.ingredientSections[0].ingredients[0].originalText, "2 tsp salt")
+    XCTAssertEqual(retained.ingredientSections[0].ingredients[0].quantity, ingredient.quantity)
+    XCTAssertEqual(retained.instructionSections, steps)
     recovered.finishIngredientText()
+    XCTAssertEqual(recovered.ingredientText?.conflicts.count, 1)
     var resolved = try XCTUnwrap(recovered.ingredientText)
     resolved.resolve(ingredient.id, acceptingInterpretation: false)
     recovered.updateIngredientText(resolved)

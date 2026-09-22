@@ -178,9 +178,9 @@ state, explicit presentation or advanced fields retains those fields while its
 authored source changes. A separate Codable conflict proposes the new parsed
 quantity, unit, package, ingredient and preparation for explicit acceptance.
 Notes, optionality, scaling behavior and custom display survive even acceptance.
-Unresolved proposals never block persisting the device-local draft with its retained
-precision and authored wording. Recipe publication requires an explicit choice to
-accept or keep those details. The native editing draft owns presenting that choice;
+Unresolved proposals never block saving retained precision and authored wording,
+whether in the device-local draft or a published Revision. Replacing precise
+details requires explicit acceptance. The native editing draft presents that choice;
 neither the parser nor reconciliation publishes a Revision.
 
 ### Future Ingredient seam
@@ -299,6 +299,7 @@ identity, pending interpretation, IngredientSection headings and unresolved
 precision proposals. Its derived sections use the same Ingredient identities as
 advanced editing; switching presentation is not a publication. Rebuilding from
 structured changes retains proposals for untouched rows and respects explicit
-adjustments. Validation completes pending interpretation and refuses to publish
-unresolved proposals. This text bookkeeping is device-local and excluded from
-`RecipeDraft` and `RecipeRevision` content; historical SwiftData schemas are unchanged.
+adjustments. Publication completes pending interpretation and retains existing
+precision when proposals remain unresolved. This text bookkeeping is device-local
+and excluded from `RecipeDraft` and `RecipeRevision` content; historical SwiftData
+schemas are unchanged.

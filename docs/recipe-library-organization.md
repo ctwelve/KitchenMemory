@@ -160,8 +160,9 @@ native text control. Native text undo/redo restores text and its draft identitie
 while that text control remains open; application-wide undo remains deferred.
 
 Changed precise ingredients retain their existing adjustments and an explicit
-parser proposal. The reader must keep the details or accept the proposal before
-Save can publish. Those unresolved choices and active text survive local draft
+parser proposal. Save can publish the authored text and retained details without
+accepting the proposal; replacing those details requires explicit acceptance.
+Those unresolved choices and active text survive local draft
 recovery. Merely opening simple editing does not reinterpret maintained content.
 Close retains the draft, Save publishes a Revision, and Discard still uses the
 existing confirmation. Organization retains the commit boundaries documented above.

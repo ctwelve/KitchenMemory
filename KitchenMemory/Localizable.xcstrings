@@ -260,37 +260,37 @@
       "en-US": {
         "stringUnit": {
           "state": "translated",
-          "value": "This wording changed an ingredient with precise adjustments. Keep those details or accept the interpretation shown below before saving."
+          "value": "This wording changed an ingredient with precise adjustments. Saving keeps those details unless you accept the interpretation shown below."
         }
       },
       "en-GB": {
         "stringUnit": {
           "state": "translated",
-          "value": "This wording changed an ingredient with precise adjustments. Keep those details or accept the interpretation shown below before saving."
+          "value": "This wording changed an ingredient with precise adjustments. Saving keeps those details unless you accept the interpretation shown below."
         }
       },
       "es-MX": {
         "stringUnit": {
           "state": "translated",
-          "value": "Este texto cambió un ingrediente con ajustes precisos. Conserva esos detalles o acepta la interpretación que aparece abajo antes de guardar."
+          "value": "Este texto cambió un ingrediente con ajustes precisos. Al guardar se conservan esos detalles, a menos que aceptes la interpretación que aparece abajo."
         }
       },
       "fr-CA": {
         "stringUnit": {
           "state": "translated",
-          "value": "Le texte d’un ingrédient comportant des ajustements précis a changé. Conservez ces détails ou acceptez l’interprétation ci-dessous avant d’enregistrer."
+          "value": "Le texte d’un ingrédient comportant des ajustements précis a changé. L’enregistrement conserve ces détails, sauf si vous acceptez l’interprétation ci-dessous."
         }
       },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
-          "value": "Der Text einer Zutat mit präzisen Anpassungen wurde geändert. Behalte die Details oder übernimm vor dem Speichern die unten angezeigte Interpretation."
+          "value": "Der Text einer Zutat mit präzisen Anpassungen wurde geändert. Beim Speichern bleiben diese Details erhalten, sofern du die unten angezeigte Interpretation nicht übernimmst."
         }
       },
       "it-IT": {
         "stringUnit": {
           "state": "translated",
-          "value": "Il testo di un ingrediente con modifiche precise è cambiato. Mantieni i dettagli o accetta l’interpretazione qui sotto prima di salvare."
+          "value": "Il testo di un ingrediente con modifiche precise è cambiato. Il salvataggio mantiene questi dettagli, a meno che tu non accetti l’interpretazione qui sotto."
         }
       }
     }

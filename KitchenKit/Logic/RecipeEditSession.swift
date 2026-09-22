@@ -14,7 +14,6 @@ public enum RecipeEditValidationIssue: Equatable, Hashable, Sendable {
   case missingTitle
   case invalidDuration(RecipeEditDurationField)
   case invalidSourceURL
-  case unresolvedIngredientChanges
 }
 
 public enum RecipeEditSessionError: Error, Equatable, Sendable {
@@ -86,7 +85,6 @@ public struct RecipeEditSession: Codable, Equatable, Sendable {
     if text(sourceURL) != nil, RecipeSourceURLPolicy.validatedURL(from: sourceURL) == nil {
       issues.insert(.invalidSourceURL)
     }
-    if completedIngredientText?.conflicts.isEmpty == false { issues.insert(.unresolvedIngredientChanges) }
     return issues
   }
 
