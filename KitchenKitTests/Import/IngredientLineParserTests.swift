@@ -6,6 +6,57 @@
 import XCTest
 
 final class IngredientLineParserTests: XCTestCase {
+  func testRangesPackagesAndAnnotationsPreserveTheSource() throws {
+    let source = "  1 1/2 – 2 1/2 cups all-purpose flour, cut in quarter-inch pieces  "
+    let result = IngredientLineParser.interpret(source, locale: Locale(identifier: "en_US"))
+    XCTAssertEqual(result.ingredient.originalText, source)
+    XCTAssertEqual(result.ingredient.quantity?.kind, .range)
+    XCTAssertEqual(result.ingredient.quantity?.lowerBound, .init(numerator: 3, denominator: 2))
+    XCTAssertEqual(result.ingredient.quantity?.upperBound, .init(numerator: 5, denominator: 2))
+    XCTAssertEqual(result.ingredient.ingredientText, "all-purpose flour")
+    XCTAssertEqual(result.ingredient.preparation, "cut in quarter-inch pieces")
+    let annotated = result.segments.map { segment in
+      (segment.kind, (source as NSString).substring(with: NSRange(segment.utf16Range)))
+    }
+    XCTAssertEqual(annotated.first?.0, .quantity)
+    XCTAssertEqual(annotated.first?.1, "1 1/2 – 2 1/2")
+    XCTAssertEqual(annotated.first { $0.0 == .unit }?.1, "cups")
+    XCTAssertEqual(annotated.first { $0.0 == .preparation }?.1, "cut in quarter-inch pieces")
+    let packaged = IngredientLineParser.parse("1 (6-oz.) can tomatoes")
+    XCTAssertEqual(packaged.quantity?.lowerBound, .init(numerator: 1))
+    XCTAssertEqual(packaged.package?.quantity.lowerBound, .init(numerator: 6))
+    XCTAssertEqual(packaged.package?.unitText, "oz.")
+    XCTAssertEqual(packaged.unitText, "can")
+    XCTAssertEqual(packaged.ingredientText, "tomatoes")
+    XCTAssertNil(IngredientLineParser.parse("1 (-6-oz.) can tomatoes").package)
+    for invalid in ["1 - two cups flour", "3–1 cups flour", "1/0 - 2 cups flour"] {
+      XCTAssertNil(IngredientLineParser.parse(invalid).quantity, invalid)
+    }
+  }
+
+  func testNumberWordsRespectLanguageAndKeepAuthoredUnits() {
+    let cases = [("en_US", "two grams flour", "grams"), ("en_GB", "two dL milk", "dL"),
+                 ("fr_CA", "deux tablespoons sucre", "tablespoons"), ("es_MX", "dos tazas harina", "tazas"),
+                 ("de_DE", "zwei g Mehl", "g"), ("it_IT", "due cucchiai farina", "cucchiai"),
+    ]
+    for (identifier, source, unit) in cases {
+      let ingredient = IngredientLineParser.parse(source, locale: Locale(identifier: identifier))
+      XCTAssertEqual(ingredient.quantity?.lowerBound, .init(numerator: 2), source)
+      XCTAssertEqual(ingredient.unitText, unit, source)
+      XCTAssertEqual(ingredient.originalText, source)
+    }
+    XCTAssertNil(IngredientLineParser.parse("quarter-inch slices", locale: Locale(identifier: "en_US")).quantity)
+  }
+
+  func testDecimalQuantitiesAreExactAndAmbiguousGroupingStaysText() {
+    assertIngredient("1.25 dL milk", lower: .init(numerator: 5, denominator: 4), unit: "dL", name: "milk")
+    assertIngredient("1,5 cups flour", lower: .init(numerator: 3, denominator: 2), unit: "cups", name: "flour")
+    for source in ["1,000 g flour", "1.000 g flour", "1,234.5 g flour"] {
+      XCTAssertNil(IngredientLineParser.parse(source).quantity, source)
+      XCTAssertEqual(IngredientLineParser.parse(source).originalText, source)
+    }
+  }
+
   func testEmptyAndIncompleteLinesRemainLosslessOriginalText() {
     let empty = IngredientLineParser.parse(" \t\n ")
     XCTAssertEqual(empty.originalText, "")

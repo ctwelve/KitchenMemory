@@ -162,6 +162,24 @@ The package size is meaningful but does not fit cleanly into a single quantity
 and unit. `PackageDescription` represents it without blocking
 the first implementation.
 
+### Ingredient text reconciliation
+
+`IngredientTextReconciliation` applies completed source lines to one existing
+IngredientSection. Exact source matches preserve the complete ingredient value
+and identity, including repeated lines in occurrence order. Remaining changed
+lines pair with remaining old rows in order; additional lines receive new IDs.
+The section identity and title are retained. Removed lines are explicit draft
+edits, not changes to maintained Recipe history.
+
+An automatic row can receive a new interpretation. A row with reviewed/edited
+state, explicit presentation or advanced fields retains those fields while its
+authored source changes. A separate Codable conflict proposes the new parsed
+quantity, unit, package, ingredient and preparation for explicit acceptance.
+Notes, optionality, scaling behavior and custom display survive even acceptance.
+Unresolved proposals never block saving the retained precision and authored
+wording. The native editing draft owns displaying, accepting or keeping those
+proposals; neither the parser nor reconciliation publishes a Revision.
+
 ### Future Ingredient seam
 
 A later pantry slice may add a kitchen-scoped normalized concept such as “whole
