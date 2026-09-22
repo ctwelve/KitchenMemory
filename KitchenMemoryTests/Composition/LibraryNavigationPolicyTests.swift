@@ -16,20 +16,4 @@ final class LibraryNavigationPolicyTests: XCTestCase {
 #endif
   }
 
-  func testDestinationSelectionPreservesRegularShellAndFocusesCompactDetail() {
-    XCTAssertEqual(
-      LibraryNavigationPolicy.destinationSelectionVisibility(
-        current: .all,
-        preservesSidebar: true
-      ),
-      .all
-    )
-    XCTAssertEqual(
-      LibraryNavigationPolicy.destinationSelectionVisibility(
-        current: .automatic,
-        preservesSidebar: false
-      ),
-      .detailOnly
-    )
-  }
 }

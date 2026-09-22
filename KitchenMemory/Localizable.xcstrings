@@ -1,6 +1,48 @@
 {
   "sourceLanguage" : "en-US",
   "strings" : {
+    "library.organization.reveal": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Temporarily Reveal Organization"
+          }
+        },
+        "en-GB": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Temporarily Reveal Organisation"
+          }
+        },
+        "es-MX": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar organización temporalmente"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afficher temporairement l’organisation"
+          }
+        },
+        "de-DE": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Organisation vorübergehend einblenden"
+          }
+        },
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostra temporaneamente l’organizzazione"
+          }
+        }
+      },
+      "comment": "Menu action for a temporary organization overlay that does not resize the recipe detail."
+    },
     "settings.samples.folder-name": {
       "extractionState": "manual",
       "comment": "Sample pack setting. Organization names are ordinary user-editable names; the Tag name excludes the display hash.",
@@ -673,48 +715,6 @@
       }
     }
   },
-  "organization.collapse": {
-    "comment": "Recipe Library organization: Collapse Folder. Folder location and Tag classification are independent of Recipe content.",
-    "extractionState": "manual",
-    "localizations": {
-      "it-IT": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Comprimi cartella"
-        }
-      },
-      "de-DE": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Ordner einklappen"
-        }
-      },
-      "en-GB": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Collapse Folder"
-        }
-      },
-      "en-US": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Collapse Folder"
-        }
-      },
-      "es-MX": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Contraer carpeta"
-        }
-      },
-      "fr-CA": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Réduire le dossier"
-        }
-      }
-    }
-  },
   "organization.collisions": {
     "comment": "Recipe Library organization: Organization Collisions. Folder location and Tag classification are independent of Recipe content.",
     "extractionState": "manual",
@@ -879,48 +879,6 @@
         "stringUnit": {
           "state": "translated",
           "value": "Terminé"
-        }
-      }
-    }
-  },
-  "organization.expand": {
-    "comment": "Recipe Library organization: Expand Folder. Folder location and Tag classification are independent of Recipe content.",
-    "extractionState": "manual",
-    "localizations": {
-      "it-IT": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Espandi cartella"
-        }
-      },
-      "de-DE": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Ordner ausklappen"
-        }
-      },
-      "en-GB": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Expand Folder"
-        }
-      },
-      "en-US": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Expand Folder"
-        }
-      },
-      "es-MX": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Expandir carpeta"
-        }
-      },
-      "fr-CA": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Développer le dossier"
         }
       }
     }

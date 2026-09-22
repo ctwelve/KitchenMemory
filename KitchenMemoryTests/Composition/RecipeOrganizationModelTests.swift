@@ -9,6 +9,68 @@ import XCTest
 
 @MainActor
 final class RecipeOrganizationModelTests: XCTestCase {
+  func testSettingsKeepVisibilityLocalAndOrderingSynchronized() throws {
+    let deviceA = try makeTestUserDefaults(suiteNamePrefix: "organization-settings-a")
+    let deviceB = try makeTestUserDefaults(suiteNamePrefix: "organization-settings-b")
+    let container = try KitchenMemorySchema.makeContainer(inMemory: true)
+    let kitchen = Kitchen(name: "Home")
+    try SwiftDataRecipeRepository(modelContainer: container).save(kitchen)
+    let repository = SwiftDataRecipeOrganizationRepository(modelContainer: container)
+    let first = RecipeOrganizationModel(repository: repository, kitchenID: kitchen.id,
+                                        scope: "owner", defaults: deviceA.defaults)
+    first.foldersEnabled = false
+    first.tagsEnabled = false
+    first.tagsExpanded = false
+    first.perform { try $0.prepare(folder: .ordering(.manual)) }
+    first.perform { try $0.prepare(tag: .ordering(.manual)) }
+    first.perform { try $0.prepare(folder: .systemViewVisible(false)) }
+    first.perform { try $0.prepare(tag: .systemViewVisible(false)) }
+    let second = RecipeOrganizationModel(repository: repository, kitchenID: kitchen.id,
+                                         scope: "owner", defaults: deviceB.defaults)
+    XCTAssertTrue(second.foldersEnabled)
+    XCTAssertTrue(second.tagsEnabled)
+    XCTAssertTrue(second.tagsExpanded)
+    XCTAssertEqual(second.snapshot?.folders.ordering, .manual)
+    XCTAssertEqual(second.snapshot?.tags.ordering, .manual)
+    XCTAssertFalse(second.showsUnfiled)
+    XCTAssertFalse(second.showsUntagged)
+    let relaunched = RecipeOrganizationModel(repository: repository, kitchenID: kitchen.id,
+                                             scope: "owner", defaults: deviceA.defaults)
+    XCTAssertFalse(relaunched.foldersEnabled)
+    XCTAssertFalse(relaunched.tagsEnabled)
+    XCTAssertFalse(relaunched.tagsExpanded)
+  }
+
+  func testOrganizationOnlyRecoveryRemainsReachableWhenFeaturesAreHidden() throws {
+    let fixture = try makeTestUserDefaults(suiteNamePrefix: "organization-navigation")
+    let container = try KitchenMemorySchema.makeContainer(inMemory: true)
+    let kitchen = Kitchen(name: "Home")
+    try SwiftDataRecipeRepository(modelContainer: container).save(kitchen)
+    let repository = SwiftDataRecipeOrganizationRepository(modelContainer: container)
+    let observed = try repository.load(in: kitchen.id)
+    try repository.accept(observed.prepare(folder: .create(id: Folder.ID(), name: "Meals", parentID: nil)))
+    try repository.accept(observed.prepare(folder: .create(id: Folder.ID(), name: "meals", parentID: nil)))
+    let organization = RecipeOrganizationModel(repository: repository, kitchenID: kitchen.id,
+                                               scope: "owner", defaults: fixture.defaults)
+    organization.foldersEnabled = false
+    organization.tagsEnabled = false
+    let app = try AppRuntime.testing()
+    let library = RecipeLibraryModel(library: app.libraryModel.library,
+                                     samplePreferences: VolatileKitchenPreferencesStore(
+                                       sampleRecipeOnboardingResponse: .accepted),
+                                     kitchenWasCreated: false, organization: organization)
+    let sessions = CookingSessionPresentationModel(sessions: app.cookingSessions,
+                                                   store: VolatileCookingSessionPresentationStore(),
+                                                   navigation: library.navigation)
+    library.loadIfNeeded()
+    sessions.loadIfNeeded()
+    XCTAssertFalse(sessions.showsRecoveryDestination)
+    let actions = LibraryCommandActions(library: library, sessions: sessions)
+    XCTAssertTrue(actions.canPerform(.recovery))
+    XCTAssertTrue(actions.perform(.recovery))
+    XCTAssertEqual(library.navigation.contentDestination, .recovery)
+  }
+
   func testLocalPreferencesFilteringDropsAndExpansionSurviveRelaunch() throws {
     let fixture = try makeTestUserDefaults(suiteNamePrefix: "organization")
     let container = try KitchenMemorySchema.makeContainer(inMemory: true)

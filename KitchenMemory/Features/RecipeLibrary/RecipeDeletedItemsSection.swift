@@ -7,10 +7,11 @@ import SwiftUI
 
 struct RecipeDeletedItemsSection: View {
   @Bindable var model: RecipeLibraryModel
+  var selectedID: Recipe.ID?
   @State private var pendingRestore: RecipeRestoreCommand?
 
   var body: some View {
-    ForEach(model.deletedRecipes) { item in
+    ForEach(model.deletedRecipes.filter { selectedID == nil || $0.id == selectedID }) { item in
       HStack(spacing: 14) {
         VStack(alignment: .leading, spacing: 4) {
           if let recipe = item.recoverableRecipe {

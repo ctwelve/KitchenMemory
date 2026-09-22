@@ -18,6 +18,7 @@ final class KitchenMemoryUITests: XCTestCase {
   func testTopLevelDestinationsExposeAccessibleNavigation() {
     let app = launchApp()
     let shell = app.descendants(matching: .any)["recipe-library-shell"]
+    revealSidebar(in: app, exposing: shell)
     assertAccessibleLabel(shell, description: "recipe library")
 
     visitTopLevelDestination(
@@ -34,6 +35,12 @@ final class KitchenMemoryUITests: XCTestCase {
     )
     // A clean Kitchen has no recovery evidence requiring a destination.
     XCTAssertFalse(app.buttons["recovery-destination"].exists)
+
+    let allRecipes = app.buttons["all-recipes-destination"]
+    revealSidebar(in: app, exposing: allRecipes)
+    XCTAssertTrue(allRecipes.waitForExistence(timeout: 5))
+    assertAccessibleLabel(allRecipes, description: "All Recipes")
+    activate(allRecipes)
 
     let recipeRow = app.buttons
       .matching(NSPredicate(format: "identifier BEGINSWITH %@", "recipe-row-"))
@@ -179,27 +186,26 @@ final class KitchenMemoryUITests: XCTestCase {
 
   @MainActor
   private func revealSidebar(in app: XCUIApplication, exposing element: XCUIElement) {
-#if os(iOS)
-    if !element.waitForExistence(timeout: 2) {
-      let sidebarToggle = app.buttons["toggle-sidebar"].firstMatch
-      if sidebarToggle.exists {
-        assertAccessibleLabel(sidebarToggle, description: "sidebar navigation")
-        activate(sidebarToggle)
-      } else {
-        let backButton = app.buttons["BackButton"]
-        if backButton.waitForExistence(timeout: 3) {
-          activate(backButton)
-        }
-      }
-    }
+    guard !element.waitForExistence(timeout: 2) else { return }
+#if os(macOS)
+    let organization = app.menuButtons["organization-navigation"].firstMatch
 #else
-    if !element.waitForExistence(timeout: 2) {
-      let toggle = app.buttons["toggle-sidebar"]
-      if toggle.waitForExistence(timeout: 3) {
-        activate(toggle)
-      }
-    }
+    let organization = app.buttons["organization-navigation"].firstMatch
 #endif
+    if organization.exists {
+      assertAccessibleLabel(organization, description: "organization navigation")
+      activate(organization)
+#if os(macOS)
+      let reveal = app.menuItems["reveal-organization"]
+#else
+      let reveal = app.buttons["reveal-organization"]
+#endif
+      XCTAssertTrue(reveal.waitForExistence(timeout: 3))
+      activate(reveal)
+    } else {
+      let back = app.buttons["BackButton"].firstMatch
+      if back.exists { activate(back) }
+    }
   }
 
   @MainActor

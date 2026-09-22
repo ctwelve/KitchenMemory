@@ -16,7 +16,9 @@ extension RecipeLibraryNavigation {
       guard destination == .recipe, library.selectedRecipe != nil else { return false }
       return command != .editRecipe || library.editingStorageIsAvailable
     case .drafts: return !library.authoringItems.isEmpty
-    case .recovery: return sessions.showsRecoveryDestination
+    case .recovery:
+      return sessions.showsRecoveryDestination || !library.recoveryRecipes.isEmpty
+        || library.organization?.requiresRecovery == true
     case .sessions, .deletedItems: return true
     }
   }

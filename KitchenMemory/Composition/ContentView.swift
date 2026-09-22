@@ -17,11 +17,11 @@ import UIKit
 struct ContentView: View {
   let startupState: AppStartupState
   let retryStartup: () -> Void
-  @Environment(\.horizontalSizeClass) private var horizontalSizeClass
   @Environment(\.locale) private var locale
   @State private var activeSheet: ActiveRecipeSheet?
   @State private var columnVisibility = LibraryNavigationPolicy.initialVisibility
-  @State private var preferredCompactColumn: NavigationSplitViewColumn = .detail
+  @State private var preferredCompactColumn: NavigationSplitViewColumn = .content
+  @State private var temporaryOrganization = false
   @State private var isShowingResetConfirmation = false
 #if !os(macOS)
   @State private var isShowingSettings = false
@@ -29,8 +29,8 @@ struct ContentView: View {
 
   var body: some View {
     Group {
-      if usesPersistentLibraryShell {
-        persistentRecipeLibrary
+      if let dependencies = preparedApp {
+        persistentRecipeLibrary(dependencies)
       } else {
         phaseContent
       }
@@ -84,15 +84,6 @@ struct ContentView: View {
 
   private var preparedApp: PreparedApp? { startupState.preparedApp }
 
-  private var usesPersistentLibraryShell: Bool {
-#if os(iOS)
-    horizontalSizeClass == .regular
-      || (horizontalSizeClass == nil && UIDevice.current.userInterfaceIdiom == .pad)
-#else
-    preparedApp != nil
-#endif
-  }
-
   @ViewBuilder
   private var phaseContent: some View {
     switch startupState {
@@ -105,103 +96,59 @@ struct ContentView: View {
     }
   }
 
-  @ViewBuilder
   private func preparedContent(_ dependencies: PreparedApp) -> some View {
-    switch dependencies.libraryModel.startupState {
-    case .loading:
-      KitchenLoadingView()
-    case .choosingSamples:
-      SampleRecipeDecisionView(
-        accept: dependencies.libraryModel.acceptSampleRecipes,
-        decline: dependencies.libraryModel.declineSampleRecipes
-      )
-    case .ready:
-      if let currentSession = dependencies.sessionModel.currentSession,
-         !dependencies.sessionModel.isShowingSessionHistory {
-        CookingSessionView(model: dependencies.sessionModel, session: currentSession)
-      } else {
-        recipeLibrary(dependencies)
-      }
-    }
+    persistentRecipeLibrary(dependencies)
   }
 
-  @ViewBuilder
-  private var persistentRecipeLibrary: some View {
-#if os(macOS)
-    if let dependencies = preparedApp {
-      persistentRecipeLibraryShell
-        .focusedSceneValue(\.resetKitchenAction) {
-          isShowingResetConfirmation = true
-        }
-        .kitchenResetConfirmation(
-          isPresented: $isShowingResetConfirmation,
-          model: dependencies.libraryModel,
-          locale: locale
-        )
-    } else {
-      persistentRecipeLibraryShell
-    }
-#else
-    persistentRecipeLibraryShell
-#endif
-  }
-
-  private var persistentRecipeLibraryShell: some View {
-    NavigationSplitView(columnVisibility: $columnVisibility, preferredCompactColumn: $preferredCompactColumn) {
-      persistentSidebar
-        .navigationTitle(.libraryTitle)
+  private func persistentRecipeLibrary(_ dependencies: PreparedApp) -> some View {
+    AdaptiveLibraryShell(visibility: $columnVisibility, preferredColumn: $preferredCompactColumn,
+                         temporarySidebar: $temporaryOrganization) {
+      recipeList(dependencies)
 #if !os(macOS)
-        .toolbar(removing: usesCustomSidebarToggle ? .sidebarToggle : nil)
+        .toolbar { libraryToolbar }
+#endif
+    } content: {
+      LibraryContentRouter(libraryModel: dependencies.libraryModel, sessionModel: dependencies.sessionModel,
+                           focusDetail: focusSelectedDestination)
+        .navigationSplitViewColumnWidth(min: 240, ideal: 300, max: 480)
+#if !os(macOS)
         .toolbar { libraryToolbar }
 #endif
     } detail: {
-      if preparedApp?.libraryModel.editor != nil {
-        persistentDetail
-      } else {
-        NavigationStack {
+      Group {
+        if dependencies.libraryModel.editor != nil {
           persistentDetail
-#if os(iOS)
-            .toolbar { detailSidebarNavigation }
-#endif
+        } else {
+          NavigationStack { persistentDetail }
         }
       }
+#if !os(macOS)
+      .toolbar { libraryToolbar }
+#endif
     }
 #if os(macOS)
-    .navigationSplitViewStyle(.balanced)
     .toolbar { libraryToolbar }
+    .focusedSceneValue(\.resetKitchenAction) { isShowingResetConfirmation = true }
+    .kitchenResetConfirmation(isPresented: $isShowingResetConfirmation,
+                             model: dependencies.libraryModel, locale: locale)
 #endif
-    .sheet(item: $activeSheet) { _ in
-      if let dependencies = preparedApp {
-        RecipeLibrarySheetContent(
-          model: dependencies.libraryModel,
-          close: { activeSheet = nil }
-        )
+    .onChange(of: dependencies.libraryModel.navigation.destination) { _, destination in
+      temporaryOrganization = false
+      switch destination {
+      case .history, .drafts, .deletedItems, .recovery: preferredCompactColumn = .content
+      default: preferredCompactColumn = .detail
       }
+    }
+    .sheet(item: $activeSheet) { _ in
+      RecipeLibrarySheetContent(model: dependencies.libraryModel, close: { activeSheet = nil })
     }
 #if !os(macOS)
     .sheet(isPresented: $isShowingSettings) {
-      if let dependencies = preparedApp {
-        NavigationStack {
-          KitchenSettingsView(
-            model: dependencies.libraryModel,
-            cloudSyncSettings: dependencies.cloudSyncSettings
-          )
-        }
+      NavigationStack {
+        KitchenSettingsView(model: dependencies.libraryModel, cloudSyncSettings: dependencies.cloudSyncSettings)
       }
     }
 #endif
-  }
-
-  @ViewBuilder
-  private var persistentSidebar: some View {
-    switch startupState {
-    case .preparing:
-      StartupRecipeLibrarySidebar(presentation: .loading)
-    case .unavailable:
-      StartupRecipeLibrarySidebar(presentation: .recovery)
-    case .ready(let dependencies):
-      recipeList(dependencies)
-    }
   }
 
   @ViewBuilder
@@ -226,78 +173,14 @@ struct ContentView: View {
     }
   }
 
-  private func recipeLibrary(_ dependencies: PreparedApp) -> some View {
-    NavigationSplitView(columnVisibility: $columnVisibility, preferredCompactColumn: $preferredCompactColumn) {
-      recipeList(dependencies)
-        .navigationTitle(.libraryTitle)
-#if os(macOS)
-        .navigationSplitViewColumnWidth(min: 280, ideal: 320)
-#endif
-        .toolbar(removing: usesCustomSidebarToggle ? .sidebarToggle : nil)
-        .toolbar { libraryToolbar }
-    } detail: {
-      NavigationStack {
-        LibraryDetailRouter(
-          libraryModel: dependencies.libraryModel,
-          sessionModel: dependencies.sessionModel,
-          presentsEditor: false
-        )
-#if os(iOS)
-        .toolbar { detailSidebarNavigation }
-#endif
-      }
-    }
-    .sheet(item: $activeSheet) { _ in
-      RecipeLibrarySheetContent(
-        model: dependencies.libraryModel,
-        close: { activeSheet = nil }
-      )
-    }
-#if !os(macOS)
-    .fullScreenCover(isPresented: compactEditorIsPresented) {
-      if let editor = dependencies.libraryModel.editor {
-        RecipeEditingDestination(model: dependencies.libraryModel, editor: editor)
-      }
-    }
-    .sheet(isPresented: $isShowingSettings) {
-      NavigationStack {
-        KitchenSettingsView(
-          model: dependencies.libraryModel,
-          cloudSyncSettings: dependencies.cloudSyncSettings
-        )
-      }
-    }
-#endif
-  }
 }
 
 private extension ContentView {
-  var compactEditorIsPresented: Binding<Bool> {
-    Binding(
-      get: { !usesPersistentLibraryShell && preparedApp?.libraryModel.editor != nil },
-      set: { if !$0 { preparedApp?.libraryModel.closeEditor() } }
-    )
-  }
-
-#if os(iOS)
-  @ToolbarContentBuilder
-  var detailSidebarNavigation: some ToolbarContent {
-    if usesCustomSidebarToggle {
-      LibrarySidebarToggle(title: .librarySidebarActionShow) {
-        withAnimation { columnVisibility = .all }
-      }
-    }
-  }
-#endif
-
   @ToolbarContentBuilder
   var libraryToolbar: some ToolbarContent {
     LibraryToolbar(
       showsKitchenActions: preparedApp != nil,
       actions: libraryActions,
-      showsSidebarToggle: usesCustomSidebarToggle,
-      sidebarToggleTitle: sidebarToggleTitle,
-      toggleSidebar: toggleSidebar,
       showSettings: showSettings
     )
   }
@@ -313,21 +196,23 @@ private extension ContentView {
     RecipeLibrarySidebar(
       model: dependencies.libraryModel,
       sessionModel: dependencies.sessionModel,
-      locale: locale,
       showSessionHistory: {
-        libraryActions?.perform(.sessions)
+        if libraryActions?.perform(.sessions) == true { preferredCompactColumn = .content }
       },
       showDeletedItems: {
-        libraryActions?.perform(.deletedItems)
+        if libraryActions?.perform(.deletedItems) == true { preferredCompactColumn = .content }
       },
       showRecovery: {
-        libraryActions?.perform(.recovery)
+        if libraryActions?.perform(.recovery) == true { preferredCompactColumn = .content }
       },
       showDrafts: {
-        libraryActions?.perform(.drafts)
+        if libraryActions?.perform(.drafts) == true { preferredCompactColumn = .content }
       },
-      selectSession: { sessionID in
-        if dependencies.sessionModel.selectSession(sessionID) { focusSelectedDestination() }
+      browse: { change in
+        if dependencies.libraryModel.navigation.browseRecipes(changingFilter: change) {
+          temporaryOrganization = false
+          preferredCompactColumn = .content
+        }
       }
     )
   }
@@ -336,10 +221,6 @@ private extension ContentView {
     // Column visibility governs regular layouts; a collapsed split view needs
     // an explicit preferred column after the person navigates back to its sidebar.
     preferredCompactColumn = .detail
-    columnVisibility = LibraryNavigationPolicy.destinationSelectionVisibility(
-      current: columnVisibility,
-      preservesSidebar: usesPersistentLibraryShell
-    )
   }
 
   var sessionIssueIsPresented: Binding<Bool> {
@@ -356,26 +237,6 @@ private extension ContentView {
       get: { preparedApp?.sessionModel.detachedEntryDraft != nil },
       set: { _ in }
     )
-  }
-
-  var usesCustomSidebarToggle: Bool {
-#if os(iOS)
-    horizontalSizeClass == .regular
-#else
-    false
-#endif
-  }
-
-  var sidebarToggleTitle: LocalizedStringResource {
-    columnVisibility == .detailOnly
-      ? .librarySidebarActionShow
-      : .librarySidebarActionHide
-  }
-
-  func toggleSidebar() {
-    withAnimation {
-      columnVisibility = columnVisibility == .detailOnly ? .all : .detailOnly
-    }
   }
 
   func showSettings() {

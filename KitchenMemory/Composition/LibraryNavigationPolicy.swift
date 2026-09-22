@@ -13,10 +13,4 @@ enum LibraryNavigationPolicy {
 #endif
   }
 
-  static func destinationSelectionVisibility(
-    current: NavigationSplitViewVisibility,
-    preservesSidebar: Bool
-  ) -> NavigationSplitViewVisibility {
-    preservesSidebar ? current : .detailOnly
-  }
 }

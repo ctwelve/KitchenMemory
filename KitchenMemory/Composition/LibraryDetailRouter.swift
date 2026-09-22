@@ -21,24 +21,15 @@ struct LibraryDetailRouter: View {
         RecipeEditingDestination(model: libraryModel, editor: editor)
       }
     case .drafts:
-      RecipeDraftsView(model: libraryModel)
+      selectionPlaceholder
     case .finished:
       if let finishedSession = sessionModel.observedFinishedSession {
         FinishedCookingSessionView(model: sessionModel, session: finishedSession)
       }
-    case .deletedItems:
-      CookingSessionDeletedItemsView(recipeCount: libraryModel.deletedRecipes.count, model: sessionModel) {
-        RecipeDeletedItemsSection(model: libraryModel)
-      }
-    case .recovery:
-      CookingSessionRecoveryView(
-        recipeCount: libraryModel.recoveryRecipes.count + (libraryModel.organization?.collisionCount ?? 0),
-                                 recipeContent: {
-        RecipeRecoverySection(model: libraryModel)
-        if let organization = libraryModel.organization { OrganizationCollisionsView(model: organization) }
-      }, model: sessionModel)
-    case .history, .session(_, history: .some):
-      CookingSessionHistoryView(model: sessionModel)
+    case .deletedItems, .recovery:
+      LibraryAuxiliaryDetail(library: libraryModel, sessions: sessionModel)
+    case .history:
+      selectionPlaceholder
     case .session:
       if let session = sessionModel.currentSession {
         CookingSessionView(model: sessionModel, session: session, embedsInNavigationStack: false)
@@ -46,6 +37,11 @@ struct LibraryDetailRouter: View {
     case .recipe:
       recipeContent
     }
+  }
+
+  private var selectionPlaceholder: some View {
+    ContentUnavailableView(.librarySelectionEmptyTitle, systemImage: "sidebar.left",
+                           description: Text(.librarySelectionEmptyMessage))
   }
 
   @ViewBuilder

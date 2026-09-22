@@ -7,11 +7,12 @@ import SwiftUI
 
 struct RecipeRecoverySection: View {
   @Bindable var model: RecipeLibraryModel
+  var selectedID: Recipe.ID?
   @State private var candidate: RecipeRevision?
   @State private var failed = false
 
   var body: some View {
-    ForEach(model.recoveryRecipes) { item in
+    ForEach(model.recoveryRecipes.filter { selectedID == nil || $0.id == selectedID }) { item in
       VStack(alignment: .leading, spacing: 12) {
         Text(.recipeRecoveryTitle).font(.headline)
         Text(.recipeRecoveryExplanation).foregroundStyle(.secondary)

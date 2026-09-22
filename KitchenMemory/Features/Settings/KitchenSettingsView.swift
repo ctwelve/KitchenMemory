@@ -85,6 +85,9 @@ struct KitchenSettingsView: View {
 
   var body: some View {
     Form {
+      if let organization = model.organization {
+        OrganizationSettingsSections(model: organization)
+      }
       if let cloudSyncSettings {
         Section(.settingsIcloudSection) {
           Toggle(
@@ -219,6 +222,9 @@ struct KitchenSettingsView: View {
         .accessibilityIdentifier("settings-privacy")
       }
     }
+    .alert(.organizationFailed, isPresented: Binding(
+      get: { model.organization?.failed == true }, set: { model.organization?.failed = $0 }
+    )) { Button(.actionCancel, role: .cancel) {} } message: { Text(.organizationFailureMessage) }
     .navigationTitle(.settingsTitle)
 #if os(macOS)
     .formStyle(.grouped)

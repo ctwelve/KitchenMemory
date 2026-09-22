@@ -9,6 +9,62 @@ import XCTest
 
 @MainActor
 final class RecipeLibraryNavigationTests: XCTestCase {
+  func testBrowsingOrganizationPreservesFiltersWhenDraftCannotBeSaved() throws {
+    let app = try AppRuntime.testing()
+    let store = NavigationDraftStore()
+    let library = RecipeLibraryModel(
+      library: app.libraryModel.library,
+      samplePreferences: VolatileKitchenPreferencesStore(sampleRecipeOnboardingResponse: .accepted),
+      kitchenWasCreated: false, editingStore: store
+    )
+    library.loadIfNeeded()
+    library.beginEditing()
+    library.editor?.session.title = "Retain my draft"
+    store.refusesWrites = true
+    var changedFilter = false
+    XCTAssertFalse(library.navigation.browseRecipes { changedFilter = true })
+    XCTAssertFalse(changedFilter)
+    XCTAssertNotNil(library.editor)
+    store.refusesWrites = false
+    XCTAssertTrue(library.navigation.browseRecipes { changedFilter = true })
+    XCTAssertTrue(changedFilter)
+    XCTAssertEqual(library.navigation.destination, .recipe)
+    XCTAssertEqual(library.drafts.drafts.first?.session.title, "Retain my draft")
+  }
+
+  func testMiddleColumnRetainsDraftAndHistoryContextWhileDetailChanges() {
+    let navigation = RecipeLibraryNavigation()
+    XCTAssertTrue(navigation.move(to: .drafts))
+    XCTAssertTrue(navigation.move(to: .editor(UUID())))
+    XCTAssertEqual(navigation.contentDestination, .drafts)
+    let recipeID = Recipe.ID(), sessionID = CookingSession.ID()
+    XCTAssertTrue(navigation.move(to: .history(.recipe(recipeID))))
+    XCTAssertTrue(navigation.move(to: .session(sessionID, history: .recipe(recipeID))))
+    XCTAssertEqual(navigation.contentDestination, .history(.recipe(recipeID)))
+    XCTAssertTrue(navigation.move(to: .finished(sessionID, history: .recipe(recipeID))))
+    XCTAssertEqual(navigation.contentDestination, .history(.recipe(recipeID)))
+    XCTAssertTrue(navigation.browseRecipes {})
+    XCTAssertEqual(navigation.contentDestination, .recipes)
+  }
+
+  func testAuxiliarySelectionRoutesToItsListAndRespectsDraftVeto() {
+    let navigation = RecipeLibraryNavigation()
+    let recipeID = Recipe.ID()
+    XCTAssertTrue(navigation.selectAuxiliary(.deletedRecipe(recipeID)))
+    XCTAssertEqual(navigation.destination, .deletedItems)
+    XCTAssertEqual(navigation.contentDestination, .deletedItems)
+    XCTAssertEqual(navigation.auxiliarySelection, .deletedRecipe(recipeID))
+    XCTAssertTrue(navigation.move(to: .editor(UUID())))
+    navigation.prepareToLeaveEditor = { false }
+    XCTAssertFalse(navigation.selectAuxiliary(.organization))
+    XCTAssertEqual(navigation.contentDestination, .drafts)
+    navigation.prepareToLeaveEditor = { true }
+    XCTAssertTrue(navigation.selectAuxiliary(.organization))
+    XCTAssertEqual(navigation.destination, .recovery)
+    XCTAssertEqual(navigation.contentDestination, .recovery)
+    XCTAssertEqual(navigation.auxiliarySelection, .organization)
+  }
+
   func testSuccessfulDraftRemovalDoesNotAskForAnotherWriteBeforeLeaving() throws {
     for savesRecipe in [false, true] {
       let app = try AppRuntime.testing()

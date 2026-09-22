@@ -5,46 +5,40 @@
 import KitchenKit
 import SwiftUI
 
+/// Named library destinations and organization only; recipes live in the content column.
 struct RecipeLibrarySidebar: View {
   @Bindable var model: RecipeLibraryModel
   @Bindable var sessionModel: CookingSessionPresentationModel
-  let locale: Locale
   let showSessionHistory: () -> Void
   let showDeletedItems: () -> Void
   let showRecovery: () -> Void
   let showDrafts: () -> Void
-  let selectSession: (CookingSession.ID) -> Void
+  let browse: (@escaping () -> Void) -> Void
+
+  @State private var presentation = OrganizationActionPresentation()
 
   var body: some View {
-    List(selection: recipeSelection) {
+    List {
+      Section {
+        Button(.organizationAll, systemImage: "books.vertical") {
+          browse {
+            model.organization?.filter.location = .all
+            model.organization?.filter.tagIDs = []
+            model.organization?.filter.untagged = false
+          }
+        }
+        .accessibilityIdentifier("all-recipes-destination")
+      }
       sessionSection
       if let organization = model.organization {
-        OrganizationSidebar(model: organization, recipes: model.recipes)
+        OrganizationSidebar(model: organization, recipes: model.recipes, browse: browse, presentation: presentation)
       }
-      recipeSection
     }
-    // This identifies the durable shell itself; a ready-only section marker
-    // separately prevents launch helpers from mistaking startup for readiness.
     .accessibilityIdentifier("recipe-library-shell")
-    .accessibilityLabel(Text(.libraryAccessibilityLabel))
+    .accessibilityLabel(Text(.organizationTitle))
     .listStyle(.sidebar)
-    .alert(.recipeComparisonUnavailable, isPresented: $model.reconciliationFailed) {
-      Button(.actionCancel, role: .cancel) {}
-    } message: { Text(model.reconciliationFailureMessage) }
-    .onChange(of: model.recipes.map(\.recipe.id), initial: true) { _, recipeIDs in
-      sessionModel.refreshSidebarAssociations(for: recipeIDs)
-    }
-    .onChange(of: sessionModel.sessions.map(\.id)) { _, _ in
-      sessionModel.refreshSidebarAssociations(for: model.recipes.map(\.recipe.id))
-    }
-    .overlay {
-      if !model.hasLoaded { ProgressView(.libraryLoading) }
-    }
-  }
-
-  private var recipeSelection: Binding<Recipe.ID?> {
-    Binding(get: { model.navigation.destination == .recipe ? model.selectedRecipeID : nil },
-            set: { model.selectRecipeForReading($0) })
+    .navigationTitle(.organizationTitle)
+    .modifier(OrganizationActionDialogs(model: model.organization, presentation: presentation))
   }
 
   private var sessionSection: some View {
@@ -67,7 +61,8 @@ struct RecipeLibrarySidebar: View {
       }
       .accessibilityIdentifier("deleted-items-destination")
 
-      if sessionModel.showsRecoveryDestination || model.organization?.requiresRecovery == true {
+      if sessionModel.showsRecoveryDestination || !model.recoveryRecipes.isEmpty
+          || model.organization?.requiresRecovery == true {
         Button(action: showRecovery) {
           Label(.recoveryTitle, systemImage: "wrench.and.screwdriver")
             .badge(
@@ -81,129 +76,4 @@ struct RecipeLibrarySidebar: View {
     .buttonStyle(.borderless)
   }
 
-  @ViewBuilder
-  private var recipeSection: some View {
-    Section {
-      if let issue = model.issue {
-        unavailableLibrary(issue)
-      } else if model.hasLoaded, model.recipes.isEmpty, model.visibleReconciliations.isEmpty {
-        emptyLibrary
-      } else {
-        ForEach(model.visibleReconciliations, id: \.recipeID) { comparison in
-          Button { model.beginReconciliation(comparison) } label: {
-            VStack(alignment: .leading) {
-              Label(.recipeComparisonTitle, systemImage: "arrow.triangle.branch")
-              Text(comparison.revisions.map(\.title).joined(separator: " / "))
-                .font(.caption).foregroundStyle(.secondary)
-            }
-          }
-          .accessibilityIdentifier("reconcile-recipe-\(comparison.recipeID.rawValue.uuidString)")
-        }
-        ForEach(
-          model.organization?.recipes(model.recipes, locale: locale) ?? model.recipes, id: \.recipe.id
-        ) { storedRecipe in
-          if let organization = model.organization, organization.selecting {
-            Toggle(storedRecipe.revision.title, isOn: Binding(get: {
-              organization.selectedRecipes.contains(storedRecipe.id)
-            }, set: { selected in
-              if selected {
-                organization.selectedRecipes.insert(storedRecipe.id)
-              } else {
-                organization.selectedRecipes.remove(storedRecipe.id)
-              }
-            }))
-          }
-          NavigationLink(value: storedRecipe.recipe.id) {
-            RecipeRow(storedRecipe: storedRecipe)
-          }
-          .draggable("km-recipe:" + storedRecipe.id.rawValue.uuidString)
-          .contextMenu {
-            if let organization = model.organization {
-              RecipeOrganizationMenus(model: organization, recipeIDs: [storedRecipe.id])
-            }
-          }
-          .accessibilityIdentifier("recipe-row-\(storedRecipe.recipe.id.rawValue.uuidString)")
-          ForEach(sessionModel.sidebarSessions(for: storedRecipe.recipe.id), id: \.id) { session in
-            Button {
-              selectSession(session.id)
-            } label: {
-              CookingSessionRow(session: session)
-                .padding(.leading, 24)
-            }
-            .buttonStyle(.borderless)
-            .accessibilityIdentifier("session-row-\(session.id.rawValue.uuidString)")
-          }
-        }
-      }
-    } header: {
-      Text(.sessionDiscoveryRecipes)
-        .accessibilityIdentifier("recipe-library-ready")
-    }
-  }
-
-  private func unavailableLibrary(_ issue: RecipeLibraryIssue) -> some View {
-    ContentUnavailableView {
-      Label(.libraryUnavailableTitle, systemImage: "exclamationmark.triangle")
-    } description: {
-      Text(issue.message(locale: locale))
-    } actions: {
-      Button(.actionTryAgain) { model.retryCurrentIssue() }
-    }
-  }
-
-  private var emptyLibrary: some View {
-    ContentUnavailableView(
-      .libraryEmptyTitle,
-      systemImage: "book.closed",
-      description: Text(.libraryEmptyMessage)
-    )
-  }
-}
-
-struct CookingSessionRow: View {
-  let session: CookingSessionProjection
-
-  var body: some View {
-    let lifecycle = CookingSessionLifecyclePresentation(session.lifecycle)
-    HStack {
-      VStack(alignment: .leading, spacing: 3) {
-        Text(session.snapshot.title)
-          .font(.headline)
-        Text(lifecycle.title)
-          .font(.caption)
-          .foregroundStyle(.secondary)
-      }
-      Spacer()
-      Image(systemName: lifecycle.symbol)
-        .accessibilityHidden(true)
-    }
-  }
-}
-
-struct RecipeRow: View {
-  let storedRecipe: StoredRecipe
-
-  var body: some View {
-    HStack(spacing: 12) {
-      RecipeImage(
-        media: storedRecipe.revision.media.first { $0.role == .thumbnail }
-          ?? storedRecipe.revision.media.first,
-        contentMode: .fill
-      )
-      .frame(width: 56, height: 56)
-      .clipShape(.rect(cornerRadius: 10))
-      .accessibilityHidden(true)
-
-      VStack(alignment: .leading, spacing: 3) {
-        Text(storedRecipe.revision.title)
-          .font(.headline)
-        if let summary = storedRecipe.revision.summary {
-          Text(summary)
-            .font(.caption)
-            .foregroundStyle(.primary)
-        }
-      }
-    }
-    .padding(.vertical, 4)
-  }
 }
