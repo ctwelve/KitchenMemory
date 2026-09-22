@@ -116,6 +116,18 @@ action reveals the existing detail when its row is filtered out; Drafts also
 retains the existing recoverable-document route. Selection and list anchors
 remain in the navigation model across column reveal and resize.
 
+## Recipe reading composition
+
+[#187](https://github.com/ctwelve/KitchenMemory/issues/187) measures the detail
+pane itself. Two columns require room for two text-scaled 320-point minimum
+columns, a 24-point gap and 48 points of outer padding; content is capped at
+1120 points. Accessibility text sizes always stack. A shared ordered section
+description keeps Ingredients before Instructions, above or toward the leading
+edge respectively. SwiftUI's AnyLayout preserves the section view identity when
+the arrangement changes. Introductory media, metadata, source, equipment and
+scaling remain ahead of the ingredient/instruction body. Recipe actions and
+Cooking Session views are unchanged.
+
 ## Validation boundary
 
 Framework tests own atomicity, stable retries, draft recovery, causal preferences,

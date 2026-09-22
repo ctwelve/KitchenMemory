@@ -16,6 +16,7 @@ struct RecipeDetailView: View {
   @Environment(\.dynamicTypeSize) private var dynamicTypeSize
   @Environment(\.locale) private var locale
   @ScaledMetric(relativeTo: .headline) private var stepNumberSize = 30
+  @ScaledMetric(relativeTo: .body) private var minimumColumnWidth = 320
 
   private var revision: RecipeRevision { storedRecipe.revision }
 
@@ -27,99 +28,49 @@ struct RecipeDetailView: View {
   }
 
   var body: some View {
-    ScrollView {
-      VStack(alignment: .leading, spacing: 24) {
-        RecipeHeroImage(media: revision.media.first { $0.role == .hero })
-        header
-        metadata
-        RecipeGalleryView(media: revision.media)
-        RecipeScalingControls(selection: $scalingSelection)
-        source
-        if !revision.equipment.isEmpty {
-          recipeSection(
-            .recipeDetailEquipmentSection,
-            systemImage: "frying.pan",
-            accessibilityIdentifier: "equipment-section"
-          ) {
-            VStack(alignment: .leading, spacing: 10) {
-              HStack(spacing: 6) {
-                Image(systemName: "info.circle").accessibilityHidden(true)
-                Text(.recipeDetailEquipmentScalingNote)
-                  .accessibilityIdentifier("equipment-scaling-help")
-              }
-              .font(.caption)
-              .foregroundStyle(.secondary)
-              ForEach(revision.equipment) { item in
-                bullet(item.originalText.isEmpty
-                  ? [RecipePresentationFormatter(locale: locale).quantity(item.quantity), item.name]
-                    .compactMap { $0 }.filter { !$0.isEmpty }.joined(separator: " ")
-                  : item.originalText)
-              }
-            }
-          }
-        }
-
-        recipeSection(
-          .recipeDetailIngredientsSection,
-          systemImage: "carrot",
-          accessibilityIdentifier: "ingredients-section"
-        ) {
-          VStack(alignment: .leading, spacing: 22) {
-            ForEach(revision.ingredientSections) { section in
+    GeometryReader { geometry in
+      ScrollView {
+        VStack(alignment: .leading, spacing: 24) {
+          RecipeHeroImage(media: revision.media.first { $0.role == .hero })
+          header
+          metadata
+          RecipeGalleryView(media: revision.media)
+          RecipeScalingControls(selection: $scalingSelection)
+          source
+          if !revision.equipment.isEmpty {
+            recipeSection(
+              .recipeDetailEquipmentSection,
+              systemImage: "frying.pan",
+              accessibilityIdentifier: "equipment-section"
+            ) {
               VStack(alignment: .leading, spacing: 10) {
-                if let title = section.title {
-                  Text(title)
-                    .font(.headline)
-                    .foregroundStyle(Color("IconMark"))
-                    .accessibilityLabel(title)
-                    .accessibilityHeading(.h3)
-                    .accessibilityIdentifier(
-                      "ingredient-subsection-\(section.id.rawValue.uuidString)"
-                    )
+                HStack(spacing: 6) {
+                  Image(systemName: "info.circle").accessibilityHidden(true)
+                  Text(.recipeDetailEquipmentScalingNote)
+                    .accessibilityIdentifier("equipment-scaling-help")
                 }
-                ForEach(section.ingredients) { ingredient in
-                  ScaledIngredientRow(ingredient: ingredient, scale: scalingSelection.scale)
-                }
-              }
-              .accessibilityElement(children: .contain)
-            }
-          }
-        }
-        recipeSection(
-          .recipeDetailInstructionsSection,
-          systemImage: "list.number",
-          accessibilityIdentifier: "instructions-section"
-        ) {
-          VStack(alignment: .leading, spacing: 24) {
-            ForEach(revision.instructionSections) { section in
-              VStack(alignment: .leading, spacing: 14) {
-                if let title = section.title {
-                  Text(title)
-                    .font(.headline)
-                    .foregroundStyle(Color("IconMark"))
-                    .accessibilityLabel(title)
-                    .accessibilityHeading(.h3)
-                    .accessibilityIdentifier(
-                      "instruction-subsection-\(section.id.rawValue.uuidString)"
-                    )
-                }
-                ForEach(Array(section.steps.enumerated()), id: \.element.id) { index, step in
-                  instructionStep(index + 1, step: step)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                ForEach(revision.equipment) { item in
+                  bullet(item.originalText.isEmpty
+                    ? [RecipePresentationFormatter(locale: locale).quantity(item.quantity), item.name]
+                      .compactMap { $0 }.filter { !$0.isEmpty }.joined(separator: " ")
+                    : item.originalText)
                 }
               }
-              .accessibilityElement(children: .contain)
             }
           }
+
+          recipeBody(RecipeReadingLayout(width: geometry.size.width, minimumColumnWidth: minimumColumnWidth,
+                                         accessibilityText: dynamicTypeSize.isAccessibilitySize))
         }
+        .frame(maxWidth: 1120, alignment: .leading)
+        .padding(.horizontal, 24)
+        .padding(.vertical, 28)
+        .frame(maxWidth: .infinity)
       }
-      .frame(maxWidth: 860, alignment: .leading)
-      .padding(.horizontal, 24)
-      .padding(.vertical, 28)
-      .frame(maxWidth: .infinity)
     }
-    // The detail identifier marks the navigation destination for UI tests.
-    // The label describes the screen as a whole; children remain contained
-    // and navigable rather than being collapsed into one enormous utterance.
+    .accessibilityElement(children: .contain)
     .accessibilityIdentifier("recipe-detail")
     .accessibilityLabel(Text(.recipeDetailAccessibilityLabel(title: revision.title)))
     .background(Color("AppBackground"))
@@ -131,6 +82,79 @@ struct RecipeDetailView: View {
 }
 
 private extension RecipeDetailView {
+  private func recipeBody(_ composition: RecipeReadingLayout) -> some View {
+    let layout = composition.sideBySide
+      ? AnyLayout(HStackLayout(alignment: .top, spacing: 24))
+      : AnyLayout(VStackLayout(alignment: .leading, spacing: 24))
+    return layout {
+      ForEach(composition.readingOrder, id: \.self) { section in
+        switch section {
+        case .ingredients: ingredients
+        case .instructions: instructions
+        }
+      }
+    }
+    .accessibilityElement(children: .contain)
+  }
+
+  private var ingredients: some View {
+    recipeSection(
+      .recipeDetailIngredientsSection,
+      systemImage: "carrot",
+      accessibilityIdentifier: "ingredients-section"
+    ) {
+      VStack(alignment: .leading, spacing: 22) {
+        ForEach(revision.ingredientSections) { section in
+          VStack(alignment: .leading, spacing: 10) {
+            if let title = section.title {
+              Text(title)
+                .font(.headline)
+                .foregroundStyle(Color("IconMark"))
+                .accessibilityLabel(title)
+                .accessibilityHeading(.h3)
+                .accessibilityIdentifier(
+                  "ingredient-subsection-\(section.id.rawValue.uuidString)"
+                )
+            }
+            ForEach(section.ingredients) { ingredient in
+              ScaledIngredientRow(ingredient: ingredient, scale: scalingSelection.scale)
+            }
+          }
+          .accessibilityElement(children: .contain)
+        }
+      }
+    }
+  }
+
+  private var instructions: some View {
+    recipeSection(
+      .recipeDetailInstructionsSection,
+      systemImage: "list.number",
+      accessibilityIdentifier: "instructions-section"
+    ) {
+      VStack(alignment: .leading, spacing: 24) {
+        ForEach(revision.instructionSections) { section in
+          VStack(alignment: .leading, spacing: 14) {
+            if let title = section.title {
+              Text(title)
+                .font(.headline)
+                .foregroundStyle(Color("IconMark"))
+                .accessibilityLabel(title)
+                .accessibilityHeading(.h3)
+                .accessibilityIdentifier(
+                  "instruction-subsection-\(section.id.rawValue.uuidString)"
+                )
+            }
+            ForEach(Array(section.steps.enumerated()), id: \.element.id) { index, step in
+              instructionStep(index + 1, step: step)
+            }
+          }
+          .accessibilityElement(children: .contain)
+        }
+      }
+    }
+  }
+
   private var header: some View {
     VStack(alignment: .leading, spacing: 10) {
       Text(revision.title)
@@ -181,11 +205,7 @@ private extension RecipeDetailView {
           .frame(maxWidth: .infinity, alignment: .leading)
           .padding(14)
           .background(Color("SubtleFill"), in: .rect(cornerRadius: 12))
-          // The card is visually two Text views plus a decorative symbol, but
-          // semantically it is one fact. A native Text representation gives a
-          // predictable spoken phrase and role on both platforms. Combining
-          // the visual children directly produced unstable macOS roles and
-          // different label/value exposure between iOS and macOS.
+          // Present each metadata card as one spoken fact.
           .accessibilityRepresentation {
             Text(.recipeMetadataAccessibilityValue(label: value.label, value: value.value))
               // The identifier names the concept, while the spoken value may
