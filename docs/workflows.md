@@ -10,7 +10,10 @@ SPDX-License-Identifier: MIT
 - Status: Exploration
 
 The accepted simplifications and stable product direction distilled from these
-ideas are recorded in `product-doctrine.md`.
+ideas are recorded in `product-doctrine.md`. Current contracts cover Recipe
+authority and reconciliation, stable-Recipe organization, and Cooking Sessions;
+the [live roadmap](https://github.com/ctwelve/KitchenMemory/issues/190) owns the
+priority and dependencies for remaining work.
 
 This document collects desired end-to-end behavior. It describes what a person
 should be able to accomplish without committing every feature to the first
@@ -173,9 +176,8 @@ needs-photograph
 family-favorite
 ```
 
-Tags may themselves be grouped or nested for browsing, but their identity should
-remain independent of presentation hierarchy. Renaming a tag should not rewrite
-recipe content.
+Tags remain a flat classification; Folders provide the navigable hierarchy.
+Renaming a tag should not rewrite recipe content.
 
 ### Saved searches and smart collections
 
@@ -222,11 +224,16 @@ When a shared or imported recipe changes, the app should know:
 - What changed.
 - Whether existing cooking sessions refer to an older revision.
 
-The exact collaboration and revision design remains open.
+The existing private Recipe authority and reconciliation contract is settled.
+Multi-person collaboration policy remains a separate post-1.0 question tracked
+by [#200](https://github.com/ctwelve/KitchenMemory/issues/200); it does not
+reopen revision ownership or reconciliation.
 
 ## Plan and prepare a recipe
 
-Selecting a recipe and desired yield may create a `PlannedCook`. The app derives
+The first readiness, shopping, and pantry slice remains to be selected in
+[#198](https://github.com/ctwelve/KitchenMemory/issues/198). If adopted,
+selecting a recipe and desired yield may create a `PlannedCook`. The app derives
 scaled ingredient requirements, compares them with explainable pantry evidence,
 and lets the person decide whether each requirement is covered, should be
 purchased, needs checking, will be substituted, or will be skipped.

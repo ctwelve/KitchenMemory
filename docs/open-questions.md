@@ -8,12 +8,17 @@ SPDX-License-Identifier: MIT
 
 
 These are future design questions, not a parallel issue backlog. Consult the
-[live issue graph](https://github.com/ctwelve/KitchenMemory/issues) before opening
-work. Recipe revisions, separate ingredient/instruction sections, Session
-Entries, flat Tags, and causal organization conflicts have current contracts
-in the [documentation map](README.md); do not reopen them as unanswered questions.
+[live roadmap](https://github.com/ctwelve/KitchenMemory/issues/190) before
+opening work. Recipe revisions, separate ingredient/instruction sections,
+Session Entries, flat Tags, causal organization conflicts, and
+`PackageDescription` have current contracts in the [documentation map](README.md);
+do not reopen them as unanswered questions.
 
 ## Product
+
+The remaining acquisition and multi-person sharing questions are respectively
+scoped by [#196](https://github.com/ctwelve/KitchenMemory/issues/196) and
+[#200](https://github.com/ctwelve/KitchenMemory/issues/200).
 
 - Which post-1.0 release should introduce multi-person Kitchen sharing?
 - Should an imported recipe be a private snapshot, a linked copy, or explicitly
@@ -22,12 +27,16 @@ in the [documentation map](README.md); do not reopen them as unanswered question
 
 ## Recipe model
 
+[#201](https://github.com/ctwelve/KitchenMemory/issues/201) owns the next
+prioritized decision about recipe fidelity and composition.
+
 - Do we need alternate ingredient groups such as “either A or B” in the initial
   model?
 - How should component yields work—for example, a sauce recipe embedded in a
   larger dish?
 - Should temperatures and equipment become structured values early?
-- What is the smallest useful representation of package sizes?
+- Which package-size reading, editing, import, or export behavior is useful
+  beyond the existing `PackageDescription` representation?
 
 ## Parsing and import
 
@@ -47,6 +56,10 @@ in the [documentation map](README.md); do not reopen them as unanswered question
 
 ## Platform
 
+[#199](https://github.com/ctwelve/KitchenMemory/issues/199) owns the next
+native-workflow and automation plan; shared-Kitchen design remains with
+[#200](https://github.com/ctwelve/KitchenMemory/issues/200).
+
 - Native SwiftUI for iPhone, iPad, and Mac is the chosen initial application
   platform. A display-centric tvOS cooking client is planned for a later phase.
 - Which combination of managed SwiftData synchronization, Core Data CloudKit
@@ -60,6 +73,9 @@ in the [documentation map](README.md); do not reopen them as unanswered question
   command-line companion, or both?
 
 ## Fuzzy pantry—deliberately deferred
+
+[#198](https://github.com/ctwelve/KitchenMemory/issues/198) selects the first
+useful readiness, shopping, and pantry slice before a persistence design.
 
 - Which qualitative amount vocabulary feels natural: `a little`, `some`,
   `plenty`, or ingredient-specific alternatives?
@@ -78,6 +94,9 @@ in the [documentation map](README.md); do not reopen them as unanswered question
 
 ## Cooking sessions and recipe evolution
 
+[#197](https://github.com/ctwelve/KitchenMemory/issues/197) scopes deferred
+Session media, timers, and recipe refinement.
+
 - When selected Session Entries become maintained Recipe work, should the person
   create a new revision, a named variant, or a new Recipe?
 - How should repeated Session Entries trigger suggestions without becoming
@@ -90,6 +109,9 @@ in the [documentation map](README.md); do not reopen them as unanswered question
   according to kitchen policy?
 
 ## Planned cooks and readiness
+
+[#198](https://github.com/ctwelve/KitchenMemory/issues/198) owns these staged
+planning and shopping decisions.
 
 - What user-facing verb best introduces readiness: Plan, Prepare, Get Ready, or
   something else?
