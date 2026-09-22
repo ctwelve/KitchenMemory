@@ -35,7 +35,9 @@ struct RecipeSimpleEditor: View {
           }
         }
       }
-    } header: { Text(.recipeEditorIngredientsSection) } footer: { Text(.recipeEditorSimpleHelp).fixedSize(horizontal: false, vertical: true) }
+    } header: { Text(.recipeEditorIngredientsSection) } footer: {
+      Text(.recipeEditorSimpleHelp).fixedSize(horizontal: false, vertical: true)
+    }
     Section(.recipeEditorInstructionsSection) {
       ForEach(editor.session.instructionSections.indices, id: \.self) { section in
         if let title = editor.session.instructionSections[section].title { Text(title).font(.headline) }

@@ -178,9 +178,10 @@ state, explicit presentation or advanced fields retains those fields while its
 authored source changes. A separate Codable conflict proposes the new parsed
 quantity, unit, package, ingredient and preparation for explicit acceptance.
 Notes, optionality, scaling behavior and custom display survive even acceptance.
-Unresolved proposals never block saving the retained precision and authored
-wording. The native editing draft owns displaying, accepting or keeping those
-proposals; neither the parser nor reconciliation publishes a Revision.
+Unresolved proposals never block persisting the device-local draft with its retained
+precision and authored wording. Recipe publication requires an explicit choice to
+accept or keep those details. The native editing draft owns presenting that choice;
+neither the parser nor reconciliation publishes a Revision.
 
 ### Future Ingredient seam
 

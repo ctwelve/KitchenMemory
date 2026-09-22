@@ -42,7 +42,11 @@ struct NativeIngredientText: NSViewRepresentable {
     context.coordinator.document = $document
     context.coordinator.locale = locale
     guard let text = scroll.documentView as? NSTextView else { return }
-    if text.string != document.text { text.string = document.text }
+    if text.string != document.text {
+      text.undoManager?.removeAllActions()
+      text.string = document.text
+    }
+    context.coordinator.synchronizeAdjustments()
     context.coordinator.textDidChange(Notification(name: NSText.didChangeNotification, object: text))
   }
 }
@@ -52,7 +56,7 @@ extension IngredientTextCoordinator: NSTextViewDelegate {
                 replacementString: String?) -> Bool {
     guard let replacementString, !applyingAttributes else { return true }
     replace(affectedCharRange, with: replacementString,
-            undoing: textView.undoManager?.isUndoing == true || textView.undoManager?.isRedoing == true)
+            undoing: textView.undoManager?.isUndoing == true, redoing: textView.undoManager?.isRedoing == true)
     return true
   }
 
@@ -60,7 +64,8 @@ extension IngredientTextCoordinator: NSTextViewDelegate {
     guard let text = notification.object as? NSTextView, !text.hasMarkedText(),
           let storage = text.textStorage else { return }
     decorate(storage, base: [.font: NSFont.preferredFont(forTextStyle: .body),
-                            .foregroundColor: NSColor.labelColor,], undoManager: text.undoManager)
+                            .foregroundColor: NSColor.labelColor,
+    ], undoManager: text.undoManager)
   }
 
   func textViewDidChangeSelection(_ notification: Notification) {
@@ -104,7 +109,11 @@ struct NativeIngredientText: UIViewRepresentable {
   func updateUIView(_ text: UITextView, context: Context) {
     context.coordinator.document = $document
     context.coordinator.locale = locale
-    if text.text != document.text { text.text = document.text }
+    if text.text != document.text {
+      text.undoManager?.removeAllActions()
+      text.text = document.text
+    }
+    context.coordinator.synchronizeAdjustments()
     context.coordinator.textViewDidChange(text)
   }
 }
@@ -113,14 +122,15 @@ extension IngredientTextCoordinator: UITextViewDelegate {
   func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
     guard !applyingAttributes else { return true }
     replace(range, with: text,
-            undoing: textView.undoManager?.isUndoing == true || textView.undoManager?.isRedoing == true)
+            undoing: textView.undoManager?.isUndoing == true, redoing: textView.undoManager?.isRedoing == true)
     return true
   }
 
   func textViewDidChange(_ textView: UITextView) {
     guard textView.markedTextRange == nil else { return }
     decorate(textView.textStorage, base: [.font: UIFont.preferredFont(forTextStyle: .body),
-                                        .foregroundColor: UIColor.label,], undoManager: textView.undoManager)
+                                        .foregroundColor: UIColor.label,
+    ], undoManager: textView.undoManager)
   }
 
   func textViewDidChangeSelection(_ textView: UITextView) {

@@ -24,6 +24,8 @@ public extension RecipeEditSession {
 
   /// Completes pending lines before a mode switch, Close, or Save.
   mutating func finishIngredientText(locale: Locale = .current) {
+    guard ingredientText != nil else { return }
+    prepareIngredientText()
     guard var text = ingredientText else { return }
     text.finishEditing(locale: locale)
     updateIngredientText(text)

@@ -58,7 +58,9 @@ final class RecipeIngredientTextDraftTests: XCTestCase {
     XCTAssertEqual(recovered.ingredientSections[0].ingredients[0].originalText, "2 tsp salt")
     XCTAssertThrowsError(try recovered.validatedDraft())
     recovered.finishIngredientText()
-    recovered.ingredientText?.resolve(ingredient.id, acceptingInterpretation: false)
+    var resolved = try XCTUnwrap(recovered.ingredientText)
+    resolved.resolve(ingredient.id, acceptingInterpretation: false)
+    recovered.updateIngredientText(resolved)
     recovered.finishIngredientText()
     let published = try recovered.validatedDraft()
     XCTAssertEqual(published.ingredientSections[0].ingredients[0].quantity, ingredient.quantity)
@@ -79,6 +81,16 @@ final class RecipeIngredientTextDraftTests: XCTestCase {
     text.finishEditing()
     XCTAssertEqual(text.sections[0].ingredients, [salt])
     XCTAssertTrue(text.conflicts.isEmpty)
+  }
+
+  func testFinishingTextPreservesDirectStructuredAdjustments() {
+    var session = RecipeEditSession(draft: RecipeDraft(title: "Soup", ingredientSections: [
+      IngredientSection(ingredients: [IngredientLineParser.parse("1 tsp salt")])
+    ]))
+    session.prepareIngredientText()
+    session.ingredientSections[0].ingredients[0].note = "An explicit adjustment"
+    session.finishIngredientText()
+    XCTAssertEqual(session.ingredientSections[0].ingredients[0].note, "An explicit adjustment")
   }
 
 }

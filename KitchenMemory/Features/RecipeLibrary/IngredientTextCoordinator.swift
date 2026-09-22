@@ -20,34 +20,60 @@ final class IngredientTextActions {
 final class IngredientTextCoordinator: NSObject {
   var document: Binding<RecipeIngredientTextDraft>
   var locale: Locale
-  private var snapshots: [String: RecipeIngredientTextDraft] = [:]
+  private var snapshots: [RecipeIngredientTextDraft]
+  private var snapshotIndex = 0
   var applyingAttributes = false
 
   init(document: Binding<RecipeIngredientTextDraft>, locale: Locale) {
     self.document = document
     self.locale = locale
+    snapshots = [document.wrappedValue]
   }
 
-  func replace(_ range: NSRange, with replacement: String, undoing: Bool) {
+  func replace(_ range: NSRange, with replacement: String, undoing: Bool, redoing: Bool = false) {
+    synchronizeAdjustments()
     var value = document.wrappedValue
-    snapshots[value.text] = value
     let resultingText = (value.text as NSString).replacingCharacters(in: range, with: replacement)
-    if undoing, let restored = snapshots[resultingText] {
-      value = restored
+    let restoredIndex: Int?
+    if undoing {
+      restoredIndex = snapshots.indices.prefix(snapshotIndex).last { snapshots[$0].text == resultingText }
+    } else if redoing {
+      restoredIndex = snapshots.indices.dropFirst(snapshotIndex + 1).first { snapshots[$0].text == resultingText }
+    } else {
+      restoredIndex = nil
+    }
+    if let restoredIndex {
+      snapshotIndex = restoredIndex
+      value = snapshots[restoredIndex]
     } else {
       value.replaceCharacters(in: range, with: replacement)
       let cursor = range.location + (replacement as NSString).length
       value.finishEditing(locale: locale, excludingLineAtUTF16Offset: replacement.contains("\n") ? nil : cursor)
+      snapshots = Array(snapshots.prefix(snapshotIndex + 1)) + [value]
+      snapshotIndex += 1
     }
     document.wrappedValue = value
-    snapshots[value.text] = value
+  }
+
+  func synchronizeAdjustments() {
+    let current = document.wrappedValue
+    let previous = snapshots[snapshotIndex]
+    guard current != previous else { return }
+    if current.text != previous.text {
+      snapshots = [current]
+      snapshotIndex = 0
+    } else {
+      snapshots = snapshots.map { $0.preservingAdjustments(from: previous, to: current) }
+      snapshots[snapshotIndex] = current
+    }
   }
 
   func finish(excluding offset: Int? = nil) {
+    synchronizeAdjustments()
     var value = document.wrappedValue
     value.finishEditing(locale: locale, excludingLineAtUTF16Offset: offset)
     if value != document.wrappedValue { document.wrappedValue = value }
-    snapshots[value.text] = value
+    snapshots[snapshotIndex] = value
   }
 
   func decorate(_ storage: NSTextStorage, base: [NSAttributedString.Key: Any], undoManager: UndoManager?) {
