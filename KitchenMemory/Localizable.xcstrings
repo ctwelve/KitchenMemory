@@ -1,6 +1,384 @@
 {
   "sourceLanguage" : "en-US",
   "strings" : {
+  "recipe.editor.simple-mode": {
+    "comment": "Simple recipe editing control or guidance. Ingredient text remains authored; explicit choices protect precise adjustments.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Simple Editor"
+        }
+      },
+      "en-GB": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Simple Editor"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Editor sencillo"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Éditeur simple"
+        }
+      },
+      "de-DE": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Einfacher Editor"
+        }
+      },
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Editor semplice"
+        }
+      }
+    }
+  },
+  "recipe.editor.advanced-mode": {
+    "comment": "Simple recipe editing control or guidance. Ingredient text remains authored; explicit choices protect precise adjustments.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Advanced Editor"
+        }
+      },
+      "en-GB": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Advanced Editor"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Editor avanzado"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Éditeur avancé"
+        }
+      },
+      "de-DE": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Erweiterter Editor"
+        }
+      },
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Editor avanzato"
+        }
+      }
+    }
+  },
+  "recipe.editor.precision": {
+    "comment": "Simple recipe editing control or guidance. Ingredient text remains authored; explicit choices protect precise adjustments.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ingredient Precision"
+        }
+      },
+      "en-GB": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ingredient Precision"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Detalles de ingredientes"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Précision des ingrédients"
+        }
+      },
+      "de-DE": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Zutaten im Detail"
+        }
+      },
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Dettagli degli ingredienti"
+        }
+      }
+    }
+  },
+  "recipe.editor.section-default": {
+    "comment": "Simple recipe editing control or guidance. Ingredient text remains authored; explicit choices protect precise adjustments.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Section"
+        }
+      },
+      "en-GB": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Section"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Sección"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Section"
+        }
+      },
+      "de-DE": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Abschnitt"
+        }
+      },
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Sezione"
+        }
+      }
+    }
+  },
+  "recipe.editor.simple-help": {
+    "comment": "Simple recipe editing control or guidance. Ingredient text remains authored; explicit choices protect precise adjustments.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "One ingredient per line. Quantities are bold, units underlined, and supporting details italic. Start a line with # and a space to make a section; remove them to turn it back into an ingredient."
+        }
+      },
+      "en-GB": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "One ingredient per line. Quantities are bold, units underlined, and supporting details italic. Start a line with # and a space to make a section; remove them to turn it back into an ingredient."
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Un ingrediente por línea. Las cantidades van en negrita, las unidades subrayadas y los detalles en cursiva. Empieza una línea con # y un espacio para crear una sección; elimínalos para volver a convertirla en ingrediente."
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Un ingrédient par ligne. Les quantités sont en gras, les unités soulignées et les détails en italique. Commencez une ligne par # et une espace pour créer une section; retirez-les pour en refaire un ingrédient."
+        }
+      },
+      "de-DE": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Eine Zutat pro Zeile. Mengen sind fett, Einheiten unterstrichen und Zusatzangaben kursiv. Beginne eine Zeile mit # und einem Leerzeichen für einen Abschnitt; entferne beides, um wieder eine Zutat daraus zu machen."
+        }
+      },
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Un ingrediente per riga. Le quantità sono in grassetto, le unità sottolineate e i dettagli in corsivo. Inizia una riga con # e uno spazio per creare una sezione; rimuovili per tornare a un ingrediente."
+        }
+      }
+    }
+  },
+  "recipe.editor.interpretation-review": {
+    "comment": "Simple recipe editing control or guidance. Ingredient text remains authored; explicit choices protect precise adjustments.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Review Ingredient Changes"
+        }
+      },
+      "en-GB": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Review Ingredient Changes"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Revisar cambios de ingredientes"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Réviser les changements aux ingrédients"
+        }
+      },
+      "de-DE": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Zutatenänderungen prüfen"
+        }
+      },
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Rivedi le modifiche agli ingredienti"
+        }
+      }
+    }
+  },
+  "recipe.editor.interpretation-explanation": {
+    "comment": "Simple recipe editing control or guidance. Ingredient text remains authored; explicit choices protect precise adjustments.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "This wording changed an ingredient with precise adjustments. Keep those details or accept the interpretation shown below before saving."
+        }
+      },
+      "en-GB": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "This wording changed an ingredient with precise adjustments. Keep those details or accept the interpretation shown below before saving."
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Este texto cambió un ingrediente con ajustes precisos. Conserva esos detalles o acepta la interpretación que aparece abajo antes de guardar."
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Le texte d’un ingrédient comportant des ajustements précis a changé. Conservez ces détails ou acceptez l’interprétation ci-dessous avant d’enregistrer."
+        }
+      },
+      "de-DE": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Der Text einer Zutat mit präzisen Anpassungen wurde geändert. Behalte die Details oder übernimm vor dem Speichern die unten angezeigte Interpretation."
+        }
+      },
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Il testo di un ingrediente con modifiche precise è cambiato. Mantieni i dettagli o accetta l’interpretazione qui sotto prima di salvare."
+        }
+      }
+    }
+  },
+  "recipe.editor.keep-details": {
+    "comment": "Simple recipe editing control or guidance. Ingredient text remains authored; explicit choices protect precise adjustments.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Keep My Details"
+        }
+      },
+      "en-GB": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Keep My Details"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Conservar mis detalles"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Conserver mes détails"
+        }
+      },
+      "de-DE": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Meine Details behalten"
+        }
+      },
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Mantieni i miei dettagli"
+        }
+      }
+    }
+  },
+  "recipe.editor.accept-interpretation": {
+    "comment": "Simple recipe editing control or guidance. Ingredient text remains authored; explicit choices protect precise adjustments.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Use This Interpretation"
+        }
+      },
+      "en-GB": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Use This Interpretation"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Usar esta interpretación"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Utiliser cette interprétation"
+        }
+      },
+      "de-DE": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Diese Interpretation übernehmen"
+        }
+      },
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Usa questa interpretazione"
+        }
+      }
+    }
+  },
   "organization.reset-filters": {
     "comment": "Contextual Recipe library browsing control or filtered empty state. Reset keeps the folder; All Recipes keeps search and tags.",
     "extractionState": "manual",

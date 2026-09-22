@@ -11,6 +11,7 @@ import Observation
 @Observable
 final class RecipeEditingModel: Identifiable {
   let draft: RecipeEditingDraft
+  var usesAdvancedEditor = false
   var confirmsDiscard = false
   var id: UUID { draft.id }
   var original: StoredRecipe? { draft.original }
@@ -20,10 +21,23 @@ final class RecipeEditingModel: Identifiable {
   var canSaveRevision: Bool { draft.canSaveRevision }
   var session: RecipeEditSession {
     get { draft.session }
-    set { draft.session = newValue }
+    set {
+      var updated = newValue
+      if updated.ingredientText == draft.session.ingredientText,
+         updated.ingredientSections != draft.session.ingredientSections {
+        updated.prepareIngredientText()
+      }
+      draft.session = updated
+    }
   }
 
   init(draft: RecipeEditingDraft) { self.draft = draft }
+
+  func setAdvancedEditor(_ advanced: Bool, locale: Locale) {
+    session.prepareIngredientText()
+    session.finishIngredientText(locale: locale)
+    usesAdvancedEditor = advanced
+  }
 }
 
 extension RecipeLibraryModel {

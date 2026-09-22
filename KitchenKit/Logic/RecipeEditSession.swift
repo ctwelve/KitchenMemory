@@ -14,6 +14,7 @@ public enum RecipeEditValidationIssue: Equatable, Hashable, Sendable {
   case missingTitle
   case invalidDuration(RecipeEditDurationField)
   case invalidSourceURL
+  case unresolvedIngredientChanges
 }
 
 public enum RecipeEditSessionError: Error, Equatable, Sendable {
@@ -43,6 +44,8 @@ public struct RecipeEditSession: Codable, Equatable, Sendable {
   public var equipment: [EquipmentItem]?
   public var ingredientSections: [IngredientSection]
   public var instructionSections: [InstructionSection]
+  /// Recoverable simple-editor state; absent in drafts created before this editor existed.
+  public var ingredientText: RecipeIngredientTextDraft?
 
   private let preservedSourceCapture: RecipeSourceCapture?
   private let preservedContentLanguage: RecipeContentLanguage?
@@ -83,6 +86,7 @@ public struct RecipeEditSession: Codable, Equatable, Sendable {
     if text(sourceURL) != nil, RecipeSourceURLPolicy.validatedURL(from: sourceURL) == nil {
       issues.insert(.invalidSourceURL)
     }
+    if completedIngredientText?.conflicts.isEmpty == false { issues.insert(.unresolvedIngredientChanges) }
     return issues
   }
 
@@ -107,9 +111,22 @@ public struct RecipeEditSession: Codable, Equatable, Sendable {
       keywords: preservedKeywords,
       media: media,
       equipment: equipment,
-      ingredientSections: ingredientSections,
+      ingredientSections: finishedIngredientSections,
       instructionSections: instructionSections
     )
+  }
+
+  private var completedIngredientText: RecipeIngredientTextDraft? {
+    var text = ingredientText
+    if let current = text, current.sections != ingredientSections {
+      text = current.incorporating(ingredientSections)
+    }
+    text?.finishEditing()
+    return text
+  }
+
+  private var finishedIngredientSections: [IngredientSection] {
+    completedIngredientText?.sections ?? ingredientSections
   }
 
   public mutating func moveIngredientSection(at index: Int, by offset: Int) {

@@ -290,3 +290,14 @@ what actually occurs in its cooking session.
 4. Section and row order are stable and user-controlled.
 5. Normalization never silently rewrites the original text.
 6. Scaling never fabricates a numeric interpretation for a textual quantity.
+
+### Simple-editor text drafts
+
+The optional `RecipeEditSession.ingredientText` document retains native text line
+identity, pending interpretation, IngredientSection headings and unresolved
+precision proposals. Its derived sections use the same Ingredient identities as
+advanced editing; switching presentation is not a publication. Rebuilding from
+structured changes retains proposals for untouched rows and respects explicit
+adjustments. Validation completes pending interpretation and refuses to publish
+unresolved proposals. This text bookkeeping is device-local and excluded from
+`RecipeDraft` and `RecipeRevision` content; historical SwiftData schemas are unchanged.

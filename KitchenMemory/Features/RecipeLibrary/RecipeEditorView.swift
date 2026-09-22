@@ -72,8 +72,19 @@ struct RecipeEditorView: View {
       .navigationBarTitleDisplayMode(.inline)
 #endif
       .toolbar {
+        ToolbarItem(placement: .automatic) {
+          if mode != .importReview {
+          Button(editor.usesAdvancedEditor ? .recipeEditorSimpleMode : .recipeEditorAdvancedMode) {
+            editor.setAdvancedEditor(!editor.usesAdvancedEditor, locale: locale)
+          }
+          .accessibilityIdentifier("recipe-editor-mode")
+          }
+        }
         ToolbarItem(placement: .cancellationAction) {
-          Button(.recipeEditorActionClose, action: close).help(Text(.recipeEditorActionClose))
+          Button(.recipeEditorActionClose) {
+            editor.session.finishIngredientText(locale: locale)
+            close()
+          }.help(Text(.recipeEditorActionClose))
         }
         ToolbarItem(placement: .destructiveAction) {
           Button(.recipeEditorActionDiscard, role: .destructive) { editor.confirmsDiscard = true }
@@ -82,6 +93,7 @@ struct RecipeEditorView: View {
         }
         ToolbarItem(placement: .confirmationAction) {
           Button(editor.isImportCandidate ? .recipeImportAcceptDraft : .recipeEditorReviseActionSave) {
+            editor.session.finishIngredientText(locale: locale)
             _ = save()
           }
             .disabled(!editor.isImportCandidate && !editor.canSaveRevision)
@@ -100,6 +112,11 @@ struct RecipeEditorView: View {
 private extension RecipeEditorView {
   @ViewBuilder
   private var editorSections: some View {
+    IngredientInterpretationReview(editor: editor)
+    if !editor.usesAdvancedEditor && mode != .importReview
+      && (editor.draft.reconciliation == nil || editor.draft.reconciliation?.draft != nil) {
+      RecipeSimpleEditor(editor: editor)
+    }
     if let organization {
       RecipeOrganizationEditor(model: organization, draft: editor.draft)
       OrganizationManagementButton(model: organization)
@@ -110,7 +127,8 @@ private extension RecipeEditorView {
     if mode == .importReview {
       importReviewSection
     }
-    if editor.draft.reconciliation == nil || editor.draft.reconciliation?.draft != nil {
+    if (editor.usesAdvancedEditor || mode == .importReview)
+      && (editor.draft.reconciliation == nil || editor.draft.reconciliation?.draft != nil) {
     recipeSection
     timingSection
     sourceSection

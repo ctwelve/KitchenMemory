@@ -137,3 +137,31 @@ and list/detail routing. Native UI tests prove named top-level destinations, con
 [ADR 0007](adr/0007-business-logic-coverage-and-ui-smoke-tests.md). Detailed feature
 workflows remain below the UI automation boundary; human platform and assistive
 technology review is still required for release acceptance.
+
+## Simple editing in the recipe pane
+
+[#188](https://github.com/ctwelve/KitchenMemory/issues/188) starts explicit Edit and
+New Recipe in the simple editor: title, multiline ingredients and instruction
+steps. Advanced Editor exposes the existing full recipe form; Ingredient Precision
+exposes those ingredient controls without leaving simple editing. Both surfaces
+write the same `RecipeEditingDraft`. Instruction section/step identities, media,
+equipment and other maintained metadata are retained across mode changes. Import
+review continues to use the full editor.
+
+`RecipeIngredientTextDraft` is optional, Codable device-local editing state inside
+`RecipeEditSession`, not a new persisted Recipe schema. Native text edit ranges
+carry surviving line identities. Text is retained immediately; completing a line,
+pasting, leaving the field, switching modes or Save completes interpretation.
+Quantity weight, underlined units, italic supporting details and accent color
+provide redundant visual distinctions without replacing authored text or moving
+the selection. A single `# ` prefix creates a real IngredientSection; removing it
+converts the line back. Add Ingredient Section inserts the same prefix through the
+native text control. Native text undo/redo restores text and its draft identities
+while that text control remains open; application-wide undo remains deferred.
+
+Changed precise ingredients retain their existing adjustments and an explicit
+parser proposal. The reader must keep the details or accept the proposal before
+Save can publish. Those unresolved choices and active text survive local draft
+recovery. Merely opening simple editing does not reinterpret maintained content.
+Close retains the draft, Save publishes a Revision, and Discard still uses the
+existing confirmation. Organization retains the commit boundaries documented above.
