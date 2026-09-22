@@ -267,7 +267,8 @@ private extension RecipeEditorView {
   }
 }
 
-extension RecipeImportConcern {
+// Pure wording generation must not inherit the app's default MainActor isolation.
+nonisolated extension RecipeImportConcern {
   func reviewMessage(locale: Locale = .current) -> String {
     switch self {
     case .missingTitle:
