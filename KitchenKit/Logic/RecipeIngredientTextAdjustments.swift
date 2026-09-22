@@ -7,7 +7,7 @@ import Foundation
 public extension RecipeIngredientTextDraft {
   /// Rebases a text-undo snapshot over subsequent explicit precision edits.
   /// Only fields changed outside the text history are carried over; historical wording and
-  /// parser-derived quantities remain undoable. Removed lines are not resurrected by precision.
+  /// parser-derived quantities remain undoable. Adjustments apply only to shared ingredient identities.
   func preservingAdjustments(from previous: Self, to current: Self) -> Self {
     let before = Dictionary(uniqueKeysWithValues: previous.sections.flatMap(\.ingredients).map { ($0.id, $0) })
     let after = Dictionary(uniqueKeysWithValues: current.sections.flatMap(\.ingredients).map { ($0.id, $0) })

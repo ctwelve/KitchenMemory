@@ -62,7 +62,7 @@ struct RecipeDetailView: View {
           recipeBody(RecipeReadingLayout(width: geometry.size.width, minimumColumnWidth: minimumColumnWidth,
                                          accessibilityText: dynamicTypeSize.isAccessibilitySize))
         }
-        .frame(maxWidth: 1120, alignment: .leading)
+        .frame(width: max(0, min(1120, geometry.size.width - 48)), alignment: .leading)
         .padding(.horizontal, 24)
         .padding(.vertical, 28)
         .frame(maxWidth: .infinity)

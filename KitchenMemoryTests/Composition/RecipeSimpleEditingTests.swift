@@ -32,7 +32,7 @@ final class RecipeSimpleEditingTests: XCTestCase {
     XCTAssertFalse(editor.usesAdvancedEditor)
     XCTAssertEqual(editor.session.ingredientText?.sections[0].ingredients[0].note, "A precise adjustment")
     XCTAssertEqual(editor.session.ingredientText?.text, paste)
-    XCTAssertTrue(editor.draft === draft)
+    XCTAssertIdentical(editor.draft, draft)
   }
   func testTextUndoPreservesLaterPrecisionForEditedAndUntouchedIngredients() throws {
     let salt = IngredientLineParser.parse("1 tsp salt")

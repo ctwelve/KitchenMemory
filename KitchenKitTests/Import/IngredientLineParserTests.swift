@@ -193,4 +193,10 @@ final class IngredientLineParserTests: XCTestCase {
     XCTAssertEqual(ingredient.preparation, preparation, file: file, line: line)
     XCTAssertEqual(ingredient.parseState, .parsed, file: file, line: line)
   }
+  func testNumberWordsWithoutALanguageRemainAuthoredText() {
+    let value = IngredientLineParser.parse("one cup flour", locale: Locale(identifier: ""))
+    XCTAssertNil(value.quantity)
+    XCTAssertEqual(value.originalText, "one cup flour")
+  }
+
 }

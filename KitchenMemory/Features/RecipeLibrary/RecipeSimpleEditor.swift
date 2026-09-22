@@ -35,9 +35,14 @@ struct RecipeSimpleEditor: View {
           }
         }
       }
-    } header: { Text(.recipeEditorIngredientsSection) } footer: {
-      Text(.recipeEditorSimpleHelp).fixedSize(horizontal: false, vertical: true)
-    }
+      VStack(alignment: .leading) {
+        Text(.recipeEditorSimpleHelp)
+          .font(.caption)
+          .lineLimit(nil)
+          .fixedSize(horizontal: false, vertical: true)
+      }
+      .frame(maxWidth: .infinity, alignment: .leading)
+    } header: { Text(.recipeEditorIngredientsSection) }
     Section(.recipeEditorInstructionsSection) {
       ForEach(editor.session.instructionSections.indices, id: \.self) { section in
         if let title = editor.session.instructionSections[section].title { Text(title).font(.headline) }

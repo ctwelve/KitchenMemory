@@ -57,6 +57,30 @@ final class KitchenMemoryUITests: XCTestCase {
   }
 
   @MainActor
+  func testRecipeEditorExposesNamedEntryAndModeControls() {
+    let app = launchApp()
+    let create = app.buttons["new-recipe"].firstMatch
+    revealSidebar(in: app, exposing: create)
+    XCTAssertTrue(create.waitForExistence(timeout: 5))
+    assertAccessibleLabel(create, description: "New Recipe")
+    activate(create)
+    let title = app.textFields["recipe-editor-title"]
+    XCTAssertTrue(title.waitForExistence(timeout: 5))
+    assertAccessibleLabel(title, description: "Recipe title")
+    let ingredients = app.textViews["simple-ingredient-text"]
+    XCTAssertTrue(ingredients.waitForExistence(timeout: 5))
+    assertAccessibleLabel(ingredients, description: "Ingredients")
+    let mode = app.buttons["recipe-editor-mode"]
+    XCTAssertTrue(mode.waitForExistence(timeout: 5))
+    assertAccessibleLabel(mode, description: "Editor mode")
+    activate(mode)
+    let summary = app.textFields["recipe-editor-summary"]
+    XCTAssertTrue(summary.waitForExistence(timeout: 5))
+    assertAccessibleLabel(summary, description: "Recipe summary")
+    app.terminate()
+  }
+
+  @MainActor
   func testOrganizationDestinationExposesAccessibleManagement() {
     let app = launchApp()
     let destination = app.buttons["organization-management"].firstMatch

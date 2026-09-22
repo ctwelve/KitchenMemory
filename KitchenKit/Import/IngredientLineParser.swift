@@ -46,11 +46,11 @@ public enum IngredientLineParser {
             remainder = clean(String(remainder.dropFirst(package.source.count)))
         }
         if remainder.isEmpty { return result }
-        let unit = remainder.split(whereSeparator: \Character.isWhitespace).first.map(String.init) ?? ""
+        let unit = String(remainder.prefix(while: { !$0.isWhitespace }))
         if units.contains(unit.lowercased().trimmingCharacters(in: .punctuationCharacters)) {
             result.ingredient.unitText = unit
             result.append(.unit, text: unit, in: source,
-                          afterUTF16: result.segments.last?.utf16Range.upperBound ?? 0)
+                          afterUTF16: result.segments[result.segments.count - 1].utf16Range.upperBound)
             remainder = clean(String(remainder.dropFirst(unit.count)))
         }
         if remainder.isEmpty, result.ingredient.package == nil {
@@ -63,11 +63,11 @@ public enum IngredientLineParser {
         result.ingredient.preparation = parts.count > 1 && !parts[1].isEmpty ? parts[1] : nil
         if let name = result.ingredient.ingredientText {
             result.append(.ingredient, text: name, in: source,
-                          afterUTF16: result.segments.last?.utf16Range.upperBound ?? 0)
+                          afterUTF16: result.segments[result.segments.count - 1].utf16Range.upperBound)
         }
         if let preparation = result.ingredient.preparation {
             result.append(.preparation, text: preparation, in: source,
-                          afterUTF16: result.segments.last?.utf16Range.upperBound ?? 0)
+                          afterUTF16: result.segments[result.segments.count - 1].utf16Range.upperBound)
         }
         return result
     }
@@ -104,7 +104,8 @@ public enum IngredientLineParser {
             return QuantityExpression(kind: .exact, lowerBound: word)
         }
         let normalized = token.replacingOccurrences(of: "-", with: "–")
-        let rangeParts = normalized.split(separator: "–", maxSplits: 1, omittingEmptySubsequences: false).map(String.init)
+        let rangeParts = normalized.split(separator: "–", maxSplits: 1, omittingEmptySubsequences: false)
+            .map(String.init)
         if rangeParts.count == 2,
            let lower = number(rangeParts[0]),
            let upper = number(rangeParts[1]),

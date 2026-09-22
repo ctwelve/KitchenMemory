@@ -37,3 +37,7 @@ Historical paths remain stable for links from issues and pull requests.
 - [Alpha Recipe Library accessibility evidence](accessibility-alpha-library-evidence.md)
 - [Alpha shell and Cooking Session accessibility evidence](accessibility-alpha-shell-evidence.md)
 - [Alpha translation validation](localization-alpha-validation.md)
+
+## Primary-screen integration
+
+- [Primary-screen slice validation](primary-screen-validation.md): 2026-09-22 development evidence and remaining native acceptance checks for #182/#189.

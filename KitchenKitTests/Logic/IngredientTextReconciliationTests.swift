@@ -19,7 +19,8 @@ final class IngredientTextReconciliationTests: XCTestCase {
         let inserted = IngredientTextReconciliation.reconcile(
             lines: [.init(source: "2 tbsp oil"),
                     .init(ingredientID: reviewed.id, source: reviewed.originalText),
-                    .init(ingredientID: salt.id, source: salt.originalText)],
+                    .init(ingredientID: salt.id, source: salt.originalText),
+            ],
             with: section, locale: .init(identifier: "en_US"))
         XCTAssertEqual(inserted.section.id, section.id)
         XCTAssertEqual(inserted.section.title, "Sauce")
@@ -28,7 +29,8 @@ final class IngredientTextReconciliationTests: XCTestCase {
         XCTAssertTrue(inserted.conflicts.isEmpty)
         let changed = IngredientTextReconciliation.reconcile(
             lines: [.init(source: "2 tbsp oil"), .init(ingredientID: reviewed.id, source: "2 cans tomatoes"),
-                    .init(ingredientID: salt.id, source: salt.originalText)],
+                    .init(ingredientID: salt.id, source: salt.originalText),
+            ],
             with: section, locale: .init(identifier: "en_US"))
         var retained = reviewed
         retained.originalText = "2 cans tomatoes"

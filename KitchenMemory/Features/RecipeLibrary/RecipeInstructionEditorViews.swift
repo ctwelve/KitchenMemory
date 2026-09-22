@@ -178,6 +178,7 @@ struct EditorTextField: View {
         TextField(label, text: $text, prompt: promptText)
           .textFieldStyle(.roundedBorder)
           .labelsHidden()
+          .accessibilityLabel(Text(label))
       }
     } label: {
       EditorFieldLabel(label)
@@ -188,6 +189,7 @@ struct EditorTextField: View {
     TextField(label, text: $text, prompt: promptText, axis: .vertical)
       .textFieldStyle(.roundedBorder)
       .labelsHidden()
+      .accessibilityLabel(Text(label))
       .lineLimit(2...8)
       .fixedSize(horizontal: false, vertical: true)
   }

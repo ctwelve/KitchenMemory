@@ -17,6 +17,7 @@ public struct RecipeIngredientTextDraft: Codable, Equatable, Sendable {
     public internal(set) var sectionID: IngredientSection.ID?
     public internal(set) var sectionTitle: String?
     public var isInterpreted: Bool { source == interpretedSource }
+    var retainsEmptyIngredient: Bool?
     var interpretedSource: String
     var conflict: IngredientTextReconciliation.Conflict?
 
@@ -25,6 +26,7 @@ public struct RecipeIngredientTextDraft: Codable, Equatable, Sendable {
       id = UUID()
       self.source = source
       self.ingredient = ingredient
+      retainsEmptyIngredient = ingredient != nil
       self.sectionID = sectionID
       self.sectionTitle = sectionTitle
       interpretedSource = source
@@ -66,11 +68,9 @@ public struct RecipeIngredientTextDraft: Codable, Equatable, Sendable {
         }
         current = IngredientSection(id: sectionID, title: line.sectionTitle, ingredients: [])
       } else if var ingredient = line.ingredient,
-                !line.source.isEmpty || ingredient.hasMeaningfulDisplayContent {
+                !line.source.isEmpty || line.retainsEmptyIngredient != false {
         if line.source != line.interpretedSource { ingredient.originalText = line.source }
         current.ingredients.append(ingredient)
-      } else if !line.source.trimmingCharacters(in: .whitespaces).isEmpty {
-        current.ingredients.append(RecipeIngredient(originalText: line.source, presentationMode: .original))
       }
     }
     if !current.ingredients.isEmpty || current.id != rootSectionID || retainsRootSection { result.append(current) }
@@ -81,12 +81,16 @@ public struct RecipeIngredientTextDraft: Codable, Equatable, Sendable {
   /// Inserting complete lines at a row's start keeps that row's identity with its suffix.
   public mutating func replaceCharacters(in range: NSRange, with replacement: String) {
     let source = text as NSString
-    guard range.location >= 0, range.length >= 0, NSMaxRange(range) <= source.length else { return }
+    guard !lines.isEmpty, range.location >= 0, range.length >= 0, NSMaxRange(range) <= source.length else { return }
     var starts: [Int] = []
     var offset = 0
     for line in lines { starts.append(offset); offset += (line.source as NSString).length + 1 }
-    let first = starts.lastIndex(where: { $0 <= range.location }) ?? 0
-    let last = starts.lastIndex(where: { $0 <= NSMaxRange(range) }) ?? first
+    var first = 0
+    var last = 0
+    for (index, start) in starts.enumerated() {
+      if start <= range.location { first = index }
+      if start <= NSMaxRange(range) { last = index }
+    }
     let prefix = (lines[first].source as NSString).substring(to: range.location - starts[first])
     let suffix = (lines[last].source as NSString).substring(from: NSMaxRange(range) - starts[last])
     let fragments = (prefix + replacement + suffix).components(separatedBy: "\n")
@@ -98,7 +102,7 @@ public struct RecipeIngredientTextDraft: Codable, Equatable, Sendable {
     }
     if fragments.count > 1 && !suffix.isEmpty && (last != first || prefix.isEmpty) {
       edited[edited.count - 1] = lines[last]
-      edited[edited.count - 1].source = fragments.last ?? ""
+      edited[edited.count - 1].source = fragments[fragments.count - 1]
     }
     for index in edited.indices where edited[index].ingredient == nil && edited[index].sectionID == nil {
       // Allocate once, so repeated persistence while typing never changes identity.
