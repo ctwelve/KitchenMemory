@@ -17,7 +17,7 @@ struct RecipeLibraryList: View {
     VStack(spacing: 0) {
       if let organization = model.organization {
         RecipeLibraryFilters(model: organization, locale: locale)
-        if model.editor != nil || model.selectedRecipeID.map({ id in !recipes.contains { $0.id == id } }) == true {
+        if showsReturnToRecipe(recipes) {
           Button(.libraryReturnToDetail, action: focusDetail)
             .padding(.bottom, 8)
             .accessibilityIdentifier("return-to-recipe-detail")
@@ -34,6 +34,7 @@ struct RecipeLibraryList: View {
       .scrollPosition(id: Binding(get: { model.navigation.recipeListAnchor },
                                   set: { model.navigation.recipeListAnchor = $0 }), anchor: .top)
     }
+    .accessibilityElement(children: .contain)
     .accessibilityIdentifier("recipe-list")
     .accessibilityLabel(Text(.libraryAccessibilityLabel))
     .navigationTitle(.libraryTitle)
@@ -46,6 +47,14 @@ struct RecipeLibraryList: View {
     }
     .onChange(of: sessionModel.sessions.map(\.id)) { _, _ in
       sessionModel.refreshSidebarAssociations(for: model.recipes.map(\.recipe.id))
+    }
+  }
+
+  private func showsReturnToRecipe(_ recipes: [StoredRecipe]) -> Bool {
+    switch model.navigation.destination {
+    case .editor: return true
+    case .recipe: return model.selectedRecipeID.map { id in !recipes.contains { $0.id == id } } ?? false
+    default: return false
     }
   }
 
@@ -103,7 +112,7 @@ struct RecipeLibraryList: View {
       RecipeRow(storedRecipe: storedRecipe)
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(6)
-        .background(model.selectedRecipeID == storedRecipe.id ? Color.accentColor.opacity(0.15) : .clear,
+        .background(model.selectedRecipeID == storedRecipe.id ? AnyShapeStyle(.selection) : AnyShapeStyle(.clear),
                     in: .rect(cornerRadius: 6))
     }
     .buttonStyle(.plain)

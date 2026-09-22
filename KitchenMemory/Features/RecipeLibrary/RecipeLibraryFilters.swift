@@ -17,9 +17,10 @@ struct RecipeLibraryFilters: View {
         .accessibilityAddTraits(.isHeader)
       TextField(.organizationSearch, text: $model.filter.search)
         .textFieldStyle(.roundedBorder)
+        .accessibilityLabel(Text(.organizationSearch))
         .accessibilityIdentifier("organization-search")
       if model.tagsEnabled, let snapshot = model.snapshot {
-        let tags = snapshot.tags.orderedTags().filter { model.filter.tagIDs.contains($0.id) }
+        let tags = snapshot.tags.orderedTags(locale: locale).filter { model.filter.tagIDs.contains($0.id) }
         if !tags.isEmpty {
           Label(tags.map(\.name).joined(separator: ", "), systemImage: "tag")
             .font(.caption)
