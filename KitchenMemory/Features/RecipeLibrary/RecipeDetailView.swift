@@ -10,9 +10,7 @@ struct RecipeDetailView: View {
 
   @State private var scalingSelection: RecipeScalingState
 
-  // The metadata grid collapses before large text makes its cards cramped.
-  // @ScaledMetric separately keeps the numbered instruction badge in step
-  // with the text size instead of clipping a larger numeral in a fixed circle.
+  // Scale the layout threshold and numbered badges with the reader’s text size.
   @Environment(\.dynamicTypeSize) private var dynamicTypeSize
   @Environment(\.locale) private var locale
   @ScaledMetric(relativeTo: .headline) private var stepNumberSize = 30
