@@ -22,7 +22,7 @@ struct OrganizationSidebar: View {
                 browse { model.filter.location = .unfiled }
               }
               .accessibilityAddTraits(model.filter.location == .unfiled ? .isSelected : [])
-              .dropDestination(for: String.self) { values, _ in
+              .dropDestination(for: String.self) { values, _ -> Bool in
                 model.dropRecipes(values, recipes: recipes, to: nil)
               }
             }
@@ -58,7 +58,7 @@ struct OrganizationSidebar: View {
                 .accessibilityIdentifier("tag-\(tag.id.rawValue.uuidString)")
                 .contextMenu { OrganizationTagActions(model: model, tag: tag, presentation: presentation) }
                 .draggable("km-tag:" + tag.id.rawValue.uuidString)
-                .dropDestination(for: String.self) { values, _ in
+                .dropDestination(for: String.self) { values, _ -> Bool in
                   model.dropTag(values, recipes: recipes, onto: tag.id)
                 }
               }
@@ -103,7 +103,7 @@ private struct OrganizationFolderBranch: View {
     }
     .contextMenu { OrganizationFolderActions(model: model, folder: folder, presentation: presentation) }
     .draggable("km-folder:" + folder.id.rawValue.uuidString)
-    .dropDestination(for: String.self) { values, _ in
+    .dropDestination(for: String.self) { values, _ -> Bool in
       model.dropFolder(values, recipes: recipes, onto: folder.id)
     }
   }
