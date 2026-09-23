@@ -49,7 +49,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		A11F7D3A306328BF00FA5B46 /* PrimaryScreenPrototype.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = PrimaryScreenPrototype.xcodeproj; sourceTree = "<group>"; };
 		A15E8F41303912A6009B0A22 /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 		A1BC7A50303F76CE0082EE96 /* AGENTS.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = AGENTS.md; sourceTree = "<group>"; };
 		A1BC7A51303F76CE0082EE96 /* AI.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = AI.md; sourceTree = "<group>"; };
@@ -168,11 +167,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		A11F7D63306328BF00FA5B46 /* Products */ = {
-			isa = PBXGroup;
-			name = Products;
-			sourceTree = "<group>";
-		};
 		A1C4E795302A63B800E2C0DB = {
 			isa = PBXGroup;
 			children = (
@@ -405,12 +399,6 @@
 			preferredProjectObjectVersion = 100;
 			productRefGroup = A1C4E79F302A63B800E2C0DB /* Products */;
 			projectDirPath = "";
-			projectReferences = (
-				{
-					ProductGroup = A11F7D63306328BF00FA5B46 /* Products */;
-					ProjectRef = A11F7D3A306328BF00FA5B46 /* PrimaryScreenPrototype.xcodeproj */;
-				},
-			);
 			projectRoot = "";
 			targets = (
 				A1C4E79D302A63B800E2C0DB /* KitchenMemory */,

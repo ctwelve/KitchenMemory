@@ -10,7 +10,7 @@ Use this guide for an intentional candidate or publication. Working versions,
 submitted releases, and published artifacts are separate states. The current
 public artifact is recorded in the root [README](../README.md); source versions
 come from the Xcode project and the [software inventory](../DEPENDENCIES.md).
-The [0.1 runbook and outcome](release-engineering-0.1.md) are historical evidence.
+The [0.1 runbook and outcome](https://github.com/ctwelve/KitchenMemory/blob/4a930de84c1180ad2736598c89dec38f200af2c7/docs/release-engineering-0.1.md) are historical evidence.
 
 ## Release tiers and versions
 
@@ -120,7 +120,7 @@ operations. Neither a working-version change nor this guide initiates them.
 - Before beta, establish tester distribution, clean-install and update checks,
   stabilized data and interface contracts, and the deferred acceptance matrix.
 
-The [0.1 tag-import failure](release-engineering-0.1.md#01-outcome) and explicitly
+The [0.1 tag-import failure](https://github.com/ctwelve/KitchenMemory/blob/4a930de84c1180ad2736598c89dec38f200af2c7/docs/release-engineering-0.1.md#01-outcome) and explicitly
 accepted local Mac archive are an exception for that candidate. If a service
 fails again, retain its evidence and establish a candidate-specific recovery
 path without weakening tag protection or claiming absent actions passed.

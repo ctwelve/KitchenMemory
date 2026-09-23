@@ -221,7 +221,7 @@ The constrained automation boundary from
 localization is not a reason to restore interaction-heavy scripts or encode a
 provisional visual hierarchy in UI tests.
 
-See [alpha translation validation](localization-alpha-validation.md) for the
+See [alpha translation validation](https://github.com/ctwelve/KitchenMemory/blob/4a930de84c1180ad2736598c89dec38f200af2c7/docs/localization-alpha-validation.md) for the
 regional content choices and the maintainer's device/layout-check waiver for
 #118–#120. It is retained evidence, not a waiver for later candidates.
 

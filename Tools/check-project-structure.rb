@@ -475,9 +475,18 @@ module KitchenMemory
       assert_exact_names("project configurations", records.map { |record| record[:name] }, APP_CONFIGURATIONS)
 
       records.each do |record|
-        reference = property(objects.fetch(record[:id])[:body], "baseConfigurationReference")
+        body = objects.fetch(record[:id])[:body]
+        reference = property(body, "baseConfigurationReference")
         reference_identifier = reference_id(reference)
         actual_path = file_references[reference_identifier]
+        if reference.nil?
+          anchor = objects[reference_id(property(body, "baseConfigurationReferenceAnchor"))]
+          if anchor && anchor[:isa] == "PBXFileSystemSynchronizedRootGroup" &&
+              property(anchor[:body], "path") == "Configurations" &&
+              property(anchor[:body], "sourceTree") == "<group>"
+            actual_path = property(body, "baseConfigurationReferenceRelativePath")
+          end
+        end
         expected_path = PROJECT_CONFIGURATION_FILES.fetch(record[:name])
         next if actual_path == expected_path
 

@@ -74,7 +74,7 @@ distributed. Cover startup/recovery, finding and reading Recipes, creating or
 importing and saving one, starting/resuming a Cooking Session, and reaching
 Settings. Focus additional checks on changed interactions. Ordinary development
 slices use checks appropriate to their changes; the
-[alpha translation device-check waiver](localization-alpha-validation.md) remains
+[alpha translation device-check waiver](https://github.com/ctwelve/KitchenMemory/blob/4a930de84c1180ad2736598c89dec38f200af2c7/docs/localization-alpha-validation.md) remains
 in force.
 
 The device-class, VoiceOver, and extensive accessibility/layout matrix below is

@@ -84,7 +84,7 @@ The application now bundles `Resources/ThirdPartyNotices.txt`, containing the
 complete MIT texts for Kitchen Memory and Defaults and the upstream license,
 copyright, and Swift Runtime Library Exception texts for Collections,
 Algorithms, and Numerics. A hosted test checks the compiled resource against the
-reviewed digest. The [0.3 signed-product inspection](docs/release-dependencies-0.3.md)
+reviewed digest. The [0.3 signed-product inspection](https://github.com/ctwelve/KitchenMemory/blob/4a930de84c1180ad2736598c89dec38f200af2c7/docs/release-dependencies-0.3.md)
 records actual linkage, privacy manifests, and packaged notices; passing source
 checks alone does not prove those files were packaged.
 
