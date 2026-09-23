@@ -4,8 +4,7 @@
 
 import SwiftUI
 
-/// A temporary reveal never writes persistent column visibility or replaces the
-/// detail subtree. Selection and drafts remain owned by the prepared app graph.
+/// Native controls own persistent visibility; pointer reveal leaves the split and its drafts in place.
 struct AdaptiveLibraryShell<Sidebar: View, Content: View, Detail: View>: View {
   @Binding var visibility: NavigationSplitViewVisibility
   @Binding var preferredColumn: NavigationSplitViewColumn
@@ -13,102 +12,47 @@ struct AdaptiveLibraryShell<Sidebar: View, Content: View, Detail: View>: View {
   @ViewBuilder let sidebar: () -> Sidebar
   @ViewBuilder let content: () -> Content
   @ViewBuilder let detail: () -> Detail
-  @State private var hoverTask: Task<Void, Never>?
-  @AccessibilityFocusState private var revealFocused: Bool
-  @AccessibilityFocusState private var dismissFocused: Bool
+  @Environment(\.accessibilityReduceMotion) private var reduceMotion
+  @Environment(\.layoutDirection) private var layoutDirection
 
   var body: some View {
     GeometryReader { geometry in
-      NavigationSplitView(columnVisibility: $visibility, preferredCompactColumn: $preferredColumn) {
-        sidebar()
-      } content: {
-        content()
-#if os(iOS)
-          .toolbar { revealToolbar }
-#endif
-      } detail: {
-        detail()
-#if os(iOS)
-          .toolbar { revealToolbar }
-#endif
-      }
-      .navigationSplitViewStyle(.balanced)
+      ZStack(alignment: .leading) {
+        NavigationSplitView(columnVisibility: $visibility, preferredCompactColumn: $preferredColumn) {
+          sidebar()
+        } content: {
+          content()
+        } detail: {
+          detail()
+        }
+        .navigationSplitViewStyle(.balanced)
+        // Otherwise the underlying native split intercepts accessibility hit tests for the overlay.
+        .accessibilityHidden(temporarySidebar)
 #if os(macOS)
-      .toolbar { revealToolbar }
-#endif
-      .accessibilityHidden(temporarySidebar)
-      .overlay(alignment: .leading) {
+        let sidebarWidth = min(280, geometry.size.width - 32)
         if temporarySidebar {
-          temporaryOrganization(width: min(280, geometry.size.width - 32))
-        } else if visibility != .all {
-#if os(macOS)
-          LibraryEdgeHoverRegion(changed: hoverChanged)
-            .frame(width: 12)
-            .accessibilityHidden(true)
+          sidebar()
+            .frame(width: sidebarWidth)
+            .background(.regularMaterial, ignoresSafeAreaEdges: .top)
+            .shadow(radius: 8)
+            .transition(.move(edge: .leading))
+            .onExitCommand { setReveal(false) }
+        }
 #endif
-        }
       }
-      .onChange(of: geometry.size) { _, _ in dismissReveal() }
-    }
-    .onChange(of: visibility) { _, _ in dismissReveal() }
-    .onChange(of: preferredColumn) { _, _ in dismissReveal() }
-    .onDisappear { hoverTask?.cancel() }
-  }
-
-  @ToolbarContentBuilder private var revealToolbar: some ToolbarContent {
-    ToolbarItem(placement: .navigation) {
-      Menu {
-        Button(.libraryOrganizationReveal) { temporarySidebar = true }
-          .accessibilityIdentifier("reveal-organization")
-        Button(visibility == .all ? .librarySidebarActionHide : .librarySidebarActionShow) {
-          visibility = visibility == .all ? .doubleColumn : .all
-          preferredColumn = visibility == .all ? .sidebar : .content
-        }
-      } label: {
-        Label(.organizationTitle, systemImage: "sidebar.left")
+#if os(macOS)
+      .background {
+        NativeSidebarHover(isHidden: visibility != .all, isRevealed: temporarySidebar,
+                           sidebarWidth: min(280, geometry.size.width - 32), layoutDirection: layoutDirection,
+                           reveal: { setReveal(true) }, dismiss: { setReveal(false) })
       }
-      .accessibilityIdentifier("organization-navigation")
-      .accessibilityFocused($revealFocused)
-      .help(Text(.organizationTitle))
+#endif
     }
+    .onChange(of: visibility) { _, _ in setReveal(false) }
   }
 
-  private func temporaryOrganization(width: CGFloat) -> some View {
-    VStack(spacing: 0) {
-      HStack {
-        Text(.organizationTitle).font(.headline).accessibilityAddTraits(.isHeader)
-        Spacer()
-        Button(.librarySidebarActionHide, systemImage: "xmark") { dismissReveal() }
-          .labelStyle(.iconOnly)
-          .keyboardShortcut(.escape, modifiers: [])
-          .accessibilityFocused($dismissFocused)
-      }.padding()
-      sidebar()
-    }
-    .frame(width: width)
-    .background(.regularMaterial)
-    .clipShape(.rect(cornerRadius: 12))
-    .shadow(radius: 8)
-    .padding(.vertical, 8)
-    .accessibilityElement(children: .contain)
-    .accessibilityLabel(Text(.organizationTitle))
-    .accessibilityIdentifier("temporary-organization")
-    .accessibilityAction(.escape) { dismissReveal() }
-    .onAppear { dismissFocused = true }
-  }
-
-  private func hoverChanged(_ inside: Bool) {
-    hoverTask?.cancel()
-    guard inside else { return }
-    hoverTask = Task { @MainActor in
-      try? await Task.sleep(for: .milliseconds(450))
-      guard !Task.isCancelled else { return }
-      temporarySidebar = true
-    }
-  }
-
-  private func dismissReveal() {
-    hoverTask?.cancel()
-    if temporarySidebar { temporarySidebar = false; revealFocused = true }
+  private func setReveal(_ shown: Bool) {
+    guard temporarySidebar != shown else { return }
+    withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.18)) { temporarySidebar = shown }
   }
 }

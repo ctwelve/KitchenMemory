@@ -112,10 +112,11 @@ struct RecipeEditorView: View {
 private extension RecipeEditorView {
   @ViewBuilder
   private var editorSections: some View {
-    IngredientInterpretationReview(editor: editor)
     if !editor.usesAdvancedEditor && mode != .importReview
       && (editor.draft.reconciliation == nil || editor.draft.reconciliation?.draft != nil) {
       RecipeSimpleEditor(editor: editor)
+    } else if editor.session.ingredientText?.conflicts.isEmpty == false {
+      IngredientInterpretationReview(editor: editor)
     }
     if let organization {
       RecipeOrganizationEditor(model: organization, draft: editor.draft)

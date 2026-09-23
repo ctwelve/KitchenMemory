@@ -547,48 +547,6 @@
       }
     }
   },
-    "library.organization.reveal": {
-      "extractionState": "manual",
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Temporarily Reveal Organization"
-          }
-        },
-        "en-GB": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Temporarily Reveal Organisation"
-          }
-        },
-        "es-MX": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mostrar organización temporalmente"
-          }
-        },
-        "fr-CA": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Afficher temporairement l’organisation"
-          }
-        },
-        "de-DE": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Organisation vorübergehend einblenden"
-          }
-        },
-        "it-IT": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mostra temporaneamente l’organizzazione"
-          }
-        }
-      },
-      "comment": "Menu action for a temporary organization overlay that does not resize the recipe detail."
-    },
     "settings.samples.folder-name": {
       "extractionState": "manual",
       "comment": "Sample pack setting. Organization names are ordinary user-editable names; the Tag name excludes the display hash.",
@@ -9313,90 +9271,6 @@
         }
       },
       "comment" : "Navigation title and toolbar label for app settings.",
-      "extractionState" : "manual"
-    },
-    "library.sidebar.action.show" : {
-      "localizations" : {
-        "it-IT": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mostra barra laterale"
-          }
-        },
-        "de-DE": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Seitenleiste einblenden"
-          }
-        },
-        "en-GB": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Show Sidebar"
-          }
-        },
-        "es-MX" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mostrar barra lateral"
-          }
-        },
-        "fr-CA" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Afficher la barre latérale"
-          }
-        },
-        "en-US" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Show Sidebar"
-          }
-        }
-      },
-      "comment" : "Accessibility label and help text for showing the recipe sidebar.",
-      "extractionState" : "manual"
-    },
-    "library.sidebar.action.hide" : {
-      "localizations" : {
-        "it-IT": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nascondi barra laterale"
-          }
-        },
-        "de-DE": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Seitenleiste ausblenden"
-          }
-        },
-        "en-GB": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hide Sidebar"
-          }
-        },
-        "es-MX" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ocultar barra lateral"
-          }
-        },
-        "fr-CA" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Masquer la barre latérale"
-          }
-        },
-        "en-US" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hide Sidebar"
-          }
-        }
-      },
-      "comment" : "Accessibility label and help text for hiding the recipe sidebar.",
       "extractionState" : "manual"
     },
     "library.unavailable.title" : {

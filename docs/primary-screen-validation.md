@@ -20,8 +20,8 @@ is `slice/182-primary-screen`; the review baseline is `26a1eb7`.
 | #185 | Pinned contextual search, full folder paths, visible tag constraints, reset semantics and recipe rows. Model filtering/selection tests and Mac search/reset walkthrough. |
 | #186 | Conservative locale-aware ingredient interpretation, exact quantities and package amounts, source annotations and identity-based precision reconciliation. Framework parser/import/reconciliation tests. |
 | #187 | Recipe-pane width and scaled text choose stacked or side-by-side Ingredients and Instructions, in the same reading order. Model composition checks and native Mac reading at wide and constrained widths. |
-| #188 | In-place simple/advanced editing, per-ingredient precision, native multiline text and undo, real section headings, recoverable proposals, explicit publication. Framework and hosted model tests; native Mac editing walkthrough. Mobile interaction remains pending. |
-| #189 | Integration checks and documentation below. Acceptance remains open until the pending native checks are completed. |
+| #188 | In-place simple/advanced editing, per-ingredient precision, native multiline text and undo, real section headings, recoverable proposals, explicit publication. Framework and hosted model tests; native Mac editing walkthrough and maintainer acceptance below. |
+| #189 | Integration checks and documentation below. The maintainer completed the remaining checks and accepted this phase on 2026-09-22. |
 
 Current behavior is documented in [native organization](recipe-library-organization.md)
 and the [Recipe domain model](recipe-domain-model.md). KitchenKit still owns
@@ -100,10 +100,30 @@ and changed Swift-source lint passed independently. Parallel Standards and Spec
 reviews against `26a1eb7` have no remaining code findings after correcting Save
 to retain precise values without requiring proposal acceptance.
 
-## Acceptance boundary
+## UI correction and maintainer acceptance
 
-Keep #189 and the parent slice open until the remaining native exercises above
-are accepted. Any discovered input or accessibility barrier is a product issue,
+The final UI batch keeps one native sidebar button, adds Mac pointer reveal to
+that control, and retains native leading-edge navigation on iOS, including the
+right edge in RTL layouts. Interpretation choices now appear below the ingredient
+field in a highlighted, animated card with Reduce Motion support and a native
+accessibility announcement. Simple-editor instruction sections and steps have
+distinct surfaces and heading levels. Ingredient rows retain their full wrapped
+height in the two-column reader.
+
+Focused Xcode-managed checks passed: Mac sidebar hover and named navigation
+(2/2), iPhone leading-edge navigation (1/1), forced-RTL right-edge navigation
+(1/1), and iPhone editor control semantics (1/1). Native Mac previews verified
+the editor in dark and increased-contrast light appearance, and reproduced then
+resolved ingredient truncation. Mac and iOS builds passed; final ingredient-row
+validation used the Mac build and preview. These bounded checks do not establish
+comprehensive assistive-technology acceptance.
+
+On 2026-09-22, the maintainer reported completing all #189 checks and accepted
+the feature as sufficiently developed for this phase. The earlier pending items
+above describe the agent's own evidence boundary, not outstanding phase-acceptance
+requirements. This acceptance does not claim a release or beta readiness.
+
+Any subsequently discovered input or accessibility barrier is a product issue,
 not an exemption under parked #155. [#168](https://github.com/ctwelve/KitchenMemory/issues/168)
 continues to own beta-wide acceptance, including later Cooking Session and
 other supported-workflow stabilization.

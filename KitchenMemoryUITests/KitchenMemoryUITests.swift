@@ -18,6 +18,15 @@ final class KitchenMemoryUITests: XCTestCase {
   func testTopLevelDestinationsExposeAccessibleNavigation() {
     let app = launchApp()
     let shell = app.descendants(matching: .any)["recipe-library-shell"]
+#if os(iOS)
+    if !shell.exists {
+      let window = app.windows.firstMatch
+      let edge = window.coordinate(withNormalizedOffset: CGVector(dx: 0.005, dy: 0.5))
+      let interior = window.coordinate(withNormalizedOffset: CGVector(dx: 0.8, dy: 0.5))
+      edge.press(forDuration: 0.05, thenDragTo: interior)
+      XCTAssertTrue(shell.waitForExistence(timeout: 5), "The native leading-edge swipe must reveal Organization")
+    }
+#endif
     revealSidebar(in: app, exposing: shell)
     assertAccessibleLabel(shell, description: "recipe library")
 
@@ -212,24 +221,12 @@ final class KitchenMemoryUITests: XCTestCase {
   private func revealSidebar(in app: XCUIApplication, exposing element: XCUIElement) {
     guard !element.waitForExistence(timeout: 2) else { return }
 #if os(macOS)
-    let organization = app.menuButtons["organization-navigation"].firstMatch
+    let show = app.buttons["Show Sidebar"].firstMatch
+    if show.exists { activate(show) }
 #else
-    let organization = app.buttons["organization-navigation"].firstMatch
+    let back = app.buttons["BackButton"].firstMatch
+    if back.exists { activate(back) }
 #endif
-    if organization.exists {
-      assertAccessibleLabel(organization, description: "organization navigation")
-      activate(organization)
-#if os(macOS)
-      let reveal = app.menuItems["reveal-organization"]
-#else
-      let reveal = app.buttons["reveal-organization"]
-#endif
-      XCTAssertTrue(reveal.waitForExistence(timeout: 3))
-      activate(reveal)
-    } else {
-      let back = app.buttons["BackButton"].firstMatch
-      if back.exists { activate(back) }
-    }
   }
 
   @MainActor
@@ -292,3 +289,62 @@ extension KitchenMemoryUITests {
 #endif
   }
 }
+
+#if os(iOS)
+extension KitchenMemoryUITests {
+  @MainActor
+  func testRightToLeftEdgeSwipeRevealsNamedDestinations() throws {
+    let app = launchApp(additionalArguments: [
+      "-AppleLanguages", "(en-US)", "-AppleLocale", "en_US",
+      "-AppleTextDirection", "YES", "-NSForceRightToLeftWritingDirection", "YES",
+    ])
+    defer { app.terminate() }
+    let allRecipes = app.buttons["all-recipes-destination"]
+    try XCTSkipIf(allRecipes.exists, "Regular layouts already expose the sidebar")
+    let window = app.windows.firstMatch
+    let edge = window.coordinate(withNormalizedOffset: CGVector(dx: 0.995, dy: 0.5))
+    let interior = window.coordinate(withNormalizedOffset: CGVector(dx: 0.2, dy: 0.5))
+    edge.press(forDuration: 0.05, thenDragTo: interior)
+    XCTAssertTrue(
+      allRecipes.waitForExistence(timeout: 5), "RTL navigation must reveal Organization from the right edge"
+    )
+    assertAccessibleLabel(allRecipes, description: "All Recipes in right-to-left navigation")
+  }
+}
+#endif
+
+#if os(macOS)
+extension KitchenMemoryUITests {
+  @MainActor
+  func testSidebarHoverRevealsNamedDestinations() {
+    let app = launchApp(additionalArguments: ["-AppleLanguages", "(en-US)", "-AppleLocale", "en_US"])
+    defer { app.terminate() }
+    XCTAssertFalse(app.menuButtons["organization-navigation"].exists)
+    let hide = app.buttons["Hide Sidebar"]
+    XCTAssertTrue(hide.waitForExistence(timeout: 5))
+    hide.click()
+    let show = app.buttons["Show Sidebar"]
+    XCTAssertTrue(show.waitForExistence(timeout: 5))
+    show.hover()
+    let allRecipes = app.buttons["all-recipes-destination"]
+    XCTAssertTrue(allRecipes.waitForExistence(timeout: 3))
+    XCTAssertTrue(show.exists, "Temporary reveal must leave the native pin action available")
+    let overlay = XCTAttachment(screenshot: app.screenshot())
+    overlay.name = "Native sidebar button with temporary Organization overlay"
+    overlay.lifetime = .keepAlways
+    add(overlay)
+    allRecipes.hover()
+    allRecipes.click()
+    XCTAssertTrue(allRecipes.exists)
+    app.buttons["new-recipe"].hover()
+    let dismissed = XCTNSPredicateExpectation(predicate: NSPredicate(format: "exists == false"), object: allRecipes)
+    XCTAssertEqual(XCTWaiter.wait(for: [dismissed], timeout: 3), .completed)
+    show.hover()
+    XCTAssertTrue(allRecipes.waitForExistence(timeout: 3))
+    show.click()
+    XCTAssertTrue(hide.waitForExistence(timeout: 5))
+    app.buttons["new-recipe"].hover()
+    XCTAssertTrue(allRecipes.exists, "A pinned sidebar remains available after the pointer leaves")
+  }
+}
+#endif

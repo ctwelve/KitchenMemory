@@ -207,7 +207,6 @@ private extension ContentView {
       },
       browse: { change in
         if dependencies.libraryModel.navigation.browseRecipes(changingFilter: change) {
-          temporaryOrganization = false
           preferredCompactColumn = .content
         }
       }
@@ -215,7 +214,6 @@ private extension ContentView {
   }
 
   func focusChangedDestination(_ destination: RecipeLibraryNavigation.Destination) {
-    temporaryOrganization = false
     switch destination {
     case .history, .drafts, .deletedItems, .recovery: preferredCompactColumn = .content
     case .recipe: break // The caller chooses list browsing versus opening a Recipe.

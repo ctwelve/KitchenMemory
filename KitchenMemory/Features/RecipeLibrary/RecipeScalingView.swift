@@ -219,6 +219,8 @@ struct ScaledIngredientRow: View {
             .foregroundStyle(.secondary)
         }
       }
+      // Narrow reading columns must grow vertically instead of truncating wording.
+      .fixedSize(horizontal: false, vertical: true)
     }
     .accessibilityElement(children: .combine)
     .accessibilityIdentifier("scaled-ingredient-\(ingredient.id.rawValue.uuidString)")

@@ -76,10 +76,15 @@ conditional Recovery are named sidebar destinations. Selecting a draft or a
 Session retains its middle-column context. Recipe detail retains its associated
 Sessions action. Session lifecycle and internal cooking interactions are unchanged.
 
-The system controls adaptive collapse. The Organization menu offers persistent
-show/hide and a separate temporary reveal; Mac also offers a delayed edge reveal.
-The temporary surface overlays rather than resizes detail, with a named dismiss
-action and Escape support. Essential actions never depend on pointer hover.
+The system controls adaptive collapse and supplies the single sidebar button,
+including its localized Show/Hide accessibility action. Pressing it changes
+persistent visibility and reflows the neighboring columns. On Mac, pointer
+tracking extends that native button: hovering reveals Organization over the
+content until the pointer leaves the sidebar area. The same native button stays
+inside that area and can pin the sidebar; Escape also dismisses a temporary reveal.
+iOS retains native split-view leading-edge navigation: left in left-to-right
+layouts and right in right-to-left layouts. Essential actions never depend
+on pointer hover.
 Selection, list anchors and recoverable editing documents belong to the prepared
 app graph rather than a particular column presentation. A folder/tag change uses
 the same draft-save veto as every other destination change.
@@ -162,6 +167,12 @@ while that text control remains open; application-wide undo remains deferred.
 Changed precise ingredients retain their existing adjustments and an explicit
 parser proposal. Save can publish the authored text and retained details without
 accepting the proposal; replacing those details requires explicit acceptance.
+In simple editing, interpretation choices appear in a highlighted card below the
+ingredient text field. Its downward reveal respects Reduce Motion and leaves the
+field ahead of the changing content. A native accessibility announcement signals
+new choices without moving focus. Instruction sections
+and their steps use nested editor surfaces, spacing, borders, semantic headings
+and accessibility groups; color is not the sole grouping cue.
 Those unresolved choices and active text survive local draft
 recovery. Merely opening simple editing does not reinterpret maintained content.
 Close retains the draft, Save publishes a Revision, and Discard still uses the
