@@ -22,6 +22,8 @@ final class IngredientTextCoordinator: NSObject {
   var locale: Locale
   private var snapshots: [RecipeIngredientTextDraft]
   private var snapshotIndex = 0
+  private weak var nativeUndoManager: UndoManager?
+  private var nativeText: (() -> String?)?
   var applyingAttributes = false
 
   init(document: Binding<RecipeIngredientTextDraft>, locale: Locale) {
@@ -66,6 +68,29 @@ final class IngredientTextCoordinator: NSObject {
       snapshots = snapshots.map { $0.preservingAdjustments(from: previous, to: current) }
       snapshots[snapshotIndex] = current
     }
+  }
+
+  /// AppKit can undo text storage without calling either text-change delegate method.
+  func observeNativeUndo(_ undoManager: UndoManager?, text: @escaping () -> String?) {
+    nativeText = text
+    guard nativeUndoManager !== undoManager else { return }
+    NotificationCenter.default.removeObserver(self, name: Notification.Name.NSUndoManagerDidUndoChange,
+                                              object: nativeUndoManager)
+    NotificationCenter.default.removeObserver(self, name: Notification.Name.NSUndoManagerDidRedoChange,
+                                              object: nativeUndoManager)
+    nativeUndoManager = undoManager
+    guard let undoManager else { return }
+    for name in [Notification.Name.NSUndoManagerDidUndoChange, Notification.Name.NSUndoManagerDidRedoChange] {
+      NotificationCenter.default.addObserver(self, selector: #selector(nativeUndoCompleted(_:)),
+                                            name: name, object: undoManager)
+    }
+  }
+
+  @objc private func nativeUndoCompleted(_ notification: Notification) {
+    guard let text = nativeText?(), text != document.wrappedValue.text else { return }
+    replace(NSRange(location: 0, length: (document.wrappedValue.text as NSString).length),
+            with: text, undoing: notification.name == Notification.Name.NSUndoManagerDidUndoChange,
+            redoing: notification.name == Notification.Name.NSUndoManagerDidRedoChange)
   }
 
   func finish(excluding offset: Int? = nil) {

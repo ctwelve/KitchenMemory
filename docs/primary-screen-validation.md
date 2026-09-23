@@ -64,8 +64,11 @@ Framework and hosted tests cover retained reviewed fields, locale parsing,
 section/ingredient identities, active-text recovery, saving retained precision
 without resolving proposals, explicit acceptance of replacement details,
 mode switching, and interleaving native text undo with later precision changes.
-The UI suite checks only named top-level destinations and editor controls;
-business workflows are not duplicated in UI automation.
+The UI suite checks named top-level destinations and editor controls, including
+destination availability across hidden, temporarily revealed, and pinned sidebar
+modes. The maintainer confirmed these primary-navigation accessibility checks as
+core UI on 2026-09-22; [ADR 0007](adr/0007-business-logic-coverage-and-ui-smoke-tests.md)
+records the bounded scope. Business workflows are not duplicated in UI automation.
 
 The standalone KitchenKit runner passed **584/584 tests** and the exact coverage
 gate: **14,208/14,208 business-logic executable lines**, with the existing 130
@@ -127,3 +130,43 @@ Any subsequently discovered input or accessibility barrier is a product issue,
 not an exemption under parked #155. [#168](https://github.com/ctwelve/KitchenMemory/issues/168)
 continues to own beta-wide acceptance, including later Cooking Session and
 other supported-workflow stabilization.
+
+## Closure-review corrections
+
+The final review found that single-line paste without a trailing newline could
+remain uninterpreted while the native Ingredients field retained focus. A hosted
+native-adapter regression reproduced the missing quantity and ingredient on Mac
+before the correction. These checks host the real text adapter with disposable
+text, rather than adding an editor workflow to UI automation. Native heading
+undo also exposed an AppKit path that changes text storage without invoking the
+text-change delegates; undo completion now reconciles the retained draft snapshot.
+The focused-field paste regression also failed on iPhone before its correction.
+UIKit's programmatic insertion does not deliver the keyboard replacement delegate,
+so paste and Add Section explicitly synchronize the same draft after native insertion.
+
+Focused Xcode-managed checks passed on Mac (5/5) and iPhone 17 / iOS 27 (5/5):
+single-line ingredient paste, single-line heading paste with native undo/redo and
+section-identity retention, deferred interpretation while typing, and the two
+existing precision/undo checks. A separate Add Section adapter regression passed
+on iPhone (1/1). Results in Xcode `RunSomeTests` action artifacts:
+`Test-KitchenMemory-2026.09.22_22-09-25--0500.xcresult` (Mac),
+`Test-KitchenMemory-2026.09.22_22-17-15--0500.xcresult` (iPhone), and
+`Test-KitchenMemory-2026.09.22_22-19-29--0500.xcresult` (iPhone Add Section).
+
+The final full Xcode-managed Mac application plan passed **203/203 tests**, including
+the sidebar UI checks and all four native ingredient-adapter regressions:
+`Test-KitchenMemory-2026.09.22_22-20-11--0500.xcresult`
+(Xcode `RunAllTests` action artifacts). The final Mac and iPhone builds emitted
+no warnings. Changed-source lint, documentation, localization and project-structure
+checks passed. Follow-up Standards and Spec reviews found no remaining actionable
+findings in the corrections; the keyboard test exercises the native delegate
+sequence, not a hardware/software keyboard interaction walkthrough.
+
+During this review, Xcode 27's Mac test host failed before XCTest connected:
+its generated runpath searched `Contents/MacOS/ReexportedBinaries`, while Xcode
+embedded the signed KitchenKit copy in `Contents/ReexportedBinaries`. A clean
+rebuild reproduced the failure. The shared macOS linker setting now includes
+`@loader_path/../ReexportedBinaries`, allowing both application and test bundles
+to find their signed copy without disabling library validation or signing the
+standalone development framework by hand. Xcode-managed hosted tests launched
+successfully after this correction.
