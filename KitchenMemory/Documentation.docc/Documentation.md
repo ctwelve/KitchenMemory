@@ -49,3 +49,4 @@ Cooking Session lifecycle from process state.
 - ``BundledSampleRecipeProvider``
 - ``KitchenPreferencesStoring``
 - ``DefaultsKitchenPreferencesStore``
+- ``OrganizationPreferencesStoring``

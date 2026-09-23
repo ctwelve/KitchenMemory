@@ -12,7 +12,7 @@ struct RecipeOrganizationMenus: View {
 
   var body: some View {
     if let snapshot = model.snapshot {
-      if model.foldersEnabled {
+      if model.preferences.foldersEnabled {
         Menu(.organizationMove) {
           Button(.organizationUnfiled) { model.move(recipeIDs, to: nil) }
           ForEach(snapshot.folders.destinations(locale: locale)) { destination in
@@ -20,7 +20,7 @@ struct RecipeOrganizationMenus: View {
           }
         }
       }
-      if model.tagsEnabled {
+      if model.preferences.tagsEnabled {
         Menu(.organizationAddTag) {
           ForEach(snapshot.tags.orderedTags(locale: locale)) { tag in
             Button(tag.displayName) { model.classify(recipeIDs, tagID: tag.id, adding: true) }
@@ -48,7 +48,7 @@ struct RecipeOrganizationEditor: View {
         RecipeOrganizationMenus(model: model, recipeIDs: [original.id])
         Text(.organizationImmediate).font(.caption).foregroundStyle(.secondary)
       } else if let snapshot = model.snapshot {
-        if model.foldersEnabled {
+        if model.preferences.foldersEnabled {
           Picker(.organizationFolders, selection: $draft.organization.folderID) {
             Text(.organizationUnfiled).tag(Folder.ID?.none)
             ForEach(snapshot.folders.destinations(locale: locale)) { destination in
@@ -56,7 +56,7 @@ struct RecipeOrganizationEditor: View {
             }
           }
         }
-        if model.tagsEnabled {
+        if model.preferences.tagsEnabled {
           ForEach(snapshot.tags.orderedTags(locale: locale)) { tag in
             Toggle(
               tag.displayName,
@@ -80,13 +80,13 @@ struct RecipeOrganizationSummary: View {
   var body: some View {
     if let snapshot = model.snapshot {
       VStack(alignment: .leading, spacing: 4) {
-        if model.foldersEnabled {
+        if model.preferences.foldersEnabled {
           if let folderID = snapshot.folders.primaryFolder(for: recipeID),
              let destination = snapshot.folders.destinations(locale: locale).first(where: { $0.id == folderID }) {
             Label(destination.path, systemImage: "folder")
           } else { Label(.organizationUnfiled, systemImage: "folder") }
         }
-        if model.tagsEnabled {
+        if model.preferences.tagsEnabled {
           let ids = snapshot.tags.tagIDs(for: recipeID)
           ForEach(snapshot.tags.orderedTags(locale: locale).filter { ids.contains($0.id) }) { tag in
             Label(tag.displayName, systemImage: "tag")

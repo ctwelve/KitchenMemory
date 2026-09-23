@@ -21,20 +21,28 @@ package inventory.
 
 | Component | Version | License | Purpose |
 | --- | --- | --- | --- |
-| [Defaults](https://github.com/sindresorhus/Defaults) | 9.0.9 | MIT | Typed local storage, observation, and iCloud key-value synchronization for the sample-onboarding preference |
+| [Defaults](https://github.com/sindresorhus/Defaults) | 9.0.9 | MIT | Typed local application preferences and observation; iCloud key-value synchronization only for the sample-onboarding preference |
 | [swift-collections](https://github.com/apple/swift-collections) | 1.6.0 | Apache-2.0 WITH Swift-exception | `DequeModule` for the ordered Cooking Session outbox, stack-safe causal-graph worklists, and Logic dependency discovery; `OrderedCollections` for first-seen identity coalescing |
 | [swift-algorithms](https://github.com/apple/swift-algorithms) | 1.2.1 | Apache-2.0 WITH Swift-exception | `Algorithms` coalesces duplicate immutable Recipe rows during CloudKit merge reconciliation |
 
 Only the `Defaults` library product from that package is linked. `DefaultsMacros` is deliberately
-not linked: the onboarding preference remains behind Kitchen Memory's testable
-storage protocol, and no application model currently needs its observation
-macro.
+not linked: preferences remain behind Kitchen Memory's testable storage
+interfaces, with native Observation forwarding for organization preferences.
 
 Defaults includes its own privacy manifest and declares no collected data. Its
 iCloud helper owns the 0.1.1 preference synchronization; Kitchen Memory retains
 only the product-specific rule that an iCloud account change clears the prior
 account's answer. Value-bearing `Defaults.iCloud` debug logging must not be
 enabled under Kitchen Memory's privacy policy.
+
+Organization visibility and scoped disclosure preferences reuse Defaults with
+explicit local-only keys. Defaults' KVO keys cannot contain dots, so binding a
+scope copies existing dotted-key values to supported keys only when the new
+value is absent. Owner/store scope is UTF-8 hex encoded in expansion keys;
+Kitchen identity remains part of the key. Boolean and Folder string-array
+representations are unchanged. This is a local preference-key adoption, not a
+SwiftData/CloudKit schema migration. Pending organization commands retain their
+separate existing JSON storage and recovery behavior.
 
 The `KitchenMemory` application target links `DequeModule` for its in-memory
 Cooking Session command outbox while preserving arrays at the presentation-store

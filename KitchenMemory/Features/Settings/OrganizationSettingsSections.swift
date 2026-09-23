@@ -12,8 +12,12 @@ struct OrganizationSettingsSections: View {
 
   var body: some View {
     Section(.organizationTitle) {
-      Toggle(.organizationShowFolders, isOn: $model.foldersEnabled)
-      Toggle(.organizationShowTags, isOn: $model.tagsEnabled)
+      Toggle(.organizationShowFolders, isOn: Binding(
+        get: { model.preferences.foldersEnabled }, set: { model.preferences.foldersEnabled = $0 }
+      ))
+      Toggle(.organizationShowTags, isOn: Binding(
+        get: { model.preferences.tagsEnabled }, set: { model.preferences.tagsEnabled = $0 }
+      ))
     }
     if let snapshot = model.snapshot {
       Section(.organizationFolders) {
