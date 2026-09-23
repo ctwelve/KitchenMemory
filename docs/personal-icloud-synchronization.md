@@ -283,7 +283,7 @@ record types were present, both affected record types contained 22 fields, and
 the expected custom-display and duration indexes were visible. This deployment
 freezes the published V1 names and meanings under the additive-evolution rules
 above. It does not substitute for the still-open two-device production recovery
-matrix in [0.1 release evidence](release-evidence-0.1.md).
+matrix in [0.1 release evidence](https://github.com/ctwelve/KitchenMemory/blob/4a930de84c1180ad2736598c89dec38f200af2c7/docs/release-evidence-0.1.md).
 
 ## Development schema workflow
 
@@ -335,52 +335,12 @@ product binaries; uses a disposable store; and cannot deploy Production. The
 project checker rejects either schema harness if its name enters the project.
 CloudKit Console remains the deliberate Production deployment surface.
 
-## V4 Production deployment runbook
+## Historical V4 deployment
 
-> Retained 0.2.2 procedure, scoped to V4. Do not use its type allowlist to
-> administer the current V7 schema. Current release work requires a reviewed
-> candidate-specific schema comparison under the development workflow above.
-
-V4 Production promotion is part of the identified 0.2.2 repair release. Run it
-only after that candidate's automated, migration, privacy, and Development
-schema evidence passes.
-
-1. Record the exact candidate commit, Xcode version, macOS version, and operator
-   in `release-evidence-0.2.2.md`. Confirm the working tree is clean and the
-   candidate contains only the additive V4 ownership record type and fields.
-2. Build the separately reviewed Mac-only administration tool documented in
-   `Tools/CloudKitProductionSchemaAdmin/README.md` from the accepted source
-   tree, using the reviewed macOS acceptance archive's provisioning profile.
-   Confirm its signed entitlements select `iCloud.net.ctwelve.KitchenMemory`
-   and the Development environment. Do not reuse the ordinary Development
-   harness, add the switch to a shared scheme, or alter an ordinary Production
-   launch.
-3. Initialize only that Production container's **Development** environment.
-   In CloudKit Console, explicitly verify the container name and **Dev** badge
-   before inspecting record types, fields, indexes, standard security roles,
-   and encryption state.
-4. Compare the server schema with the accepted V4 model and the existing V3
-   Production baseline. The preview must add exactly
-   `CD_KitchenOwnershipRecord` and its generated fields and indexes without
-   removing, renaming, retyping, repurposing, or changing encryption on any
-   published type or field. Abort on any unexplained role or index change.
-5. Open the deployment preview without confirming it. Record its bounded
-   additive conclusion in the evidence ledger; never commit account data, raw
-   schema exports, private records, or screenshots containing them.
-6. Produce and verify the signed acceptance archives from that exact candidate
-   commit before any irreversible promotion. Record signing, archive, privacy,
-   entitlement, installation, and launch conclusions in the evidence ledger.
-   An archive failure returns to source correction and invalidates the preview.
-7. A separately authorized publication task may then confirm deployment.
-   Afterward, inspect the Production environment directly and record that every
-   expected type, field, index, security grant, and encryption choice is present.
-8. Only after that verification may the publication task create the immutable
-   release tag, produce any required final tag-driven archives, or distribute
-   the candidate. A failed or ambiguous preview stops publication; it is never
-   repaired by resetting Production or deleting published schema.
-
-The runbook does not authorize deployment. The release operator must make that
-irreversible choice deliberately for the named candidate.
+The completed 0.2.2 V4 procedure remains in
+[Git history](https://github.com/ctwelve/KitchenMemory/blob/4a930de84c1180ad2736598c89dec38f200af2c7/docs/personal-icloud-synchronization.md#v4-production-deployment-runbook).
+Its type allowlist must not administer the current V7 schema. Current release
+work requires the reviewed candidate-specific comparison described above.
 
 ## 1.0 validation boundary
 

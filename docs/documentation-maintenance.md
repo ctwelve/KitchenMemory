@@ -20,17 +20,25 @@ separately scoped development utilities.
 | Vocabulary | [CONTEXT.md](../CONTEXT.md) | Stable domain language |
 | Decisions | `docs/adr/`, linked from [the decision index](adr/README.md) | Rationale, status, amendments and supersession |
 | Research | `docs/research/`, linked from [the research index](research/README.md) | Dated evidence and adoption conditions; fixture READMEs link from their investigation |
-| Milestone records | Existing paths linked from [history](history.md) | Candidate results, release notes, completed plans and explicit omissions |
+| Milestone records | [History](history.md), with completed records linked at a Git commit | Candidate results, release notes, completed plans and explicit omissions |
 | Code entry points | Existing application and KitchenKit DocC catalogs | Symbols, ownership, and a short newcomer tour |
 | Agent workflow | `AGENTS.md` routing to `docs/agents/` | Conditional instructions loaded for the current task |
 | Skill library | `.agents/skills/`; `skills/` is a compatibility link | One maintained copy of workflow skills and references |
 
 New top-level guidance belongs in the map or history index. New decisions and
 research belong in their respective indexes. Every repository-authored Markdown
-page must be reachable from the root README through local links. Preserve
-historical file paths and evidence; an old pending gate is not a current task.
-Do not update old results to make them look current. Promote durable rules out
-of a historical runbook into one current guide, with a pointer back to its record.
+page must be reachable from the root README through local links. Keep the working
+tree focused on current guidance and active investigations. Retire completed
+milestone records, superseded research and disposable prototypes when their
+conclusions have been incorporated. Preserve access to useful evidence through
+commit-pinned Git links in the appropriate index; repair inbound links and remove
+obsolete project references in the same change. Git retains the original files.
+
+An old pending gate is not a current task. Do not update old results to make them
+look current. Promote durable rules out of a historical runbook into one current
+guide before retiring it. Retain accepted decisions and supersession links that
+still explain current architecture. Frozen schema declarations are executable
+compatibility contracts, not disposable historical documentation.
 
 ## Validation
 
@@ -51,7 +59,9 @@ Current implementation tables are compared with native project targets,
 KitchenKit responsibility directories, current schema alias, checked-in test
 plans and scheme references, and the localization inventory. Deprecated module
 and target names are rejected in current guidance; historical records, ADRs and
-research may retain them. Historical links must still resolve.
+research may retain them. Local historical links must still resolve; inspect
+commit-pinned links against the named Git tree because external URLs are not
+fetched by the checker.
 
 The guard is bounded, not a general Markdown renderer or semantic proof. It
 supports the repository's inline/reference links, ATX headings and explicit HTML
@@ -61,52 +71,10 @@ behavior against source. Existing project/localization/inventory checkers own
 the deeper source invariants. A source-only guard cannot inspect hosted Xcode
 Cloud settings or prove linguistic quality, accessibility, or global sync.
 
-## Audit boundary, September 2026
+## Earlier audit evidence
 
-The broad consolidation landed in [PR 173](https://github.com/ctwelve/KitchenMemory/pull/173)
-after release preparation #124. The final #85 reconciliation uses merged
-[PR 174](https://github.com/ctwelve/KitchenMemory/pull/174), commit
-`ac9095ba3b0cc20fb85227e50420c808f39175de`, after #125 completed the version,
-dependency, license, and signed-product review.
-
-The final pass checked current guidance against the implemented presentation
-folders, five targets, two shared schemes, three test plans, four KitchenKit
-responsibility roots, V7 schema alias, six supported locales, resource ownership,
-and committed package graph. [Implementation architecture](implementation-architecture.md),
-[localization](localization-architecture.md), and [the software inventory](../DEPENDENCIES.md)
-remain the owners of those details. The working source is 0.3.0; the root README
-continues to describe the published alpha rather than imply a new distribution.
-The [dependency evidence](release-dependencies-0.3.md) records the actual signed
-resources, privacy manifests, linkage, and archive-path correction.
-
-Current Recipe authority, Folder/Tag, and maintenance guidance agrees with the
-retained evidence and repository seams. [Device retirement](records-maintenance.md#device-retirement-boundary)
-remains beta-wayfinder work; no device roster or cross-device retirement
-protocol is claimed. Historical ADRs, research, schema declarations, and release
-records retain their paths and dated results through their indexes. Old version
-numbers in those records are evidence, not stale instructions to overwrite.
-
-The maintainer restored the strict Cloud PR requirement. The
-[current CI boundary](continuous-integration.md#github-enforcement-boundary)
-records the two trusted required checks; local UI validation remains applicable
-while Cloud UI tests are suspended. This reconciliation changes documentation
-only and performs no GitHub-protection or Cloud-workflow mutation.
-
-Fresh verification on September 7, 2026 passed all 92 Ruby contract tests
-(334 assertions), including the documentation guard's 13 tests (42 assertions),
-and all seven Python tool tests. Documentation, localization, project/resource,
-inventory, and ordinary untagged-release checks passed. SwiftLint 0.65.1 reported
-zero violations across 347 Swift files. The checked-in post-clone workflow runs
-the documentation guard and its tests during ordinary CI.
-
-No application, framework, test, resource, dependency, or build-setting input
-changes in this final pass. The native suites, exact coverage, static analysis,
-and signed-product checks from [#125](release-dependencies-0.3.md#validation-ledger)
-therefore remain applicable to the unchanged source. The comprehensive beta
-accessibility matrix is deferred under #168, not reported as passed. The
-remaining [#126 acceptance packet](https://github.com/ctwelve/KitchenMemory/issues/126)
-owns synthetic scenario assembly and final Mac-only alpha acceptance.
-
-This audit retains only repository metadata and concise validation results;
-private debugging material, account identifiers, Recipe content, and raw logs
-are excluded.
+The completed September 2026 consolidation and validation ledger remains in
+[Git history](https://github.com/ctwelve/KitchenMemory/blob/4a930de84c1180ad2736598c89dec38f200af2c7/docs/documentation-maintenance.md#audit-boundary-september-2026).
+Current topology belongs to [implementation architecture](implementation-architecture.md),
+localization to [its contract](localization-architecture.md), and release
+requirements to [release engineering](release-engineering.md).

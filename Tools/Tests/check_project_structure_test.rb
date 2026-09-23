@@ -548,6 +548,42 @@ class CheckProjectStructureTest < Minitest::Test
     assert_includes error.message, "project Develop must use Develop.xcconfig"
   end
 
+  def anchored_configuration_fixture(folder: "Configurations", filename: "Develop.xcconfig")
+    fixture = Fixture.new
+    anchor = "FFFFFFFFFFFFFFFFFFFFFFFF"
+    fixture.project << <<~GROUP
+		#{anchor} /* Configurations */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = #{folder};
+			sourceTree = "<group>";
+		};
+    GROUP
+    fixture.project.sub!(/baseConfigurationReference = [0-9A-F]+ \/\* Develop\.xcconfig \*\/;/,
+      "baseConfigurationReferenceAnchor = #{anchor} /* Configurations */;\n" \
+      "\t\t\tbaseConfigurationReferenceRelativePath = #{filename};")
+    fixture
+  end
+
+  def test_accepts_configuration_in_synchronized_folder
+    assert_equal 5, validate(anchored_configuration_fixture).fetch(:target_count)
+  end
+
+  def test_rejects_anchored_configuration_in_wrong_folder
+    assert_contract_error { validate(anchored_configuration_fixture(folder: "Other")) }
+  end
+
+  def test_rejects_anchored_configuration_using_wrong_file
+    error = assert_contract_error { validate(anchored_configuration_fixture(filename: "Production.xcconfig")) }
+    assert_includes error.message, "project Develop must use Develop.xcconfig"
+  end
+
+  def test_rejects_anchored_configuration_with_missing_anchor
+    fixture = anchored_configuration_fixture
+    fixture.project.sub!("baseConfigurationReferenceAnchor = FFFFFFFFFFFFFFFFFFFFFFFF",
+      "baseConfigurationReferenceAnchor = EEEEEEEEEEEEEEEEEEEEEEEE")
+    assert_contract_error { validate(fixture) }
+  end
+
   def test_rejects_project_configuration_without_automatic_merged_binaries
     fixture = Fixture.new
     fixture.project.sub!("MERGED_BINARY_TYPE = automatic;", "MERGED_BINARY_TYPE = none;")

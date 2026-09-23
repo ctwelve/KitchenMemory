@@ -18,6 +18,16 @@ final class KitchenMemoryUITests: XCTestCase {
   func testTopLevelDestinationsExposeAccessibleNavigation() {
     let app = launchApp()
     let shell = app.descendants(matching: .any)["recipe-library-shell"]
+#if os(iOS)
+    if !shell.exists {
+      let window = app.windows.firstMatch
+      let edge = window.coordinate(withNormalizedOffset: CGVector(dx: 0.005, dy: 0.5))
+      let interior = window.coordinate(withNormalizedOffset: CGVector(dx: 0.8, dy: 0.5))
+      edge.press(forDuration: 0.05, thenDragTo: interior)
+      XCTAssertTrue(shell.waitForExistence(timeout: 5), "The native leading-edge swipe must reveal Organization")
+    }
+#endif
+    revealSidebar(in: app, exposing: shell)
     assertAccessibleLabel(shell, description: "recipe library")
 
     visitTopLevelDestination(
@@ -35,6 +45,12 @@ final class KitchenMemoryUITests: XCTestCase {
     // A clean Kitchen has no recovery evidence requiring a destination.
     XCTAssertFalse(app.buttons["recovery-destination"].exists)
 
+    let allRecipes = app.buttons["all-recipes-destination"]
+    revealSidebar(in: app, exposing: allRecipes)
+    XCTAssertTrue(allRecipes.waitForExistence(timeout: 5))
+    assertAccessibleLabel(allRecipes, description: "All Recipes")
+    activate(allRecipes)
+
     let recipeRow = app.buttons
       .matching(NSPredicate(format: "identifier BEGINSWITH %@", "recipe-row-"))
       .firstMatch
@@ -46,6 +62,30 @@ final class KitchenMemoryUITests: XCTestCase {
     let recipeDetail = app.descendants(matching: .any)["recipe-detail"]
     XCTAssertTrue(recipeDetail.waitForExistence(timeout: 5))
     assertAccessibleLabel(recipeDetail, description: "recipe detail")
+    app.terminate()
+  }
+
+  @MainActor
+  func testRecipeEditorExposesNamedEntryAndModeControls() {
+    let app = launchApp()
+    let create = app.buttons["new-recipe"].firstMatch
+    revealSidebar(in: app, exposing: create)
+    XCTAssertTrue(create.waitForExistence(timeout: 5))
+    assertAccessibleLabel(create, description: "New Recipe")
+    activate(create)
+    let title = app.textFields["recipe-editor-title"]
+    XCTAssertTrue(title.waitForExistence(timeout: 5))
+    assertAccessibleLabel(title, description: "Recipe title")
+    let ingredients = app.textViews["simple-ingredient-text"]
+    XCTAssertTrue(ingredients.waitForExistence(timeout: 5))
+    assertAccessibleLabel(ingredients, description: "Ingredients")
+    let mode = app.buttons["recipe-editor-mode"]
+    XCTAssertTrue(mode.waitForExistence(timeout: 5))
+    assertAccessibleLabel(mode, description: "Editor mode")
+    activate(mode)
+    let summary = app.textFields["recipe-editor-summary"]
+    XCTAssertTrue(summary.waitForExistence(timeout: 5))
+    assertAccessibleLabel(summary, description: "Recipe summary")
     app.terminate()
   }
 
@@ -179,26 +219,13 @@ final class KitchenMemoryUITests: XCTestCase {
 
   @MainActor
   private func revealSidebar(in app: XCUIApplication, exposing element: XCUIElement) {
-#if os(iOS)
-    if !element.waitForExistence(timeout: 2) {
-      let sidebarToggle = app.buttons["toggle-sidebar"].firstMatch
-      if sidebarToggle.exists {
-        assertAccessibleLabel(sidebarToggle, description: "sidebar navigation")
-        activate(sidebarToggle)
-      } else {
-        let backButton = app.buttons["BackButton"]
-        if backButton.waitForExistence(timeout: 3) {
-          activate(backButton)
-        }
-      }
-    }
+    guard !element.waitForExistence(timeout: 2) else { return }
+#if os(macOS)
+    let show = app.buttons["Show Sidebar"].firstMatch
+    if show.exists { activate(show) }
 #else
-    if !element.waitForExistence(timeout: 2) {
-      let toggle = app.buttons["toggle-sidebar"]
-      if toggle.waitForExistence(timeout: 3) {
-        activate(toggle)
-      }
-    }
+    let back = app.buttons["BackButton"].firstMatch
+    if back.exists { activate(back) }
 #endif
   }
 
@@ -222,18 +249,6 @@ final class KitchenMemoryUITests: XCTestCase {
   }
 
   @MainActor
-  private func openSettings(in app: XCUIApplication) {
-#if os(macOS)
-    app.typeKey(",", modifierFlags: .command)
-#else
-    let openSettings = app.buttons["open-settings"]
-    XCTAssertTrue(openSettings.waitForExistence(timeout: 2))
-    assertAccessibleLabel(openSettings, description: "Settings action")
-    activate(openSettings)
-#endif
-  }
-
-  @MainActor
   private func assertAccessibleLabel(_ element: XCUIElement, description: String) {
     let label = element.label.trimmingCharacters(in: .whitespacesAndNewlines)
     XCTAssertFalse(
@@ -253,3 +268,83 @@ final class KitchenMemoryUITests: XCTestCase {
     )
   }
 }
+
+extension KitchenMemoryUITests {
+  @MainActor
+  private func openSettings(in app: XCUIApplication) {
+#if os(macOS)
+    app.typeKey(",", modifierFlags: .command)
+#else
+    let openSettings = app.buttons["open-settings"]
+    XCTAssertTrue(openSettings.waitForExistence(timeout: 2))
+    assertAccessibleLabel(openSettings, description: "Settings action")
+    activate(openSettings)
+    let form = app.collectionViews["settings-form"]
+    XCTAssertTrue(form.waitForExistence(timeout: 5))
+    let synchronization = app.switches["settings-icloud-sync"]
+    // Expanded translations can place this lazily materialized row below the fold.
+    for _ in 0..<3 where !synchronization.exists {
+      form.swipeUp()
+    }
+#endif
+  }
+}
+
+#if os(iOS)
+extension KitchenMemoryUITests {
+  @MainActor
+  func testRightToLeftEdgeSwipeRevealsNamedDestinations() throws {
+    let app = launchApp(additionalArguments: [
+      "-AppleLanguages", "(en-US)", "-AppleLocale", "en_US",
+      "-AppleTextDirection", "YES", "-NSForceRightToLeftWritingDirection", "YES",
+    ])
+    defer { app.terminate() }
+    let allRecipes = app.buttons["all-recipes-destination"]
+    try XCTSkipIf(allRecipes.exists, "Regular layouts already expose the sidebar")
+    let window = app.windows.firstMatch
+    let edge = window.coordinate(withNormalizedOffset: CGVector(dx: 0.995, dy: 0.5))
+    let interior = window.coordinate(withNormalizedOffset: CGVector(dx: 0.2, dy: 0.5))
+    edge.press(forDuration: 0.05, thenDragTo: interior)
+    XCTAssertTrue(
+      allRecipes.waitForExistence(timeout: 5), "RTL navigation must reveal Organization from the right edge"
+    )
+    assertAccessibleLabel(allRecipes, description: "All Recipes in right-to-left navigation")
+  }
+}
+#endif
+
+#if os(macOS)
+extension KitchenMemoryUITests {
+  @MainActor
+  func testSidebarHoverRevealsNamedDestinations() {
+    let app = launchApp(additionalArguments: ["-AppleLanguages", "(en-US)", "-AppleLocale", "en_US"])
+    defer { app.terminate() }
+    XCTAssertFalse(app.menuButtons["organization-navigation"].exists)
+    let hide = app.buttons["Hide Sidebar"]
+    XCTAssertTrue(hide.waitForExistence(timeout: 5))
+    hide.click()
+    let show = app.buttons["Show Sidebar"]
+    XCTAssertTrue(show.waitForExistence(timeout: 5))
+    show.hover()
+    let allRecipes = app.buttons["all-recipes-destination"]
+    XCTAssertTrue(allRecipes.waitForExistence(timeout: 3))
+    XCTAssertTrue(show.exists, "Temporary reveal must leave the native pin action available")
+    let overlay = XCTAttachment(screenshot: app.screenshot())
+    overlay.name = "Native sidebar button with temporary Organization overlay"
+    overlay.lifetime = .keepAlways
+    add(overlay)
+    allRecipes.hover()
+    allRecipes.click()
+    XCTAssertTrue(allRecipes.exists)
+    app.buttons["new-recipe"].hover()
+    let dismissed = XCTNSPredicateExpectation(predicate: NSPredicate(format: "exists == false"), object: allRecipes)
+    XCTAssertEqual(XCTWaiter.wait(for: [dismissed], timeout: 3), .completed)
+    show.hover()
+    XCTAssertTrue(allRecipes.waitForExistence(timeout: 3))
+    show.click()
+    XCTAssertTrue(hide.waitForExistence(timeout: 5))
+    app.buttons["new-recipe"].hover()
+    XCTAssertTrue(allRecipes.exists, "A pinned sidebar remains available after the pointer leaves")
+  }
+}
+#endif

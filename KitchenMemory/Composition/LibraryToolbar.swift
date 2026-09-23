@@ -7,9 +7,6 @@ import SwiftUI
 struct LibraryToolbar: ToolbarContent {
   let showsKitchenActions: Bool
   let actions: LibraryCommandActions?
-  let showsSidebarToggle: Bool
-  let sidebarToggleTitle: LocalizedStringResource
-  let toggleSidebar: () -> Void
   let showSettings: () -> Void
 
   @ToolbarContentBuilder
@@ -32,11 +29,6 @@ struct LibraryToolbar: ToolbarContent {
         .help(Text(.libraryActionImportRecipe))
       }
     }
-#if os(iOS)
-    if showsSidebarToggle {
-      LibrarySidebarToggle(title: sidebarToggleTitle, action: toggleSidebar)
-    }
-#endif
 #if !os(macOS)
     if showsKitchenActions {
       ToolbarItem(placement: .primaryAction) {
@@ -48,21 +40,6 @@ struct LibraryToolbar: ToolbarContent {
       }
     }
 #endif
-  }
-}
-
-struct LibrarySidebarToggle: ToolbarContent {
-  let title: LocalizedStringResource
-  let action: () -> Void
-
-  var body: some ToolbarContent {
-    ToolbarItem(placement: .navigation) {
-      Button(action: action) {
-        ToolbarIconLabel(title, systemImage: "sidebar.left")
-      }
-      .accessibilityIdentifier("toggle-sidebar")
-      .help(Text(title))
-    }
   }
 }
 

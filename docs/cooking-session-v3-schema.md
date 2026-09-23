@@ -463,6 +463,6 @@ Slice 19's read-only CloudKit Console review confirmed every generated V3
 domain field, the managed single-field indexes, the standard `_world` Read,
 `_icloud` Create, and `_creator` Write grants, and no encrypted field types in
 the Development container. The exact environment and counts are recorded in
-[0.2 release evidence](release-evidence-0.2.md). Production schema
+[0.2 release evidence](https://github.com/ctwelve/KitchenMemory/blob/4a930de84c1180ad2736598c89dec38f200af2c7/docs/release-evidence-0.2.md). Production schema
 initialization and deployment remain explicitly outside this decision and
 ordinary application launch.

@@ -84,7 +84,7 @@ The application now bundles `Resources/ThirdPartyNotices.txt`, containing the
 complete MIT texts for Kitchen Memory and Defaults and the upstream license,
 copyright, and Swift Runtime Library Exception texts for Collections,
 Algorithms, and Numerics. A hosted test checks the compiled resource against the
-reviewed digest. The [0.3 signed-product inspection](docs/release-dependencies-0.3.md)
+reviewed digest. The [0.3 signed-product inspection](https://github.com/ctwelve/KitchenMemory/blob/4a930de84c1180ad2736598c89dec38f200af2c7/docs/release-dependencies-0.3.md)
 records actual linkage, privacy manifests, and packaged notices; passing source
 checks alone does not prove those files were packaged.
 
@@ -104,7 +104,7 @@ of every dependency update.
 
 ## 0.3 source review
 
-The working application is **0.3.2**. Its source build-number seed remains **1**
+The working application is **0.3.3**. Its source build-number seed remains **1**
 under the [release contract](docs/release-engineering.md); Xcode Cloud owns
 advancing distributed build numbers. `RELEASE` still identifies the earlier
 submitted version. This source preparation creates no release tag or distribution.

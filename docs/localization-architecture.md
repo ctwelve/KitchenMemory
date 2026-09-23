@@ -87,6 +87,39 @@ AppKit reads `Credits.rtf` as formatted bundle content, so the complete document
 has a resource variant for each supported locale rather than flattening its
 formatting and links into String Catalog entries.
 
+## Ingredient recognition
+
+Ingredient recognition is separate from interface translation. The public
+`IngredientLineParser` accepts a caller-supplied locale (defaulting to the user's
+current language and region), retains nonblank source wording exactly, and
+returns optional structure plus UTF-16 spans for annotation. It does not translate
+or convert units. Callers interpret completed/left lines or pasted batches;
+interpretation is not permission to rewrite text while someone types.
+
+The bounded grammar recognizes ASCII integers, slash and common Unicode
+fractions, mixed fractions, hyphen/en-dash ranges, and exact decimal quantities.
+Dot and comma decimals are accepted when unambiguous; a three-digit suffix after
+a nonzero integer, such as `1,000` or `1.000`, remains text because it might be
+grouping. Decimal values use rational arithmetic, with the existing million-unit
+component limit. Negative, malformed, descending, or out-of-bound quantities
+remain unstructured. Non-numeric hyphens in `all-purpose` and `quarter-inch`
+are not quantity ranges.
+
+Foundation NumberFormatter spell-out parsing recognizes canonical whole-number
+words from zero through one hundred in English, French, Spanish, German, and
+Italian. Recognition requires an exact locale-specific spell-out round trip,
+and prefixes are bounded to seven whitespace-delimited tokens. This deliberately
+does not claim arbitrary inflections, fractional words, colloquialisms, or every
+language Foundation can format. The supported-locale examples include English
+grams/deciliters and French tablespoons. Common English and selected French,
+Spanish, German and Italian units are recognized without changing their spelling.
+Other words remain useful source text, including partially recognized lines.
+
+Parenthesized package quantities, such as `1 (6-oz.) can tomatoes`, keep their
+inner quantity separate from the outer count. Unsupported package syntax stays
+in the source. Focused examples live in `IngredientLineParserTests`; UI locale
+coverage is not a claim of exhaustive ingredient-language recognition.
+
 ## Bundled recipe packs
 
 A starter recipe is authored content, not interface copy. Its title, summary,
@@ -188,7 +221,7 @@ The constrained automation boundary from
 localization is not a reason to restore interaction-heavy scripts or encode a
 provisional visual hierarchy in UI tests.
 
-See [alpha translation validation](localization-alpha-validation.md) for the
+See [alpha translation validation](https://github.com/ctwelve/KitchenMemory/blob/4a930de84c1180ad2736598c89dec38f200af2c7/docs/localization-alpha-validation.md) for the
 regional content choices and the maintainer's device/layout-check waiver for
 #118–#120. It is retained evidence, not a waiver for later candidates.
 

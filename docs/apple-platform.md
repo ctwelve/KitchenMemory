@@ -42,20 +42,21 @@ compromised interface. See
 
 ## Current navigation model
 
-The shared sidebar has two first-class destinations: Sessions and Recipes.
-Sessions is always reachable, including when no Recipe is selected. Its sidebar
-preview is intentionally short, while the destination itself exposes the
-device-local current convenience, every other ordinary Active or Stopped
-Session, and immutable Finished history. A Recipe detail also links to Sessions
-whose retained root names that Recipe provenance; this is a contextual filter,
-not ownership by the current Recipe object.
+The native adaptive shell separates Organization, destination lists and selected
+content into three columns. All Recipes, conditional Drafts, Session History,
+Deleted Items and conditional Recovery remain reachable as named destinations.
+Native collapse handles compact displays; a temporary Organization overlay reveals
+navigation without resizing the current detail. See the
+[library organization contract](recipe-library-organization.md) for preference
+ownership, disclosure, selection and draft-save boundaries.
 
-Opening Active or Stopped work enters the cooking interaction. Opening Finished
-history enters an observational detail with explicit continuation and immediate
-lineage. The structure reserves a durable Sessions destination for later search,
-folders, and tags without adding those schemas or presenting them as 0.2
-features. Stable automation identifiers cover the destination, current/recent/
-history groups, switching, Finished detail, lineage, and continuation.
+Session History is reachable without selecting a Recipe. It exposes the
+device-local current convenience, other ordinary Active or Stopped Sessions and
+immutable Finished history. Recipe detail also links to Sessions whose retained
+root names that Recipe provenance; this is a contextual filter, not ownership by
+the current Recipe object. The list remains in the middle column while selection
+opens the existing cooking interaction or observational Finished detail with
+explicit continuation and immediate lineage.
 
 ## Native product targets and destinations
 

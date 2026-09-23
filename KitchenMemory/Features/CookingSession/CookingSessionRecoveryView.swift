@@ -9,6 +9,8 @@ struct CookingSessionDeletedItemsView<RecipeContent: View>: View {
   let recipeCount: Int
   @Bindable var model: CookingSessionPresentationModel
   @ViewBuilder var recipeContent: () -> RecipeContent
+  var selectedID: CookingSession.ID?
+  var includesSessions = true
   @State private var pendingRestore: CookingSessionProjection?
 
   var body: some View {
@@ -21,10 +23,18 @@ struct CookingSessionDeletedItemsView<RecipeContent: View>: View {
         Text(.deletedItemsRetentionMessage)
           .foregroundStyle(.secondary)
         recipeContent()
-        ForEach(model.deletedSessions, id: \.id) { session in
+        ForEach(
+          model.deletedSessions.filter { includesSessions && (selectedID == nil || $0.id == selectedID) },
+          id: \.id
+        ) { session in
           deletedSession(session)
         }
-        ForEach(model.waitingDeletedSessions, id: \.evidence.sessionID) { item in
+        ForEach(
+          model.waitingDeletedSessions.filter {
+            includesSessions && (selectedID == nil || $0.evidence.sessionID == selectedID)
+          },
+          id: \.evidence.sessionID
+        ) { item in
           waitingSession(item)
         }
         if model.deletedItemCount + recipeCount == 0 {
@@ -118,6 +128,8 @@ struct CookingSessionRecoveryView<RecipeContent: View>: View {
   let recipeCount: Int
   @ViewBuilder var recipeContent: () -> RecipeContent
   @Bindable var model: CookingSessionPresentationModel
+  var selectedID: CookingSession.ID?
+  var includesSessions = true
   @State private var pendingSelection: ClosureSelectionRequest?
 
   var body: some View {
@@ -129,10 +141,20 @@ struct CookingSessionRecoveryView<RecipeContent: View>: View {
           .accessibilityIdentifier("session-recovery")
         Text(.recoveryMessage).foregroundStyle(.secondary)
         recipeContent()
-        ForEach(model.waitingSessions, id: \.evidence.sessionID) { item in
+        ForEach(
+          model.waitingSessions.filter {
+            includesSessions && (selectedID == nil || $0.evidence.sessionID == selectedID)
+          },
+          id: \.evidence.sessionID
+        ) { item in
           recoveryWaitingRow(item)
         }
-        ForEach(model.recoverySessions, id: \.evidence.sessionID) { item in
+        ForEach(
+          model.recoverySessions.filter {
+            includesSessions && (selectedID == nil || $0.evidence.sessionID == selectedID)
+          },
+          id: \.evidence.sessionID
+        ) { item in
           recoveryRow(item)
         }
         if model.recoveryItemCount == 0, recipeCount == 0 {

@@ -53,7 +53,7 @@ struct IngredientSectionEditor: View {
   }
 }
 
-private struct IngredientEditor: View {
+struct IngredientEditor: View {
   @Binding var ingredient: RecipeIngredient
   @Environment(\.locale) private var locale
   let moveUp: () -> Void

@@ -43,6 +43,8 @@ public struct RecipeEditSession: Codable, Equatable, Sendable {
   public var equipment: [EquipmentItem]?
   public var ingredientSections: [IngredientSection]
   public var instructionSections: [InstructionSection]
+  /// Recoverable simple-editor state; absent in drafts created before this editor existed.
+  public internal(set) var ingredientText: RecipeIngredientTextDraft?
 
   private let preservedSourceCapture: RecipeSourceCapture?
   private let preservedContentLanguage: RecipeContentLanguage?
@@ -107,9 +109,22 @@ public struct RecipeEditSession: Codable, Equatable, Sendable {
       keywords: preservedKeywords,
       media: media,
       equipment: equipment,
-      ingredientSections: ingredientSections,
+      ingredientSections: finishedIngredientSections,
       instructionSections: instructionSections
     )
+  }
+
+  private var completedIngredientText: RecipeIngredientTextDraft? {
+    var text = ingredientText
+    if let current = text, current.sections != ingredientSections {
+      text = current.incorporating(ingredientSections)
+    }
+    text?.finishEditing()
+    return text
+  }
+
+  private var finishedIngredientSections: [IngredientSection] {
+    completedIngredientText?.sections ?? ingredientSections
   }
 
   public mutating func moveIngredientSection(at index: Int, by offset: Int) {

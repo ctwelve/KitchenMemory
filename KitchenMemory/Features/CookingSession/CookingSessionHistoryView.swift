@@ -7,10 +7,7 @@ import SwiftUI
 
 struct CookingSessionHistoryView: View {
   @Bindable var model: CookingSessionPresentationModel
-  private var selectedSessionID: Binding<CookingSession.ID?> {
-    Binding(get: { model.historyScope == nil ? nil : model.currentSessionID },
-            set: { if $0 == nil { model.leaveCurrentSession() } })
-  }
+  var focusDetail: () -> Void = {}
 
   private var ordinarySessions: [CookingSessionProjection] {
     model.displayedHistorySessions.filter { $0.lifecycle != .finished }
@@ -33,9 +30,9 @@ struct CookingSessionHistoryView: View {
 
   var body: some View {
     ScrollView {
-      LazyVStack(alignment: .leading, spacing: 24) {
+      LazyVStack(alignment: .leading, spacing: 12) {
         Text(historyTitle)
-          .font(.largeTitle.bold())
+          .font(.headline)
           .accessibilityHeading(.h1)
           .accessibilityIdentifier("sessions-history")
 
@@ -67,24 +64,19 @@ struct CookingSessionHistoryView: View {
           .frame(maxWidth: .infinity)
         }
       }
+      .scrollTargetLayout()
       .frame(maxWidth: 820, alignment: .leading)
-      .padding(28)
+      .padding(12)
       .frame(maxWidth: .infinity, alignment: .center)
     }
+    .scrollPosition(id: Binding(get: { model.navigation.historyListAnchor },
+                                set: { model.navigation.historyListAnchor = $0 }), anchor: .top)
     .background(Color("AppBackground"))
-    .navigationDestination(item: selectedSessionID) { sessionID in
-      CookingSessionHistorySessionDestination(
-        model: model,
-        sessionID: sessionID,
-        leaveSession: {
-          model.leaveCurrentSession()
-        }
-      )
-    }
+
   }
 
   private var historyTitle: LocalizedStringResource {
-    switch model.historyScope {
+    switch model.displayedHistoryScope {
     case .recipe: .sessionHistoryRecipeTitle
     case .all, nil: .sessionHistoryTitle
     }
@@ -97,7 +89,7 @@ struct CookingSessionHistoryView: View {
   ) -> some View {
     VStack(alignment: .leading, spacing: 12) {
       Text(title)
-        .font(.title2.bold())
+        .font(.subheadline)
         .accessibilityHeading(.h2)
       content()
     }
@@ -109,47 +101,28 @@ struct CookingSessionHistoryView: View {
   private func sessionButton(_ session: CookingSessionProjection) -> some View {
     if session.lifecycle == .finished {
       Button {
-        model.observeFinishedSession(session.id)
+        if model.observeFinishedSession(session.id) { focusDetail() }
       } label: {
         CookingSessionHistoryRow(session: session)
       }
       .buttonStyle(.plain)
       .accessibilityIdentifier(historyRowIdentifier(session))
+      .id(session.id)
     } else {
       Button {
-        model.selectSessionFromHistory(session.id)
+        if model.selectSessionFromHistory(session.id) { focusDetail() }
       } label: {
         CookingSessionHistoryRow(session: session)
       }
       .buttonStyle(.plain)
       .accessibilityIdentifier(historyRowIdentifier(session))
+      .id(session.id)
     }
   }
 
   private func historyRowIdentifier(_ session: CookingSessionProjection) -> String {
     let prefix = session.lifecycle == .finished ? "finished-session-row" : "history-session-row"
     return "\(prefix)-\(session.id.rawValue.uuidString)"
-  }
-}
-
-private struct CookingSessionHistorySessionDestination: View {
-  @Bindable var model: CookingSessionPresentationModel
-  let sessionID: CookingSession.ID
-  let leaveSession: () -> Void
-
-  var body: some View {
-    Group {
-      if let currentSession = model.currentSession, currentSession.id == sessionID {
-        CookingSessionView(
-          model: model,
-          session: currentSession,
-          embedsInNavigationStack: false,
-          leaveSession: leaveSession
-        )
-      } else {
-        Color.clear
-      }
-    }
   }
 }
 

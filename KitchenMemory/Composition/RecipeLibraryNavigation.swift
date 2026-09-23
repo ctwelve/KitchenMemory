@@ -22,6 +22,34 @@ final class RecipeLibraryNavigation {
     case recovery
   }
 
+  enum ContentDestination: Equatable {
+    case recipes, drafts, history(CookingSessionHistoryScope), deletedItems, recovery
+  }
+
+  enum AuxiliarySelection: Equatable {
+    case deletedRecipe(Recipe.ID), deletedSession(CookingSession.ID)
+    case recoveryRecipe(Recipe.ID), recoverySession(CookingSession.ID), organization
+
+    var destination: Destination {
+      switch self {
+      case .deletedRecipe, .deletedSession: .deletedItems
+      case .recoveryRecipe, .recoverySession, .organization: .recovery
+      }
+    }
+  }
+
+  private(set) var auxiliarySelection: AuxiliarySelection?
+  var recipeListAnchor: Recipe.ID?
+  var historyListAnchor: CookingSession.ID?
+
+  @discardableResult
+  func selectAuxiliary(_ item: AuxiliarySelection) -> Bool {
+    guard move(to: item.destination) else { return false }
+    auxiliarySelection = item
+    return true
+  }
+
+  private(set) var contentDestination: ContentDestination = .recipes
   private(set) var destination: Destination = .recipe
   private(set) var selectedRecipeID: Recipe.ID?
   @ObservationIgnored var prepareToLeaveEditor: () -> Bool = { true }
@@ -55,6 +83,18 @@ final class RecipeLibraryNavigation {
     guard next != destination else { return true }
     guard canLeave() else { return false }
     destination = next
+    auxiliarySelection = nil
+    switch next {
+    case .recipe: contentDestination = .recipes
+    case .drafts: contentDestination = .drafts
+    case .history(let scope), .finished(_, let scope), .session(_, history: .some(let scope)):
+      contentDestination = .history(scope)
+    case .deletedItems: contentDestination = .deletedItems
+    case .recovery: contentDestination = .recovery
+    case .editor:
+      if contentDestination != .recipes { contentDestination = .drafts }
+    case .session(_, history: nil): break
+    }
     persistSessionSelection(currentSessionID)
     return true
   }
@@ -63,6 +103,15 @@ final class RecipeLibraryNavigation {
   func selectRecipe(_ id: Recipe.ID?) -> Bool {
     guard move(to: .recipe) else { return false }
     selectedRecipeID = id
+    return true
+  }
+
+  /// A filter change is navigation: do not hide the current editor or mutate its
+  /// browsing context until its recoverable draft has been accepted.
+  @discardableResult
+  func browseRecipes(changingFilter: () -> Void) -> Bool {
+    guard move(to: .recipe) else { return false }
+    changingFilter()
     return true
   }
 

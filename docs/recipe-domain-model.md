@@ -162,6 +162,27 @@ The package size is meaningful but does not fit cleanly into a single quantity
 and unit. `PackageDescription` represents it without blocking
 the first implementation.
 
+### Ingredient text reconciliation
+
+`IngredientTextReconciliation` applies completed source lines to one existing
+IngredientSection. Callers carry each existing line’s stable ingredient identity
+through text edits; new pasted lines have no identity. Unchanged identified lines
+preserve the complete ingredient value. Reconciliation never guesses identity
+from wording or position, so insertion plus editing cannot transfer precision
+to an unrelated row. Duplicate or unknown identities receive fresh IDs.
+The section identity and title are retained. Removed lines are explicit draft
+edits, not changes to maintained Recipe history.
+
+An automatic row can receive a new interpretation. A row with reviewed/edited
+state, explicit presentation or advanced fields retains those fields while its
+authored source changes. A separate Codable conflict proposes the new parsed
+quantity, unit, package, ingredient and preparation for explicit acceptance.
+Notes, optionality, scaling behavior and custom display survive even acceptance.
+Unresolved proposals never block saving retained precision and authored wording,
+whether in the device-local draft or a published Revision. Replacing precise
+details requires explicit acceptance. The native editing draft presents that choice;
+neither the parser nor reconciliation publishes a Revision.
+
 ### Future Ingredient seam
 
 A later pantry slice may add a kitchen-scoped normalized concept such as “whole
@@ -270,3 +291,15 @@ what actually occurs in its cooking session.
 4. Section and row order are stable and user-controlled.
 5. Normalization never silently rewrites the original text.
 6. Scaling never fabricates a numeric interpretation for a textual quantity.
+
+### Simple-editor text drafts
+
+The optional `RecipeEditSession.ingredientText` document retains native text line
+identity, pending interpretation, IngredientSection headings and unresolved
+precision proposals. Its derived sections use the same Ingredient identities as
+advanced editing; switching presentation is not a publication. Rebuilding from
+structured changes retains proposals for untouched rows and respects explicit
+adjustments. Publication completes pending interpretation and retains existing
+precision when proposals remain unresolved. This text bookkeeping is device-local
+and excluded from `RecipeDraft` and `RecipeRevision` content; historical SwiftData
+schemas are unchanged.

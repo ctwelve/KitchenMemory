@@ -22,7 +22,7 @@ and encryption choices must remain unchanged; no existing type is removed.
 Review generated CloudKit fields, assets,
 indexes, and standard roles against the local model and deployment preview;
 any unexplained change stops the release. The V4 procedure remains historical
-evidence in `docs/release-evidence-0.2.2.md`.
+evidence in the [0.2.2 record](https://github.com/ctwelve/KitchenMemory/blob/4a930de84c1180ad2736598c89dec38f200af2c7/docs/release-evidence-0.2.2.md).
 
 The tool is absent from the Kitchen Memory project, shared schemes, test plans,
 archives, and product binaries. It uses a disposable temporary store, refuses

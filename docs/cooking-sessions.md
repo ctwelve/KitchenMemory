@@ -16,7 +16,7 @@ cooking, device ownership, and multi-person collaboration are not 0.2 promises.
 
 The precise evidence and storage contracts live in
 [Cooking Session V3](cooking-session-v3-schema.md). The ordered implementation
-route lives in the [0.2 roadmap](roadmap-0.2.md).
+route lives in the [0.2 roadmap](https://github.com/ctwelve/KitchenMemory/blob/4a930de84c1180ad2736598c89dec38f200af2c7/docs/roadmap-0.2.md).
 
 ## Start and historical context
 

@@ -25,6 +25,11 @@ Amended on 2026-09-02 to clarify that the current UI target proves only
 accessible top-level structure and navigation. It does not repeat feature
 behavior or claim comprehensive assistive-technology validation.
 
+Amended on 2026-09-22 with maintainer agreement: the sidebar's hidden,
+temporarily revealed, and pinned modes are core primary-navigation accessibility
+states. Bounded native checks of destination reachability and accessibility-tree
+availability across those modes are within the shell suite's scope.
+
 Amended by [ADR 0019](0019-stage-accessibility-acceptance-at-beta.md): Issue 132
 has settled the staged alpha/beta accessibility policy. Its former future-decision
 references below are historical; the current protocol is in
@@ -64,7 +69,12 @@ destinations are reachable:
 - the startup-failure recovery action.
 
 Navigation activation is permitted only as the minimum action needed to reveal
-and inspect a top-level destination. Do not use UI automation to re-prove
+and inspect a top-level destination. This includes hiding, temporarily revealing,
+and pinning the sidebar, then checking that named destinations are exposed or
+removed as appropriate. Pointer exit and native leading-edge navigation, including
+the right edge in RTL layouts, may be exercised to establish that accessibility
+contract. These checks do not assert incidental tree shape or establish VoiceOver
+usability. Outside this bounded primary-navigation scope, do not use UI automation to re-prove
 feature workflows, state transitions, framework-standard button behavior,
 provisional editor layout, scrolling, disclosure state, exact visible strings,
 or incidental accessibility-tree shape. Do not locate controls by coordinates.

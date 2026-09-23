@@ -8,9 +8,14 @@ import KitchenKit
 struct RecipeDraftsView: View {
   @Bindable var model: RecipeLibraryModel
 
+  var focusDetail: () -> Void = {}
+
   var body: some View {
     List(model.authoringItems) { draft in
-      Button { model.resumeEditingDraft(draft.id) } label: {
+      Button {
+        model.resumeEditingDraft(draft.id)
+        if model.editor?.id == draft.id { focusDetail() }
+      } label: {
         VStack(alignment: .leading) {
           if draft.session.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             Text(.recipeDraftsUntitled)

@@ -21,6 +21,7 @@ final class RecipeOrganizationModel {
   var filter = RecipeOrganizationFilter()
   var selectedRecipes: Set<Recipe.ID> = []
   var selecting = false
+  var tagsExpanded: Bool { didSet { defaults.set(tagsExpanded, forKey: prefix + ".tags-expanded") } }
   var foldersEnabled: Bool { didSet { defaults.set(foldersEnabled, forKey: "organization.folders.enabled") } }
   var tagsEnabled: Bool { didSet { defaults.set(tagsEnabled, forKey: "organization.tags.enabled") } }
   var expanded: Set<Folder.ID> { didSet { persistExpanded() } }
@@ -35,6 +36,7 @@ final class RecipeOrganizationModel {
     self.kitchenID = kitchenID
     self.defaults = defaults
     prefix = "organization." + scope + "." + kitchenID.rawValue.uuidString
+    tagsExpanded = defaults.object(forKey: prefix + ".tags-expanded") as? Bool ?? true
     foldersEnabled = defaults.object(forKey: "organization.folders.enabled") as? Bool ?? true
     tagsEnabled = defaults.object(forKey: "organization.tags.enabled") as? Bool ?? true
     expanded = Set((defaults.stringArray(forKey: prefix + ".expanded") ?? []).compactMap(UUID.init(uuidString:))
@@ -71,6 +73,16 @@ final class RecipeOrganizationModel {
     guard let snapshot else { return recipes }
     return filter.apply(to: recipes, organization: snapshot,
                         foldersEnabled: foldersEnabled, tagsEnabled: tagsEnabled, locale: locale)
+  }
+
+  func resetFilters() {
+    filter.search = ""
+    filter.tagIDs = []
+    filter.untagged = false
+  }
+
+  func showAllRecipes() {
+    filter.location = .all
   }
 
   func perform(_ prepare: (RecipeOrganization) throws -> RecipeOrganizationCommand) {
@@ -148,6 +160,7 @@ final class RecipeOrganizationModel {
     changeRejected = false
     failed = false
     expanded = []
+    tagsExpanded = true
     filter = RecipeOrganizationFilter()
     selectedRecipes = []
   }

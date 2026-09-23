@@ -7,8 +7,8 @@ SPDX-License-Identifier: MIT
 -->
 
 Use this map to load the guidance for the work at hand. Current contracts and
-accepted decisions govern implementation; research and milestone records explain
-how we got here. GitHub Issues owns the live plan and dependencies. The root
+accepted decisions govern implementation; targeted research and links to Git
+history provide background when needed. GitHub Issues owns the live plan and dependencies. The root
 [README](../README.md) describes the published alpha and downloads.
 
 ## Start here
@@ -56,6 +56,7 @@ synthetic experiments. Recheck evidence before adopting an old recommendation.
 
 ## Release records and milestone history
 
-The [history index](history.md) retains release notes, candidate evidence,
-completed roadmaps, startup measurements, localization review, and alpha
-accessibility evidence. It includes the [0.3 release-preparation audit](release-preparation-0.3.md).
+The [history index](history.md) links completed release notes, candidate evidence,
+roadmaps and validation records at fixed Git commits. Load those records only
+when revisiting their evidence. Current feature acceptance stays local until
+the feature is integrated.
