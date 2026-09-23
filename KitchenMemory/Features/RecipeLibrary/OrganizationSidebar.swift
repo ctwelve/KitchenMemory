@@ -15,7 +15,7 @@ struct OrganizationSidebar: View {
   var body: some View {
     Group {
       if let snapshot = model.snapshot {
-        if model.foldersEnabled {
+        if model.preferences.foldersEnabled {
           Section {
             if model.showsUnfiled {
               Button(.organizationUnfiled, systemImage: "tray") {
@@ -40,9 +40,12 @@ struct OrganizationSidebar: View {
             }
           }
         }
-        if model.tagsEnabled {
+        if model.preferences.tagsEnabled {
           Section {
-            DisclosureGroup(isExpanded: $model.tagsExpanded) {
+            DisclosureGroup(isExpanded: Binding(
+              get: { model.preferences.tagsExpanded },
+              set: { model.preferences.tagsExpanded = $0 }
+            )) {
               if model.showsUntagged, !snapshot.tags.tags.isEmpty {
                 Button(.organizationUntagged, systemImage: "tag.slash") {
                   browse { model.filter.untagged = true; model.filter.tagIDs = [] }
@@ -89,8 +92,14 @@ private struct OrganizationFolderBranch: View {
   var body: some View {
     Group {
       if let children = model.snapshot?.folders.children(of: folder.id, locale: locale), !children.isEmpty {
-        DisclosureGroup(isExpanded: Binding(get: { model.expanded.contains(folder.id) }, set: { expanded in
-          if expanded { model.expanded.insert(folder.id) } else { model.expanded.remove(folder.id) }
+        DisclosureGroup(isExpanded: Binding(get: {
+          model.preferences.expanded.contains(folder.id)
+        }, set: { expanded in
+          if expanded {
+            model.preferences.expanded.insert(folder.id)
+          } else {
+            model.preferences.expanded.remove(folder.id)
+          }
         })) {
           ForEach(children) { child in
             OrganizationFolderBranch(model: model, folder: child, recipes: recipes,

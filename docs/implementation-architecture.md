@@ -124,6 +124,16 @@ Recipe Library and Session projections, preferences, and external-change/cloud
 observers for their full lifetimes. Startup exposes prepared or unavailable
 state with retry; test hosts select explicit disposable storage.
 
+`KitchenPreferencesStoring` owns application preference storage. Launch-time
+cloud selection remains available before Kitchen preparation; composition binds
+`OrganizationPreferencesStoring` only after resolving owner/store scope and
+Kitchen identity. Settings and organization presentation share that observable
+capability, including feature visibility, scoped expansion, and expansion reset.
+Production uses local-only typed Defaults keys; disposable graphs use retained
+in-memory preferences. Presentation retains pending-command JSON, retry, and
+recovery separately. See [the dependency inventory](../DEPENDENCIES.md) for the
+small adoption of legacy dotted preference keys required by Defaults.
+
 `RecipeLibraryModel` crosses the deep `RecipeLibrary` seam for durable library
 intentions. `RecipeDrafts` owns device-local Recipe Editing Draft membership,
 contents, recovery, persistence, and frozen-command publication;

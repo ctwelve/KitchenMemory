@@ -57,7 +57,10 @@ protocol CloudSyncPreferenceStoring: AnyObject {
 @MainActor
 protocol KitchenPreferencesStoring:
   SampleRecipeOnboardingStoring,
-  CloudSyncPreferenceStoring {}
+  CloudSyncPreferenceStoring {
+  /// Bind only after the owner/store scope and Kitchen identity are resolved.
+  func organizationPreferences(scope: String, kitchenID: Kitchen.ID) -> any OrganizationPreferencesStoring
+}
 
 /// Stores typed application preferences while preserving each key's scope.
 ///
@@ -72,6 +75,7 @@ final class DefaultsKitchenPreferencesStore: NSObject, KitchenPreferencesStoring
 
   private let sampleRecipeOnboardingKey: Defaults.Key<StoredSampleRecipeOnboardingResponse>
   private let cloudSynchronizationKey: Defaults.Key<Bool>
+  private let defaults: UserDefaults
   private let notificationCenter: NotificationCenter
   private var sampleRecipeObservation: (any Defaults.Observation)?
   private var onSampleRecipeChange: (@MainActor (SampleRecipeOnboardingResponse) -> Void)?
@@ -87,6 +91,7 @@ final class DefaultsKitchenPreferencesStore: NSObject, KitchenPreferencesStoring
       suite: defaults,
       iCloud: false
     )
+    self.defaults = defaults
     self.cloudSynchronizationKey = cloudSynchronizationKey
     sampleRecipeOnboardingKey = Defaults.Key(
       Self.sampleRecipeOnboardingResponseKey,
@@ -96,6 +101,10 @@ final class DefaultsKitchenPreferencesStore: NSObject, KitchenPreferencesStoring
     )
     self.notificationCenter = notificationCenter
     super.init()
+  }
+
+  func organizationPreferences(scope: String, kitchenID: Kitchen.ID) -> any OrganizationPreferencesStoring {
+    DefaultsOrganizationPreferences(defaults: defaults, scope: scope, kitchenID: kitchenID)
   }
 
   deinit {
@@ -156,6 +165,16 @@ final class DefaultsKitchenPreferencesStore: NSObject, KitchenPreferencesStoring
 final class VolatileKitchenPreferencesStore: KitchenPreferencesStoring {
   var sampleRecipeOnboardingResponse: SampleRecipeOnboardingResponse
   var personalCloudSynchronizationEnabled: Bool
+  private let organizationVisibility = VolatileOrganizationVisibility()
+  private var organizationScopes: [String: VolatileOrganizationPreferences] = [:]
+
+  func organizationPreferences(scope: String, kitchenID: Kitchen.ID) -> any OrganizationPreferencesStoring {
+    let identity = scope + "." + kitchenID.rawValue.uuidString
+    if let existing = organizationScopes[identity] { return existing }
+    let preferences = VolatileOrganizationPreferences(visibility: organizationVisibility)
+    organizationScopes[identity] = preferences
+    return preferences
+  }
 
   init(
     sampleRecipeOnboardingResponse: SampleRecipeOnboardingResponse = .undecided,

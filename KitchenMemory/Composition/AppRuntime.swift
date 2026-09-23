@@ -220,7 +220,6 @@ enum AppRuntime {
     )
 #endif
   }
-
 }
 
 @MainActor
@@ -265,6 +264,7 @@ struct PreparedCore {
     if plan.sampleFixture == .installed {
       try SampleRecipeInstallService(repository: recipeRepository, samples: samples).install(in: kitchenID)
     }
+    let organizationScope = ownerID.rawValue + "." + (plan.store.personalCloudContainerIdentifier ?? "local")
     libraryModel = RecipeLibraryModel(
       library: library,
       samplePreferences: preferences,
@@ -275,7 +275,8 @@ struct PreparedCore {
       organization: RecipeOrganizationModel(
         repository: SwiftDataRecipeOrganizationRepository(modelContainer: modelContainer),
         kitchenID: preparedKitchen.kitchen.id,
-        scope: ownerID.rawValue + "." + (plan.store.personalCloudContainerIdentifier ?? "local"),
+        scope: organizationScope,
+        preferences: preferences.organizationPreferences(scope: organizationScope, kitchenID: kitchenID),
         defaults: plan.store.isInMemory ? try organizationTestingDefaults() : .standard
       )
     )

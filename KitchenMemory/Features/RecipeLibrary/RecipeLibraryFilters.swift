@@ -19,7 +19,7 @@ struct RecipeLibraryFilters: View {
         .textFieldStyle(.roundedBorder)
         .accessibilityLabel(Text(.organizationSearch))
         .accessibilityIdentifier("organization-search")
-      if model.tagsEnabled, let snapshot = model.snapshot {
+      if model.preferences.tagsEnabled, let snapshot = model.snapshot {
         let tags = snapshot.tags.orderedTags(locale: locale).filter { model.filter.tagIDs.contains($0.id) }
         if !tags.isEmpty {
           Label(tags.map(\.name).joined(separator: ", "), systemImage: "tag")
@@ -41,7 +41,9 @@ struct RecipeLibraryFilters: View {
   }
 
   private var scopeTitle: String {
-    guard model.foldersEnabled else { return LocalizedStringResource.organizationAll.localized(for: locale) }
+    guard model.preferences.foldersEnabled else {
+      return LocalizedStringResource.organizationAll.localized(for: locale)
+    }
     switch model.filter.location {
     case .all: return LocalizedStringResource.organizationAll.localized(for: locale)
     case .unfiled: return LocalizedStringResource.organizationUnfiled.localized(for: locale)
@@ -55,7 +57,7 @@ struct RecipeLibraryFilters: View {
   private var filterActions: some View {
     Button(.organizationResetFilters) { model.resetFilters() }
       .accessibilityIdentifier("reset-recipe-filters")
-    if model.foldersEnabled, model.filter.location != .all {
+    if model.preferences.foldersEnabled, model.filter.location != .all {
       Button(.organizationAll) { model.showAllRecipes() }
     }
   }

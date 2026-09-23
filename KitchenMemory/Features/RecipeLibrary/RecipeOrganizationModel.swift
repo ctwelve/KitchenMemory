@@ -12,6 +12,7 @@ final class RecipeOrganizationModel {
   private let repository: any RecipeOrganizationRepository
   private let kitchenID: Kitchen.ID
   private let defaults: UserDefaults
+  let preferences: any OrganizationPreferencesStoring
   private let prefix: String
   private(set) var snapshot: RecipeOrganization?
   private(set) var pending: RecipeOrganizationCommand?
@@ -21,26 +22,19 @@ final class RecipeOrganizationModel {
   var filter = RecipeOrganizationFilter()
   var selectedRecipes: Set<Recipe.ID> = []
   var selecting = false
-  var tagsExpanded: Bool { didSet { defaults.set(tagsExpanded, forKey: prefix + ".tags-expanded") } }
-  var foldersEnabled: Bool { didSet { defaults.set(foldersEnabled, forKey: "organization.folders.enabled") } }
-  var tagsEnabled: Bool { didSet { defaults.set(tagsEnabled, forKey: "organization.tags.enabled") } }
-  var expanded: Set<Folder.ID> { didSet { persistExpanded() } }
   private(set) var showsUnfiled = true
   private(set) var showsUntagged = true
 
   init(
     repository: any RecipeOrganizationRepository, kitchenID: Kitchen.ID, scope: String,
+    preferences: any OrganizationPreferencesStoring,
     defaults: UserDefaults = .standard
   ) {
     self.repository = repository
     self.kitchenID = kitchenID
     self.defaults = defaults
+    self.preferences = preferences
     prefix = "organization." + scope + "." + kitchenID.rawValue.uuidString
-    tagsExpanded = defaults.object(forKey: prefix + ".tags-expanded") as? Bool ?? true
-    foldersEnabled = defaults.object(forKey: "organization.folders.enabled") as? Bool ?? true
-    tagsEnabled = defaults.object(forKey: "organization.tags.enabled") as? Bool ?? true
-    expanded = Set((defaults.stringArray(forKey: prefix + ".expanded") ?? []).compactMap(UUID.init(uuidString:))
-      .map(Folder.ID.init(rawValue:)))
     if let data = defaults.data(forKey: prefix + ".pending") {
       do {
         let command = try JSONDecoder().decode(RecipeOrganizationCommand.self, from: data)
@@ -72,7 +66,8 @@ final class RecipeOrganizationModel {
   func recipes(_ recipes: [StoredRecipe], locale: Locale) -> [StoredRecipe] {
     guard let snapshot else { return recipes }
     return filter.apply(to: recipes, organization: snapshot,
-                        foldersEnabled: foldersEnabled, tagsEnabled: tagsEnabled, locale: locale)
+                        foldersEnabled: preferences.foldersEnabled,
+                        tagsEnabled: preferences.tagsEnabled, locale: locale)
   }
 
   func resetFilters() {
@@ -115,7 +110,7 @@ final class RecipeOrganizationModel {
   func reorderFolder(from offsets: IndexSet, to destination: Int, locale: Locale) {
     guard let snapshot, snapshot.folders.ordering == .manual,
           offsets.count == 1, let source = offsets.first else { return }
-    let rows = snapshot.folders.outline(expanded: expanded, locale: locale)
+    let rows = snapshot.folders.outline(expanded: preferences.expanded, locale: locale)
     guard rows.indices.contains(source), (0...rows.count).contains(destination) else { return }
     let folder = rows[source].folder
     var reordered = rows.map(\.folder)
@@ -159,8 +154,7 @@ final class RecipeOrganizationModel {
     storageInvalid = false
     changeRejected = false
     failed = false
-    expanded = []
-    tagsExpanded = true
+    preferences.resetExpansion()
     filter = RecipeOrganizationFilter()
     selectedRecipes = []
   }
@@ -178,9 +172,6 @@ final class RecipeOrganizationModel {
     if !filter.tagIDs.insert(id).inserted { filter.tagIDs.remove(id) }
   }
 
-  private func persistExpanded() {
-    defaults.set(expanded.map { $0.rawValue.uuidString }.sorted(), forKey: prefix + ".expanded")
-  }
   func identifier(_ value: String, prefix: String) -> UUID? {
     guard value.hasPrefix(prefix) else { return nil }
     return UUID(uuidString: String(value.dropFirst(prefix.count)))
