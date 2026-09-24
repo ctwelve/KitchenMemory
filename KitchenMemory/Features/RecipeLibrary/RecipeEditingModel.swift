@@ -20,10 +20,10 @@ final class RecipeEditingModel: Identifiable {
   var pendingSave: RecipeSaveCommand? { draft.pendingSave }
   var isImportCandidate: Bool { draft.isImportCandidate }
   var canSaveRevision: Bool { draft.canSaveRevision }
-  /// Compatibility binding for fields outside ingredient authoring, pending interface sealing in #212.
+  /// Bindings for recipe details; Kit preserves live ingredients and captured metadata.
   var session: RecipeEditSession {
     get { draft.session }
-    set { draft.session = newValue }
+    set { draft.updateRecipeDetails(from: newValue) }
   }
 
   init(draft: RecipeEditingDraft) { self.draft = draft }

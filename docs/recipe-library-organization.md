@@ -158,7 +158,10 @@ Structured ingredient and section controls in both modes call identity-based
 and surviving line identities before the existing persistence notification.
 Mode changes and accept/keep interpretation choices use the same live-draft
 owner. A removed row's stale control cannot recreate it, and a frozen Save
-intention rejects further edits.
+intention rejects further edits. The live session and ingredient snapshots are
+read-only to clients. Other form fields retain copy-based bindings through
+`updateRecipeDetails(from:)`, which cannot replace ingredient state or captured
+metadata. Text interpretation and representation repair remain inside KitchenKit.
 
 `RecipeIngredientTextDraft` is optional, Codable device-local editing state inside
 `RecipeEditSession`, not a new persisted Recipe schema. Native text edit ranges
@@ -190,6 +193,10 @@ new choices without moving focus. Instruction sections
 and their steps use nested editor surfaces, spacing, borders, semantic headings
 and accessibility groups; color is not the sole grouping cue.
 Those unresolved choices and active text survive local draft
-recovery. Merely opening simple editing does not reinterpret maintained content.
+recovery. Reconciliation choices retain pending text, precision, and proposals
+for untouched ingredients; explicit whole-Revision or ingredient-collection
+choices replace them. Restoration repairs legacy representation mismatches from
+maintained structured contents before exposing the live draft. Merely opening
+simple editing does not reinterpret maintained content.
 Close retains the draft, Save publishes a Revision, and Discard still uses the
 existing confirmation. Organization retains the commit boundaries documented above.

@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import Foundation
-import KitchenKit
+@testable import KitchenKit
 import XCTest
 
 final class RecipeIngredientTextDraftTests: XCTestCase {

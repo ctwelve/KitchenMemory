@@ -121,7 +121,9 @@ final class RecipeDraftRelaunchTests: XCTestCase {
     } onChange: {
       changed.fulfill()
     }
-    draft.session.title = "Direct module edit"
+    var details = draft.session
+    details.title = "Direct module edit"
+    draft.updateRecipeDetails(from: details)
     XCTAssertEqual(editor.session.title, "Direct module edit")
     editor.session.summary = "Native binding edit"
     XCTAssertEqual(draft.session.summary, "Native binding edit")

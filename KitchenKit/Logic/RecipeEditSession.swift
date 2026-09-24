@@ -22,8 +22,9 @@ public enum RecipeEditSessionError: Error, Equatable, Sendable {
 
 /// UI-independent state for editing a recipe.
 ///
-/// The current sheet and a future in-page editor can bind to the same value
-/// without making SwiftUI responsible for validation or lossless draft assembly.
+/// Clients may edit non-ingredient fields on a copy and submit them through
+/// `RecipeEditingDraft.updateRecipeDetails(from:)`. Ingredient state is externally
+/// read-only and is maintained by the live draft's explicit operations.
 public struct RecipeEditSession: Codable, Equatable, Sendable {
   public static let maximumDurationMinutes = 366 * 24 * 60
 
@@ -41,7 +42,8 @@ public struct RecipeEditSession: Codable, Equatable, Sendable {
   public var sourceURL: String
   public var media: [RecipeMedia]?
   public var equipment: [EquipmentItem]?
-  public var ingredientSections: [IngredientSection]
+  /// Read-only ingredient contents; mutate the live draft through its ingredient operations.
+  public internal(set) var ingredientSections: [IngredientSection]
   public var instructionSections: [InstructionSection]
   /// Recoverable simple-editor state; absent in drafts created before this editor existed.
   public internal(set) var ingredientText: RecipeIngredientTextDraft?
@@ -127,7 +129,7 @@ public struct RecipeEditSession: Codable, Equatable, Sendable {
     completedIngredientText?.sections ?? ingredientSections
   }
 
-  public mutating func moveIngredientSection(at index: Int, by offset: Int) {
+  mutating func moveIngredientSection(at index: Int, by offset: Int) {
     moveElement(in: &ingredientSections, at: index, by: offset)
   }
 

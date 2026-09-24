@@ -116,12 +116,10 @@ final class RecipeIngredientAuthoringTests: XCTestCase {
     var salt = IngredientLineParser.parse("1 tsp salt")
     salt.parseState = .reviewed
     let fixture = try Fixture(sections: [IngredientSection(title: "Main", ingredients: [salt])])
-    // The current native-text ingress remains supported until #211 migrates its history.
-    fixture.draft.session.prepareIngredientText()
-    var text = try XCTUnwrap(fixture.draft.session.ingredientText)
-    text.replaceCharacters(in: NSRange(location: 7, length: 1), with: "2")
-    text.finishEditing(locale: Locale(identifier: "en_US"))
-    fixture.draft.session.updateIngredientText(text)
+    let input = fixture.draft.beginIngredientTextEditing()
+    input.replaceCharacters(in: NSRange(location: 7, length: 1), with: "2", source: input.document.text)
+    input.completeLines(locale: Locale(identifier: "en_US"))
+    let text = input.document
     let sectionID = try XCTUnwrap(text.sections.first?.id)
     let lineIDs = text.lines.map(\.id)
     let proposal = try XCTUnwrap(text.conflicts.first)
@@ -144,11 +142,9 @@ final class RecipeIngredientAuthoringTests: XCTestCase {
       var salt = IngredientLineParser.parse("1 tsp salt")
       salt.note = "Use fine salt"
       let fixture = try Fixture(sections: [IngredientSection(ingredients: [salt])])
-      XCTAssertTrue(fixture.draft.prepareIngredientText())
-      var text = try XCTUnwrap(fixture.draft.session.ingredientText)
-      let ingredientID = try XCTUnwrap(text.sections.first?.ingredients.first?.id)
-      text.replaceCharacters(in: NSRange(location: 0, length: 1), with: "2")
-      fixture.draft.session.updateIngredientText(text)
+      let input = fixture.draft.beginIngredientTextEditing()
+      let ingredientID = try XCTUnwrap(input.document.sections.first?.ingredients.first?.id)
+      input.replaceCharacters(in: NSRange(location: 0, length: 1), with: "2", source: input.document.text)
 
       XCTAssertTrue(fixture.draft.finishIngredientText(locale: Locale(identifier: "en_US")))
       XCTAssertEqual(fixture.draft.session.ingredientText?.conflicts.count, 1)

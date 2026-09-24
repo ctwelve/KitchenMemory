@@ -34,6 +34,21 @@ Repository protocols                  Persistence boundary
 Domain values and evidence projector  Domain
 ```
 
+### Editing a Recipe
+
+``RecipeDrafts`` owns recoverable device-local drafts and publication. A live
+``RecipeEditingDraft`` exposes a read-only ``RecipeEditSession`` snapshot.
+Use identity-based ingredient operations or a ``RecipeIngredientTextEditing``
+interface for ingredient changes. Native controls retain one interface for their
+lifetime; completing a mode or replacing contents retires its transient history.
+
+For other form fields, edit a session copy and submit
+``RecipeEditingDraft/updateRecipeDetails(from:)``. Kit applies editable details
+while retaining ingredients and captured metadata. Restoration and reconciliation
+keep ingredient text and structured contents consistent before persistence.
+``RecipeIngredientTextDraft`` contains recoverable wording, line identities, and
+interpretation proposals; it is not part of a published ``RecipeRevision``.
+
 ## Topics
 
 ### Domain Foundations

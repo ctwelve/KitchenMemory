@@ -117,23 +117,25 @@ final class RecipeIngredientTextEditingTests: XCTestCase {
 
   func testReplacementWithIdenticalWordingRetiresOldIdentityHistory() throws {
     let fixture = try IngredientTextEditingFixture()
-    let draft = fixture.draft
+    let recipeID = Recipe.ID()
+    let first = RecipeRevision(recipeID: recipeID, revisionNumber: 1, title: "Soup", ingredientSections: [
+      IngredientSection(ingredients: [IngredientLineParser.parse("1 tsp salt")]),
+    ])
+    let second = RecipeRevision(recipeID: recipeID, revisionNumber: 2, title: "Replacement", ingredientSections: [
+      IngredientSection(ingredients: [IngredientLineParser.parse("1 tsp salt")]),
+    ])
+    let comparison = try RecipeReconciliation(kitchenID: Kitchen.ID(), revisions: [first, second],
+                                              observedSelectionIDs: [])
+    let draft = try fixture.drafts.beginReconciliation(comparison)
+    try draft.chooseRevision(first.id)
     let old = draft.beginIngredientTextEditing()
     let oldID = try XCTUnwrap(old.document.sections.first?.ingredients.first?.id)
-    var replacement = RecipeEditSession(draft: RecipeDraft(title: "Replacement", ingredientSections: [
-      IngredientSection(ingredients: [IngredientLineParser.parse("1 tsp salt")]),
-    ]))
-    replacement.prepareIngredientText()
-    draft.session = replacement
+    try draft.choose(.ingredients, from: second.id)
     XCTAssertFalse(old.isActive)
     XCTAssertFalse(old.replaceCharacters(in: NSRange(location: 0, length: 1), with: "2", source: "1 tsp salt"))
-    XCTAssertEqual(draft.session, replacement)
+    XCTAssertEqual(draft.session.ingredientSections, second.ingredientSections)
     let current = draft.beginIngredientTextEditing()
     XCTAssertNotEqual(current.document.sections.first?.ingredients.first?.id, oldID)
-    draft.session = RecipeEditSession(draft: RecipeDraft(title: "No text document"))
-    XCTAssertFalse(current.isActive)
-    XCTAssertFalse(current.completeLines())
-    XCTAssertNil(draft.session.ingredientText)
   }
 
   func testModeCompletionRetiresCallbacksAndReopeningStartsNewHistory() throws {

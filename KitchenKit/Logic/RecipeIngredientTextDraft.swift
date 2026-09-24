@@ -6,8 +6,9 @@ import Foundation
 
 /// Device-local text and identity bookkeeping for simple ingredient editing.
 ///
-/// Native text adapters supply the actual edited UTF-16 range. Interpretation never rewrites
-/// the source. The resulting sections and unresolved proposals survive draft recovery; this
+/// This read-only snapshot is maintained by `RecipeEditingDraft` operations and native edits
+/// through `RecipeIngredientTextEditing`. Interpretation never rewrites the source.
+/// The resulting sections and unresolved proposals survive draft recovery; this
 /// document is editing state only and is never included in a published Revision.
 public struct RecipeIngredientTextDraft: Codable, Equatable, Sendable {
   public struct Line: Codable, Equatable, Identifiable, Sendable {
@@ -79,7 +80,7 @@ public struct RecipeIngredientTextDraft: Codable, Equatable, Sendable {
 
   /// Applies one native edit, retaining identities only for surviving parts of affected lines.
   /// Inserting complete lines at a row's start keeps that row's identity with its suffix.
-  public mutating func replaceCharacters(in range: NSRange, with replacement: String) {
+  mutating func replaceCharacters(in range: NSRange, with replacement: String) {
     let source = text as NSString
     guard !lines.isEmpty, range.location >= 0, range.length >= 0, NSMaxRange(range) <= source.length else { return }
     var starts: [Int] = []
@@ -114,7 +115,7 @@ public struct RecipeIngredientTextDraft: Codable, Equatable, Sendable {
 
   /// Call on completed lines, paste, blur, and before switching modes or publishing.
   /// An active line may be excluded while its authored text is already retained in `sections`.
-  public mutating func finishEditing(locale: Locale = .current, excludingLineAtUTF16Offset activeOffset: Int? = nil) {
+  mutating func finishEditing(locale: Locale = .current, excludingLineAtUTF16Offset activeOffset: Int? = nil) {
     var offset = 0
     for index in lines.indices {
       let length = (lines[index].source as NSString).length
@@ -151,9 +152,10 @@ public struct RecipeIngredientTextDraft: Codable, Equatable, Sendable {
   }
 
   /// Rebuild after structured editing while retaining proposals for untouched ingredients.
-  public func incorporating(_ sections: [IngredientSection],
-                            displayWording: [RecipeIngredient.ID: String] = [:]) -> Self {
+  func incorporating(_ sections: [IngredientSection],
+                     displayWording: [RecipeIngredient.ID: String] = [:]) -> Self {
     let current = self.sections
+    let currentIngredients = Dictionary(uniqueKeysWithValues: current.flatMap(\.ingredients).map { ($0.id, $0) })
     let sameStructure = current.count == sections.count && zip(current, sections).allSatisfy {
       $0.id == $1.id && $0.title == $1.title && $0.ingredients.map(\.id) == $1.ingredients.map(\.id)
     }
@@ -161,7 +163,8 @@ public struct RecipeIngredientTextDraft: Codable, Equatable, Sendable {
       var updated = self
       let ingredients = Dictionary(uniqueKeysWithValues: sections.flatMap(\.ingredients).map { ($0.id, $0) })
       for index in updated.lines.indices {
-        guard let previous = updated.lines[index].ingredient, let value = ingredients[previous.id] else { continue }
+        guard let previous = updated.lines[index].ingredient, let value = ingredients[previous.id],
+              currentIngredients[previous.id] != value else { continue }
         updated.lines[index].incorporate(value)
       }
       return updated
@@ -171,7 +174,7 @@ public struct RecipeIngredientTextDraft: Codable, Equatable, Sendable {
       let replacement = updated.lines[index]
       if let ingredient = replacement.ingredient,
          var previous = lines.first(where: { $0.sectionID == nil && $0.ingredient?.id == ingredient.id }) {
-        previous.incorporate(ingredient)
+        if currentIngredients[ingredient.id] != ingredient { previous.incorporate(ingredient) }
         updated.lines[index] = previous
       } else if let sectionID = replacement.sectionID,
                 var previous = lines.first(where: { $0.sectionID == sectionID }) {
@@ -185,7 +188,7 @@ public struct RecipeIngredientTextDraft: Codable, Equatable, Sendable {
   }
 
   /// Explicitly accept the parser proposal or retain all precise fields for an edited line.
-  public mutating func resolve(_ id: RecipeIngredient.ID, acceptingInterpretation: Bool) {
+  mutating func resolve(_ id: RecipeIngredient.ID, acceptingInterpretation: Bool) {
     guard let index = lines.firstIndex(where: { $0.ingredient?.id == id }),
           let proposal = lines[index].conflict else { return }
     if acceptingInterpretation { lines[index].ingredient = proposal.proposed }
