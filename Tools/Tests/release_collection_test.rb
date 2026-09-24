@@ -74,6 +74,7 @@ class ReleaseCollectionTest < Minitest::Test
     with_artifacts { |directory| prepare(directory) }
     creation = @calls.find { |args| args[1..2] == %w[release create] }
     assert_includes creation, '--draft'
+    assert_includes creation, '--prerelease'
     assert_includes creation, '--verify-tag'
     assert_equal 3, @calls.count { |args| args[1..2] == %w[release upload] }
   end

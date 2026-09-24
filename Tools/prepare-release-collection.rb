@@ -38,7 +38,7 @@ module KitchenMemory
         Dir.mktmpdir do |temp|
           notes = File.join(temp, 'notes.md')
           File.write(notes, "Verified notarized macOS artifact from Xcode Cloud build #{evidence.fetch('cloud_build_number')}.\n\nPending install/launch acceptance and release-tier review. Do not publish until those checks are complete.\n\nCommit: #{sha}\n")
-          capture('gh', 'release', 'create', tag, '--repo', repo, '--verify-tag', '--draft', '--title', "Kitchen Memory #{tag.delete_prefix('release/')}", '--notes-file', notes)
+          capture('gh', 'release', 'create', tag, '--repo', repo, '--verify-tag', '--draft', '--prerelease', '--title', "Kitchen Memory #{tag.delete_prefix('release/')} alpha", '--notes-file', notes)
         end
       end
       files = [evidence.fetch('artifact_name'), 'SHA256SUMS', 'release-evidence.json'].map { |name| File.join(directory, name) }

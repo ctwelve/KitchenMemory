@@ -166,3 +166,21 @@ is established by artifact collection.
 
 API contract references: [Cloud build runs](https://developer.apple.com/documentation/appstoreconnectapi/build-runs)
 and [Cloud artifacts](https://developer.apple.com/documentation/appstoreconnectapi/artifacts).
+
+## 0.3.3 alpha candidate
+
+The maintainer requested a simple release of the current accepted code on
+2026-09-24. Version 0.3.3 gathers the accepted adaptive navigation, recipe reading
+and ingredient-editing slices, package algorithm improvements, and the macOS/iOS
+26.5 baseline with GitHub development CI. It remains an alpha, with focused
+integration and distribution checks rather than a new major-release audit.
+
+The release marker is aligned with the existing 0.3.3 application and inventory.
+Required PR checks and exact post-merge GitHub/Cloud validation must pass before
+the annotated `release/0.3.3` tag is created. The collector must verify the new
+tagged product and record its source SHA, Cloud build, artifact identity, and
+checksum. Historical build 429 is tooling evidence only.
+
+Publication remains pending the new artifact's standalone launch check and
+reviewed alpha release notes. This candidate does not claim beta readiness,
+the deferred comprehensive UI/accessibility matrix, or a new TestFlight audience.
