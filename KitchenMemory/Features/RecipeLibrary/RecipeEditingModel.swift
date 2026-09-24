@@ -20,7 +20,7 @@ final class RecipeEditingModel: Identifiable {
   var pendingSave: RecipeSaveCommand? { draft.pendingSave }
   var isImportCandidate: Bool { draft.isImportCandidate }
   var canSaveRevision: Bool { draft.canSaveRevision }
-  /// Compatibility binding for native text and fields outside structured ingredient authoring.
+  /// Compatibility binding for fields outside ingredient authoring, pending interface sealing in #212.
   var session: RecipeEditSession {
     get { draft.session }
     set { draft.session = newValue }

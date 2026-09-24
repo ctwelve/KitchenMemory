@@ -19,7 +19,7 @@ struct RecipeSimpleEditor: View {
     Section {
       VStack(alignment: .leading, spacing: 0) {
         if editor.session.ingredientText != nil {
-          NativeIngredientText(document: textBinding, actions: textActions)
+          NativeIngredientText(draft: editor.draft, actions: textActions)
             .frame(height: textHeight)
             .overlay(RoundedRectangle(cornerRadius: 6).stroke(.secondary.opacity(0.4)))
         }
@@ -87,12 +87,6 @@ struct RecipeSimpleEditor: View {
     }
     .accessibilityElement(children: .contain)
     .accessibilityLabel(title)
-  }
-
-  private var textBinding: Binding<RecipeIngredientTextDraft> {
-    // Native text replacement/history retains its compatibility path until issue #211.
-    Binding(get: { editor.session.ingredientText ?? .init(sections: editor.session.ingredientSections) },
-            set: { editor.session.updateIngredientText($0) })
   }
 
   private func prepareText() {

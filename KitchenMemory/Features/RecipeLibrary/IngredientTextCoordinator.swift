@@ -18,56 +18,30 @@ final class IngredientTextActions {
 
 @MainActor
 final class IngredientTextCoordinator: NSObject {
-  var document: Binding<RecipeIngredientTextDraft>
+  let editing: RecipeIngredientTextEditing
+  var document: RecipeIngredientTextDraft { editing.document }
   var locale: Locale
-  private var snapshots: [RecipeIngredientTextDraft]
-  private var snapshotIndex = 0
   private weak var nativeUndoManager: UndoManager?
   private var nativeText: (() -> String?)?
   var applyingAttributes = false
 
-  init(document: Binding<RecipeIngredientTextDraft>, locale: Locale) {
-    self.document = document
+  init(draft: RecipeEditingDraft, locale: Locale) {
+    editing = draft.beginIngredientTextEditing()
     self.locale = locale
-    snapshots = [document.wrappedValue]
   }
 
-  func replace(_ range: NSRange, with replacement: String, undoing: Bool, redoing: Bool = false) {
-    synchronizeAdjustments()
-    var value = document.wrappedValue
-    let resultingText = (value.text as NSString).replacingCharacters(in: range, with: replacement)
-    let restoredIndex: Int?
-    if undoing {
-      restoredIndex = snapshots.indices.prefix(snapshotIndex).last { snapshots[$0].text == resultingText }
-    } else if redoing {
-      restoredIndex = snapshots.indices.dropFirst(snapshotIndex + 1).first { snapshots[$0].text == resultingText }
-    } else {
-      restoredIndex = nil
-    }
-    if let restoredIndex {
-      snapshotIndex = restoredIndex
-      value = snapshots[restoredIndex]
-    } else {
-      value.replaceCharacters(in: range, with: replacement)
-      let cursor = range.location + (replacement as NSString).length
-      value.finishEditing(locale: locale, excludingLineAtUTF16Offset: replacement.contains("\n") ? nil : cursor)
-      snapshots = Array(snapshots.prefix(snapshotIndex + 1)) + [value]
-      snapshotIndex += 1
-    }
-    document.wrappedValue = value
+  func end() {
+    editing.end()
+    observeNativeUndo(nil, text: { nil })
   }
 
-  func synchronizeAdjustments() {
-    let current = document.wrappedValue
-    let previous = snapshots[snapshotIndex]
-    guard current != previous else { return }
-    if current.text != previous.text {
-      snapshots = [current]
-      snapshotIndex = 0
-    } else {
-      snapshots = snapshots.map { $0.preservingAdjustments(from: previous, to: current) }
-      snapshots[snapshotIndex] = current
-    }
+  @discardableResult
+  func replace(_ range: NSRange, with replacement: String, source: String,
+               undoing: Bool, redoing: Bool = false) -> Bool {
+    guard editing.isActive, source == document.text else { return false }
+    editing.replaceCharacters(in: range, with: replacement, source: source,
+                              undoing: undoing, redoing: redoing, locale: locale)
+    return true
   }
 
   /// AppKit can undo text storage without calling either text-change delegate method.
@@ -87,28 +61,23 @@ final class IngredientTextCoordinator: NSObject {
   }
 
   @objc private func nativeUndoCompleted(_ notification: Notification) {
-    guard let text = nativeText?(), text != document.wrappedValue.text else { return }
-    replace(NSRange(location: 0, length: (document.wrappedValue.text as NSString).length),
-            with: text, undoing: notification.name == Notification.Name.NSUndoManagerDidUndoChange,
-            redoing: notification.name == Notification.Name.NSUndoManagerDidRedoChange)
+    guard let text = nativeText?() else { return }
+    editing.observeNativeUndo(text: text, redoing: notification.name == Notification.Name.NSUndoManagerDidRedoChange,
+                              locale: locale)
   }
 
   func finish(excluding offset: Int? = nil) {
-    synchronizeAdjustments()
-    var value = document.wrappedValue
-    value.finishEditing(locale: locale, excludingLineAtUTF16Offset: offset)
-    if value != document.wrappedValue { document.wrappedValue = value }
-    snapshots[snapshotIndex] = value
+    editing.completeLines(excluding: offset, locale: locale)
   }
 
   func decorate(_ storage: NSTextStorage, base: [NSAttributedString.Key: Any], undoManager: UndoManager?) {
-    guard !applyingAttributes, storage.string == document.wrappedValue.text else { return }
+    guard !applyingAttributes, editing.isActive, storage.string == document.text else { return }
     applyingAttributes = true
     undoManager?.disableUndoRegistration()
     storage.beginEditing()
     storage.setAttributes(base, range: NSRange(location: 0, length: storage.length))
     var offset = 0
-    for line in document.wrappedValue.lines {
+    for line in document.lines {
       let length = (line.source as NSString).length
       defer { offset += length + 1 }
       if line.sectionID != nil {

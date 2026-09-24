@@ -28,16 +28,38 @@ public final class RecipeEditingDraft: Identifiable {
   }
   private var contents: RecipeEditSession
   @ObservationIgnored var changed: () -> Void = {}
+  @ObservationIgnored weak var ingredientTextEditing: RecipeIngredientTextEditing?
+  /// Transient identity for the native editor lifetime. Recreate the control when this changes.
+  /// Precision changes retain it; replacement content and completed editor lifetimes do not.
+  public private(set) var ingredientTextEditorID = UUID()
+
+  func retireIngredientTextEditing(_ editing: RecipeIngredientTextEditing) {
+    guard ingredientTextEditing === editing else { return }
+    ingredientTextEditing = nil
+    ingredientTextEditorID = UUID()
+  }
 
   /// Current editing contents. Use this draft's ingredient operations for structured edits.
-  /// The setter remains a compatibility ingress for native text history and other recipe fields.
+  /// The setter remains a legacy compatibility ingress to seal in #212; native editors use
+  /// `beginIngredientTextEditing()` and unrelated recipe fields still use session bindings.
   public var session: RecipeEditSession {
     get { contents }
     set {
       guard pendingSave == nil else { return }
       contents = newValue
+      ingredientTextEditing?.synchronize()
       changed()
     }
+  }
+
+  func updateIngredientText(_ text: RecipeIngredientTextDraft, from editing: RecipeIngredientTextEditing) -> Bool {
+    guard ingredientTextEditing === editing, pendingSave == nil else { return false }
+    var updated = contents
+    updated.updateIngredientText(text)
+    guard updated != contents else { return false }
+    contents = updated
+    changed()
+    return true
   }
 
   public var pendingSave: RecipeSaveCommand? {
@@ -116,6 +138,7 @@ public final class RecipeEditingDraft: Identifiable {
     if comparison.draft != nil { try comparison.retainEdits(from: session) }
     try change(&comparison)
     guard let selected = comparison.draft else { throw RecipeReconciliationError.missingChoice }
+    ingredientTextEditing?.end()
     reconciliation = comparison
     contents = RecipeEditSession(draft: selected)
     changed()

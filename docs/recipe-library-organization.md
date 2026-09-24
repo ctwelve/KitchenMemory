@@ -171,6 +171,15 @@ converts the line back. Add Ingredient Section inserts the same prefix through t
 native text control. Native text undo/redo restores text and its draft identities
 while that text control remains open; application-wide undo remains deferred.
 
+`RecipeIngredientTextEditing` retains the transient semantic history for that
+native control. Text undo/redo restores historical quantities and identities
+while keeping later explicit precision adjustments. Mode completion, view
+teardown, and replacement content retire the editing interface; delayed callbacks
+cannot edit its replacement. The app recreates the native control when Kit's
+editor identity changes, so native actions and semantic history share one lifetime.
+Precision changes that leave the text and line identities unchanged retain that
+lifetime. None of this history enters the draft's encoded record or a Revision.
+
 Changed precise ingredients retain their existing adjustments and an explicit
 parser proposal. Save can publish the authored text and retained details without
 accepting the proposal; replacing those details requires explicit acceptance.

@@ -97,7 +97,8 @@ public extension RecipeEditingDraft {
   /// Existing precise fields and unresolved proposals retain their normal choice semantics.
   @discardableResult
   func finishIngredientText(locale: Locale = .current) -> Bool {
-    editIngredientText {
+    ingredientTextEditing?.end()
+    return editIngredientText {
       $0.prepareIngredientText()
       $0.finishIngredientText(locale: locale)
     }
