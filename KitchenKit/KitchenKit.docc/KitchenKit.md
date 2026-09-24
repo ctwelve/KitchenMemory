@@ -66,6 +66,8 @@ Domain values and evidence projector  Domain
 
 - ``RecipeLibrary``
 - ``RecipeDraft``
+- ``RecipeDrafts``
+- ``RecipeEditingDraft``
 - ``RecipeEditSession``
 - ``RecipeIngredientTextDraft``
 - ``CookingSessions``

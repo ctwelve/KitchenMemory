@@ -29,12 +29,12 @@ struct RecipeSimpleEditor: View {
         textActions.addSection(LocalizedStringResource.recipeEditorSectionDefault.localized(for: locale))
       }
       DisclosureGroup(.recipeEditorPrecision) {
-        ForEach(editor.session.ingredientSections.indices, id: \.self) { section in
-          ForEach(editor.session.ingredientSections[section].ingredients.indices, id: \.self) { index in
-            IngredientEditor(ingredient: $editor.session.ingredientSections[section].ingredients[index],
-                             moveUp: { moveIngredient(section, index, by: -1) },
-                             moveDown: { moveIngredient(section, index, by: 1) },
-                             delete: { editor.session.ingredientSections[section].ingredients.remove(at: index) })
+        ForEach(editor.session.ingredientSections) { section in
+          ForEach(section.ingredients) { ingredient in
+            IngredientEditor(ingredient: editor.ingredientBinding(ingredient),
+                             moveUp: { editor.draft.moveIngredient(ingredient.id, by: -1) },
+                             moveDown: { editor.draft.moveIngredient(ingredient.id, by: 1) },
+                             delete: { editor.draft.removeIngredient(ingredient.id) })
           }
         }
       }
@@ -90,6 +90,7 @@ struct RecipeSimpleEditor: View {
   }
 
   private var textBinding: Binding<RecipeIngredientTextDraft> {
+    // Native text replacement/history retains its compatibility path until issue #211.
     Binding(get: { editor.session.ingredientText ?? .init(sections: editor.session.ingredientSections) },
             set: { editor.session.updateIngredientText($0) })
   }
@@ -98,13 +99,7 @@ struct RecipeSimpleEditor: View {
     let formatter = RecipePresentationFormatter(locale: locale)
     let wording = Dictionary(uniqueKeysWithValues: editor.session.ingredientSections.flatMap(\.ingredients)
       .map { ($0.id, formatter.ingredient($0)) })
-    editor.session.prepareIngredientText(displayWording: wording)
-  }
-
-  private func moveIngredient(_ section: Int, _ index: Int, by offset: Int) {
-    let destination = index + offset
-    guard editor.session.ingredientSections[section].ingredients.indices.contains(destination) else { return }
-    editor.session.ingredientSections[section].ingredients.swapAt(index, destination)
+    editor.draft.prepareIngredientText(displayWording: wording)
   }
 }
 
@@ -180,8 +175,6 @@ struct IngredientInterpretationReview: View {
   }
 
   private func resolve(_ id: RecipeIngredient.ID, accept: Bool) {
-    guard var text = editor.session.ingredientText else { return }
-    text.resolve(id, acceptingInterpretation: accept)
-    editor.session.updateIngredientText(text)
+    editor.draft.resolveIngredientInterpretation(id, accepting: accept)
   }
 }

@@ -4,6 +4,9 @@
 
 import Foundation
 
+/// Low-level value operations retained for native text/history compatibility.
+/// Structured editor controls use the corresponding `RecipeEditingDraft` operations so
+/// text and structured contents agree before the live draft notifies persistence.
 public extension RecipeEditSession {
   /// Opens the simple editor without reinterpreting any maintained content.
   mutating func prepareIngredientText(displayWording: [RecipeIngredient.ID: String] = [:]) {

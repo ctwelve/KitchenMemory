@@ -5,6 +5,7 @@
 import Foundation
 import KitchenKit
 import Observation
+import SwiftUI
 
 /// A native binding and dialog adapter over one KitchenKit-owned draft.
 @MainActor
@@ -19,24 +20,25 @@ final class RecipeEditingModel: Identifiable {
   var pendingSave: RecipeSaveCommand? { draft.pendingSave }
   var isImportCandidate: Bool { draft.isImportCandidate }
   var canSaveRevision: Bool { draft.canSaveRevision }
+  /// Compatibility binding for native text and fields outside structured ingredient authoring.
   var session: RecipeEditSession {
     get { draft.session }
-    set {
-      var updated = newValue
-      if updated.ingredientText == draft.session.ingredientText,
-         updated.ingredientSections != draft.session.ingredientSections {
-        updated.prepareIngredientText()
-      }
-      draft.session = updated
-    }
+    set { draft.session = newValue }
   }
 
   init(draft: RecipeEditingDraft) { self.draft = draft }
 
   func setAdvancedEditor(_ advanced: Bool, locale: Locale) {
-    session.prepareIngredientText()
-    session.finishIngredientText(locale: locale)
+    draft.finishIngredientText(locale: locale)
     usesAdvancedEditor = advanced
+  }
+
+  func ingredientBinding(_ ingredient: RecipeIngredient) -> Binding<RecipeIngredient> {
+    Binding(
+      get: { self.session.ingredientSections.lazy.flatMap(\.ingredients)
+        .first(where: { $0.id == ingredient.id }) ?? ingredient },
+      set: { self.draft.updateIngredient($0) }
+    )
   }
 }
 
