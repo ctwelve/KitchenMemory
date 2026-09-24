@@ -899,18 +899,18 @@ class CheckProjectStructureTest < Minitest::Test
     assert_includes error.message, "KitchenMemoryUITests must remain serial"
   end
 
-  def test_rejects_serial_hosted_application_test_target
+  def test_rejects_parallel_hosted_application_test_target
     fixture = Fixture.new
     plan = JSON.parse(fixture.plans.fetch("KitchenMemory.xctestplan"))
     hosted_target = plan.fetch("testTargets").find do |entry|
       entry.dig("target", "name") == "KitchenMemoryTests"
     end
-    hosted_target.delete("parallelizable")
+    hosted_target["parallelizable"] = true
     fixture.plans["KitchenMemory.xctestplan"] = JSON.generate(plan)
 
     error = assert_contract_error { validate(fixture) }
 
-    assert_includes error.message, "KitchenMemoryTests must remain parallel"
+    assert_includes error.message, "KitchenMemoryTests must remain serial"
   end
 
   def test_rejects_platform_plan_with_wrong_variable_expansion_target

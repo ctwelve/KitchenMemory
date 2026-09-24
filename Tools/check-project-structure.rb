@@ -160,12 +160,12 @@ module KitchenMemory
       },
       "KitchenMemoryCloud.xctestplan" => {
         configuration: "Test Scheme Action",
-        parallel_targets: %w[KitchenKitTests KitchenMemoryTests],
+        parallel_targets: %w[KitchenKitTests],
         variable_expansion_target: "KitchenMemory"
       },
       "KitchenMemory.xctestplan" => {
         configuration: "Test Scheme Action",
-        parallel_targets: %w[KitchenMemoryTests],
+        parallel_targets: [],
         variable_expansion_target: "KitchenMemory"
       }
     }.freeze

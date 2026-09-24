@@ -34,13 +34,15 @@ schemes use `Testing`; `KitchenMemory Release` uses `ProductionTesting` for Test
 and `Production` for Archive. This explicit release scheme preserves ordinary
 local test settings while exercising optimized code in Cloud.
 
-The hosted `KitchenMemoryTests` target remains parallelizable. The
-`KitchenMemoryUITests` target is deliberately serial: its methods share one
-application lifecycle, and native macOS runners cannot safely foreground that
-application while another UI runner or retained hosted-test process owns it.
-The UI launch harness terminates a retained macOS host before applying the
-disposable UI-testing launch plan. The project-structure contract enforces this
-parallel-hosted, serial-UI boundary.
+The hosted `KitchenMemoryTests` and `KitchenMemoryUITests` targets run serially
+in both application plans. Hosted tests exercise real native windows, first
+responders, paste delivery, and undo managers; they are not independent of an
+application lifecycle. This also isolates the intermittent iOS native-paste
+failure observed under parallel CI execution. Serialization is a controlled
+mitigation, not yet proof of that failure's cause. The unhosted `KitchenKitTests`
+target remains parallelizable. The UI launch harness terminates a retained macOS
+host before applying the disposable UI-testing launch plan. The project-structure
+contract enforces parallel framework tests and serial application tests.
 
 The application scheme does not expose Mac Catalyst, Mac Designed for iPhone
 or iPad, or visionOS Designed for iPhone or iPad destinations. Compatibility
