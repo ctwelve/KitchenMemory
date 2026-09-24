@@ -187,6 +187,8 @@ class CheckProjectStructureTest < Minitest::Test
 			baseConfigurationReference = #{file_identifier} /* #{name}.xcconfig */;
 			buildSettings = {
 				MERGED_BINARY_TYPE = automatic;
+				MACOSX_DEPLOYMENT_TARGET = 26.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
 			};
 			name = #{name};
 		};
@@ -591,6 +593,20 @@ class CheckProjectStructureTest < Minitest::Test
     error = assert_contract_error { validate(fixture) }
 
     assert_includes error.message, "project Debug must set MERGED_BINARY_TYPE to automatic"
+  end
+
+  def test_rejects_project_deployment_target_drift
+    fixture = Fixture.new
+    fixture.project.sub!("MACOSX_DEPLOYMENT_TARGET = 26.5;", "MACOSX_DEPLOYMENT_TARGET = 26.0;")
+    error = assert_contract_error { validate(fixture) }
+    assert_includes error.message, "must set MACOSX_DEPLOYMENT_TARGET to 26.5"
+  end
+
+  def test_rejects_target_deployment_override
+    fixture = Fixture.new
+    fixture.project.sub!("SUPPORTED_PLATFORMS =", "IPHONEOS_DEPLOYMENT_TARGET = 26.0;\n\t\t\t\tSUPPORTED_PLATFORMS =")
+    error = assert_contract_error { validate(fixture) }
+    assert_includes error.message, "must inherit or set IPHONEOS_DEPLOYMENT_TARGET to 26.5"
   end
 
   def test_rejects_localization_contract_phase_after_product_build_phase

@@ -35,7 +35,7 @@ xcrun --sdk iphoneos swiftc \
   -swift-version 6 \
   -parse-as-library \
   -enable-testing \
-  -target arm64-apple-ios26.0 \
+  -target arm64-apple-ios26.5 \
   -sdk "$sdk" \
   -F "$products" \
   -framework KitchenKit \

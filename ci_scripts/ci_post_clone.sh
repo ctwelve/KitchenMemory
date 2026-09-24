@@ -8,28 +8,8 @@ set -eu
 
 repository_path=$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)
 
-# Exercise the repository-owned contract through its dependency-free Ruby entry
-# point in the same way locally and in Xcode Cloud.
-ruby "$repository_path/Tools/Tests/check_release_version_test.rb"
-ruby "$repository_path/Tools/Tests/check_project_structure_test.rb"
-ruby "$repository_path/Tools/Tests/check_software_inventory_test.rb"
-ruby "$repository_path/Tools/Tests/check_localization_test.rb"
-ruby "$repository_path/Tools/Tests/check_documentation_test.rb"
-ruby "$repository_path/Tools/check-documentation.rb"
-ruby "$repository_path/Tools/check-localization.rb"
-
-# Keep the native multiplatform target, generated bundle metadata, platform
-# plist adapters, project-owned sandbox capabilities, signing entitlements,
-# shared schemes and plans, resources, and test hosts synchronized.
-ruby "$repository_path/Tools/check-project-structure.rb"
-
-# Keep the reviewed SPDX inventory synchronized with SwiftPM pins and the
-# marketing version before package code or executable plugins run.
-ruby "$repository_path/Tools/check-software-inventory.rb"
-
-# Branch and pull-request actions have no tag and pass without a release check.
-# Archives require an immutable tag that matches the version committed in Xcode.
-ruby "$repository_path/Tools/check-release-version.rb"
+# Share the same repository contracts with local checks and GitHub Actions.
+ruby "$repository_path/Tools/check-repository.rb"
 
 # Disable fingerprint validation for pinned package dependencies. This tradeoff
 # enables SwiftLint in Xcode Cloud's noninteractive build environment.

@@ -6,6 +6,8 @@ SPDX-License-Identifier: MIT
 
 # Kitchen Memory
 
+Requires macOS 26.5 or iOS 26.5 or newer. Build with Xcode 27.
+
 > Cook, remember, improve.
 
 Kitchen Memory is a private, local-first recipe book for Mac, iPhone, and iPad.

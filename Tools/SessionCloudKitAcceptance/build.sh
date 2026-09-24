@@ -37,7 +37,7 @@ xcrun swiftc \
   -swift-version 6 \
   -parse-as-library \
   -enable-testing \
-  -target arm64-apple-macos26.0 \
+  -target arm64-apple-macos26.5 \
   -sdk "$sdk" \
   -I "$products" \
   -Xcc "-fmodule-map-file=$numerics_shims/module.modulemap" \
