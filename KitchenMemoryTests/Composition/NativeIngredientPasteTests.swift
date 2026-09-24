@@ -9,23 +9,64 @@ import XCTest
 
 @MainActor
 final class NativeIngredientPasteTests: XCTestCase {
+  func testReplacementRetiresTheOldNativeControlEvenWhenWordingMatches() async throws {
+    let salt = IngredientLineParser.parse("1 tsp salt")
+    let draft = RecipeEditingDraft(draft: RecipeDraft(ingredientSections: [IngredientSection(ingredients: [salt])]))
+    let host = try IngredientPasteHost(draft: draft)
+    defer { host.close() }
+    let old = try host.textView()
+    let oldCoordinator = try XCTUnwrap(old.delegate as? IngredientTextCoordinator)
+    var replacement = RecipeEditSession(draft: RecipeDraft(ingredientSections: [
+      IngredientSection(ingredients: [IngredientLineParser.parse("1 tsp salt")]),
+    ]))
+    replacement.prepareIngredientText()
+    draft.session = replacement
+    try await host.waitFor { (try? host.textView()) !== old }
+    XCTAssertFalse(oldCoordinator.replace(NSRange(location: 0, length: 1), with: "2",
+                                          source: "1 tsp salt", undoing: false))
+    XCTAssertEqual(draft.session, replacement)
+    let current = try host.textView()
+    XCTAssertNotIdentical(current, old)
+    XCTAssertFalse(try XCTUnwrap(current.undoManager).canUndo)
+  }
+
+  func testNativeTextUndoAndRedoPreserveLaterPrecisionAndIdentity() async throws {
+    let salt = IngredientLineParser.parse("1 tsp salt")
+    let draft = RecipeEditingDraft(draft: RecipeDraft(ingredientSections: [IngredientSection(ingredients: [salt])]))
+    let host = try IngredientPasteHost(draft: draft)
+    defer { host.close() }
+    let text = try host.textView()
+    host.focus(text)
+    host.select(NSRange(location: 0, length: 1), in: text)
+    host.paste("2", into: text)
+    try await host.waitFor { draft.session.ingredientSections.first?.ingredients.first?.quantity?
+      .lowerBound?.numerator == 2 }
+    var adjusted = try XCTUnwrap(draft.session.ingredientSections.first?.ingredients.first)
+    adjusted.note = "Use fine salt"
+    XCTAssertTrue(draft.updateIngredient(adjusted))
+    // Let SwiftUI update the native adapter, as it does when a precision control changes the draft.
+    await Task.yield()
+    host.undo(in: text)
+    XCTAssertEqual(draft.session.ingredientText?.text, "1 tsp salt")
+    XCTAssertEqual(draft.session.ingredientSections.first?.ingredients.first?.quantity?.lowerBound?.numerator, 1)
+    XCTAssertEqual(draft.session.ingredientSections.first?.ingredients.first?.id, salt.id)
+    XCTAssertEqual(draft.session.ingredientSections.first?.ingredients.first?.note, "Use fine salt")
+    host.redo(in: text)
+    XCTAssertEqual(draft.session.ingredientText?.text, "2 tsp salt")
+    XCTAssertEqual(draft.session.ingredientSections.first?.ingredients.first?.quantity?.lowerBound?.numerator, 2)
+    XCTAssertEqual(draft.session.ingredientSections.first?.ingredients.first?.id, salt.id)
+    XCTAssertEqual(draft.session.ingredientSections.first?.ingredients.first?.note, "Use fine salt")
+  }
+
   func testSingleLineIngredientPasteInterpretsWithoutLeavingTheLine() async throws {
-    var document = RecipeIngredientTextDraft(sections: [])
-    let interpreted = expectation(description: "Pasted ingredient interpreted")
-    var completed = false
-    let binding = Binding(get: { document }, set: {
-      document = $0
-      if !completed, document.text == "2 cups flour", document.lines.allSatisfy(\.isInterpreted) {
-        completed = true
-        interpreted.fulfill()
-      }
-    })
-    let host = try IngredientPasteHost(document: binding)
+    let draft = RecipeEditingDraft(draft: RecipeDraft())
+    var document: RecipeIngredientTextDraft { draft.session.ingredientText! }
+    let host = try IngredientPasteHost(draft: draft)
     defer { host.close() }
     let text = try host.textView()
     host.focus(text)
     host.paste("2 cups flour", into: text)
-    await fulfillment(of: [interpreted], timeout: 3)
+    try await host.waitFor { document.text == "2 cups flour" && document.lines.allSatisfy(\.isInterpreted) }
     XCTAssertEqual(document.text, "2 cups flour")
     let ingredient = try XCTUnwrap(document.sections.first?.ingredients.first)
     XCTAssertEqual(ingredient.quantity?.lowerBound?.numerator, 2)
@@ -34,22 +75,14 @@ final class NativeIngredientPasteTests: XCTestCase {
   }
 
   func testSingleLineHeadingPasteRetainsSectionIdentityThroughNativeUndoAndRedo() async throws {
-    var document = RecipeIngredientTextDraft(sections: [])
-    let interpreted = expectation(description: "Pasted heading interpreted")
-    var completed = false
-    let binding = Binding(get: { document }, set: {
-      document = $0
-      if !completed, document.sections.first?.title == "Sauce" {
-        completed = true
-        interpreted.fulfill()
-      }
-    })
-    let host = try IngredientPasteHost(document: binding)
+    let draft = RecipeEditingDraft(draft: RecipeDraft())
+    var document: RecipeIngredientTextDraft { draft.session.ingredientText! }
+    let host = try IngredientPasteHost(draft: draft)
     defer { host.close() }
     let text = try host.textView()
     host.focus(text)
     host.paste("# Sauce", into: text)
-    await fulfillment(of: [interpreted], timeout: 3)
+    try await host.waitFor { document.sections.first?.title == "Sauce" }
     let sectionID = try XCTUnwrap(document.sections.first?.id)
     XCTAssertEqual(document.text, "# Sauce")
     XCTAssertEqual(host.selection(in: text), NSRange(location: 7, length: 0))
@@ -70,8 +103,9 @@ final class NativeIngredientPasteTests: XCTestCase {
   }
 
   func testTypingKeepsTheActiveLineUninterpretedUntilFocusLeaves() throws {
-    var document = RecipeIngredientTextDraft(sections: [])
-    let host = try IngredientPasteHost(document: Binding(get: { document }, set: { document = $0 }))
+    let draft = RecipeEditingDraft(draft: RecipeDraft())
+    var document: RecipeIngredientTextDraft { draft.session.ingredientText! }
+    let host = try IngredientPasteHost(draft: draft)
     defer { host.close() }
     let text = try host.textView()
     host.focus(text)
@@ -92,10 +126,10 @@ final class NativeIngredientPasteTests: XCTestCase {
 
   func testAddingSectionAppendsToNativeTextAndDraft() throws {
     let flour = IngredientLineParser.parse("2 cups flour")
-    var document = RecipeIngredientTextDraft(sections: [IngredientSection(ingredients: [flour])])
+    let draft = RecipeEditingDraft(draft: RecipeDraft(ingredientSections: [IngredientSection(ingredients: [flour])]))
+    var document: RecipeIngredientTextDraft { draft.session.ingredientText! }
     let actions = IngredientTextActions()
-    let host = try IngredientPasteHost(document: Binding(get: { document }, set: { document = $0 }),
-                                       actions: actions)
+    let host = try IngredientPasteHost(draft: draft, actions: actions)
     defer { host.close() }
     let text = try host.textView()
     host.focus(text)
@@ -129,8 +163,8 @@ private final class IngredientPasteHost {
   private let window: UIWindow
 #endif
 
-  init(document: Binding<RecipeIngredientTextDraft>, actions: IngredientTextActions = .init()) throws {
-    let editor = NativeIngredientText(document: document, actions: actions)
+  init(draft: RecipeEditingDraft, actions: IngredientTextActions = .init()) throws {
+    let editor = NativeIngredientText(draft: draft, actions: actions)
 #if os(macOS)
     let hosting = NSHostingView(rootView: editor)
     hosting.frame = NSRect(x: 0, y: 0, width: 400, height: 200)
@@ -151,6 +185,12 @@ private final class IngredientPasteHost {
     window.makeKeyAndVisible()
     root.layoutIfNeeded()
 #endif
+  }
+
+  func waitFor(_ condition: () -> Bool) async throws {
+    let deadline = ContinuousClock.now.advanced(by: .seconds(3))
+    while !condition(), ContinuousClock.now < deadline { try await Task.sleep(for: .milliseconds(10)) }
+    XCTAssertTrue(condition(), "Native editor did not reach the expected state")
   }
 
   func focus(_ text: IngredientPlatformTextView) {
@@ -218,6 +258,14 @@ private final class IngredientPasteHost {
     text.selectedRange()
 #else
     text.selectedRange
+#endif
+  }
+
+  func select(_ range: NSRange, in text: IngredientPlatformTextView) {
+#if os(macOS)
+    text.setSelectedRange(range)
+#else
+    text.selectedRange = range
 #endif
   }
 }

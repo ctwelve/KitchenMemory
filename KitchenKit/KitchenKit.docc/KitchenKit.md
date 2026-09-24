@@ -70,6 +70,7 @@ Domain values and evidence projector  Domain
 - ``RecipeEditingDraft``
 - ``RecipeEditSession``
 - ``RecipeIngredientTextDraft``
+- ``RecipeIngredientTextEditing``
 - ``CookingSessions``
 
 ### Import

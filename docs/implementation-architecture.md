@@ -145,11 +145,15 @@ app-owned Save implementation.
 `RecipeEditingDraft` also owns structured ingredient edits, section operations,
 interpretation choices, and mode-completion reconciliation. It updates text and
 structured contents together before notifying existing draft persistence; the
-app supplies identity-based bindings and localized display wording. The mutable
-session and low-level text methods remain compatibility ingress for native text
-replacement/history and other recipe fields. Issue #211 moves that native text
-history ownership; #212 seals ingredient writes after that migration. Structured
-editor controls must not introduce new uses of the compatibility ingress.
+app supplies identity-based bindings and localized display wording.
+`RecipeIngredientTextEditing` owns transient semantic snapshots and rebases later
+precision adjustments over native undo/redo. A native control retains one editing
+interface for its lifetime. Kit retires that interface on mode completion or
+replacement content; the observable `ingredientTextEditorID` makes the app
+recreate the native control, preventing delayed callbacks from reaching its
+replacement. Native selection, composition, undo grouping/delivery, and styling
+remain in the app. The mutable session and low-level text methods remain legacy
+compatibility ingress to seal in #212; no application ingredient editor uses them.
 
 `RecipeLibraryNavigation` is the single accepted destination owner. Editor,
 Session, finished observation, history return scope, Drafts, Deleted Items, and

@@ -5,15 +5,27 @@
 import KitchenKit
 import SwiftUI
 
+/// A retired Kit editing lifetime gets a fresh native control, so delayed callbacks stay retired.
+struct NativeIngredientText: View {
+  @Bindable var draft: RecipeEditingDraft
+  let actions: IngredientTextActions
+
+  var body: some View {
+    NativeIngredientTextView(draft: draft, actions: actions)
+      .id(draft.ingredientTextEditorID)
+      .id(draft.id)
+  }
+}
+
 #if os(macOS)
 import AppKit
 
-struct NativeIngredientText: NSViewRepresentable {
-  @Binding var document: RecipeIngredientTextDraft
+private struct NativeIngredientTextView: NSViewRepresentable {
+  @Bindable var draft: RecipeEditingDraft
   let actions: IngredientTextActions
   @Environment(\.locale) private var locale
 
-  func makeCoordinator() -> IngredientTextCoordinator { .init(document: $document, locale: locale) }
+  func makeCoordinator() -> IngredientTextCoordinator { .init(draft: draft, locale: locale) }
 
   func makeNSView(context: Context) -> NSScrollView {
     let scroll = IngredientPasteTextView.scrollableTextView()
@@ -23,13 +35,13 @@ struct NativeIngredientText: NSViewRepresentable {
     text.isAutomaticQuoteSubstitutionEnabled = false
     text.isAutomaticDashSubstitutionEnabled = false
     text.font = .preferredFont(forTextStyle: .body)
-    text.string = document.text
+    text.string = context.coordinator.document.text
     text.delegate = context.coordinator
     text.textContainerInset = NSSize(width: 8, height: 8)
     text.setAccessibilityLabel(LocalizedStringResource.recipeEditorIngredientsSection.localized(for: locale))
     text.setAccessibilityIdentifier("simple-ingredient-text")
-    actions.addSection = { [weak text] title in
-      guard let text else { return }
+    actions.addSection = { [weak text, weak coordinator = context.coordinator] title in
+      guard let text, let coordinator, coordinator.editing.isActive else { return }
       text.window?.makeFirstResponder(text)
       text.insertText((text.string.isEmpty ? "" : "\n") + "# " + title + "\n",
                       replacementRange: NSRange(location: (text.string as NSString).length, length: 0))
@@ -39,15 +51,21 @@ struct NativeIngredientText: NSViewRepresentable {
   }
 
   func updateNSView(_ scroll: NSScrollView, context: Context) {
-    context.coordinator.document = $document
     context.coordinator.locale = locale
     guard let text = scroll.documentView as? NSTextView else { return }
+    let document = context.coordinator.document
     if text.string != document.text {
       text.undoManager?.removeAllActions()
       text.string = document.text
     }
-    context.coordinator.synchronizeAdjustments()
     context.coordinator.textDidChange(Notification(name: NSText.didChangeNotification, object: text))
+  }
+
+  static func dismantleNSView(_ scroll: NSScrollView, coordinator: IngredientTextCoordinator) {
+    coordinator.end()
+    guard let text = scroll.documentView as? NSTextView else { return }
+    text.delegate = nil
+    text.undoManager?.removeAllActions()
   }
 }
 
@@ -67,9 +85,8 @@ extension IngredientTextCoordinator: NSTextViewDelegate {
   func textView(_ textView: NSTextView, shouldChangeTextIn affectedCharRange: NSRange,
                 replacementString: String?) -> Bool {
     guard let replacementString, !applyingAttributes else { return true }
-    replace(affectedCharRange, with: replacementString,
-            undoing: textView.undoManager?.isUndoing == true, redoing: textView.undoManager?.isRedoing == true)
-    return true
+    return replace(affectedCharRange, with: replacementString, source: textView.string,
+                   undoing: textView.undoManager?.isUndoing == true, redoing: textView.undoManager?.isRedoing == true)
   }
 
   func textDidChange(_ notification: Notification) {
@@ -83,7 +100,7 @@ extension IngredientTextCoordinator: NSTextViewDelegate {
 
   func textViewDidChangeSelection(_ notification: Notification) {
     guard !applyingAttributes, let text = notification.object as? NSTextView,
-          !text.hasMarkedText(), text.string == document.wrappedValue.text else { return }
+          !text.hasMarkedText(), text.string == document.text else { return }
     finish(excluding: text.selectedRange().location)
   }
 
@@ -92,16 +109,16 @@ extension IngredientTextCoordinator: NSTextViewDelegate {
 #else
 import UIKit
 
-struct NativeIngredientText: UIViewRepresentable {
-  @Binding var document: RecipeIngredientTextDraft
+private struct NativeIngredientTextView: UIViewRepresentable {
+  @Bindable var draft: RecipeEditingDraft
   let actions: IngredientTextActions
   @Environment(\.locale) private var locale
 
-  func makeCoordinator() -> IngredientTextCoordinator { .init(document: $document, locale: locale) }
+  func makeCoordinator() -> IngredientTextCoordinator { .init(draft: draft, locale: locale) }
 
   func makeUIView(context: Context) -> UITextView {
     let text = UITextView()
-    text.text = document.text
+    text.text = context.coordinator.document.text
     text.font = .preferredFont(forTextStyle: .body)
     text.adjustsFontForContentSizeCategory = true
     text.smartDashesType = .no
@@ -111,7 +128,7 @@ struct NativeIngredientText: UIViewRepresentable {
     text.accessibilityLabel = LocalizedStringResource.recipeEditorIngredientsSection.localized(for: locale)
     text.accessibilityIdentifier = "simple-ingredient-text"
     actions.addSection = { [weak text, weak coordinator = context.coordinator] title in
-      guard let text, let coordinator else { return }
+      guard let text, let coordinator, coordinator.editing.isActive else { return }
       text.becomeFirstResponder()
       text.selectedRange = NSRange(location: (text.text as NSString).length, length: 0)
       guard let range = text.selectedTextRange else { return }
@@ -123,14 +140,20 @@ struct NativeIngredientText: UIViewRepresentable {
   }
 
   func updateUIView(_ text: UITextView, context: Context) {
-    context.coordinator.document = $document
     context.coordinator.locale = locale
+    let document = context.coordinator.document
     if text.text != document.text {
       text.undoManager?.removeAllActions()
       text.text = document.text
     }
-    context.coordinator.synchronizeAdjustments()
     context.coordinator.textViewDidChange(text)
+  }
+
+  static func dismantleUIView(_ text: UITextView, coordinator: IngredientTextCoordinator) {
+    coordinator.end()
+    text.delegate = nil
+    text.pasteDelegate = nil
+    text.undoManager?.removeAllActions()
   }
 }
 
@@ -152,13 +175,14 @@ extension IngredientTextCoordinator: UITextPasteDelegate {
 
   /// Programmatic UITextInput insertion does not deliver shouldChangeTextIn like keyboard input does.
   func insertText(_ replacement: String, into text: UITextView, replacing range: UITextRange) {
+    guard editing.isActive else { return }
+    let source = text.text ?? ""
     let affected = NSRange(location: text.offset(from: text.beginningOfDocument, to: range.start),
                            length: text.offset(from: range.start, to: range.end))
     text.selectedTextRange = range
     text.insertText(replacement)
-    if text.text != document.wrappedValue.text {
-      replace(affected, with: replacement, undoing: false)
-    }
+    // If UIKit already delivered its delegate callback, Kit rejects this duplicate pre-edit source.
+    replace(affected, with: replacement, source: source, undoing: false)
     textViewDidChange(text)
   }
 }
@@ -166,9 +190,8 @@ extension IngredientTextCoordinator: UITextPasteDelegate {
 extension IngredientTextCoordinator: UITextViewDelegate {
   func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
     guard !applyingAttributes else { return true }
-    replace(range, with: text,
-            undoing: textView.undoManager?.isUndoing == true, redoing: textView.undoManager?.isRedoing == true)
-    return true
+    return replace(range, with: text, source: textView.text,
+                   undoing: textView.undoManager?.isUndoing == true, redoing: textView.undoManager?.isRedoing == true)
   }
 
   func textViewDidChange(_ textView: UITextView) {
@@ -181,7 +204,7 @@ extension IngredientTextCoordinator: UITextViewDelegate {
 
   func textViewDidChangeSelection(_ textView: UITextView) {
     guard !applyingAttributes, textView.markedTextRange == nil,
-          textView.text == document.wrappedValue.text else { return }
+          textView.text == document.text else { return }
     finish(excluding: textView.selectedRange.location)
   }
 
