@@ -4,7 +4,7 @@
 
 import Foundation
 
-public extension RecipeIngredientTextDraft {
+extension RecipeIngredientTextDraft {
   /// Rebases a text-undo snapshot over subsequent explicit precision edits.
   /// Only fields changed outside the text history are carried over; historical wording and
   /// parser-derived quantities remain undoable. Adjustments apply only to shared ingredient identities.

@@ -10,21 +10,26 @@ import XCTest
 @MainActor
 final class NativeIngredientPasteTests: XCTestCase {
   func testReplacementRetiresTheOldNativeControlEvenWhenWordingMatches() async throws {
-    let salt = IngredientLineParser.parse("1 tsp salt")
-    let draft = RecipeEditingDraft(draft: RecipeDraft(ingredientSections: [IngredientSection(ingredients: [salt])]))
+    let recipeID = Recipe.ID()
+    let first = RecipeRevision(recipeID: recipeID, revisionNumber: 1, title: "Soup", ingredientSections: [
+      IngredientSection(ingredients: [IngredientLineParser.parse("1 tsp salt")]),
+    ])
+    let second = RecipeRevision(recipeID: recipeID, revisionNumber: 2, title: "Stew", ingredientSections: [
+      IngredientSection(ingredients: [IngredientLineParser.parse("1 tsp salt")]),
+    ])
+    var comparison = try RecipeReconciliation(kitchenID: Kitchen.ID(), revisions: [first, second],
+                                              observedSelectionIDs: [])
+    try comparison.chooseRevision(first.id)
+    let draft = RecipeEditingDraft(draft: RecipeDraft(revision: first), reconciliation: comparison)
     let host = try IngredientPasteHost(draft: draft)
     defer { host.close() }
     let old = try host.textView()
     let oldCoordinator = try XCTUnwrap(old.delegate as? IngredientTextCoordinator)
-    var replacement = RecipeEditSession(draft: RecipeDraft(ingredientSections: [
-      IngredientSection(ingredients: [IngredientLineParser.parse("1 tsp salt")]),
-    ]))
-    replacement.prepareIngredientText()
-    draft.session = replacement
+    try draft.choose(.ingredients, from: second.id)
     try await host.waitFor { (try? host.textView()) !== old }
     XCTAssertFalse(oldCoordinator.replace(NSRange(location: 0, length: 1), with: "2",
                                           source: "1 tsp salt", undoing: false))
-    XCTAssertEqual(draft.session, replacement)
+    XCTAssertEqual(draft.session.ingredientSections, second.ingredientSections)
     let current = try host.textView()
     XCTAssertNotIdentical(current, old)
     XCTAssertFalse(try XCTUnwrap(current.undoManager).canUndo)

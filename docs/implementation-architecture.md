@@ -152,8 +152,17 @@ interface for its lifetime. Kit retires that interface on mode completion or
 replacement content; the observable `ingredientTextEditorID` makes the app
 recreate the native control, preventing delayed callbacks from reaching its
 replacement. Native selection, composition, undo grouping/delivery, and styling
-remain in the app. The mutable session and low-level text methods remain legacy
-compatibility ingress to seal in #212; no application ingredient editor uses them.
+remain in the app. Live `session` and its ingredient representations are externally
+read-only. Unrelated form bindings submit `updateRecipeDetails(from:)`; Kit copies
+only editable non-ingredient fields, retaining ingredients and captured metadata.
+Low-level text mutation and history rebasing are internal implementation details.
+
+Recovery normalizes legacy representation mismatches inside Kit before exposing
+a live draft, retaining structured precision and untouched text/proposals without
+completing interpretation. Reconciliation retains pending text, row identities,
+and proposals for untouched ingredients; selecting a whole Revision or ingredient
+collection deliberately replaces them. Native history remains transient, and
+neither the draft file version nor the published Revision format changes.
 
 `RecipeLibraryNavigation` is the single accepted destination owner. Editor,
 Session, finished observation, history return scope, Drafts, Deleted Items, and

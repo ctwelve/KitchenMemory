@@ -333,7 +333,11 @@ location, runs the shared `KitchenKit` scheme and its explicit plan with
 explicit code coverage, and invokes the checker only after Xcode succeeds. This
 macOS result is the canonical exact line-coverage artifact for KitchenKit. It
 does not replace either app correctness lane or the separately selected UI
-smoke target.
+smoke target. The runner also compiles an ordinary `import KitchenKit` client
+against that build with `Tools/check-ingredient-authoring-interface.rb`. Supported
+live-draft operations must compile; direct session replacement, ingredient writes,
+and retired low-level text/history APIs must fail access checking. This gate uses
+neither `@testable` nor access-control overrides.
 
 To check an existing result bundle directly, pass it to:
 

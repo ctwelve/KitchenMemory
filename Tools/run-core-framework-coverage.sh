@@ -32,3 +32,4 @@ xcodebuild test \
   CODE_SIGNING_ALLOWED=NO
 
 "$SCRIPT_DIRECTORY/check-core-framework-coverage.sh" "$RESULT_BUNDLE"
+ruby "$SCRIPT_DIRECTORY/check-ingredient-authoring-interface.rb" "$DERIVED_DATA_PATH/Build/Products/Testing"

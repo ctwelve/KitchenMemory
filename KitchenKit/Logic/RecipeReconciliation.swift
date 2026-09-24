@@ -128,6 +128,12 @@ public struct RecipeReconciliation: Codable, Equatable, Sendable {
     draft = try editedDraft(from: session)
   }
 
+  /// Live reconciliation retains unfinished text and editing identities until publication.
+  mutating func retainEditingContents(from session: RecipeEditSession) throws {
+    try retainEdits(from: session)
+    draft?.ingredientSections = session.ingredientSections
+  }
+
   private func revision(_ id: RecipeRevision.ID) throws -> RecipeRevision {
     guard let value = revisions.first(where: { $0.id == id }) else {
       throw RecipeReconciliationError.invalidChoice

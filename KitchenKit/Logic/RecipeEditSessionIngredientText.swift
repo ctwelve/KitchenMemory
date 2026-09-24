@@ -4,10 +4,8 @@
 
 import Foundation
 
-/// Low-level value operations retained until the public ingredient interface is sealed in #212.
-/// Application editors use `RecipeEditingDraft` and `RecipeIngredientTextEditing` so text and
-/// structured contents agree before the live draft notifies persistence.
-public extension RecipeEditSession {
+/// Kit-owned representation maintenance. Live operations publish both representations together.
+extension RecipeEditSession {
   /// Opens the simple editor without reinterpreting any maintained content.
   mutating func prepareIngredientText(displayWording: [RecipeIngredient.ID: String] = [:]) {
     if let ingredientText {

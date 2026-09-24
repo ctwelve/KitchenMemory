@@ -39,10 +39,9 @@ public final class RecipeEditingDraft: Identifiable {
     ingredientTextEditorID = UUID()
   }
 
-  /// Current editing contents. Use this draft's ingredient operations for structured edits.
-  /// The setter remains a legacy compatibility ingress to seal in #212; native editors use
-  /// `beginIngredientTextEditing()` and unrelated recipe fields still use session bindings.
-  public var session: RecipeEditSession {
+  /// Read-only snapshot of live editing contents. Use ingredient operations for ingredient
+  /// changes and `updateRecipeDetails(from:)` to apply edits to unrelated recipe fields.
+  public internal(set) var session: RecipeEditSession {
     get { contents }
     set {
       guard pendingSave == nil else { return }
@@ -93,6 +92,9 @@ public final class RecipeEditingDraft: Identifiable {
     var session = record.session
     if session.equipment == nil { session.equipment = record.original?.revision.equipment ?? [] }
     if session.media == nil { session.media = record.original?.revision.media ?? [] }
+    // Older clients could persist structured edits without updating the text document.
+    // Repair from those maintained contents without completing pending interpretation.
+    if session.ingredientText != nil { session.prepareIngredientText() }
     contents = session
   }
 
@@ -116,11 +118,11 @@ public final class RecipeEditingDraft: Identifiable {
     contents = session
   }
   public func chooseRevision(_ id: RecipeRevision.ID) throws {
-    try reconcile { try $0.chooseRevision(id) }
+    try reconcile(retainingIngredientText: false) { try $0.chooseRevision(id) }
   }
 
   public func choose(_ field: RecipeComparisonField, from id: RecipeRevision.ID) throws {
-    try reconcile { try $0.choose(field, from: id) }
+    try reconcile(retainingIngredientText: field != .ingredients) { try $0.choose(field, from: id) }
   }
 
   public func chooseIngredient(
@@ -133,14 +135,20 @@ public final class RecipeEditingDraft: Identifiable {
     }
   }
 
-  private func reconcile(_ change: (inout RecipeReconciliation) throws -> Void) throws {
+  private func reconcile(
+    retainingIngredientText: Bool = true, _ change: (inout RecipeReconciliation) throws -> Void
+  ) throws {
     guard pendingSave == nil, var comparison = reconciliation else { throw RecipeReconciliationError.invalidChoice }
-    if comparison.draft != nil { try comparison.retainEdits(from: session) }
+    if comparison.draft != nil { try comparison.retainEditingContents(from: session) }
     try change(&comparison)
     guard let selected = comparison.draft else { throw RecipeReconciliationError.missingChoice }
+    var updated = RecipeEditSession(draft: selected)
+    if retainingIngredientText, let text = contents.ingredientText {
+      updated.updateIngredientText(text.incorporating(selected.ingredientSections))
+    }
     ingredientTextEditing?.end()
     reconciliation = comparison
-    contents = RecipeEditSession(draft: selected)
+    contents = updated
     changed()
   }
 
