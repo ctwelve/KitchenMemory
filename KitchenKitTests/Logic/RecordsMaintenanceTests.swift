@@ -8,6 +8,25 @@ import XCTest
 final class RecordsMaintenanceTests: XCTestCase {
   private let start = Date(timeIntervalSince1970: 1_700_000_000)
 
+  func testPagesKeepUniqueIdentityOrderAndEndOnAnExactlyFullPage() throws {
+    let ids = try (1...4).map { index in
+      try XCTUnwrap(UUID(uuidString: "00000000-0000-0000-0000-00000000000\(index)"))
+    }
+    let input = [ids[3], ids[1], ids[0], ids[2], ids[1], ids[3]]
+    var visited: [UUID] = []
+    let cursor = try maintainPage(input, after: nil, limit: 2) { visited.append($0) }
+    XCTAssertEqual(visited, [ids[0], ids[1]])
+    XCTAssertEqual(cursor, ids[1].uuidString)
+    visited = []
+    XCTAssertNil(try maintainPage(input, after: cursor, limit: 2) { visited.append($0) })
+    XCTAssertEqual(visited, [ids[2], ids[3]])
+    visited = []
+    XCTAssertNil(try maintainPage(input, after: ids[3].uuidString, limit: 2) { visited.append($0) })
+    XCTAssertTrue(visited.isEmpty)
+    XCTAssertNil(try maintainPage(input, after: nil, limit: Int.max) { visited.append($0) })
+    XCTAssertEqual(visited, ids)
+  }
+
   func testFailedAggregateDoesNotStarveLaterCandidatesAndCancellationStopsThePage() throws {
     enum Failure: Error { case unavailable }
     let ids = (0..<3).map { _ in UUID() }.sorted { $0.uuidString < $1.uuidString }

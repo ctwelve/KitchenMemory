@@ -2,6 +2,7 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
+import Algorithms
 import Foundation
 import SwiftData
 
@@ -93,9 +94,8 @@ public final class RecordsMaintenanceRepository {
 
 /// Stable logical-identity continuation; concurrent arrivals behind it enter the next sweep.
 func maintenancePage(_ ids: [UUID], after: String?, limit: Int) -> (ids: Set<UUID>, continuation: String?) {
-  let candidates = Set(ids).sorted { $0.uuidString < $1.uuidString }
-    .filter { id in after.map { id.uuidString > $0 } ?? true }
-  let page = candidates.prefix(limit)
+  let candidates = Set(ids).filter { id in after.map { id.uuidString > $0 } ?? true }
+  let page = candidates.min(count: limit, sortedBy: { $0.uuidString < $1.uuidString })
   return (Set(page), candidates.count > page.count ? page.last?.uuidString : nil)
 }
 

@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import Foundation
+import HeapModule
 
 /// Shared immutable identity and causal context for organization policies.
 struct OrganizationAction<Payload: OrganizationPayload>: Codable, Equatable, Sendable {
@@ -44,19 +45,30 @@ struct OrganizationEvidence<Payload: OrganizationPayload> {
   var heads: [UUID] { graph.maximalNodes }
 
   var replayOrder: [Action] {
-    var pending = receipts.sorted {
+    let pending = receipts.sorted {
       $0.authoredAt == $1.authoredAt ? $0.id.uuidString < $1.id.uuidString : $0.authoredAt < $1.authoredAt
     }
-    var emitted: Set<UUID> = []
     let known = Set(receipts.map(\.id))
+    var dependencies = Array(repeating: 0, count: pending.count)
+    var children: [UUID: [Int]] = [:]
+    // Indices carry the canonical timestamp/UUID priority, including newly ready receipts.
+    var ready = Heap<Int>()
+    for (index, receipt) in pending.enumerated() {
+      let parents = Set(receipt.observed).intersection(known)
+      dependencies[index] = parents.count
+      for parent in parents { children[parent, default: []].append(index) }
+      if parents.isEmpty { ready.insert(index) }
+    }
     let byID = Dictionary(uniqueKeysWithValues: actions.map { ($0.id, $0) })
     var result: [Action] = []
-    while let index = pending.firstIndex(where: {
-      $0.observed.allSatisfy { emitted.contains($0) || !known.contains($0) }
-    }) {
-      let next = pending.remove(at: index)
-      emitted.insert(next.id)
+    while let index = ready.popMin() {
+      let next = pending[index]
       if let action = byID[next.id] { result.append(action) }
+      // Payload-free checkpoint receipts still release their causal descendants.
+      for child in children[next.id, default: []] {
+        dependencies[child] -= 1
+        if dependencies[child] == 0 { ready.insert(child) }
+      }
     }
     return result
   }

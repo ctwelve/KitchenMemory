@@ -2,6 +2,7 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
+import Algorithms
 import Foundation
 
 // The deterministic parser and its bounded scanners stay together so its
@@ -347,7 +348,7 @@ private extension SchemaOrgRecipeImporter {
 
     static func yield(_ value: Any?) -> RecipeYield? {
         if let values = value as? [Any] {
-            guard let first = values.compactMap(cleanedNonemptyText).first else { return nil }
+      guard let first = values.firstNonNil(cleanedNonemptyText) else { return nil }
             return RecipeYield(originalText: first)
         }
         if let object = value as? [String: Any] {
