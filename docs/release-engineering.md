@@ -124,3 +124,41 @@ The [0.1 tag-import failure](https://github.com/ctwelve/KitchenMemory/blob/4a930
 accepted local Mac archive are an exception for that candidate. If a service
 fails again, retain its evidence and establish a candidate-specific recovery
 path without weakening tag protection or claiming absent actions passed.
+
+## Automated Cloud artifact collection
+
+The release collector is being introduced on `release-eng/cloud-release-handoff`;
+its live Apple API access and artifact layout still need verification before
+calling the handoff operational. GitHub protection has already been cut over as
+recorded in the [CI contract](continuous-integration.md#github-enforcement-boundary).
+
+`.github/workflows/release.yml` responds to immutable release tags and supports
+manual retry with the same existing tag. It uses the protected `main` branch's
+tooling, verifies the exact commit's successful GitHub push-to-main check, and
+waits up to two hours for the configured Cloud release workflow's matching tag
+and source commit. A failed latest Cloud attempt is not replaced by an older
+success. This collector neither starts an Archive nor changes a tag.
+
+The `release-collection` GitHub environment needs `ASC_KEY_ID`, `ASC_ISSUER_ID`,
+and `ASC_PRIVATE_KEY` secrets, plus the `ASC_RELEASE_WORKFLOW_ID` variable.
+Use a dedicated App Store Connect API key with the least role Apple permits for
+reading Cloud build artifacts. Keep private keys and signed download URLs out
+of repository files, logs, and release evidence.
+
+Only Apple's `STAPLED_NOTARIZED_ARCHIVE` artifact is eligible. The collector
+requires an unambiguous artifact and checks the actual app's bundle identity,
+version, Developer ID team, Hardened Runtime, sandbox and Production CloudKit
+entitlements, both Mac architectures, signature, notarization ticket, and
+Gatekeeper assessment. It retains the original download bytes and creates a
+SHA-256 checksum and a provenance record identifying the exact Cloud run and
+artifact. Unexpected packaging fails for inspection rather than guessing.
+
+The collector prepares a **draft** GitHub Release. It can resume missing uploads;
+existing assets must match byte for byte, and published releases are never
+modified. Before publishing, complete the install/launch acceptance and the
+applicable release-tier checks above, then replace the provisional draft notes
+with reviewed release notes. No TestFlight audience or public iOS distribution
+is established by artifact collection.
+
+API contract references: [Cloud build runs](https://developer.apple.com/documentation/appstoreconnectapi/build-runs)
+and [Cloud artifacts](https://developer.apple.com/documentation/appstoreconnectapi/artifacts).

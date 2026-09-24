@@ -1,0 +1,49 @@
+# Kitchen Memory
+# Copyright © 2026 the Kitchen Memory contributors.
+# SPDX-License-Identifier: MIT
+name: Collect Cloud release
+on:
+  push:
+    tags: ['release/*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing immutable release/major.minor.patch tag
+        required: true
+        type: string
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: release-${{ inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+jobs:
+  collect:
+    runs-on: xcode-27
+    timeout-minutes: 150
+    environment: release-collection
+    permissions:
+      contents: write
+      actions: read
+    env:
+      RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      DEVELOPER_DIR: /Applications/Xcode_27.0.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify release readiness
+        run: /usr/bin/ruby Tools/prepare-release-collection.rb "$RELEASE_TAG"
+      - name: Collect and verify notarized Mac artifact
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_PRIVATE_KEY: ${{ secrets.ASC_PRIVATE_KEY }}
+          ASC_RELEASE_WORKFLOW_ID: ${{ vars.ASC_RELEASE_WORKFLOW_ID }}
+        run: /usr/bin/ruby Tools/collect-cloud-release.rb "$RELEASE_TAG" build/release
+      - name: Prepare draft release
+        run: /usr/bin/ruby Tools/prepare-release-collection.rb "$RELEASE_TAG" build/release
