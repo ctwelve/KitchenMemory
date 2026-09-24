@@ -11,10 +11,13 @@ Xcode Cloud remains the release-engineering and beta-testing service. The
 application requires macOS 26.5 and iOS 26.5 or newer; the current toolchain is
 Xcode 27.
 
-**Migration status:** the GitHub workflow is prepared in the repository. The
-live protection inspected on 2026-09-24 still requires the Cloud PR result;
-complete the cutover below only after a successful hosted GitHub run. A local
-build or workflow file is not proof of a completed migration.
+**Migration status (2026-09-24):** GitHub PR and post-merge development checks
+passed for merge `19d602a` (the post-merge iOS lane passed on its second attempt
+without source changes). Main now requires `PR source policy` and GitHub's
+`Development CI`. Release tag readiness requires both GitHub's aggregate and
+Cloud's `KitchenMemory | Merge to main`. Cloud routing is configured as described
+below. The release collector has verified a historical notarized artifact; its
+first tag-triggered GitHub execution remains pending integration.
 
 ## Scheme, plan, and destination contract
 
@@ -204,27 +207,29 @@ integration restriction.
 
 ### GitHub enforcement boundary
 
-Live inspection on 2026-09-24 found strict main protection requiring
-`PR source policy` (GitHub Actions app 15368) and
-`KitchenMemory | PR to main from governed branches` (Xcode Cloud app 117084).
-The `Release tag readiness` ruleset also requires Cloud's
-`KitchenMemory | Merge to main` on the tagged commit. Preserve these until the
-replacement has actual hosted evidence.
+The live cutover on 2026-09-24 replaced the Cloud PR requirement with
+`Development CI`, bound to GitHub Actions (app 15368), alongside `PR source
+policy`. Strict mode, required PRs, resolved conversations, administrator
+enforcement, and force-push/deletion restrictions remain unchanged.
 
-Cut over in this order:
+`Release tag readiness` retains Cloud's `KitchenMemory | Merge to main`
+(integration 117084) and additionally requires GitHub's `Development CI`
+(integration 15368), with no bypass actors. The release operator and collector
+must verify the successful **push-to-main** run on the exact tagged commit;
+a same-named PR check does not establish post-merge acceptance.
 
-1. Install the dedicated development signing secrets and publish this workflow.
-2. Verify every GitHub lane on the candidate, including Mac/iOS UI tests and
-   exact KitchenKit coverage. Validate the workflow on a stacked PR too.
-3. Replace the required Cloud PR aggregate with `Development CI`, bound to
-   GitHub Actions. Preserve strict mode, required PRs, resolved conversations,
-   administrator enforcement, and force-push/deletion restrictions.
-4. Verify the GitHub push run on the actual merge. Update `Release tag readiness`
-   to require the GitHub `Development CI` result, preserving its no-bypass rule.
-   The release operator must verify the successful **push-to-main** run on that
-   exact commit, not just a same-named PR check.
-5. Disable the superseded daily Cloud development, PR, and merge workflows.
-   Keep release and beta workflows. Do not delete their historical evidence.
+The agreed Cloud routing is:
+
+- Pushes to `release-eng/*`: Build and Analyze for macOS and iOS. Live routing
+  was narrowed to this prefix on 2026-09-24, with every file change included.
+- Pushes to `main`: required Build and Analyze actions for both platforms,
+  plus KitchenKit tests and KitchenMemoryCloud hosted app tests on both.
+  GitHub retains the full app plan, including UI tests.
+- Immutable `release/x.y.z` tags: Production Archives and Mac notarization.
+
+The superseded Cloud PR workflow was deactivated on 2026-09-24 after verifying
+the replacement actions through Apple's API. Its build history remains available.
+No TestFlight audience or automatic publication was added.
 
 Release creation authority and tag immutability remain separate rulesets.
 This preserves the immutable tag and owner-only creation policy. Repository
