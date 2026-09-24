@@ -24,10 +24,13 @@ class CITest < Minitest::Test
 
   def test_core_has_exact_coverage_and_consumer_checks_after_tests
     jobs = commands('core')
-    assert_equal %w[build test coverage interface], jobs.map(&:first)
+    assert_equal %w[test coverage interface], jobs.map(&:first)
+    assert_includes jobs.first.last, 'test'
+    refute_includes jobs.first.last, 'test-without-building'
+    result = jobs.first.last[jobs.first.last.index('-resultBundlePath') + 1]
     assert_includes jobs.first.last, '-enableCodeCoverage'
     assert_equal 'YES', jobs.first.last[jobs.first.last.index('-enableCodeCoverage') + 1]
-    assert_equal '/tmp/evidence/Tests.xcresult', jobs[2].last.last
+    assert_equal result, jobs[1].last.last
   end
 
   def test_daily_build_checks_production_without_archiving

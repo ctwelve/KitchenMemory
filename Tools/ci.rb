@@ -62,6 +62,9 @@ module KitchenMemory
         jobs.insert(1, ['signing', [RbConfig.ruby, 'Tools/check-ci-signing.rb', File.join(derived, 'Build/Products/Testing')]])
       end
       if framework
+        # Coverage validates source membership from the build log as well as
+        # executed lines. Keep both in one fresh result bundle.
+        jobs = [['test', testing + ['test', '-resultBundlePath', result] + signing]]
         jobs << ['coverage', ['sh', 'Tools/check-core-framework-coverage.sh', result]]
         jobs << ['interface', [RbConfig.ruby, 'Tools/check-ingredient-authoring-interface.rb', File.join(derived, 'Build/Products/Testing')]]
       end
