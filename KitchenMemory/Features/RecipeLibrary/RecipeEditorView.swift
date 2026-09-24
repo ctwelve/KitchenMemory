@@ -82,7 +82,7 @@ struct RecipeEditorView: View {
         }
         ToolbarItem(placement: .cancellationAction) {
           Button(.recipeEditorActionClose) {
-            editor.session.finishIngredientText(locale: locale)
+            editor.draft.finishIngredientText(locale: locale)
             close()
           }.help(Text(.recipeEditorActionClose))
         }
@@ -93,7 +93,7 @@ struct RecipeEditorView: View {
         }
         ToolbarItem(placement: .confirmationAction) {
           Button(editor.isImportCandidate ? .recipeImportAcceptDraft : .recipeEditorReviseActionSave) {
-            editor.session.finishIngredientText(locale: locale)
+            editor.draft.finishIngredientText(locale: locale)
             _ = save()
           }
             .disabled(!editor.isImportCandidate && !editor.canSaveRevision)
@@ -233,18 +233,18 @@ private extension RecipeEditorView {
 
   private var ingredientsSection: some View {
     Section {
-      ForEach(editor.session.ingredientSections.indices, id: \.self) { sectionIndex in
+      ForEach(Array(editor.session.ingredientSections.enumerated()), id: \.element.id) { sectionIndex, section in
         IngredientSectionEditor(
-          section: $editor.session.ingredientSections[sectionIndex],
-          moveUp: { editor.session.moveIngredientSection(at: sectionIndex, by: -1) },
-          moveDown: { editor.session.moveIngredientSection(at: sectionIndex, by: 1) },
-          delete: { editor.session.ingredientSections.remove(at: sectionIndex) }
+          editor: editor,
+          section: section,
+          moveUp: { editor.draft.moveIngredientSection(section.id, by: -1) },
+          moveDown: { editor.draft.moveIngredientSection(section.id, by: 1) },
+          delete: { editor.draft.removeIngredientSection(section.id) }
         )
-        .id("ingredient-section-\(editor.session.ingredientSections[sectionIndex].id.rawValue.uuidString)")
         .modifier(EditorGroupSurface(index: sectionIndex))
       }
       Button(.recipeEditorIngredientsActionAddSection, systemImage: "plus") {
-        editor.session.ingredientSections.append(IngredientSection(title: nil, ingredients: []))
+        editor.draft.addIngredientSection()
       }
       .accessibilityIdentifier("add-ingredient-section")
     } header: { Text(.recipeEditorIngredientsSection) } footer: {

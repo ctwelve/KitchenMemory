@@ -162,20 +162,24 @@ public struct RecipeIngredientTextDraft: Codable, Equatable, Sendable {
       let ingredients = Dictionary(uniqueKeysWithValues: sections.flatMap(\.ingredients).map { ($0.id, $0) })
       for index in updated.lines.indices {
         guard let previous = updated.lines[index].ingredient, let value = ingredients[previous.id] else { continue }
-        if value != previous { updated.lines[index].conflict = nil }
-        updated.lines[index].ingredient = value
-        if value.originalText != previous.originalText {
-          updated.lines[index].source = value.originalText
-          updated.lines[index].interpretedSource = value.originalText
-        }
+        updated.lines[index].incorporate(value)
       }
       return updated
     }
     var updated = Self(sections: sections, displayWording: displayWording)
     for index in updated.lines.indices {
-      guard let ingredient = updated.lines[index].ingredient,
-            let previous = lines.first(where: { $0.ingredient == ingredient }) else { continue }
-      updated.lines[index].conflict = previous.conflict
+      let replacement = updated.lines[index]
+      if let ingredient = replacement.ingredient,
+         var previous = lines.first(where: { $0.sectionID == nil && $0.ingredient?.id == ingredient.id }) {
+        previous.incorporate(ingredient)
+        updated.lines[index] = previous
+      } else if let sectionID = replacement.sectionID,
+                var previous = lines.first(where: { $0.sectionID == sectionID }) {
+        previous.source = replacement.source
+        previous.interpretedSource = replacement.source
+        previous.sectionTitle = replacement.sectionTitle
+        updated.lines[index] = previous
+      }
     }
     return updated
   }
@@ -186,5 +190,16 @@ public struct RecipeIngredientTextDraft: Codable, Equatable, Sendable {
           let proposal = lines[index].conflict else { return }
     if acceptingInterpretation { lines[index].ingredient = proposal.proposed }
     lines[index].conflict = nil
+  }
+}
+
+private extension RecipeIngredientTextDraft.Line {
+  mutating func incorporate(_ value: RecipeIngredient) {
+    if value != ingredient { conflict = nil }
+    if value.originalText != ingredient?.originalText {
+      source = value.originalText
+      interpretedSource = value.originalText
+    }
+    ingredient = value
   }
 }

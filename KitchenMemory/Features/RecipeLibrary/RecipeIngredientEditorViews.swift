@@ -6,7 +6,8 @@ import KitchenKit
 import SwiftUI
 
 struct IngredientSectionEditor: View {
-  @Binding var section: IngredientSection
+  @Bindable var editor: RecipeEditingModel
+  let section: IngredientSection
   let moveUp: () -> Void
   let moveDown: () -> Void
   let delete: () -> Void
@@ -19,17 +20,17 @@ struct IngredientSectionEditor: View {
       accessibilityIdentifier: "ingredient-editor-section-\(section.id.rawValue.uuidString)"
     ) {
       EditorTextField(.recipeEditorSectionNameField, text: titleBinding, prompt: .fieldOptionalPrompt)
-      ForEach(section.ingredients.indices, id: \.self) { index in
+      ForEach(Array(section.ingredients.enumerated()), id: \.element.id) { index, ingredient in
         IngredientEditor(
-            ingredient: $section.ingredients[index],
-            moveUp: { move(index, by: -1) },
-            moveDown: { move(index, by: 1) },
-            delete: { section.ingredients.remove(at: index) }
+            ingredient: editor.ingredientBinding(ingredient),
+            moveUp: { editor.draft.moveIngredient(ingredient.id, by: -1) },
+            moveDown: { editor.draft.moveIngredient(ingredient.id, by: 1) },
+            delete: { editor.draft.removeIngredient(ingredient.id) }
         )
         .modifier(EditorGroupSurface(index: index, level: .item))
       }
       Button(.recipeEditorIngredientsActionAdd, systemImage: "plus") {
-        section.ingredients.append(RecipeIngredient(parseState: .edited))
+        editor.draft.addIngredient(to: section.id)
       }
         .accessibilityIdentifier("add-ingredient-\(section.id.rawValue.uuidString)")
       HStack {
@@ -42,14 +43,9 @@ struct IngredientSectionEditor: View {
   }
   private var titleBinding: Binding<String> {
     Binding(
-      get: { section.title ?? "" },
-      set: { section.title = $0 }
+      get: { editor.session.ingredientSections.first(where: { $0.id == section.id })?.title ?? "" },
+      set: { editor.draft.renameIngredientSection(section.id, to: $0) }
     )
-  }
-  private func move(_ index: Int, by offset: Int) {
-    let destination = index + offset
-    guard section.ingredients.indices.contains(destination) else { return }
-    section.ingredients.swapAt(index, destination)
   }
 }
 

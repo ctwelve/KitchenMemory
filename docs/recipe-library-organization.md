@@ -153,6 +153,13 @@ write the same `RecipeEditingDraft`. Instruction section/step identities, media,
 equipment and other maintained metadata are retained across mode changes. Import
 review continues to use the full editor.
 
+Structured ingredient and section controls in both modes call identity-based
+`RecipeEditingDraft` operations. KitchenKit reconciles text, precise contents,
+and surviving line identities before the existing persistence notification.
+Mode changes and accept/keep interpretation choices use the same live-draft
+owner. A removed row's stale control cannot recreate it, and a frozen Save
+intention rejects further edits.
+
 `RecipeIngredientTextDraft` is optional, Codable device-local editing state inside
 `RecipeEditSession`, not a new persisted Recipe schema. Native text edit ranges
 carry surviving line identities. Text is retained immediately; completing a line,

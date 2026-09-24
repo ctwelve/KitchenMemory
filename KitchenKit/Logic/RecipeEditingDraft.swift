@@ -29,6 +29,8 @@ public final class RecipeEditingDraft: Identifiable {
   private var contents: RecipeEditSession
   @ObservationIgnored var changed: () -> Void = {}
 
+  /// Current editing contents. Use this draft's ingredient operations for structured edits.
+  /// The setter remains a compatibility ingress for native text history and other recipe fields.
   public var session: RecipeEditSession {
     get { contents }
     set {
