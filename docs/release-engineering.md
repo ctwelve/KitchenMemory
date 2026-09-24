@@ -127,10 +127,14 @@ path without weakening tag protection or claiming absent actions passed.
 
 ## Automated Cloud artifact collection
 
-The release collector is being introduced on `release-eng/cloud-release-handoff`;
-its live Apple API access and artifact layout still need verification before
-calling the handoff operational. GitHub protection has already been cut over as
-recorded in the [CI contract](continuous-integration.md#github-enforcement-boundary).
+The release collector is being introduced on `release-eng/cloud-release-handoff`.
+On 2026-09-24, the dedicated Apple API key and GitHub environment were configured,
+and the collector downloaded and passed every artifact check against historical
+Cloud build 429 (`release/0.3.1`, commit `ebc64869fdd8059e7455cdb79a2838675d573966`).
+This was a local collection proof; it did not modify that published release or
+repeat install/launch acceptance. The first tag-triggered GitHub collection and
+draft upload remain pending integration and the next release. GitHub protection
+and Cloud routing are recorded in the [CI contract](continuous-integration.md#github-enforcement-boundary).
 
 `.github/workflows/release.yml` responds to immutable release tags and supports
 manual retry with the same existing tag. It uses the protected `main` branch's

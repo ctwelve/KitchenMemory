@@ -15,8 +15,9 @@ Xcode 27.
 passed for merge `19d602a` (the post-merge iOS lane passed on its second attempt
 without source changes). Main now requires `PR source policy` and GitHub's
 `Development CI`. Release tag readiness requires both GitHub's aggregate and
-Cloud's `KitchenMemory | Merge to main`. Cloud workflow routing and automated
-release-artifact collection are being completed separately.
+Cloud's `KitchenMemory | Merge to main`. Cloud routing is configured as described
+below. The release collector has verified a historical notarized artifact; its
+first tag-triggered GitHub execution remains pending integration.
 
 ## Scheme, plan, and destination contract
 
@@ -219,13 +220,16 @@ a same-named PR check does not establish post-merge acceptance.
 
 The agreed Cloud routing is:
 
-- Pushes to `release-eng/*`: Build and Analyze for macOS and iOS.
-- Pushes to `main`: full automated validation in the Cloud environment.
+- Pushes to `release-eng/*`: Build and Analyze for macOS and iOS. Live routing
+  was narrowed to this prefix on 2026-09-24, with every file change included.
+- Pushes to `main`: required Build and Analyze actions for both platforms,
+  plus KitchenKit tests and KitchenMemoryCloud hosted app tests on both.
+  GitHub retains the full app plan, including UI tests.
 - Immutable `release/x.y.z` tags: Production Archives and Mac notarization.
 
-Retire the superseded Cloud PR workflow after inspecting the replacement
-configuration. Preserve Cloud build history and beta workflows. Do not infer
-new TestFlight audiences or automatic publication from this routing.
+The superseded Cloud PR workflow was deactivated on 2026-09-24 after verifying
+the replacement actions through Apple's API. Its build history remains available.
+No TestFlight audience or automatic publication was added.
 
 Release creation authority and tag immutability remain separate rulesets.
 This preserves the immutable tag and owner-only creation policy. Repository

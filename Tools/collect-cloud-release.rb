@@ -9,6 +9,7 @@ require 'fileutils'
 require 'open3'
 require 'tmpdir'
 require_relative 'Release/cloud'
+require_relative 'check-release-version'
 
 module KitchenMemory
   module Release
@@ -51,7 +52,7 @@ module KitchenMemory
     end
 
     def collect(tag, output)
-      raise 'Expected release/major.minor.patch' unless tag.match?(%r{\Arelease/\d+\.\d+\.\d+\z})
+      raise 'Expected release/major.minor.patch' unless ReleaseVersion::TAG_PATTERN.match?(tag.to_s)
       raise 'Use a new output directory' if File.exist?(output)
       sha = command('git', 'rev-parse', "#{tag}^{commit}")
       raise 'Release tags must be annotated' unless command('git', 'cat-file', '-t', "refs/tags/#{tag}") == 'tag'
