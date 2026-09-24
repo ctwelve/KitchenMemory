@@ -169,15 +169,25 @@ public struct RecipeIngredientTextDraft: Codable, Equatable, Sendable {
       }
       return updated
     }
+    var ingredientLines: [RecipeIngredient.ID: Line] = [:]
+    var sectionLines: [IngredientSection.ID: Line] = [:]
+    // Reverse insertion retains the first matching line, as the original linear lookup did.
+    for line in lines.reversed() {
+      if let sectionID = line.sectionID {
+        sectionLines[sectionID] = line
+      } else if let ingredient = line.ingredient {
+        ingredientLines[ingredient.id] = line
+      }
+    }
     var updated = Self(sections: sections, displayWording: displayWording)
     for index in updated.lines.indices {
       let replacement = updated.lines[index]
       if let ingredient = replacement.ingredient,
-         var previous = lines.first(where: { $0.sectionID == nil && $0.ingredient?.id == ingredient.id }) {
+         var previous = ingredientLines[ingredient.id] {
         if currentIngredients[ingredient.id] != ingredient { previous.incorporate(ingredient) }
         updated.lines[index] = previous
       } else if let sectionID = replacement.sectionID,
-                var previous = lines.first(where: { $0.sectionID == sectionID }) {
+                var previous = sectionLines[sectionID] {
         previous.source = replacement.source
         previous.interpretedSource = replacement.source
         previous.sectionTitle = replacement.sectionTitle

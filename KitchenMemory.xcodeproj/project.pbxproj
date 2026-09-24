@@ -15,6 +15,7 @@
 		D30000000000000000000002 /* OrderedCollections in Frameworks */ = {isa = PBXBuildFile; productRef = D30000000000000000000012 /* OrderedCollections */; };
 		D30000000000000000000003 /* Algorithms in Frameworks */ = {isa = PBXBuildFile; productRef = D30000000000000000000013 /* Algorithms */; };
 		D30000000000000000000021 /* DequeModule in Frameworks */ = {isa = PBXBuildFile; productRef = D30000000000000000000014 /* DequeModule */; };
+		D30000000000000000000022 /* HeapModule in Frameworks */ = {isa = PBXBuildFile; productRef = D30000000000000000000015 /* HeapModule */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -156,6 +157,7 @@
 				D30000000000000000000003 /* Algorithms in Frameworks */,
 				D30000000000000000000001 /* DequeModule in Frameworks */,
 				D30000000000000000000002 /* OrderedCollections in Frameworks */,
+				D30000000000000000000022 /* HeapModule in Frameworks */,
 			);
 		};
 		A1C9A4853042896F00F1F13D /* Frameworks */ = {
@@ -307,6 +309,7 @@
 				D30000000000000000000013 /* Algorithms */,
 				D30000000000000000000011 /* DequeModule */,
 				D30000000000000000000012 /* OrderedCollections */,
+				D30000000000000000000015 /* HeapModule */,
 			);
 			productName = KitchenKit;
 			productReference = A1C9A47E3042896F00F1F13D /* KitchenKit.framework */;
@@ -2296,6 +2299,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = D30000000000000000000004 /* XCRemoteSwiftPackageReference "swift-collections" */;
 			productName = DequeModule;
+		};
+		D30000000000000000000015 /* HeapModule */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D30000000000000000000004 /* XCRemoteSwiftPackageReference "swift-collections" */;
+			productName = HeapModule;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

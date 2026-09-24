@@ -7,6 +7,25 @@ import Foundation
 import XCTest
 
 final class RecipeOrganizationTests: XCTestCase {
+  func testNewlyUnblockedParentChoicePrecedesAnAlreadyReadyLaterChoice() throws {
+    let kitchen = Kitchen.ID(), first = Folder.ID(), second = Folder.ID()
+    let empty = try FolderLibrary(kitchenID: kitchen, commands: [])
+    let creation = try empty.prepare(.create(id: first, name: "First", parentID: nil),
+                                     at: Date(timeIntervalSince1970: 10))
+    let partial = try FolderLibrary(kitchenID: kitchen, commands: [creation])
+    let dependent = try partial.prepare(.create(id: second, name: "Second", parentID: first),
+                                       at: Date(timeIntervalSince1970: 0))
+    // Concurrently requests the opposite edge, without observing Second's creation.
+    let later = FolderCommand(kitchenID: kitchen, action: OrganizationAction(
+      id: UUID(), authoredAt: Date(timeIntervalSince1970: 20), observed: [creation.id, creation.id, UUID()],
+      payload: FolderChange.move(id: first, parentID: second)))
+    for commands in [[creation, dependent, later], [later, dependent, creation]] {
+      let library = try FolderLibrary(kitchenID: kitchen, commands: commands)
+      XCTAssertEqual(library.children(of: nil).map(\.id), [first])
+      XCTAssertEqual(library.children(of: first).map(\.id), [second])
+    }
+  }
+
   func testSystemVisibilityConvergesAndSurvivesCheckpoint() throws {
     let kitchen = Kitchen.ID()
     let folders = try FolderLibrary(kitchenID: kitchen, commands: [])

@@ -2,6 +2,7 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
+import Algorithms
 import OrderedCollections
 
 enum IdentityCoalescingResult<Value: Equatable, Identity: Hashable>: Equatable {
@@ -20,10 +21,7 @@ enum IdentityCollection {
     _ values: [Value],
     id: KeyPath<Value, Identity>
   ) -> [Value] {
-    var identities = OrderedSet<Identity>()
-    return values.filter { value in
-      identities.append(value[keyPath: id]).inserted
-    }
+    values.uniqued(on: { $0[keyPath: id] })
   }
 
   static func coalesce<Value: Equatable, Identity: Hashable>(

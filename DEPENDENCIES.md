@@ -22,8 +22,8 @@ package inventory.
 | Component | Version | License | Purpose |
 | --- | --- | --- | --- |
 | [Defaults](https://github.com/sindresorhus/Defaults) | 9.0.9 | MIT | Typed local application preferences and observation; iCloud key-value synchronization only for the sample-onboarding preference |
-| [swift-collections](https://github.com/apple/swift-collections) | 1.6.0 | Apache-2.0 WITH Swift-exception | `DequeModule` for the ordered Cooking Session outbox, stack-safe causal-graph worklists, and Logic dependency discovery; `OrderedCollections` for first-seen identity coalescing |
-| [swift-algorithms](https://github.com/apple/swift-algorithms) | 1.2.1 | Apache-2.0 WITH Swift-exception | `Algorithms` coalesces duplicate immutable Recipe rows during CloudKit merge reconciliation |
+| [swift-collections](https://github.com/apple/swift-collections) | 1.6.0 | Apache-2.0 WITH Swift-exception | `DequeModule` for the ordered Cooking Session outbox, stack-safe causal-graph worklists, and Logic dependency discovery; `OrderedCollections` for first-seen identity coalescing; `HeapModule` for ready organization receipts |
+| [swift-algorithms](https://github.com/apple/swift-algorithms) | 1.2.1 | Apache-2.0 WITH Swift-exception | `Algorithms` coalesces duplicate immutable Recipe rows, preserves first-seen uniqueness, selects bounded maintenance pages, and stops import yield discovery at the first valid value |
 
 Only the `Defaults` library product from that package is linked. `DefaultsMacros` is deliberately
 not linked: preferences remain behind Kitchen Memory's testable storage
@@ -46,10 +46,12 @@ separate existing JSON storage and recovery behavior.
 
 The `KitchenMemory` application target links `DequeModule` for its in-memory
 Cooking Session command outbox while preserving arrays at the presentation-store
-codec boundary. `KitchenKit` links `DequeModule`, `OrderedCollections`, and
+codec boundary. `KitchenKit` links `DequeModule`, `OrderedCollections`, `HeapModule`, and
 `Algorithms`; the Collections products implement causal-graph worklists,
-first-seen identity semantics, and dependency traversal, while Algorithms
-coalesces duplicate immutable rows inside the owned Recipe repository. Their
+first-seen identity coalescing, dependency traversal, and a priority queue for
+causally ready organization receipts. Algorithms supplies immutable-row
+coalescing, stable uniqueness, bounded minimum selection for maintenance pages,
+and first-valid import yield selection. Their
 transitive implementation modules include `InternalCollectionsUtilities` and
 `ContainersPreview`. The umbrella `Collections` product and unrelated collection
 modules are not linked. Package
