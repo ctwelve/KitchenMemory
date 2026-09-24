@@ -151,7 +151,7 @@ module KitchenMemory
     PLANS = {
       "KitchenKit.xctestplan" => %w[KitchenKitTests],
       "KitchenMemory.xctestplan" => %w[KitchenMemoryTests KitchenMemoryUITests],
-      "KitchenMemoryCloud.xctestplan" => %w[KitchenMemoryTests]
+      "KitchenMemoryCloud.xctestplan" => %w[KitchenKitTests KitchenMemoryTests KitchenMemoryUITests]
     }.freeze
     PLAN_POLICIES = {
       "KitchenKit.xctestplan" => {
@@ -160,7 +160,7 @@ module KitchenMemory
       },
       "KitchenMemoryCloud.xctestplan" => {
         configuration: "Test Scheme Action",
-        parallel_targets: %w[KitchenMemoryTests],
+        parallel_targets: %w[KitchenKitTests KitchenMemoryTests],
         variable_expansion_target: "KitchenMemory"
       },
       "KitchenMemory.xctestplan" => {
@@ -170,6 +170,13 @@ module KitchenMemory
       }
     }.freeze
     SCHEME_ACTION_CONFIGURATIONS = {
+      "KitchenMemory Release" => {
+        "TestAction" => "ProductionTesting",
+        "LaunchAction" => "ProductionTesting",
+        "ProfileAction" => "Production",
+        "AnalyzeAction" => "ProductionTesting",
+        "ArchiveAction" => "Production"
+      },
       "KitchenKit" => {
         "TestAction" => "Testing",
         "LaunchAction" => "Debug",
@@ -186,6 +193,11 @@ module KitchenMemory
       }
     }.freeze
     SCHEMES = {
+      "KitchenMemory Release" => {
+        product: "KitchenMemory",
+        plan: "KitchenMemoryCloud.xctestplan",
+        runnable: true
+      },
       "KitchenKit" => {
         product: "KitchenKit",
         plan: "KitchenKit.xctestplan",

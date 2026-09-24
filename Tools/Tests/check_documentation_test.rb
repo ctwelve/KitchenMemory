@@ -150,10 +150,10 @@ class DocumentationContractTest < Minitest::Test
   def test_plan_membership_and_scheme_reference_drift_fail
     with_topology do |root, docs|
       mutate(root, "KitchenMemoryCloud.xctestplan") { |text| text.sub('"name": "KitchenMemoryTests"', '"name": "KitchenMemoryUITests"') }
-      mutate(root, "KitchenMemory.xcodeproj/xcshareddata/xcschemes/KitchenMemory.xcscheme") { |text| text.sub("container:KitchenMemoryCloud.xctestplan", "container:Other.xctestplan") }
+      mutate(root, "KitchenMemory.xcodeproj/xcshareddata/xcschemes/KitchenMemory Release.xcscheme") { |text| text.sub("container:KitchenMemoryCloud.xctestplan", "container:Other.xctestplan") }
       errors = Contract.topology_errors(root, docs)
       assert errors.any? { |error| error.start_with?("KitchenMemoryCloud.xctestplan test targets") }
-      assert_includes errors, "KitchenMemoryCloud.xctestplan: absent from KitchenMemory scheme"
+      assert_includes errors, "KitchenMemoryCloud.xctestplan: absent from KitchenMemory Release scheme"
     end
   end
 

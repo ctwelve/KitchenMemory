@@ -371,7 +371,7 @@ class CheckProjectStructureTest < Minitest::Test
     result = validate(fixture)
 
     assert_equal 5, result[:target_count]
-    assert_equal 2, result[:scheme_count]
+    assert_equal 3, result[:scheme_count]
     assert_equal 3, result[:plan_count]
     expected_core_groups = {
       "KitchenKit" => ["KitchenKit"],
@@ -935,7 +935,7 @@ class CheckProjectStructureTest < Minitest::Test
     assert_includes error.message, "KitchenMemory TestAction must use Testing"
   end
 
-  def test_rejects_ui_tests_in_cloud_plan
+  def test_requires_framework_tests_in_full_cloud_plan
     fixture = Fixture.new
     local = JSON.parse(fixture.plans.fetch("KitchenMemory.xctestplan"))
     cloud = JSON.parse(fixture.plans.fetch("KitchenMemoryCloud.xctestplan"))
@@ -945,7 +945,7 @@ class CheckProjectStructureTest < Minitest::Test
     error = assert_contract_error { validate(fixture) }
 
     assert_includes error.message, "KitchenMemoryCloud.xctestplan test targets"
-    assert_includes error.message, "KitchenMemoryUITests"
+    assert_includes error.message, "KitchenKitTests"
   end
 
   def test_rejects_cloud_plan_as_local_default

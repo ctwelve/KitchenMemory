@@ -11,7 +11,7 @@ require 'rbconfig'
 
 module KitchenMemory
   module CI
-    LANES = %w[mac-tests ios-tests core mac-build ios-build].freeze
+    LANES = %w[mac-tests ios-tests core mac-build ios-build mac-analyze ios-analyze].freeze
     module_function
 
     def simulator_destination
@@ -37,9 +37,11 @@ module KitchenMemory
       common = ['xcodebuild', '-project', 'KitchenMemory.xcodeproj', '-scheme', scheme,
                 '-destination', destination, '-derivedDataPath', derived,
                 '-onlyUsePackageVersionsFromResolvedFile', '-skipPackagePluginValidation', '-skipMacroValidation']
+      if lane.end_with?('-analyze')
+        return [['analyze', common + ['analyze', '-configuration', 'Testing', 'CODE_SIGNING_ALLOWED=NO']]]
+      end
       if lane.end_with?('-build')
         return [
-          ['analyze', common + ['analyze', '-configuration', 'Testing', 'CODE_SIGNING_ALLOWED=NO']],
           ['production', common + ['build', '-configuration', 'Production', 'CODE_SIGNING_ALLOWED=NO']]
         ]
       end
@@ -99,7 +101,7 @@ if $PROGRAM_NAME == __FILE__
   abort 'Use a new output directory for each CI lane' if File.exist?(output)
   destination = if lane == 'ios-tests'
                   KitchenMemory::CI.simulator_destination
-                elsif lane == 'ios-build'
+                elsif %w[ios-build ios-analyze].include?(lane)
                   'generic/platform=iOS'
                 else
                   'platform=macOS'

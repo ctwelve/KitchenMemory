@@ -63,7 +63,11 @@ module KitchenMemory
                          private_key: ENV.fetch('ASC_PRIVATE_KEY'))
       workflow = ENV.fetch('ASC_RELEASE_WORKFLOW_ID')
       raise 'Invalid workflow ID' unless workflow.match?(/\A[0-9a-f-]{36}\z/i)
-      run = client.wait_for_run(workflow: workflow, tag: tag, sha: sha)
+      run = client.wait_for_run(workflow: workflow, tag: tag, sha: sha,
+                                timeout: ENV['ASC_BUILD_RUN_ID'] ? 0 : 7200)
+      if ENV['ASC_BUILD_RUN_ID'] && run.fetch('id') != ENV['ASC_BUILD_RUN_ID']
+        raise 'Cloud attempt changed after readiness; retry collection from the wait job'
+      end
       artifact = client.notarized_artifact(run.fetch('id'))
       attrs = artifact.fetch('attributes')
       url = URI(attrs.fetch('downloadUrl'))
