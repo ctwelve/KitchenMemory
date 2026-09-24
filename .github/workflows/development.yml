@@ -62,7 +62,7 @@ jobs:
   build:
     needs: decision
     if: needs.decision.outputs.mode == 'full'
-    name: ${{ matrix.lane }}
+    # Default labels include the lane when expanded and stay readable when skipped.
     runs-on: xcode-27
     timeout-minutes: 30
     strategy:
@@ -95,7 +95,7 @@ jobs:
           retention-days: 7
 
   analysis:
-    name: Analyze (${{ matrix.platform }})
+    # Default labels avoid unresolved matrix expressions when analysis is skipped.
     if: github.event_name == 'workflow_dispatch' && inputs.analyze
     runs-on: xcode-27
     timeout-minutes: 30
