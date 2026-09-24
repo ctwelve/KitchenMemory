@@ -21,6 +21,6 @@
 	<key>LSBackgroundOnly</key>
 	<true/>
 	<key>LSMinimumSystemVersion</key>
-	<string>26.0</string>
+	<string>26.5</string>
 </dict>
 </plist>

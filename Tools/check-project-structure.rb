@@ -52,7 +52,9 @@ module KitchenMemory
       [configuration, "#{configuration}.xcconfig"]
     end.freeze
     PROJECT_BUILD_SETTINGS = {
-      "MERGED_BINARY_TYPE" => "automatic"
+      "MERGED_BINARY_TYPE" => "automatic",
+      "MACOSX_DEPLOYMENT_TARGET" => "26.5",
+      "IPHONEOS_DEPLOYMENT_TARGET" => "26.5"
     }.freeze
     APP_FILE_CONTRACTS = {
       "KitchenMemory" => {
@@ -538,6 +540,14 @@ module KitchenMemory
       TARGET_TYPES.each_key do |target_name|
         names = configurations.fetch(target_name).map { |record| record[:name] }
         assert_exact_names("#{target_name} configurations", names, APP_CONFIGURATIONS)
+        configurations.fetch(target_name).each do |record|
+          %w[MACOSX_DEPLOYMENT_TARGET IPHONEOS_DEPLOYMENT_TARGET].each do |setting|
+            value = record[:settings][setting]
+            next if value.nil? || value == "$(inherited)" || value == "26.5"
+
+            raise ContractError, "#{target_name} #{record[:name]} must inherit or set #{setting} to 26.5"
+          end
+        end
       end
       configurations
     end

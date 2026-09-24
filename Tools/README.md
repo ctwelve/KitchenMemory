@@ -12,6 +12,8 @@ are not shipping product modules.
 
 | Task | Entry point |
 | --- | --- |
+| Shared local, GitHub, and Cloud checks | `check-repository.rb` |
+| GitHub daily CI | `ci.rb`, `ci-signing.rb`, `check-ci-signing.rb`; [CI policy](../docs/continuous-integration.md) |
 | Structural/source contracts | `check-project-structure.rb`, `check-localization.rb`, `check-software-inventory.rb`, `check-release-version.rb` |
 | Documentation links and currentness | [Documentation maintenance](../docs/documentation-maintenance.md), `check-documentation.rb` |
 | Synthetic checker regression tests | `Tests/*_test.rb`; the Cloud post-clone script runs them before package code |

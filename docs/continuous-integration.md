@@ -6,11 +6,15 @@ Copyright © 2026 the Kitchen Memory contributors.
 SPDX-License-Identifier: MIT
 -->
 
-Xcode Cloud is Kitchen Memory's continuous-integration system. Local Xcode
-uses the full `KitchenMemory` test plan. Cloud Test actions explicitly select
-`KitchenMemoryCloud`, which runs hosted correctness tests while UI testing is
-temporarily suspended. The `KitchenKit` scheme and plan retain unhosted framework
-coverage.
+GitHub Actions owns daily build, analysis, coverage, and native test checks.
+Xcode Cloud remains the release-engineering and beta-testing service. The
+application requires macOS 26.5 and iOS 26.5 or newer; the current toolchain is
+Xcode 27.
+
+**Migration status:** the GitHub workflow is prepared in the repository. The
+live protection inspected on 2026-09-24 still requires the Cloud PR result;
+complete the cutover below only after a successful hosted GitHub run. A local
+build or workflow file is not proof of a completed migration.
 
 ## Scheme, plan, and destination contract
 
@@ -49,58 +53,76 @@ actions automatically.
 
 ### Integration and hardening development
 
-The development workflow starts for meaningful project changes pushed to
-`slice/*` integration branches, `bugs/*` hardening branches, and
-`release-eng/*` release-infrastructure branches. Development currently performs separate iOS and macOS Build and Analyze actions
-with the `KitchenMemory` scheme and `Testing`. The pull-request workflow supplies
-hosted correctness Test actions using `KitchenMemoryCloud` on both destinations.
-The standalone KitchenKit coverage runner and full native local application plan
-supply the remaining required evidence; they are not additional Cloud Test
-lanes. Local UI navigation remains required when applicable while Cloud UI
-testing is paused. Local
-developer runs use the
-same application scheme with the `Develop` configuration. The distinct
-development bundle identifier keeps local stores,
-CloudKit metadata, and onboarding preferences out of the Production app
-sandbox. Its separate
-CloudKit container also keeps development records and schema administration
-away from production service state.
+`.github/workflows/development.yml` runs on pull requests to **any base**,
+including stacked integration branches, merge-queue candidates, pushes to
+`main`, and manual dispatch. Pull-request runs test GitHub's candidate merge
+commit. The `edited` event also covers retargeting a stack. No path exclusions
+can leave a required result waiting indefinitely. New runs cancel obsolete runs
+for the same event and PR or ref.
 
-Start a release-engineering pass from accepted `main`. A batch of feature
-slices may use a short-lived `slice/*` integration branch; focused `codex/*`
-working branches feed the appropriate governed lane.
+The independent lanes are:
 
-`release-eng/*` owns repeatable release plumbing and its directly supporting
-hardening: CI contracts, dependency inventory, SBOM maintenance, version and tag
-validation, packaging, signing, notarization, and distribution automation. It
-is not a second feature lane. User-visible defects remain `bugs/*`, while new
-product capability remains `slice/*`.
+- Repository contracts: dependency-free Ruby tooling tests, project structure,
+  localization, documentation, software inventory, and release-version checks.
+- macOS and iOS builds: `Testing` Analyze and `Production` Build, without
+  distribution signing or Archive.
+- KitchenKit: standalone macOS correctness tests, exact complete line coverage,
+  and ordinary-consumer public interface checks.
+- iOS application tests: full `KitchenMemory` plan on an available iPhone
+  simulator at iOS 26.5 or newer.
+- Signed macOS application tests: full `KitchenMemory` plan, including serial
+  UI navigation checks, with a dedicated development identity.
 
-Published `slice/*`, `bugs/*`, and `release-eng/*` branches are governed
-integration lanes. GitHub automatically deletes their remote branches after
-merge. The merge commit, pull request, and protected `main` history preserve
-the accepted integration and its evidence; keeping a branch name is unnecessary.
-Post-beta maintenance release branches for supported major, minor, and patch
-lines are retained for backports under the [release-tier policy](release-engineering.md).
-They are distinct from these disposable integration lanes.
-Local integration branches, working branches such as `codex/*`, and completed
-worktrees are short-lived working state. Clean them up only after verifying
-their work on `main` and the required merge evidence, as described in
-[branch cleanup](#branch-cleanup).
+`Development CI` is the aggregate check. It requires every lane to succeed;
+failure, cancellation, and skipped signed tests cannot produce a green gate.
+Results and logs are retained for seven days. These are development artifacts,
+not distributable releases.
 
-Build, Analyze, and the complete platform Test actions are required to pass.
-The KitchenKit coverage gate has reached exact complete line coverage; a
-failing logic test or coverage check is a product defect.
+The workflow uses GitHub's `xcode-27` hosted image and explicitly selects
+`/Applications/Xcode_27.0.app`. The simulator is discovered from the installed
+runtimes, not pinned to a device UUID or model name. Package versions come from
+`Package.resolved`; each build job checks the reviewed software inventory
+before allowing the pinned build-tool plugin to execute.
+
+`Tools/ci.rb` owns the command orchestration, while shared schemes and plans
+own configuration and test membership. Local native tests continue to use
+[Xcode's Test action](agents/xcode.md). The hosted driver refuses ordinary local
+invocation so it cannot silently replace that signing workflow.
+
+Keep feature work in `slice/*`, hardening in `bugs/*`, and release infrastructure
+in `release-eng/*`. Focused `codex/*` working branches can feed those lanes.
+Stacked PRs receive CI before their base lands. The existing `PR source policy`
+check applies when the final integration PR targets `main`.
+
+Local `Develop` builds retain the separate development bundle identifier and
+CloudKit container. Testing hosts use disposable state; Production retains the
+shipping entitlement set. This migration changes no persisted schema, user
+store, release version, or CloudKit service configuration.
+
+### Signing setup
+
+As of 2026-09-24, both secrets are configured in KitchenMemory's `ci-signing`
+environment using Folio's dedicated CI development certificate, as authorized
+by the maintainer. The identity is shared for now; separate it if project
+ownership or organization boundaries later require that separation.
+
+Create the `ci-signing` GitHub environment with `CI_CERTIFICATE_P12_BASE64` and
+`CI_CERTIFICATE_PASSWORD`, containing a dedicated Apple Development identity
+for the project's team. Do not use a distribution identity. The helper imports
+it only into a temporary keychain on a disposable GitHub-hosted runner, restores
+the original keychain search list, and removes it even after failure.
+
+Fork pull requests never receive this identity. Their unsigned checks can run,
+but the aggregate remains red until a maintainer reviews the change and runs it
+from an in-repository branch. No `pull_request_target` execution is used.
 
 ### Branch cleanup
 
 Cleanup follows acceptance and integration; it does not substitute for either.
 Confirm that the intended pull request is merged into `main`, its required
-pull-request checks passed, and the applicable iOS and macOS `Merge to main`
-Production Build actions succeeded for the actual merge commit. If the workflow
-did not start because of the documented [change filters](#change-filters),
-verify and record that the exact merged diff qualifies for that exclusion;
-an unexplained missing run is not an exemption. A deleted remote branch or a
+pull-request checks passed, and the GitHub `Development CI` push run succeeded for the actual merge commit.
+During cutover, also preserve any still-required Cloud merge evidence. A PR
+result is not proof of the post-merge result. A deleted remote branch or a
 green result from another commit is not proof of the required state.
 
 Inspect local state before switching branches or removing anything:
@@ -155,105 +177,59 @@ or rewriting historical evidence.
 
 ### Main production
 
-The `Merge to main` workflow starts for selected project changes merged or
-pushed to `main`. It currently contains an iOS Build action for Any iOS Device
-and a macOS Build action for Any Mac, both using `KitchenMemory` with
-`Production`. It does not contain Test, Analyze,
-Archive, or post-actions. Signed distribution archives therefore remain an
-explicit release-tag operation.
-
-This division is intentional. Test and Analyze are handled by the development
-and pull-request workflows under their respective gates; `Merge to main`
-verifies that the actual merge result still compiles as a production build on
-both platforms without repeating those actions. It is production-build
-evidence, not distribution evidence.
+The push-to-`main` GitHub run tests the actual merge and builds Production for
+both platforms. It does not archive, notarize, upload, or distribute an app.
 
 ### Release tags and notarization
 
 [Release engineering](release-engineering.md) owns the version/`RELEASE`/tag
-contract, candidate gates, Archive and notarization actions, immutable evidence,
-and distribution procedure. `Tag to release/` uses the native application
-scheme with `Production` on both platforms, accepts any file change, and does
-not auto-cancel an older release build. Creating its tag is an intentional
-release operation.
+contract, tiered release checks, Archive, signing, notarization, and distribution.
+Keep Xcode Cloud's `Tag to release/` workflow and its immutable release evidence.
+Xcode Cloud also remains the place for beta-testing workflows; do not infer a
+new TestFlight distribution group, audience, or automatic upload from the daily
+CI migration.
 
 ### Change filters
 
-The release-tag workflow accepts any file change because the tag itself is the
-deliberate release signal. The other workflows use an all-file exclusion rule:
-they do not start when every changed path is one of the root `README.md`,
-`LICENSE`, `COPYRIGHT`, `AI.md`, or `.gitignore` files. A commit that also
-changes any other path still starts the workflow. This corresponds to Xcode
-Cloud's `DO_NOT_START_IF_ALL_FILES_MATCH` rule mode.
-
-This denylist keeps product, project, dependency, test, asset, lint, tooling,
-and cloud-script changes covered without maintaining a fragile allowlist.
-Update it only for root-level files that cannot affect the product or CI
-contract.
+Daily GitHub checks have no path filter. Release tags accept every file change
+because the immutable tag is the deliberate release signal.
 
 ### Pull-request gate
 
-The pull-request workflow starts for meaningful project changes in pull requests
-from `slice/*`, `bugs/*`, or `release-eng/*` into `main`. Both hosted Test actions are required by project policy before merge;
-Development supplies Build and Analyze, not a duplicate Test action.
-
-The repository-owned `PR source policy` GitHub Actions check runs for every
-pull request into `main`, including source branches that Xcode Cloud deliberately
-does not accept. It succeeds only for `slice/*`, `bugs/*`, and `release-eng/*`;
-an ineligible branch receives an immediate naming failure instead of silently
-waiting for a Cloud workflow that cannot start. The workflow checks only pull-
-request metadata, does not check out or execute proposed source, and has read-
-only repository permission.
-
-GitHub applies required status checks to the protected target branch rather
-than conditionally interpreting the pull request's source name. Consequently,
-an ineligible pull request may still display the Xcode Cloud result as expected
-until it is renamed or closed. Preserve the required Cloud check's Xcode Cloud
-GitHub App binding when maintaining the rule. Never fabricate its status to hide that platform
-limitation.
-
-Xcode Cloud reports the aggregate `KitchenMemory | PR to main from governed
-branches` result. It is required for PRs; inspect the actual candidate result
-before merge.
+Require `PR source policy` and GitHub Actions' `Development CI` on `main` after
+cutover. The aggregate has the same name for PR and merge-group runs. Source
+policy continues to enforce governed branch names only for PRs into `main`;
+stacked PRs to other bases receive the development checks without that final
+integration restriction.
 
 ### GitHub enforcement boundary
 
-Xcode Cloud supplies build and action results but does not provide all of the
-repository controls required by the release policy. GitHub owns that boundary.
+Live inspection on 2026-09-24 found strict main protection requiring
+`PR source policy` (GitHub Actions app 15368) and
+`KitchenMemory | PR to main from governed branches` (Xcode Cloud app 117084).
+The `Release tag readiness` ruleset also requires Cloud's
+`KitchenMemory | Merge to main` on the tagged commit. Preserve these until the
+replacement has actual hosted evidence.
 
-As inspected on 2026-09-07, classic protection on `main` requires a pull request,
-the GitHub Actions-owned `PR source policy` check, the Xcode Cloud-owned
-`KitchenMemory | PR to main from governed branches` aggregate, an up-to-date
-branch, and resolved review conversations. It applies to administrators, blocks force-push
-and deletion, allows merge commits, and requires zero approving reviews while
-there is one release operator.
+Cut over in this order:
 
-The maintainer restored the Cloud PR requirement on 2026-09-07 after the hosted
-Cloud lanes became reliable with UI testing suspended. The earlier exception
-allowed progress during repeated Cloud UI runner failures; it did not waive the
-local semantic tests or the obligation to inspect real Cloud results.
+1. Install the dedicated development signing secrets and publish this workflow.
+2. Verify every GitHub lane on the candidate, including Mac/iOS UI tests and
+   exact KitchenKit coverage. Validate the workflow on a stacked PR too.
+3. Replace the required Cloud PR aggregate with `Development CI`, bound to
+   GitHub Actions. Preserve strict mode, required PRs, resolved conversations,
+   administrator enforcement, and force-push/deletion restrictions.
+4. Verify the GitHub push run on the actual merge. Update `Release tag readiness`
+   to require the GitHub `Development CI` result, preserving its no-bypass rule.
+   The release operator must verify the successful **push-to-main** run on that
+   exact commit, not just a same-named PR check.
+5. Disable the superseded daily Cloud development, PR, and merge workflows.
+   Keep release and beta workflows. Do not delete their historical evidence.
 
-The PR rule should require exactly `PR source policy` from GitHub Actions and
-`KitchenMemory | PR to main from governed branches` from the Xcode Cloud GitHub
-App, with strict/up-to-date mode enabled. `KitchenMemory | Development Workflow`
-is a separate branch workflow, and `KitchenMemory | Merge to main` runs after
-merge. Requiring that post-merge status on a PR creates a circular gate. Its
-release-tag requirement below remains separate. Do not fabricate a status or
-weaken its trusted-source binding to hide a missing run.
-
-Three active tag rulesets target `release/*`:
-
-- `Release tag creation` allows only the repository owner to create a matching
-  tag.
-- `Release tag readiness` has no bypass and requires a successful
-  `KitchenMemory | Merge to main` status from the Xcode Cloud GitHub App on the
-  target commit.
-- `Release tag immutability` has no bypass and prevents every update or deletion
-  after creation.
-
-The separate rulesets are intentional: authority to create a release does not
-grant authority to move or erase its evidence. The Ruby release contract then
-validates the tag and committed version inside Xcode Cloud.
+Release creation authority and tag immutability remain separate rulesets.
+This preserves the immutable tag and owner-only creation policy. Repository
+files cannot update Cloud workflows or GitHub protection by themselves; record
+the live cutover evidence when it is performed.
 
 ## Native test boundary
 
@@ -270,8 +246,8 @@ defined in ADR 0019. See
 ownership and its non-UI testing boundary are described in
 [localization architecture](localization-architecture.md).
 
-The `Testing` and `ProductionTesting` configurations deliberately use minimal
-platform-specific entitlement files. Their application-hosted tests do not
+The `Testing` and `ProductionTesting` configurations deliberately omit the
+shipping entitlement files and retain the project-owned sandbox capabilities. Their application-hosted tests do not
 carry personal CloudKit or push-notification capabilities. This is least
 privilege on iOS and is also required because Xcode Cloud's macOS test runner
 cannot launch a host application carrying those restricted entitlements.
@@ -391,6 +367,41 @@ plist, and entitlement invariants. The documentation checker connects navigable
 current guidance to those same source inputs; historical records are exempt
 from current-topology assertions, not from local-link checks.
 
+## Build settings baseline
+
+All five targets and all five configurations share a macOS/iOS 26.5 minimum.
+The project checker rejects lower project defaults or divergent target overrides.
+The launch storyboard is refreshed with Xcode 27's Interface Builder upgrader;
+its object identifiers and layout remain stable. Resource schema numbers such
+as storyboard `3.0` and “Xcode 8 format” are serialization identifiers, not OS
+minimums. Historical SwiftData schemas remain immutable.
+
+Xcode's recommended localizability analysis, dead-code stripping, and String
+Catalog symbols remain enabled. No outstanding recommended-setting warning was
+shown by Xcode 27 during this audit. Do not copy settings from Folio wholesale:
+KitchenMemory's Swift, multiplatform, mergeable-framework build has different
+requirements from Folio's Objective-C Suite installation.
+
+Two non-default search paths remain deliberate compatibility workarounds:
+
+- The macOS linker adds `@loader_path/../ReexportedBinaries`. Xcode 27 places the
+  signed debug framework beside `MacOS` but generates a runpath inside it. The
+  clean-build failure and successful correction are recorded in
+  [primary-screen validation](primary-screen-validation.md). This relative path
+  stays within the app/test bundle; it does not enable environment-based library
+  loading, disable library validation, or introduce a machine-specific path.
+- KitchenKit's `_NumericsShims` header search paths cover ordinary and Archive
+  package-checkout layouts. Removing them on 2026-09-24 reproduced `Unable to
+  resolve module dependency: '_NumericsShims'` during Xcode dependency scanning.
+  Retain them until both a clean normal build and an Archive build succeed
+  without them. SwiftPM pins and the ordinary-consumer interface check make
+  dependency-layout changes visible rather than silently accepting stale code.
+
+`Tools/StartupMeasurements/measure.py` sets `DYLD_FRAMEWORK_PATH` only for its
+local measurement subprocess. It is not a shipped app setting or CI environment.
+The signed GitHub Mac lane verifies the test host's team signature, Hardened
+Runtime, sandbox, and library validation before starting tests.
+
 ## Static analysis
 
 The saved application schemes use `Testing` for Analyze. Project build
@@ -447,8 +458,8 @@ must be reviewed like source changes.
 
 ## Maintenance
 
-The workflows use a shared macOS alias mapped to the latest available macOS
-release. During early alpha, the project prefers the current Xcode Cloud test
+The retained Cloud workflows use a shared macOS alias mapped to the latest
+available macOS release. During early alpha, the project prefers the current Xcode Cloud test
 host over carrying application workarounds for a Swift 6.2 XCTest runtime defect
 on macOS 26.2, tracked as
 [swiftlang/swift#87316](https://github.com/swiftlang/swift/issues/87316). This is
@@ -462,8 +473,8 @@ Testing and Production configurations locally with that Xcode version, review ne
 analyzer and linter diagnostics, and then update all applicable workflows.
 
 Custom scripts in `ci_scripts` run for every cloud action. The post-clone script
-runs the dependency-free Ruby contract tests, validates the live target/scheme/
-plan structure, and performs the read-only release check on every action. Run
+uses `Tools/check-repository.rb`, the same dependency-free checks as GitHub.
+It validates the target/scheme/plan structure and the read-only release contract. Run
 the same checks locally with:
 
 ```sh

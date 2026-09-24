@@ -13,6 +13,10 @@ on:
       - reopened
       - synchronize
       - ready_for_review
+      - edited
+
+  merge_group:
+    types: [checks_requested]
 
 permissions:
   contents: read
@@ -24,9 +28,14 @@ jobs:
     steps:
       - name: Validate source branch
         env:
+          EVENT_NAME: ${{ github.event_name }}
           HEAD_REF: ${{ github.head_ref }}
         shell: bash
         run: |
+          if [[ "$EVENT_NAME" == merge_group ]]; then
+            echo "Source branches were checked before entering the merge queue."
+            exit 0
+          fi
           case "$HEAD_REF" in
             slice/*|bugs/*|release-eng/*)
               echo "Eligible pull-request source: $HEAD_REF"

@@ -1,0 +1,122 @@
+# Kitchen Memory
+# Copyright © 2026 the Kitchen Memory contributors.
+# SPDX-License-Identifier: MIT
+name: Development CI
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, ready_for_review, edited]
+  merge_group:
+    types: [checks_requested]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  DEVELOPER_DIR: /Applications/Xcode_27.0.app/Contents/Developer
+
+concurrency:
+  group: development-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  repository:
+    name: Repository contracts
+    runs-on: xcode-27
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - run: /usr/bin/ruby Tools/check-repository.rb
+
+  build:
+    name: ${{ matrix.lane }}
+    runs-on: xcode-27
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        lane: [mac-build, ios-build, core, ios-tests]
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Validate pinned dependencies before executing package plugins
+        run: /usr/bin/ruby Tools/check-software-inventory.rb
+      - name: Record environment
+        run: |
+          mkdir -p build
+          { sw_vers; xcodebuild -version; git rev-parse HEAD; } | tee build/environment.log
+      - name: Build, analyze, or test
+        env:
+          CI_LANE: ${{ matrix.lane }}
+        run: /usr/bin/ruby Tools/ci.rb "$CI_LANE" build/ci
+      - name: Retain diagnostics
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ${{ matrix.lane }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            build/environment.log
+            build/ci/*.log
+            build/ci/*.xcresult
+          retention-days: 7
+
+  mac-tests:
+    name: Signed macOS tests
+    # A fork cannot receive the CI signing identity. The aggregate fails closed.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: xcode-27
+    timeout-minutes: 30
+    environment: ci-signing
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Validate pinned dependencies before executing package plugins
+        run: /usr/bin/ruby Tools/check-software-inventory.rb
+      - name: Import dedicated development identity
+        env:
+          CI_CERTIFICATE_P12_BASE64: ${{ secrets.CI_CERTIFICATE_P12_BASE64 }}
+          CI_CERTIFICATE_PASSWORD: ${{ secrets.CI_CERTIFICATE_PASSWORD }}
+        run: /usr/bin/ruby Tools/ci-signing.rb import
+      - name: Run hosted and UI tests
+        run: /usr/bin/ruby Tools/ci.rb mac-tests build/ci
+      - name: Remove temporary signing identity
+        if: always()
+        run: /usr/bin/ruby Tools/ci-signing.rb cleanup
+      - name: Retain diagnostics
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: mac-tests-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            build/ci/*.log
+            build/ci/*.xcresult
+          retention-days: 7
+
+  required:
+    name: Development CI
+    if: always()
+    needs: [repository, build, mac-tests]
+    runs-on: ubuntu-latest
+    env:
+      REPOSITORY_RESULT: ${{ needs.repository.result }}
+      BUILD_RESULT: ${{ needs.build.result }}
+      MAC_TEST_RESULT: ${{ needs.mac-tests.result }}
+    steps:
+      - name: Require all lanes to pass
+        run: |
+          if [[ "$REPOSITORY_RESULT" != success || "$BUILD_RESULT" != success || "$MAC_TEST_RESULT" != success ]]; then
+            echo 'All repository, build, analysis, coverage, and native test lanes must pass.'
+            echo 'Fork changes need a reviewed in-repository branch before signed tests can run.'
+            exit 1
+          fi
