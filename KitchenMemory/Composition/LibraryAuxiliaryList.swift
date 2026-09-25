@@ -10,7 +10,7 @@ import SwiftUI
 struct LibraryAuxiliaryList: View {
   let library: RecipeLibraryModel
   let sessions: CookingSessionPresentationModel
-  let focusDetail: () -> Void
+  let applyNavigationFocus: () -> Void
   private var isDeleted: Bool { library.navigation.contentDestination == .deletedItems }
 
   var body: some View {
@@ -69,7 +69,7 @@ struct LibraryAuxiliaryList: View {
 
   private func row(_ item: RecipeLibraryNavigation.AuxiliarySelection, title: String, symbol: String) -> some View {
     Button {
-      if library.navigation.selectAuxiliary(item) { focusDetail() }
+      if library.navigation.selectAuxiliary(item) { applyNavigationFocus() }
     } label: {
       Label(title, systemImage: symbol).frame(maxWidth: .infinity, alignment: .leading)
     }

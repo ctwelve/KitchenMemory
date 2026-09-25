@@ -11,6 +11,8 @@ import Observation
 @MainActor
 @Observable
 final class RecipeLibraryNavigation {
+  enum Focus: Equatable { case content, detail }
+
   enum Destination: Equatable {
     case recipe
     case editor(UUID)
@@ -44,13 +46,12 @@ final class RecipeLibraryNavigation {
 
   @discardableResult
   func selectAuxiliary(_ item: AuxiliarySelection) -> Bool {
-    guard move(to: item.destination) else { return false }
-    auxiliarySelection = item
-    return true
+    accept(item.destination, focus: .detail, auxiliary: item)
   }
 
   private(set) var contentDestination: ContentDestination = .recipes
   private(set) var destination: Destination = .recipe
+  private(set) var focus: Focus = .content
   private(set) var selectedRecipeID: Recipe.ID?
   @ObservationIgnored var prepareToLeaveEditor: () -> Bool = { true }
   @ObservationIgnored private var persistSessionSelection: (CookingSession.ID?) -> Void = { _ in }
@@ -69,7 +70,7 @@ final class RecipeLibraryNavigation {
   }
 
   func installSessionStore(_ store: any CookingSessionPresentationStoring) {
-    if let id = store.currentSessionID { destination = .session(id, history: nil) }
+    if let id = store.currentSessionID { move(to: .session(id, history: nil)) }
     persistSessionSelection = { store.currentSessionID = $0 }
   }
 
@@ -80,28 +81,40 @@ final class RecipeLibraryNavigation {
 
   @discardableResult
   func move(to next: Destination) -> Bool {
-    guard next != destination else { return true }
-    guard canLeave() else { return false }
+    accept(next)
+  }
+
+  private func accept(_ next: Destination, focus requestedFocus: Focus? = nil,
+                      auxiliary: AuxiliarySelection? = nil) -> Bool {
+    guard next == destination || canLeave() else { return false }
+    let changedDestination = next != destination
+    let context = context(for: next)
     destination = next
-    auxiliarySelection = nil
-    switch next {
-    case .recipe: contentDestination = .recipes
-    case .drafts: contentDestination = .drafts
-    case .history(let scope), .finished(_, let scope), .session(_, history: .some(let scope)):
-      contentDestination = .history(scope)
-    case .deletedItems: contentDestination = .deletedItems
-    case .recovery: contentDestination = .recovery
-    case .editor:
-      if contentDestination != .recipes { contentDestination = .drafts }
-    case .session(_, history: nil): break
-    }
-    persistSessionSelection(currentSessionID)
+    contentDestination = context.content
+    focus = requestedFocus ?? context.focus
+    auxiliarySelection = auxiliary
+    if changedDestination { persistSessionSelection(currentSessionID) }
     return true
+  }
+
+  private func context(for next: Destination) -> (content: ContentDestination, focus: Focus) {
+    switch next {
+    case .recipe: return (.recipes, selectedRecipeID == nil ? .content : .detail)
+    case .drafts: return (.drafts, .content)
+    case .history(let scope): return (.history(scope), .content)
+    case .finished(_, let scope), .session(_, history: .some(let scope)):
+      return (.history(scope), .detail)
+    case .deletedItems: return (.deletedItems, .content)
+    case .recovery: return (.recovery, .content)
+    case .editor:
+      return (contentDestination == .recipes ? .recipes : .drafts, .detail)
+    case .session(_, history: nil): return (contentDestination, .detail)
+    }
   }
 
   @discardableResult
   func selectRecipe(_ id: Recipe.ID?) -> Bool {
-    guard move(to: .recipe) else { return false }
+    guard accept(.recipe, focus: id == nil ? .content : .detail) else { return false }
     selectedRecipeID = id
     return true
   }
@@ -110,11 +123,17 @@ final class RecipeLibraryNavigation {
   /// browsing context until its recoverable draft has been accepted.
   @discardableResult
   func browseRecipes(changingFilter: () -> Void) -> Bool {
-    guard move(to: .recipe) else { return false }
+    guard accept(.recipe, focus: .content) else { return false }
     changingFilter()
     return true
   }
 
   /// Refresh selection metadata without stealing an editor or Session destination.
   func reconcileRecipeSelection(_ id: Recipe.ID?) { selectedRecipeID = id }
+
+  /// Reopening a retained item affects only the invoking window's column adapter.
+  @discardableResult
+  func reopenDetail() -> Bool {
+    accept(destination, focus: .detail, auxiliary: auxiliarySelection)
+  }
 }

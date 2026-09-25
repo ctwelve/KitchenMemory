@@ -174,8 +174,18 @@ neither the draft file version nor the published Revision format changes.
 `RecipeLibraryNavigation` is the single accepted destination owner. Editor,
 Session, finished observation, history return scope, Drafts, Deleted Items, and
 Recovery are mutually exclusive destinations. Leaving an editor requires the
-local persistence check. Navigation never emits Stop or Finish. Compact native
-navigation derives from the same accepted destination.
+local persistence check. Each accepted transition also selects its browsing
+context and content/detail focus intent; browsing Recipes differs from opening
+the selected Recipe even when the destination value is unchanged. Rejected
+navigation preserves context, selection, anchors, and focus. Navigation never
+emits Stop or Finish, and rejecting navigation cannot undo an accepted Session
+command or re-stage its retired identity.
+
+Native window adapters map the accepted focus intent to a compact split-view
+column. They continue observing shared destination changes, while an explicit
+repeat action applies focus only in its originating window. There is no shared
+focus-event counter or broadcast of window effects. Sidebar presentation, sheets,
+column visibility, and layout direction remain window-owned.
 
 `CookingSessionPresentationModel` projects the separate `CookingSessions` Logic
 interface. Queries use retained Session provenance rather than joins through

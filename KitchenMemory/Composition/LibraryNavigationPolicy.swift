@@ -6,8 +6,12 @@ import SwiftUI
 
 enum LibraryNavigationPolicy {
   static func initialColumn(startup: RecipeLibraryModel.StartupState,
-                            destination: RecipeLibraryNavigation.Destination) -> NavigationSplitViewColumn {
-    startup == .ready && destination == .recipe ? .content : .detail
+                            focus: RecipeLibraryNavigation.Focus) -> NavigationSplitViewColumn {
+    startup == .ready ? column(for: focus) : .detail
+  }
+
+  static func column(for focus: RecipeLibraryNavigation.Focus) -> NavigationSplitViewColumn {
+    focus == .content ? .content : .detail
   }
 
   static var initialVisibility: NavigationSplitViewVisibility {

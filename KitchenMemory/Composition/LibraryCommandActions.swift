@@ -15,7 +15,7 @@ struct LibraryCommandActions {
   let library: RecipeLibraryModel
   let sessions: CookingSessionPresentationModel
   var openImport: () -> Void = {}
-  var focusDestination: () -> Void = {}
+  var focusDestination: (RecipeLibraryNavigation.Focus) -> Void = { _ in }
 
   func canPerform(_ command: Command) -> Bool {
     library.navigation.canPerform(command, library: library, sessions: sessions)
@@ -25,7 +25,7 @@ struct LibraryCommandActions {
   func perform(_ command: Command) -> Bool {
     guard library.navigation.perform(command, library: library, sessions: sessions, openImport: openImport)
     else { return false }
-    if command != .saveRevision { focusDestination() }
+    if command != .saveRevision { focusDestination(library.navigation.focus) }
     return true
   }
 }

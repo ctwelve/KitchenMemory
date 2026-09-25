@@ -8,7 +8,7 @@ import SwiftUI
 struct LibraryContentRouter: View {
   @Bindable var libraryModel: RecipeLibraryModel
   @Bindable var sessionModel: CookingSessionPresentationModel
-  let focusDetail: () -> Void
+  let applyNavigationFocus: () -> Void
   @Environment(\.locale) private var locale
 
   var body: some View {
@@ -16,15 +16,15 @@ struct LibraryContentRouter: View {
       switch libraryModel.navigation.contentDestination {
       case .recipes:
         RecipeLibraryList(model: libraryModel, sessionModel: sessionModel, locale: locale,
-                          focusDetail: focusDetail, selectSession: { id in
-          if sessionModel.selectSession(id) { focusDetail() }
+                          applyNavigationFocus: applyNavigationFocus, selectSession: { id in
+          if sessionModel.selectSession(id) { applyNavigationFocus() }
         })
       case .drafts:
-        RecipeDraftsView(model: libraryModel, focusDetail: focusDetail)
+        RecipeDraftsView(model: libraryModel, applyNavigationFocus: applyNavigationFocus)
       case .history:
-        CookingSessionHistoryView(model: sessionModel, focusDetail: focusDetail)
+        CookingSessionHistoryView(model: sessionModel, applyNavigationFocus: applyNavigationFocus)
       case .deletedItems, .recovery:
-        LibraryAuxiliaryList(library: libraryModel, sessions: sessionModel, focusDetail: focusDetail)
+        LibraryAuxiliaryList(library: libraryModel, sessions: sessionModel, applyNavigationFocus: applyNavigationFocus)
       }
     }
   }
