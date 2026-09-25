@@ -15,7 +15,8 @@ final class RecipeDraftRelaunchTests: XCTestCase {
     let store = VolatileRecipeEditingStore()
     let model = RecipeLibraryModel(
       library: RecipeLibrary(kitchenID: try kitchenID(app), repository: app.recipeRepository,
-                             samples: FailedDraftResetSamples(), importer: RecipeImportService()),
+                             samples: FailedDraftResetSamples(), importer: RecipeImportService(),
+      sampleFolderName: "Sample Pack", sampleTagName: "samples"),
       samplePreferences: VolatileKitchenPreferencesStore(sampleRecipeOnboardingResponse: .accepted),
       kitchenWasCreated: false, editingStore: store
     )
@@ -139,7 +140,8 @@ final class RecipeDraftRelaunchTests: XCTestCase {
     let model = RecipeLibraryModel(
       library: RecipeLibrary(
         kitchenID: try kitchenID(app), repository: app.recipeRepository,
-        samples: BundledSampleRecipeProvider(), importer: RecipeImportService()
+        samples: BundledSampleRecipeProvider(), importer: RecipeImportService(),
+      sampleFolderName: "Sample Pack", sampleTagName: "samples"
       ),
       samplePreferences: VolatileKitchenPreferencesStore(sampleRecipeOnboardingResponse: .accepted),
       kitchenWasCreated: false,

@@ -55,13 +55,13 @@ public struct KitchenBootstrapService {
     self.repository = repository
   }
 
-  public func prepareInitialKitchen(named name: String = "Home Kitchen") throws -> Kitchen {
+  public func prepareInitialKitchen(named name: String) throws -> Kitchen {
     try prepareInitialKitchenWithStatus(named: name).kitchen
   }
 
   /// Distinguishes a truly new local Kitchen from one already present in the store.
   public func prepareInitialKitchenWithStatus(
-    named name: String = "Home Kitchen",
+    named name: String,
     ownerID: KitchenOwner.ID? = nil
   ) throws -> PreparedKitchen {
     if let ownerID {

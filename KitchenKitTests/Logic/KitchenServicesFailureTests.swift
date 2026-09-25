@@ -12,18 +12,18 @@ final class KitchenServicesFailureTests: XCTestCase {
     let repository = try makeRepository()
     let service = KitchenBootstrapService(repository: repository)
 
-    let kitchen = try service.prepareInitialKitchen()
+    let kitchen = try service.prepareInitialKitchen(named: "Test Kitchen")
 
     XCTAssertEqual(kitchen.id, KitchenBootstrapService.personalKitchenID)
-    XCTAssertEqual(try service.prepareInitialKitchen(), kitchen)
+    XCTAssertEqual(try service.prepareInitialKitchen(named: "Test Kitchen"), kitchen)
   }
 
   func testBootstrapReportsWhetherItCreatedOrFoundThePersonalKitchen() throws {
     let repository = try makeRepository()
     let service = KitchenBootstrapService(repository: repository)
 
-    let firstPreparation = try service.prepareInitialKitchenWithStatus()
-    let secondPreparation = try service.prepareInitialKitchenWithStatus()
+    let firstPreparation = try service.prepareInitialKitchenWithStatus(named: "Test Kitchen")
+    let secondPreparation = try service.prepareInitialKitchenWithStatus(named: "Test Kitchen")
 
     XCTAssertTrue(firstPreparation.wasCreated)
     XCTAssertFalse(secondPreparation.wasCreated)
@@ -69,7 +69,7 @@ final class KitchenServicesFailureTests: XCTestCase {
     let ownerID = KitchenOwner.ID(rawValue: "cloudkit:production:current-user")
 
     let prepared = try KitchenBootstrapService(repository: repository)
-      .prepareInitialKitchenWithStatus(ownerID: ownerID)
+      .prepareInitialKitchenWithStatus(named: "Test Kitchen", ownerID: ownerID)
 
     XCTAssertEqual(prepared.kitchen.id, KitchenBootstrapService.personalKitchenID)
     XCTAssertEqual(prepared.kitchen.ownerID, ownerID)
@@ -86,7 +86,7 @@ final class KitchenServicesFailureTests: XCTestCase {
 
     XCTAssertThrowsError(
       try KitchenBootstrapService(repository: repository)
-        .prepareInitialKitchenWithStatus(ownerID: firstOwner)
+        .prepareInitialKitchenWithStatus(named: "Test Kitchen", ownerID: firstOwner)
     ) { error in
       XCTAssertEqual(
         error as? KitchenMemoryPersistenceError,
@@ -102,7 +102,7 @@ final class KitchenServicesFailureTests: XCTestCase {
     try repository.save(legacyKitchen)
 
     XCTAssertEqual(
-      try KitchenBootstrapService(repository: repository).prepareInitialKitchen(),
+      try KitchenBootstrapService(repository: repository).prepareInitialKitchen(named: "Test Kitchen"),
       legacyKitchen
     )
   }

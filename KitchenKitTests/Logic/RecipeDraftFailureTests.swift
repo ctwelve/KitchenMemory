@@ -85,7 +85,8 @@ final class RecipeDraftFailureTests: XCTestCase {
     let kitchen = Kitchen(name: "Home")
     try repository.save(kitchen)
     let library = RecipeLibrary(kitchenID: kitchen.id, repository: repository,
-                                samples: FailureSamples(), importer: RecipeImportService())
+                                samples: FailureSamples(), importer: RecipeImportService(),
+      sampleFolderName: "Sample Pack", sampleTagName: "samples")
     let original = try library.create(from: RecipeDraft(title: "Original"))
     let store = DraftFailureStore()
     let drafts = RecipeDrafts(library: library, store: store)
@@ -113,7 +114,8 @@ final class RecipeDraftFailureTests: XCTestCase {
     let kitchen = Kitchen(name: "Home")
     try repository.save(kitchen)
     return RecipeLibrary(kitchenID: kitchen.id, repository: repository,
-                         samples: FailureSamples(), importer: RecipeImportService())
+                         samples: FailureSamples(), importer: RecipeImportService(),
+      sampleFolderName: "Sample Pack", sampleTagName: "samples")
   }
 }
 

@@ -2,6 +2,7 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
+import Foundation
 import KitchenKit
 
 @MainActor
@@ -15,7 +16,8 @@ func makePersistentStoreChangeObserver(
   return PersistentStoreChangeObserver {
     guard (try? reconcileKitchenOwnership(
       repository: core.recipeRepository,
-      ownerID: core.ownerID
+      ownerID: core.ownerID,
+      locale: core.locale
     )) != nil else { return }
     performExternalStoreRefresh(
       libraryModel: core.libraryModel,
@@ -29,14 +31,11 @@ func makePersistentStoreChangeObserver(
 @MainActor
 func reconcileKitchenOwnership(
   repository: SwiftDataRecipeRepository,
-  ownerID: KitchenOwner.ID
+  ownerID: KitchenOwner.ID,
+  locale: Locale = .current
 ) throws {
-  let personalKitchenID = KitchenBootstrapService.personalKitchenID
-  let name = try repository.kitchen(id: personalKitchenID)?.name ?? "Home Kitchen"
-  try repository.convergeKitchens(
-    into: Kitchen(id: personalKitchenID, ownerID: ownerID, name: name),
-    ownedBy: ownerID
-  )
+  _ = try KitchenBootstrapService(repository: repository).prepareInitialKitchenWithStatus(
+    named: LocalizedStringResource.kitchenDefaultName.localized(for: locale), ownerID: ownerID)
 }
 
 @MainActor

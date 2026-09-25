@@ -183,7 +183,8 @@ private struct IngredientLifecycleFixture {
     let kitchen = Kitchen(name: "Home")
     try repository.save(kitchen)
     library = RecipeLibrary(kitchenID: kitchen.id, repository: repository,
-                            samples: IngredientLifecycleSamples(), importer: RecipeImportService())
+                            samples: IngredientLifecycleSamples(), importer: RecipeImportService(),
+      sampleFolderName: "Sample Pack", sampleTagName: "samples")
     var salt = IngredientLineParser.parse("1 tsp salt")
     salt.note = "Use fine salt"
     let capture = RecipeSourceCapture(kind: .schemaOrgJSONLD,

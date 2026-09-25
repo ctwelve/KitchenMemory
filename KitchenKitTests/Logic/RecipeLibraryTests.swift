@@ -217,7 +217,8 @@ final class RecipeLibraryTests: XCTestCase {
       kitchenID: kitchen.id,
       repository: repository,
       samples: samples,
-      importer: importer
+      importer: importer,
+      sampleFolderName: "Sample Pack", sampleTagName: "samples"
     )
   }
 

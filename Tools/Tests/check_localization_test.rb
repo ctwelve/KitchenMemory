@@ -84,4 +84,40 @@ class LocalizationContractTest < Minitest::Test
     refute_empty Contract.source_errors({"Other.swift" => 'Text(verbatim: "/")'}, {}, {}, exception)
     refute_empty Contract.source_errors({"Quantity.swift" => 'Text(verbatim: "English")'}, {}, {}, exception)
   end
+
+  def test_framework_rejects_localization_dependencies_and_default_interface_names
+    ['import SwiftUI', 'String(localized: .kitchenName)',
+     'NSLocalizedString("name", comment: "")', 'LocalizedStringResource.kitchenName',
+     'bundle.localizedString(forKey: key, value: nil, table: nil)',
+     'func prepare(named name: String = "Home Kitchen") {}',
+     'init(sampleFolderName: String = "Sample Pack") {}',
+     'Text("Hello")'].each do |source|
+      refute_empty Contract.framework_errors({"KitchenKit/Logic.swift" => source}, []), source
+    end
+    %w[KitchenKit/Localizable.xcstrings KitchenKit/fr.lproj/Localizable.strings
+       KitchenKit/Localizable.stringsdict].each do |resource|
+      refute_empty Contract.framework_errors({}, [resource]), resource
+    end
+    assert_empty Contract.framework_errors({"KitchenKit/Parser.swift" => <<~SWIFT}, [])
+      let vocabulary = ["cups", "tablespoons"]
+      let key = "recipe.title"
+      let diagnostic = "Missing recipe"
+      let example = "String(localized: key)"
+      // import SwiftUI
+      func prepare(named name: String) {}
+    SWIFT
+  end
+
+  def test_application_default_name_boundaries_reject_literal_fallbacks
+    {
+      "KitchenMemory/Composition/AppRuntime.swift" => 'prepareInitialKitchenWithStatus(named: "Home Kitchen")',
+      "KitchenMemory/PlatformAdapters/AppStoreRefresh.swift" => 'let name = kitchen?.name ?? "Home Kitchen"',
+    }.each do |path, source|
+      refute_empty Contract.default_name_errors({path => source})
+    end
+    assert_empty Contract.default_name_errors({
+      "KitchenMemory/PlatformAdapters/AppStoreRefresh.swift" =>
+        'let name = kitchen?.name ?? LocalizedStringResource.kitchenDefaultName.localized(for: locale)',
+    })
+  end
 end

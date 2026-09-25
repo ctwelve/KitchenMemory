@@ -18,7 +18,8 @@ final class RecipeDraftPublicationTests: XCTestCase {
     let kitchen = Kitchen(name: "Home")
     try repository.save(kitchen)
     let library = RecipeLibrary(kitchenID: kitchen.id, repository: repository,
-                                samples: PublicationSamples(), importer: RecipeImportService())
+                                samples: PublicationSamples(), importer: RecipeImportService(),
+      sampleFolderName: "Sample Pack", sampleTagName: "samples")
     let store = RemovalFailingDraftStore(url: directory.appendingPathComponent("drafts.json"))
     let drafts = RecipeDrafts(library: library, store: store)
     let draft = try XCTUnwrap(drafts.begin())
@@ -34,7 +35,8 @@ final class RecipeDraftPublicationTests: XCTestCase {
       modelContainer: try KitchenMemorySchema.makeContainer(storeURL: directory.appendingPathComponent("kitchen.store"))
     )
     let reopenedLibrary = RecipeLibrary(kitchenID: kitchen.id, repository: reopened,
-                                        samples: PublicationSamples(), importer: RecipeImportService())
+                                        samples: PublicationSamples(), importer: RecipeImportService(),
+      sampleFolderName: "Sample Pack", sampleTagName: "samples")
     let restored = RecipeDrafts(library: reopenedLibrary, store: FileRecipeEditingStore(url: store.file.url))
     XCTAssertEqual(restored.drafts.first?.pendingSave, command)
     XCTAssertTrue(try XCTUnwrap(restored.save(draft.id)).removedDraft)

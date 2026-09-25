@@ -121,6 +121,38 @@ module KitchenMemory
       errors
     end
 
+    # Deliberately permits parser vocabulary, persisted keys, authored content,
+    # and diagnostics. Only interface dependencies and named defaults are guarded.
+    def framework_errors(sources, resources)
+      errors = source_errors(sources, {}, {})
+      sources.each do |path, source|
+        clean = source_without_comments(source)
+        code = clean.gsub(TOKEN) { |token| " " * token.length }
+        if code.match?(/\b(?:import\s+SwiftUI|LocalizedStringResource|LocalizedStringKey|NSLocalizedString|String\s*\(\s*localized:|localizedString\s*\(\s*forKey:)/)
+          errors << "#{path}: framework must not depend on interface localization"
+        end
+        if code.match?(/\b(?:named\s+name|sampleFolderName|sampleTagName)\s*:\s*String\s*=/)
+          errors << "#{path}: interface default names must be supplied by the application"
+        end
+      end
+      resources.each do |path|
+        if path.match?(/\.(?:xcstrings|strings|stringsdict)\z|\.lproj(?:\/|\z)/)
+          errors << "#{path}: framework must not contain localization resources"
+        end
+      end
+      errors
+    end
+
+    def default_name_errors(sources)
+      sources.map do |path, source|
+        next unless path.end_with?("Composition/AppRuntime.swift", "PlatformAdapters/AppStoreRefresh.swift")
+        clean = source_without_comments(source)
+        if clean.match?(/(?:\b(?:named|sampleFolderName|sampleTagName)\s*:|\.name\s*\?\?)\s*\#*"/)
+          "#{path}: default names must use application localization, not literal fallbacks"
+        end
+      end.compact
+    end
+
     def validate(root)
       contract = JSON.parse(File.read(File.join(root, "Configurations/LocalizationContract.json")))
       catalogs = %w[Localizable InfoPlist].to_h do |name|
@@ -131,6 +163,10 @@ module KitchenMemory
       end
       sources = Dir.glob(File.join(root, "KitchenMemory/**/*.swift")).to_h { |path| [path, File.read(path)] }
       errors.concat(source_errors(sources, catalogs.fetch("Localizable").fetch("strings"), contract.fetch("retainedKeys"), contract.fetch("literalExceptions")))
+      errors.concat(default_name_errors(sources))
+      framework_paths = Dir.glob(File.join(root, "KitchenKit/**/*"))
+      framework_sources = framework_paths.grep(/\.swift\z/).to_h { |path| [path, File.read(path)] }
+      errors.concat(framework_errors(framework_sources, framework_paths))
       errors
     end
   end

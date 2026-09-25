@@ -77,6 +77,14 @@ the application decides how that concern is phrased and pluralized. This keeps
 business-logic tests independent of a development language while allowing
 focused presentation tests to exercise locale-specific output.
 
+Default Kitchen and Sample Pack organization names are application-owned copy.
+KitchenKit requires callers to supply those names explicitly. Startup and
+ownership-refresh fallback resolve `kitchen.default-name` from the application
+catalog; Sample Pack installation likewise supplies localized Folder and Tag
+names. These are creation defaults, not language-dependent views of stored names.
+Existing names and identities, including historical English defaults and user
+spelling, remain unchanged when the interface locale changes.
+
 Numbers, dates, durations, temperatures, and measurements are formatted for
 an explicit locale at the presentation boundary. A formatted value is never
 parsed back into a domain value, and changing locale never changes stored
@@ -245,6 +253,14 @@ and raw localization-key lookups. The two exact nonprose exceptions are an
 example HTTPS URL and an accessibility-hidden fraction separator, each with a
 source path and reason. Historical documents and authored Recipe assets are not
 scanned as interface Swift code.
+
+The same verification scans KitchenKit for localization resources, localization
+lookup APIs, SwiftUI dependencies, literal interface labels, and defaults on the
+Kitchen and Sample Pack naming parameters. It also guards literal defaults at
+the app's startup and ownership-refresh boundaries. Synthetic fixtures exercise
+both violations and legitimate vocabulary, persisted keys, and diagnostics.
+This is a bounded source guard: indirect wrappers and new naming APIs still
+require review. Framework strings are not blanket-banned.
 
 This source guard recognizes a bounded set of SwiftUI label entry points. It is
 not whole-program data-flow analysis: dynamically assembled copy, new custom
