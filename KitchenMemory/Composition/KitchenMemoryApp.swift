@@ -50,7 +50,9 @@ struct KitchenMemoryApp: App {
       await startup.performBackgroundMaintenance()
     }
     .onChange(of: scenePhase) { _, phase in
-      if phase == .background { BackgroundMaintenance.requestOpportunity() }
+      if phase == .background {
+        Task { await BackgroundMaintenance.requestOpportunity() }
+      }
     }
 #endif
   }

@@ -72,25 +72,26 @@ struct RecipeEditorView: View {
       .navigationBarTitleDisplayMode(.inline)
 #endif
       .toolbar {
-        ToolbarItem(placement: .automatic) {
-          if mode != .importReview {
-          Button(editor.usesAdvancedEditor ? .recipeEditorSimpleMode : .recipeEditorAdvancedMode) {
-            editor.setAdvancedEditor(!editor.usesAdvancedEditor, locale: locale)
-          }
-          .accessibilityIdentifier("recipe-editor-mode")
-          }
-        }
+        editorModeToolbarItem.visibilityPriority(.high)
         ToolbarItem(placement: .cancellationAction) {
-          Button(.recipeEditorActionClose) {
+          Button {
             editor.draft.finishIngredientText(locale: locale)
             close()
-          }.help(Text(.recipeEditorActionClose))
+          } label: {
+            Label(.recipeEditorActionClose, systemImage: "xmark")
+#if os(iOS)
+              .labelStyle(.iconOnly)
+#endif
+          }
+          .help(Text(.recipeEditorActionClose))
         }
+        .visibilityPriority(.low)
         ToolbarItem(placement: .destructiveAction) {
           Button(.recipeEditorActionDiscard, role: .destructive) { editor.confirmsDiscard = true }
             .help(Text(.recipeEditorActionDiscard))
             .disabled(editor.pendingSave != nil)
         }
+        .visibilityPriority(.low)
         ToolbarItem(placement: .confirmationAction) {
           Button(editor.isImportCandidate ? .recipeImportAcceptDraft : .recipeEditorReviseActionSave) {
             editor.draft.finishIngredientText(locale: locale)
@@ -100,6 +101,7 @@ struct RecipeEditorView: View {
             .accessibilityIdentifier("recipe-editor-save")
             .help(Text(editor.isImportCandidate ? .recipeImportAcceptDraft : .recipeEditorReviseActionSave))
         }
+        .visibilityPriority(.low)
       }
       .confirmationDialog(.recipeEditorDiscardConfirmation, isPresented: $editor.confirmsDiscard) {
         Button(.recipeEditorActionDiscard, role: .destructive, action: discard)
@@ -110,6 +112,23 @@ struct RecipeEditorView: View {
 }
 
 private extension RecipeEditorView {
+  var editorModeToolbarItem: some ToolbarContent {
+    ToolbarItem(placement: .automatic) {
+      if mode != .importReview {
+        Button {
+          editor.setAdvancedEditor(!editor.usesAdvancedEditor, locale: locale)
+        } label: {
+          Label(editor.usesAdvancedEditor ? .recipeEditorSimpleMode : .recipeEditorAdvancedMode,
+                systemImage: "slider.horizontal.3")
+#if os(iOS)
+            .labelStyle(.iconOnly)
+#endif
+        }
+        .accessibilityIdentifier("recipe-editor-mode")
+      }
+    }
+  }
+
   @ViewBuilder
   private var editorSections: some View {
     if !editor.usesAdvancedEditor && mode != .importReview

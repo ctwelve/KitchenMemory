@@ -53,8 +53,8 @@ module KitchenMemory
     end.freeze
     PROJECT_BUILD_SETTINGS = {
       "MERGED_BINARY_TYPE" => "automatic",
-      "MACOSX_DEPLOYMENT_TARGET" => "26.5",
-      "IPHONEOS_DEPLOYMENT_TARGET" => "26.5"
+      "MACOSX_DEPLOYMENT_TARGET" => "27.0",
+      "IPHONEOS_DEPLOYMENT_TARGET" => "27.0"
     }.freeze
     APP_FILE_CONTRACTS = {
       "KitchenMemory" => {
@@ -570,9 +570,9 @@ module KitchenMemory
         configurations.fetch(target_name).each do |record|
           %w[MACOSX_DEPLOYMENT_TARGET IPHONEOS_DEPLOYMENT_TARGET].each do |setting|
             value = record[:settings][setting]
-            next if value.nil? || value == "$(inherited)" || value == "26.5"
+            next if value.nil? || value == "$(inherited)" || value == "27.0"
 
-            raise ContractError, "#{target_name} #{record[:name]} must inherit or set #{setting} to 26.5"
+            raise ContractError, "#{target_name} #{record[:name]} must inherit or set #{setting} to 27.0"
           end
         end
       end

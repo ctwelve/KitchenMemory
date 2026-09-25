@@ -21,11 +21,11 @@ module KitchenMemory
       candidates = devices.flat_map do |runtime, entries|
         next [] unless runtime.match?(/\.iOS-\d/)
         version = runtime.split('iOS-').last.split('-').map(&:to_i)
-        next [] if (version <=> [26, 5]) == -1
+        next [] if (version <=> [27, 0]) == -1
         entries.select { |device| device.fetch('isAvailable', false) && device.fetch('name').start_with?('iPhone') }
           .map { |device| [version, device.fetch('name'), device.fetch('udid')] }
       end
-      raise 'Install an iOS 26.5 or newer iPhone simulator' if candidates.empty?
+      raise 'Install an iOS 27.0 or newer iPhone simulator' if candidates.empty?
       "platform=iOS Simulator,id=#{candidates.sort.last.last}"
     end
 

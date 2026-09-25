@@ -8,7 +8,7 @@ SPDX-License-Identifier: MIT
 
 GitHub Actions owns daily build, analysis, coverage, and native test checks.
 Xcode Cloud remains the release-engineering and beta-testing service. The
-application requires macOS 26.5 and iOS 26.5 or newer; the current toolchain is
+application requires macOS 27.0 and iOS 27.0 or newer; the current toolchain is
 Xcode 27.
 
 **Release boundary (2026-09-24):** GitHub owns review-ready development validation.
@@ -98,7 +98,7 @@ The independent lanes are:
 - KitchenKit: standalone macOS correctness tests, exact complete line coverage,
   and ordinary-consumer public interface checks.
 - iOS application tests: full `KitchenMemory` plan on an available iPhone
-  simulator at iOS 26.5 or newer.
+  simulator at iOS 27.0 or newer.
 - Signed macOS application tests: full `KitchenMemory` plan, including serial
   UI navigation checks, with a dedicated development identity.
 
@@ -399,7 +399,9 @@ from current-topology assertions, not from local-link checks.
 
 ## Build settings baseline
 
-All five targets and all five configurations share a macOS/iOS 26.5 minimum.
+All five targets and all five configurations share a macOS/iOS 27.0 minimum.
+This alpha compatibility decision is recorded in [ADR 0021](adr/0021-adopt-platform-27-during-alpha.md).
+
 The project checker rejects lower project defaults or divergent target overrides.
 The launch storyboard is refreshed with Xcode 27's Interface Builder upgrader;
 its object identifiers and layout remain stable. Resource schema numbers such
@@ -537,3 +539,55 @@ as a reason to weaken the checker until the project happens to pass.
 
 Keep cloud scripts short, deterministic, and limited to environment preparation
 so build, test, Analyze, and Archive behavior remains visible in Xcode's schemes.
+
+### Local platform 27 validation
+
+Use Xcode 27 and the `KitchenMemory Release` scheme's `KitchenMemoryCloud`
+test plan for production-test reproduction. Record the exact Xcode and OS build,
+simulator model, and completed result bundle; compare those with the Cloud run.
+Run UI tests serially. Do not substitute larger-device success for the compact
+device that failed, or send another release candidate to Cloud before local
+validation is complete.
+
+Keep a compact simulator inventory on iOS/iPadOS 27:
+
+| Destination | Purpose | Frequency |
+| --- | --- | --- |
+| iPhone SE (3rd generation) | Smallest phone viewport; toolbar and keyboard pressure; current Cloud parity | Focused fixes and full release plan |
+| iPhone 17 (or a current standard-size Pro) | Modern phone safe areas and typical layout | Layout changes and release spot checks |
+| iPad mini (A17 Pro) | Small tablet and narrow window layouts | Layout changes and release spot checks |
+| iPad Pro 13-inch | Wide layouts and window resizing | Layout changes and release spot checks |
+| My Mac, macOS 27 | Native AppKit integration and resizable windows | Focused fixes and full release plan |
+
+The SE and Mac form the frequent loop. The other destinations add layout
+coverage without repeating the entire business-logic suite on every screen.
+Include manual large-text, VoiceOver, keyboard, and RTL checks at accessibility
+acceptance; automated element discovery alone does not establish usability.
+
+#### Platform 27 migration evidence, 2026-09-25
+
+Xcode 27 (27A266a), Swift 6.4, and the `KitchenMemory Release` scheme's
+`KitchenMemoryCloud` plan produced these completed local results:
+
+| Destination | Result | Result bundle timestamp |
+| --- | --- | --- |
+| iPhone SE (3rd generation), iOS 27.0 (24A434) | 813 passed, no failures or skips | 2026.09.25_12-21-22--0500 |
+| My Mac, macOS 27.0 (26A428) | 815 passed, no failures or skips | 2026.09.25_12-30-25--0500 |
+
+The final background-submission completion-order correction was rebuilt on iOS
+and followed by both background/startup coordinator checks passing
+(`2026.09.25_12-28-03--0500`). The focused editor accessibility test also passed
+on the SE after compact toolbar controls replaced the overflowing text-only
+mode action. Priority alone had reproduced the original failure.
+
+Both full-plan bridge calls exceeded their response timeout; the completed
+DerivedData result bundles, not the bridge timeout, establish these counts.
+Repository contracts passed. Standards and spec reviews identified and resolved
+background-submission ordering and an artifact-architecture guard error.
+
+This is not warning-free or distribution acceptance: duplicate debug-map object
+warnings remain (98 in the macOS optimized build), alongside AppIntents metadata
+notices. The macOS result also records six internal runtime priority-inversion
+warnings; their origin has not been established by this migration. No warning
+suppression was added. A signed archive, notarized installation, remote CI run,
+and comprehensive assistive-technology validation remain separate evidence.

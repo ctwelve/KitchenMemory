@@ -6,7 +6,8 @@ SPDX-License-Identifier: MIT
 
 # Kitchen Memory
 
-Requires macOS 26.5 or iOS 26.5 or newer. Build with Xcode 27.
+Current development source requires macOS 27 or iOS/iPadOS 27 or newer.
+Build with Xcode 27. See [ADR 0021](docs/adr/0021-adopt-platform-27-during-alpha.md).
 
 > Cook, remember, improve.
 
@@ -22,7 +23,7 @@ does not yet have a public iOS download or TestFlight group.
 
 ## Download and install
 
-The macOS alpha requires macOS 26 or later and runs natively on Apple silicon
+The published 0.3.1 macOS alpha requires macOS 26 or later and runs natively on Apple silicon
 and Intel Macs.
 
 1. Download `KitchenMemory-0.3.1-macOS.zip` from the [0.3.1 release](https://github.com/ctwelve/KitchenMemory/releases/tag/release/0.3.1).

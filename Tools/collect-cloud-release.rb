@@ -47,7 +47,7 @@ module KitchenMemory
       command('xcrun', 'stapler', 'validate', app)
       command('spctl', '--assess', '--type', 'execute', '--verbose=2', app)
       architectures = command('lipo', '-archs', File.join(app, 'Contents/MacOS', read.call('CFBundleExecutable'))).split
-      raise 'Expected universal Mac application' unless %w[arm64 x86_64].all? { |arch| architectures.include?(arch) }
+      raise 'Expected Apple silicon Mac application' unless architectures.include?('arm64')
       read.call('CFBundleVersion')
     end
 
