@@ -44,7 +44,9 @@ final class NativeIngredientPasteTests: XCTestCase {
     host.focus(text)
     host.select(NSRange(location: 0, length: 1), in: text)
     host.paste("2", into: text)
-    try await host.waitFor(diagnostics: {
+    // The first item-provider paste can include cold simulator text-service startup.
+    // This checks eventual native delivery, not a three-second performance budget.
+    try await host.waitFor(timeout: .seconds(30), diagnostics: {
       "\(host.editorState(text)); ingredient document: \(String(reflecting: draft.session.ingredientText))"
     }) {
       draft.session.ingredientSections.first?.ingredients.first?.quantity?.lowerBound?.numerator == 2
@@ -195,9 +197,10 @@ private final class IngredientPasteHost {
 #endif
   }
 
-  func waitFor(diagnostics: () -> String = { "" }, file: StaticString = #filePath, line: UInt = #line,
+  func waitFor(timeout: Duration = .seconds(3), diagnostics: () -> String = { "" },
+               file: StaticString = #filePath, line: UInt = #line,
                _ condition: () -> Bool) async throws {
-    let deadline = ContinuousClock.now.advanced(by: .seconds(3))
+    let deadline = ContinuousClock.now.advanced(by: timeout)
     while !condition(), ContinuousClock.now < deadline { try await Task.sleep(for: .milliseconds(10)) }
     // Stop here so later undo/redo assertions cannot obscure an incomplete paste.
     _ = try XCTUnwrap(condition() ? true : nil,
