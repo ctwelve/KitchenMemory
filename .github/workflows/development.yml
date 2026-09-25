@@ -11,9 +11,15 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      analyze:
+        description: Also run Clang static analysis on both platforms
+        type: boolean
+        default: false
 
 permissions:
   contents: read
+  actions: read
 
 defaults:
   run:
@@ -23,10 +29,26 @@ env:
   DEVELOPER_DIR: /Applications/Xcode_27.0.app/Contents/Developer
 
 concurrency:
-  group: development-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  group: development-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}-${{ github.event_name == 'pull_request' && github.event.action == 'edited' && !github.event.changes.base && 'metadata' || 'candidate' }}
   cancel-in-progress: true
 
 jobs:
+  decision:
+    name: Select validation
+    runs-on: ubuntu-latest
+    outputs:
+      mode: ${{ steps.decide.outputs.mode }}
+      tree: ${{ steps.decide.outputs.tree }}
+      source_run: ${{ steps.decide.outputs.source_run }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - id: decide
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: ruby Tools/ci-evidence.rb decide
+
   repository:
     name: Repository contracts
     runs-on: xcode-27
@@ -38,7 +60,9 @@ jobs:
       - run: /usr/bin/ruby Tools/check-repository.rb
 
   build:
-    name: ${{ matrix.lane }}
+    needs: decision
+    if: needs.decision.outputs.mode == 'full'
+    # Default labels include the lane when expanded and stay readable when skipped.
     runs-on: xcode-27
     timeout-minutes: 30
     strategy:
@@ -70,10 +94,28 @@ jobs:
             build/ci/*.xcresult
           retention-days: 7
 
+  analysis:
+    # Default labels avoid unresolved matrix expressions when analysis is skipped.
+    if: github.event_name == 'workflow_dispatch' && inputs.analyze
+    runs-on: xcode-27
+    timeout-minutes: 30
+    strategy:
+      matrix:
+        platform: [mac, ios]
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - run: ruby Tools/check-software-inventory.rb
+      - env:
+          CI_LANE: ${{ matrix.platform }}-analyze
+        run: ruby Tools/ci.rb "$CI_LANE" build/analysis
+
   mac-tests:
+    needs: decision
     name: Signed macOS tests
     # A fork cannot receive the CI signing identity. The aggregate fails closed.
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    if: needs.decision.outputs.mode == 'full' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: xcode-27
     timeout-minutes: 30
     environment: ci-signing
@@ -104,19 +146,50 @@ jobs:
           retention-days: 7
 
   required:
+    # Keep the required check name stable across every event. Ready PR edits
+    # must reuse verified tree evidence or complete full validation.
     name: Development CI
     if: always()
-    needs: [repository, build, mac-tests]
+    needs: [decision, repository, build, mac-tests, analysis]
     runs-on: ubuntu-latest
     env:
+      DECISION_RESULT: ${{ needs.decision.result }}
+      VALIDATION_MODE: ${{ needs.decision.outputs.mode }}
+      ANALYSIS_RESULT: ${{ needs.analysis.result }}
+      SOURCE_RUN: ${{ needs.decision.outputs.source_run }}
       REPOSITORY_RESULT: ${{ needs.repository.result }}
       BUILD_RESULT: ${{ needs.build.result }}
       MAC_TEST_RESULT: ${{ needs.mac-tests.result }}
     steps:
-      - name: Require all lanes to pass
+      - name: Require successful validation
         run: |
-          if [[ "$REPOSITORY_RESULT" != success || "$BUILD_RESULT" != success || "$MAC_TEST_RESULT" != success ]]; then
-            echo 'All repository, build, analysis, coverage, and native test lanes must pass.'
-            echo 'Fork changes need a reviewed in-repository branch before signed tests can run.'
-            exit 1
-          fi
+          [[ "$DECISION_RESULT" == success && "$REPOSITORY_RESULT" == success ]] || exit 1
+          [[ "$ANALYSIS_RESULT" == success || "$ANALYSIS_RESULT" == skipped ]] || exit 1
+          case "$VALIDATION_MODE" in
+            full)
+              [[ "$BUILD_RESULT" == success && "$MAC_TEST_RESULT" == success ]] || exit 1
+              ;;
+            reuse)
+              [[ "$SOURCE_RUN" =~ ^[0-9]+$ && "$BUILD_RESULT" == skipped && "$MAC_TEST_RESULT" == skipped ]] || exit 1
+              echo "Reused full candidate validation from run $SOURCE_RUN."
+              ;;
+            fast)
+              [[ "$BUILD_RESULT" == skipped && "$MAC_TEST_RESULT" == skipped ]] || exit 1
+              echo 'Fast draft checks only; review-ready changes require full validation.'
+              ;;
+            *) exit 1 ;;
+          esac
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        if: needs.decision.outputs.mode == 'full'
+        with:
+          persist-credentials: false
+      - name: Record successful candidate tree
+        if: needs.decision.outputs.mode == 'full'
+        run: ruby Tools/ci-evidence.rb record validation.json
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: needs.decision.outputs.mode == 'full'
+        with:
+          name: validated-tree-${{ needs.decision.outputs.tree }}
+          path: validation.json
+          retention-days: 7
+          overwrite: true

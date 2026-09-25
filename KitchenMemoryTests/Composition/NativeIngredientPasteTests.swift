@@ -44,8 +44,13 @@ final class NativeIngredientPasteTests: XCTestCase {
     host.focus(text)
     host.select(NSRange(location: 0, length: 1), in: text)
     host.paste("2", into: text)
-    try await host.waitFor { draft.session.ingredientSections.first?.ingredients.first?.quantity?
-      .lowerBound?.numerator == 2 }
+    // The first item-provider paste can include cold simulator text-service startup.
+    // This checks eventual native delivery, not a three-second performance budget.
+    try await host.waitFor(timeout: .seconds(30), diagnostics: {
+      "\(host.editorState(text)); ingredient document: \(String(reflecting: draft.session.ingredientText))"
+    }) {
+      draft.session.ingredientSections.first?.ingredients.first?.quantity?.lowerBound?.numerator == 2
+    }
     var adjusted = try XCTUnwrap(draft.session.ingredientSections.first?.ingredients.first)
     adjusted.note = "Use fine salt"
     XCTAssertTrue(draft.updateIngredient(adjusted))
@@ -192,10 +197,23 @@ private final class IngredientPasteHost {
 #endif
   }
 
-  func waitFor(_ condition: () -> Bool) async throws {
-    let deadline = ContinuousClock.now.advanced(by: .seconds(3))
+  func waitFor(timeout: Duration = .seconds(3), diagnostics: () -> String = { "" },
+               file: StaticString = #filePath, line: UInt = #line,
+               _ condition: () -> Bool) async throws {
+    let deadline = ContinuousClock.now.advanced(by: timeout)
     while !condition(), ContinuousClock.now < deadline { try await Task.sleep(for: .milliseconds(10)) }
-    XCTAssertTrue(condition(), "Native editor did not reach the expected state")
+    // Stop here so later undo/redo assertions cannot obscure an incomplete paste.
+    _ = try XCTUnwrap(condition() ? true : nil,
+                      "Native editor did not reach the expected state. \(diagnostics())", file: file, line: line)
+  }
+
+  func editorState(_ text: IngredientPlatformTextView) -> String {
+#if os(macOS)
+    "native text: \(text.string.debugDescription); selection: \(text.selectedRange())"
+#else
+    "native text: \((text.text ?? "").debugDescription); selection: \(text.selectedRange); "
+      + "first responder: \(text.isFirstResponder); marked text: \(text.markedTextRange != nil)"
+#endif
   }
 
   func focus(_ text: IngredientPlatformTextView) {

@@ -104,10 +104,11 @@ operations. Neither a working-version change nor this guide initiates them.
   tag to replay a failed service event. The candidate must already be on `main`
   with required Production evidence. [GitHub enforcement](continuous-integration.md#github-enforcement-boundary)
   restricts creation separately from readiness and immutability.
-- The `Tag to release/` Cloud workflow uses the `KitchenMemory` scheme and
+- The `Tag to release/` Cloud workflow uses the `KitchenMemory Release` scheme and
   `Production` for iOS and macOS Archives with normal signing and production
   entitlements. Both prepare App Store Connect distribution; the macOS archive
-  has a notarization post-action. No TestFlight group or post-action is configured.
+  has a notarization post-action. Required `ProductionTesting` actions exercise
+  framework, app-hosted, and UI tests on both platforms. No TestFlight group is configured.
 - Inspect the signed products: versions, build numbers, universal Mac/iOS
   architecture, entitlements, schema readiness, privacy manifests, dependency
   notices and embedded frameworks, localized metadata, credits, icons, and launch
@@ -139,9 +140,10 @@ and Cloud routing are recorded in the [CI contract](continuous-integration.md#gi
 `.github/workflows/release.yml` responds to immutable release tags and supports
 manual retry with the same existing tag. It uses the protected `main` branch's
 tooling, verifies the exact commit's successful GitHub push-to-main check, and
-waits up to two hours for the configured Cloud release workflow's matching tag
+waits on a Linux runner up to two hours for the configured Cloud release workflow's matching tag
 and source commit. A failed latest Cloud attempt is not replaced by an older
-success. This collector neither starts an Archive nor changes a tag.
+success. A Mac verification job starts only after Cloud succeeds; it fails promptly
+if the Cloud attempt has changed. This collector neither starts an Archive nor changes a tag.
 
 The `release-collection` GitHub environment needs `ASC_KEY_ID`, `ASC_ISSUER_ID`,
 and `ASC_PRIVATE_KEY` secrets, plus the `ASC_RELEASE_WORKFLOW_ID` variable.
@@ -176,7 +178,7 @@ and ingredient-editing slices, package algorithm improvements, and the macOS/iOS
 integration and distribution checks rather than a new major-release audit.
 
 The release marker is aligned with the existing 0.3.3 application and inventory.
-Required PR checks and exact post-merge GitHub/Cloud validation must pass before
+Required PR checks and exact post-merge GitHub validation must pass before
 the annotated `release/0.3.3` tag is created. The collector must verify the new
 tagged product and record its source SHA, Cloud build, artifact identity, and
 checksum. Historical build 429 is tooling evidence only.

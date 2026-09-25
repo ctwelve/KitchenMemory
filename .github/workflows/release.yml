@@ -18,9 +18,34 @@ concurrency:
   group: release-${{ inputs.tag || github.ref_name }}
   cancel-in-progress: false
 jobs:
-  collect:
-    runs-on: xcode-27
+  wait:
+    name: Await Cloud release validation
+    runs-on: ubuntu-latest
     timeout-minutes: 150
+    environment: release-collection
+    outputs:
+      run_id: ${{ steps.cloud.outputs.run_id }}
+    env:
+      RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: false
+      - id: cloud
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_PRIVATE_KEY: ${{ secrets.ASC_PRIVATE_KEY }}
+          ASC_RELEASE_WORKFLOW_ID: ${{ vars.ASC_RELEASE_WORKFLOW_ID }}
+        run: ruby Tools/wait-cloud-release.rb "$RELEASE_TAG"
+  collect:
+    needs: wait
+    runs-on: xcode-27
+    timeout-minutes: 30
     environment: release-collection
     permissions:
       contents: write
@@ -44,6 +69,7 @@ jobs:
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
           ASC_PRIVATE_KEY: ${{ secrets.ASC_PRIVATE_KEY }}
           ASC_RELEASE_WORKFLOW_ID: ${{ vars.ASC_RELEASE_WORKFLOW_ID }}
+          ASC_BUILD_RUN_ID: ${{ needs.wait.outputs.run_id }}
         run: /usr/bin/ruby Tools/collect-cloud-release.rb "$RELEASE_TAG" build/release
       - name: Prepare draft release
         run: /usr/bin/ruby Tools/prepare-release-collection.rb "$RELEASE_TAG" build/release

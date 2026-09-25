@@ -11,37 +11,38 @@ Xcode Cloud remains the release-engineering and beta-testing service. The
 application requires macOS 26.5 and iOS 26.5 or newer; the current toolchain is
 Xcode 27.
 
-**Migration status (2026-09-24):** GitHub PR and post-merge development checks
-passed for merge `19d602a` (the post-merge iOS lane passed on its second attempt
-without source changes). Main now requires `PR source policy` and GitHub's
-`Development CI`. Release tag readiness requires both GitHub's aggregate and
-Cloud's `KitchenMemory | Merge to main`. Cloud routing is configured as described
-below. The release collector has verified a historical notarized artifact; its
-first tag-triggered GitHub execution remains pending integration.
+**Release boundary (2026-09-24):** GitHub owns review-ready development validation.
+Xcode Cloud is reserved for deliberate release candidates: optimized tests and
+Production archives on both platforms. Ordinary main and release-eng pushes do
+not need a second Cloud validation environment. The first 0.3.3 archive remains
+pending; historical build 429 proves collector compatibility only.
 
 ## Scheme, plan, and destination contract
 
 | Scheme and plan | Scheme build product | Plan test targets | Native destination |
 | --- | --- | --- | --- |
 | `KitchenKit` with `KitchenKit.xctestplan` | `KitchenKit` | `KitchenKitTests` | native macOS for canonical coverage; iOS as needed |
-| `KitchenMemory` with `KitchenMemoryCloud.xctestplan` | `KitchenMemory` | `KitchenMemoryTests` | Cloud iOS or native macOS |
+| `KitchenMemory Release` with `KitchenMemoryCloud.xctestplan` | `KitchenMemory` | `KitchenKitTests`, `KitchenMemoryTests`, `KitchenMemoryUITests` | Cloud iOS or native macOS, `ProductionTesting` |
 | `KitchenMemory` with `KitchenMemory.xctestplan` | `KitchenMemory` | `KitchenMemoryTests`, `KitchenMemoryUITests` | iOS device, Simulator, or native macOS |
 
 Each shared scheme has one top-level product buildable; Xcode adds dependencies
 through ordinary resolution. Its selected plan is the sole owner of test-target
 membership: `KitchenKit.xctestplan` contains the unhosted framework target,
 while the default local application plan includes hosted and UI tests, and the
-Cloud application plan includes hosted tests only. The schemes default Test and Analyze to `Testing`; Xcode Cloud
-may still select a configuration and destination explicitly without introducing
-duplicate scheme names.
+Cloud release plan includes framework, hosted, and serial UI tests. Development
+schemes use `Testing`; `KitchenMemory Release` uses `ProductionTesting` for Test
+and `Production` for Archive. This explicit release scheme preserves ordinary
+local test settings while exercising optimized code in Cloud.
 
-The hosted `KitchenMemoryTests` target remains parallelizable. The
-`KitchenMemoryUITests` target is deliberately serial: its methods share one
-application lifecycle, and native macOS runners cannot safely foreground that
-application while another UI runner or retained hosted-test process owns it.
-The UI launch harness terminates a retained macOS host before applying the
-disposable UI-testing launch plan. The project-structure contract enforces this
-parallel-hosted, serial-UI boundary.
+The hosted `KitchenMemoryTests` and `KitchenMemoryUITests` targets run serially
+in both application plans. Hosted tests exercise real native windows, first
+responders, paste delivery, and undo managers; they are not independent of an
+application lifecycle. This also isolates the intermittent iOS native-paste
+failure observed under parallel CI execution. Serialization is a controlled
+mitigation, not yet proof of that failure's cause. The unhosted `KitchenKitTests`
+target remains parallelizable. The UI launch harness terminates a retained macOS
+host before applying the disposable UI-testing launch plan. The project-structure
+contract enforces parallel framework tests and serial application tests.
 
 The application scheme does not expose Mac Catalyst, Mac Designed for iPhone
 or iPad, or visionOS Designed for iPhone or iPad destinations. Compatibility
@@ -56,19 +57,31 @@ actions automatically.
 
 ### Integration and hardening development
 
-`.github/workflows/development.yml` runs on pull requests to **any base**,
-including stacked integration branches, merge-queue candidates, pushes to
-`main`, and manual dispatch. Pull-request runs test GitHub's candidate merge
-commit. The `edited` event also covers retargeting a stack. No path exclusions
-can leave a required result waiting indefinitely. New runs cancel obsolete runs
-for the same event and PR or ref.
+`.github/workflows/development.yml` handles PRs against any stack base, merge
+queues, main pushes, and manual dispatch. Draft PRs receive fast repository
+checks. Review-ready source/base changes require full validation. Native lanes
+reuse evidence only for an identical Git tree under the same policy within seven
+days, from a successful same-repository Development CI run and its current run
+attempt. Missing, expired, incompatible, or unreadable evidence runs the full
+suite. Manual dispatch always forces full validation.
+
+`Tools/ci-evidence.rb` records the actual checked-out candidate tree after every
+full run. The accepted merge can therefore verify the exact tree without another
+native suite. Different merge-queue combinations still require validation.
+An edited PR event covers stack retargeting. The required `Development CI` check
+keeps the same name for every event. Ready PR description/title edits must reuse
+successful evidence for the exact tree or run full validation; a cheap metadata
+check cannot authorize merging. Their separate concurrency group prevents them
+from cancelling a candidate run. An edit before evidence is available can start
+another full run. Draft checks never produce full-validation evidence.
 
 The independent lanes are:
 
 - Repository contracts: dependency-free Ruby tooling tests, project structure,
   localization, documentation, software inventory, and release-version checks.
-- macOS and iOS builds: `Testing` Analyze and `Production` Build, without
-  distribution signing or Archive.
+- macOS and iOS `Production` builds, without distribution signing or Archive.
+- Optional macOS/iOS Clang analysis through manual dispatch with `analyze: true`;
+  use it for relevant C-family/dependency or analysis-setting changes.
 - KitchenKit: standalone macOS correctness tests, exact complete line coverage,
   and ordinary-consumer public interface checks.
 - iOS application tests: full `KitchenMemory` plan on an available iPhone
@@ -76,10 +89,11 @@ The independent lanes are:
 - Signed macOS application tests: full `KitchenMemory` plan, including serial
   UI navigation checks, with a dedicated development identity.
 
-`Development CI` is the aggregate check. It requires every lane to succeed;
-failure, cancellation, and skipped signed tests cannot produce a green gate.
-Results and logs are retained for seven days. These are development artifacts,
-not distributable releases.
+`Development CI` requires repository checks plus either every native lane's
+success or verified reusable full evidence. Only draft PRs use the fast path;
+a draft must become review-ready and satisfy validation before merging. A skipped
+signing lane, failure, or cancellation cannot pass a full run. Diagnostics and
+validation evidence are retained for seven days.
 
 The workflow uses GitHub's `xcode-27` hosted image and explicitly selects
 `/Applications/Xcode_27.0.app`. The simulator is discovered from the installed
@@ -180,8 +194,9 @@ or rewriting historical evidence.
 
 ### Main production
 
-The push-to-`main` GitHub run tests the actual merge and builds Production for
-both platforms. It does not archive, notarize, upload, or distribute an app.
+The push-to-`main` GitHub run verifies evidence for the actual merged tree. It
+runs Production builds and native tests only if reusable evidence is absent.
+It does not archive, notarize, upload, or distribute an app.
 
 ### Release tags and notarization
 
@@ -212,24 +227,22 @@ The live cutover on 2026-09-24 replaced the Cloud PR requirement with
 policy`. Strict mode, required PRs, resolved conversations, administrator
 enforcement, and force-push/deletion restrictions remain unchanged.
 
-`Release tag readiness` retains Cloud's `KitchenMemory | Merge to main`
-(integration 117084) and additionally requires GitHub's `Development CI`
-(integration 15368), with no bypass actors. The release operator and collector
+`Release tag readiness` requires GitHub's `Development CI` (integration 15368),
+with no bypass actors. Cloud validation follows the tag and gates collection. The release operator and collector
 must verify the successful **push-to-main** run on the exact tagged commit;
 a same-named PR check does not establish post-merge acceptance.
 
-The agreed Cloud routing is:
+The agreed Cloud routing is release-only. The Development Workflow, Merge to
+main, and old PR workflows are retired; their history is preserved. The tagged
+release workflow has two `KitchenMemory Release` Test actions and two Production
+Archive actions, one per platform. Test builds already compile their products;
+archives provide the distribution build, so separate Cloud Build actions add no
+required evidence. No TestFlight audience is inferred from this configuration.
 
-- Pushes to `release-eng/*`: Build and Analyze for macOS and iOS. Live routing
-  was narrowed to this prefix on 2026-09-24, with every file change included.
-- Pushes to `main`: required Build and Analyze actions for both platforms,
-  plus KitchenKit tests and KitchenMemoryCloud hosted app tests on both.
-  GitHub retains the full app plan, including UI tests.
-- Immutable `release/x.y.z` tags: Production Archives and Mac notarization.
-
-The superseded Cloud PR workflow was deactivated on 2026-09-24 after verifying
-the replacement actions through Apple's API. Its build history remains available.
-No TestFlight audience or automatic publication was added.
+Release tag readiness requires GitHub's exact-main Development CI result. Cloud
+release tests and archives gate collection of the finished artifact, not creation
+of the tag that triggers those actions. The collector accepts only a successful
+whole Cloud run, including required tests.
 
 Release creation authority and tag immutability remain separate rulesets.
 This preserves the immutable tag and owner-only creation policy. Repository
@@ -261,16 +274,15 @@ the testing exception does not alter a shipped application.
 
 ### Cloud UI testing
 
-Cloud UI testing is temporarily suspended on both native platforms following
-macOS foreground-activation failures (issue #155). Configure every application
-Test action in Cloud to use **Specific Test Plans > KitchenMemoryCloud**. Keep
-`KitchenMemory` as the local default; its bounded UI suite remains enabled. A green Cloud run does not replace local UI validation. The speculative
-activation delegate and diagnostic probes have been removed.
+Cloud UI testing is re-enabled in `KitchenMemoryCloud.xctestplan`, including its
+serial UI target, to reassess the previous activation failures under the current
+toolchain. GitHub's full application plan also retains UI tests. Runner failures
+remain failures until investigated; re-enabling a target is not passing evidence.
 
-To restore Cloud UI coverage after the platform issue is resolved, select the
-full `KitchenMemory` plan in those Cloud actions and verify repeated passes on
-macOS and iOS. Track the upstream investigation separately from this temporary
-mitigation; see [the activation research](research/macos-cloud-ui-test-activation.md).
+To temporarily suspend UI tests, disable the UI target in the affected test plan
+and document the reason. Neither the GitHub workflow nor Cloud action needs to
+change. Preserve the target reference so re-enabling it is a plan-only edit.
+Historical context: [the activation research](research/macos-cloud-ui-test-activation.md).
 
 Application-hosted XCTest processes also select an in-memory store in those two
 testing configurations by detecting Xcode's hosted-test environment. This keeps
