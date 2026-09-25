@@ -62,13 +62,17 @@ jobs:
   build:
     needs: decision
     if: needs.decision.outputs.mode == 'full'
-    # Default labels include the lane when expanded and stay readable when skipped.
+    name: ${{ matrix.name || 'Production builds' }}
     runs-on: xcode-27
     timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
-        lane: [mac-build, ios-build, core, ios-tests]
+        include:
+          - lane: mac-build
+            name: macOS — Production build
+          - lane: ios-build
+            name: iOS — Production build
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -79,7 +83,7 @@ jobs:
         run: |
           mkdir -p build
           { sw_vers; xcodebuild -version; git rev-parse HEAD; } | tee build/environment.log
-      - name: Build, analyze, or test
+      - name: Build Production configuration
         env:
           CI_LANE: ${{ matrix.lane }}
         run: /usr/bin/ruby Tools/ci.rb "$CI_LANE" build/ci
@@ -94,14 +98,76 @@ jobs:
             build/ci/*.xcresult
           retention-days: 7
 
+  core-tests:
+    needs: decision
+    if: needs.decision.outputs.mode == 'full'
+    name: KitchenKit — Tests and coverage
+    runs-on: xcode-27
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Validate pinned dependencies before executing package plugins
+        run: /usr/bin/ruby Tools/check-software-inventory.rb
+      - name: Record environment
+        run: |
+          mkdir -p build
+          { sw_vers; xcodebuild -version; git rev-parse HEAD; } | tee build/environment.log
+      - name: Run framework tests, coverage, and public interface checks
+        run: /usr/bin/ruby Tools/ci.rb core build/ci
+      - name: Retain diagnostics
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: core-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            build/environment.log
+            build/ci/*.log
+            build/ci/*.xcresult
+          retention-days: 7
+
+  ios-tests:
+    needs: decision
+    if: needs.decision.outputs.mode == 'full'
+    name: iOS — App and UI tests
+    runs-on: xcode-27
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Validate pinned dependencies before executing package plugins
+        run: /usr/bin/ruby Tools/check-software-inventory.rb
+      - name: Record environment
+        run: |
+          mkdir -p build
+          { sw_vers; xcodebuild -version; git rev-parse HEAD; } | tee build/environment.log
+      - name: Run app and UI tests on the iPhone simulator
+        run: /usr/bin/ruby Tools/ci.rb ios-tests build/ci
+      - name: Retain diagnostics
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: ios-tests-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            build/environment.log
+            build/ci/*.log
+            build/ci/*.xcresult
+          retention-days: 7
+
   analysis:
-    # Default labels avoid unresolved matrix expressions when analysis is skipped.
+    name: ${{ matrix.name || 'Static analysis' }}
     if: github.event_name == 'workflow_dispatch' && inputs.analyze
     runs-on: xcode-27
     timeout-minutes: 30
     strategy:
       matrix:
-        platform: [mac, ios]
+        include:
+          - platform: mac
+            name: macOS — Static analysis
+          - platform: ios
+            name: iOS — Static analysis
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -113,24 +179,30 @@ jobs:
 
   mac-tests:
     needs: decision
-    name: Signed macOS tests
+    name: macOS — App and UI tests
     # A fork cannot receive the CI signing identity. The aggregate fails closed.
     if: needs.decision.outputs.mode == 'full' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: xcode-27
     timeout-minutes: 30
-    environment: ci-signing
+    environment:
+      name: ci-signing
+      deployment: false
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - name: Validate pinned dependencies before executing package plugins
         run: /usr/bin/ruby Tools/check-software-inventory.rb
+      - name: Record environment
+        run: |
+          mkdir -p build
+          { sw_vers; xcodebuild -version; git rev-parse HEAD; } | tee build/environment.log
       - name: Import dedicated development identity
         env:
           CI_CERTIFICATE_P12_BASE64: ${{ secrets.CI_CERTIFICATE_P12_BASE64 }}
           CI_CERTIFICATE_PASSWORD: ${{ secrets.CI_CERTIFICATE_PASSWORD }}
         run: /usr/bin/ruby Tools/ci-signing.rb import
-      - name: Run hosted and UI tests
+      - name: Run app and UI tests
         run: /usr/bin/ruby Tools/ci.rb mac-tests build/ci
       - name: Remove temporary signing identity
         if: always()
@@ -141,6 +213,7 @@ jobs:
         with:
           name: mac-tests-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
+            build/environment.log
             build/ci/*.log
             build/ci/*.xcresult
           retention-days: 7
@@ -150,7 +223,7 @@ jobs:
     # must reuse verified tree evidence or complete full validation.
     name: Development CI
     if: always()
-    needs: [decision, repository, build, mac-tests, analysis]
+    needs: [decision, repository, build, core-tests, ios-tests, mac-tests, analysis]
     runs-on: ubuntu-latest
     env:
       DECISION_RESULT: ${{ needs.decision.result }}
@@ -159,6 +232,8 @@ jobs:
       SOURCE_RUN: ${{ needs.decision.outputs.source_run }}
       REPOSITORY_RESULT: ${{ needs.repository.result }}
       BUILD_RESULT: ${{ needs.build.result }}
+      CORE_TEST_RESULT: ${{ needs.core-tests.result }}
+      IOS_TEST_RESULT: ${{ needs.ios-tests.result }}
       MAC_TEST_RESULT: ${{ needs.mac-tests.result }}
     steps:
       - name: Require successful validation
@@ -167,14 +242,14 @@ jobs:
           [[ "$ANALYSIS_RESULT" == success || "$ANALYSIS_RESULT" == skipped ]] || exit 1
           case "$VALIDATION_MODE" in
             full)
-              [[ "$BUILD_RESULT" == success && "$MAC_TEST_RESULT" == success ]] || exit 1
+              [[ "$BUILD_RESULT" == success && "$CORE_TEST_RESULT" == success && "$IOS_TEST_RESULT" == success && "$MAC_TEST_RESULT" == success ]] || exit 1
               ;;
             reuse)
-              [[ "$SOURCE_RUN" =~ ^[0-9]+$ && "$BUILD_RESULT" == skipped && "$MAC_TEST_RESULT" == skipped ]] || exit 1
+              [[ "$SOURCE_RUN" =~ ^[0-9]+$ && "$BUILD_RESULT" == skipped && "$CORE_TEST_RESULT" == skipped && "$IOS_TEST_RESULT" == skipped && "$MAC_TEST_RESULT" == skipped ]] || exit 1
               echo "Reused full candidate validation from run $SOURCE_RUN."
               ;;
             fast)
-              [[ "$BUILD_RESULT" == skipped && "$MAC_TEST_RESULT" == skipped ]] || exit 1
+              [[ "$BUILD_RESULT" == skipped && "$CORE_TEST_RESULT" == skipped && "$IOS_TEST_RESULT" == skipped && "$MAC_TEST_RESULT" == skipped ]] || exit 1
               echo 'Fast draft checks only; review-ready changes require full validation.'
               ;;
             *) exit 1 ;;

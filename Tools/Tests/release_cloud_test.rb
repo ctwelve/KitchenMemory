@@ -54,6 +54,18 @@ class ReleaseCloudTest < Minitest::Test
     error = assert_raises(RuntimeError) { client.wait_for_run(workflow: 'workflow', tag: 'release/0.3.3', sha: 'abc') }
     assert_includes error.message, 'FAILED'
   end
+  def test_completion_check_does_not_poll_an_unfinished_build
+    client = Cloud.allocate
+    calls = 0
+    client.define_singleton_method(:list) { |_| calls += 1; [[], []] }
+    client.define_singleton_method(:sleep) { |_| flunk 'Completion handoff must not poll' }
+    error = assert_raises(RuntimeError) do
+      client.wait_for_run(workflow: 'workflow', tag: 'release/0.3.3', sha: 'abc', timeout: 0)
+    end
+    assert_includes error.message, 'Timed out'
+    assert_equal 1, calls
+  end
+
   def test_selects_only_the_unique_stapled_notarized_artifact
     client = Cloud.allocate
     actions = [{'id' => 'mac', 'attributes' => {'completionStatus' => 'SUCCEEDED'}}]

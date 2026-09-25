@@ -89,6 +89,12 @@ check cannot authorize merging. Their separate concurrency group prevents them
 from cancelling a candidate run. An edit before evidence is available can start
 another full run. Draft checks never produce full-validation evidence.
 
+The workflow exposes separate `build`, `core-tests`, `ios-tests`, and `mac-tests`
+jobs. Only the two Production builds share a matrix; each matrix entry still has
+its own runner and build output. Each application test job builds its own test
+products before running them. Job names identify the platform and purpose;
+macOS signing is setup within its test job.
+
 The independent lanes are:
 
 - Repository contracts: dependency-free Ruby tooling tests, project structure,

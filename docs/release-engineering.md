@@ -137,13 +137,20 @@ repeat install/launch acceptance. The first tag-triggered GitHub collection and
 draft upload remain pending integration and the next release. GitHub protection
 and Cloud routing are recorded in the [CI contract](continuous-integration.md#github-enforcement-boundary).
 
-`.github/workflows/release.yml` responds to immutable release tags and supports
-manual retry with the same existing tag. It uses the protected `main` branch's
-tooling, verifies the exact commit's successful GitHub push-to-main check, and
-waits on a Linux runner up to two hours for the configured Cloud release workflow's matching tag
-and source commit. A failed latest Cloud attempt is not replaced by an older
-success. A Mac verification job starts only after Cloud succeeds; it fails promptly
-if the Cloud attempt has changed. This collector neither starts an Archive nor changes a tag.
+`.github/workflows/release.yml` starts collection when Xcode Cloud posts a
+successful `KitchenMemory | Tag to release/` commit status. GitHub supports this
+through its [status event](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#status).
+The workflow must be merged into the default branch before this trigger is active.
+No tag-triggered polling runner or external webhook relay is required.
+
+The completion event supplies a source SHA and Cloud build ID. The resolver
+requires one release tag at that SHA; the collector independently verifies main
+validation and the configured Apple workflow's latest successful tag/commit build.
+The event alone is not trusted as release evidence. Incomplete builds fail promptly,
+and a stale event cannot collect an older attempt. Manual dispatch with the existing
+tag is the recovery path for missed events or delayed artifact availability; it
+also performs a single readiness check, without polling. Collection runs serialize
+to avoid competing draft uploads. A published release is never modified.
 
 The `release-collection` GitHub environment needs `ASC_KEY_ID`, `ASC_ISSUER_ID`,
 and `ASC_PRIVATE_KEY` secrets, plus the `ASC_RELEASE_WORKFLOW_ID` variable.

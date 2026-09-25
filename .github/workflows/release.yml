@@ -3,8 +3,7 @@
 # SPDX-License-Identifier: MIT
 name: Collect Cloud release
 on:
-  push:
-    tags: ['release/*']
+  status:
   workflow_dispatch:
     inputs:
       tag:
@@ -15,43 +14,25 @@ permissions:
   contents: read
   actions: read
 concurrency:
-  group: release-${{ inputs.tag || github.ref_name }}
+  # Unrelated status events must not displace a queued collection run.
+  group: release-collection-${{ (github.event_name == 'workflow_dispatch' || (github.event.state == 'success' && github.event.context == 'KitchenMemory | Tag to release/')) && 'candidate' || github.run_id }}
   cancel-in-progress: false
 jobs:
-  wait:
-    name: Await Cloud release validation
-    runs-on: ubuntu-latest
-    timeout-minutes: 150
-    environment: release-collection
-    outputs:
-      run_id: ${{ steps.cloud.outputs.run_id }}
-    env:
-      RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
-      GH_TOKEN: ${{ github.token }}
-      GH_REPO: ${{ github.repository }}
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          ref: main
-          fetch-depth: 0
-          persist-credentials: false
-      - id: cloud
-        env:
-          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
-          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
-          ASC_PRIVATE_KEY: ${{ secrets.ASC_PRIVATE_KEY }}
-          ASC_RELEASE_WORKFLOW_ID: ${{ vars.ASC_RELEASE_WORKFLOW_ID }}
-        run: ruby Tools/wait-cloud-release.rb "$RELEASE_TAG"
   collect:
-    needs: wait
+    name: Verify and collect Cloud release
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.state == 'success' && github.event.context == 'KitchenMemory | Tag to release/')
     runs-on: xcode-27
     timeout-minutes: 30
-    environment: release-collection
+    environment:
+      name: release-collection
+      deployment: false
     permissions:
       contents: write
       actions: read
     env:
-      RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+      REQUESTED_TAG: ${{ inputs.tag }}
       GH_TOKEN: ${{ github.token }}
       GH_REPO: ${{ github.repository }}
       DEVELOPER_DIR: /Applications/Xcode_27.0.app/Contents/Developer
@@ -61,6 +42,8 @@ jobs:
           ref: main
           fetch-depth: 0
           persist-credentials: false
+      - name: Resolve completed release candidate
+        run: /usr/bin/ruby Tools/resolve-cloud-release.rb
       - name: Verify release readiness
         run: /usr/bin/ruby Tools/prepare-release-collection.rb "$RELEASE_TAG"
       - name: Collect and verify notarized Mac artifact
@@ -69,7 +52,6 @@ jobs:
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
           ASC_PRIVATE_KEY: ${{ secrets.ASC_PRIVATE_KEY }}
           ASC_RELEASE_WORKFLOW_ID: ${{ vars.ASC_RELEASE_WORKFLOW_ID }}
-          ASC_BUILD_RUN_ID: ${{ needs.wait.outputs.run_id }}
         run: /usr/bin/ruby Tools/collect-cloud-release.rb "$RELEASE_TAG" build/release
       - name: Prepare draft release
         run: /usr/bin/ruby Tools/prepare-release-collection.rb "$RELEASE_TAG" build/release
