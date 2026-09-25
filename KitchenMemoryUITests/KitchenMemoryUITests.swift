@@ -282,9 +282,13 @@ extension KitchenMemoryUITests {
     let form = app.collectionViews["settings-form"]
     XCTAssertTrue(form.waitForExistence(timeout: 5))
     let synchronization = app.switches["settings-icloud-sync"]
-    // Expanded translations can place this lazily materialized row below the fold.
-    for _ in 0..<3 where !synchronization.exists {
-      form.swipeUp()
+    // Short overlapping steps keep a lazily materialized row from being skipped
+    // between full-page swipes on compact screens or with expanded translations.
+    let scrollStart = form.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.75))
+    let scrollEnd = form.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.45))
+    for _ in 0..<10 {
+      if synchronization.waitForExistence(timeout: 0.5) { break }
+      scrollStart.press(forDuration: 0.05, thenDragTo: scrollEnd)
     }
 #endif
   }

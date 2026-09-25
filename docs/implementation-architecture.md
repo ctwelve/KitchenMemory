@@ -103,12 +103,19 @@ smoke together on either native destination; the UI harness selects disposable
 storage through its launch arguments. A release-equivalent UI validation run may
 select `ProductionTesting` explicitly.
 
-The project keeps `MERGED_BINARY_TYPE` at `automatic` so Xcode can optimize
-framework linkage for the selected build. Because hosted test products may
-then re-export `KitchenKit`, each test target's localization-catalog embedding
-script must run before Sources, Frameworks, and Resources. Running it later can
-make the script's test-bundle output and Xcode's re-export signing step depend
-on one another. The project-structure checker freezes this ordering.
+KitchenKit is an ordinary dynamic framework. Every project configuration sets
+`MERGED_BINARY_TYPE = none`; the application explicitly embeds and signs the
+framework in its standard Frameworks directory. App and framework select the
+Collections umbrella product independently, and optimized framework tests link
+it explicitly for `@testable` storage metadata. Hosted app tests continue to
+resolve KitchenKit through their application bundle loader.
+
+Automatic merging was removed after Xcode 27 produced duplicate debug-map
+records for shared package objects and coverage runtime objects. The controlled
+comparison and local validation are recorded in
+[continuous integration](continuous-integration.md#collections-umbrella-and-merged-debug-map-follow-up-2026-09-25).
+Localization-catalog embedding scripts retain their established ordering before
+Sources, Frameworks, and Resources; the checker continues to freeze that ordering.
 
 Production retains automatic signing but does not pin an Apple Development
 identity. Xcode therefore remains responsible for selecting the appropriate

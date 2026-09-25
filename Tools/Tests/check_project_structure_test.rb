@@ -186,7 +186,7 @@ class CheckProjectStructureTest < Minitest::Test
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = #{file_identifier} /* #{name}.xcconfig */;
 			buildSettings = {
-				MERGED_BINARY_TYPE = automatic;
+				MERGED_BINARY_TYPE = none;
 				MACOSX_DEPLOYMENT_TARGET = 27.0;
 				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
 			};
@@ -588,13 +588,13 @@ class CheckProjectStructureTest < Minitest::Test
     assert_contract_error { validate(fixture) }
   end
 
-  def test_rejects_project_configuration_without_automatic_merged_binaries
+  def test_rejects_project_configuration_with_automatic_merged_binaries
     fixture = Fixture.new
-    fixture.project.sub!("MERGED_BINARY_TYPE = automatic;", "MERGED_BINARY_TYPE = none;")
+    fixture.project.sub!("MERGED_BINARY_TYPE = none;", "MERGED_BINARY_TYPE = automatic;")
 
     error = assert_contract_error { validate(fixture) }
 
-    assert_includes error.message, "project Debug must set MERGED_BINARY_TYPE to automatic"
+    assert_includes error.message, "project Debug must set MERGED_BINARY_TYPE to none"
   end
 
   def test_rejects_duplicate_kitchenkit_link_in_hosted_tests

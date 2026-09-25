@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import Foundation
-import HeapModule
+import Collections
 
 /// Shared immutable identity and causal context for organization policies.
 struct OrganizationAction<Payload: OrganizationPayload>: Codable, Equatable, Sendable {

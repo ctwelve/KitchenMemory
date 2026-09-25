@@ -165,8 +165,12 @@ sequence, not a hardware/software keyboard interaction walkthrough.
 During this review, Xcode 27's Mac test host failed before XCTest connected:
 its generated runpath searched `Contents/MacOS/ReexportedBinaries`, while Xcode
 embedded the signed KitchenKit copy in `Contents/ReexportedBinaries`. A clean
-rebuild reproduced the failure. The shared macOS linker setting now includes
+rebuild reproduced the failure. At that time, the shared macOS linker setting was updated to include
 `@loader_path/../ReexportedBinaries`, allowing both application and test bundles
 to find their signed copy without disabling library validation or signing the
 standalone development framework by hand. Xcode-managed hosted tests launched
 successfully after this correction.
+
+The 2026-09-25 [dynamic-framework follow-up](continuous-integration.md#collections-umbrella-and-merged-debug-map-follow-up-2026-09-25)
+supersedes that runpath workaround: KitchenKit now uses ordinary dynamic
+embedding in Frameworks with merging disabled.

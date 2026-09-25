@@ -2,7 +2,7 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
-import DequeModule
+import Collections
 import Foundation
 
 /// Product intentions and classified reads for one Kitchen's Cooking Sessions.

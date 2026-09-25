@@ -37,8 +37,9 @@ local test settings while exercising optimized code in Cloud.
 
 `KitchenMemoryTests` resolves KitchenKit through its application bundle loader.
 Do not add KitchenKit to that hosted target's Link Binary With Libraries phase:
-automatic merging otherwise puts separate copies in the app and test bundle,
-causing runtime type checks to fail in optimized builds. The unhosted
+this keeps the host responsible for the shared framework. Under the former
+automatic-merging configuration, a second link caused duplicate runtime types
+and failed optimized type checks. The unhosted
 `KitchenKitTests` target still links KitchenKit directly.
 
 Only the disposable `ProductionTesting` app disables hardened runtime, following
@@ -411,17 +412,17 @@ minimums. Historical SwiftData schemas remain immutable.
 Xcode's recommended localizability analysis, dead-code stripping, and String
 Catalog symbols remain enabled. No outstanding recommended-setting warning was
 shown by Xcode 27 during this audit. Do not copy settings from Folio wholesale:
-KitchenMemory's Swift, multiplatform, mergeable-framework build has different
+KitchenMemory's Swift, multiplatform framework build has different
 requirements from Folio's Objective-C Suite installation.
 
-Two non-default search paths remain deliberate compatibility workarounds:
+KitchenKit is an ordinary dynamic framework, embedded and signed in the app's
+standard Frameworks directory. All project configurations explicitly set
+`MERGED_BINARY_TYPE = none`, and the project checker rejects automatic merging.
+The app uses its platform-standard Frameworks runpaths. The former `@loader_path/../ReexportedBinaries` workaround is removed;
+it applied to Xcode's automatic-merging development layout.
 
-- The macOS linker adds `@loader_path/../ReexportedBinaries`. Xcode 27 places the
-  signed debug framework beside `MacOS` but generates a runpath inside it. The
-  clean-build failure and successful correction are recorded in
-  [primary-screen validation](primary-screen-validation.md). This relative path
-  stays within the app/test bundle; it does not enable environment-based library
-  loading, disable library validation, or introduce a machine-specific path.
+One non-default header search path remains deliberate:
+
 - KitchenKit's `_NumericsShims` header search paths cover ordinary and Archive
   package-checkout layouts. Removing them on 2026-09-24 reproduced `Unable to
   resolve module dependency: '_NumericsShims'` during Xcode dependency scanning.
@@ -528,13 +529,12 @@ project marketing version and root `RELEASE` marker have both been advanced to
 that same version.
 
 The structure contract also pins each project configuration to its matching
-xcconfig and automatic merged-binary mode; the development and production
-bundle namespaces; platform plist, entitlement, and synchronized-folder
+xcconfig and disabled merging; the development and production bundle namespaces; platform plist, entitlement, and synchronized-folder
 ownership; the shared schemes and explicit plans listed above; and exclusive
 plan ownership of test-target membership. It also requires each
 localization-catalog embedding phase to run first in its hosted-test target,
-preventing a dependency cycle between that test-bundle output and KitchenKit
-re-export signing. Treat a contract failure as a reviewable project change, not
+preserving the ordering introduced to avoid a cycle with the former KitchenKit
+re-export signing step. Treat a contract failure as a reviewable project change, not
 as a reason to weaken the checker until the project happens to pass.
 
 Keep cloud scripts short, deterministic, and limited to environment preparation
@@ -591,3 +591,73 @@ notices. The macOS result also records six internal runtime priority-inversion
 warnings; their origin has not been established by this migration. No warning
 suppression was added. A signed archive, notarized installation, remote CI run,
 and comprehensive assistive-technology validation remain separate evidence.
+
+### Collections umbrella and merged debug-map follow-up (2026-09-25)
+
+The initial umbrella-product experiment kept automatic KitchenKit merging,
+explicit Collections dependencies in both consumers, coverage, and dead-code
+stripping. Its macOS ProductionTesting build succeeded but reported 387 duplicate
+debug-map warnings: 365 Collections object entries and 22 profile-runtime
+entries (11 in the app, 11 in KitchenKitTests). This supersedes the earlier
+98-warning baseline for the narrower product selection above.
+
+A linker-only differential probe reused the same compiled app objects, SDK,
+coverage instrumentation, and link flags from the successful Xcode build. All
+output paths (executable, LTO object, dependency information) were redirected
+into temporary directories. `dsymutil --dump-debug-map` then gave:
+
+| Temporary app link | Duplicate Collections entries | Duplicate coverage-runtime entries |
+| --- | ---: | ---: |
+| Original `-merge_framework KitchenKit` | 365 | 11 |
+| Only replace merge with `-framework KitchenKit` | 0 | 0 |
+| Original merge; omit nine Collections product objects from the app link file list | 0 | 11 |
+
+The nine inputs were Collections, InternalCollectionsUtilities, BitCollections,
+SpanPreview, DequeModule, HashTreeCollections, HeapModule, OrderedCollections,
+and _RopeModule. Each temporary link succeeded. These probes establish that
+merging combines duplicate debug-map records for package objects linked by both
+consumers; the coverage runtime has the same merge-sensitive symptom. The
+third probe is diagnostic only: removing the app's direct dependency would make
+it rely on framework implementation details and needs separate development-link
+validation. The temporary probe executables were not runtime-tested.
+
+LLVM's [Mach-O debug-map parser](https://github.com/llvm/llvm-project/blob/main/llvm/tools/dsymutil/MachODebugMapParser.cpp)
+warns when records share an object name and timestamp, then skips the duplicate.
+This is evidence about debug information, not proof of duplicated executable
+behavior or a complete dSYM. Following this evidence, the maintainer selected
+ordinary dynamic KitchenKit linking. The app now explicitly embeds and signs KitchenKit in Frameworks,
+automatic merging is explicitly disabled, and the ReexportedBinaries runpath
+workaround is removed. Both consumers retain their explicit Collections
+umbrella dependency. Coverage and dead-code stripping remain enabled; no
+warning suppression was added. This trades merged packaging for a conventional
+framework load and avoids depending on the observed merge/debug-map interaction.
+Archive symbolication remains a separate release check.
+
+The adopted dynamic configuration passed all 815 macOS tests (no failures or
+skips; result `2026.09.25_13-01-56--0500`). The completed DerivedData result
+establishes this despite a bridge result-copy error. Six pre-existing internal
+QoS runtime warnings remain. A clean preceded the topology validation; the app
+contains signed KitchenKit in `Contents/Frameworks`, links it through `@rpath`,
+and contains no `ReexportedBinaries` directory. Deep, strict signature verification
+passed with the normal keychain context. Direct debug-map inspection of the app,
+embedded KitchenKit, and KitchenKitTests found zero duplicate-object warnings on
+both macOS and the iOS simulator. Repository contracts pass and both review axes
+have no remaining findings.
+
+The dynamic iPhone SE iOS 27 full plan (`2026.09.25_13-06-13--0500`) recorded
+812 passes and one failure in `testSettingsExposeAccessibleTopLevelStructure`,
+with no skips or runtime warnings. Its unchanged isolated rerun passed
+(`2026.09.25_13-15-40--0500`). The failed activity trace and UI hierarchy show
+three large Settings swipes reaching the bottom (100% scroll), past the lazily
+materialized iCloud switch. The helper now uses bounded, overlapping 30%-height
+drags and checks existence between steps. Both callers then passed on the SE
+(`2026.09.25_13-18-16--0500`): ordinary Settings access and the six-language
+doubled-text/right-to-left check. These focused passes do not replace the
+record of the initial full-plan failure; the complete plan was not repeated
+after the test-helper correction.
+
+The Apple linker report was prepared with the controlled comparison and a
+redacted diagnostic attachment. The maintainer is handling submission through
+Feedback Assistant; no submitted feedback ID is recorded here yet. The reported
+absence of these warnings on Xcode 26.6 is maintainer history, not an identical
+build comparison performed during this investigation.

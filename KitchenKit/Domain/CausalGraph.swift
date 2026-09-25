@@ -2,8 +2,7 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
-import DequeModule
-import OrderedCollections
+import Collections
 
 /// Iterative traversal mechanics shared by Kitchen Memory evidence families.
 ///

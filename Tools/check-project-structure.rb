@@ -52,7 +52,7 @@ module KitchenMemory
       [configuration, "#{configuration}.xcconfig"]
     end.freeze
     PROJECT_BUILD_SETTINGS = {
-      "MERGED_BINARY_TYPE" => "automatic",
+      "MERGED_BINARY_TYPE" => "none",
       "MACOSX_DEPLOYMENT_TARGET" => "27.0",
       "IPHONEOS_DEPLOYMENT_TARGET" => "27.0"
     }.freeze

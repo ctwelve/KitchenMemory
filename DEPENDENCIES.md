@@ -44,20 +44,27 @@ representations are unchanged. This is a local preference-key adoption, not a
 SwiftData/CloudKit schema migration. Pending organization commands retain their
 separate existing JSON storage and recovery behavior.
 
-The `KitchenMemory` application target links `DequeModule` for its in-memory
-Cooking Session command outbox while preserving arrays at the presentation-store
-codec boundary. `KitchenKit` links `DequeModule`, `OrderedCollections`, `HeapModule`, and
-`Algorithms`; the Collections products implement causal-graph worklists,
-first-seen identity coalescing, dependency traversal, and a priority queue for
-causally ready organization receipts. Algorithms supplies immutable-row
-coalescing, stable uniqueness, bounded minimum selection for maintenance pages,
-and first-valid import yield selection. Their
-transitive implementation modules include `InternalCollectionsUtilities` and
-`SpanPreview`. The umbrella `Collections` product and unrelated collection
-modules are not linked. Package
-types remain implementation details behind Kitchen
-Memory-owned presentation, Domain, Logic, and repository interfaces. Swift Async
-Algorithms is not present in the graph.
+`KitchenMemory` and `KitchenKit` link and import the `Collections` umbrella
+product. The app uses its deque for the in-memory Cooking Session command outbox
+while preserving arrays at the presentation-store codec boundary. KitchenKit
+uses deques for causal-graph worklists and dependency traversal, ordered sets for
+first-seen identity coalescing, and a heap for causally ready organization
+receipts. KitchenKit also links `Algorithms` for immutable-row coalescing, stable
+uniqueness, bounded minimum selection for maintenance pages, and first-valid
+import yield selection.
+
+The umbrella brings BitCollections, DequeModule, HashTreeCollections, HeapModule,
+OrderedCollections, and _RopeModule into the build graph, with implementation
+modules including InternalCollectionsUtilities and SpanPreview. This is a
+source-import convenience; the SBOM inventories the swift-collections package
+regardless of which products are selected. Dead-code stripping remains enabled,
+but build-graph membership does not establish which code survives in a shipping
+binary. KitchenKit is an ordinary dynamic framework, embedded and signed by the app. Package types
+remain implementation details behind KitchenMemory-owned presentation, Domain,
+Logic, and repository interfaces. Swift Async Algorithms is not present in the
+graph. `KitchenKitTests` also links Collections: optimized `@testable`
+access emits references to its internal storage metadata, which is not exported
+by the ordinary dynamic KitchenKit framework.
 
 The Xcode 26.6 investigation found that Xcode did not propagate swift-algorithms' transitive `_NumericsShims` C
 module-map search path when an Xcode framework target imports `Algorithms`.

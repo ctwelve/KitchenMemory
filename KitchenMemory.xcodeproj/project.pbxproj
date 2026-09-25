@@ -10,11 +10,11 @@
 		A18D21BE303D64A000009405 /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = A18D21BD303D64A000009405 /* Defaults */; };
 		A1C9A4893042896F00F1F13D /* KitchenKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1C9A47E3042896F00F1F13D /* KitchenKit.framework */; };
 		A1C9E0033042896F00F1F13D /* KitchenKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1C9A47E3042896F00F1F13D /* KitchenKit.framework */; };
-		D30000000000000000000001 /* DequeModule in Frameworks */ = {isa = PBXBuildFile; productRef = D30000000000000000000011 /* DequeModule */; };
-		D30000000000000000000002 /* OrderedCollections in Frameworks */ = {isa = PBXBuildFile; productRef = D30000000000000000000012 /* OrderedCollections */; };
+		D30000000000000000000001 /* Collections in Frameworks */ = {isa = PBXBuildFile; productRef = D30000000000000000000011 /* Collections */; };
 		D30000000000000000000003 /* Algorithms in Frameworks */ = {isa = PBXBuildFile; productRef = D30000000000000000000013 /* Algorithms */; };
-		D30000000000000000000021 /* DequeModule in Frameworks */ = {isa = PBXBuildFile; productRef = D30000000000000000000014 /* DequeModule */; };
-		D30000000000000000000022 /* HeapModule in Frameworks */ = {isa = PBXBuildFile; productRef = D30000000000000000000015 /* HeapModule */; };
+		D30000000000000000000021 /* Collections in Frameworks */ = {isa = PBXBuildFile; productRef = D30000000000000000000014 /* Collections */; };
+		D40000000000000000000001 /* KitchenKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A1C9A47E3042896F00F1F13D /* KitchenKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		D40000000000000000000003 /* Collections in Frameworks */ = {isa = PBXBuildFile; productRef = D40000000000000000000004 /* Collections */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,6 +47,20 @@
 			remoteInfo = KitchenMemory;
 		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		D40000000000000000000002 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				D40000000000000000000001 /* KitchenKit.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		A15E8F41303912A6009B0A22 /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
@@ -136,7 +150,7 @@
 			files = (
 				A1C9E0033042896F00F1F13D /* KitchenKit.framework in Frameworks */,
 				A18D21BE303D64A000009405 /* Defaults in Frameworks */,
-				D30000000000000000000021 /* DequeModule in Frameworks */,
+				D30000000000000000000021 /* Collections in Frameworks */,
 			);
 		};
 		A1C4E7AA302A63B900E2C0DB /* Frameworks */ = {
@@ -153,15 +167,14 @@
 			isa = PBXFrameworksBuildPhase;
 			files = (
 				D30000000000000000000003 /* Algorithms in Frameworks */,
-				D30000000000000000000001 /* DequeModule in Frameworks */,
-				D30000000000000000000002 /* OrderedCollections in Frameworks */,
-				D30000000000000000000022 /* HeapModule in Frameworks */,
+				D30000000000000000000001 /* Collections in Frameworks */,
 			);
 		};
 		A1C9A4853042896F00F1F13D /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
 				A1C9A4893042896F00F1F13D /* KitchenKit.framework in Frameworks */,
+				D40000000000000000000003 /* Collections in Frameworks */,
 			);
 		};
 /* End PBXFrameworksBuildPhase section */
@@ -221,6 +234,7 @@
 				A1C4E79A302A63B800E2C0DB /* Sources */,
 				A1C4E79B302A63B800E2C0DB /* Frameworks */,
 				A1C4E79C302A63B800E2C0DB /* Resources */,
+				D40000000000000000000002 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -234,7 +248,7 @@
 			name = KitchenMemory;
 			packageProductDependencies = (
 				A18D21BD303D64A000009405 /* Defaults */,
-				D30000000000000000000014 /* DequeModule */,
+				D30000000000000000000014 /* Collections */,
 			);
 			productName = KitchenMemory;
 			productReference = A1C4E79E302A63B800E2C0DB /* KitchenMemory.app */;
@@ -305,9 +319,7 @@
 			name = KitchenKit;
 			packageProductDependencies = (
 				D30000000000000000000013 /* Algorithms */,
-				D30000000000000000000011 /* DequeModule */,
-				D30000000000000000000012 /* OrderedCollections */,
-				D30000000000000000000015 /* HeapModule */,
+				D30000000000000000000011 /* Collections */,
 			);
 			productName = KitchenKit;
 			productReference = A1C9A47E3042896F00F1F13D /* KitchenKit.framework */;
@@ -331,6 +343,9 @@
 				A1C9A48C3042896F00F1F13D /* KitchenKitTests */,
 			);
 			name = KitchenKitTests;
+			packageProductDependencies = (
+				D40000000000000000000004 /* Collections */,
+			);
 			productName = KitchenKitTests;
 			productReference = A1C9A4883042896F00F1F13D /* KitchenKitTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -538,6 +553,7 @@
 			baseConfigurationReferenceAnchor = A11F80A53063510C00FA5B46 /* Configurations */;
 			baseConfigurationReferenceRelativePath = Debug.xcconfig;
 			buildSettings = {
+				MERGED_BINARY_TYPE = none;
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
@@ -594,7 +610,6 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 27.0;
-				MERGED_BINARY_TYPE = automatic;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -608,6 +623,7 @@
 			baseConfigurationReferenceAnchor = A11F80A53063510C00FA5B46 /* Configurations */;
 			baseConfigurationReferenceRelativePath = Production.xcconfig;
 			buildSettings = {
+				MERGED_BINARY_TYPE = none;
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
@@ -658,7 +674,6 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 27.0;
-				MERGED_BINARY_TYPE = automatic;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -1642,6 +1657,7 @@
 			baseConfigurationReferenceAnchor = A11F80A53063510C00FA5B46 /* Configurations */;
 			baseConfigurationReferenceRelativePath = Develop.xcconfig;
 			buildSettings = {
+				MERGED_BINARY_TYPE = none;
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
@@ -1698,7 +1714,6 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 27.0;
-				MERGED_BINARY_TYPE = automatic;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -1821,6 +1836,7 @@
 			baseConfigurationReferenceAnchor = A11F80A53063510C00FA5B46 /* Configurations */;
 			baseConfigurationReferenceRelativePath = Testing.xcconfig;
 			buildSettings = {
+				MERGED_BINARY_TYPE = none;
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
@@ -1877,7 +1893,6 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 27.0;
-				MERGED_BINARY_TYPE = automatic;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -1997,6 +2012,7 @@
 			baseConfigurationReferenceAnchor = A11F80A53063510C00FA5B46 /* Configurations */;
 			baseConfigurationReferenceRelativePath = ProductionTesting.xcconfig;
 			buildSettings = {
+				MERGED_BINARY_TYPE = none;
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
@@ -2047,7 +2063,6 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 27.0;
-				MERGED_BINARY_TYPE = automatic;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -2278,30 +2293,25 @@
 			package = A18D21B7303D644B00009405 /* XCRemoteSwiftPackageReference "Defaults" */;
 			productName = Defaults;
 		};
-		D30000000000000000000011 /* DequeModule */ = {
+		D30000000000000000000011 /* Collections */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = D30000000000000000000004 /* XCRemoteSwiftPackageReference "swift-collections" */;
-			productName = DequeModule;
-		};
-		D30000000000000000000012 /* OrderedCollections */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = D30000000000000000000004 /* XCRemoteSwiftPackageReference "swift-collections" */;
-			productName = OrderedCollections;
+			productName = Collections;
 		};
 		D30000000000000000000013 /* Algorithms */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = D30000000000000000000005 /* XCRemoteSwiftPackageReference "swift-algorithms" */;
 			productName = Algorithms;
 		};
-		D30000000000000000000014 /* DequeModule */ = {
+		D30000000000000000000014 /* Collections */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = D30000000000000000000004 /* XCRemoteSwiftPackageReference "swift-collections" */;
-			productName = DequeModule;
+			productName = Collections;
 		};
-		D30000000000000000000015 /* HeapModule */ = {
+		D40000000000000000000004 /* Collections */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = D30000000000000000000004 /* XCRemoteSwiftPackageReference "swift-collections" */;
-			productName = HeapModule;
+			productName = Collections;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
