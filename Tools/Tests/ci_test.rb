@@ -55,11 +55,11 @@ class CITest < Minitest::Test
   def test_aggregate_rejects_skipped_failed_and_cancelled_jobs
     job = workflow('development').fetch('jobs').fetch('required')
     assert_equal 'always()', job.fetch('if')
-    assert_equal %w[decision repository build mac-tests analysis], job.fetch('needs')
+    assert_equal %w[decision repository build core-tests ios-tests mac-tests analysis], job.fetch('needs')
     script = job.fetch('steps').first.fetch('run')
-    good = {'DECISION_RESULT' => 'success', 'VALIDATION_MODE' => 'full', 'ANALYSIS_RESULT' => 'skipped', 'REPOSITORY_RESULT' => 'success', 'BUILD_RESULT' => 'success', 'MAC_TEST_RESULT' => 'success'}
+    good = {'DECISION_RESULT' => 'success', 'VALIDATION_MODE' => 'full', 'ANALYSIS_RESULT' => 'skipped', 'REPOSITORY_RESULT' => 'success', 'BUILD_RESULT' => 'success', 'CORE_TEST_RESULT' => 'success', 'IOS_TEST_RESULT' => 'success', 'MAC_TEST_RESULT' => 'success'}
     assert Open3.capture3(good, 'bash', '-c', script).last.success?
-    %w[DECISION_RESULT REPOSITORY_RESULT BUILD_RESULT MAC_TEST_RESULT].product(%w[failure skipped cancelled]).each do |key, result|
+    %w[DECISION_RESULT REPOSITORY_RESULT BUILD_RESULT CORE_TEST_RESULT IOS_TEST_RESULT MAC_TEST_RESULT].product(%w[failure skipped cancelled]).each do |key, result|
       refute Open3.capture3(good.merge(key => result), 'bash', '-c', script).last.success?, "Accepted #{key}=#{result}"
     end
   end
@@ -68,16 +68,27 @@ class CITest < Minitest::Test
     script = workflow('development').fetch('jobs').fetch('required').fetch('steps').first.fetch('run')
     env = {'DECISION_RESULT' => 'success', 'REPOSITORY_RESULT' => 'success',
            'VALIDATION_MODE' => 'reuse', 'SOURCE_RUN' => '42', 'ANALYSIS_RESULT' => 'skipped',
-           'BUILD_RESULT' => 'skipped', 'MAC_TEST_RESULT' => 'skipped'}
+           'BUILD_RESULT' => 'skipped', 'CORE_TEST_RESULT' => 'skipped', 'IOS_TEST_RESULT' => 'skipped', 'MAC_TEST_RESULT' => 'skipped'}
     assert Open3.capture3(env, 'bash', '-c', script).last.success?
     refute Open3.capture3(env.merge('SOURCE_RUN' => ''), 'bash', '-c', script).last.success?
-    refute Open3.capture3(env.merge('BUILD_RESULT' => 'failure'), 'bash', '-c', script).last.success?
+    %w[BUILD_RESULT CORE_TEST_RESULT IOS_TEST_RESULT MAC_TEST_RESULT].product(%w[success failure cancelled]).each do |key, result|
+      refute Open3.capture3(env.merge(key => result), 'bash', '-c', script).last.success?, "Accepted #{key}=#{result} for reuse"
+    end
+    assert Open3.capture3(env.merge('VALIDATION_MODE' => 'fast'), 'bash', '-c', script).last.success?
+    %w[BUILD_RESULT CORE_TEST_RESULT IOS_TEST_RESULT MAC_TEST_RESULT].each do |key|
+      refute Open3.capture3(env.merge('VALIDATION_MODE' => 'fast', key => 'failure'), 'bash', '-c', script).last.success?
+    end
   end
 
-  def test_cloud_wait_does_not_occupy_a_mac_runner
+  def test_cloud_collection_starts_from_completion_without_a_wait_job
     jobs = workflow('release').fetch('jobs')
-    assert_equal 'ubuntu-latest', jobs.fetch('wait').fetch('runs-on')
-    assert_equal 'wait', jobs.fetch('collect').fetch('needs')
+    refute jobs.key?('wait')
+    refute jobs.fetch('collect').key?('needs')
+    triggers = workflow('release').fetch('on') { workflow('release').fetch(true) }
+    assert triggers.key?('status')
+    assert triggers.key?('workflow_dispatch')
+    refute triggers.key?('push')
+    assert_includes jobs.fetch('collect').fetch('if'), "github.event.state == 'success'"
     assert_equal 30, jobs.fetch('collect').fetch('timeout-minutes')
   end
 
