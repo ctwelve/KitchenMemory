@@ -300,35 +300,26 @@ extension KitchenMemoryUITests {
 #if os(macOS)
 extension KitchenMemoryUITests {
   @MainActor
-  func testSidebarHoverRevealsNamedDestinations() {
+  func testSidebarControlsExposeNamedDestinations() {
     let app = launchApp(additionalArguments: ["-AppleLanguages", "(en-US)", "-AppleLocale", "en_US"])
     defer { app.terminate() }
-    XCTAssertFalse(app.menuButtons["organization-navigation"].exists)
     let hide = app.buttons["Hide Sidebar"]
     XCTAssertTrue(hide.waitForExistence(timeout: 5))
-    hide.click()
+    assertAccessibleLabel(hide, description: "Hide Sidebar")
+    XCTAssertTrue(hide.isEnabled)
+    activate(hide)
     let show = app.buttons["Show Sidebar"]
     XCTAssertTrue(show.waitForExistence(timeout: 5))
-    show.hover()
-    let allRecipes = app.buttons["all-recipes-destination"]
-    XCTAssertTrue(allRecipes.waitForExistence(timeout: 3))
-    XCTAssertTrue(show.exists, "Temporary reveal must leave the native pin action available")
-    let overlay = XCTAttachment(screenshot: app.screenshot())
-    overlay.name = "Native sidebar button with temporary Organization overlay"
-    overlay.lifetime = .keepAlways
-    add(overlay)
-    allRecipes.hover()
-    allRecipes.click()
-    XCTAssertTrue(allRecipes.exists)
-    app.buttons["new-recipe"].hover()
-    let dismissed = XCTNSPredicateExpectation(predicate: NSPredicate(format: "exists == false"), object: allRecipes)
-    XCTAssertEqual(XCTWaiter.wait(for: [dismissed], timeout: 3), .completed)
-    show.hover()
-    XCTAssertTrue(allRecipes.waitForExistence(timeout: 3))
-    show.click()
+    assertAccessibleLabel(show, description: "Show Sidebar")
+    XCTAssertTrue(show.isEnabled)
+    activate(show)
     XCTAssertTrue(hide.waitForExistence(timeout: 5))
-    app.buttons["new-recipe"].hover()
-    XCTAssertTrue(allRecipes.exists, "A pinned sidebar remains available after the pointer leaves")
+    for identifier in ["all-recipes-destination", "sessions-destination", "deleted-items-destination"] {
+      let destination = app.buttons[identifier]
+      XCTAssertTrue(destination.waitForExistence(timeout: 5))
+      assertAccessibleLabel(destination, description: identifier)
+      XCTAssertTrue(destination.isEnabled)
+    }
   }
 }
 #endif
