@@ -204,7 +204,7 @@ final class AppStartupCoordinatorTests: XCTestCase {
     )
   }
 
-  func testDevelopmentDiagnosticsRetainOnlyBoundedInMemoryMilestones() {
+  func testDiagnosticsFollowTheBuildConfiguration() {
     let diagnostics = AppStartupDiagnostics(
       maximumMilestones: 2,
       uptime: { 42 }
@@ -214,10 +214,14 @@ final class AppStartupCoordinatorTests: XCTestCase {
     diagnostics.record(.preparationStarted)
     diagnostics.record(.preparationReady)
 
+#if DEBUG
     XCTAssertEqual(
       diagnostics.markers.map(\.milestone),
       [.startupSurfacePresented, .preparationStarted]
     )
+#else
+    XCTAssertTrue(diagnostics.markers.isEmpty, "Production must not retain development diagnostics")
+#endif
   }
 
   func testShellPresentationDescribesEveryStartupStateWithoutPrivateFailureDetails() throws {

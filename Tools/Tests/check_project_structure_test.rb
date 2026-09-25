@@ -243,6 +243,8 @@ class CheckProjectStructureTest < Minitest::Test
       end
       contract = KitchenMemory::ProjectStructure::APP_FILE_CONTRACTS[target_name]
       if contract
+        runtime = configuration_name == "ProductionTesting" ? "NO" : "YES"
+        lines << "\t\t\t\tENABLE_HARDENED_RUNTIME = #{runtime};\n"
         contract[:info_plist_settings].each do |setting, value|
           rendered_setting = setting.include?("[") ? setting.inspect : setting
           rendered_value = value.match?(/\s/) ? value.inspect : value
@@ -593,6 +595,42 @@ class CheckProjectStructureTest < Minitest::Test
     error = assert_contract_error { validate(fixture) }
 
     assert_includes error.message, "project Debug must set MERGED_BINARY_TYPE to automatic"
+  end
+
+  def test_rejects_duplicate_kitchenkit_link_in_hosted_tests
+    fixture = Fixture.new
+    target_id = fixture.target_ids.fetch("KitchenMemoryTests")
+    start = fixture.project.index("#{target_id} /* KitchenMemoryTests */ = {")
+    phase_list = fixture.project.index("buildPhases = (", start)
+    fixture.project.insert(phase_list + "buildPhases = (".length, "\n\t\t\t\tFFFFFFFFFFFFFFFFFFFFFFF1,")
+    fixture.project << <<~OBJECTS
+      FFFFFFFFFFFFFFFFFFFFFFF1 /* Frameworks */ = {
+        isa = PBXFrameworksBuildPhase;
+        files = (
+          FFFFFFFFFFFFFFFFFFFFFFF2,
+        );
+      };
+      FFFFFFFFFFFFFFFFFFFFFFF2 /* KitchenKit in Frameworks */ = {isa = PBXBuildFile; fileRef = FFFFFFFFFFFFFFFFFFFFFFF3 /* KitchenKit.framework */; };
+      FFFFFFFFFFFFFFFFFFFFFFF3 /* KitchenKit.framework */ = {isa = PBXFileReference; path = KitchenKit.framework; };
+    OBJECTS
+    error = assert_contract_error { validate(fixture) }
+    assert_includes error.message, "must resolve KitchenKit through its host"
+  end
+
+  def test_rejects_hardened_runtime_in_cloud_test_host
+    fixture = Fixture.new
+    fixture.project.sub!("ENABLE_HARDENED_RUNTIME = NO;", "ENABLE_HARDENED_RUNTIME = YES;")
+    error = assert_contract_error { validate(fixture) }
+    assert_includes error.message, "ProductionTesting must set ENABLE_HARDENED_RUNTIME to NO"
+  end
+
+  def test_rejects_disabling_hardened_runtime_outside_cloud_test_host
+    fixture = Fixture.new
+    start = fixture.project.index('/* Production configuration for PBXNativeTarget "KitchenMemory" */ =')
+    setting = fixture.project.index("ENABLE_HARDENED_RUNTIME = YES;", start)
+    fixture.project[setting, "ENABLE_HARDENED_RUNTIME = YES;".length] = "ENABLE_HARDENED_RUNTIME = NO;"
+    error = assert_contract_error { validate(fixture) }
+    assert_includes error.message, "Production must set ENABLE_HARDENED_RUNTIME to YES"
   end
 
   def test_rejects_project_deployment_target_drift

@@ -222,6 +222,7 @@ module KitchenMemory
       objects = parse_objects(project_contents)
       validate_project_configurations(objects, parse_file_references(project_contents))
       targets = validate_targets(objects)
+      validate_hosted_framework_linkage(project_contents, objects, targets)
       validate_test_prebuild_phases(objects, targets)
       configurations = validate_configurations(objects, targets)
       validate_platforms(configurations)
@@ -520,6 +521,20 @@ module KitchenMemory
       end
     end
 
+    def validate_hosted_framework_linkage(contents, objects, targets)
+      framework_ids = parse_file_references(contents).select { |_id, path| path == "KitchenKit.framework" }.keys
+      build_file_ids = contents.scan(/([0-9A-F]+)\s+\/\*[^\n]*?\*\/\s*=\s*\{isa = PBXBuildFile; fileRef = ([0-9A-F]+)/)
+        .map { |id, file_id| id if framework_ids.include?(file_id) }.compact
+      phase_ids = reference_ids(targets.fetch("KitchenMemoryTests")[:body], "buildPhases")
+      phase_ids.each do |id|
+        phase = objects[id]
+        next unless phase && phase[:isa] == "PBXFrameworksBuildPhase"
+        next if (reference_ids(phase[:body], "files") & build_file_ids).empty?
+
+        raise ContractError, "KitchenMemoryTests must resolve KitchenKit through its host, not merge a second copy"
+      end
+    end
+
     def validate_test_prebuild_phases(objects, targets)
       TEST_PREBUILD_PHASES.each do |target_name, expected_name|
         phase_ids = reference_ids(targets.fetch(target_name)[:body], "buildPhases")
@@ -681,6 +696,14 @@ module KitchenMemory
           unless actual_capability_settings == contract[:capability_settings]
             raise ContractError,
                   "#{target_name} #{name} must express macOS sandbox capabilities in build settings"
+          end
+
+          # Cloud re-signs the hosted test bundle with a different team. Only the
+          # disposable production-test host may disable library validation.
+          expected_runtime = name == "ProductionTesting" ? "NO" : "YES"
+          unless settings["ENABLE_HARDENED_RUNTIME"] == expected_runtime
+            raise ContractError,
+                  "#{target_name} #{name} must set ENABLE_HARDENED_RUNTIME to #{expected_runtime}"
           end
 
           expected_entitlements = if %w[Testing ProductionTesting].include?(name)

@@ -14,8 +14,9 @@ Xcode 27.
 **Release boundary (2026-09-24):** GitHub owns review-ready development validation.
 Xcode Cloud is reserved for deliberate release candidates: optimized tests and
 Production archives on both platforms. Ordinary main and release-eng pushes do
-not need a second Cloud validation environment. The first 0.3.3 archive remains
-pending; historical build 429 proves collector compatibility only.
+not need a second Cloud validation environment. The 0.3.3 candidate (Cloud build 481) archived successfully but failed required
+production tests; it was not published. Historical build 429 proves collector
+compatibility only.
 
 ## Scheme, plan, and destination contract
 
@@ -33,6 +34,18 @@ Cloud release plan includes framework, hosted, and serial UI tests. Development
 schemes use `Testing`; `KitchenMemory Release` uses `ProductionTesting` for Test
 and `Production` for Archive. This explicit release scheme preserves ordinary
 local test settings while exercising optimized code in Cloud.
+
+`KitchenMemoryTests` resolves KitchenKit through its application bundle loader.
+Do not add KitchenKit to that hosted target's Link Binary With Libraries phase:
+automatic merging otherwise puts separate copies in the app and test bundle,
+causing runtime type checks to fail in optimized builds. The unhosted
+`KitchenKitTests` target still links KitchenKit directly.
+
+Only the disposable `ProductionTesting` app disables hardened runtime, following
+[Apple's macOS Cloud test-runner workaround](https://developer.apple.com/xcode-cloud/release-notes/)
+(Feedback 11302291). Cloud can re-sign the injected test bundle with a different
+team from its host. `Production` archives retain hardened runtime, signing,
+and production entitlements; the artifact collector still verifies them.
 
 The hosted `KitchenMemoryTests` and `KitchenMemoryUITests` targets run serially
 in both application plans. Hosted tests exercise real native windows, first
