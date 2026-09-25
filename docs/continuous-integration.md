@@ -68,10 +68,12 @@ suite. Manual dispatch always forces full validation.
 `Tools/ci-evidence.rb` records the actual checked-out candidate tree after every
 full run. The accepted merge can therefore verify the exact tree without another
 native suite. Different merge-queue combinations still require validation.
-An edited PR event covers stack retargeting. Description/title edits receive a
-separate `PR metadata` check and concurrency group: they cannot replace the
-required candidate result or cancel its native run. Draft and metadata checks
-never produce full-validation evidence.
+An edited PR event covers stack retargeting. The required `Development CI` check
+keeps the same name for every event. Ready PR description/title edits must reuse
+successful evidence for the exact tree or run full validation; a cheap metadata
+check cannot authorize merging. Their separate concurrency group prevents them
+from cancelling a candidate run. An edit before evidence is available can start
+another full run. Draft checks never produce full-validation evidence.
 
 The independent lanes are:
 

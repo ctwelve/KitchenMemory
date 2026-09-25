@@ -25,7 +25,6 @@ module KitchenMemory
     end
 
     def full_candidate?(event, payload)
-      return false if event == 'pull_request' && payload['action'] == 'edited' && !payload.dig('changes', 'base')
       return !payload.dig('pull_request', 'draft') if event == 'pull_request'
       %w[push merge_group workflow_dispatch].include?(event)
     end

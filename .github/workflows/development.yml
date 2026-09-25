@@ -146,8 +146,9 @@ jobs:
           retention-days: 7
 
   required:
-    # Metadata-only events must never replace a failed/pending candidate gate.
-    name: ${{ github.event_name == 'pull_request' && github.event.action == 'edited' && !github.event.changes.base && 'PR metadata' || 'Development CI' }}
+    # Keep the required check name stable across every event. Ready PR edits
+    # must reuse verified tree evidence or complete full validation.
+    name: Development CI
     if: always()
     needs: [decision, repository, build, mac-tests, analysis]
     runs-on: ubuntu-latest
@@ -174,7 +175,7 @@ jobs:
               ;;
             fast)
               [[ "$BUILD_RESULT" == skipped && "$MAC_TEST_RESULT" == skipped ]] || exit 1
-              echo 'Fast draft or metadata checks only; review-ready changes require full validation.'
+              echo 'Fast draft checks only; review-ready changes require full validation.'
               ;;
             *) exit 1 ;;
           esac

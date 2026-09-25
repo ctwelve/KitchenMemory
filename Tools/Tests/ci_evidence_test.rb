@@ -12,7 +12,7 @@ class CIEvidenceTest < Minitest::Test
   def test_draft_push_is_fast_but_ready_candidate_and_retarget_require_validation
     refute C.full_candidate?('pull_request', {'action' => 'synchronize', 'pull_request' => {'draft' => true}})
     assert C.full_candidate?('pull_request', {'action' => 'ready_for_review', 'pull_request' => {'draft' => false}})
-    refute C.full_candidate?('pull_request', {'action' => 'edited', 'pull_request' => {'draft' => false}})
+    assert C.full_candidate?('pull_request', {'action' => 'edited', 'pull_request' => {'draft' => false}})
     assert C.full_candidate?('pull_request', {'action' => 'edited', 'changes' => {'base' => {}}, 'pull_request' => {'draft' => false}})
     assert C.full_candidate?('merge_group', {})
     assert C.full_candidate?('push', {})
