@@ -193,3 +193,25 @@ Historical build 429 is tooling evidence only.
 Publication remains pending the new artifact's standalone launch check and
 reviewed alpha release notes. This candidate does not claim beta readiness,
 the deferred comprehensive UI/accessibility matrix, or a new TestFlight audience.
+
+
+## 0.3.5 alpha candidate
+
+The maintainer requested release of the accepted platform-27 changes on
+2026-09-25. PR #229 merged as `26ec95aff0f8ae037d2f307c20f1f7c9123156dc`;
+its full development validation and the exact merge's push-to-main validation
+both passed (GitHub runs 36183534076 and 36186410808). The maintainer also
+reported a successful manual iOS smoke test.
+
+The earlier immutable `release/0.3.4` tag belongs to the failed Cloud candidate;
+it is not moved or reused. This version-only candidate advances the application,
+release marker, and software inventory to 0.3.5. It includes iOS/macOS 27 minimums,
+updated dependencies, conventional dynamic KitchenKit linkage, and accessibility
+checks driven through named controls. No persisted schema change is introduced.
+The separate development-CI naming cleanup remains outside this candidate.
+
+After this preparation merges, require its exact main validation before creating
+`release/0.3.5`. Cloud production tests, signed Archives, notarized artifact
+collection, standalone Mac install/launch acceptance, and reviewed alpha release
+notes remain outstanding. Local checks and earlier candidates do not substitute
+for those results. No new TestFlight audience is requested.
