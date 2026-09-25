@@ -7,7 +7,7 @@ import SwiftUI
 
 struct CookingSessionHistoryView: View {
   @Bindable var model: CookingSessionPresentationModel
-  var focusDetail: () -> Void = {}
+  var applyNavigationFocus: () -> Void = {}
 
   private var ordinarySessions: [CookingSessionProjection] {
     model.displayedHistorySessions.filter { $0.lifecycle != .finished }
@@ -101,7 +101,7 @@ struct CookingSessionHistoryView: View {
   private func sessionButton(_ session: CookingSessionProjection) -> some View {
     if session.lifecycle == .finished {
       Button {
-        if model.observeFinishedSession(session.id) { focusDetail() }
+        if model.observeFinishedSession(session.id) { applyNavigationFocus() }
       } label: {
         CookingSessionHistoryRow(session: session)
       }
@@ -110,7 +110,7 @@ struct CookingSessionHistoryView: View {
       .id(session.id)
     } else {
       Button {
-        if model.selectSessionFromHistory(session.id) { focusDetail() }
+        if model.selectSessionFromHistory(session.id) { applyNavigationFocus() }
       } label: {
         CookingSessionHistoryRow(session: session)
       }

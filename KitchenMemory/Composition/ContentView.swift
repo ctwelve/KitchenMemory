@@ -106,7 +106,7 @@ struct ContentView: View {
 #endif
     } content: {
       LibraryContentRouter(libraryModel: dependencies.libraryModel, sessionModel: dependencies.sessionModel,
-                           focusDetail: focusSelectedDestination)
+                           applyNavigationFocus: applyAcceptedNavigationFocus)
         .navigationSplitViewColumnWidth(min: 240, ideal: 300, max: 480)
 #if !os(macOS)
         .toolbar { libraryToolbar }
@@ -131,10 +131,10 @@ struct ContentView: View {
 #endif
     .onChange(of: dependencies.libraryModel.startupState, initial: true) { _, startup in
       preferredCompactColumn = LibraryNavigationPolicy.initialColumn(
-        startup: startup, destination: dependencies.libraryModel.navigation.destination)
+        startup: startup, focus: dependencies.libraryModel.navigation.focus)
     }
-    .onChange(of: dependencies.libraryModel.navigation.destination) { _, destination in
-      focusChangedDestination(destination)
+    .onChange(of: dependencies.libraryModel.navigation.destination) { _, _ in
+      applyAcceptedNavigationFocus()
     }
     .sheet(item: $activeSheet) { _ in
       RecipeLibrarySheetContent(model: dependencies.libraryModel, close: { activeSheet = nil })
@@ -185,7 +185,7 @@ private extension ContentView {
   var libraryActions: LibraryCommandActions? {
     preparedApp.map {
       LibraryCommandActions(library: $0.libraryModel, sessions: $0.sessionModel,
-                            openImport: { activeSheet = .importURL }, focusDestination: focusSelectedDestination)
+                            openImport: { activeSheet = .importURL }, focusDestination: applyNavigationFocus)
     }
   }
 
@@ -194,37 +194,32 @@ private extension ContentView {
       model: dependencies.libraryModel,
       sessionModel: dependencies.sessionModel,
       showSessionHistory: {
-        if libraryActions?.perform(.sessions) == true { preferredCompactColumn = .content }
+        libraryActions?.perform(.sessions)
       },
       showDeletedItems: {
-        if libraryActions?.perform(.deletedItems) == true { preferredCompactColumn = .content }
+        libraryActions?.perform(.deletedItems)
       },
       showRecovery: {
-        if libraryActions?.perform(.recovery) == true { preferredCompactColumn = .content }
+        libraryActions?.perform(.recovery)
       },
       showDrafts: {
-        if libraryActions?.perform(.drafts) == true { preferredCompactColumn = .content }
+        libraryActions?.perform(.drafts)
       },
       browse: { change in
         if dependencies.libraryModel.navigation.browseRecipes(changingFilter: change) {
-          preferredCompactColumn = .content
+          applyAcceptedNavigationFocus()
         }
       }
     )
   }
 
-  func focusChangedDestination(_ destination: RecipeLibraryNavigation.Destination) {
-    switch destination {
-    case .history, .drafts, .deletedItems, .recovery: preferredCompactColumn = .content
-    case .recipe: break // The caller chooses list browsing versus opening a Recipe.
-    default: preferredCompactColumn = .detail
-    }
+  func applyNavigationFocus(_ focus: RecipeLibraryNavigation.Focus) {
+    preferredCompactColumn = LibraryNavigationPolicy.column(for: focus)
   }
 
-  func focusSelectedDestination() {
-    // Column visibility governs regular layouts; a collapsed split view needs
-    // an explicit preferred column after the person navigates back to its sidebar.
-    preferredCompactColumn = .detail
+  func applyAcceptedNavigationFocus() {
+    guard let navigation = preparedApp?.libraryModel.navigation else { return }
+    applyNavigationFocus(navigation.focus)
   }
 
   var sessionIssueIsPresented: Binding<Bool> {

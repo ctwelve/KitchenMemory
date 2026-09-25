@@ -8,6 +8,29 @@ import XCTest
 
 @MainActor
 final class LibraryCommandActionsTests: XCTestCase {
+  func testRepeatedListCommandsApplyAcceptedFocusOnlyToTheirOriginatingWindow() throws {
+    let app = try AppRuntime.testing()
+    app.libraryModel.loadIfNeeded()
+    app.sessionModel.loadIfNeeded()
+    var firstEffects: [RecipeLibraryNavigation.Focus] = []
+    var secondEffects: [RecipeLibraryNavigation.Focus] = []
+    let first = LibraryCommandActions(library: app.libraryModel, sessions: app.sessionModel,
+      focusDestination: { firstEffects.append($0) })
+    let second = LibraryCommandActions(library: app.libraryModel, sessions: app.sessionModel,
+      focusDestination: { secondEffects.append($0) })
+    XCTAssertTrue(first.perform(.sessions))
+    XCTAssertTrue(second.perform(.sessions))
+    XCTAssertTrue(second.perform(.sessions))
+    XCTAssertEqual(firstEffects, [.content])
+    XCTAssertEqual(secondEffects, [.content, .content])
+    XCTAssertEqual(app.libraryModel.navigation.destination, .history(.all))
+    XCTAssertTrue(first.perform(.newRecipe))
+    XCTAssertEqual(firstEffects, [.content, .detail])
+    XCTAssertTrue(first.perform(.drafts))
+    XCTAssertEqual(firstEffects, [.content, .detail, .content])
+    XCTAssertEqual(secondEffects, [.content, .content])
+  }
+
 #if os(macOS)
   func testNewRecipeMenuOpensAnEditorWithoutAWindowAndPreservesExistingDraft() throws {
     let app = try AppRuntime.testing()

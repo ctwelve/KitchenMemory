@@ -9,6 +9,28 @@ import XCTest
 
 @MainActor
 final class RecipeLibraryNavigationTests: XCTestCase {
+  func testAcceptedIntentDistinguishesBrowsingFromOpeningTheSameRecipe() {
+    let navigation = RecipeLibraryNavigation()
+    let recipeID = Recipe.ID()
+    XCTAssertTrue(navigation.selectRecipe(recipeID))
+    XCTAssertEqual(navigation.focus, .detail)
+    XCTAssertTrue(navigation.browseRecipes {})
+    XCTAssertEqual(navigation.destination, .recipe)
+    XCTAssertEqual(navigation.selectedRecipeID, recipeID)
+    XCTAssertEqual(navigation.focus, .content)
+    XCTAssertTrue(navigation.selectRecipe(recipeID))
+    XCTAssertEqual(navigation.focus, .detail)
+    XCTAssertTrue(navigation.move(to: .history(.all)))
+    XCTAssertEqual(navigation.focus, .content)
+    XCTAssertTrue(navigation.move(to: .session(CookingSession.ID(), history: .all)))
+    XCTAssertEqual(navigation.focus, .detail)
+    XCTAssertTrue(navigation.selectAuxiliary(.organization))
+    XCTAssertEqual(navigation.focus, .detail)
+    XCTAssertTrue(navigation.move(to: .recovery))
+    XCTAssertEqual(navigation.focus, .content)
+    XCTAssertNil(navigation.auxiliarySelection)
+  }
+
   func testFilteringAnEditedRecipePreservesDraftSelectionAndReturnContext() throws {
     let app = try AppRuntime.testing()
     let library = app.libraryModel
@@ -44,15 +66,55 @@ final class RecipeLibraryNavigationTests: XCTestCase {
     library.beginEditing()
     library.editor?.session.title = "Retain my draft"
     store.refusesWrites = true
+    let focus = library.navigation.focus
+    let selected = library.navigation.selectedRecipeID
+    library.navigation.recipeListAnchor = selected
     var changedFilter = false
     XCTAssertFalse(library.navigation.browseRecipes { changedFilter = true })
     XCTAssertFalse(changedFilter)
+    XCTAssertEqual(library.navigation.focus, focus)
+    XCTAssertEqual(library.navigation.selectedRecipeID, selected)
+    XCTAssertEqual(library.navigation.recipeListAnchor, selected)
     XCTAssertNotNil(library.editor)
     store.refusesWrites = false
     XCTAssertTrue(library.navigation.browseRecipes { changedFilter = true })
     XCTAssertTrue(changedFilter)
     XCTAssertEqual(library.navigation.destination, .recipe)
     XCTAssertEqual(library.drafts.drafts.first?.session.title, "Retain my draft")
+  }
+
+  func testAcceptedSessionCommandStaysRetiredWhenEditorPreservationVetoesNavigation() throws {
+    let app = try AppRuntime.testing()
+    let draftStore = NavigationDraftStore()
+    let library = RecipeLibraryModel(library: app.libraryModel.library,
+      samplePreferences: VolatileKitchenPreferencesStore(sampleRecipeOnboardingResponse: .accepted),
+      kitchenWasCreated: false, editingStore: draftStore)
+    let commandStore = VolatileCookingSessionPresentationStore()
+    let sessions = CookingSessionPresentationModel(sessions: app.cookingSessions,
+      store: commandStore, navigation: library.navigation)
+    library.loadIfNeeded()
+    sessions.loadIfNeeded()
+    let recipe = try XCTUnwrap(library.selectedRecipe)
+    library.beginEditing(recipe)
+    let editor = try XCTUnwrap(library.editor)
+    editor.session.title = "Preserve before leaving"
+    draftStore.refusesWrites = true
+    let destination = library.navigation.destination
+    let focus = library.navigation.focus
+    XCTAssertTrue(sessions.start(from: recipe))
+    XCTAssertTrue(commandStore.pendingCommands.isEmpty)
+    XCTAssertEqual(sessions.sessions.count, 1)
+    let acceptedID = try XCTUnwrap(sessions.sessions.first?.id)
+    XCTAssertEqual(library.navigation.destination, destination)
+    XCTAssertEqual(library.navigation.focus, focus)
+    XCTAssertIdentical(library.editor, editor)
+    XCTAssertTrue(library.editingStorageFailed)
+    sessions.retryPendingCommands()
+    sessions.reloadAfterExternalStoreChange()
+    XCTAssertTrue(commandStore.pendingCommands.isEmpty)
+    XCTAssertEqual(sessions.sessions.map(\.id), [acceptedID])
+    XCTAssertEqual(library.navigation.destination, destination)
+    XCTAssertEqual(editor.session.title, "Preserve before leaving")
   }
 
   func testMiddleColumnRetainsDraftAndHistoryContextWhileDetailChanges() {
@@ -155,7 +217,7 @@ final class RecipeLibraryNavigationTests: XCTestCase {
     var openedImport = false
     var focused = false
     let actions = LibraryCommandActions(library: library, sessions: sessions,
-                                       openImport: { openedImport = true }, focusDestination: { focused = true })
+                                       openImport: { openedImport = true }, focusDestination: { _ in focused = true })
     XCTAssertTrue(actions.perform(.newRecipe))
     let editor = try XCTUnwrap(library.editor)
     focused = false

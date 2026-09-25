@@ -66,7 +66,7 @@ struct RecipeLibraryCommands: Commands {
     if libraryWindowPresent { return focused }
     return app.map {
       LibraryCommandActions(library: $0.libraryModel, sessions: $0.sessionModel,
-                            focusDestination: openLibrary)
+                            focusDestination: { _ in openLibrary() })
     }
   }
 

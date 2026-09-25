@@ -9,7 +9,7 @@ struct RecipeLibraryList: View {
   @Bindable var model: RecipeLibraryModel
   @Bindable var sessionModel: CookingSessionPresentationModel
   let locale: Locale
-  let focusDetail: () -> Void
+  let applyNavigationFocus: () -> Void
   let selectSession: (CookingSession.ID) -> Void
 
   var body: some View {
@@ -18,7 +18,9 @@ struct RecipeLibraryList: View {
       if let organization = model.organization {
         RecipeLibraryFilters(model: organization, locale: locale)
         if showsReturnToRecipe(recipes) {
-          Button(.libraryReturnToDetail, action: focusDetail)
+          Button(.libraryReturnToDetail) {
+            if model.navigation.reopenDetail() { applyNavigationFocus() }
+          }
             .padding(.bottom, 8)
             .accessibilityIdentifier("return-to-recipe-detail")
         }
@@ -69,7 +71,7 @@ struct RecipeLibraryList: View {
         ForEach(model.visibleReconciliations, id: \.recipeID) { comparison in
           Button {
             model.beginReconciliation(comparison)
-            if model.editor != nil { focusDetail() }
+            if model.editor != nil { applyNavigationFocus() }
           } label: {
             VStack(alignment: .leading) {
               Label(.recipeComparisonTitle, systemImage: "arrow.triangle.branch")
@@ -107,7 +109,7 @@ struct RecipeLibraryList: View {
       }))
     }
     Button {
-      if model.selectRecipeForReading(storedRecipe.id) { focusDetail() }
+      if model.selectRecipeForReading(storedRecipe.id) { applyNavigationFocus() }
     } label: {
       RecipeRow(storedRecipe: storedRecipe)
         .frame(maxWidth: .infinity, alignment: .leading)
