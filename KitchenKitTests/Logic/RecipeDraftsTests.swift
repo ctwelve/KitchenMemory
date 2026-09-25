@@ -13,7 +13,8 @@ final class RecipeDraftsTests: XCTestCase {
     let kitchen = Kitchen(name: "Home")
     try repository.save(kitchen)
     let library = RecipeLibrary(kitchenID: kitchen.id, repository: repository,
-                                samples: EmptyDraftSamples(), importer: RecipeImportService())
+                                samples: EmptyDraftSamples(), importer: RecipeImportService(),
+      sampleFolderName: "Sample Pack", sampleTagName: "samples")
     let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
     defer { try? FileManager.default.removeItem(at: directory) }
     try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
@@ -36,7 +37,8 @@ final class RecipeDraftsTests: XCTestCase {
     let kitchen = Kitchen(name: "Home")
     try repository.save(kitchen)
     let library = RecipeLibrary(kitchenID: kitchen.id, repository: repository,
-                                samples: EmptyDraftSamples(), importer: RecipeImportService())
+                                samples: EmptyDraftSamples(), importer: RecipeImportService(),
+      sampleFolderName: "Sample Pack", sampleTagName: "samples")
     let store = VolatileRecipeEditingStore()
     let drafts = RecipeDrafts(library: library, store: store)
     let option = RecipeImportOption(id: .init(blockIndex: 0, objectIndex: 0),
@@ -60,7 +62,8 @@ final class RecipeDraftsTests: XCTestCase {
     let kitchen = Kitchen(name: "Home")
     try repository.save(kitchen)
     let library = RecipeLibrary(kitchenID: kitchen.id, repository: repository,
-                                samples: EmptyDraftSamples(), importer: RecipeImportService())
+                                samples: EmptyDraftSamples(), importer: RecipeImportService(),
+      sampleFolderName: "Sample Pack", sampleTagName: "samples")
     let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
     defer { try? FileManager.default.removeItem(at: directory) }
     let url = directory.appendingPathComponent("drafts.json")

@@ -114,7 +114,8 @@ final class RecipeRetentionTests: XCTestCase {
     _ = try repository.maintainDeletedRecipes(in: kitchen.id, at: date.addingTimeInterval(31 * 86_400))
     try repository.save(command)
     let library = RecipeLibrary(kitchenID: kitchen.id, repository: repository,
-                                samples: RetentionSamples(), importer: RecipeImportService())
+                                samples: RetentionSamples(), importer: RecipeImportService(),
+      sampleFolderName: "Sample Pack", sampleTagName: "samples")
     let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
     defer { try? FileManager.default.removeItem(at: directory) }
     let store = FileRecipeEditingStore(url: directory.appendingPathComponent("drafts.json"))

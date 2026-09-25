@@ -31,7 +31,7 @@ final class KitchenConvergenceWorkflowTests: XCTestCase {
     let repository = SwiftDataRecipeRepository(modelContainer: container)
     let ownerID = KitchenOwner.ID(rawValue: "cloudkit:production:current-user")
     let kitchen = try KitchenBootstrapService(repository: repository)
-      .prepareInitialKitchenWithStatus(ownerID: ownerID).kitchen
+      .prepareInitialKitchenWithStatus(named: "Test Kitchen", ownerID: ownerID).kitchen
     let sample = storedRecipe(recipeID: recipeID, kitchenID: kitchen.id)
 
     try KitchenResetService(

@@ -53,7 +53,7 @@ public struct RecipeLibrary {
     resetRepository: (any KitchenResetRepository)? = nil,
     organizationRepository: (any RecipeOrganizationRepository)? = nil,
     samplePackRepository: (any SamplePackRepository)? = nil,
-    sampleFolderName: String = "Sample Pack", sampleTagName: String = "samples"
+    sampleFolderName: String, sampleTagName: String
   ) {
     self.samplePack = samplePackRepository
     self.samples = samples

@@ -130,6 +130,7 @@ struct AppLaunchPlan: Equatable {
 enum AppRuntime {
   struct TestingConfiguration {
     var library: AppLaunchPlan.SampleFixture = .installed
+    var locale: Locale = .current
     var preferencesStore: (any KitchenPreferencesStoring)?
     var sampleProvider: (any SampleRecipeProviding)?
     var initialKitchenWasCreatedOverride: Bool?
@@ -200,6 +201,7 @@ enum AppRuntime {
       ownerID: KitchenOwner.ID(rawValue: "testing:personal-kitchen-owner"),
       preferences: preferences,
       samples: configuration.sampleProvider ?? BundledSampleRecipeProvider(),
+      locale: configuration.locale,
       initialKitchenWasCreatedOverride:
         configuration.initialKitchenWasCreatedOverride,
       sessionPresentationStore: configuration.sessionPresentationStore
@@ -231,12 +233,14 @@ struct PreparedCore {
   let cookingSessions: CookingSessions
   let recipeRepository: SwiftDataRecipeRepository
   let ownerID: KitchenOwner.ID
+  let locale: Locale
 
   init(
     plan: AppLaunchPlan,
     ownerID: KitchenOwner.ID,
     preferences: any KitchenPreferencesStoring,
     samples: any SampleRecipeProviding,
+    locale: Locale = .current,
     initialKitchenWasCreatedOverride: Bool?
   ) throws {
     modelContainer = try KitchenMemorySchema.makeContainer(
@@ -245,8 +249,10 @@ struct PreparedCore {
     )
     recipeRepository = SwiftDataRecipeRepository(modelContainer: modelContainer)
     self.ownerID = ownerID
+    self.locale = locale
     let preparedKitchen = try KitchenBootstrapService(repository: recipeRepository)
-      .prepareInitialKitchenWithStatus(ownerID: ownerID)
+      .prepareInitialKitchenWithStatus(
+        named: LocalizedStringResource.kitchenDefaultName.localized(for: locale), ownerID: ownerID)
     kitchenID = preparedKitchen.kitchen.id
     let library = RecipeLibrary(
       kitchenID: preparedKitchen.kitchen.id,
@@ -256,8 +262,8 @@ struct PreparedCore {
       resetRepository: SwiftDataKitchenResetRepository(modelContainer: modelContainer),
       organizationRepository: SwiftDataRecipeOrganizationRepository(modelContainer: modelContainer),
       samplePackRepository: SwiftDataSamplePackRepository(modelContainer: modelContainer),
-      sampleFolderName: String(localized: .settingsSamplesFolderName),
-      sampleTagName: String(localized: .settingsSamplesTagName)
+      sampleFolderName: LocalizedStringResource.settingsSamplesFolderName.localized(for: locale),
+      sampleTagName: LocalizedStringResource.settingsSamplesTagName.localized(for: locale)
     )
     // Seed the minimal shell fixture without simulating a user's explicit pack request.
     // Pack behavior is exercised by hosted tests starting from an empty Kitchen.
@@ -305,6 +311,7 @@ struct PreparedApp {
   let cookingSessions: CookingSessions
   let recipeRepository: SwiftDataRecipeRepository
   let ownerID: KitchenOwner.ID
+  let locale: Locale
   let sessionModel: CookingSessionPresentationModel
   let persistentStoreChangeObserver: PersistentStoreChangeObserver?
   let personalCloudStatusMonitor: PersonalCloudStatusMonitor?
@@ -316,6 +323,7 @@ struct PreparedApp {
     ownerID: KitchenOwner.ID,
     preferences: any KitchenPreferencesStoring,
     samples: any SampleRecipeProviding,
+    locale: Locale = .current,
     initialKitchenWasCreatedOverride: Bool? = nil,
     sessionPresentationStore: any CookingSessionPresentationStoring
   ) throws {
@@ -324,6 +332,7 @@ struct PreparedApp {
       ownerID: ownerID,
       preferences: preferences,
       samples: samples,
+      locale: locale,
       initialKitchenWasCreatedOverride: initialKitchenWasCreatedOverride
     )
     let sessionModel = CookingSessionPresentationModel(
@@ -342,6 +351,7 @@ struct PreparedApp {
     cookingSessions = core.cookingSessions
     recipeRepository = core.recipeRepository
     self.ownerID = core.ownerID
+    self.locale = core.locale
     self.sessionModel = sessionModel
     cloudSyncSettings = plan.offersCloudSyncSetting
       ? CloudSyncSettings(
@@ -372,7 +382,7 @@ struct PreparedApp {
   }
 
   func reloadAfterExternalStoreChange() {
-    guard (try? reconcileKitchenOwnership(repository: recipeRepository, ownerID: ownerID)) != nil else {
+    guard (try? reconcileKitchenOwnership(repository: recipeRepository, ownerID: ownerID, locale: locale)) != nil else {
       return
     }
     performExternalStoreRefresh(

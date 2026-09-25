@@ -76,9 +76,20 @@ final class SamplePackLocalizationContractTests: XCTestCase {
       XCTAssertEqual(try tags.library(in: kitchen.id).tags.first?.name,
         LocalizedStringResource.settingsSamplesTagName.localized(for: locale))
       try folders.append(initial.prepare(.rename(id: XCTUnwrap(status.folderID), name: "My spelling")))
+      try tags.append(tags.library(in: kitchen.id).prepare(
+        .rename(id: XCTUnwrap(status.tagID), name: "Mes exemples")))
       _ = try library.load()
       XCTAssertEqual(try folders.library(in: kitchen.id).folders.first?.name, "My spelling")
       XCTAssertEqual(try library.samplePackStatus()?.folderID, status.folderID)
+      let reopened = RecipeLibrary(kitchenID: kitchen.id, repository: repository,
+        samples: BundledSampleRecipeProvider(preferredLanguages: [language]), importer: RecipeImportService(),
+        samplePackRepository: SwiftDataSamplePackRepository(modelContainer: container),
+        sampleFolderName: "Different locale folder", sampleTagName: "different-locale-tag")
+      try reopened.installSamples()
+      XCTAssertEqual(try folders.library(in: kitchen.id).folders.first?.name, "My spelling")
+      XCTAssertEqual(try tags.library(in: kitchen.id).tags.first?.name, "Mes exemples")
+      XCTAssertEqual(try reopened.samplePackStatus()?.folderID, status.folderID)
+      XCTAssertEqual(try reopened.samplePackStatus()?.tagID, status.tagID)
     }
   }
 }

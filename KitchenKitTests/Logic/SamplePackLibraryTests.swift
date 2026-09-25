@@ -17,7 +17,8 @@ final class SamplePackLibraryTests: XCTestCase {
     let library = RecipeLibrary(kitchenID: kitchen.id, repository: repository,
       samples: LibrarySampleProvider(), importer: RecipeImportService(),
       resetRepository: SwiftDataKitchenResetRepository(modelContainer: container),
-      samplePackRepository: SwiftDataSamplePackRepository(modelContainer: container))
+      samplePackRepository: SwiftDataSamplePackRepository(modelContainer: container),
+      sampleFolderName: "Sample Pack", sampleTagName: "samples")
     try library.installSamples()
     // Edited samples survive disabling the pack and are then deleted manually.
     for recipe in try library.load().recipes {
@@ -56,10 +57,12 @@ final class SamplePackLibraryTests: XCTestCase {
     try library.setSamplePack(removal)
     XCTAssertEqual(try library.samplePackStatus()?.deleted, 2)
     let foreign = RecipeLibrary(kitchenID: Kitchen.ID(), repository: repository,
-      samples: samples, importer: RecipeImportService(), samplePackRepository: pack)
+      samples: samples, importer: RecipeImportService(), samplePackRepository: pack,
+      sampleFolderName: "Sample Pack", sampleTagName: "samples")
     XCTAssertThrowsError(try foreign.setSamplePack(install))
     let unsupported = RecipeLibrary(kitchenID: kitchen.id, repository: repository,
-      samples: samples, importer: RecipeImportService())
+      samples: samples, importer: RecipeImportService(),
+      sampleFolderName: "Sample Pack", sampleTagName: "samples")
     XCTAssertNil(try unsupported.samplePackStatus())
     XCTAssertThrowsError(try unsupported.prepareSamplePack(enabled: true))
     XCTAssertThrowsError(try unsupported.setSamplePack(install))

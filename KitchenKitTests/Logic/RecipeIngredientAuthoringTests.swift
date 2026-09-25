@@ -175,7 +175,8 @@ final class RecipeIngredientAuthoringTests: XCTestCase {
       let kitchen = Kitchen(name: "Home")
       try repository.save(kitchen)
       library = RecipeLibrary(kitchenID: kitchen.id, repository: repository,
-                              samples: IngredientAuthoringSamples(), importer: RecipeImportService())
+                              samples: IngredientAuthoringSamples(), importer: RecipeImportService(),
+      sampleFolderName: "Sample Pack", sampleTagName: "samples")
       let original = try library.create(from: RecipeDraft(title: "Soup", ingredientSections: sections))
       drafts = RecipeDrafts(library: library, store: store)
       draft = try XCTUnwrap(drafts.begin(original))

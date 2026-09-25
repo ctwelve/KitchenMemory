@@ -47,8 +47,8 @@ final class KitchenMemoryTests: XCTestCase {
     )
 
     let bootstrap = KitchenBootstrapService(repository: repository)
-    let firstKitchen = try bootstrap.prepareInitialKitchen()
-    let secondKitchen = try bootstrap.prepareInitialKitchen()
+    let firstKitchen = try bootstrap.prepareInitialKitchen(named: "Test Kitchen")
+    let secondKitchen = try bootstrap.prepareInitialKitchen(named: "Test Kitchen")
 
     XCTAssertEqual(firstKitchen, secondKitchen)
     XCTAssertEqual(try repository.kitchens(), [firstKitchen])

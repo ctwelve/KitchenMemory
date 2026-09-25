@@ -1,6 +1,48 @@
 {
   "sourceLanguage" : "en-US",
   "strings" : {
+    "kitchen.default-name" : {
+      "comment" : "Default name for a newly created personal Kitchen or a missing Kitchen during ownership refresh. Stored and user-authored names are never translated or renamed. Home means the household kitchen, not navigation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de-DE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Küche zu Hause"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Home Kitchen"
+          }
+        },
+        "en-US" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Home Kitchen"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cocina de casa"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuisine de la maison"
+          }
+        },
+        "it-IT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cucina di casa"
+          }
+        }
+      }
+    },
   "recipe.editor.simple-mode": {
     "comment": "Simple recipe editing control or guidance. Ingredient text remains authored; explicit choices protect precise adjustments.",
     "extractionState": "manual",

@@ -23,7 +23,8 @@ final class RecipeOrganizationDraftTests: XCTestCase {
     try organization.accept(organization.load(in: kitchen.id).prepare(tag: .create(id: tag, name: "Quick")))
     try organization.accept(organization.load(in: kitchen.id).prepare(tag: .create(id: secondTag, name: "Family")))
     let library = RecipeLibrary(kitchenID: kitchen.id, repository: recipes, samples: OrganizationDraftSamples(),
-      importer: RecipeImportService(), organizationRepository: organization)
+      importer: RecipeImportService(), organizationRepository: organization,
+      sampleFolderName: "Sample Pack", sampleTagName: "samples")
     let store = OrganizationDraftStore(url: directory.appendingPathComponent("Drafts.json"))
     var drafts = RecipeDrafts(library: library, store: store)
     let first = try XCTUnwrap(drafts.begin())
@@ -61,7 +62,8 @@ final class RecipeOrganizationDraftTests: XCTestCase {
     let kitchen = Kitchen(name: "Home")
     try repository.save(kitchen)
     let library = RecipeLibrary(kitchenID: kitchen.id, repository: repository, samples: OrganizationDraftSamples(),
-                                importer: RecipeImportService())
+                                importer: RecipeImportService(),
+      sampleFolderName: "Sample Pack", sampleTagName: "samples")
     let save = try library.prepareSave(from: RecipeDraft(title: "Soup"), original: nil, observedSelectionIDs: [])
     XCTAssertNil(try library.prepareOrganization(.init(), for: save))
     XCTAssertThrowsError(try library.prepareOrganization(.init(folderID: Folder.ID()), for: save))

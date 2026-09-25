@@ -109,7 +109,8 @@ final class RecipeReconciliationTests: XCTestCase {
     }
     let comparison = try XCTUnwrap(repository.reconciliations(in: kitchen.id).first)
     let library = RecipeLibrary(kitchenID: kitchen.id, repository: repository,
-                                samples: ComparisonSamples(), importer: RecipeImportService())
+                                samples: ComparisonSamples(), importer: RecipeImportService(),
+      sampleFolderName: "Sample Pack", sampleTagName: "samples")
     let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
     defer { try? FileManager.default.removeItem(at: directory) }
     let store = ComparisonStore(url: directory.appendingPathComponent("drafts.json"))

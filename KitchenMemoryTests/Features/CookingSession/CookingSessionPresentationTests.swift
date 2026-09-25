@@ -261,7 +261,7 @@ extension CookingSessionPresentationTests {
     let container = try KitchenMemorySchema.makeContainer(storeURL: storeURL)
     let recipeRepository = SwiftDataRecipeRepository(modelContainer: container)
     let kitchen = try KitchenBootstrapService(repository: recipeRepository)
-      .prepareInitialKitchenWithStatus().kitchen
+      .prepareInitialKitchenWithStatus(named: "Test Kitchen").kitchen
     let sessionRepository = SwiftDataCookingSessionRepository(modelContainer: container)
     let store = DefaultsCookingSessionPresentationStore(defaults: defaults)
     let model = CookingSessionPresentationModel(
@@ -296,12 +296,13 @@ private func stageInterruptedStart(
   let container = try KitchenMemorySchema.makeContainer(storeURL: storeURL)
   let recipeRepository = SwiftDataRecipeRepository(modelContainer: container)
   let kitchen = try KitchenBootstrapService(repository: recipeRepository)
-    .prepareInitialKitchenWithStatus().kitchen
+    .prepareInitialKitchenWithStatus(named: "Test Kitchen").kitchen
   let library = RecipeLibrary(
     kitchenID: kitchen.id,
     repository: recipeRepository,
     samples: BundledSampleRecipeProvider(preferredLanguages: ["en-US"]),
-    importer: RecipeImportService()
+    importer: RecipeImportService(),
+      sampleFolderName: "Sample Pack", sampleTagName: "samples"
   )
   try library.installSamples()
   let recipe = try XCTUnwrap(library.load().recipes.first)

@@ -205,7 +205,8 @@ private struct IngredientTextEditingFixture {
     let kitchen = Kitchen(name: "Home")
     try repository.save(kitchen)
     let library = RecipeLibrary(kitchenID: kitchen.id, repository: repository,
-                                samples: IngredientTextEditingSamples(), importer: RecipeImportService())
+                                samples: IngredientTextEditingSamples(), importer: RecipeImportService(),
+      sampleFolderName: "Sample Pack", sampleTagName: "samples")
     let original = try library.create(from: RecipeDraft(title: "Soup", ingredientSections: [
       IngredientSection(ingredients: ingredients),
     ]))

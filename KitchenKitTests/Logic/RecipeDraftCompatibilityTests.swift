@@ -21,7 +21,8 @@ final class RecipeDraftCompatibilityTests: XCTestCase {
     try context.save()
     let reopened = SwiftDataRecipeRepository(modelContainer: container)
     let library = RecipeLibrary(kitchenID: kitchen.id, repository: reopened,
-                                samples: CompatibilitySamples(), importer: RecipeImportService())
+                                samples: CompatibilitySamples(), importer: RecipeImportService(),
+      sampleFolderName: "Sample Pack", sampleTagName: "samples")
     let store = VolatileRecipeEditingStore()
     let drafts = RecipeDrafts(library: library, store: store)
     XCTAssertNil(drafts.begin(original))
@@ -35,7 +36,8 @@ final class RecipeDraftCompatibilityTests: XCTestCase {
     let kitchen = Kitchen(name: "Home")
     try repository.save(kitchen)
     let library = RecipeLibrary(kitchenID: kitchen.id, repository: repository,
-                                samples: CompatibilitySamples(), importer: RecipeImportService())
+                                samples: CompatibilitySamples(), importer: RecipeImportService(),
+      sampleFolderName: "Sample Pack", sampleTagName: "samples")
     let original = try library.create(from: RecipeDraft(
       title: "Soup", media: [RecipeMedia(role: .hero, assetName: "SyntheticHero")],
       equipment: [EquipmentItem(originalText: "Pot", name: "Pot")]
@@ -71,7 +73,8 @@ final class RecipeDraftCompatibilityTests: XCTestCase {
     let kitchen = Kitchen(name: "Home")
     try repository.save(kitchen)
     let library = RecipeLibrary(kitchenID: kitchen.id, repository: repository,
-                                samples: CompatibilitySamples(), importer: RecipeImportService())
+                                samples: CompatibilitySamples(), importer: RecipeImportService(),
+      sampleFolderName: "Sample Pack", sampleTagName: "samples")
     let original = try library.create(from: RecipeDraft(title: "Soup"))
     let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
     defer { try? FileManager.default.removeItem(at: directory) }
@@ -96,7 +99,8 @@ final class RecipeDraftCompatibilityTests: XCTestCase {
     let repository = SwiftDataRecipeRepository(modelContainer: try KitchenMemorySchema.makeContainer(inMemory: true))
     let kitchen = Kitchen(name: "Not yet present")
     let library = RecipeLibrary(kitchenID: kitchen.id, repository: repository,
-                                samples: CompatibilitySamples(), importer: RecipeImportService())
+                                samples: CompatibilitySamples(), importer: RecipeImportService(),
+      sampleFolderName: "Sample Pack", sampleTagName: "samples")
     let store = VolatileRecipeEditingStore()
     let drafts = RecipeDrafts(library: library, store: store)
     let draft = try XCTUnwrap(drafts.begin())

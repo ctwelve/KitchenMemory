@@ -46,7 +46,8 @@ final class SamplePackSettingsTests: XCTestCase {
     let pack = RecoverableSampleRepository(base: SwiftDataSamplePackRepository(modelContainer: container))
     let model = RecipeLibraryModel(library: RecipeLibrary(kitchenID: kitchen.id, repository: repository,
       samples: BundledSampleRecipeProvider(preferredLanguages: ["en-US"]), importer: RecipeImportService(),
-      resetRepository: SwiftDataKitchenResetRepository(modelContainer: container), samplePackRepository: pack),
+      resetRepository: SwiftDataKitchenResetRepository(modelContainer: container), samplePackRepository: pack,
+      sampleFolderName: "Sample Pack", sampleTagName: "samples"),
       samplePreferences: VolatileKitchenPreferencesStore(sampleRecipeOnboardingResponse: .accepted),
       kitchenWasCreated: false)
     model.loadIfNeeded()
