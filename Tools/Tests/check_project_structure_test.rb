@@ -186,9 +186,9 @@ class CheckProjectStructureTest < Minitest::Test
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = #{file_identifier} /* #{name}.xcconfig */;
 			buildSettings = {
-				MERGED_BINARY_TYPE = automatic;
-				MACOSX_DEPLOYMENT_TARGET = 26.5;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				MERGED_BINARY_TYPE = none;
+				MACOSX_DEPLOYMENT_TARGET = 27.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
 			};
 			name = #{name};
 		};
@@ -588,13 +588,13 @@ class CheckProjectStructureTest < Minitest::Test
     assert_contract_error { validate(fixture) }
   end
 
-  def test_rejects_project_configuration_without_automatic_merged_binaries
+  def test_rejects_project_configuration_with_automatic_merged_binaries
     fixture = Fixture.new
-    fixture.project.sub!("MERGED_BINARY_TYPE = automatic;", "MERGED_BINARY_TYPE = none;")
+    fixture.project.sub!("MERGED_BINARY_TYPE = none;", "MERGED_BINARY_TYPE = automatic;")
 
     error = assert_contract_error { validate(fixture) }
 
-    assert_includes error.message, "project Debug must set MERGED_BINARY_TYPE to automatic"
+    assert_includes error.message, "project Debug must set MERGED_BINARY_TYPE to none"
   end
 
   def test_rejects_duplicate_kitchenkit_link_in_hosted_tests
@@ -635,16 +635,16 @@ class CheckProjectStructureTest < Minitest::Test
 
   def test_rejects_project_deployment_target_drift
     fixture = Fixture.new
-    fixture.project.sub!("MACOSX_DEPLOYMENT_TARGET = 26.5;", "MACOSX_DEPLOYMENT_TARGET = 26.0;")
+    fixture.project.sub!("MACOSX_DEPLOYMENT_TARGET = 27.0;", "MACOSX_DEPLOYMENT_TARGET = 26.0;")
     error = assert_contract_error { validate(fixture) }
-    assert_includes error.message, "must set MACOSX_DEPLOYMENT_TARGET to 26.5"
+    assert_includes error.message, "must set MACOSX_DEPLOYMENT_TARGET to 27.0"
   end
 
   def test_rejects_target_deployment_override
     fixture = Fixture.new
     fixture.project.sub!("SUPPORTED_PLATFORMS =", "IPHONEOS_DEPLOYMENT_TARGET = 26.0;\n\t\t\t\tSUPPORTED_PLATFORMS =")
     error = assert_contract_error { validate(fixture) }
-    assert_includes error.message, "must inherit or set IPHONEOS_DEPLOYMENT_TARGET to 26.5"
+    assert_includes error.message, "must inherit or set IPHONEOS_DEPLOYMENT_TARGET to 27.0"
   end
 
   def test_rejects_localization_contract_phase_after_product_build_phase

@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import Algorithms
-import OrderedCollections
+import Collections
 
 enum IdentityCoalescingResult<Value: Equatable, Identity: Hashable>: Equatable {
   case coalesced([Value])

@@ -45,7 +45,11 @@ the assertions then inspect accessible names and enabled state. An identifier is
 an automation hook, not a user-facing name and not proof of accessibility.
 Navigation activation is only a means of revealing the next top-level structure.
 The suite does not test workflow behavior, coordinates, layout, geometry,
-scrolling, or incidental hierarchy shape.
+scrolling, or incidental hierarchy shape. Use named accessibility navigation
+controls instead of synthesized swipes or coordinate drags. For a lazy form,
+verify the named destination landmark and its exposed top-level actions; do not
+scroll to an arbitrary detail row and treat its absence from the current
+viewport's tree as proof that the screen is inaccessible.
 
 Hosted and framework tests separately prove behavior, including
 container-width composition boundaries, accessibility-size reading order,

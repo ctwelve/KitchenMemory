@@ -2,7 +2,7 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
-import DequeModule
+import Collections
 
 /// Device-local FIFO for Cooking Session intentions awaiting a durable result.
 ///

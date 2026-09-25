@@ -109,8 +109,8 @@ operations. Neither a working-version change nor this guide initiates them.
   entitlements. Both prepare App Store Connect distribution; the macOS archive
   has a notarization post-action. Required `ProductionTesting` actions exercise
   framework, app-hosted, and UI tests on both platforms. No TestFlight group is configured.
-- Inspect the signed products: versions, build numbers, universal Mac/iOS
-  architecture, entitlements, schema readiness, privacy manifests, dependency
+- Inspect the signed products: versions, build numbers, native Apple silicon Mac
+  and iOS architectures, entitlements, schema readiness, privacy manifests, dependency
   notices and embedded frameworks, localized metadata, credits, icons, and launch
   resources. Reconcile packages with [DEPENDENCIES.md](../DEPENDENCIES.md) and
   the SBOM. Source-input checks do not replace signed-product inspection.

@@ -11,7 +11,7 @@ require 'time'
 
 module KitchenMemory
   module CIEvidence
-    POLICY = 'xcode-27.0-full-development-v1'
+    POLICY = 'xos-27.0-full-development-v2'
     module_function
 
     def capture(*args)

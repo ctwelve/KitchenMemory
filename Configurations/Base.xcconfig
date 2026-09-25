@@ -10,8 +10,3 @@ KITCHEN_MEMORY_APS_ENVIRONMENT = development
 CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES
 DEAD_CODE_STRIPPING = YES
 STRING_CATALOG_GENERATE_SYMBOLS = YES
-
-// Xcode 27 embeds unmerged debug dependencies beside MacOS, while its generated
-// @loader_path/ReexportedBinaries runpath looks inside MacOS. Find the signed
-// embedded copy for both the application and hosted test bundles.
-OTHER_LDFLAGS[sdk=macosx*] = $(inherited) -Wl,-rpath,@loader_path/../ReexportedBinaries

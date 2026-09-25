@@ -3,9 +3,9 @@
   "dataLicense": "CC0-1.0",
   "SPDXID": "SPDXRef-DOCUMENT",
   "name": "Kitchen Memory 0.3.4 source dependency inventory",
-  "documentNamespace": "https://github.com/ctwelve/KitchenMemory/sbom/0.3.4/2026-09-25",
+  "documentNamespace": "https://github.com/ctwelve/KitchenMemory/sbom/0.3.4/2026-09-25-platform-27",
   "creationInfo": {
-    "created": "2026-09-25T15:04:50Z",
+    "created": "2026-09-25T17:14:15Z",
     "creators": [
       "Organization: Kitchen Memory contributors"
     ]
@@ -64,13 +64,13 @@
     {
       "name": "swift-syntax",
       "SPDXID": "SPDXRef-Package-swift-syntax",
-      "versionInfo": "603.0.2",
+      "versionInfo": "604.0.0",
       "downloadLocation": "https://github.com/swiftlang/swift-syntax",
       "filesAnalyzed": false,
       "checksums": [
         {
           "algorithm": "SHA1",
-          "checksumValue": "79e4b74a295b6eb74a8b585e3a39d29e70c1dbd1"
+          "checksumValue": "050f1a346fbbac0ca2cfb15a95274f7bd1cf0ccf"
         }
       ],
       "licenseConcluded": "NOASSERTION",
@@ -81,7 +81,7 @@
         {
           "referenceCategory": "PACKAGE-MANAGER",
           "referenceType": "purl",
-          "referenceLocator": "pkg:github/swiftlang/swift-syntax@603.0.2"
+          "referenceLocator": "pkg:github/swiftlang/swift-syntax@604.0.0"
         },
         {
           "referenceCategory": "OTHER",
@@ -122,13 +122,13 @@
     {
       "name": "swift-collections",
       "SPDXID": "SPDXRef-Package-swift-collections",
-      "versionInfo": "1.6.0",
+      "versionInfo": "1.7.0",
       "downloadLocation": "https://github.com/apple/swift-collections",
       "filesAnalyzed": false,
       "checksums": [
         {
           "algorithm": "SHA1",
-          "checksumValue": "a0cb0954ecb21e4e31b0070e6ed5674e8556685a"
+          "checksumValue": "a66de878e87ef5a3d5d390e0f6d9002aa5541a43"
         }
       ],
       "licenseConcluded": "NOASSERTION",
@@ -139,7 +139,7 @@
         {
           "referenceCategory": "PACKAGE-MANAGER",
           "referenceType": "purl",
-          "referenceLocator": "pkg:github/apple/swift-collections@1.6.0"
+          "referenceLocator": "pkg:github/apple/swift-collections@1.7.0"
         },
         {
           "referenceCategory": "OTHER",
@@ -229,6 +229,56 @@
           "referenceLocator": "pkg:github/realm/SwiftLint@0.65.1"
         }
       ]
+    },
+    {
+      "name": "actions/checkout",
+      "SPDXID": "SPDXRef-Package-actions-checkout",
+      "versionInfo": "7.0.1",
+      "downloadLocation": "https://github.com/actions/checkout",
+      "filesAnalyzed": false,
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "3d3c42e5aac5ba805825da76410c181273ba90b1"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT",
+      "copyrightText": "NOASSERTION",
+      "primaryPackagePurpose": "APPLICATION",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:github/actions/checkout@v7.0.1"
+        }
+      ],
+      "comment": "CI action source revision; bundled JavaScript transitive dependencies are not individually enumerated."
+    },
+    {
+      "name": "actions/upload-artifact",
+      "SPDXID": "SPDXRef-Package-actions-upload-artifact",
+      "versionInfo": "7.0.1",
+      "downloadLocation": "https://github.com/actions/upload-artifact",
+      "filesAnalyzed": false,
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "043fb46d1a93c77aae656e7c1c64a875d1fc6a0a"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT",
+      "copyrightText": "NOASSERTION",
+      "primaryPackagePurpose": "APPLICATION",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:github/actions/upload-artifact@v7.0.1"
+        }
+      ],
+      "comment": "CI action source revision; bundled JavaScript transitive dependencies are not individually enumerated."
     }
   ],
   "relationships": [
@@ -252,7 +302,7 @@
       "spdxElementId": "SPDXRef-Package-KitchenMemory",
       "relationshipType": "DEPENDS_ON",
       "relatedSpdxElement": "SPDXRef-Package-swift-collections",
-      "comment": "KitchenKit uses DequeModule, OrderedCollections, and HeapModule for causal traversal, Logic dependency discovery, identity coalescing, and ready organization receipt priority; KitchenMemory uses DequeModule behind its device-local Cooking Session outbox."
+      "comment": "Both KitchenKit and KitchenMemory select the Collections umbrella product. KitchenKit uses its deque, ordered set, and heap implementations for causal traversal, Logic dependency discovery, identity coalescing, and ready organization receipt priority; KitchenMemory uses its deque behind the device-local Cooking Session outbox. This relationship inventories source dependencies, not retained code after dead stripping."
     },
     {
       "spdxElementId": "SPDXRef-Package-swift-numerics",
@@ -274,6 +324,16 @@
       "spdxElementId": "SPDXRef-Package-SwiftLintBinary",
       "relationshipType": "BUILD_DEPENDENCY_OF",
       "relatedSpdxElement": "SPDXRef-Package-SwiftLintPlugins"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-actions-checkout",
+      "relationshipType": "BUILD_DEPENDENCY_OF",
+      "relatedSpdxElement": "SPDXRef-Package-KitchenMemory"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-actions-upload-artifact",
+      "relationshipType": "BUILD_DEPENDENCY_OF",
+      "relatedSpdxElement": "SPDXRef-Package-KitchenMemory"
     }
   ]
 }

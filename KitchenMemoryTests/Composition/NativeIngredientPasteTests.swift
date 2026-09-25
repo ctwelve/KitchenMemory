@@ -48,9 +48,9 @@ final class NativeIngredientPasteTests: XCTestCase {
     // This checks eventual native delivery, not a three-second performance budget.
     try await host.waitFor(timeout: .seconds(30), diagnostics: {
       "\(host.editorState(text)); ingredient document: \(String(reflecting: draft.session.ingredientText))"
-    }) {
+    }, {
       draft.session.ingredientSections.first?.ingredients.first?.quantity?.lowerBound?.numerator == 2
-    }
+    })
     var adjusted = try XCTUnwrap(draft.session.ingredientSections.first?.ingredients.first)
     adjusted.note = "Use fine salt"
     XCTAssertTrue(draft.updateIngredient(adjusted))

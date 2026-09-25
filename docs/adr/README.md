@@ -32,6 +32,7 @@ amends them.
 - [0019: Stage accessibility acceptance at beta](0019-stage-accessibility-acceptance-at-beta.md)
 
 - [0020: Scale release assurance to scope](0020-scale-release-assurance-to-scope.md)
+- [0021: Adopt platform 27 during alpha](0021-adopt-platform-27-during-alpha.md)
 
 ## Superseded architecture decisions
 

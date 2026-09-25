@@ -54,7 +54,7 @@ forbidden = {
 Dir.mktmpdir('KitchenMemoryIngredientInterface') do |directory|
   source = File.join(directory, 'Consumer.swift')
   command = ['xcrun', '--sdk', 'macosx', 'swiftc', '-typecheck', '-swift-version', '6',
-             '-sdk', sdk.strip, '-target', "#{architecture}-apple-macos26.5", '-F', products, '-I', products,
+             '-sdk', sdk.strip, '-target', "#{architecture}-apple-macos27.0", '-F', products, '-I', products,
              '-Xcc', "-fmodule-map-file=#{numerics_shims}/module.modulemap", '-Xcc', "-I#{numerics_shims}",
              '-module-cache-path', File.join(directory, 'Modules'), source]
   compile = lambda do |body|
