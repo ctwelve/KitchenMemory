@@ -117,6 +117,28 @@ final class RecipeLibraryNavigationTests: XCTestCase {
     XCTAssertEqual(editor.session.title, "Preserve before leaving")
   }
 
+  func testReconciliationDoesNotReportAcceptanceWhenExistingEditorCannotBePreserved() throws {
+    let app = try AppRuntime.testing()
+    let store = NavigationDraftStore()
+    let library = RecipeLibraryModel(library: app.libraryModel.library,
+      samplePreferences: VolatileKitchenPreferencesStore(sampleRecipeOnboardingResponse: .accepted),
+      kitchenWasCreated: false, editingStore: store)
+    library.loadIfNeeded()
+    library.beginEditing()
+    let editor = try XCTUnwrap(library.editor)
+    store.refusesWrites = true
+    let recipeID = Recipe.ID()
+    let comparison = try RecipeReconciliation(kitchenID: Kitchen.ID(), revisions: [
+      RecipeRevision(recipeID: recipeID, revisionNumber: 1, title: "Soup"),
+      RecipeRevision(recipeID: recipeID, revisionNumber: 2, title: "Stew"),
+    ], observedSelectionIDs: [])
+    var windowEffects = 0
+    if library.beginReconciliation(comparison) { windowEffects += 1 }
+    XCTAssertEqual(windowEffects, 0)
+    XCTAssertIdentical(library.editor, editor)
+    XCTAssertEqual(library.navigation.destination, .editor(editor.id))
+  }
+
   func testMiddleColumnRetainsDraftAndHistoryContextWhileDetailChanges() {
     let navigation = RecipeLibraryNavigation()
     XCTAssertTrue(navigation.move(to: .drafts))

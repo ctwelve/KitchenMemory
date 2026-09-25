@@ -13,8 +13,7 @@ struct RecipeDraftsView: View {
   var body: some View {
     List(model.authoringItems) { draft in
       Button {
-        model.resumeEditingDraft(draft.id)
-        if model.editor?.id == draft.id { applyNavigationFocus() }
+        if model.resumeEditingDraft(draft.id) { applyNavigationFocus() }
       } label: {
         VStack(alignment: .leading) {
           if draft.session.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {

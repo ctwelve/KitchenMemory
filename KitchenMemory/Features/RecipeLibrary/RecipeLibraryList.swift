@@ -70,8 +70,7 @@ struct RecipeLibraryList: View {
       } else {
         ForEach(model.visibleReconciliations, id: \.recipeID) { comparison in
           Button {
-            model.beginReconciliation(comparison)
-            if model.editor != nil { applyNavigationFocus() }
+            if model.beginReconciliation(comparison) { applyNavigationFocus() }
           } label: {
             VStack(alignment: .leading) {
               Label(.recipeComparisonTitle, systemImage: "arrow.triangle.branch")

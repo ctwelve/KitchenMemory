@@ -70,9 +70,10 @@ extension RecipeLibraryModel {
     navigation.selectRecipe(id)
   }
 
-  func resumeEditingDraft(_ id: UUID) {
-    guard drafts.drafts.contains(where: { $0.id == id }) else { return }
-    navigation.move(to: .editor(id))
+  @discardableResult
+  func resumeEditingDraft(_ id: UUID) -> Bool {
+    guard drafts.drafts.contains(where: { $0.id == id }) else { return false }
+    return navigation.move(to: .editor(id))
   }
 
   func retryEditingStorage() { drafts.retryStorage() }
@@ -93,15 +94,17 @@ extension RecipeLibraryModel {
 }
 
 extension RecipeLibraryModel {
-  func beginReconciliation(_ comparison: RecipeReconciliation) {
-    guard navigation.canLeave() else { return }
+  @discardableResult
+  func beginReconciliation(_ comparison: RecipeReconciliation) -> Bool {
+    guard navigation.canLeave() else { return false }
     do {
       let draft = try drafts.beginReconciliation(comparison)
-      navigation.move(to: .editor(draft.id))
+      return navigation.move(to: .editor(draft.id))
     } catch {
       reconciliationFailureMessage = error as? RecipeReconciliationError == .existingDraft
         ? .recipeComparisonExistingDraft : .recipeComparisonStorageFailure
       reconciliationFailed = true
+      return false
     }
   }
 }
