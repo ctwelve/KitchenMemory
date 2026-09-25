@@ -18,16 +18,8 @@ final class KitchenMemoryUITests: XCTestCase {
   func testTopLevelDestinationsExposeAccessibleNavigation() {
     let app = launchApp()
     let shell = app.descendants(matching: .any)["recipe-library-shell"]
-#if os(iOS)
-    if !shell.exists {
-      let window = app.windows.firstMatch
-      let edge = window.coordinate(withNormalizedOffset: CGVector(dx: 0.005, dy: 0.5))
-      let interior = window.coordinate(withNormalizedOffset: CGVector(dx: 0.8, dy: 0.5))
-      edge.press(forDuration: 0.05, thenDragTo: interior)
-      XCTAssertTrue(shell.waitForExistence(timeout: 5), "The native leading-edge swipe must reveal Organization")
-    }
-#endif
     revealSidebar(in: app, exposing: shell)
+    XCTAssertTrue(shell.waitForExistence(timeout: 5))
     assertAccessibleLabel(shell, description: "recipe library")
 
     visitTopLevelDestination(
@@ -118,9 +110,6 @@ final class KitchenMemoryUITests: XCTestCase {
     let app = launchApp(additionalArguments: ["--ui-testing-cloud-sync-disabled"])
     openSettings(in: app)
 
-    let synchronization = app.switches["settings-icloud-sync"]
-    XCTAssertTrue(synchronization.waitForExistence(timeout: 5))
-    assertAccessibleLabel(synchronization, description: "iCloud synchronization setting")
     app.terminate()
   }
 
@@ -152,9 +141,6 @@ final class KitchenMemoryUITests: XCTestCase {
       let sessions = app.buttons["sessions-destination"]
       assertAccessibleLabel(sessions, description: "localized Sessions destination")
       openSettings(in: app)
-      let synchronization = app.switches["settings-icloud-sync"]
-      XCTAssertTrue(synchronization.waitForExistence(timeout: 5))
-      assertAccessibleLabel(synchronization, description: "localized Settings structure")
       app.terminate()
     }
   }
@@ -279,17 +265,15 @@ extension KitchenMemoryUITests {
     XCTAssertTrue(openSettings.waitForExistence(timeout: 2))
     assertAccessibleLabel(openSettings, description: "Settings action")
     activate(openSettings)
-    let form = app.collectionViews["settings-form"]
+#endif
+    let form = app.descendants(matching: .any)["settings-form"].firstMatch
     XCTAssertTrue(form.waitForExistence(timeout: 5))
-    let synchronization = app.switches["settings-icloud-sync"]
-    // Short overlapping steps keep a lazily materialized row from being skipped
-    // between full-page swipes on compact screens or with expanded translations.
-    let scrollStart = form.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.75))
-    let scrollEnd = form.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.45))
-    for _ in 0..<10 {
-      if synchronization.waitForExistence(timeout: 0.5) { break }
-      scrollStart.press(forDuration: 0.05, thenDragTo: scrollEnd)
-    }
+    assertAccessibleLabel(form, description: "Settings landmark")
+#if os(iOS)
+    let done = app.buttons["dismiss-settings"]
+    XCTAssertTrue(done.waitForExistence(timeout: 5))
+    assertAccessibleLabel(done, description: "Settings dismissal action")
+    XCTAssertTrue(done.isEnabled)
 #endif
   }
 }
@@ -297,20 +281,16 @@ extension KitchenMemoryUITests {
 #if os(iOS)
 extension KitchenMemoryUITests {
   @MainActor
-  func testRightToLeftEdgeSwipeRevealsNamedDestinations() throws {
+  func testRightToLeftNavigationExposesNamedDestinations() {
     let app = launchApp(additionalArguments: [
       "-AppleLanguages", "(en-US)", "-AppleLocale", "en_US",
       "-AppleTextDirection", "YES", "-NSForceRightToLeftWritingDirection", "YES",
     ])
     defer { app.terminate() }
     let allRecipes = app.buttons["all-recipes-destination"]
-    try XCTSkipIf(allRecipes.exists, "Regular layouts already expose the sidebar")
-    let window = app.windows.firstMatch
-    let edge = window.coordinate(withNormalizedOffset: CGVector(dx: 0.995, dy: 0.5))
-    let interior = window.coordinate(withNormalizedOffset: CGVector(dx: 0.2, dy: 0.5))
-    edge.press(forDuration: 0.05, thenDragTo: interior)
+    revealSidebar(in: app, exposing: allRecipes)
     XCTAssertTrue(
-      allRecipes.waitForExistence(timeout: 5), "RTL navigation must reveal Organization from the right edge"
+      allRecipes.waitForExistence(timeout: 5), "RTL navigation must expose Organization destinations"
     )
     assertAccessibleLabel(allRecipes, description: "All Recipes in right-to-left navigation")
   }

@@ -223,6 +223,7 @@ struct KitchenSettingsView: View {
       }
     }
     .accessibilityIdentifier("settings-form")
+    .accessibilityLabel(Text(.settingsTitle))
     .alert(.organizationFailed, isPresented: Binding(
       get: { model.organization?.failed == true }, set: { model.organization?.failed = $0 }
     )) { Button(.actionCancel, role: .cancel) {} } message: { Text(.organizationFailureMessage) }
@@ -237,6 +238,7 @@ struct KitchenSettingsView: View {
     .toolbar {
       ToolbarItem(placement: .confirmationAction) {
         Button(.actionDone) { dismiss() }
+          .accessibilityIdentifier("dismiss-settings")
           .help(Text(.actionDone))
       }
     }

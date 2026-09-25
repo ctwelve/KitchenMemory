@@ -649,15 +649,32 @@ The dynamic iPhone SE iOS 27 full plan (`2026.09.25_13-06-13--0500`) recorded
 with no skips or runtime warnings. Its unchanged isolated rerun passed
 (`2026.09.25_13-15-40--0500`). The failed activity trace and UI hierarchy show
 three large Settings swipes reaching the bottom (100% scroll), past the lazily
-materialized iCloud switch. The helper now uses bounded, overlapping 30%-height
-drags and checks existence between steps. Both callers then passed on the SE
-(`2026.09.25_13-18-16--0500`): ordinary Settings access and the six-language
-doubled-text/right-to-left check. These focused passes do not replace the
-record of the initial full-plan failure; the complete plan was not repeated
-after the test-helper correction.
+materialized iCloud switch. A shorter-scroll experiment passed both callers, but was rejected by the
+maintainer because gesture-driven viewport traversal is outside the intended
+semantic UI-test scope. The current checks open Settings through its named
+action, inspect the named Settings landmark, and verify the enabled, named iOS
+dismissal action. They no longer depend on the offscreen iCloud row. Settings
+behavior remains covered below the view layer; this change does not claim
+screen-reader or complete control-tree acceptance.
+
 
 The Apple linker report was prepared with the controlled comparison and a
 redacted diagnostic attachment. The maintainer is handling submission through
 Feedback Assistant; no submitted feedback ID is recorded here yet. The reported
 absence of these warnings on Xcode 26.6 is maintainer history, not an identical
 build comparison performed during this investigation.
+
+The final accessibility-control approach passed these focused checks without
+swipes or coordinate drags:
+
+| Destination | Checks | Result bundle timestamp |
+| --- | --- | --- |
+| iPhone SE, iOS 27 | Settings landmark/dismissal and six-language doubled-text/RTL structure | 2026.09.25_13-23-54--0500 |
+| iPhone SE, iOS 27 | Top-level destination navigation and RTL navigation via named controls | 2026.09.25_13-27-40--0500 |
+| My Mac, macOS 27 | Settings landmark and six-language doubled-text/RTL structure | 2026.09.25_13-29-38--0500 |
+
+Each focused run passed both tests with no skips. The complete native plans were
+not repeated after this semantic-scope correction. Repository contracts and both
+review axes pass. Ordinary navigation activation remains the minimum action
+needed to inspect the next accessible destination; visual placement and gesture
+behavior are outside these assertions.
