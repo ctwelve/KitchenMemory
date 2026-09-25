@@ -169,19 +169,26 @@ is established by artifact collection.
 API contract references: [Cloud build runs](https://developer.apple.com/documentation/appstoreconnectapi/build-runs)
 and [Cloud artifacts](https://developer.apple.com/documentation/appstoreconnectapi/artifacts).
 
-## 0.3.3 alpha candidate
+## 0.3.4 alpha candidate
 
 The maintainer requested a simple release of the current accepted code on
-2026-09-24. Version 0.3.3 gathers the accepted adaptive navigation, recipe reading
-and ingredient-editing slices, package algorithm improvements, and the macOS/iOS
-26.5 baseline with GitHub development CI. It remains an alpha, with focused
-integration and distribution checks rather than a new major-release audit.
+2026-09-24. This candidate gathers the accepted adaptive navigation, recipe
+reading and ingredient-editing slices, package algorithm improvements, and the
+macOS/iOS 26.5 baseline with GitHub development CI. It remains an alpha, with
+focused integration and distribution checks rather than a new major-release audit.
 
-The release marker is aligned with the existing 0.3.3 application and inventory.
-Required PR checks and exact post-merge GitHub validation must pass before
-the annotated `release/0.3.3` tag is created. The collector must verify the new
-tagged product and record its source SHA, Cloud build, artifact identity, and
-checksum. Historical build 429 is tooling evidence only.
+The immutable `release/0.3.3` candidate archived successfully in Cloud build 481,
+but failed required production tests and was not published. PR #227 corrected
+hosted test linkage and production diagnostics expectations, and applied Apple's
+macOS Cloud test-host signing workaround. Its full local optimized release plans
+passed 813 iOS and 815 macOS tests; all required GitHub checks also passed.
+Cloud confirmation of the signing workaround remains pending.
+
+The release marker is aligned with the 0.3.4 application and inventory. Required
+PR checks and exact post-merge GitHub validation must pass before the annotated
+`release/0.3.4` tag is created. The collector must verify the newly tagged product
+and record its source SHA, Cloud build, artifact identity, and checksum.
+Historical build 429 is tooling evidence only.
 
 Publication remains pending the new artifact's standalone launch check and
 reviewed alpha release notes. This candidate does not claim beta readiness,
