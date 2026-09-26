@@ -195,9 +195,6 @@ module KitchenMemory
       errors = link_errors(documents, root) + navigation_errors(documents, root)
       return errors unless errors.empty?
       errors.concat(topology_errors(root, documents))
-      alias_path = File.join(root, "skills")
-      errors << "skills must remain a compatibility symlink to .agents/skills" unless File.symlink?(alias_path) && File.readlink(alias_path) == ".agents/skills" && File.directory?(alias_path)
-      errors
     end
   end
 end
@@ -206,7 +203,7 @@ if $PROGRAM_NAME == __FILE__
   begin
     errors = KitchenMemory::DocumentationContract.validate(File.expand_path("..", __dir__))
     abort errors.join("\n") unless errors.empty?
-    puts "Validated documentation links, navigation, current topology, and the single skill library."
+    puts "Validated documentation links, navigation, and current topology."
   rescue JSON::ParserError, KeyError, IndexError, Errno::ENOENT, REXML::ParseException => error
     abort "Documentation contract error: #{error.message}"
   end
