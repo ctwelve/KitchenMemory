@@ -27,6 +27,7 @@ or the user explicitly requests reassessment; elapsed time alone does not make
 the issue actionable. Remove the parking label once the dependency is resolved
 or a viable local path is established, then triage readiness again.
 
-For example, #155 remains open while Cloud UI testing is suspended pending the
-Apple activation investigation. Restore Cloud UI coverage only after validation
-establishes that the blocker is resolved.
+When current supported configurations pass the formerly blocked checks, record
+the exact evidence and reconcile the ticket and affected guidance. A successful
+run can resolve an operational blocker without establishing its original cause;
+state that limit explicitly rather than claiming an upstream fix.

@@ -113,7 +113,7 @@ resolve KitchenKit through their application bundle loader.
 Automatic merging was removed after Xcode 27 produced duplicate debug-map
 records for shared package objects and coverage runtime objects. The controlled
 comparison and local validation are recorded in
-[continuous integration](continuous-integration.md#collections-umbrella-and-merged-debug-map-follow-up-2026-09-25).
+[the completed CI investigation](https://github.com/ctwelve/KitchenMemory/blob/f3592ce39af63b737b49ae7dee80cd558cc64b2a/docs/continuous-integration.md#collections-umbrella-and-merged-debug-map-follow-up-2026-09-25).
 Localization-catalog embedding scripts retain their established ordering before
 Sources, Frameworks, and Resources; the checker continues to freeze that ordering.
 

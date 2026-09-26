@@ -2,10 +2,10 @@
   "spdxVersion": "SPDX-2.3",
   "dataLicense": "CC0-1.0",
   "SPDXID": "SPDXRef-DOCUMENT",
-  "name": "Kitchen Memory 0.3.5 source dependency inventory",
-  "documentNamespace": "https://github.com/ctwelve/KitchenMemory/sbom/0.3.5/2026-09-25-platform-27",
+  "name": "Kitchen Memory 0.3.6 source dependency inventory",
+  "documentNamespace": "https://github.com/ctwelve/KitchenMemory/sbom/0.3.6/2026-09-25-reconciliation",
   "creationInfo": {
-    "created": "2026-09-25T17:14:15Z",
+    "created": "2026-09-26T04:52:39Z",
     "creators": [
       "Organization: Kitchen Memory contributors"
     ]
@@ -17,7 +17,7 @@
     {
       "name": "Kitchen Memory",
       "SPDXID": "SPDXRef-Package-KitchenMemory",
-      "versionInfo": "0.3.5",
+      "versionInfo": "0.3.6",
       "downloadLocation": "https://github.com/ctwelve/KitchenMemory",
       "filesAnalyzed": false,
       "licenseConcluded": "NOASSERTION",
@@ -28,7 +28,7 @@
         {
           "referenceCategory": "PACKAGE-MANAGER",
           "referenceType": "purl",
-          "referenceLocator": "pkg:github/ctwelve/KitchenMemory@0.3.5"
+          "referenceLocator": "pkg:github/ctwelve/KitchenMemory@0.3.6"
         }
       ]
     },

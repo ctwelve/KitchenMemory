@@ -40,6 +40,28 @@ guide before retiring it. Retain accepted decisions and supersession links that
 still explain current architecture. Frozen schema declarations are executable
 compatibility contracts, not disposable historical documentation.
 
+## Reconcile documentation and tickets
+
+For a reconciliation pass, compare the current checkout and merged PRs with
+open GitHub Issues, native dependencies and sub-issues, and published release
+evidence. An issue body or readiness label can lag its actual blocker graph.
+Update roadmap checkboxes and source pointers after verifying their completion;
+keep design acceptance distinct from feature delivery and release acceptance.
+Link published implementation children from their gate and add the real native
+blockers. Track concrete defects found in completed refactors separately instead
+of leaving them only in characterization tests or future design prose.
+
+Verify a published artifact's version, minimum platform and architectures before
+changing download claims. A working source version or successful build is not
+evidence of distribution. For retired local documents, verify each commit-pinned
+replacement against the named Git tree and repair references in active tickets
+as well as repository pages. Retain the original candidate's limitations.
+
+Run the repository checks after reconciliation. Report which hosted settings or
+external evidence were actually inspected; local configuration checks alone
+cannot establish their current state. Changes to product decisions remain with
+their design tickets, even when this pass discovers missing or stale planning.
+
 ## Validation
 
 ```sh

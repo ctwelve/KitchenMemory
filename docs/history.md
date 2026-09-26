@@ -41,8 +41,16 @@ Use commit-pinned links when citing retired files from issues or pull requests.
 
 ## Primary-screen integration
 
-- [Primary-screen slice validation](primary-screen-validation.md): 2026-09-22 development evidence and maintainer acceptance for the active #182/#189 feature PR.
+- [Primary-screen slice validation](https://github.com/ctwelve/KitchenMemory/blob/f3592ce39af63b737b49ae7dee80cd558cc64b2a/docs/primary-screen-validation.md): completed #182/#189 evidence, integrated through [PR #209](https://github.com/ctwelve/KitchenMemory/pull/209).
 
 The disposable #183 prototype remains in [Git history](https://github.com/ctwelve/KitchenMemory/tree/8aa01d1/Tools/PrimaryScreenPrototype).
 Its implementation has been replaced by the production slice; no prototype
 project reference belongs in the shipping workspace.
+
+## Platform 27 and release validation
+
+- [Platform-27 native validation and dynamic-linkage investigation](https://github.com/ctwelve/KitchenMemory/blob/f3592ce39af63b737b49ae7dee80cd558cc64b2a/docs/continuous-integration.md#local-platform-27-validation): completed candidate observations, including warnings and testing limits.
+- [Earlier Xcode 26 UI-runner diagnostic](https://github.com/ctwelve/KitchenMemory/blob/f3592ce39af63b737b49ae7dee80cd558cc64b2a/docs/continuous-integration.md#current-ui-runner-diagnostic): historical tooling messages, not the current toolchain baseline.
+- [0.3.4 candidate preparation](https://github.com/ctwelve/KitchenMemory/blob/f3592ce39af63b737b49ae7dee80cd558cc64b2a/docs/release-engineering.md#034-alpha-candidate): the immutable candidate failed Cloud validation and was not published.
+- [0.3.5 candidate preparation](https://github.com/ctwelve/KitchenMemory/blob/f3592ce39af63b737b49ae7dee80cd558cc64b2a/docs/release-engineering.md#035-alpha-candidate): its pending gates describe preparation time; publication subsequently completed.
+- [Kitchen Memory 0.3.5 alpha](https://github.com/ctwelve/KitchenMemory/releases/tag/release/0.3.5): published September 25, 2026, from `ef0ce4817805a319af32ba846b43eb66a3e5d388`, Cloud build 483. The release includes the exact artifact identity/checksum and records signature, Gatekeeper, stapling and standalone-launch acceptance. It requires macOS/iOS 27; public distribution remains the Mac download. No beta or new TestFlight acceptance is implied.

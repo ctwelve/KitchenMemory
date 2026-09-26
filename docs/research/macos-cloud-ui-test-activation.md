@@ -6,7 +6,10 @@ Copyright © 2026 the Kitchen Memory contributors.
 SPDX-License-Identifier: MIT
 -->
 
-- Status: Public-source research; cause and workaround remain unconfirmed
+- Status: Historical investigation; the original cause remains unconfirmed.
+  Cloud UI tests are enabled and the 0.3.5 release passed both native Cloud Test
+  actions; see [current policy and evidence](../continuous-integration.md#cloud-ui-testing).
+  The dated findings below are preserved, not a current suspension instruction.
 - Researched: 2026-09-06
 - Scope: macOS XCTest foreground activation, Cloud runner limitations, and
   related Tahoe reports

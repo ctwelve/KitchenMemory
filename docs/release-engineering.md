@@ -176,49 +176,15 @@ is established by artifact collection.
 API contract references: [Cloud build runs](https://developer.apple.com/documentation/appstoreconnectapi/build-runs)
 and [Cloud artifacts](https://developer.apple.com/documentation/appstoreconnectapi/artifacts).
 
-## 0.3.4 alpha candidate
+## Publication reconciliation
 
-The maintainer requested a simple release of the current accepted code on
-2026-09-24. This candidate gathers the accepted adaptive navigation, recipe
-reading and ingredient-editing slices, package algorithm improvements, and the
-macOS/iOS 26.5 baseline with GitHub development CI. It remains an alpha, with
-focused integration and distribution checks rather than a new major-release audit.
+After publication, update the root README's public version, download asset,
+platform minimum and distribution availability from the accepted release. Keep
+that published state distinct from the working version and last-submitted
+`RELEASE` marker. Add the release and its evidence to [history](history.md), and
+retire completed candidate instructions to commit-pinned links. Failed tags
+remain immutable historical candidates; they are not pending publication work.
 
-The immutable `release/0.3.3` candidate archived successfully in Cloud build 481,
-but failed required production tests and was not published. PR #227 corrected
-hosted test linkage and production diagnostics expectations, and applied Apple's
-macOS Cloud test-host signing workaround. Its full local optimized release plans
-passed 813 iOS and 815 macOS tests; all required GitHub checks also passed.
-Cloud confirmation of the signing workaround remains pending.
-
-The release marker is aligned with the 0.3.4 application and inventory. Required
-PR checks and exact post-merge GitHub validation must pass before the annotated
-`release/0.3.4` tag is created. The collector must verify the newly tagged product
-and record its source SHA, Cloud build, artifact identity, and checksum.
-Historical build 429 is tooling evidence only.
-
-Publication remains pending the new artifact's standalone launch check and
-reviewed alpha release notes. This candidate does not claim beta readiness,
-the deferred comprehensive UI/accessibility matrix, or a new TestFlight audience.
-
-
-## 0.3.5 alpha candidate
-
-The maintainer requested release of the accepted platform-27 changes on
-2026-09-25. PR #229 merged as `26ec95aff0f8ae037d2f307c20f1f7c9123156dc`;
-its full development validation and the exact merge's push-to-main validation
-both passed (GitHub runs 36183534076 and 36186410808). The maintainer also
-reported a successful manual iOS smoke test.
-
-The earlier immutable `release/0.3.4` tag belongs to the failed Cloud candidate;
-it is not moved or reused. This version-only candidate advances the application,
-release marker, and software inventory to 0.3.5. It includes iOS/macOS 27 minimums,
-updated dependencies, conventional dynamic KitchenKit linkage, and accessibility
-checks driven through named controls. No persisted schema change is introduced.
-The separate development-CI naming cleanup remains outside this candidate.
-
-After this preparation merges, require its exact main validation before creating
-`release/0.3.5`. Cloud production tests, signed Archives, notarized artifact
-collection, standalone Mac install/launch acceptance, and reviewed alpha release
-notes remain outstanding. Local checks and earlier candidates do not substitute
-for those results. No new TestFlight audience is requested.
+The published [0.3.5 alpha](https://github.com/ctwelve/KitchenMemory/releases/tag/release/0.3.5)
+and the earlier 0.3.4/0.3.5 preparation records are linked from the
+[release history](history.md#platform-27-and-release-validation).

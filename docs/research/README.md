@@ -12,8 +12,9 @@ Read a record when evaluating its named capability or revisiting its evidence.
 Dates and conclusions describe the investigation, not a current adoption mandate.
 [Accepted decisions](../adr/README.md) and current guidance take precedence.
 GPLv3 distribution and internal-framework-linkage research are historical after
-ADRs 0015 and 0012. The Cloud UI activation investigation remains relevant while
-[Cloud UI tests are suspended](../continuous-integration.md#cloud-ui-testing).
+ADRs 0015 and 0012. The Cloud UI activation investigation records an earlier
+failure; [current Cloud UI policy and evidence](../continuous-integration.md#cloud-ui-testing)
+supersede its operational status.
 
 - [Application-operation undo and redo proposal](application-undo-policy.md)
 - [Native undo facilities and helper-framework evaluation](native-undo-facilities.md)
