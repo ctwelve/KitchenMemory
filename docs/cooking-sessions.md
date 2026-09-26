@@ -18,6 +18,11 @@ The precise evidence and storage contracts live in
 [Cooking Session V3](cooking-session-v3-schema.md). The ordered implementation
 route lives in the [0.2 roadmap](https://github.com/ctwelve/KitchenMemory/blob/4a930de84c1180ad2736598c89dec38f200af2c7/docs/roadmap-0.2.md).
 
+The [agreed next interface](cooking-session-interface.md) records the
+2026-09-26 #193 design, including reading, progress, notes, scaling, Finish,
+history, restoration, and failure presentation. Its implementation is pending;
+the versioned interface descriptions below document the existing foundation.
+
 ## Start and historical context
 
 Viewing a Recipe never creates a Session. Explicit Start mints one stable
@@ -146,6 +151,10 @@ that submission, and submitting again after retry can create a second Entry,
 including a duplicate when the text is unchanged. These are known defects, not
 intended draft or submission semantics; the delivery extraction preserves and
 reports them rather than expanding its product scope.
+[#245](https://github.com/ctwelve/KitchenMemory/issues/245) now owns their
+correction under the [accepted retry and draft interaction](cooking-session-interface.md#notes-and-outcome):
+Retry saves the original submission, newer text/target edits remain a draft,
+and a later Entry requires a separate deliberate submission.
 
 Session Outcome is optional and distinct from lifecycle. Its initial coarse
 values are great, okay, and unsuccessful. Finishing with no Entries or Outcome
