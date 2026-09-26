@@ -365,9 +365,21 @@ distribution/API design is selected here.
 
 ## Proposed implementation tickets
 
-These are **ticket drafts**, not newly published issues or ready-for-agent work.
-Publish the agreed slices with native dependency edges before claiming them.
-References U0–U7 below are local planning identifiers, not GitHub issue numbers.
+The U0–U7 table preserves the design-stage decomposition. The published graph
+under [#204](https://github.com/ctwelve/KitchenMemory/issues/204) owns current
+scope and readiness: [#236](https://github.com/ctwelve/KitchenMemory/issues/236)
+qualifies the independently maintained UndoKit XCFramework; [#237](https://github.com/ctwelve/KitchenMemory/issues/237),
+[#238](https://github.com/ctwelve/KitchenMemory/issues/238), and
+[#239](https://github.com/ctwelve/KitchenMemory/issues/239) are the vertical
+single-move, bulk-move, and Tag slices. Later policy is separated into
+[#240](https://github.com/ctwelve/KitchenMemory/issues/240),
+[#241](https://github.com/ctwelve/KitchenMemory/issues/241), and
+[#242](https://github.com/ctwelve/KitchenMemory/issues/242).
+References U0–U7 are historical planning identifiers, not additional tickets
+to publish or independent authorization to implement unresolved behavior.
+The known Entry retry/text-loss and duplicate-submission correction is tracked
+separately in [#245](https://github.com/ctwelve/KitchenMemory/issues/245);
+its acceptance is a prerequisite for later Entry undo only.
 
 | Draft | Bounded outcome / acceptance | Depends on |
 | --- | --- | --- |

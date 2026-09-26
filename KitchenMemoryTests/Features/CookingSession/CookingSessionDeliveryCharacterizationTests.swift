@@ -11,6 +11,7 @@ import XCTest
 final class SessionDeliveryCharacterizationTests: XCTestCase {
   // Known pre-existing defect, explicitly characterized for #214 rather than
   // accepted product semantics: retry discards text edited after submission.
+  // The corrective scope and regression acceptance are tracked in #245.
   func testCharacterizesRetryClearingNewerTextWhileEarlierSubmissionWasPending() throws {
     let (model, _) = try fixture()
     model.updateCurrentEntryDraft(text: "Submitted text", target: nil)
@@ -23,7 +24,7 @@ final class SessionDeliveryCharacterizationTests: XCTestCase {
 
   // A second explicit submit retries the old identity, then creates another.
   // Unchanged text becomes two Entries; new text is captured before retry clears
-  // the draft. These are pre-refactor behaviors, not a new duplication policy.
+  // the draft. These are pre-refactor behaviors tracked by #245, not a new policy.
   func testCharacterizesSecondSubmissionAfterRetryWithUnchangedOrEditedText() throws {
     for text in ["Submitted text", "Newer text"] {
       let (model, service) = try fixture()

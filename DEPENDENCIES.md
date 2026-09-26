@@ -130,10 +130,13 @@ of every dependency update.
 
 ## 0.3 source review
 
-The working application is **0.3.5**. Its source build-number seed remains **1**
+The working application is **0.3.6**. Its source build-number seed remains **1**
 under the [release contract](docs/release-engineering.md); Xcode Cloud owns
-advancing distributed build numbers. `RELEASE` still identifies the earlier
-submitted version. This source preparation creates no release tag or distribution.
+advancing distributed build numbers. `RELEASE` identifies the last submitted
+version, **0.3.5**, which is also the current published alpha. The reconciliation
+slice advances only the working patch version under that policy; package pins,
+persisted formats and deployment targets are unchanged. It creates no release
+tag or distribution.
 
 All six resolved packages and the SwiftLint binary were checked against upstream
 stable releases on 2026-09-25. Collections advances from 1.6.0 to 1.7.0, and

@@ -123,8 +123,9 @@ catch a real barrier; do not expand automation to satisfy a coverage quota.
 
 Reliable automated semantic regressions block pull requests. Diagnose runner and
 toolchain failures and provide an alternate local check with evidence; a tooling
-failure cannot silently excuse a product regression. Cloud UI testing remains
-suspended under [Issue 155](https://github.com/ctwelve/KitchenMemory/issues/155).
+failure cannot silently excuse a product regression. Cloud UI tests are enabled;
+the [CI contract](continuous-integration.md#cloud-ui-testing) records the current
+release evidence and the earlier activation investigation.
 Local native tests use [Xcode-managed signing](agents/xcode.md). The ordinary CI
 and governed-branch gates remain in force; release acceptance additionally
 requires the human evidence appropriate to alpha or beta.

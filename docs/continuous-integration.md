@@ -11,12 +11,11 @@ Xcode Cloud remains the release-engineering and beta-testing service. The
 application requires macOS 27.0 and iOS 27.0 or newer; the current toolchain is
 Xcode 27.
 
-**Release boundary (2026-09-24):** GitHub owns review-ready development validation.
-Xcode Cloud is reserved for deliberate release candidates: optimized tests and
-Production archives on both platforms. Ordinary main and release-eng pushes do
-not need a second Cloud validation environment. The 0.3.3 candidate (Cloud build 481) archived successfully but failed required
-production tests; it was not published. Historical build 429 proves collector
-compatibility only.
+GitHub owns review-ready development validation. Xcode Cloud is reserved for
+deliberate release candidates: optimized tests and Production archives on both
+platforms. Ordinary main and release-eng pushes do not require a second Cloud
+validation environment. Completed candidates and platform investigations are
+retained in the [history index](history.md#platform-27-and-release-validation).
 
 ## Scheme, plan, and destination contract
 
@@ -294,10 +293,17 @@ the testing exception does not alter a shipped application.
 
 ### Cloud UI testing
 
-Cloud UI testing is re-enabled in `KitchenMemoryCloud.xctestplan`, including its
-serial UI target, to reassess the previous activation failures under the current
-toolchain. GitHub's full application plan also retains UI tests. Runner failures
-remain failures until investigated; re-enabling a target is not passing evidence.
+Cloud UI testing is enabled in `KitchenMemoryCloud.xctestplan`, including its
+serial UI target. GitHub's full application plan also retains UI tests. The
+published [0.3.5 release](https://github.com/ctwelve/KitchenMemory/releases/tag/release/0.3.5)
+used commit `ef0ce4817805a319af32ba846b43eb66a3e5d388`, whose Cloud plan enables
+all three test targets. Cloud build 483 completed both
+[macOS](https://github.com/ctwelve/KitchenMemory/runs/108254062720) and
+[iOS](https://github.com/ctwelve/KitchenMemory/runs/108254865442) Test actions
+successfully with zero reported test failures. This resolves #155's operational
+suspension for the supported configuration; it does not identify the original
+activation failure's cause or establish comprehensive accessibility acceptance.
+Later runner failures remain failures requiring investigation.
 
 To temporarily suspend UI tests, disable the UI target in the affected test plan
 and document the reason. Neither the GitHub workflow nor Cloud action needs to
@@ -378,14 +384,6 @@ than in this repository. Keep its actions, requirements, branch patterns, tag
 prefixes, and change filters aligned with this policy. TestFlight distribution
 is intentionally absent for now; the normal archive and notarization workflow
 is driven only by the `release/` tag prefix.
-
-### Current UI-runner diagnostic
-
-With Xcode 26.6, both the iOS 26.5 simulator and macOS 26.6.2 may report internal
-`DebuggerVersionStore` / `no debugger version` messages while launching XCUI
-tests. The fallback launcher currently proceeds and the smoke tests execute.
-Treat the messages as Apple tooling diagnostics, but treat any assertion reached
-inside a test body as an ordinary test failure requiring investigation.
 
 ## Repository contracts
 
@@ -497,15 +495,10 @@ must be reviewed like source changes.
 
 ## Maintenance
 
-The retained Cloud workflows use a shared macOS alias mapped to the latest
-available macOS release. During early alpha, the project prefers the current Xcode Cloud test
-host over carrying application workarounds for a Swift 6.2 XCTest runtime defect
-on macOS 26.2, tracked as
-[swiftlang/swift#87316](https://github.com/swiftlang/swift/issues/87316). This is
-a CI test-environment choice and does not change the application's deployment
-target. Reconsider an additional oldest-supported compatibility lane before an
-external beta when failures can inform supported-user risk rather than block
-early development on a fixed platform defect.
+The retained Cloud workflows use a shared macOS alias. Inspect its live mapping
+when preparing a candidate; historical host selections are not proof of the
+current environment. Reconsider an oldest-supported compatibility lane before
+external beta, alongside the candidate's supported-user matrix.
 
 Treat every environment or alias change as a deliberate migration: run the
 Testing and Production configurations locally with that Xcode version, review new
@@ -546,141 +539,9 @@ as a reason to weaken the checker until the project happens to pass.
 Keep cloud scripts short, deterministic, and limited to environment preparation
 so build, test, Analyze, and Archive behavior remains visible in Xcode's schemes.
 
-### Local platform 27 validation
+## Earlier platform validation
 
-Use Xcode 27 and the `KitchenMemory Release` scheme's `KitchenMemoryCloud`
-test plan for production-test reproduction. Record the exact Xcode and OS build,
-simulator model, and completed result bundle; compare those with the Cloud run.
-Run UI tests serially. Do not substitute larger-device success for the compact
-device that failed, or send another release candidate to Cloud before local
-validation is complete.
-
-Keep a compact simulator inventory on iOS/iPadOS 27:
-
-| Destination | Purpose | Frequency |
-| --- | --- | --- |
-| iPhone SE (3rd generation) | Smallest phone viewport; toolbar and keyboard pressure; current Cloud parity | Focused fixes and full release plan |
-| iPhone 17 (or a current standard-size Pro) | Modern phone safe areas and typical layout | Layout changes and release spot checks |
-| iPad mini (A17 Pro) | Small tablet and narrow window layouts | Layout changes and release spot checks |
-| iPad Pro 13-inch | Wide layouts and window resizing | Layout changes and release spot checks |
-| My Mac, macOS 27 | Native AppKit integration and resizable windows | Focused fixes and full release plan |
-
-The SE and Mac form the frequent loop. The other destinations add layout
-coverage without repeating the entire business-logic suite on every screen.
-Include manual large-text, VoiceOver, keyboard, and RTL checks at accessibility
-acceptance; automated element discovery alone does not establish usability.
-
-#### Platform 27 migration evidence, 2026-09-25
-
-Xcode 27 (27A266a), Swift 6.4, and the `KitchenMemory Release` scheme's
-`KitchenMemoryCloud` plan produced these completed local results:
-
-| Destination | Result | Result bundle timestamp |
-| --- | --- | --- |
-| iPhone SE (3rd generation), iOS 27.0 (24A434) | 813 passed, no failures or skips | 2026.09.25_12-21-22--0500 |
-| My Mac, macOS 27.0 (26A428) | 815 passed, no failures or skips | 2026.09.25_12-30-25--0500 |
-
-The final background-submission completion-order correction was rebuilt on iOS
-and followed by both background/startup coordinator checks passing
-(`2026.09.25_12-28-03--0500`). The focused editor accessibility test also passed
-on the SE after compact toolbar controls replaced the overflowing text-only
-mode action. Priority alone had reproduced the original failure.
-
-Both full-plan bridge calls exceeded their response timeout; the completed
-DerivedData result bundles, not the bridge timeout, establish these counts.
-Repository contracts passed. Standards and spec reviews identified and resolved
-background-submission ordering and an artifact-architecture guard error.
-
-This is not warning-free or distribution acceptance: duplicate debug-map object
-warnings remain (98 in the macOS optimized build), alongside AppIntents metadata
-notices. The macOS result also records six internal runtime priority-inversion
-warnings; their origin has not been established by this migration. No warning
-suppression was added. A signed archive, notarized installation, remote CI run,
-and comprehensive assistive-technology validation remain separate evidence.
-
-### Collections umbrella and merged debug-map follow-up (2026-09-25)
-
-The initial umbrella-product experiment kept automatic KitchenKit merging,
-explicit Collections dependencies in both consumers, coverage, and dead-code
-stripping. Its macOS ProductionTesting build succeeded but reported 387 duplicate
-debug-map warnings: 365 Collections object entries and 22 profile-runtime
-entries (11 in the app, 11 in KitchenKitTests). This supersedes the earlier
-98-warning baseline for the narrower product selection above.
-
-A linker-only differential probe reused the same compiled app objects, SDK,
-coverage instrumentation, and link flags from the successful Xcode build. All
-output paths (executable, LTO object, dependency information) were redirected
-into temporary directories. `dsymutil --dump-debug-map` then gave:
-
-| Temporary app link | Duplicate Collections entries | Duplicate coverage-runtime entries |
-| --- | ---: | ---: |
-| Original `-merge_framework KitchenKit` | 365 | 11 |
-| Only replace merge with `-framework KitchenKit` | 0 | 0 |
-| Original merge; omit nine Collections product objects from the app link file list | 0 | 11 |
-
-The nine inputs were Collections, InternalCollectionsUtilities, BitCollections,
-SpanPreview, DequeModule, HashTreeCollections, HeapModule, OrderedCollections,
-and _RopeModule. Each temporary link succeeded. These probes establish that
-merging combines duplicate debug-map records for package objects linked by both
-consumers; the coverage runtime has the same merge-sensitive symptom. The
-third probe is diagnostic only: removing the app's direct dependency would make
-it rely on framework implementation details and needs separate development-link
-validation. The temporary probe executables were not runtime-tested.
-
-LLVM's [Mach-O debug-map parser](https://github.com/llvm/llvm-project/blob/main/llvm/tools/dsymutil/MachODebugMapParser.cpp)
-warns when records share an object name and timestamp, then skips the duplicate.
-This is evidence about debug information, not proof of duplicated executable
-behavior or a complete dSYM. Following this evidence, the maintainer selected
-ordinary dynamic KitchenKit linking. The app now explicitly embeds and signs KitchenKit in Frameworks,
-automatic merging is explicitly disabled, and the ReexportedBinaries runpath
-workaround is removed. Both consumers retain their explicit Collections
-umbrella dependency. Coverage and dead-code stripping remain enabled; no
-warning suppression was added. This trades merged packaging for a conventional
-framework load and avoids depending on the observed merge/debug-map interaction.
-Archive symbolication remains a separate release check.
-
-The adopted dynamic configuration passed all 815 macOS tests (no failures or
-skips; result `2026.09.25_13-01-56--0500`). The completed DerivedData result
-establishes this despite a bridge result-copy error. Six pre-existing internal
-QoS runtime warnings remain. A clean preceded the topology validation; the app
-contains signed KitchenKit in `Contents/Frameworks`, links it through `@rpath`,
-and contains no `ReexportedBinaries` directory. Deep, strict signature verification
-passed with the normal keychain context. Direct debug-map inspection of the app,
-embedded KitchenKit, and KitchenKitTests found zero duplicate-object warnings on
-both macOS and the iOS simulator. Repository contracts pass and both review axes
-have no remaining findings.
-
-The dynamic iPhone SE iOS 27 full plan (`2026.09.25_13-06-13--0500`) recorded
-812 passes and one failure in `testSettingsExposeAccessibleTopLevelStructure`,
-with no skips or runtime warnings. Its unchanged isolated rerun passed
-(`2026.09.25_13-15-40--0500`). The failed activity trace and UI hierarchy show
-three large Settings swipes reaching the bottom (100% scroll), past the lazily
-materialized iCloud switch. A shorter-scroll experiment passed both callers, but was rejected by the
-maintainer because gesture-driven viewport traversal is outside the intended
-semantic UI-test scope. The current checks open Settings through its named
-action, inspect the named Settings landmark, and verify the enabled, named iOS
-dismissal action. They no longer depend on the offscreen iCloud row. Settings
-behavior remains covered below the view layer; this change does not claim
-screen-reader or complete control-tree acceptance.
-
-
-The Apple linker report was prepared with the controlled comparison and a
-redacted diagnostic attachment. The maintainer is handling submission through
-Feedback Assistant; no submitted feedback ID is recorded here yet. The reported
-absence of these warnings on Xcode 26.6 is maintainer history, not an identical
-build comparison performed during this investigation.
-
-The final accessibility-control approach passed these focused checks without
-swipes or coordinate drags:
-
-| Destination | Checks | Result bundle timestamp |
-| --- | --- | --- |
-| iPhone SE, iOS 27 | Settings landmark/dismissal and six-language doubled-text/RTL structure | 2026.09.25_13-23-54--0500 |
-| iPhone SE, iOS 27 | Top-level destination navigation and RTL navigation via named controls | 2026.09.25_13-27-40--0500 |
-| My Mac, macOS 27 | Settings landmark and six-language doubled-text/RTL structure | 2026.09.25_13-29-38--0500 |
-
-Each focused run passed both tests with no skips. The complete native plans were
-not repeated after this semantic-scope correction. Repository contracts and both
-review axes pass. Ordinary navigation activation remains the minimum action
-needed to inspect the next accessible destination; visual placement and gesture
-behavior are outside these assertions.
+The completed platform-27 migration, dynamic-linkage investigation, native-test
+results, and their limitations are retained through the
+[history index](history.md#platform-27-and-release-validation). They describe
+those candidates, not fresh acceptance of the current checkout.
