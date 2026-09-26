@@ -36,37 +36,35 @@ extension CookingSessionPresentationModel {
   @discardableResult
   func deleteSession(_ sessionID: CookingSession.ID) -> Bool {
     let complete = sessions + finishedSessions
-    guard complete.contains(where: { $0.id == sessionID && $0.disposition == .ordinary }),
-          prepareForNewCommand()
+    guard complete.contains(where: { $0.id == sessionID && $0.disposition == .ordinary })
     else { return false }
-    return stageAndPerform(.delete(
+    return submitCommand { .delete(
       deletionID: SessionDeletion.ID(),
       sessionID: sessionID,
       deletedAt: now()
-    ))
+    ) }
   }
 
   @discardableResult
   func restoreSession(_ sessionID: CookingSession.ID) -> Bool {
-    guard deletedSessions.contains(where: { $0.id == sessionID }),
-          prepareForNewCommand()
+    guard deletedSessions.contains(where: { $0.id == sessionID })
     else { return false }
-    do {
+    var alreadyRestored = false
+    let accepted = submitCommand {
       let deletionIDs = try service.unresolvedDeletionIDs(for: sessionID)
       guard !deletionIDs.isEmpty else {
-        reload()
-        return false
+        alreadyRestored = true
+        return nil
       }
-      return stageAndPerform(.restore(
+      return .restore(
         commandID: RestoreCookingSessionIntention.ID(),
         sessionID: sessionID,
         restoredAt: now(),
         observedDeletionIDs: deletionIDs
-      ))
-    } catch {
-      present(.read)
-      return false
+      )
     }
+    if alreadyRestored { reload() }
+    return accepted
   }
 
   @discardableResult
@@ -75,16 +73,15 @@ extension CookingSessionPresentationModel {
     for recovery: SessionRecovery
   ) -> Bool {
     let candidates = closureCandidates(for: recovery)
-    guard candidates.contains(where: { $0.id == selectedClosureID }),
-          prepareForNewCommand()
+    guard candidates.contains(where: { $0.id == selectedClosureID })
     else { return false }
-    return stageAndPerform(.resolveClosure(
+    return submitCommand { .resolveClosure(
       factID: SessionFact.ID(),
       sessionID: recovery.evidence.sessionID,
       authoredAt: now(),
       selectedClosureID: selectedClosureID,
       observedClosureIDs: candidates.map(\.id)
-    ))
+    ) }
   }
 
   func closureCandidates(for recovery: SessionRecovery) -> [SessionClosureEvidence] {

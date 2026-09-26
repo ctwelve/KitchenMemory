@@ -8,6 +8,22 @@ import XCTest
 
 @MainActor
 extension CookingSessionEntryPresentationTests {
+  func testTerminalRetirementDoesNotReportEntryAcceptanceOrAuthorizeFinish() {
+    let sessionID = CookingSession.ID()
+    let service = RemoteFinishDuringSubmitService(sessionID: sessionID)
+    let store = VolatileCookingSessionPresentationStore()
+    store.currentSessionID = sessionID
+    let model = CookingSessionPresentationModel(sessions: service, store: store)
+    model.loadIfNeeded()
+    model.updateCurrentEntryDraft(text: "Retain rejected text", target: nil)
+    service.isRemotelyFinished = true
+    XCTAssertFalse(model.submitCurrentEntryDraft())
+    XCTAssertTrue(store.pendingCommands.isEmpty)
+    XCTAssertEqual(model.currentEntryDraft?.text, "Retain rejected text")
+    XCTAssertFalse(model.submitCurrentEntryDraftAndFinish())
+    XCTAssertEqual(store.entryDrafts.first?.text, "Retain rejected text")
+  }
+
   func testSubmittingDraftThenFinishingPreservesExactEntryEvidence() throws {
     let preparedApp = try AppRuntime.testing()
     preparedApp.libraryModel.loadIfNeeded()

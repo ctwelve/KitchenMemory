@@ -151,14 +151,13 @@ extension CookingSessionPresentationModel {
 
   @discardableResult
   func continueSession(_ sourceSessionID: CookingSession.ID) -> Bool {
-    guard finishedSessions.contains(where: { $0.id == sourceSessionID }),
-          prepareForNewCommand()
+    guard finishedSessions.contains(where: { $0.id == sourceSessionID })
     else { return false }
-    return stageAndPerform(.continueSession(
+    return submitCommand { .continueSession(
       sessionID: CookingSession.ID(),
       sourceSessionID: sourceSessionID,
       startedAt: now()
-    ))
+    ) }
   }
 
   func dismissStaleSessionNudge() {

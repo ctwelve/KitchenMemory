@@ -117,6 +117,53 @@ final class RecipeLibraryNavigationTests: XCTestCase {
     XCTAssertEqual(editor.session.title, "Preserve before leaving")
   }
 
+  func testAutomaticAndExplicitRetryPreserveAcceptanceAcrossNavigationVeto() throws {
+    for trigger in ["launch", "external", "explicit"] {
+      for veto in [false, true] {
+        let app = try AppRuntime.testing()
+        let draftStore = NavigationDraftStore()
+        let library = RecipeLibraryModel(library: app.libraryModel.library,
+          samplePreferences: VolatileKitchenPreferencesStore(sampleRecipeOnboardingResponse: .accepted),
+          kitchenWasCreated: false, editingStore: draftStore)
+        library.loadIfNeeded()
+        let recipe = try XCTUnwrap(library.selectedRecipe)
+        library.beginEditing(recipe)
+        let editor = try XCTUnwrap(library.editor)
+        editor.session.title = "Keep this edit"
+        draftStore.refusesWrites = veto
+        let destination = library.navigation.destination
+        let commandStore = VolatileCookingSessionPresentationStore()
+        let id = CookingSession.ID()
+        let command = PendingCookingSessionCommand.start(sessionID: id,
+          recipeID: recipe.recipe.id, revisionID: recipe.revision.id, startedAt: Date())
+        commandStore.pendingCommands = [command]
+        let service = NavigationRetryService(base: app.cookingSessions)
+        service.refusesStart = trigger != "launch"
+        let sessions = CookingSessionPresentationModel(sessions: service,
+          store: commandStore, navigation: library.navigation)
+        sessions.loadIfNeeded()
+        if trigger != "launch" {
+          XCTAssertEqual(commandStore.pendingCommands, [command])
+          service.refusesStart = false
+          if trigger == "external" { sessions.reloadAfterExternalStoreChange() }
+          else { sessions.retryCurrentIssue() }
+        }
+        XCTAssertTrue(commandStore.pendingCommands.isEmpty, trigger)
+        XCTAssertEqual(sessions.sessions.map(\.id), [id], trigger)
+        XCTAssertEqual(library.navigation.destination,
+          veto ? destination : .session(id, history: nil), trigger)
+        if veto {
+          XCTAssertIdentical(library.editor, editor)
+          XCTAssertEqual(editor.session.title, "Keep this edit")
+        }
+        sessions.retryCurrentIssue()
+        sessions.reloadAfterExternalStoreChange()
+        XCTAssertTrue(commandStore.pendingCommands.isEmpty)
+        XCTAssertEqual(sessions.sessions.map(\.id), [id])
+      }
+    }
+  }
+
   func testReconciliationDoesNotReportAcceptanceWhenExistingEditorCannotBePreserved() throws {
     let app = try AppRuntime.testing()
     let store = NavigationDraftStore()
@@ -334,5 +381,20 @@ private final class NavigationDraftStore: RecipeEditingStoring {
     if refusesWrites { throw CocoaError(.fileWriteUnknown) }
     self.records = records
     if refusesWritesAfterRemoval && records.isEmpty { refusesWrites = true }
+  }
+}
+
+@MainActor
+private final class NavigationRetryService: CookingSessionServing {
+  let base: any CookingSessionServing
+  var refusesStart = false
+  init(base: any CookingSessionServing) { self.base = base }
+  func sessions() throws -> [SessionProjectionResult] { try base.sessions() }
+  func start(_ intention: StartCookingSessionIntention) throws -> CookingSessionCommandResult {
+    if refusesStart { throw CookingSessionLogicError.sessionWriteFailed }
+    return try base.start(intention)
+  }
+  func perform(_ intention: CookingSessionIntention) throws -> CookingSessionCommandResult {
+    try base.perform(intention)
   }
 }

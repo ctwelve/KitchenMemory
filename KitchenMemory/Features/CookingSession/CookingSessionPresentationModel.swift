@@ -86,8 +86,8 @@ final class CookingSessionPresentationModel {
   var issue: CookingSessionPresentationIssue?
   var isShowingIssue = false
   private(set) var hasLoaded = false
-  var outbox: CookingSessionOutbox
-  var entryDrafts: [CookingSessionEntryDraft]
+  let delivery: CookingSessionDelivery
+  var entryDrafts: [CookingSessionEntryDraft] { delivery.entryDrafts }
   var detachedEntryDraft: CookingSessionEntryDraft?
   var finishedSessionIDs: Set<CookingSession.ID> = []
   var historyScope: CookingSessionHistoryScope? { navigation.historyScope }
@@ -110,8 +110,7 @@ final class CookingSessionPresentationModel {
     self.now = now
     self.navigation = navigation
     navigation.installSessionStore(store)
-    outbox = CookingSessionOutbox(persistedCommands: store.pendingCommands)
-    entryDrafts = store.entryDrafts
+    delivery = CookingSessionDelivery(service: sessions, store: store)
     sessionVisits = store.sessionVisits
   }
 
@@ -121,7 +120,7 @@ final class CookingSessionPresentationModel {
   }
 
   var pendingCommands: [PendingCookingSessionCommand] {
-    outbox.commands
+    delivery.pendingCommands
   }
 
   var currentEntryDraft: CookingSessionEntryDraft? {
@@ -131,7 +130,7 @@ final class CookingSessionPresentationModel {
 
   func loadIfNeeded() {
     guard !hasLoaded else { return }
-    if !outbox.isEmpty {
+    if !pendingCommands.isEmpty {
       retryPendingCommands()
     }
     reload()
@@ -140,7 +139,7 @@ final class CookingSessionPresentationModel {
 
   func reloadAfterExternalStoreChange() {
     guard hasLoaded else { return }
-    if !outbox.isEmpty {
+    if !pendingCommands.isEmpty {
       retryPendingCommands()
     }
     reload()
@@ -148,7 +147,7 @@ final class CookingSessionPresentationModel {
 
   /// Clears every device-local and projected Session value after durable reset succeeds.
   func resetAfterKitchenReset() {
-    store.clear()
+    delivery.reset()
     sessions = []
     finishedSessions = []
     deletedSessions = []
@@ -161,8 +160,6 @@ final class CookingSessionPresentationModel {
     recoverySessionCount = 0
     issue = nil
     isShowingIssue = false
-    outbox = CookingSessionOutbox(persistedCommands: [])
-    entryDrafts = []
     detachedEntryDraft = nil
     finishedSessionIDs = []
     recipeHistorySessions = []
@@ -171,7 +168,7 @@ final class CookingSessionPresentationModel {
   }
 
   func retryCurrentIssue() {
-    if !outbox.isEmpty {
+    if !pendingCommands.isEmpty {
       retryPendingCommands()
     } else {
       reload()
@@ -210,43 +207,16 @@ final class CookingSessionPresentationModel {
   }
 
   func replaceDraft(_ draft: CookingSessionEntryDraft) {
-    entryDrafts.removeAll { $0.sessionID == draft.sessionID }
-    entryDrafts.append(draft)
-    persistEntryDrafts()
+    delivery.replaceDraft(draft)
   }
 
   func removeDraft(for sessionID: CookingSession.ID) {
-    entryDrafts.removeAll { $0.sessionID == sessionID }
-    persistEntryDrafts()
-    refreshDetachedEntryDraft()
-  }
-
-  func moveDraft(
-    from sourceSessionID: CookingSession.ID,
-    to destinationSessionID: CookingSession.ID,
-    target: SessionProgressTarget?
-  ) {
-    guard let sourceDraft = entryDrafts.first(where: { $0.sessionID == sourceSessionID }) else {
-      return
-    }
-    entryDrafts.removeAll {
-      $0.sessionID == sourceSessionID || $0.sessionID == destinationSessionID
-    }
-    entryDrafts.append(CookingSessionEntryDraft(
-      sessionID: destinationSessionID,
-      text: sourceDraft.text,
-      target: target
-    ))
-    persistEntryDrafts()
+    delivery.removeDraft(for: sessionID)
     refreshDetachedEntryDraft()
   }
 
   func refreshDetachedEntryDraft() {
     detachedEntryDraft = entryDrafts.first { finishedSessionIDs.contains($0.sessionID) }
-  }
-
-  private func persistEntryDrafts() {
-    store.entryDrafts = entryDrafts
   }
 
   func sessionOrder(
