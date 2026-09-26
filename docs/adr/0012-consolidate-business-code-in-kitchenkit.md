@@ -1,6 +1,6 @@
 # Consolidate business code in KitchenKit
 
-- Status: Accepted
+- Status: Accepted; peer-framework application clarified by ADR 0022
 
 Kitchen Memory builds Domain, Import, Logic, and Persistence into one native
 framework and Swift module named `KitchenKit`. Those names remain responsibility
@@ -29,3 +29,9 @@ submodules. A future capability should become a peer framework only when it has
 an independent consumer, dependency footprint, or evolution reason. Revisit
 this decision if the unified target produces a measured incremental-build
 regression or a responsibility gains a real independent client.
+
+[ADR 0022](0022-shared-durable-undo-framework.md) applies this independent-consumer
+criterion to planned UndoKit, shared by KitchenMemory and Folio. KitchenKit keeps
+domain command preparation, validation and acceptance; UndoKit owns reusable
+durable history storage and native integration. The new framework remains
+implementation work, not a change to the current target inventory.

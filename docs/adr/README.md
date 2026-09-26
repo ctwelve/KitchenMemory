@@ -33,6 +33,7 @@ amends them.
 
 - [0020: Scale release assurance to scope](0020-scale-release-assurance-to-scope.md)
 - [0021: Adopt platform 27 during alpha](0021-adopt-platform-27-during-alpha.md)
+- [0022: Share durable semantic undo through UndoKit](0022-shared-durable-undo-framework.md)
 
 ## Superseded architecture decisions
 

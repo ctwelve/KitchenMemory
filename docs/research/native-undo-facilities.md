@@ -6,9 +6,16 @@ Copyright © 2026 the Kitchen Memory contributors.
 SPDX-License-Identifier: MIT
 -->
 
-- Status: Primary-source evidence and adoption constraints; not an accepted product policy
+- Status: Primary-source evidence; subsequent policy agreement recorded in ADR 0022
 - Researched: 2026-09-25
 - Scope: Foundation, SwiftUI, AppKit, and UIKit support for #191
+
+The maintainer subsequently selected a shared Core Data-backed UndoKit framework
+for durable history in KitchenMemory and Folio. Follow
+[ADR 0022](../adr/0022-shared-durable-undo-framework.md) for the accepted direction
+and the [storage follow-up](durable-undo-storage.md) for persistence constraints.
+The native API findings below remain evidence, not a claim that UndoManager
+itself supplies persistence or that the framework has been implemented.
 
 ## Finding
 
@@ -71,8 +78,8 @@ from the platform's description of a group as collected undo operations.
 **Native history is not durable history.** The reviewed interface records
 callbacks and exposes neither a serialized stack format nor synchronization
 semantics. Do not promise restoration after relaunch or transfer between devices
-based on `UndoManager`. Durable retry records, if required by a later policy,
-would be separate app/domain data rather than serialization of native callbacks.
+based on `UndoManager`. The now-agreed durable semantic history is separate
+UndoKit/host data, not serialization of native callbacks.
 [UndoManager API surface](https://developer.apple.com/documentation/foundation/undomanager)
 
 **Automatic storage undo is not semantic undo.** SwiftData can attach the window
@@ -98,9 +105,10 @@ app-wide shortcut.
 5. Verify actual menu routing, localized action names, mobile gestures, hardware
    keyboard shortcuts, and accessible failure feedback on supported platforms.
 
-These are recommended adoption gates. They do not settle which Kitchen Memory
-operations should be reversible or whether scene-local history is the final
-product policy; #191's operation matrix and policy review must decide those.
+These remain required native proof gates. The subsequent
+[policy agreement](application-undo-policy.md#agreed-decisions) selects reversible
+operations, KitchenMemory scene ownership, and durable history. Its U0/U1 drafts
+add on-disk recovery and native restoration proofs before adoption.
 
 ## Focused helper comparison
 
@@ -120,13 +128,13 @@ recommendations for this application, not upstream claims. The existing
 | **Point-Free Swift Navigation 2.11.2**, released August 31, 2026. [Release](https://github.com/pointfreeco/swift-navigation/releases/tag/2.11.2) | State-driven navigation and binding tools. The reviewed product/source inventory provides no `UndoManager` integration; repository code searches found no `UndoManager` match and only an undo mention in an alert example. [Tagged source](https://github.com/pointfreeco/swift-navigation/tree/2.11.2/Sources) | **Do not add for #191.** No verified undo complexity is removed. MIT; its Swift 6.2 manifest includes macros and several package/trait dependencies, so this is not a tiny undo adapter. Reconsider only for an independently demonstrated navigation need. [Manifest](https://github.com/pointfreeco/swift-navigation/blob/2.11.2/Package@swift-6.2.swift), [license](https://github.com/pointfreeco/swift-navigation/blob/2.11.2/LICENSE) |
 | **Yjs `Y.UndoManager` / YSwift**, Yjs stable 13.6.33 released September 23, 2026; YSwift 0.2.1 released April 4, 2024. [Yjs release](https://github.com/yjs/yjs/releases/tag/v13.6.33), [YSwift release](https://github.com/y-crdt/yswift/releases/tag/0.2.1) | Selective undo over Yjs shared types with transaction-origin filtering, capture intervals, explicit capture boundaries, and stack metadata. YSwift exposes origin-scoped undo/redo over Y collections through its Rust-backed bridge. [Yjs API](https://docs.yjs.dev/api/undo-manager), [YSwift implementation](https://github.com/y-crdt/yswift/blob/0.2.1/Sources/YSwift/YUndoManager.swift) | **Reconsider only if a future collaborative editor deliberately adopts a Y document model.** This is not an adapter over Kitchen Memory's current immutable evidence model. Both root licenses are MIT; YSwift adds a checksum-pinned binary XCFramework and a Rust build path, plus DocC tooling. Its last repository push was July 20, 2024, so current Swift/toolchain compatibility is unproven here. [Manifest](https://github.com/y-crdt/yswift/blob/0.2.1/Package.swift), [repository metadata](https://api.github.com/repos/y-crdt/yswift), [Yjs license](https://github.com/yjs/yjs/blob/v13.6.33/LICENSE), [YSwift license](https://github.com/y-crdt/yswift/blob/0.2.1/LICENSE) |
 
-**Recommendation:** start with native `UndoManager` and existing Collections
-where a named container requirement warrants it. Keep the history entry's
-identity, inverse intention, observed preconditions, and acceptance outcome
-under Kitchen Memory ownership. No reviewed helper supplies the application's
-failed-write and synchronization-aware compensation contract. Native text
-history should also retain its existing implementation unless a separate editor
-problem demonstrates a benefit from a value-history package.
+**Recommendation after policy agreement:** build reusable UndoKit around native
+`UndoManager` integration and local Core Data history storage, using existing
+Collections where a named container requirement warrants it. Host adapters own
+inverse meaning, observed preconditions and accepted outcomes. No reviewed helper
+supplies the required durable recovery and synchronization-aware compensation
+contract. Native text history retains its existing implementation unless a
+separate editor problem demonstrates a benefit from a value-history package.
 
 This comparison inspected source and metadata; it did not resolve, build, or
 add any candidate. A new dependency still requires the inventory's full
