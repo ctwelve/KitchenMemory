@@ -24,6 +24,19 @@ The extent of that assistance varies by change. The Git history is the primary
 record of how the project evolved; material AI assistance should also be noted
 in commit or review context when doing so would help future contributors.
 
+## Architecture and design skills
+
+Kitchen Memory makes extensive use of Matt Pocock's
+[mattpocock/skills](https://github.com/mattpocock/skills) in its architecture and
+product design. These skills help structure design interrogation, domain
+modeling, architectural reasoning, prototyping, and review. We credit this
+collection as an important part of the project's development process.
+
+The skills are installed globally in the contributor's agent environment;
+Kitchen Memory does not maintain a repository-local copy. Agents resolve named
+skills through their active skill catalog. Project-specific contracts,
+decisions, and workflow conventions remain in this repository.
+
 ## Human responsibility
 
 Human contributors direct the work, decide what belongs in the project, review

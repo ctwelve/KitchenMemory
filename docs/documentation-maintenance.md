@@ -23,7 +23,7 @@ separately scoped development utilities.
 | Milestone records | [History](history.md), with completed records linked at a Git commit | Candidate results, release notes, completed plans and explicit omissions |
 | Code entry points | Existing application and KitchenKit DocC catalogs | Symbols, ownership, and a short newcomer tour |
 | Agent workflow | `AGENTS.md` routing to `docs/agents/` | Conditional instructions loaded for the current task |
-| Skill library | `.agents/skills/` | Workflow skills and references for agents |
+| Skill library | Contributor's global agent installation; [attribution and use](../AI.md#architecture-and-design-skills) | Resolve workflow skills through the active agent's skill catalog |
 
 New top-level guidance belongs in the map or history index. New decisions and
 research belong in their respective indexes. Every repository-authored Markdown
