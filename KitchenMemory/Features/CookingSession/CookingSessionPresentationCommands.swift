@@ -117,28 +117,35 @@ extension CookingSessionPresentationModel {
         case .unavailable: present(.read)
         }
       case let .resolved(pending, resolution):
-        switch resolution {
-        case let .accepted(session):
-          refreshDetachedEntryDraft()
-          issue = nil
-          isShowingIssue = false
-          upsert(session)
-          applySelection(for: session, pending: pending)
-          if pending.refreshesClassification { reload() }
-        case .rejectedByFinishedSource:
-          issue = nil
-          isShowingIssue = false
-        case let .retiredStaleConsent(attention):
-          reload()
-          present(.attention(attention))
-        case .retiredCompletedRestore:
-          issue = nil
-          isShowingIssue = false
-          reload()
-        case let .attention(attention):
-          present(.attention(attention))
-        }
+        consume(resolution, for: pending)
       }
+    }
+  }
+
+  private func consume(
+    _ resolution: PendingCookingSessionResolution,
+    for pending: PendingCookingSessionCommand
+  ) {
+    switch resolution {
+    case let .accepted(session):
+      refreshDetachedEntryDraft()
+      issue = nil
+      isShowingIssue = false
+      upsert(session)
+      applySelection(for: session, pending: pending)
+      if pending.refreshesClassification { reload() }
+    case .rejectedByFinishedSource:
+      issue = nil
+      isShowingIssue = false
+    case let .retiredStaleConsent(attention):
+      reload()
+      present(.attention(attention))
+    case .retiredCompletedRestore:
+      issue = nil
+      isShowingIssue = false
+      reload()
+    case let .attention(attention):
+      present(.attention(attention))
     }
   }
 

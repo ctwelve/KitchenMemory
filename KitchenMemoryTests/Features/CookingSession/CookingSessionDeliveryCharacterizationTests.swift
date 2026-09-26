@@ -8,7 +8,7 @@ import KitchenKit
 import XCTest
 
 @MainActor
-final class CookingSessionDeliveryCharacterizationTests: XCTestCase {
+final class SessionDeliveryCharacterizationTests: XCTestCase {
   // Known pre-existing defect, explicitly characterized for #214 rather than
   // accepted product semantics: retry discards text edited after submission.
   func testCharacterizesRetryClearingNewerTextWhileEarlierSubmissionWasPending() throws {

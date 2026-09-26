@@ -26,7 +26,8 @@ final class CookingSessionDeliveryTests: XCTestCase {
     let events = relaunched.retry()
     XCTAssertEqual(events.count, 1)
     guard case .resolved(let retried, .accepted) = events.first else {
-      return XCTFail("Retry must report domain acceptance")
+      XCTFail("Retry must report domain acceptance")
+      return
     }
     XCTAssertEqual(retried, command)
     XCTAssertTrue(relaunched.pendingCommands.isEmpty)
@@ -104,7 +105,8 @@ final class CookingSessionDeliveryTests: XCTestCase {
     XCTAssertTrue(delivery.submit { command }.wasAccepted)
     XCTAssertEqual(store.events, [.pending(1), .draftSession(destinationID), .pending(0)])
     XCTAssertEqual(delivery.entryDrafts, [.init(sessionID: destinationID, text: "  Keep this 🍋  ",
-      target: destinationTarget)])
+      target: destinationTarget),
+    ])
     store.pendingCommands = [command]
     let replay = CookingSessionDelivery(service: service, store: store)
     _ = replay.retry()

@@ -145,8 +145,11 @@ final class RecipeLibraryNavigationTests: XCTestCase {
         if trigger != "launch" {
           XCTAssertEqual(commandStore.pendingCommands, [command])
           service.refusesStart = false
-          if trigger == "external" { sessions.reloadAfterExternalStoreChange() }
-          else { sessions.retryCurrentIssue() }
+          if trigger == "external" {
+            sessions.reloadAfterExternalStoreChange()
+          } else {
+            sessions.retryCurrentIssue()
+          }
         }
         XCTAssertTrue(commandStore.pendingCommands.isEmpty, trigger)
         XCTAssertEqual(sessions.sessions.map(\.id), [id], trigger)
@@ -186,6 +189,9 @@ final class RecipeLibraryNavigationTests: XCTestCase {
     XCTAssertEqual(library.navigation.destination, .editor(editor.id))
   }
 
+}
+
+extension RecipeLibraryNavigationTests {
   func testMiddleColumnRetainsDraftAndHistoryContextWhileDetailChanges() {
     let navigation = RecipeLibraryNavigation()
     XCTAssertTrue(navigation.move(to: .drafts))
@@ -381,20 +387,5 @@ private final class NavigationDraftStore: RecipeEditingStoring {
     if refusesWrites { throw CocoaError(.fileWriteUnknown) }
     self.records = records
     if refusesWritesAfterRemoval && records.isEmpty { refusesWrites = true }
-  }
-}
-
-@MainActor
-private final class NavigationRetryService: CookingSessionServing {
-  let base: any CookingSessionServing
-  var refusesStart = false
-  init(base: any CookingSessionServing) { self.base = base }
-  func sessions() throws -> [SessionProjectionResult] { try base.sessions() }
-  func start(_ intention: StartCookingSessionIntention) throws -> CookingSessionCommandResult {
-    if refusesStart { throw CookingSessionLogicError.sessionWriteFailed }
-    return try base.start(intention)
-  }
-  func perform(_ intention: CookingSessionIntention) throws -> CookingSessionCommandResult {
-    try base.perform(intention)
   }
 }

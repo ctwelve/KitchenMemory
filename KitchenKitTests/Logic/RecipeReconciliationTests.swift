@@ -93,9 +93,7 @@ final class RecipeReconciliationTests: XCTestCase {
   }
 
   func testComparisonChoicesAndFrozenSaveSurviveRelaunchWithoutOverwritingAnExistingDraft() throws {
-    let repository = SwiftDataRecipeRepository(
-      modelContainer: try KitchenMemorySchema.makeContainer(inMemory: true)
-    )
+    let repository = SwiftDataRecipeRepository(modelContainer: try KitchenMemorySchema.makeContainer(inMemory: true))
     let kitchen = Kitchen(name: "Kitchen")
     try repository.save(kitchen)
     let editor = RecipeEditor(repository: repository)
