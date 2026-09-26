@@ -24,6 +24,28 @@ The extent of that assistance varies by change. The Git history is the primary
 record of how the project evolved; material AI assistance should also be noted
 in commit or review context when doing so would help future contributors.
 
+## Architecture and design skills
+
+Kitchen Memory makes extensive use of Matt Pocock's
+[mattpocock/skills](https://github.com/mattpocock/skills) in its architecture and
+product design. These skills help structure design interrogation, domain
+modeling, architectural reasoning, prototyping, and review. We credit this
+collection as an important part of the project's development process.
+
+Additional credits for the globally installed toolkit:
+
+| Source | Contribution |
+| --- | --- |
+| [rgmez/apple-accessibility-skills](https://github.com/rgmez/apple-accessibility-skills) | SwiftUI, UIKit, and AppKit accessibility audit skills and manual verification checklists, available for platform-specific interface reviews. |
+| [Vercel Labs' skills](https://github.com/vercel-labs/skills) | The `find-skills` discovery skill and the installer used to manage the shared catalog. |
+| [Dex Horthy / HumanLayer](https://github.com/humanlayer/skills/blob/main/plugins/show-me/skills/show-me/SKILL.md) | The `show-me` work credited upstream by Matt Pocock's `pr` skill, which informs how we present changes and evidence in pull requests. |
+
+The global catalog is intentionally kept small, with reusable skills shared
+across projects. Skills are installed in the contributor's agent environment;
+Kitchen Memory does not maintain a repository-local copy. Agents resolve named
+skills through their active skill catalog. Project-specific contracts,
+decisions, and workflow conventions remain in this repository.
+
 ## Human responsibility
 
 Human contributors direct the work, decide what belongs in the project, review

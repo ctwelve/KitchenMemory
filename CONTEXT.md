@@ -64,6 +64,10 @@ _Avoid_: Closed session, archived session
 One confirmed, session-owned piece of authored cooking reality, optionally anchored to one element of the Execution Snapshot.
 _Avoid_: Deviation, annotation, change record
 
+**Session Entry Draft**:
+A recoverable working note belonging to one Cooking Session, optionally aimed at one element of its Execution Snapshot, distinct from a confirmed Session Entry.
+_Avoid_: Recipe Editing Draft, confirmed Session Entry, ingredient-owned draft
+
 **Session Fact**:
 Immutable evidence of one accepted cooking intention whose causal context allows device-independent reconciliation without making clocks or devices authoritative.
 _Avoid_: Event log row, mutable activity record

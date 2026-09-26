@@ -58,6 +58,11 @@ the current Recipe object. The list remains in the middle column while selection
 opens the existing cooking interaction or observational Finished detail with
 explicit continuation and immediate lineage.
 
+The [accepted Cooking Session interface](cooking-session-interface.md) defines
+the next reading/progress, history, restoration, and hands-busy interaction
+slice. Implementation and native gesture acceptance remain pending; it retains
+these navigation and shared-domain ownership seams.
+
 ## Native product targets and destinations
 
 `KitchenMemory` is one native multiplatform target supporting iPhone, iPad, iOS

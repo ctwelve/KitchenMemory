@@ -35,8 +35,11 @@ as evidence of completion.
 
 ## Inner loop: improve only what earns its cost
 
-1. Use [improve-codebase-architecture](../.agents/skills/improve-codebase-architecture/SKILL.md)
-   and its [design vocabulary](../.agents/skills/codebase-design/SKILL.md).
+Resolve the named skills below from the active agent's global skill catalog;
+see [skill attribution and use](../AI.md#architecture-and-design-skills).
+
+1. Use the `improve-codebase-architecture` skill
+   and the `codebase-design` skill's design vocabulary.
    Start with recent hotspots, then cover the remaining codebase over the pass.
    Rank candidates by demonstrated friction and likely benefit relative to risk.
    Require concrete files and callers, a real ownership or testability problem,
@@ -45,7 +48,7 @@ as evidence of completion.
    target do not make a recommendation actionable. Apply the deletion test;
    removing a useful abstraction only to scatter complexity is not improvement.
 2. Select the strongest actionable recommendation, if any, and use
-   [implement](../.agents/skills/implement/SKILL.md) in a small reviewable step.
+   the `implement` skill in a small reviewable step.
    For this release workflow, the maintainer has preselected the top justified
    recommendation: the architecture skill's ordinary candidate-choice pause does
    not require another selection each iteration. Resolve design questions from
@@ -82,7 +85,7 @@ When a complete inner pass produces no further actionable findings:
    must correspond to the candidate being reviewed; coverage is not proof of
    meaningful assertions or of dead-code absence.
 2. Run independent adversarial **Spec** and **Engineering** reviews, using
-   [code-review](../.agents/skills/code-review/SKILL.md). Reviewers inspect the same
+   the `code-review` skill. Reviewers inspect the same
    pinned candidate without relying on the implementer's conclusions. Spec checks
    accepted behavior, invariants, preservation, omissions, and scope. Engineering
    checks ownership, actual call paths, platform/resource wiring, failure handling,
