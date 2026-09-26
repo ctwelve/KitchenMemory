@@ -27,7 +27,7 @@ history provide background when needed. GitHub Issues owns the live plan and dep
 - Recipe content: [domain model](recipe-domain-model.md), [web import](web-import.md), [private media](recipe-media.md).
 - Recipe authority: [V5 storage contract](recipe-authority-v5-schema.md), [reconciliation](recipe-reconciliation.md), [deletion and restoration](recipe-disposition.md), [retention and Recovery](recipe-retention.md).
 - Organization: [native library](recipe-library-organization.md), [Folders](folders.md), [Tags](tags.md), [reversible sample pack](sample-pack.md).
-- Cooking: [Sessions](cooking-sessions.md), [V3 storage contract](cooking-session-v3-schema.md).
+- Cooking: [Sessions](cooking-sessions.md), [agreed next interface](cooking-session-interface.md) (implementation pending), [V3 storage contract](cooking-session-v3-schema.md).
 - Storage operation: [personal iCloud](personal-icloud-synchronization.md), [records maintenance](records-maintenance.md).
 - Person-facing policy: [public privacy commitment](../PRIVACY.md), [privacy engineering](privacy.md), [naming and voice](naming.md).
 

@@ -18,5 +18,7 @@ and [application](../../KitchenMemory/Documentation.docc/Documentation.md) DocC
 catalogs explain actual symbols, ownership, and code entry points. Keep those
 small newcomer guides complementary to repository docs.
 
-The maintained skill library is `.agents/skills/`. For documentation routing or
-validation changes, see [the maintenance contract](../documentation-maintenance.md).
+For skill-guided architecture and design, resolve the named skill from the
+active agent's globally installed skill catalog. [AI use and skill attribution](../../AI.md#architecture-and-design-skills)
+describes the project's extensive use of `mattpocock/skills`. For documentation
+routing or validation changes, see [the maintenance contract](../documentation-maintenance.md).
