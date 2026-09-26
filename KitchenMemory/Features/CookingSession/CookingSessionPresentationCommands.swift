@@ -8,33 +8,30 @@ import KitchenKit
 extension CookingSessionPresentationModel {
   @discardableResult
   func start(from recipe: StoredRecipe) -> Bool {
-    guard prepareForNewCommand() else { return false }
-    return stageAndPerform(.start(
+    return submitCommand { .start(
       sessionID: CookingSession.ID(),
       recipeID: recipe.recipe.id,
       revisionID: recipe.revision.id,
       startedAt: Date()
-    ))
+    ) }
   }
   @discardableResult
   func stopCurrentSession() -> Bool {
-    guard let session = currentSession, session.lifecycle == .active,
-          prepareForNewCommand() else { return false }
-    return stageAndPerform(.stop(
+    guard let session = currentSession, session.lifecycle == .active else { return false }
+    return submitCommand { .stop(
       factID: SessionFact.ID(),
       sessionID: session.id,
       authoredAt: Date()
-    ))
+    ) }
   }
   @discardableResult
   func resumeCurrentSession() -> Bool {
-    guard let session = currentSession, session.lifecycle == .stopped,
-          prepareForNewCommand() else { return false }
-    return stageAndPerform(.resume(
+    guard let session = currentSession, session.lifecycle == .stopped else { return false }
+    return submitCommand { .resume(
       factID: SessionFact.ID(),
       sessionID: session.id,
       authoredAt: Date()
-    ))
+    ) }
   }
   @discardableResult
   func setIngredient(_ id: SessionIngredient.ID, to state: SessionIngredientProgress) -> Bool {
@@ -42,7 +39,7 @@ extension CookingSessionPresentationModel {
           session.snapshot.ingredientSections.flatMap(\.ingredients).contains(where: {
             $0.id == id
           }) else { return false }
-    return stageIndependentAndPerform(.progress(
+    return submitIndependentCommand(.progress(
       factID: SessionFact.ID(),
       sessionID: session.id,
       authoredAt: Date(),
@@ -55,7 +52,7 @@ extension CookingSessionPresentationModel {
           session.snapshot.instructionSections.flatMap(\.steps).contains(where: {
             $0.id == id
           }) else { return false }
-    return stageIndependentAndPerform(.progress(
+    return submitIndependentCommand(.progress(
       factID: SessionFact.ID(),
       sessionID: session.id,
       authoredAt: Date(),
@@ -68,7 +65,7 @@ extension CookingSessionPresentationModel {
           let replacement = workingScale(for: session.snapshot, scale: scale)
     else { return false }
     guard session.workingScale != replacement else { return true }
-    return stageIndependentAndPerform(.replaceWorkingScale(
+    return submitIndependentCommand(.replaceWorkingScale(
       factID: SessionFact.ID(),
       sessionID: session.id,
       authoredAt: Date(),
@@ -85,108 +82,70 @@ extension CookingSessionPresentationModel {
       return false
     }
     discardCurrentEntryDraft()
-    guard prepareForNewCommand() else { return false }
-    return stageAndPerform(.finish(
+    return submitCommand { .finish(
       closureID: SessionClosure.ID(),
       sessionID: session.id,
       finishedAt: Date()
-    ))
+    ) }
   }
 
   func retryPendingCommands() {
-    while let pending = outbox.head {
-      do {
-        let result = try perform(pending)
-        guard apply(result, for: pending) else { return }
-      } catch let logicError as CookingSessionLogicError {
-        present(.command(logicError))
-        return
-      } catch {
-        present(.read)
-        return
-      }
-    }
+    consume(delivery.retry())
   }
 }
 
 extension CookingSessionPresentationModel {
-  func prepareForNewCommand() -> Bool {
-    guard !outbox.isEmpty else { return true }
-    retryPendingCommands()
-    return outbox.isEmpty
+  func submitCommand(_ makeCommand: () throws -> PendingCookingSessionCommand?) -> Bool {
+    let report = delivery.submit(makeCommand)
+    consume(report.events)
+    return report.wasAccepted || report.completedRestore
   }
 
-  func stageAndPerform(_ pending: PendingCookingSessionCommand) -> Bool {
-    outbox.replace(with: pending)
-    persistPendingCommands()
-    retryPendingCommands()
-    return !outbox.contains(pending)
+  func submitIndependentCommand(_ command: PendingCookingSessionCommand) -> Bool {
+    let report = delivery.submitIndependent(command)
+    consume(report.events)
+    return report.wasAccepted
   }
 
-  func stageIndependentAndPerform(_ pending: PendingCookingSessionCommand) -> Bool {
-    guard outbox.allSatisfy({ $0.isIndependentActivity(for: pending.sessionID) }) else {
-      return false
+  private func consume(_ events: [CookingSessionDelivery.Event]) {
+    for event in events {
+      switch event {
+      case let .failed(_, failure):
+        switch failure {
+        case let .command(error): present(.command(error))
+        case let .attention(attention): present(.attention(attention))
+        case .unavailable: present(.read)
+        }
+      case let .resolved(pending, resolution):
+        consume(resolution, for: pending)
+      }
     }
-    outbox.enqueue(pending)
-    persistPendingCommands()
-    retryPendingCommands()
-    return !outbox.contains(pending)
   }
 
-  // Exhaustive durable terminal-state routing keeps every outbox retirement
-  // adjacent to its persistence boundary and prevents a new case being lost.
-  func apply(
-    _ result: CookingSessionCommandResult,
+  private func consume(
+    _ resolution: PendingCookingSessionResolution,
     for pending: PendingCookingSessionCommand
-  ) -> Bool {
-    switch PendingCookingSessionResolution(result: result, pending: pending) {
+  ) {
+    switch resolution {
     case let .accepted(session):
-      guard outbox.head == pending else { return false }
-      // Draft state crosses its local durability boundary before the outbox
-      // identity is cleared. A process interruption can therefore replay the
-      // accepted command, but can never strand or lose the user's text.
-      applyDraftAcceptance(for: pending, session: session)
-      outbox.retireHead()
-      persistPendingCommands()
+      refreshDetachedEntryDraft()
       issue = nil
       isShowingIssue = false
       upsert(session)
       applySelection(for: session, pending: pending)
       if pending.refreshesClassification { reload() }
-      return true
     case .rejectedByFinishedSource:
-      guard outbox.head == pending else { return false }
-      // Logic has definitively rejected this specific identity because its
-      // source Session is already Finished. The command can never become
-      // eligible on retry, while any exact local draft remains separately
-      // durable for explicit continuation, copy, or discard.
-      outbox.retireHead()
-      persistPendingCommands()
       issue = nil
       isShowingIssue = false
-      return true
     case let .retiredStaleConsent(attention):
-      guard outbox.head == pending else { return false }
-      // Consent to resolve retained evidence is bounded to what the user saw.
-      // A changed frontier or candidate set requires a fresh explicit choice.
-      outbox.retireHead()
-      persistPendingCommands()
       reload()
       present(.attention(attention))
-      return true
     case .retiredCompletedRestore:
-      guard outbox.head == pending else { return false }
-      // Another replica may already have restored the observed frontier. The
-      // local intention is then complete and safe to retire idempotently.
-      outbox.retireHead()
-      persistPendingCommands()
       issue = nil
       isShowingIssue = false
       reload()
-      return true
     case let .attention(attention):
       present(.attention(attention))
-      return false
     }
   }
 
@@ -212,10 +171,6 @@ extension CookingSessionPresentationModel {
     }
   }
 
-  func persistPendingCommands() {
-    store.pendingCommands = outbox.commands
-  }
-
   func applyingPendingCommands(
     to session: CookingSessionProjection
   ) -> CookingSessionProjection {
@@ -223,7 +178,7 @@ extension CookingSessionPresentationModel {
     var workingScale = session.workingScale
     var entries = session.entries
     var outcome = session.outcome
-    for pending in outbox.commands where pending.sessionID == session.id {
+    for pending in pendingCommands where pending.sessionID == session.id {
       switch pending {
       case let .progress(_, _, _, value):
         progress.removeAll { $0.target == value.target }
@@ -262,28 +217,6 @@ extension CookingSessionPresentationModel {
       entries: entries,
       outcome: outcome
     )
-  }
-
-  func applyDraftAcceptance(
-    for pending: PendingCookingSessionCommand,
-    session: CookingSessionProjection
-  ) {
-    switch pending {
-    case .submitEntry:
-      removeDraft(for: pending.sessionID)
-    case let .continueSession(newSessionID, sourceSessionID, _):
-      guard let draft = entryDrafts.first(where: { $0.sessionID == sourceSessionID }) else { return }
-      let mappedTarget = draft.target.flatMap { sourceTarget in
-        session.snapshot.continuationBaseline?.targetMappings.first(where: {
-          $0.sourceTarget == sourceTarget
-        })?.target
-      }
-      moveDraft(from: sourceSessionID, to: newSessionID, target: mappedTarget)
-    case .start, .stop, .resume, .progress, .replaceWorkingScale, .reviseEntry,
-         .retargetEntry, .withdrawEntry, .setOutcome, .clearOutcome, .finish,
-         .delete, .restore, .resolveClosure:
-      break
-    }
   }
 
   func workingScale(

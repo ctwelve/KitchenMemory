@@ -137,8 +137,8 @@ cloud selection remains available before Kitchen preparation; composition binds
 Kitchen identity. Settings and organization presentation share that observable
 capability, including feature visibility, scoped expansion, and expansion reset.
 Production uses local-only typed Defaults keys; disposable graphs use retained
-in-memory preferences. Presentation retains pending-command JSON, retry, and
-recovery separately. See [the dependency inventory](../DEPENDENCIES.md) for the
+in-memory preferences. App-owned Cooking Session delivery retains pending
+commands and retry separately from preferences and presentation. See [the dependency inventory](../DEPENDENCIES.md) for the
 small adoption of legacy dotted preference keys required by Defaults.
 
 `RecipeLibraryModel` crosses the deep `RecipeLibrary` seam for durable library
@@ -189,8 +189,14 @@ column visibility, and layout direction remain window-owned.
 
 `CookingSessionPresentationModel` projects the separate `CookingSessions` Logic
 interface. Queries use retained Session provenance rather than joins through
-currently visible Recipes. Commands enter an ordered device-local outbox with
-final identities before submission and leave after locally durable acceptance.
+currently visible Recipes. App-owned `CookingSessionDelivery` owns staging,
+ordered retry, terminal classification, retirement, and acceptance-required Entry
+draft mutations. It is the single in-memory owner of pending commands and Entry
+drafts, using the existing production or volatile presentation store. Final
+identities are stored before submission; accepted draft effects are stored
+before command retirement. Presentation consumes typed results and retains
+selection, navigation, dialogs, visits, and optimistic projections. A navigation
+veto cannot undo delivery acceptance or re-stage a retired command.
 Progress and scale project optimistically over the immutable snapshot; relaunch
 retries the same intentions. A definitively rejected command against an already
 Finished Session clears its impossible identity while retaining exact Entry

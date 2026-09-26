@@ -64,7 +64,7 @@ sleeping, terminating, and relaunching only change or restore presentation
 selection. Stop, Resume, and confirmed Finish are the only shell actions that
 submit lifecycle intentions.
 
-The presentation retains accepted intentions in an ordered device-local outbox
+The app-owned `CookingSessionDelivery` retains pending intentions in an ordered device-local outbox
 before they cross Logic. Independent progress and scale actions may accumulate
 without replacing one another. Retries preserve order and reuse the same
 Session, Fact, or Closure identity after an interruption or ambiguous failure;
@@ -74,6 +74,18 @@ rejects because its source Session is already Finished: only that now-impossible
 identity clears. Any exact Entry draft remains separately local for explicit
 continuation, confirmed copy, or discard. The outbox is not synchronized and
 does not imply that another device has received the evidence.
+
+Delivery distinguishes domain acceptance, terminal retirement without acceptance,
+and pending failure. Stale restore or closure consent retires and requires a new
+explicit choice; an already completed restore retires idempotently. An empty
+queue does not authorize a composite Submit-and-Finish action. Accepted Entry
+clearing and continuation target mapping cross the existing local storage seam
+before retirement, independently of later navigation success. Launch, external
+refresh, and explicit retry all use the same delivery path.
+
+The store's encoding, legacy single-command decoding, corrupt-storage policy,
+and reset behavior remain unchanged. Delivery does not claim stronger crash
+durability than the existing UserDefaults adapter provides.
 
 ## Cooking interaction
 
@@ -120,13 +132,20 @@ process relaunch. Finish and remote Finish must offer explicit handling for that
 draft; no path silently loses or misassigns it.
 
 The 0.1.5 interaction keeps that draft in application-owned device-local
-storage, separate from the synchronized accepted-intention outbox. Submission
+storage, separate from the device-local pending-intention outbox. Submission
 preserves the exact authored Unicode text and clears the draft only after Logic
 confirms local durability. Finish offers add, copy, discard, and cancel choices.
 If remote Finish arrives first, the person may continue into a new immutable
 Session, copy the draft, discard it, or leave it unresolved; continuation maps
 the target through the captured continuation baseline instead of silently
 retargeting it.
+
+Characterization tests record two pre-existing defects requiring separate,
+bounded fixes: accepting an older pending submission can clear text edited since
+that submission, and submitting again after retry can create a second Entry,
+including a duplicate when the text is unchanged. These are known defects, not
+intended draft or submission semantics; the delivery extraction preserves and
+reports them rather than expanding its product scope.
 
 Session Outcome is optional and distinct from lifecycle. Its initial coarse
 values are great, okay, and unsuccessful. Finishing with no Entries or Outcome

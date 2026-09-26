@@ -6,12 +6,12 @@ import Foundation
 import KitchenKit
 
 @MainActor
-extension CookingSessionPresentationModel {
+extension PendingCookingSessionCommand {
   // This exhaustive retry router keeps every durable command identity adjacent
   // to its matching Logic intention so new enum cases cannot be silently lost.
   // swiftlint:disable:next cyclomatic_complexity function_body_length
-  func perform(_ pending: PendingCookingSessionCommand) throws -> CookingSessionCommandResult {
-    switch pending {
+  func perform(using service: any CookingSessionServing) throws -> CookingSessionCommandResult {
+    switch self {
     case let .start(sessionID, recipeID, revisionID, startedAt):
       try service.start(StartCookingSessionIntention(
         sessionID: sessionID,

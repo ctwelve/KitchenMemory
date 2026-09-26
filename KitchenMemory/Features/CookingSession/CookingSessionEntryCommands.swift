@@ -20,15 +20,14 @@ extension CookingSessionPresentationModel {
   @discardableResult
   func submitCurrentEntryDraft() -> Bool {
     guard let session = currentSession, session.lifecycle == .active,
-          let draft = currentEntryDraft, draft.isMeaningful,
-          prepareForNewCommand() else { return false }
-    return stageAndPerform(.submitEntry(
+          let draft = currentEntryDraft, draft.isMeaningful else { return false }
+    return submitCommand { .submitEntry(
       factID: SessionFact.ID(),
       sessionID: session.id,
       authoredAt: Date(),
       text: draft.text,
       target: draft.target
-    ))
+    ) }
   }
 
   @discardableResult
@@ -39,67 +38,62 @@ extension CookingSessionPresentationModel {
   ) -> Bool {
     guard let session = currentSession, session.lifecycle == .active,
           CookingSessionEntryDraft.isMeaningful(text),
-          session.knowsEntry(entryID),
-          prepareForNewCommand() else { return false }
-    return stageAndPerform(.reviseEntry(
+          session.knowsEntry(entryID) else { return false }
+    return submitCommand { .reviseEntry(
       factID: SessionFact.ID(),
       sessionID: session.id,
       authoredAt: Date(),
       entryID: entryID,
       text: text,
       target: target
-    ))
+    ) }
   }
 
   @discardableResult
   func retargetEntry(_ entryID: SessionEntry.ID, to target: SessionProgressTarget?) -> Bool {
     guard let session = currentSession, session.lifecycle == .active,
-          session.entries.contains(where: { $0.id == entryID }),
-          prepareForNewCommand() else { return false }
-    return stageAndPerform(.retargetEntry(
+          session.entries.contains(where: { $0.id == entryID }) else { return false }
+    return submitCommand { .retargetEntry(
       factID: SessionFact.ID(),
       sessionID: session.id,
       authoredAt: Date(),
       entryID: entryID,
       target: target
-    ))
+    ) }
   }
 
   @discardableResult
   func withdrawEntry(_ entryID: SessionEntry.ID) -> Bool {
     guard let session = currentSession, session.lifecycle == .active,
-          session.knowsEntry(entryID),
-          prepareForNewCommand() else { return false }
-    return stageAndPerform(.withdrawEntry(
+          session.knowsEntry(entryID) else { return false }
+    return submitCommand { .withdrawEntry(
       factID: SessionFact.ID(),
       sessionID: session.id,
       authoredAt: Date(),
       entryID: entryID
-    ))
+    ) }
   }
 
   @discardableResult
   func setOutcome(_ outcome: SessionOutcome) -> Bool {
-    guard let session = currentSession, session.lifecycle == .active,
-          prepareForNewCommand() else { return false }
-    return stageAndPerform(.setOutcome(
+    guard let session = currentSession, session.lifecycle == .active else { return false }
+    return submitCommand { .setOutcome(
       factID: SessionFact.ID(),
       sessionID: session.id,
       authoredAt: Date(),
       outcome: outcome
-    ))
+    ) }
   }
 
   @discardableResult
   func clearOutcome() -> Bool {
     guard let session = currentSession, session.lifecycle == .active,
-          session.outcome != nil || session.hasOutcomeConflict,
-          prepareForNewCommand() else { return false }
-    return stageAndPerform(.clearOutcome(
+          session.outcome != nil || session.hasOutcomeConflict else { return false }
+    return submitCommand { .clearOutcome(
       factID: SessionFact.ID(),
       sessionID: session.id,
       authoredAt: Date()
-    ))
+    ) }
   }
 
   @discardableResult
@@ -141,12 +135,11 @@ extension CookingSessionPresentationModel {
   @discardableResult
   func continueDetachedEntryDraft() -> Bool {
     guard let draft = detachedEntryDraft else { return false }
-    guard prepareForNewCommand() else { return false }
-    return stageAndPerform(.continueSession(
+    return submitCommand { .continueSession(
       sessionID: CookingSession.ID(),
       sourceSessionID: draft.sessionID,
       startedAt: Date()
-    ))
+    ) }
   }
 }
 

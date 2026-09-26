@@ -27,18 +27,10 @@ struct CookingSessionOutbox {
     queue.isEmpty
   }
 
-  func contains(_ command: PendingCookingSessionCommand) -> Bool {
-    queue.contains(command)
-  }
-
   func allSatisfy(
     _ predicate: (PendingCookingSessionCommand) throws -> Bool
   ) rethrows -> Bool {
     try queue.allSatisfy(predicate)
-  }
-
-  mutating func replace(with command: PendingCookingSessionCommand) {
-    queue = [command]
   }
 
   mutating func enqueue(_ command: PendingCookingSessionCommand) {

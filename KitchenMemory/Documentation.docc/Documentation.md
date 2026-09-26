@@ -15,6 +15,9 @@ For a first safari through the source, follow the runtime from
 to ``PreparedApp``. Once preparation succeeds, ``ContentView`` presents two
 observable projections: ``RecipeLibraryModel`` for maintained recipes and
 ``CookingSessionPresentationModel`` for cooking activity and history.
+Its app-owned ``CookingSessionDelivery`` owns pending command storage, ordered
+retry, and acceptance-required Entry draft effects. Presentation consumes
+results and owns navigation and dialogs.
 
 ```text
 KitchenMemoryApp
@@ -43,6 +46,7 @@ Cooking Session lifecycle from process state.
 
 - ``RecipeLibraryModel``
 - ``CookingSessionPresentationModel``
+- ``CookingSessionDelivery``
 
 ### Application Resources and Preferences
 
