@@ -23,7 +23,7 @@ separately scoped development utilities.
 | Milestone records | [History](history.md), with completed records linked at a Git commit | Candidate results, release notes, completed plans and explicit omissions |
 | Code entry points | Existing application and KitchenKit DocC catalogs | Symbols, ownership, and a short newcomer tour |
 | Agent workflow | `AGENTS.md` routing to `docs/agents/` | Conditional instructions loaded for the current task |
-| Skill library | `.agents/skills/`; `skills/` is a compatibility link | One maintained copy of workflow skills and references |
+| Skill library | `.agents/skills/` | Workflow skills and references for agents |
 
 New top-level guidance belongs in the map or history index. New decisions and
 research belong in their respective indexes. Every repository-authored Markdown
@@ -50,7 +50,7 @@ ruby Tools/check-documentation.rb
 Xcode Cloud's post-clone verification runs both before dependencies execute.
 The checker covers root Markdown, `docs/`, tool READMEs, and the two DocC maps.
 It checks local file links and ATX heading fragments, reference definitions,
-reachability, index classification, and the single skill-tree alias. Fenced
+reachability, and index classification. Fenced
 examples, inline code, and DocC symbol references are not Markdown file links.
 External URLs are deliberately not fetched. Skill-internal templates are not
 repository-authored documentation and have their own workflow semantics.
