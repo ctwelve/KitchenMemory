@@ -15,6 +15,8 @@ GPLv3 distribution and internal-framework-linkage research are historical after
 ADRs 0015 and 0012. The Cloud UI activation investigation remains relevant while
 [Cloud UI tests are suspended](../continuous-integration.md#cloud-ui-testing).
 
+- [Application-operation undo and redo proposal](application-undo-policy.md)
+- [Native undo facilities and helper-framework evaluation](native-undo-facilities.md)
 - [Alamofire for recipe retrieval](alamofire-for-recipe-retrieval.md)
 - [Allergen awareness and substitution assistance](allergen-awareness-and-substitution.md)
 - [CloudKit production schema evolution and container replacement](cloudkit-production-schema-evolution.md)
