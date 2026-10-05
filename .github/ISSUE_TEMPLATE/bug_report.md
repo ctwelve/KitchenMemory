@@ -1,38 +1,36 @@
 ---
 name: Bug report
-about: Create a report to help us improve
+about: Report a reproducible problem with Kitchen Memory
 title: ''
 labels: ''
 assignees: ''
 
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+<!--
+Kitchen Memory
+Copyright © 2026 the Kitchen Memory contributors.
+SPDX-License-Identifier: MIT
+-->
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+**Before submitting**
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+- Search existing issues for the same problem.
+- Do not include private recipes, account details, or other personal information.
+- Report suspected security vulnerabilities privately as described in [the Security Policy](https://github.com/ctwelve/KitchenMemory/blob/main/SECURITY.md), not in a public issue.
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+**What happened?**
+Describe the problem and what you expected to happen.
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
+**Steps to reproduce**
+- Step 1:
+- Step 2:
+- Step 3:
 
-**Smartphone (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
+**Environment**
+- Kitchen Memory version or commit:
+- Device and model:
+- OS version:
 
 **Additional context**
-Add any other context about the problem here.
+Add any other context. If you attach a screenshot or log, remove private recipe and account data first.
