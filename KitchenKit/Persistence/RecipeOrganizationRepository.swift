@@ -5,9 +5,13 @@
 import Foundation
 import SwiftData
 
+/// Main-actor boundary for Kitchen organization reads and atomic batch acceptance.
 @MainActor
 public protocol RecipeOrganizationRepository {
+  /// Reads Folder and Tag domain projections for the Kitchen; invalid evidence throws.
   func load(in kitchenID: Kitchen.ID) throws -> RecipeOrganization
+  /// Accepts a frozen organization batch and optional first Recipe Save in one local transaction.
+  /// The batch and child receipts preserve exact retry; changed command reuse throws.
   func accept(_ command: RecipeOrganizationCommand, firstSave: RecipeSaveCommand?) throws
 }
 
@@ -16,13 +20,18 @@ public protocol RecipeOrganizationRepository {
 public final class SwiftDataRecipeOrganizationRepository: RecipeOrganizationRepository {
   private let container: ModelContainer
 
+  /// Binds the shared container used for Folder, Tag, receipt, and optional first-Save acceptance.
   public init(modelContainer: ModelContainer) { container = modelContainer }
 
+  /// Reconstructs the Kitchen's Folder and Tag organization from local evidence.
   public func load(in kitchenID: Kitchen.ID) throws -> RecipeOrganization {
     try RecipeOrganization(folders: SwiftDataFolderRepository(modelContainer: container).library(in: kitchenID),
                            tags: SwiftDataTagRepository(modelContainer: container).library(in: kitchenID))
   }
 
+  /// Atomically accepts assignments, their batch receipt, and an optional zero-parent Recipe Save.
+  /// Scope mismatches, changed receipt digests, invalid replay, or persistence failures throw.
+  /// Success establishes local durability while remote delivery may remain partial.
   public func accept(_ command: RecipeOrganizationCommand, firstSave: RecipeSaveCommand? = nil) throws {
     guard command.folders.allSatisfy({ $0.kitchenID == command.kitchenID }),
           command.tags.allSatisfy({ $0.kitchenID == command.kitchenID }) else { throw FolderError.wrongKitchen }

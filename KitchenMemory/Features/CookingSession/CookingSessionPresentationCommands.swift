@@ -89,6 +89,7 @@ extension CookingSessionPresentationModel {
     ) }
   }
 
+  /// Consumes delivery results without minting replacement intention identities.
   func retryPendingCommands() {
     consume(delivery.retry())
   }
@@ -149,6 +150,10 @@ extension CookingSessionPresentationModel {
     }
   }
 
+  /// Requests navigation after delivery has already applied acceptance effects.
+  ///
+  /// Leaving an editor can be vetoed. That veto preserves its destination but
+  /// does not undo the accepted Session command or re-stage its retired identity.
   func applySelection(
     for session: CookingSessionProjection,
     pending: PendingCookingSessionCommand
@@ -171,6 +176,10 @@ extension CookingSessionPresentationModel {
     }
   }
 
+  /// Overlays pending activity for display while retaining the evidence-derived lifecycle.
+  ///
+  /// This value is an optimistic projection, not a repository write or proof of
+  /// acceptance. The immutable Execution Snapshot remains the cooking baseline.
   func applyingPendingCommands(
     to session: CookingSessionProjection
   ) -> CookingSessionProjection {

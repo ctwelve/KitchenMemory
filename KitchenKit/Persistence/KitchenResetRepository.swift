@@ -8,6 +8,8 @@ import SwiftData
 /// One atomic persistence boundary for returning a Kitchen to bundled samples.
 @MainActor
 public protocol KitchenResetRepository: AnyObject {
+  /// Atomically replaces this Kitchen's durable contents with explicitly supplied Recipes.
+  /// Callers own separate device-local draft and delivery cleanup before invoking reset.
   func reset(kitchenID: Kitchen.ID, to recipes: [StoredRecipe]) throws
 }
 
@@ -16,10 +18,14 @@ public protocol KitchenResetRepository: AnyObject {
 public final class SwiftDataKitchenResetRepository: KitchenResetRepository {
   private let modelContainer: ModelContainer
 
+  /// Binds the container whose Recipe, Session, and organization records the reset owns.
   public init(modelContainer: ModelContainer) {
     self.modelContainer = modelContainer
   }
 
+  /// Replaces Recipe authority and payload, and erases Session and organization evidence in one local transaction.
+  /// Validates supplied Recipes before replacement; failure rolls back the transaction.
+  /// Kitchen identity remains retained, and local editing/delivery documents are caller-owned.
   public func reset(kitchenID: Kitchen.ID, to recipes: [StoredRecipe]) throws {
     let context = ModelContext(modelContainer)
     let recipeRepository = SwiftDataRecipeRepository(context: context)
@@ -71,6 +77,8 @@ final class RecipeOnlyKitchenResetRepository: KitchenResetRepository {
     self.repository = repository
   }
 
+  /// Atomically replaces this Kitchen's durable contents with explicitly supplied Recipes.
+  /// Callers own separate device-local draft and delivery cleanup before invoking reset.
   func reset(kitchenID: Kitchen.ID, to recipes: [StoredRecipe]) throws {
     try repository.replaceRecipes(in: kitchenID, with: recipes)
   }

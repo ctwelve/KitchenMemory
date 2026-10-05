@@ -5,7 +5,16 @@
 import KitchenKit
 import SwiftUI
 
-/// A retired Kit editing lifetime gets a fresh native control, so delayed callbacks stay retired.
+/// Hosts the native ingredient editor for one KitchenKit editing lifetime.
+///
+/// SwiftUI's representable callbacks create, update, and dismantle the control;
+/// AppKit or UIKit then calls its coordinator for typing, selection, and paste.
+/// The two explicit identities rebuild the control when either the draft or its
+/// Kit editing lifetime changes. Old callbacks retain the retired interface,
+/// never a lookup that could accidentally reach the replacement editor.
+///
+/// See [AppKit integration](https://developer.apple.com/tutorials/app-dev-training/integrating-appkit)
+/// for the representable/coordinator lifecycle.
 struct NativeIngredientText: View {
   @Bindable var draft: RecipeEditingDraft
   let actions: IngredientTextActions
@@ -25,6 +34,8 @@ private struct NativeIngredientTextView: NSViewRepresentable {
   let actions: IngredientTextActions
   @Environment(\.locale) private var locale
 
+  // SwiftUI creates a coordinator for this representable identity, keeping
+  // delegate state outside the short-lived SwiftUI view value.
   func makeCoordinator() -> IngredientTextCoordinator { .init(draft: draft, locale: locale) }
 
   func makeNSView(context: Context) -> NSScrollView {
@@ -40,6 +51,9 @@ private struct NativeIngredientTextView: NSViewRepresentable {
     text.textContainerInset = NSSize(width: 8, height: 8)
     text.setAccessibilityLabel(LocalizedStringResource.recipeEditorIngredientsSection.localized(for: locale))
     text.setAccessibilityIdentifier("simple-ingredient-text")
+    // The command bridge outlives individual native updates. Weak captures
+    // avoid retaining a removed text view; responder activation and insertion
+    // leave selection and undo grouping under the native text system.
     actions.addSection = { [weak text, weak coordinator = context.coordinator] title in
       guard let text, let coordinator, coordinator.editing.isActive else { return }
       text.window?.makeFirstResponder(text)
@@ -54,6 +68,8 @@ private struct NativeIngredientTextView: NSViewRepresentable {
     context.coordinator.locale = locale
     guard let text = scroll.documentView as? NSTextView else { return }
     let document = context.coordinator.document
+    // Ordinary typing already matches Kit. A mismatched model replacement
+    // invalidates native history rather than applying old undo to new contents.
     if text.string != document.text {
       text.undoManager?.removeAllActions()
       text.string = document.text
@@ -62,6 +78,7 @@ private struct NativeIngredientTextView: NSViewRepresentable {
   }
 
   static func dismantleNSView(_ scroll: NSScrollView, coordinator: IngredientTextCoordinator) {
+    // Teardown retires semantic history and disconnects delayed native input.
     coordinator.end()
     guard let text = scroll.documentView as? NSTextView else { return }
     text.delegate = nil
@@ -81,6 +98,8 @@ private final class IngredientPasteTextView: NSTextView {
   }
 }
 
+// AppKit calls shouldChange before applying the text replacement. Mirror the
+// UTF-16 operation into Kit first; reject callbacks from an obsolete source.
 extension IngredientTextCoordinator: NSTextViewDelegate {
   func textView(_ textView: NSTextView, shouldChangeTextIn affectedCharRange: NSRange,
                 replacementString: String?) -> Bool {
@@ -89,6 +108,8 @@ extension IngredientTextCoordinator: NSTextViewDelegate {
                    undoing: textView.undoManager?.isUndoing == true, redoing: textView.undoManager?.isRedoing == true)
   }
 
+  // Marked text is provisional IME composition. Avoid restyling it or treating
+  // a composition-driven selection move as completion of the active line.
   func textDidChange(_ notification: Notification) {
     guard let text = notification.object as? NSTextView, !text.hasMarkedText(),
           let storage = text.textStorage else { return }
@@ -101,6 +122,8 @@ extension IngredientTextCoordinator: NSTextViewDelegate {
   func textViewDidChangeSelection(_ notification: Notification) {
     guard !applyingAttributes, let text = notification.object as? NSTextView,
           !text.hasMarkedText(), text.string == document.text else { return }
+    // Moving the caret completes other lines while preserving the active line
+    // as pending. Native offsets and Kit's text ranges both use UTF-16 units.
     finish(excluding: text.selectedRange().location)
   }
 
@@ -114,6 +137,8 @@ private struct NativeIngredientTextView: UIViewRepresentable {
   let actions: IngredientTextActions
   @Environment(\.locale) private var locale
 
+  // As on macOS, the coordinator retains one Kit interface for this control,
+  // while SwiftUI may recreate and update the representable value many times.
   func makeCoordinator() -> IngredientTextCoordinator { .init(draft: draft, locale: locale) }
 
   func makeUIView(context: Context) -> UITextView {
@@ -127,6 +152,9 @@ private struct NativeIngredientTextView: UIViewRepresentable {
     text.pasteDelegate = context.coordinator
     text.accessibilityLabel = LocalizedStringResource.recipeEditorIngredientsSection.localized(for: locale)
     text.accessibilityIdentifier = "simple-ingredient-text"
+    // The command bridge outlives individual native updates. Weak captures
+    // avoid retaining a removed text view; responder activation and insertion
+    // leave selection and undo grouping under the native text system.
     actions.addSection = { [weak text, weak coordinator = context.coordinator] title in
       guard let text, let coordinator, coordinator.editing.isActive else { return }
       text.becomeFirstResponder()
@@ -142,6 +170,8 @@ private struct NativeIngredientTextView: UIViewRepresentable {
   func updateUIView(_ text: UITextView, context: Context) {
     context.coordinator.locale = locale
     let document = context.coordinator.document
+    // Model-driven replacement is not another keystroke: old native undo
+    // actions refer to the previous contents and must be retired first.
     if text.text != document.text {
       text.undoManager?.removeAllActions()
       text.text = document.text
@@ -150,6 +180,7 @@ private struct NativeIngredientTextView: UIViewRepresentable {
   }
 
   static func dismantleUIView(_ text: UITextView, coordinator: IngredientTextCoordinator) {
+    // Teardown retires semantic history and disconnects delayed native input.
     coordinator.end()
     text.delegate = nil
     text.pasteDelegate = nil
@@ -173,7 +204,11 @@ extension IngredientTextCoordinator: UITextPasteDelegate {
     return insertedRange
   }
 
-  /// Programmatic UITextInput insertion does not deliver shouldChangeTextIn like keyboard input does.
+  /// Mirrors programmatic native insertion even if the keyboard delegate path is skipped.
+  ///
+  /// Paste and Add Section enter here. Capture the pre-edit source and native
+  /// range before insertion, then submit the same operation to Kit. If UIKit
+  /// also sent the delegate callback, source validation rejects the duplicate.
   func insertText(_ replacement: String, into text: UITextView, replacing range: UITextRange) {
     guard editing.isActive else { return }
     let source = text.text ?? ""
@@ -187,6 +222,8 @@ extension IngredientTextCoordinator: UITextPasteDelegate {
   }
 }
 
+// UIKit keyboard edits enter before the native replacement through this
+// delegate. The captured Kit interface validates its lifetime and pre-edit text.
 extension IngredientTextCoordinator: UITextViewDelegate {
   func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
     guard !applyingAttributes else { return true }
@@ -194,6 +231,8 @@ extension IngredientTextCoordinator: UITextViewDelegate {
                    undoing: textView.undoManager?.isUndoing == true, redoing: textView.undoManager?.isRedoing == true)
   }
 
+  // Do not decorate provisional multistage input. UIKit owns the marked range
+  // until the person commits it; selection completion below uses the same guard.
   func textViewDidChange(_ textView: UITextView) {
     guard textView.markedTextRange == nil else { return }
     observeNativeUndo(textView.undoManager) { [weak textView] in textView?.text }
@@ -205,6 +244,8 @@ extension IngredientTextCoordinator: UITextViewDelegate {
   func textViewDidChangeSelection(_ textView: UITextView) {
     guard !applyingAttributes, textView.markedTextRange == nil,
           textView.text == document.text else { return }
+    // Complete departed lines, leaving the line containing the native caret
+    // pending; Swift Character counts would not match these UTF-16 offsets.
     finish(excluding: textView.selectedRange.location)
   }
 

@@ -9,74 +9,43 @@ import Foundation
 
 /// Validation failures for the initial text-first editor.
 public enum RecipeEditorError: Error, Equatable {
+  /// The draft title is blank after trimming whitespace and newlines.
   case missingTitle
+  /// The Recipe to revise cannot be read as current maintained content.
   case missingRecipe
 }
 
-/// A high-level, main-actor–bound coordinator for creating and revising recipes.
+/// Prepares immutable Recipe revisions and accepts explicit Saves through a repository.
 ///
-/// RecipeEditor encapsulates the domain logic required to transform an editable
-/// in-memory draft (RecipeDraft) into an immutable RecipeRevision and persist it
-/// alongside its parent Recipe. It ensures that user-entered text is normalized,
-/// empty fields are discarded, and section/child identifiers are handled safely
-/// across revisions.
+/// Ordinary saves trim optional text and remove empty content while retaining
+/// structured uncertainty. Each revised section, ingredient, step, and equipment
+/// row receives a revision-local identity; media references retain their identity.
+/// Nil media or equipment in legacy drafts preserves the prior collection.
+/// Reconciliation preserves untouched authored values rather than normalizing them.
 ///
-/// Responsibilities:
-/// - Validates essential fields (for example, non-empty title) and surfaces
-///   domain-specific validation failures via RecipeEditorError.
-/// - Normalizes and cleans draft content by trimming whitespace, removing empty
-///   sections/steps/ingredients, and stripping placeholder values.
-/// - Creates a new Recipe with its initial revision, or appends a new immutable
-///   revision to an existing Recipe while preserving non-authored metadata
-///   (e.g., cuisines, categories, keywords, media, equipment).
-/// - Prevents identifier collisions across revisions by re-identifying section
-///   and child entities when creating subsequent revisions.
-///
-/// Concurrency:
-/// - Constrained to the main actor because it is typically driven by UI flows
-///   and interacts with UI-owned state. Persistence calls should be designed to
-///   be main-actor–safe by the repository implementation.
-///
-/// Persistence:
-/// - Delegates storage and retrieval to an injected RecipeRepository, allowing
-///   the editor to remain platform- and storage-agnostic.
-///
-/// Typical usage:
-/// - Build a RecipeDraft from user input or an existing RecipeRevision.
-/// - Call create(in:from:) to persist an entirely new Recipe with its initial
-///   revision.
-/// - Call revise(recipeID:from:) to append a new revision to an existing Recipe,
-///   preserving non-authored metadata and re-identifying section/child content.
-///
-/// Errors:
-/// - Throws RecipeEditorError.missingTitle when the draft lacks a valid title.
-/// - Throws RecipeEditorError.missingRecipe when attempting to revise a recipe
-///   that cannot be found in the repository.
-///
-/// Testing considerations:
-/// - Provide a test double for RecipeRepository to verify that the editor emits
-///   the expected Recipe and RecipeRevision given a draft, including cleanup of
-///   whitespace and removal of empty sections/steps/ingredients.
-/// - Assert that follow-up revisions preserve non-authored metadata and do not
-///   reuse section/child identifiers from previous revisions.
-///
-/// Dependencies:
-/// - Domain values such as Recipe and RecipeRevision.
-/// - The RecipeRepository seam for storage operations.
+/// The main actor follows the repository's actor-bound persistence contract.
+/// A prepared command writes nothing: callers needing recoverable publication
+/// retain it locally before acceptance and retry that identical command.
 @MainActor
 public struct RecipeEditor {
   private let repository: any RecipeRepository
 
+  /// Binds revision preparation and acceptance to a main-actor Recipe repository.
   public init(repository: any RecipeRepository) {
     self.repository = repository
   }
 
+  /// Prepares and accepts a new Recipe with a zero-parent revision and initial Selection.
+  /// Throws title validation or repository errors; every invocation creates a new command.
   public func create(in kitchenID: Kitchen.ID, from draft: RecipeDraft) throws -> StoredRecipe {
     let command = try prepareSave(in: kitchenID, from: draft, original: nil, observedSelectionIDs: [])
     try repository.save(command)
     return StoredRecipe(recipe: command.recipe, revision: command.revision)
   }
 
+  /// Reads the current Recipe and Selection frontier, then accepts a new child revision.
+  /// Throws for missing Recipe, invalid title, or repository failure. Use a retained
+  /// prepared Save when the operation must survive an uncertain acceptance or relaunch.
   public func revise(recipeID: Recipe.ID, from draft: RecipeDraft) throws -> StoredRecipe {
     guard let stored = try repository.recipe(id: recipeID) else {
       throw RecipeEditorError.missingRecipe

@@ -9,6 +9,12 @@ import Observation
 /// Owns device-local staging, ordered retry, and retirement. The existing store
 /// provides its usual guarantees; this does not imply synchronized delivery or
 /// stronger crash durability than UserDefaults offers.
+///
+/// ``CookingSessionPresentationModel`` invokes this owner from user actions,
+/// first load, explicit retry, and external-store refresh. Commands are stored
+/// with final identities before submission; accepted Entry draft effects are
+/// stored before retirement. These steps permit the same intention to be retried
+/// if service acceptance succeeds before local retirement is recorded.
 @MainActor
 @Observable
 final class CookingSessionDelivery {
@@ -85,6 +91,12 @@ final class CookingSessionDelivery {
     return Report(requested: command, events: retry())
   }
 
+  /// Drains the FIFO until the first unresolved result, preserving exact identities.
+  ///
+  /// Acceptance applies draft effects before removing the head. Terminal
+  /// classifications also retire the head; attention and thrown failures leave
+  /// it pending and stop later work from overtaking it. Returned events let
+  /// presentation choose dialogs and navigation after delivery is resolved.
   func retry() -> [Event] {
     var events: [Event] = []
     while let pending = outbox.head {
@@ -95,6 +107,8 @@ final class CookingSessionDelivery {
           events.append(.failed(pending, .attention(attention)))
           return events
         }
+        // Navigation happens later in the report consumer. A window veto there
+        // cannot roll back acceptance or put this retired identity back in the FIFO.
         if case .accepted(let session) = resolution {
           applyDraftAcceptance(for: pending, session: session)
         }

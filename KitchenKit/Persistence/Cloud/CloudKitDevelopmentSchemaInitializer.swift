@@ -18,6 +18,10 @@ public enum CloudKitDevelopmentSchemaInitializer {
     case persistentStoreUnavailable
   }
 
+  /// Explicitly initializes the additive Development schema using the current generated model.
+  /// Run before constructing the ordinary SwiftData container for this store; Core Data
+  /// temporarily owns and then unloads it. Available only in Develop macOS builds.
+  /// Model generation, store loading, initialization, or unloading failures throw.
   public static func initialize(containerIdentifier: String) throws {
     try autoreleasepool {
       let schema = Schema(versionedSchema: CurrentKitchenMemorySchema.self)

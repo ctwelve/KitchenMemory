@@ -16,6 +16,9 @@ public final class PersistentStoreChangeObserver: NSObject {
   private let notificationCenter: NotificationCenter
   private let onChange: @MainActor () -> Void
 
+  /// Observes generic remote-store changes and delivers refresh callbacks on the main actor.
+  /// Retain the observer while refresh work is needed; deinitialization removes observation.
+  /// Notifications are unfiltered hints to reread evidence, not proof of record delivery.
   public init(
     notificationCenter: NotificationCenter = .default,
     onChange: @escaping @MainActor () -> Void

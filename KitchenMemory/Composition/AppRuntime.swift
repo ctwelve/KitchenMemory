@@ -29,6 +29,10 @@ struct AppLaunchInputs {
   }
 }
 
+/// Resolved launch policy shared by every dependency in a prepared graph.
+///
+/// Resolution happens before opening a store, so tests, local launches, and
+/// personal-cloud launches cannot accidentally select inconsistent adapters.
 struct AppLaunchPlan: Equatable {
   enum Store: Equatable {
     case inMemory
@@ -137,6 +141,11 @@ enum AppRuntime {
     var sessionPresentationStore: (any CookingSessionPresentationStoring)?
   }
 
+  /// Prepares the live graph when ``AppStartupCoordinator`` starts an attempt.
+  ///
+  /// Preferences select transport before a container exists; owner resolution
+  /// then precedes Kitchen bootstrap and feature-model construction. Failures
+  /// become privacy-safe startup state through ``AppStartupState/prepare(using:)``.
   static func prepare() async -> AppStartupState {
     await AppStartupState.prepare {
       let inputs = AppLaunchInputs.current
@@ -182,6 +191,10 @@ enum AppRuntime {
     }
   }
 
+  /// Builds a disposable graph for previews and tests with injectable local stores.
+  ///
+  /// This uses the same composition path as a live launch, with an in-memory
+  /// container and a stable test owner instead of account lookup.
   static func testing(
     _ configuration: TestingConfiguration = TestingConfiguration()
   ) throws -> PreparedApp {
@@ -224,6 +237,11 @@ enum AppRuntime {
   }
 }
 
+/// The store and KitchenKit services constructed before store/cloud observers attach.
+///
+/// ``PreparedApp`` adds Session presentation and retains the finished graph.
+/// This intermediate value keeps bootstrap order in one place rather than
+/// letting each feature create its own container or Kitchen identity.
 @MainActor
 struct PreparedCore {
   let kitchenID: Kitchen.ID

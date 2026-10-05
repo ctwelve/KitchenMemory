@@ -5,17 +5,37 @@
 import CryptoKit
 import Foundation
 
+// These related public values and their caller contracts form one domain boundary.
+// Keep their documentation beside the declarations rather than splitting the contract.
+// swiftlint:disable file_length
+
 /// A caller-owned command choosing which accepted Recipe Revision is current.
 public struct RecipeSelectionCommand: Codable, Equatable, Sendable {
+  /// A domain-typed stable UUID identity, independent of persistence record identity.
   public typealias ID = StableIdentifier<RecipeSelectionCommand>
 
+  /// The caller-owned immutable operation identity.
+  ///
+  /// Exact retries reuse it with identical content; conflicting reuse requires rejection
+  /// or recovery rather than another accepted effect.
   public let id: ID
+  /// The Kitchen ownership boundary for this value; transport identity cannot substitute for it.
   public let kitchenID: Kitchen.ID
+  /// The stable maintained Recipe identity, independent of a particular Revision.
   public let recipeID: Recipe.ID
+  /// The existing accepted Revision chosen for presentation.
   public let selectedRevisionID: RecipeRevision.ID
+  /// The authored choice date; competing choices are resolved causally rather than by this clock.
   public let selectedAt: Date
+  /// The complete prior Selection frontier observed when the choice was prepared.
+  ///
+  /// Retain this frontier on retry; a concurrent unobserved choice can remain competing.
   public let observedSelectionIDs: [ID]
 
+  /// Freezes a selection intention with caller-owned identity and observed context.
+  ///
+  /// Retain the whole value for retry; construction does not verify that its Revision
+  /// is accepted or that the supplied frontier is complete.
   public init(
     id: ID = ID(),
     kitchenID: Kitchen.ID,
@@ -35,15 +55,29 @@ public struct RecipeSelectionCommand: Codable, Equatable, Sendable {
 
 /// One retry-safe intention to append immutable Recipe content and select it.
 public struct RecipeSaveCommand: Codable, Equatable, Sendable {
+  /// A domain-typed stable UUID identity, independent of persistence record identity.
   public typealias ID = StableIdentifier<RecipeSaveCommand>
 
+  /// The caller-owned immutable operation identity.
+  ///
+  /// Exact retries reuse it with identical content; conflicting reuse requires rejection
+  /// or recovery rather than another accepted effect.
   public let id: ID
+  /// The stable aggregate receiving the new immutable content.
   public let recipe: Recipe
+  /// The complete content accepted by this Save, with its caller-owned Revision identity.
   public let revision: RecipeRevision
+  /// The authored Save date, retained across retries and excluded from currentness decisions.
   public let savedAt: Date
+  /// The explicit complete ancestry of this Revision; empty means a root, multiple means reconciliation.
   public let parentRevisionIDs: [RecipeRevision.ID]
+  /// The paired immutable choice selecting the saved Revision against observed prior selections.
   public let selection: RecipeSelectionCommand
 
+  /// Freezes content, ancestry, and Selection as one retryable publication intention.
+  ///
+  /// Construction does not validate ownership or cross-field consistency; acceptance
+  /// belongs to the repository and must retain these identities on retry.
   public init(
     id: ID = ID(),
     recipe: Recipe,
@@ -61,21 +95,35 @@ public struct RecipeSaveCommand: Codable, Equatable, Sendable {
   }
 }
 
+/// A failure to read the frozen Recipe authority byte representation.
+///
+/// Unknown versions can become available to a newer reader; malformed or noncanonical
+/// bytes are positive integrity failures rather than partially usable evidence.
 public enum RecipeAuthorityCodecError: Error, Equatable {
+  /// The byte layout or decoded content cannot represent the declared format.
   case malformedData
+  /// The value decodes but its bytes violate canonical ordering, uniqueness, or re-encoding.
   case noncanonicalData
+  /// The declared version is unknown to this reader; retain its bytes for a future reader.
   case unsupportedFormat(Int)
 }
 
+/// A format-tagged canonical UUID set ready for an authority envelope.
 public struct EncodedRecipeIdentifierSet: Equatable, Sendable {
+  /// The frozen codec version interpreting these bytes.
   public let formatVersion: Int
+  /// The canonical bytes to persist unchanged in the authority envelope.
   public let data: Data
 }
 
 /// Canonical format-1 sets are sorted raw UUID bytes with no delimiters.
 public enum RecipeIdentifierSetCodec {
+  /// The supported raw UUID set format, currently version 1.
   public static let formatVersion = 1
 
+  /// Deduplicates UUIDs, sorts their raw bytes, and concatenates them without delimiters.
+  ///
+  /// An empty set encodes to empty data; input order carries no authority.
   public static func encode(_ identifiers: [UUID]) -> EncodedRecipeIdentifierSet {
     let bytes = Set(identifiers).map(uuidBytes).sorted(by: lexicographicallyPrecedes)
     return EncodedRecipeIdentifierSet(
@@ -84,6 +132,9 @@ public enum RecipeIdentifierSetCodec {
     )
   }
 
+  /// Reads a format-1 set without repairing retained evidence.
+  ///
+  /// Throws for unknown versions, non-16-byte alignment, duplicates, or unsorted bytes.
   public static func decode(formatVersion: Int, data: Data) throws -> [UUID] {
     guard formatVersion == self.formatVersion else {
       throw RecipeAuthorityCodecError.unsupportedFormat(formatVersion)
@@ -106,14 +157,26 @@ public enum RecipeIdentifierSetCodec {
 
 /// The exact ordered payload rows needed to reconstruct one Recipe Revision.
 public struct RecipePayloadManifest: Equatable, Sendable {
+  /// The root Revision whose ordered child identities this manifest commits.
   public let revisionID: RecipeRevision.ID
+  /// Media identities in authored order, including references whose bytes are unavailable.
   public let mediaIDs: [RecipeMedia.ID]
+  /// Equipment row identities in authored order.
   public let equipmentIDs: [EquipmentItem.ID]
+  /// Ingredient group identities in authored order.
   public let ingredientSectionIDs: [IngredientSection.ID]
+  /// Ingredient row identities flattened in section and row order.
   public let ingredientIDs: [RecipeIngredient.ID]
+  /// Instruction group identities in authored order.
   public let instructionSectionIDs: [InstructionSection.ID]
+  /// Instruction identities flattened in section and step order.
   public let instructionStepIDs: [InstructionStep.ID]
 
+  /// Captures the exact ordered identities needed to reconstruct the supplied Revision.
+  ///
+  /// Authored values and media references are committed by the canonical Revision
+  /// digest. Local image bytes are excluded; their integrity is checked against
+  /// the private content-addressed reference.
   public init(revision: RecipeRevision) {
     revisionID = revision.id
     mediaIDs = revision.media.map(\.id)
@@ -143,15 +206,22 @@ public struct RecipePayloadManifest: Equatable, Sendable {
   }
 }
 
+/// A format-tagged ordered payload manifest, without the payload values themselves.
 public struct EncodedRecipePayloadManifest: Equatable, Sendable {
+  /// The frozen codec version interpreting these bytes.
   public let formatVersion: Int
+  /// The canonical bytes to persist unchanged in the authority envelope.
   public let data: Data
 }
 
 /// Format 1 is the root UUID followed by six fixed-order, big-endian-counted UUID lists.
 public enum RecipePayloadManifestCodec {
+  /// The supported counted ordered-manifest format, currently version 1.
   public static let formatVersion = 1
 
+  /// Encodes the root UUID and six ordered child lists with big-endian counts.
+  ///
+  /// Order is authored content and is preserved; this method does not remove repeated IDs.
   public static func encode(_ manifest: RecipePayloadManifest) -> EncodedRecipePayloadManifest {
     var data = Data(uuidBytes(manifest.revisionID.rawValue))
     for identifiers in arrays(from: manifest) {
@@ -164,6 +234,10 @@ public enum RecipePayloadManifestCodec {
     return EncodedRecipePayloadManifest(formatVersion: formatVersion, data: data)
   }
 
+  /// Reads six ordered child lists while requiring a complete byte layout and unique IDs per family.
+  ///
+  /// Throws for unsupported versions, truncation, trailing bytes, or repeated identities;
+  /// it preserves list order rather than sorting it.
   public static func decode(formatVersion: Int, data: Data) throws -> RecipePayloadManifest {
     guard formatVersion == self.formatVersion else {
       throw RecipeAuthorityCodecError.unsupportedFormat(formatVersion)
@@ -209,11 +283,16 @@ public enum RecipePayloadManifestCodec {
 
 /// The compact authority retained when reconstructable Recipe payload is pruned.
 public struct RecipeAuthorityFrontier: Equatable, Sendable {
+  /// The maximal accepted Revision identities retained after pruning.
   public let revisionHeads: [RecipeRevision.ID]
+  /// The maximal Selection identities retained after pruning.
   public let selectionHeads: [RecipeSelectionCommand.ID]
+  /// Deletion identities covered by the compact authority evidence.
   public let deletionIDs: [UUID]
+  /// Restoration identities covered by the compact authority evidence.
   public let restorationIDs: [UUID]
 
+  /// Retains a proposed compact frontier; canonical set normalization occurs in its codec.
   public init(
     revisionHeads: [RecipeRevision.ID],
     selectionHeads: [RecipeSelectionCommand.ID],
@@ -227,16 +306,22 @@ public struct RecipeAuthorityFrontier: Equatable, Sendable {
   }
 }
 
+/// Canonical compact authority bytes and the SHA-256 digest committing them.
 public struct EncodedRecipeAuthorityFrontier: Equatable, Sendable {
+  /// The frozen codec version interpreting these bytes.
   public let formatVersion: Int
+  /// The canonical bytes to persist unchanged in the authority envelope.
   public let data: Data
+  /// SHA-256 of `data`, binding the retained envelope to these exact canonical bytes.
   public let digest: Data
 }
 
 /// Format 1 stores four fixed-order, counted canonical identifier sets.
 public enum RecipeAuthorityFrontierCodec {
+  /// The supported four-set compact frontier format, currently version 1.
   public static let formatVersion = 1
 
+  /// Deduplicates and sorts each frontier family, then commits the counted bytes with SHA-256.
   public static func encode(
     _ frontier: RecipeAuthorityFrontier
   ) -> EncodedRecipeAuthorityFrontier {
@@ -255,6 +340,10 @@ public enum RecipeAuthorityFrontierCodec {
     )
   }
 
+  /// Reads four canonical identifier sets without repairing duplicates or ordering.
+  ///
+  /// Throws for unsupported versions, malformed layout, repeated IDs, or noncanonical
+  /// bytes. Digest verification belongs to the containing evidence boundary.
   public static func decode(
     formatVersion: Int,
     data: Data
@@ -298,16 +387,25 @@ public enum RecipeAuthorityFrontierCodec {
   }
 }
 
+/// Canonical Recipe content bytes with their format version and SHA-256 commitment.
 public struct EncodedRecipeRevision: Equatable, Sendable {
+  /// The frozen codec version interpreting these bytes.
   public let formatVersion: Int
+  /// The canonical bytes to persist unchanged in the authority envelope.
   public let data: Data
+  /// SHA-256 of `data`, binding the retained envelope to these exact canonical bytes.
   public let digest: Data
 }
 
 /// Persistence-independent canonical bytes for complete Recipe Revision values.
 public enum RecipeRevisionCodec {
+  /// The supported canonical Recipe JSON format, currently version 1.
   public static let formatVersion = 1
 
+  /// Produces sorted-key canonical JSON and its SHA-256 digest.
+  ///
+  /// Optional local image bytes are removed from the encoded copy; authored references
+  /// and descriptions remain committed. Encoding errors propagate to the caller.
   public static func encode(_ revision: RecipeRevision) throws -> EncodedRecipeRevision {
     let encoder = JSONEncoder()
     encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
@@ -327,6 +425,10 @@ public enum RecipeRevisionCodec {
     )
   }
 
+  /// Reads only the supported canonical JSON representation and requires byte-identical re-encoding.
+  ///
+  /// Throws for unsupported versions, malformed content, or noncanonical bytes. It
+  /// does not validate Save ancestry or compare an external authority digest.
   public static func decode(formatVersion: Int, data: Data) throws -> RecipeRevision {
     guard formatVersion == self.formatVersion else {
       throw RecipeAuthorityCodecError.unsupportedFormat(formatVersion)
@@ -393,3 +495,5 @@ private extension Data {
     }
   }
 }
+
+// swiftlint:enable file_length

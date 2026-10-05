@@ -11,6 +11,11 @@ import SwiftUI
 /// uses compact navigation on iPhone. It routes already-derived presentation
 /// state; KitchenKit remains responsible for business behavior and durable
 /// Session lifecycle.
+///
+/// SwiftUI owns this view's `@State` storage for each window's view identity;
+/// repeated `body` evaluation does not recreate its presentation state. The
+/// supplied ``PreparedApp`` models are shared references, so an accepted
+/// destination changes across windows while dialogs and column layout stay local.
 struct ContentView: View {
   let startupState: AppStartupState
   let retryStartup: () -> Void
@@ -32,6 +37,9 @@ struct ContentView: View {
         phaseContent
       }
     }
+    // A view task runs when this shell appears and restarts when its phase
+    // changes. Multiple windows may invoke it; the retained models' load guards
+    // make initialization idempotent instead of tying data lifetime to a view.
     .task(id: shellPresentation) {
       preparedApp?.libraryModel.loadIfNeeded()
       preparedApp?.sessionModel.loadIfNeeded()
@@ -133,6 +141,9 @@ struct ContentView: View {
       preferredCompactColumn = LibraryNavigationPolicy.initialColumn(
         startup: startup, focus: dependencies.libraryModel.navigation.focus)
     }
+    // Other windows observe accepted destination changes here. An explicit
+    // repeat action also applies focus through this window's command closure,
+    // because an unchanged destination does not trigger this onChange callback.
     .onChange(of: dependencies.libraryModel.navigation.destination) { _, _ in
       applyAcceptedNavigationFocus()
     }

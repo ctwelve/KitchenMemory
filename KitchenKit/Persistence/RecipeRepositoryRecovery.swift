@@ -6,6 +6,8 @@ import Foundation
 import SwiftData
 
 extension SwiftDataRecipeRepository {
+  /// Reads unavailable or invalid authority and independently decodable recovery payloads.
+  /// Competing Selections use reconciliation; malformed payloads are not offered as recovered content.
   public func recoveryRecipes(in kitchenID: Kitchen.ID) throws -> [RecipeRecovery] {
     try recipeIdentifiers(in: kitchenID.rawValue).compactMap { identifier in
       let id = Recipe.ID(rawValue: identifier)

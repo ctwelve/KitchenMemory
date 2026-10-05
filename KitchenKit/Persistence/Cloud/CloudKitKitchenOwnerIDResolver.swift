@@ -8,10 +8,14 @@ import CloudKit
 public struct CloudKitKitchenOwnerIDResolver: Sendable {
   private let containerIdentifier: String
 
+  /// Selects the CloudKit container whose opaque current-account record establishes owner scope.
   public init(containerIdentifier: String) {
     self.containerIdentifier = containerIdentifier
   }
 
+  /// Resolves an opaque owner identity scoped to this container and current CloudKit account.
+  /// Throws account or CloudKit failures rather than inventing a local owner; no person-facing
+  /// name or contact information is returned.
   public func ownerID() async throws -> KitchenOwner.ID {
     let recordID = try await CKContainer(identifier: containerIdentifier).userRecordID()
     return Self.ownerID(

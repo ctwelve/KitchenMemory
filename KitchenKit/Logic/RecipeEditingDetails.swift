@@ -9,7 +9,7 @@ public extension RecipeEditingDraft {
   ///
   /// Use a copy of `session` for form bindings. Ingredients, captured source metadata,
   /// language, and classification remain unchanged by this operation.
-  /// Frozen Save intentions reject changes. A successful change persists once and does
+  /// Frozen Save intentions reject changes. A successful change notifies the draft owner once and does
   /// not retire native ingredient history; unchanged details return `false`.
   @discardableResult
   func updateRecipeDetails(from edited: RecipeEditSession) -> Bool {

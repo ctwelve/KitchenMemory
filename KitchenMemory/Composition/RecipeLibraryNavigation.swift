@@ -8,6 +8,11 @@ import Observation
 
 /// The accepted destination for one prepared app graph. Navigation never authors
 /// Session lifecycle evidence; leaving an editor asks KitchenKit to persist it.
+///
+/// `@Observable` lets views track the destination and selection they read; it
+/// does not create another navigation owner for each window. ``PreparedApp``
+/// supplies this same object to both feature projections. Window adapters turn
+/// its accepted focus intent into their own split-view column state.
 @MainActor
 @Observable
 final class RecipeLibraryNavigation {
@@ -79,6 +84,10 @@ final class RecipeLibraryNavigation {
     return prepareToLeaveEditor()
   }
 
+  /// Accepts a destination only after the current editor can be safely left.
+  ///
+  /// A rejected transition changes neither destination nor browsing context.
+  /// Calling this method never stops or finishes a Cooking Session.
   @discardableResult
   func move(to next: Destination) -> Bool {
     accept(next)

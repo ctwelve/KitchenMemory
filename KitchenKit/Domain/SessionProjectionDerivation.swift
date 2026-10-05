@@ -47,6 +47,8 @@ extension ProjectionBuilder {
         let lifecycleFacts = facts.filter { $0.kind == .stop || $0.kind == .resume }
         let maximal = maximalFacts(lifecycleFacts, parents: parents)
         guard !maximal.isEmpty else { return .active }
+        // Concurrent Resume keeps independent work Active; a later observed Stop
+        // still dominates it causally. Timestamp order never elects lifecycle.
         return maximal.contains(where: { $0.kind == .resume }) ? .active : .stopped
     }
 

@@ -12,6 +12,11 @@ import SwiftData
 /// exposes the recipe-library and Cooking Session presentation models used by
 /// feature views. External-store notifications re-enter the graph here so both
 /// projections refresh from one ownership-reconciled boundary.
+///
+/// ``AppStartupState/ready(_:)`` holds this value after preparation. Its reference
+/// properties keep the same repositories, observable models, and notification
+/// observers alive while SwiftUI recreates view values. Retaining the observer
+/// properties is functional: releasing an observer stops its notification bridge.
 @MainActor
 struct PreparedApp {
   let modelContainer: ModelContainer
@@ -83,6 +88,11 @@ struct PreparedApp {
     personalCloudStatusMonitor?.start()
   }
 
+  /// Reconciles Kitchen ownership before refreshing both feature projections.
+  ///
+  /// This is an explicit refresh entry point for callers that already know the
+  /// store changed; the retained notification observer uses the same helpers.
+  /// Failed ownership reconciliation leaves the current presentation intact.
   func reloadAfterExternalStoreChange() {
     guard (try? reconcileKitchenOwnership(repository: recipeRepository, ownerID: ownerID, locale: locale)) != nil else {
       return

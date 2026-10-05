@@ -14,12 +14,19 @@ import Foundation
 /// This type deliberately has no network or persistence dependency. Callers
 /// retain control of acquisition, candidate choice, review, and saving.
 public struct SchemaOrgRecipeImporter: Sendable {
+    /// Independent finite budgets governing acquisition-size, JSON expansion, and emitted content.
     public let limits: RecipeImportLimits
 
+    /// Creates a deterministic parser with supplied positive resource limits; it opens no network or store.
     public init(limits: RecipeImportLimits = .init()) {
         self.limits = limits
     }
 
+    /// Discovers JSON-LD script blocks in captured HTML and returns all usable Recipe interpretations.
+    ///
+    /// It does not execute scripts or use general article heuristics. Malformed sibling
+    /// blocks remain diagnostic; any resource ceiling discards candidates. The optional
+    /// URL supplies provenance and relative-link resolution, without fetching.
     public func importHTML(_ html: String, documentURL: URL? = nil) -> RecipeImportResult {
         guard html.utf8.count <= limits.maximumInputBytes else {
             return Self.limitExceededResult(.inputBytes)
@@ -31,6 +38,11 @@ public struct SchemaOrgRecipeImporter: Sendable {
         return importJSONLDBlocks(discovery.blocks, documentURL: documentURL)
     }
 
+    /// Interprets one captured JSON-LD block, including arrays and `@graph` Recipe objects.
+    ///
+    /// BOM-marked UTF-16/32 is transcribed to UTF-8; unmarked input must be UTF-8.
+    /// Unsupported shapes and malformed data become diagnostics rather than throws.
+    /// Resource failures return no partial candidates and preserve their limit reason.
     public func importJSONLD(_ data: Data, documentURL: URL? = nil) -> RecipeImportResult {
         importJSONLDBlocks([data], documentURL: documentURL)
     }
@@ -63,6 +75,9 @@ public struct SchemaOrgRecipeImporter: Sendable {
                     continue
                 }
             }
+            // Resource failure invalidates discovery as a whole. Returning only
+            // an early candidate prefix could falsely make a multi-Recipe source
+            // appear unambiguous and would hide material the person should review.
             guard JSONStructurePreflight.isWithinLimits(data, limits: limits) else {
                 diagnostics.append(.init(
                     blockIndex: blockIndex,
@@ -131,6 +146,9 @@ public struct SchemaOrgRecipeImporter: Sendable {
                     ))
                     return RecipeImportResult(candidates: [], diagnostics: diagnostics)
                 }
+                // Capture the containing source block, not serialized normalized
+                // fields: normalization intentionally omits unsupported semantics,
+                // while this transcription permits later reinterpretation.
                 let snapshot = RecipeImportSourceSnapshot(
                     documentURL: documentURL,
                     jsonLD: data

@@ -26,6 +26,9 @@ struct TagOrder {
 }
 
 extension TagLibrary {
+  /// Returns Tags in shared manual order or locale-aware case-insensitive name order.
+  ///
+  /// Equal names use stable UUID ties; no name collision is automatically merged.
   public func orderedTags(locale: Locale = .current) -> [Tag] {
     let children = tags
     if ordering == .manual {
@@ -42,6 +45,9 @@ extension TagLibrary {
 }
 
 extension TagLibrary {
+  /// The causally selected Untagged visibility preference, defaulting to true.
+  ///
+  /// Reconstructing retained organization evidence can throw shared evidence errors.
   public var systemViewVisible: Bool {
     get throws {
       let evidence = try OrganizationEvidence(actions, checkpoints: checkpointEvidence)

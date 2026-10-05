@@ -5,11 +5,16 @@
 import CryptoKit
 import Foundation
 
+/// Canonical format-tagged Session bytes and their SHA-256 commitment.
 public struct EncodedSessionValue: Equatable, Sendable {
+    /// The frozen codec version interpreting these bytes.
     public let formatVersion: Int
+    /// The canonical encoded bytes to retain unchanged in the evidence envelope.
     public let data: Data
+    /// SHA-256 of the canonical encoded bytes, independent of transport availability.
     public let digest: Data
 
+    /// Retains an encoded envelope without verifying canonicality or checking an external commitment.
     public init(formatVersion: Int, data: Data, digest: Data) {
         self.formatVersion = formatVersion
         self.data = data
@@ -17,13 +22,23 @@ public struct EncodedSessionValue: Equatable, Sendable {
     }
 }
 
+/// The format-1 canonical JSON representation of self-contained cooking context.
 public enum ExecutionSnapshotCodec {
+    /// The supported canonical JSON format, currently version 1.
     public static let formatVersion = 1
 
+    /// Encodes the supplied snapshot as sorted-key JSON and returns its SHA-256 commitment.
+    ///
+    /// Encoding does not perform evidence ownership, target, or causal validation.
+    /// Caller-created collection order must already satisfy the format’s invariants.
     public static func encode(_ snapshot: ExecutionSnapshot) throws -> EncodedSessionValue {
         try canonicalJSON(snapshot, formatVersion: formatVersion)
     }
 
+    /// Decodes a supported canonical snapshot without repairing retained bytes.
+    ///
+    /// Throws for unknown versions, malformed JSON, or a value whose canonical re-encoding
+    /// differs. Evidence digest and domain-invariant checks remain projector responsibilities.
     public static func decode(formatVersion: Int, data: Data) throws -> ExecutionSnapshot {
         guard formatVersion == self.formatVersion else {
             throw SessionCodecError.unsupportedFormat(formatVersion)
@@ -36,31 +51,50 @@ public enum ExecutionSnapshotCodec {
     }
 }
 
+/// A failure to read canonical Session evidence without changing the retained bytes.
 public enum SessionCodecError: Error, Equatable {
+    /// The supplied byte layout or JSON cannot represent the declared value.
     case malformedData
+    /// Decoded values or re-encoded bytes violate canonical ordering or spelling.
     case noncanonicalData
+    /// The declared format version is unknown; retain its bytes for a future reader.
     case unsupportedFormat(Int)
 }
 
+/// SHA-256 commitments for canonical Session evidence bytes.
 public enum SessionDigest {
+    /// Returns the raw 32-byte SHA-256 digest of exactly the supplied bytes.
     public static func sha256(_ data: Data) -> Data {
         Data(SHA256.hash(data: data))
     }
 }
 
+/// A format-tagged sorted UUID frontier with no payload values.
 public struct EncodedCausalHeads: Equatable, Sendable {
+    /// The frozen codec version interpreting these bytes.
     public let formatVersion: Int
+    /// The canonical encoded bytes to retain unchanged in the evidence envelope.
     public let data: Data
 
+    /// Retains an encoded envelope without verifying canonicality or checking an external commitment.
     public init(formatVersion: Int, data: Data) {
         self.formatVersion = formatVersion
         self.data = data
     }
 }
 
+/// Format-1 Session frontiers encoded as lexicographically sorted raw UUID bytes.
+///
+/// Decoding rejects duplicate or unsorted identities instead of silently normalizing
+/// retained evidence. Encoding sorts but does not remove duplicate input identities.
 public enum CausalHeadsCodec {
+    /// The supported raw sorted UUID frontier format, currently version 1.
     public static let formatVersion = 1
 
+    /// Sorts raw UUID bytes and concatenates them without delimiters.
+    ///
+    /// Input duplicates are retained; callers must supply a set-like frontier or the
+    /// result will fail the decoder’s uniqueness check.
     public static func encode(_ identifiers: [UUID]) -> EncodedCausalHeads {
         let sortedBytes = identifiers.map(uuidBytes).sorted(by: lexicographicallyPrecedes)
         return EncodedCausalHeads(
@@ -69,6 +103,10 @@ public enum CausalHeadsCodec {
         )
     }
 
+    /// Reads only supported, 16-byte-aligned, unique, sorted predecessor UUIDs.
+    ///
+    /// Throws for unsupported versions, malformed layout, or noncanonical ordering;
+    /// it does not verify dependency existence or causal antichain policy.
     public static func decode(formatVersion: Int, data: Data) throws -> [UUID] {
         guard formatVersion == self.formatVersion else {
             throw SessionCodecError.unsupportedFormat(formatVersion)
@@ -103,13 +141,23 @@ public enum CausalHeadsCodec {
     }
 }
 
+/// The format-1 canonical JSON representation of typed cooking Fact content.
 public enum SessionFactPayloadCodec {
+    /// The supported canonical JSON format, currently version 1.
     public static let formatVersion = 1
 
+    /// Encodes the supplied Fact payload as sorted-key JSON and returns its SHA-256 commitment.
+    ///
+    /// Encoding does not perform evidence ownership, target, or causal validation.
+    /// Caller-created collection order must already satisfy the format’s invariants.
     public static func encode(_ payload: SessionFactPayload) throws -> EncodedSessionValue {
         try canonicalJSON(payload, formatVersion: formatVersion)
     }
 
+    /// Decodes a supported canonical Fact payload without repairing retained bytes.
+    ///
+    /// Throws for unknown versions, malformed JSON, or a value whose canonical re-encoding
+    /// differs. Evidence digest and domain-invariant checks remain projector responsibilities.
     public static func decode(formatVersion: Int, data: Data) throws -> SessionFactPayload {
         guard formatVersion == self.formatVersion else {
             throw SessionCodecError.unsupportedFormat(formatVersion)
@@ -122,13 +170,23 @@ public enum SessionFactPayloadCodec {
     }
 }
 
+/// The format-1 canonical JSON representation of a coarse Session Outcome.
 public enum SessionOutcomeCodec {
+    /// The supported canonical JSON format, currently version 1.
     public static let formatVersion = 1
 
+    /// Encodes the coarse assessment as sorted-key JSON and returns its SHA-256 commitment.
+    ///
+    /// The assessment is independent of lifecycle; this method does not finish a
+    /// Session or compare an external Closure’s commitment.
     public static func encode(_ outcome: SessionOutcome) throws -> EncodedSessionValue {
         try canonicalJSON(outcome, formatVersion: formatVersion)
     }
 
+    /// Decodes a supported canonical Outcome without repairing retained bytes.
+    ///
+    /// Throws for unknown versions, malformed JSON, or a value whose canonical re-encoding
+    /// differs. Evidence digest and domain-invariant checks remain projector responsibilities.
     public static func decode(formatVersion: Int, data: Data) throws -> SessionOutcome {
         guard formatVersion == self.formatVersion else {
             throw SessionCodecError.unsupportedFormat(formatVersion)
@@ -137,15 +195,25 @@ public enum SessionOutcomeCodec {
     }
 }
 
+/// The format-1 canonical JSON representation of copied continuation context.
 public enum SessionContinuationBaselineCodec {
+    /// The supported canonical JSON format, currently version 1.
     public static let formatVersion = 1
 
+    /// Encodes the supplied continuation baseline as sorted-key JSON and returns its SHA-256 commitment.
+    ///
+    /// Encoding does not perform evidence ownership, target, or causal validation.
+    /// Caller-created collection order must already satisfy the format’s invariants.
     public static func encode(
         _ baseline: SessionContinuationBaseline
     ) throws -> EncodedSessionValue {
         try canonicalJSON(baseline, formatVersion: formatVersion)
     }
 
+    /// Decodes a supported canonical continuation baseline without repairing retained bytes.
+    ///
+    /// Throws for unknown versions, malformed JSON, or a value whose canonical re-encoding
+    /// differs. Evidence digest and domain-invariant checks remain projector responsibilities.
     public static func decode(
         formatVersion: Int,
         data: Data
@@ -161,13 +229,23 @@ public enum SessionContinuationBaselineCodec {
     }
 }
 
+/// The format-1 canonical JSON representation committed by a Session Closure.
 public enum ClosedSessionProjectionCodec {
+    /// The supported canonical JSON format, currently version 1.
     public static let formatVersion = 1
 
+    /// Encodes the supplied closed projection as sorted-key JSON and returns its SHA-256 commitment.
+    ///
+    /// Encoding does not perform evidence ownership, target, or causal validation.
+    /// Caller-created collection order must already satisfy the format’s invariants.
     public static func encode(_ projection: ClosedSessionProjection) throws -> EncodedSessionValue {
         try canonicalJSON(projection, formatVersion: formatVersion)
     }
 
+    /// Decodes a supported canonical closed projection without repairing retained bytes.
+    ///
+    /// Throws for unknown versions, malformed JSON, or a value whose canonical re-encoding
+    /// differs. Evidence digest and domain-invariant checks remain projector responsibilities.
     public static func decode(formatVersion: Int, data: Data) throws -> ClosedSessionProjection {
         guard formatVersion == self.formatVersion else {
             throw SessionCodecError.unsupportedFormat(formatVersion)

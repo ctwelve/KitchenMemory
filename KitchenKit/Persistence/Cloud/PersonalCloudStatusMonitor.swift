@@ -6,19 +6,24 @@ import CloudKit
 import CoreData
 import Foundation
 
+/// Main-actor account-availability seam for cloud-status presentation and deterministic test adapters.
 @MainActor
 public protocol PersonalCloudAccountChecking {
+  /// Checks current account availability without proving managed record delivery.
   func status() async -> PersonalCloudStatus
 }
 
+/// Maps one container's CloudKit account availability into plain presentation status.
 @MainActor
 public struct CloudKitAccountChecker: PersonalCloudAccountChecking {
   private let container: CKContainer
 
+  /// Selects the CloudKit container whose account status will be checked.
   public init(containerIdentifier: String) {
     container = CKContainer(identifier: containerIdentifier)
   }
 
+  /// Checks account availability and maps unknown or thrown failures to failed status.
   public func status() async -> PersonalCloudStatus {
     do {
       return Self.status(for: try await container.accountStatus())
@@ -54,6 +59,10 @@ public final class PersonalCloudStatusMonitor: NSObject {
   private var state = PersonalCloudStatusState()
   private var accountCheckGeneration = 0
 
+  /// Registers account and managed-operation observation without beginning the initial account check.
+  /// Retain the monitor and call ``start()``. Callbacks run on the main actor; successful-transfer
+  /// callbacks require a named relevant store and completed successful import/export event.
+  /// A transfer callback is a local observation, never proof another device received all records.
   public init(
     notificationCenter: NotificationCenter = .default,
     accountChecker: any PersonalCloudAccountChecking,
@@ -85,6 +94,8 @@ public final class PersonalCloudStatusMonitor: NSObject {
     notificationCenter.removeObserver(self)
   }
 
+  /// Starts an asynchronous account check and immediately publishes checking status.
+  /// Later checks supersede earlier results; managed CloudKit continues owning transport.
   public func start() {
     refreshAccountStatus()
   }

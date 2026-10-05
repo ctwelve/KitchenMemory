@@ -14,6 +14,10 @@ struct BundledSampleRecipeProvider: SampleRecipeProviding {
     self.preferredLanguages = preferredLanguages
   }
 
+  /// Supplies bundle values when KitchenKit requests samples for a prepared Kitchen.
+  ///
+  /// Localization and identity checks run here, but this provider does not save.
+  /// The calling install operation retains authority over durable publication.
   func recipes(in kitchenID: Kitchen.ID) throws -> [StoredRecipe] {
     let manifest = try SampleRecipeCatalog.loadManifest()
     let references = try SampleRecipeCatalog.localizedRecipes(

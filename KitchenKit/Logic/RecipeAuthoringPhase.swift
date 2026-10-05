@@ -7,8 +7,11 @@ import Foundation
 
 /// Local workflow meaning, independent of observation and file persistence.
 public enum RecipeAuthoringPhase: Codable, Equatable, Sendable {
+  /// Retained import awaiting explicit acceptance before Recipe publication.
   case importCandidate
+  /// Mutable device-local working content with no accepted shared revision.
   case editing
+  /// Frozen Recipe Save retained for identical retry and eventual local cleanup.
   case saving(RecipeSaveCommand)
 
   /// Repeated acceptance never restarts editing or replaces a frozen save.

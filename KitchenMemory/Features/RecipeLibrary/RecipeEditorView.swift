@@ -28,6 +28,8 @@ struct RecipeEditorView: View {
   let reviewConcerns: [RecipeImportConcern]
 
   @Environment(\.locale) private var locale
+  // The parent supplies the retained model; @Bindable creates $editor field
+  // bindings without creating a second draft or owning its persistence.
   @Bindable var editor: RecipeEditingModel
 
   init(

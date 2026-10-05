@@ -21,6 +21,7 @@ struct LibraryCommandActions {
     library.navigation.canPerform(command, library: library, sessions: sessions)
   }
 
+  /// Applies window focus only after the shared navigation owner accepts the intention.
   @discardableResult
   func perform(_ command: Command) -> Bool {
     guard library.navigation.perform(command, library: library, sessions: sessions, openImport: openImport)

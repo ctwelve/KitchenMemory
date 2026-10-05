@@ -10,25 +10,42 @@ import Foundation
 /// flattened transcription. This lets an editor make local corrections without
 /// losing section headings, ingredient provenance, or incomplete details.
 public struct RecipeDraft: Codable, Equatable, Sendable {
+  /// Authored title, validated as nonblank when preparing a Save.
   public var title: String
+  /// Optional authored description of the dish.
   public var summary: String?
+  /// Authored attribution for the person or source responsible for the recipe.
   public var authorName: String?
+  /// Authored content language, independent of the interface locale.
   public var contentLanguage: RecipeContentLanguage?
+  /// Editable source attribution, separate from retained import evidence.
   public var source: RecipeSource?
+  /// Retained source evidence; editing attribution does not rewrite the capture.
   public var sourceCapture: RecipeSourceCapture?
+  /// Authored yield and any structured quantity available for scaling.
   public var recipeYield: RecipeYield?
+  /// Optional authored preparation duration.
   public var prepDuration: RecipeDuration?
+  /// Optional authored cooking duration.
   public var cookDuration: RecipeDuration?
+  /// Optional authored total duration; no sum is inferred from other durations.
   public var totalDuration: RecipeDuration?
+  /// Source or author supplied cuisine wording, retained without classification inference.
   public var cuisines: [String]
+  /// Source or author supplied category wording, distinct from Kitchen Tags.
   public var categories: [String]
+  /// Authored keyword wording, distinct from Kitchen Tag assignments.
   public var keywords: [String]
-  /// Nil preserves Equipment for legacy callers; an explicit empty array removes it.
+  /// Nil preserves prior media on revision; an explicit empty array removes it.
   public var media: [RecipeMedia]?
+  /// Editable equipment; nil preserves prior equipment on revision, while an empty array removes it.
   public var equipment: [EquipmentItem]?
+  /// Ordered authored ingredient sections and their structured, potentially incomplete values.
   public var ingredientSections: [IngredientSection]
+  /// Ordered authored instruction sections and steps.
   public var instructionSections: [InstructionSection]
 
+  /// Creates an editable value without validation, normalization, or persistence.
   public init(
     title: String = "",
     summary: String? = nil,
@@ -92,6 +109,7 @@ public struct RecipeDraft: Codable, Equatable, Sendable {
     )
   }
 
+  /// Copies maintained content into an editable value while retaining its provenance.
   public init(revision: RecipeRevision) {
     self.init(
       title: revision.title,

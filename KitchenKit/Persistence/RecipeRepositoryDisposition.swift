@@ -6,6 +6,8 @@ import Foundation
 import SwiftData
 
 extension SwiftDataRecipeRepository {
+  /// Accepts deletion evidence while retaining Recipe payload and authority.
+  /// Exact retry is idempotent; unavailable authority, invalid scope, or identity reuse throws.
   public func delete(_ command: RecipeDeleteCommand) throws {
     try performIsolatedWrite { try $0.acceptDeletion(command) }
   }
@@ -28,6 +30,8 @@ extension SwiftDataRecipeRepository {
     ))
   }
 
+  /// Atomically resolves the deletion markers named by an explicit Restore.
+  /// Unobserved deletions remain effective; invalid markers and changed retry identity throw.
   public func restore(_ command: RecipeRestoreCommand) throws {
     try performIsolatedWrite { try $0.acceptRestoration(command) }
   }
@@ -67,6 +71,8 @@ extension SwiftDataRecipeRepository {
     for row in rows where !existingIDs.contains(row.id) { self.context.insert(row) }
   }
 
+  /// Reads retained Deleted Items, including incomplete or invalid authority requiring attention.
+  /// Pruned Recipes and late-evidence-after-prune Recovery are not restorable Deleted Items.
   public func deletedRecipes(in kitchenID: Kitchen.ID) throws -> [DeletedRecipe] {
     let kitchenIdentifier = kitchenID.rawValue
     let deletions = try context.fetch(FetchDescriptor<RecipeDeletionRecord>(

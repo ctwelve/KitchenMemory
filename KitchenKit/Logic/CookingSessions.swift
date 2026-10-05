@@ -18,6 +18,8 @@ public struct CookingSessions {
   let commandFactory: CookingSessionCommandFactory
   let dispositionFactory: CookingSessionDispositionFactory
 
+  /// Binds Recipe provenance and Session evidence repositories to one Kitchen on the main actor.
+  /// The repositories retain durability; this value coordinates intentions and classified reads.
   public init(
     kitchenID: Kitchen.ID,
     recipeRepository: any RecipeRepository,
@@ -48,6 +50,9 @@ public struct CookingSessions {
     dispositionFactory = CookingSessionDispositionFactory(commands: commands)
   }
 
+  /// Reconstructs one Session from retained evidence within this Kitchen.
+  /// Returns nil for absent or outside-Kitchen evidence, and preserves Unavailable and
+  /// Recovery classifications. Repository failures become ``CookingSessionLogicError/sessionReadFailed``.
   public func session(id: CookingSession.ID) throws -> SessionProjectionResult? {
     guard let evidence = try retainedEvidence(id: id), evidenceBelongsToKitchen(evidence) else {
       return nil
@@ -55,18 +60,24 @@ public struct CookingSessions {
     return SessionEvidenceProjector.project(evidence)
   }
 
+  /// Reads every known Session classification in this Kitchen, including incomplete and Recovery evidence.
   public func sessions() throws -> [SessionProjectionResult] {
     do { return try sessionRepository.sessions(in: kitchenID) } catch {
       throw CookingSessionLogicError.sessionReadFailed
     }
   }
 
+  /// Reads Session history through retained Recipe provenance within this Kitchen.
+  /// Deleting or hiding the source Recipe does not remove its independently owned Sessions.
   public func sessions(for recipeID: Recipe.ID) throws -> [SessionProjectionResult] {
     do { return try sessionRepository.sessions(for: recipeID, in: kitchenID) } catch {
       throw CookingSessionLogicError.sessionReadFailed
     }
   }
 
+  /// Returns a bounded set of classifications with locally retained Closure evidence.
+  /// Ordering uses descriptive Finish time, not conflict authority. Results may require
+  /// Recovery or more data; a nonpositive limit returns an empty collection.
   public func finishedSessions(limit: Int) throws -> [SessionProjectionResult] {
     do { return try sessionRepository.finishedSessions(in: kitchenID, limit: limit) } catch {
       throw CookingSessionLogicError.sessionReadFailed
@@ -150,6 +161,10 @@ public struct CookingSessions {
     return descendantCount
   }
 
+  /// Captures the exact source revision into a self-contained Session root and accepts it locally.
+  /// An identical retained Start returns its current classification without creating another root.
+  /// Changed identity reuse throws a collision; read, encoding, and append failures are classified.
+  /// Keep the same intention when retrying after an uncertain result.
   public func start(
     _ intention: StartCookingSessionIntention
   ) throws -> CookingSessionCommandResult {

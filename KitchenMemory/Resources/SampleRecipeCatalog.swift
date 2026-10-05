@@ -25,11 +25,13 @@ public struct SampleRecipePackManifest: Codable, Equatable, Identifiable, Sendab
     }
 }
 
+/// One recipe family with localized, independently identified bundled variants.
 public struct SampleRecipeReference: Codable, Equatable, Sendable {
     public let familyID: UUID
     public let variants: [LocalizedSampleRecipeReference]
 }
 
+/// Asset names and stable recipe identity for one bundled language variant.
 public struct LocalizedSampleRecipeReference: Codable, Equatable, Sendable {
     public let localeIdentifier: String
     public let recipeID: Recipe.ID
@@ -38,6 +40,8 @@ public struct LocalizedSampleRecipeReference: Codable, Equatable, Sendable {
 }
 
 public extension SampleRecipeReference {
+    /// Selects exact locale, then language matches in preference order, then English.
+    /// Returns no variant if neither the preferences nor the English fallback match.
     func variant(preferredLanguages: [String]) -> LocalizedSampleRecipeReference? {
         let preferences = preferredLanguages.map(Self.canonicalLocale)
         for preference in preferences {
@@ -64,11 +68,15 @@ public extension SampleRecipeReference {
     }
 }
 
+/// Decoded bundle content awaiting attachment to a prepared Kitchen.
+/// Loading this value does not install or save a recipe.
 public struct SampleRecipeDocument: Codable, Equatable, Sendable {
     public let formatVersion: Int
     public let recipeID: Recipe.ID
     public let revision: RecipeRevision
 
+    /// Attaches the bundled recipe identity to a Kitchen without changing its Revision.
+    /// Identity mismatch throws before a value can reach the install service.
     public func materialize(in kitchenID: Kitchen.ID) throws -> SampleRecipeMaterialization {
         guard revision.recipeID == recipeID else {
             throw SampleRecipeCatalogError.inconsistentRecipeIdentity
@@ -80,11 +88,13 @@ public struct SampleRecipeDocument: Codable, Equatable, Sendable {
     }
 }
 
+/// A Kitchen-scoped recipe and its unchanged bundled Revision, ready for installation.
 public struct SampleRecipeMaterialization: Equatable, Sendable {
     public let recipe: Recipe
     public let revision: RecipeRevision
 }
 
+/// Classifies resource lookup and identity failures at the application bundle boundary.
 public enum SampleRecipeCatalogError: Error, Equatable {
     case missingAsset(String)
     case inconsistentRecipeIdentity
@@ -92,13 +102,21 @@ public enum SampleRecipeCatalogError: Error, Equatable {
 }
 
 /// Loads deterministic sample content from the application's asset catalog.
+///
+/// ``BundledSampleRecipeProvider`` implements KitchenKit's sample capability
+/// with this catalog. Resource loading and locale choice remain app-owned;
+/// KitchenKit's install service decides whether to save materialized recipes.
+/// The catalog resolves its own bundle so a hosted test's main bundle cannot
+/// silently redirect lookup away from application resources.
 public enum SampleRecipeCatalog {
     static let resourceBundle = Bundle(for: SampleRecipeCatalogBundleToken.self)
 
+    /// Decodes the pack index from the catalog's containing bundle.
     public static func loadManifest() throws -> SampleRecipePackManifest {
         try decodeAsset(named: "SampleManifest", as: SampleRecipePackManifest.self)
     }
 
+    /// Decodes a selected variant and verifies that the asset matches its recipe identity.
     public static func loadRecipe(
         _ reference: LocalizedSampleRecipeReference
     ) throws -> SampleRecipeDocument {
@@ -109,6 +127,8 @@ public enum SampleRecipeCatalog {
         return document
     }
 
+    /// Resolves one variant per manifest family, preserving manifest order.
+    /// Missing language fallbacks fail the complete request rather than skipping a family.
     public static func localizedRecipes(
         in manifest: SampleRecipePackManifest,
         preferredLanguages: [String]
