@@ -9,6 +9,9 @@ struct StoredSessionEvidence {
   let containsPlaceholder: Bool
 
   var projection: SessionProjectionResult {
+    // Schema defaults satisfy managed-store requirements, but never stand in for domain
+    // evidence. A present placeholder row is positive invalidity; a missing row is different
+    // and remains the projector's ordinary partial-delivery classification.
     if containsPlaceholder {
       return .recovery(
         SessionRecovery(evidence: evidence, reasons: [.placeholderBearingRecord])

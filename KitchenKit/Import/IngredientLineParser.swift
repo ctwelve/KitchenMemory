@@ -20,13 +20,23 @@ public enum IngredientLineParser {
         "cucchiaio", "cucchiai", "cucchiaino", "cucchiaini", "tazza", "tazze", "grammi", "litri",
     ]
 
-    /// Parses completed input. The authored source is never replaced by formatted values.
+    /// Interprets a completed line conservatively and retains its original presentation.
+    ///
+    /// Supported leading amounts may yield quantity, package size, unit, name, and
+    /// comma-separated preparation. Unrecognized or ambiguous wording remains
+    /// unparsed original text rather than blocking review. Nothing resolves a
+    /// canonical ingredient or converts authored units.
     public static func parse(_ source: String, locale: Locale = .current) -> RecipeIngredient {
         interpret(source, locale: locale).ingredient
     }
 
-    /// Returns structured interpretation and UTF-16 source spans suitable for native text annotation.
-    /// Call after completing/leaving a line, or once per pasted line, rather than rewriting active input.
+    /// Returns provisional structure and UTF-16 spans into the unchanged source.
+    ///
+    /// Numeric fractions, supported Unicode fractions, ranges, and unambiguous
+    /// decimals are bounded to finite quantity components. Spell-out amounts
+    /// use the supplied locale for English, French, Spanish, German, and Italian.
+    /// Unit recognition uses a finite vocabulary and does not convert units.
+    /// Call after completing a line or paste; annotation does not rewrite active input.
     public static func interpret(_ source: String, locale: Locale = .current) -> IngredientLineInterpretation {
         var result = IngredientLineInterpretation(
             ingredient: RecipeIngredient(

@@ -5,9 +5,14 @@
 import Foundation
 import SwiftData
 
+/// Main-actor boundary for reversible sample-pack intent and locally atomic acceptance.
 @MainActor
 public protocol SamplePackRepository {
+  /// Derives accepted enablement intent and content counts from supplied stable sample identities.
+  /// Throws for invalid samples or unreadable organization/Recipe evidence.
   func status(in kitchenID: Kitchen.ID, samples: [StoredRecipe]) throws -> SamplePackStatus
+  /// Accepts a frozen pack transition with Recipe and organization evidence in one local transaction.
+  /// Retries use the same command; removal must be revalidated against current maintained content.
   func accept(_ command: SamplePackCommand) throws
 }
 
@@ -19,8 +24,11 @@ public final class SwiftDataSamplePackRepository: SamplePackRepository {
     OrganizationStore(modelContainer: container, namespace: "sample-pack", recipeID: { _ in nil })
   }
 
+  /// Binds the shared container used for Recipe authority, organization, and sample-pack receipts.
   public init(modelContainer: ModelContainer) { container = modelContainer }
 
+  /// Reads accepted pack intent and counts installed, edited, deleted, and unavailable sample identities.
+  /// Only complete unchanged Recipes qualify for the returned removal set.
   public func status(in kitchenID: Kitchen.ID, samples: [StoredRecipe]) throws -> SamplePackStatus {
     let context = ModelContext(container)
     return try status(in: kitchenID, samples: samples, context: context)
@@ -77,6 +85,9 @@ public final class SwiftDataSamplePackRepository: SamplePackRepository {
     }
   }
 
+  /// Atomically accepts an explicit pack transition and records its exact retry digest.
+  /// Enablement preserves edited, pruned, and withheld Recipes; disabling deletes only
+  /// requested identities that remain unchanged at acceptance. Changed identity reuse throws.
   public func accept(_ command: SamplePackCommand) throws {
     try validate(command.samples, in: command.kitchenID)
     guard command.removalIDs.isSubset(of: Set(command.samples.map(\.id))) else {

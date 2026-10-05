@@ -4,19 +4,29 @@
 
 import Foundation
 
+/// Identifies the duration input requiring correction before a Recipe Save.
 public enum RecipeEditDurationField: CaseIterable, Equatable, Hashable, Sendable {
+  /// The preparation-duration input in whole minutes.
   case preparation
+  /// The cooking-duration input in whole minutes.
   case cooking
+  /// The independently authored total-duration input in whole minutes.
   case total
 }
 
+/// A form validation problem; sparse ingredients or instructions remain valid authored content.
 public enum RecipeEditValidationIssue: Equatable, Hashable, Sendable {
+  /// The title is empty after trimming whitespace and newlines.
   case missingTitle
+  /// A duration is not a whole number in the supported minute range.
   case invalidDuration(RecipeEditDurationField)
+  /// A nonblank source URL does not satisfy the link activation policy.
   case invalidSourceURL
 }
 
+/// Failures when extracting a publishable draft from editable input.
 public enum RecipeEditSessionError: Error, Equatable, Sendable {
+  /// The complete set of form issues that prevents draft extraction.
   case invalid(Set<RecipeEditValidationIssue>)
 }
 
@@ -26,24 +36,40 @@ public enum RecipeEditSessionError: Error, Equatable, Sendable {
 /// `RecipeEditingDraft.updateRecipeDetails(from:)`. Ingredient state is externally
 /// read-only and is maintained by the live draft's explicit operations.
 public struct RecipeEditSession: Codable, Equatable, Sendable {
+  /// Largest accepted whole-minute duration, equivalent to 366 days.
   public static let maximumDurationMinutes = 366 * 24 * 60
 
+  /// Editable title input; a nonblank value is required for Save.
   public var title: String
+  /// Editable summary input; publication normalizes blank optional text.
   public var summary: String
+  /// Editable author attribution input.
   public var authorName: String
+  /// Editable yield, retaining authored wording and optional structured quantity.
   public var recipeYield: RecipeYield?
+  /// Preparation duration input in whole minutes; blank means unspecified.
   public var prepMinutes: String
+  /// Cooking duration input in whole minutes; blank means unspecified.
   public var cookMinutes: String
+  /// Independent total duration input in whole minutes; blank means unspecified.
   public var totalMinutes: String
+  /// Source attribution kind retained when creating the resulting source value.
   public var sourceKind: RecipeSource.Kind
+  /// Editable source title input.
   public var sourceTitle: String
+  /// Editable source-author attribution input.
   public var sourceAuthor: String
+  /// Editable publisher attribution input.
   public var sourcePublisher: String
+  /// Editable absolute HTTP or HTTPS source URL; blank means no link.
   public var sourceURL: String
+  /// Editable media; nil permits legacy preservation when revising.
   public var media: [RecipeMedia]?
+  /// Editable equipment; nil permits legacy preservation when revising.
   public var equipment: [EquipmentItem]?
   /// Read-only ingredient contents; mutate the live draft through its ingredient operations.
   public internal(set) var ingredientSections: [IngredientSection]
+  /// Ordered instructions editable on a session copy before submitting recipe details.
   public var instructionSections: [InstructionSection]
   /// Recoverable simple-editor state; absent in drafts created before this editor existed.
   public internal(set) var ingredientText: RecipeIngredientTextDraft?
@@ -54,6 +80,7 @@ public struct RecipeEditSession: Codable, Equatable, Sendable {
   private let preservedCategories: [String]
   private let preservedKeywords: [String]
 
+  /// Creates form inputs from a draft, retaining captured metadata and classification separately.
   public init(draft: RecipeDraft = RecipeDraft()) {
     title = draft.title
     summary = draft.summary ?? ""
@@ -78,6 +105,7 @@ public struct RecipeEditSession: Codable, Equatable, Sendable {
     preservedKeywords = draft.keywords
   }
 
+  /// All current title, duration, and source-link issues, without changing the input.
   public var validationIssues: Set<RecipeEditValidationIssue> {
     var issues: Set<RecipeEditValidationIssue> = []
     if text(title) == nil { issues.insert(.missingTitle) }
@@ -90,8 +118,13 @@ public struct RecipeEditSession: Codable, Equatable, Sendable {
     return issues
   }
 
+  /// Whether the current form inputs pass validation; this does not prove storage availability.
   public var canSave: Bool { validationIssues.isEmpty }
 
+  /// Extracts a validated draft, completing pending ingredient interpretation on a copy.
+  ///
+  /// Throws ``RecipeEditSessionError/invalid(_:)`` with every detected form issue.
+  /// The live editing session and its native history are unchanged.
   public func validatedDraft() throws -> RecipeDraft {
     let issues = validationIssues
     guard issues.isEmpty else { throw RecipeEditSessionError.invalid(issues) }
@@ -133,12 +166,14 @@ public struct RecipeEditSession: Codable, Equatable, Sendable {
     moveElement(in: &ingredientSections, at: index, by: offset)
   }
 
+  /// Swaps equipment with the row at the requested offset; absent equipment or invalid indices do nothing.
   public mutating func moveEquipment(at index: Int, by offset: Int) {
     guard var items = equipment else { return }
     moveElement(in: &items, at: index, by: offset)
     equipment = items
   }
 
+  /// Swaps instruction sections at the requested offset; invalid source or destination indices do nothing.
   public mutating func moveInstructionSection(at index: Int, by offset: Int) {
     moveElement(in: &instructionSections, at: index, by: offset)
   }

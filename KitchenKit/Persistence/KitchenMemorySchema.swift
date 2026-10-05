@@ -14,12 +14,15 @@ typealias CurrentKitchenMemorySchema = KitchenMemorySchemaV7
 /// callers never need to know whether CloudKit moves their records between
 /// devices, and a future shared-Kitchen adapter can use a different mechanism.
 public enum KitchenMemoryStoreSynchronization: Equatable, Sendable {
+  /// Uses local SwiftData persistence with managed CloudKit transport explicitly disabled.
   case localOnly
+  /// Uses the named container's private CloudKit database with the default durable store.
   case personalCloud(containerIdentifier: String)
 }
 
 /// Invalid combinations of durable-store location and synchronization policy.
 public enum KitchenMemorySchemaError: Error, Equatable {
+  /// Personal cloud was requested for an in-memory or explicitly located store, which is unsupported.
   case cloudRequiresDefaultStore
 }
 

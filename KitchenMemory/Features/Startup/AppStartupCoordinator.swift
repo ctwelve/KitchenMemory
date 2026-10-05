@@ -121,6 +121,11 @@ final class AppStartupCoordinator: ObservableObject {
     self.recordMilestone = recordMilestone
   }
 
+  /// Starts foreground preparation after ``StartupFrameObserver`` reports a frame.
+  ///
+  /// More than one scene can report its startup surface. The coordinator accepts
+  /// the first report only, keeping graph preparation app-owned rather than
+  /// starting another attempt for every window.
   func startupSurfacePresented() {
     guard !startupSurfaceHasPresented else { return }
     startupSurfaceHasPresented = true
@@ -143,6 +148,11 @@ final class AppStartupCoordinator: ObservableObject {
     await state.preparedApp?.recordsMaintenance.performOpportunity()
   }
 
+  /// Requests a new attempt after retiring any in-flight preparation result.
+  ///
+  /// Cancellation is cooperative: the old operation can still return a graph.
+  /// `retryIsPending` prevents publishing that result and starts the replacement
+  /// only after the old attempt has returned.
   func retry() {
     state = .preparing
     guard let preparationTask else {
@@ -156,6 +166,8 @@ final class AppStartupCoordinator: ObservableObject {
   private func prepareIfNeeded() {
     guard preparationTask == nil, state.preparedApp == nil else { return }
     recordMilestone(.preparationStarted)
+    // This task belongs to the coordinator, unlike ContentView's appearance
+    // task. Window recomposition therefore cannot restart store preparation.
     preparationTask = Task { [weak self] in
       guard let self else { return }
       let preparedState = await prepareApplication()

@@ -11,12 +11,19 @@ import Foundation
 /// The resulting sections and unresolved proposals survive draft recovery; this
 /// document is editing state only and is never included in a published Revision.
 public struct RecipeIngredientTextDraft: Codable, Equatable, Sendable {
+  /// One recoverable text line with stable local identity and any retained ingredient or section meaning.
   public struct Line: Codable, Equatable, Identifiable, Sendable {
+    /// Stable line identity preserved for surviving text through native edits and recovery.
     public let id: UUID
+    /// Exact visible line wording, including unfinished input.
     public internal(set) var source: String
+    /// Retained ingredient meaning; pending text may differ from its last interpretation.
     public internal(set) var ingredient: RecipeIngredient?
+    /// Section identity when the line represents a section heading.
     public internal(set) var sectionID: IngredientSection.ID?
+    /// Authored heading title; nil retains an untitled section.
     public internal(set) var sectionTitle: String?
+    /// Whether current wording has been processed; a completed line may still have an unresolved proposal.
     public var isInterpreted: Bool { source == interpretedSource }
     var retainsEmptyIngredient: Bool?
     var interpretedSource: String
@@ -34,10 +41,13 @@ public struct RecipeIngredientTextDraft: Codable, Equatable, Sendable {
     }
   }
 
+  /// Ordered lines with retained identities, pending input, and interpretation proposals.
   public private(set) var lines: [Line]
   private let rootSectionID: IngredientSection.ID
   private let retainsRootSection: Bool
+  /// Exact line sources joined with newline separators for the native control.
   public var text: String { lines.map(\.source).joined(separator: "\n") }
+  /// Pending proposals requiring explicit acceptance or preservation of precise fields.
   public var conflicts: [IngredientTextReconciliation.Conflict] { lines.compactMap(\.conflict) }
 
   /// Optional display wording is used only for existing structured rows without original text.
@@ -59,6 +69,7 @@ public struct RecipeIngredientTextDraft: Codable, Equatable, Sendable {
     if lines.isEmpty { lines = [Line(source: "")] }
   }
 
+  /// Ordered structured contents, retaining current wording even for unfinished ingredient lines.
   public var sections: [IngredientSection] {
     var result: [IngredientSection] = []
     var current = IngredientSection(id: rootSectionID, title: nil, ingredients: [])

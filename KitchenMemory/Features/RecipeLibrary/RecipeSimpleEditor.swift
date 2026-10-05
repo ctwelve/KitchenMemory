@@ -8,6 +8,9 @@ import SwiftUI
 struct RecipeSimpleEditor: View {
   @Bindable var editor: RecipeEditingModel
   @Environment(\.locale) private var locale
+  // SwiftUI retains this command bridge for the simple editor's view identity.
+  // The representable installs weak native-control callbacks as controls appear;
+  // the button can then insert through the current native text/undo system.
   @State private var textActions = IngredientTextActions()
   @ScaledMetric(relativeTo: .body) private var textHeight = 240
 

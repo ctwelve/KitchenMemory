@@ -63,6 +63,11 @@ enum CookingSessionPresentationIssue: Equatable {
 /// Replaceable presentation projection over retained Cooking Session evidence.
 /// It selects and translates commands but never derives lifecycle from view or
 /// process state.
+///
+/// ``PreparedApp`` retains this `@Observable` model. SwiftUI tracks the projected
+/// properties read by views, while ``CookingSessionDelivery`` retains pending
+/// identities and Entry drafts independently of those views' local dialogs.
+/// Optimistic presentation can show pending activity without declaring it accepted.
 @MainActor
 @Observable
 final class CookingSessionPresentationModel {
@@ -128,6 +133,11 @@ final class CookingSessionPresentationModel {
     return entryDrafts.first { $0.sessionID == currentSessionID }
   }
 
+  /// Retries retained intentions before the shell's first Session read.
+  ///
+  /// Multiple window tasks may call this entry point; `hasLoaded` belongs to the
+  /// shared model. Retry submits the original stored identities rather than
+  /// turning relaunch into new cooking evidence.
   func loadIfNeeded() {
     guard !hasLoaded else { return }
     if !pendingCommands.isEmpty {
@@ -137,6 +147,11 @@ final class CookingSessionPresentationModel {
     hasLoaded = true
   }
 
+  /// Retries pending delivery and rebuilds reads after the repository is refreshed.
+  ///
+  /// Store notifications are only invalidation signals. Delivery still needs
+  /// the Logic result to distinguish acceptance, terminal retirement, and work
+  /// that must remain pending.
   func reloadAfterExternalStoreChange() {
     guard hasLoaded else { return }
     if !pendingCommands.isEmpty {

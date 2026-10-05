@@ -11,6 +11,7 @@ public final class SwiftDataCookingSessionRepository: CookingSessionRepository {
   private let modelContainer: ModelContainer
   private var context: ModelContext
 
+  /// Creates an actor-bound read context; each append uses a separate local write context.
   public init(modelContainer: ModelContainer) {
     self.modelContainer = modelContainer
     context = ModelContext(modelContainer)
@@ -31,6 +32,9 @@ public final class SwiftDataCookingSessionRepository: CookingSessionRepository {
     context = ModelContext(modelContainer)
   }
 
+  /// Appends the complete local transaction or throws before local acceptance completes.
+  /// Evidence remains immutable. Local atomicity does not require managed CloudKit to
+  /// deliver the remote transaction together; Logic owns exact-intention retry checks.
   public func append(_ transaction: CookingSessionTransaction) throws {
     let records = try transaction.records()
     try records.validateForPersistence()
@@ -39,17 +43,23 @@ public final class SwiftDataCookingSessionRepository: CookingSessionRepository {
     }
   }
 
+  /// Classifies retained evidence as readable, Unavailable, or requiring Recovery.
+  /// Returns nil for unknown identity; no partial domain Session is fabricated.
   public func session(id: CookingSession.ID) throws -> SessionProjectionResult? {
     let stored = try storedEvidence(sessionID: id)
     guard !stored.evidence.isEmpty else { return nil }
     return stored.projection
   }
 
+  /// Returns all retained evidence for this Session, or nil when nothing is known.
+  /// Partial or conflicting evidence is retained for retry preparation and explicit classification.
   public func evidence(id: CookingSession.ID) throws -> SessionEvidence? {
     let stored = try storedEvidence(sessionID: id)
     return stored.evidence.isEmpty ? nil : stored.evidence
   }
 
+  /// Reads every known Session classification routed to this Kitchen.
+  /// Evidence without a root remains visible through its retained Kitchen routing.
   public func sessions(in kitchenID: Kitchen.ID) throws -> [SessionProjectionResult] {
     try storedEvidence(in: kitchenID)
       .sorted { $0.evidence.sessionID.rawValue.uuidString
@@ -81,6 +91,7 @@ public final class SwiftDataCookingSessionRepository: CookingSessionRepository {
     }.filter { $0.evidence.belongs(to: kitchenID) }
   }
 
+  /// Reads classifications through retained root Recipe provenance, even when the source Recipe is hidden.
   public func sessions(for recipeID: Recipe.ID) throws -> [SessionProjectionResult] {
     let identifier = recipeID.rawValue
     let ids = Set(try context.fetch(
@@ -89,6 +100,7 @@ public final class SwiftDataCookingSessionRepository: CookingSessionRepository {
     return try classify(sessionIDs: ids)
   }
 
+  /// Reads classifications through root Recipe provenance within the specified Kitchen.
   public func sessions(
     for recipeID: Recipe.ID,
     in kitchenID: Kitchen.ID
@@ -103,6 +115,9 @@ public final class SwiftDataCookingSessionRepository: CookingSessionRepository {
     return try classify(sessionIDs: ids)
   }
 
+  /// Returns up to `limit` classifications with retained Closure evidence, newest descriptive Finish time first.
+  /// Results can still be Unavailable or Recovery; Closure presence alone does not prove a valid Finished Session.
+  /// A nonpositive limit returns no results.
   public func finishedSessions(
     in kitchenID: Kitchen.ID,
     limit: Int
@@ -122,6 +137,7 @@ public final class SwiftDataCookingSessionRepository: CookingSessionRepository {
       .map(\.0.projection)
   }
 
+  /// Reads retained deletion markers for a Kitchen without requiring a Session root.
   public func deletions(in kitchenID: Kitchen.ID) throws -> [SessionDeletionEvidence] {
     let identifier = kitchenID.rawValue
     let records = try context.fetch(
@@ -130,6 +146,7 @@ public final class SwiftDataCookingSessionRepository: CookingSessionRepository {
     return try completeDeletionEvidence(records)
   }
 
+  /// Reads retained deletion markers for a Session, independently of its lifecycle.
   public func deletions(for sessionID: CookingSession.ID) throws -> [SessionDeletionEvidence] {
     let identifier = sessionID.rawValue
     let records = try context.fetch(
@@ -138,6 +155,8 @@ public final class SwiftDataCookingSessionRepository: CookingSessionRepository {
     return try completeDeletionEvidence(records)
   }
 
+  /// Reads every physical deletion envelope with this logical marker identity.
+  /// Conflicting duplicates must remain available for classification rather than choosing one.
   public func deletions(id: SessionDeletion.ID) throws -> [SessionDeletionEvidence] {
     let identifier = id.rawValue
     let records = try context.fetch(
@@ -146,6 +165,7 @@ public final class SwiftDataCookingSessionRepository: CookingSessionRepository {
     return try completeDeletionEvidence(records)
   }
 
+  /// Reads retained resolution envelopes for an observed deletion marker.
   public func restorations(
     for deletionID: SessionDeletion.ID
   ) throws -> [SessionDeletionResolutionEvidence] {
@@ -177,6 +197,9 @@ public final class SwiftDataCookingSessionRepository: CookingSessionRepository {
   private func performIsolatedWrite(
     _ operation: (SwiftDataCookingSessionRepository) throws -> Void
   ) throws {
+    // A thrown save may leave pending inserts in its context. Keep those records out of
+    // the long-lived read context, and roll back this isolated unit before permitting retry.
+    // Atomic local append still permits CloudKit to deliver individual envelopes remotely.
     let writerContext = ModelContext(modelContainer)
     let writer = SwiftDataCookingSessionRepository(context: writerContext)
     do {

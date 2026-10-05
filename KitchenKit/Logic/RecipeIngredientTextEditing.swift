@@ -26,9 +26,11 @@ public final class RecipeIngredientTextEditing {
   private var snapshots: [RecipeIngredientTextDraft]
   private var snapshotIndex = 0
 
+  /// Current semantic text document for this editor, including pending lines and proposals.
   public var document: RecipeIngredientTextDraft {
     draft.session.ingredientText ?? snapshots[snapshotIndex]
   }
+  /// Whether this interface is still attached to the live draft and no Save has frozen it.
   public var isActive: Bool { draft.ingredientTextEditing === self && draft.pendingSave == nil }
 
   init(draft: RecipeEditingDraft) {

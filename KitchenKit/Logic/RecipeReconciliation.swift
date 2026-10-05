@@ -4,10 +4,15 @@
 
 import Foundation
 
+/// An authored content field that can be compared and copied independently during reconciliation.
 public enum RecipeComparisonField: String, Codable, CaseIterable, Identifiable, Sendable {
+  /// Title, summary, attribution, language, source evidence, and authored yield choices.
   case title, summary, author, language, source, yield
+  /// Independent durations and source-provided taxonomy choices.
   case preparation, cooking, total, cuisines, categories, keywords
+  /// Complete ordered content collections; selecting ingredients replaces that collection.
   case ingredients, instructions, equipment, media
+  /// Stable field name suitable for presenting comparison choices.
   public var id: String { rawValue }
 
   // Each supported field has one explicit, lossless copy operation.
@@ -36,22 +41,36 @@ public enum RecipeComparisonField: String, Codable, CaseIterable, Identifiable, 
   }
 }
 
+/// Failures in forming or editing an explicit local revision comparison.
 public enum RecipeReconciliationError: Error, Equatable {
+  /// The comparison lacks distinct revisions of one Recipe, or cannot supply valid reconciliation parents.
   case invalidParents
+  /// No starting revision has yet been selected for the local draft.
   case missingChoice
+  /// The requested revision, row, or editing state is not a valid comparison choice.
   case invalidChoice
+  /// An ordinary draft already owns this Recipe and must be finished or discarded first.
   case existingDraft
 }
 
 /// A recoverable local comparison. Choosing content never creates shared authority.
 public struct RecipeReconciliation: Codable, Equatable, Sendable {
+  /// Kitchen scope used to validate publication of the reconciliation.
   public let kitchenID: Kitchen.ID
+  /// Stable Recipe shared by every compared revision.
   public let recipeID: Recipe.ID
+  /// Distinct revisions offered for explicit authored-content choices.
   public let revisions: [RecipeRevision]
+  /// Selection frontier observed by the comparison; later unseen choices remain concurrent.
   public let observedSelectionIDs: [RecipeSelectionCommand.ID]
+  /// Chosen local content, or nil until a starting revision is selected.
   public private(set) var draft: RecipeDraft?
+  /// Every compared revision identity to name as a parent in a reconciliation Save.
   public var parentRevisionIDs: [RecipeRevision.ID] { revisions.map(\.id) }
 
+  /// Creates a comparison of at least two distinct revisions belonging to one Recipe.
+  /// Throws ``RecipeReconciliationError/invalidParents`` for an invalid parent collection;
+  /// no revision is selected and no shared authority is written.
   public init(
     kitchenID: Kitchen.ID, revisions: [RecipeRevision], observedSelectionIDs: [RecipeSelectionCommand.ID]
   ) throws {
@@ -63,10 +82,13 @@ public struct RecipeReconciliation: Codable, Equatable, Sendable {
     self.observedSelectionIDs = observedSelectionIDs
   }
 
+  /// Starts or replaces local content from one compared revision; an unknown revision throws.
   public mutating func chooseRevision(_ id: RecipeRevision.ID) throws {
     draft = RecipeDraft(revision: try revision(id))
   }
 
+  /// Copies one authored field from a compared revision into the selected draft.
+  /// Throws before a starting choice or when the revision is not a comparison candidate.
   public mutating func choose(_ field: RecipeComparisonField, from id: RecipeRevision.ID) throws {
     guard var draft else { throw RecipeReconciliationError.missingChoice }
     field.copy(from: RecipeDraft(revision: try revision(id)), to: &draft)
@@ -102,6 +124,8 @@ public struct RecipeReconciliation: Codable, Equatable, Sendable {
     self.draft = draft
   }
 
+  /// Returns authored fields that differ, ignoring revision-local row identities and image-byte availability.
+  /// Throws for unknown revisions or encoding failures; collection order remains meaningful.
   public func differences(between first: RecipeRevision.ID, and second: RecipeRevision.ID) throws
     -> [RecipeComparisonField] {
     try Self.differences(RecipeDraft(revision: revision(first)), RecipeDraft(revision: revision(second)))
@@ -124,6 +148,7 @@ public struct RecipeReconciliation: Codable, Equatable, Sendable {
     return result
   }
 
+  /// Retains deliberate changes from validated editor inputs without normalizing untouched authored values.
   public mutating func retainEdits(from session: RecipeEditSession) throws {
     draft = try editedDraft(from: session)
   }

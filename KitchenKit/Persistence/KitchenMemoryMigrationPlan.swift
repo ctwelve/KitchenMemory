@@ -9,8 +9,10 @@ import SwiftData
 /// Published local and CloudKit names remain frozen. Every later change adds a
 /// new schema and migration stage rather than editing this definition.
 public enum KitchenMemorySchemaV1: VersionedSchema {
+  /// Version used by SwiftData to recognize this historical schema generation.
   public static let versionIdentifier = Schema.Version(1, 0, 0)
 
+  /// Complete model membership for this generation; historical model declarations remain frozen.
   public static let models: [any PersistentModel.Type] = [
     KitchenRecord.self,
     RecipeRecord.self,
@@ -30,8 +32,10 @@ public enum KitchenMemorySchemaV1: VersionedSchema {
 /// record types let every repository read converge after disconnected devices
 /// exchange edits and deletions without changing Domain values.
 public enum KitchenMemorySchemaV2: VersionedSchema {
+  /// Version used by SwiftData to recognize this historical schema generation.
   public static let versionIdentifier = Schema.Version(2, 0, 0)
 
+  /// Complete model membership for this generation; historical model declarations remain frozen.
   public static let models: [any PersistentModel.Type] = [
     KitchenRecord.self,
     RecipeRecord.self,
@@ -49,8 +53,10 @@ public enum KitchenMemorySchemaV2: VersionedSchema {
 
 /// Adds immutable Cooking Session document evidence without changing V2 rows.
 public enum KitchenMemorySchemaV3: VersionedSchema {
+  /// Version used by SwiftData to recognize this historical schema generation.
   public static let versionIdentifier = Schema.Version(3, 0, 0)
 
+  /// Complete model membership for this generation; historical model declarations remain frozen.
   public static let models: [any PersistentModel.Type] = KitchenMemorySchemaV2.models + [
     CookingSessionRecord.self,
     SessionFactRecord.self,
@@ -62,8 +68,10 @@ public enum KitchenMemorySchemaV3: VersionedSchema {
 
 /// Adds explicit account-scoped Kitchen ownership without rewriting V1 rows.
 public enum KitchenMemorySchemaV4: VersionedSchema {
+  /// Version used by SwiftData to recognize this historical schema generation.
   public static let versionIdentifier = Schema.Version(4, 0, 0)
 
+  /// Complete model membership for this generation; historical model declarations remain frozen.
   public static let models: [any PersistentModel.Type] = KitchenMemorySchemaV3.models + [
     KitchenOwnershipRecord.self,
   ]
@@ -71,8 +79,10 @@ public enum KitchenMemorySchemaV4: VersionedSchema {
 
 /// Adds immutable Recipe authority evidence and disposition chronology.
 public enum KitchenMemorySchemaV5: VersionedSchema {
+  /// Version used by SwiftData to recognize this historical schema generation.
   public static let versionIdentifier = Schema.Version(5, 0, 0)
 
+  /// Complete model membership for this generation; historical model declarations remain frozen.
   public static let models: [any PersistentModel.Type] = KitchenMemorySchemaV4.models + [
     RecipeSaveRecord.self,
     RecipeSelectionRecord.self,
@@ -82,7 +92,9 @@ public enum KitchenMemorySchemaV5: VersionedSchema {
 
 /// Adds private image payloads without changing published Recipe rows.
 public enum KitchenMemorySchemaV6: VersionedSchema {
+  /// Version used by SwiftData to recognize this historical schema generation.
   public static let versionIdentifier = Schema.Version(6, 0, 0)
+  /// Complete model membership for this generation; historical model declarations remain frozen.
   public static let models: [any PersistentModel.Type] = KitchenMemorySchemaV5.models + [
     RecipeImagePayloadRecord.self,
   ]
@@ -90,7 +102,9 @@ public enum KitchenMemorySchemaV6: VersionedSchema {
 
 /// Adds shared organization actions and reconstructive checkpoints without changing V6 rows.
 public enum KitchenMemorySchemaV7: VersionedSchema {
+  /// Version used by SwiftData to recognize this historical schema generation.
   public static let versionIdentifier = Schema.Version(7, 0, 0)
+  /// Complete model membership for this generation; historical model declarations remain frozen.
   public static let models: [any PersistentModel.Type] = KitchenMemorySchemaV6.models + [
     OrganizationActionRecord.self,
     OrganizationCheckpointRecord.self,
@@ -99,9 +113,11 @@ public enum KitchenMemorySchemaV7: VersionedSchema {
 
 /// The ordered migration path for Kitchen Memory's private local store.
 ///
-/// Released V1 stores migrate additively to V2; neither existing recipe rows
-/// nor the deployed V1 CloudKit record types are renamed or repurposed.
+/// Declares adjacent additive lightweight stages through V7 while preserving
+/// historical record names and meanings. This local plan does not administer
+/// CloudKit schema deployment or promise migration of every historical alpha store.
 public enum KitchenMemoryMigrationPlan: SchemaMigrationPlan {
+  /// Historical schema sequence accepted by the local migration plan, from V1 through V7.
   public static let schemas: [any VersionedSchema.Type] = [
     KitchenMemorySchemaV1.self,
     KitchenMemorySchemaV2.self,
@@ -112,6 +128,8 @@ public enum KitchenMemoryMigrationPlan: SchemaMigrationPlan {
     KitchenMemorySchemaV7.self,
   ]
 
+  /// Adjacent additive lightweight migrations; schema membership alone does not prove
+  /// arbitrary alpha-store compatibility.
   public static let stages: [MigrationStage] = [
     .lightweight(fromVersion: KitchenMemorySchemaV1.self, toVersion: KitchenMemorySchemaV2.self),
     .lightweight(fromVersion: KitchenMemorySchemaV2.self, toVersion: KitchenMemorySchemaV3.self),

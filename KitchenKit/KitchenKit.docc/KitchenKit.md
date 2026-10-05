@@ -49,6 +49,129 @@ keep ingredient text and structured contents consistent before persistence.
 ``RecipeIngredientTextDraft`` contains recoverable wording, line identities, and
 interpretation proposals; it is not part of a published ``RecipeRevision``.
 
+### Choose the smallest entry point
+
+| Task | Start with | Caller responsibility |
+| --- | --- | --- |
+| Read or change a maintained Recipe | ``RecipeLibrary`` | Supply repositories scoped to the same Kitchen; present failures and choices |
+| Keep editing recoverable across relaunch | ``RecipeDrafts`` | Retain the collection and provide a device-local editing store |
+| Parse captured recipe markup | ``SchemaOrgRecipeImporter`` | Acquire input, choose a candidate, and review it before Save |
+| Retrieve a recipe webpage | ``RecipeImportService`` | Initiate acquisition explicitly and present import concerns |
+| Scale a reading copy | ``RecipeScalingState`` | Choose an honest numeric yield basis and show unchanged-row reasons |
+| Record cooking activity | ``CookingSessions`` | Retain prepared intentions for retry and handle classified results |
+| Implement storage | ``RecipeRepository`` / ``CookingSessionRepository`` | Preserve immutable command identities and evidence boundaries |
+
+Domain and Import values can move across isolation boundaries when their types
+are `Sendable`. Repository adapters, the live draft collection, and product
+services that access those repositories use the main actor. `async` import
+does not make an actor-bound repository safe to access from a background task.
+
+### Parse without saving
+
+This example consumes an already captured JSON-LD document. It performs no
+network request and creates no Recipe:
+
+```swift
+import Foundation
+import KitchenKit
+
+func inspectCapturedRecipe() -> RecipeImportResult {
+    let markup = """
+    {"@context":"https://schema.org","@type":"Recipe",
+     "name":"Toast","recipeIngredient":["1 slice bread"],
+     "recipeInstructions":["Toast the bread."]}
+    """
+    return SchemaOrgRecipeImporter().importJSONLD(Data(markup.utf8))
+}
+```
+
+Inspect ``RecipeImportResult/candidates`` and
+``RecipeImportResult/diagnostics`` together. Resource-limit failures can reject
+the operation's candidates rather than return a partially accepted result.
+Source snapshots preserve captured evidence; they do not establish that the
+website's claims are true. ``RecipeImportService`` turns candidates into
+reviewable ``RecipeImportOption`` values, and ``RecipeDrafts`` can retain them
+before the person accepts an import for editing.
+
+### Edit through the retained draft
+
+A `RecipeEditSession` is a value. Mutating a local copy alone does not notify
+the retained draft or persist it. Submit non-ingredient changes through the
+live draft's interface:
+
+```swift
+import KitchenKit
+
+@MainActor
+func beginRecipe(in drafts: RecipeDrafts) -> RecipeEditingDraft? {
+    guard let draft = drafts.begin() else { return nil }
+    var details = draft.session
+    details.title = "Toast"
+    draft.updateRecipeDetails(from: details)
+    return draft
+}
+```
+
+`begin()` can return a draft even when its initial persistence attempt fails;
+present the collection's storage status and check persistence before leaving.
+Save freezes one command before submission. Retrying that pending Save uses
+the same identity and contents. ``RecipeDrafts/Publication`` distinguishes
+accepted publication from successful local draft cleanup, so a cleanup failure
+must not be presented as proof that the Recipe was never saved.
+
+For native ingredient text, retain one ``RecipeIngredientTextEditing`` for the
+control's lifetime, forward UTF-16 replacements, and end it on teardown. The
+control owns marked text, selection, and native Undo/Redo delivery. KitchenKit
+owns the matching semantic snapshots. Recreate the control when
+``RecipeEditingDraft/ingredientTextEditorID`` changes so delayed callbacks cannot
+mutate replacement contents.
+
+### Scale a transient reading value
+
+```swift
+import KitchenKit
+
+func doubledIngredient(_ ingredient: RecipeIngredient) -> ScaledRecipeIngredient? {
+    let yield = RecipeYield(
+        quantity: QuantityExpression(
+            kind: .exact, lowerBound: RationalQuantity(numerator: 2)
+        ),
+        originalText: "2 servings"
+    )
+    var reading = RecipeScalingState(recipeYield: yield)
+    reading.adjustWorkingYield(by: 2)
+    guard let scale = reading.scale else { return nil }
+    return ingredient.scaled(using: scale)
+}
+```
+
+The maintained ingredient remains untouched. Examine
+``ScaledRecipeIngredient/status``: fixed quantities, uncertain text, display
+overrides, manual-review choices, and arithmetic failures have explicit reasons
+for retaining their authored amounts. Scaling does not infer units or convert
+a textual yield into a numeric one.
+
+### Preparation, acceptance, and transport
+
+Recipe Save, Selection, Folder, Tag, and Cooking Session commands carry stable
+identities and observed evidence. Preparation captures an intention against
+what the caller observed; repository acceptance validates the relevant current
+evidence. A stale screen is not authorization to overwrite newer evidence.
+
+``CookingSessions`` reads retained evidence through
+``SessionEvidenceProjector``. A result can be a usable Session, temporarily
+unavailable material, or evidence requiring Recovery. Those distinctions remain
+meaningful after local writes and partial CloudKit delivery. A view disappearing
+does not Stop or Finish a Session; only an explicit accepted intention does.
+The application owns its pending-command outbox and retry presentation.
+
+``KitchenMemorySchema`` is a composition entry point for SwiftData adapters.
+Its default container is local-only; personal CloudKit requires the default
+durable store and explicit synchronization selection. A successful local save
+does not prove upload, download, convergence, or migration of arbitrary alpha
+data. Domain callers receive values and classified evidence, never live
+SwiftData records.
+
 ## Topics
 
 ### Domain Foundations
@@ -68,6 +191,16 @@ interpretation proposals; it is not part of a published ``RecipeRevision``.
 - ``FolderCheckpoint``
 - ``FolderRepository``
 
+### Tag Organization
+
+- ``Tag``
+- ``TagLibrary``
+- ``TagIntent``
+- ``TagCommand``
+- ``TagCollision``
+- ``TagCheckpoint``
+- ``TagRepository``
+
 ### Recipe Content
 
 - ``RecipeSource``
@@ -86,6 +219,8 @@ interpretation proposals; it is not part of a published ``RecipeRevision``.
 - ``RecipeEditSession``
 - ``RecipeIngredientTextDraft``
 - ``RecipeIngredientTextEditing``
+- ``RecipeScalingState``
+- ``ScaledRecipeIngredient``
 - ``CookingSessions``
 
 ### Import
@@ -100,6 +235,9 @@ interpretation proposals; it is not part of a published ``RecipeRevision``.
 - ``RecipeRepository``
 - ``CookingSessionRepository``
 - ``KitchenMemorySchema``
+- ``RecipeEditingStoring``
+- ``FileRecipeEditingStore``
+- ``KitchenMemoryStoreSynchronization``
 
 ### Cooking Session Evidence
 

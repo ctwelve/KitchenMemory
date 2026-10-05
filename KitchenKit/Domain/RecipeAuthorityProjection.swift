@@ -5,7 +5,16 @@
 import CryptoKit
 import Foundation
 
+/// Derives current Recipe content and disposition from immutable retained evidence.
+///
+/// Save ancestry, Selection causality, manifests, ownership, and digests are validated
+/// before presentation. Neither dates nor the compatibility pointer elect currentness.
 public enum RecipeAuthorityProjector {
+  /// Validates retained evidence and derives one complete authority classification.
+  ///
+  /// Exact duplicate identities coalesce. Pruning is checked before ordinary authority;
+  /// missing material waits, while ownership, graph, manifest, or digest contradictions
+  /// require recovery. Concurrent heads choosing the same Revision agree without a clock tie.
   public static func project(_ evidence: RecipeAuthorityEvidence) -> RecipeAuthorityProjection {
     if let disposition = pruneDisposition(evidence) { return disposition }
     let normalized: NormalizedRecipeAuthorityEvidence
@@ -153,6 +162,9 @@ private extension RecipeAuthorityProjector {
       return .recovery(.malformedEncoding)
     }
     let actual = RecipePayloadManifest(revision: revision)
+    // A strict identity subset can be a delivery still in progress. Extra rows,
+    // changed ordering, or a different root contradict the committed manifest;
+    // accepting a plausible partial Recipe would hide that distinction.
     guard actual == expected else {
       return manifest(actual, isSubsetOf: expected)
         ? .unavailable(.incompleteManifest(save.revisionID))

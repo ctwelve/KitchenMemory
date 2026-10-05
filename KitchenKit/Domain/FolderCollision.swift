@@ -6,6 +6,7 @@ import Foundation
 
 /// Separate live Folder identities sharing one sibling name. Repair requires a person.
 public struct FolderCollision: Equatable, Sendable {
+  /// The separate colliding sibling identities, sorted by UUID rather than collapsed automatically.
   public let folderIDs: [Folder.ID]
 
   static func detect(in folders: [Folder]) -> [FolderCollision] {

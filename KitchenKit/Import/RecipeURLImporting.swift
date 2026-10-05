@@ -9,5 +9,9 @@ import Foundation
 /// Product logic depends on this small boundary so transport and parsing
 /// failures can be tested without making a network request.
 public protocol RecipeURLImporting: Sendable {
+  /// Acquires and interprets one URL into reviewable candidates.
+  ///
+  /// Implementations own transport and parsing failures; success does not accept a
+  /// Recipe Save, select among multiple candidates, or download referenced images.
   func importRecipe(from url: URL) async throws -> RecipeImportResult
 }

@@ -4,8 +4,11 @@
 
 import Foundation
 
+/// Supplies localized bundled recipes for a specified Kitchen on the main actor.
 @MainActor
 public protocol SampleRecipeProviding {
+  /// Decodes the selected sample collection scoped to the Kitchen.
+  /// Throws when sample content is unavailable; supplying content does not authorize installation.
   func recipes(in kitchenID: Kitchen.ID) throws -> [StoredRecipe]
 }
 
@@ -14,24 +17,34 @@ public protocol SampleRecipeProviding {
 /// Acceptance authorizes that one requested installation, not automatic repair
 /// or future transfers. ``SampleRecipePresence`` describes current content.
 public enum SampleRecipeOnboardingResponse: String, Equatable, Sendable {
+  /// The first-run question has not received an explicit answer.
   case undecided
+  /// The person authorized the requested installation, without authorizing future repair.
   case accepted
+  /// The person declined the requested first-run installation.
   case declined
 }
 
 /// How much of the current localized sample pack is present in one Kitchen.
 public enum SampleRecipePresence: Equatable, Sendable {
+  /// No stable identity from the current sample pack is present.
   case none
+  /// Some, but not all, stable sample identities are present.
   case partial
+  /// Every stable identity from the current sample pack is present.
   case complete
+  /// Bundled sample content could not be read to establish presence.
   case unavailable
 }
 
 /// The personal Kitchen plus whether this launch had to create it locally.
 public struct PreparedKitchen: Equatable, Sendable {
+  /// Kitchen selected or created by local bootstrap.
   public let kitchen: Kitchen
+  /// Whether bootstrap found no Kitchen and had to establish one locally.
   public let wasCreated: Bool
 
+  /// Creates a bootstrap result without performing storage work.
   public init(kitchen: Kitchen, wasCreated: Bool) {
     self.kitchen = kitchen
     self.wasCreated = wasCreated
@@ -51,10 +64,13 @@ public struct KitchenBootstrapService {
 
   private let repository: any RecipeRepository
 
+  /// Binds bootstrap to the main-actor repository that owns durable Kitchen identity.
   public init(repository: any RecipeRepository) {
     self.repository = repository
   }
 
+  /// Returns an existing personal or legacy Kitchen, or atomically creates an empty one.
+  /// Repository failures propagate; absence of Recipe content never authorizes sample installation.
   public func prepareInitialKitchen(named name: String) throws -> Kitchen {
     try prepareInitialKitchenWithStatus(named: name).kitchen
   }
@@ -99,11 +115,15 @@ public struct SampleRecipeInstallService {
   private let repository: any RecipeRepository
   private let samples: any SampleRecipeProviding
 
+  /// Binds Recipe storage and bundled sample decoding for the service.
   public init(repository: any RecipeRepository, samples: any SampleRecipeProviding) {
     self.repository = repository
     self.samples = samples
   }
 
+  /// Installs sample content through the repository's compatibility authority writer.
+  /// Visible Recipes are preserved; compatible retained sample content can be restored
+  /// by resolving known deletions. Decoding and repository failures propagate.
   public func install(in kitchenID: Kitchen.ID) throws {
     let sampleRecipes = try samples.recipes(in: kitchenID)
     try repository.addRecipes(sampleRecipes, to: kitchenID)
@@ -137,11 +157,13 @@ public struct KitchenResetService {
   private let repository: any KitchenResetRepository
   private let samples: any SampleRecipeProviding
 
+  /// Uses a reset repository that owns the complete durable reset boundary.
   public init(repository: any KitchenResetRepository, samples: any SampleRecipeProviding) {
     self.repository = repository
     self.samples = samples
   }
 
+  /// Binds Recipe storage and bundled sample decoding for the service.
   public init(repository: any RecipeRepository, samples: any SampleRecipeProviding) {
     self.init(
       repository: RecipeOnlyKitchenResetRepository(repository: repository),
@@ -149,6 +171,9 @@ public struct KitchenResetService {
     )
   }
 
+  /// Replaces the Kitchen through its reset repository, optionally decoding and installing samples.
+  /// Throws on sample or repository failure. Callers must purge device-local editing
+  /// and delivery state separately before an explicit reset.
   public func reset(kitchenID: Kitchen.ID, installSamples: Bool = true) throws {
     let sampleRecipes = try installSamples ? samples.recipes(in: kitchenID) : []
     try repository.reset(kitchenID: kitchenID, to: sampleRecipes)

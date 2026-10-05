@@ -127,6 +127,9 @@ final class DefaultsKitchenPreferencesStore: NSObject, KitchenPreferencesStoring
     _ onChange: @escaping @MainActor (SampleRecipeOnboardingResponse) -> Void
   ) {
     onSampleRecipeChange = onChange
+    // Retain the observation for the store's lifetime. Defaults calls back on
+    // its delivery context; the task enters the main actor before changing the
+    // retained library projection rather than calling a view directly.
     sampleRecipeObservation = Defaults.observe(sampleRecipeOnboardingKey, options: []) { change in
       let response = change.newValue.response
       Task { @MainActor in onChange(response) }

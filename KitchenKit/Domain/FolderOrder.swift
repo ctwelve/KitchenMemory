@@ -4,8 +4,11 @@
 
 import Foundation
 
+/// The shared Folder presentation mode; manual neighbor order survives mode changes.
 public enum FolderOrdering: String, Codable, Equatable, Sendable {
+  /// Locale-aware display-name order with stable identity ties.
   case alphabetical
+  /// Retained neighbor order, including creations and explicit repositioning.
   case manual
 }
 
@@ -31,6 +34,10 @@ struct FolderOrder {
 }
 
 extension FolderLibrary {
+  /// Returns direct children in the selected shared order.
+  ///
+  /// Alphabetical comparison uses the supplied locale and UUID ties; manual ordering
+  /// uses retained neighbor evidence. Nil chooses the implicit Kitchen root.
   public func children(of parentID: Folder.ID?, locale: Locale = .current) -> [Folder] {
     let children = folders.filter { $0.parentID == parentID }
     if ordering == .manual {
@@ -68,6 +75,9 @@ extension FolderLibrary {
 }
 
 extension FolderLibrary {
+  /// The causally selected Unfiled visibility preference, defaulting to true.
+  ///
+  /// Reconstructing retained organization evidence can throw `FolderError`.
   public var systemViewVisible: Bool {
     get throws {
       let evidence = try OrganizationEvidence(actions, checkpoints: checkpointEvidence)

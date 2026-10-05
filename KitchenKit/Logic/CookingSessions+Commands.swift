@@ -8,7 +8,15 @@ import Foundation
 extension CookingSessions {
   // This switch is the complete public intention vocabulary; keeping it in one
   // place makes newly added commands fail compilation until they are routed.
-  // swiftlint:disable:next cyclomatic_complexity function_body_length
+  // swiftlint:disable cyclomatic_complexity function_body_length
+  /// Accepts or retries one frozen Session intention using current retained evidence.
+  ///
+  /// The main-actor operation validates lifecycle, targets, and explicit observed choices
+  /// before appending the smallest complete local transaction. Identical retained intent
+  /// is classified again; conflicting identity reuse throws. ``CookingSessionAttention``
+  /// may describe a precondition veto or a post-append projection requiring attention.
+  /// A thrown read after append does not prove the write was rejected: retain the same
+  /// intention for retry. Success never proves remote delivery.
   public func perform(
     _ intention: CookingSessionIntention
   ) throws -> CookingSessionCommandResult {
@@ -104,6 +112,7 @@ extension CookingSessions {
       try performContinuation(value)
     }
   }
+  // swiftlint:enable cyclomatic_complexity function_body_length
 
   // Finish deliberately keeps retry validation and its atomic transaction
   // selection adjacent so neither half can drift from the other.
@@ -331,6 +340,9 @@ extension CookingSessions {
     requiredLifecycle: SessionLifecycle
   ) throws -> CookingSessionCommandResult {
     let evidence = try requiredEvidence(id: intention.sessionID)
+    // Test retained identity before lifecycle: an accepted Active command must remain
+    // retryable after a later Stop or Finish. Rebuilding its causal heads now would invent
+    // a different command, so compare authored intent against its original envelope.
     if let existing = evidence.facts.first(where: { $0.id == intention.id }) {
       guard try commandFactory.matchesRetry(
         existing,

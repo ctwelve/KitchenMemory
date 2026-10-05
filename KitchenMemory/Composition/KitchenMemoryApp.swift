@@ -9,6 +9,13 @@ import SwiftUI
 /// Startup remains visible while ``AppStartupCoordinator`` prepares the
 /// application graph. The same prepared dependencies then feed the iOS window,
 /// the macOS window, and the macOS Settings scene.
+///
+/// The system calls SwiftUI's default `App.main()` for this `@main` conformer;
+/// SwiftUI evaluates `body` and creates windows from its scene declarations.
+/// The app retains one startup
+/// coordinator through `@StateObject`; creating another library window therefore
+/// shares the prepared models rather than preparing another store. Each window's
+/// ``ContentView`` owns its own sheets and split-view columns.
 @main
 struct KitchenMemoryApp: App {
   @Environment(\.scenePhase) private var scenePhase
@@ -18,6 +25,7 @@ struct KitchenMemoryApp: App {
     _startup = StateObject(wrappedValue: AppStartupCoordinator())
   }
 
+  /// Declares the scenes SwiftUI manages, including system-invoked background refresh.
   var body: some Scene {
 #if os(macOS)
     WindowGroup(id: RecipeLibraryCommands.windowID) {
@@ -64,6 +72,8 @@ struct KitchenMemoryApp: App {
       retryStartup: retryPreparation
     )
     .background(startupFrameObserver)
+    // SwiftUI reruns this view task when the shell phase changes. Maintenance
+    // still checks its own eligibility; an active scene is only an opportunity.
     .task(id: AppShellPresentation(state: startup.state)) {
       if scenePhase == .active { startup.state.preparedApp?.recordsMaintenance.launchOpportunity() }
     }

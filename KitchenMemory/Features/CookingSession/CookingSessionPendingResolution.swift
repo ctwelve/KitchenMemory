@@ -4,6 +4,12 @@
 
 import KitchenKit
 
+/// Distinguishes retryable attention from outcomes that retire a local command.
+///
+/// A Finished source makes the intention impossible; changed consent frontiers
+/// require a new explicit decision. Neither case means acceptance. Keeping this
+/// classification separate lets delivery retire identities while presentation
+/// preserves authored Entry text and offers the next action.
 enum PendingCookingSessionResolution {
   case accepted(CookingSessionProjection)
   case rejectedByFinishedSource

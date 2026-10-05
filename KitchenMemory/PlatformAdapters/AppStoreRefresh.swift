@@ -5,6 +5,12 @@
 import Foundation
 import KitchenKit
 
+/// Connects managed-store invalidation to the prepared graph for personal-cloud launches.
+///
+/// KitchenKit's observer receives Core Data remote-change notifications and
+/// hops to the main actor before invoking this closure. A notification means
+/// reads may be stale, not that a specific intention was accepted or that cloud
+/// synchronization completed. ``PreparedApp`` retains the observer and its graph.
 @MainActor
 func makePersistentStoreChangeObserver(
   plan: AppLaunchPlan,
@@ -38,6 +44,11 @@ func reconcileKitchenOwnership(
     named: LocalizedStringResource.kitchenDefaultName.localized(for: locale), ownerID: ownerID)
 }
 
+/// Refreshes feature read models after the caller reconciles Kitchen ownership.
+///
+/// Session queries use a repository-owned SwiftData context, so replace that
+/// read context before retrying commands and rebuilding Session presentation.
+/// Early notifications leave feature initialization to the shell's first load.
 @MainActor
 func performExternalStoreRefresh(
   libraryModel: RecipeLibraryModel,

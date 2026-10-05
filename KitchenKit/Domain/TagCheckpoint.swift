@@ -6,9 +6,15 @@ import Foundation
 
 /// Reconstructive organization evidence with an explicit minimum retention promise.
 public struct TagCheckpoint: Codable, Equatable, Sendable {
+  /// The immutable checkpoint identity, binding its retained receipts and reconstruction payloads.
   public let id: UUID
+  /// The Kitchen ownership boundary for this value; transport identity cannot substitute for it.
   public let kitchenID: Kitchen.ID
+  /// The local compaction date, independent of evidence authorship dates.
   public let createdAt: Date
+  /// The minimum checkpoint retention promise, at least 1,827 days after creation.
+  ///
+  /// Expiry alone does not permit discarding the last reconstructive evidence.
   public let antiResurrectionUntil: Date
   let evidence: OrganizationCheckpoint<TagChange>
 }

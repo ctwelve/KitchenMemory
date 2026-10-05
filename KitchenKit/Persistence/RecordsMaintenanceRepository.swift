@@ -14,6 +14,8 @@ public final class RecordsMaintenanceRepository {
   private let kitchenID: Kitchen.ID
   private let batchSize: Int
 
+  /// Scopes opportunistic maintenance to one Kitchen and a candidate/removal batch size of at least one.
+  /// Batch count is bounded; reconstructing each complete evidence aggregate is not constant-cost.
   public init(modelContainer: ModelContainer, kitchenID: Kitchen.ID, batchSize: Int = 16) {
     container = modelContainer
     self.kitchenID = kitchenID
@@ -44,6 +46,9 @@ public final class RecordsMaintenanceRepository {
     }
   }
 
+  /// Runs the initial bounded page and reports whether this sweep has no continuation.
+  /// True means this opportunity finished its sweep, not that every candidate was eligible
+  /// or every attempted aggregate succeeded. Cancellation and outer read failures propagate.
   public func run(_ job: RecordsMaintenanceJob, at date: Date) throws -> Bool {
     try run(job, at: date, after: nil) == nil
   }

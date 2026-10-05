@@ -11,6 +11,11 @@ import Observation
 /// The model owns selection, startup sample choice, cloud-status display, and
 /// coarse user-facing failure categories. It delegates recipe operations to
 /// KitchenKit's `RecipeLibrary` and never exposes SwiftData records to views.
+///
+/// ``PreparedApp`` retains this `@Observable` object across view reconstruction.
+/// SwiftUI tracks properties a view reads and invalidates that view when they
+/// change; observation does not save recipes. Views and commands still call
+/// explicit product methods to cross the KitchenKit boundary.
 @MainActor
 @Observable
 final class RecipeLibraryModel {
@@ -100,6 +105,10 @@ final class RecipeLibraryModel {
     resetPresentationState = handler
   }
 
+  /// Loads library contents and resolves sample onboarding once for this model.
+  ///
+  /// Each window's shell task may call this. The model's retained load state,
+  /// rather than the lifetime of any view, guards initialization.
   func loadIfNeeded() {
     guard !hasLoaded else { return }
     reload()

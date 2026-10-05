@@ -24,6 +24,11 @@ struct CookingSessionLifecyclePresentation {
   }
 }
 
+/// Renders a supplied Session projection and submits explicit user intentions.
+///
+/// `@Bindable` exposes the retained model to controls; the confirmation `@State`
+/// values belong to this view's identity. Appearing, disappearing, or resizing
+/// this interface does not authorize a Session lifecycle transition.
 struct CookingSessionView: View {
   @Bindable var model: CookingSessionPresentationModel
   let session: CookingSessionProjection

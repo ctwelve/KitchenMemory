@@ -58,6 +58,8 @@ struct OrganizationStore<Payload: OrganizationPayload> {
     snapshot.actions.append(contentsOf: actions)
     try validate(snapshot)
     var retained = Set(matching.map(\.id))
+    // Compaction removes raw envelopes, not accepted identities. Checkpoint receipts
+    // must join live-row identities here or a late retry could append the same action again.
     retained.formUnion(snapshot.checkpoints.flatMap { $0.evidence.receipts }.map(\.id))
     for action in actions {
       try validateAssignment(action.payload, in: kitchenID, context: context, requireRecipe: false)

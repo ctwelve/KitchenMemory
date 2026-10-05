@@ -12,10 +12,14 @@ import SwiftData
 
 /// A recipe together with the revision selected as its current content.
 public struct StoredRecipe: Codable, Equatable, Identifiable, Sendable {
+  /// Stable Recipe identity, independent of which Revision is selected.
   public var id: Recipe.ID { recipe.id }
+  /// Durable Recipe identity and the selected current-revision reference.
   public let recipe: Recipe
+  /// Immutable revision presented as current content for the paired Recipe.
   public let revision: RecipeRevision
 
+  /// Pairs domain values without validation or storage; repository writes validate their identities.
   public init(recipe: Recipe, revision: RecipeRevision) {
     self.recipe = recipe
     self.revision = revision
@@ -30,34 +34,69 @@ public struct StoredRecipe: Codable, Equatable, Identifiable, Sendable {
 /// operation; no default fabricates evidence or weakens a Save command.
 @MainActor
 public protocol RecipeRepository: AnyObject {
+  /// Persists Kitchen identity and name without authorizing Recipe or sample installation.
   func save(_ kitchen: Kitchen) throws
-  /// Atomically creates one Kitchen together with its initial recipes.
+  /// Atomically creates a previously absent Kitchen and its initial Recipe authority.
+  /// Existing Kitchen, invalid ownership, and inconsistent supplied identities throw.
   func create(_ kitchen: Kitchen, with recipes: [StoredRecipe]) throws
+  /// Accepts a compatibility Recipe/revision pair through the immutable authority writer.
+  /// Callers needing explicit retry control should retain a ``RecipeSaveCommand`` instead.
   func save(recipe: Recipe, revision: RecipeRevision) throws
   /// Atomically accepts one caller-identified immutable Save and Selection.
+  /// Identical retry coalesces; changed identity reuse throws. Success proves local
+  /// durability only, and retries must retain the same complete command envelope.
   func save(_ command: RecipeSaveCommand) throws
-  /// Atomically chooses an existing accepted Revision using immutable evidence.
+  /// Accepts deletion evidence while retaining Recipe history; exact retry is idempotent.
   func delete(_ command: RecipeDeleteCommand) throws
+  /// Atomically resolves the deletion markers named by an explicit Restore.
+  /// Unobserved deletions remain effective; invalid markers and changed retry identity throw.
   func restore(_ command: RecipeRestoreCommand) throws
+  /// Reads retained Deleted Items, including incomplete or invalid authority requiring attention.
+  /// Pruned Recipes and late-evidence-after-prune Recovery are not restorable Deleted Items.
   func deletedRecipes(in kitchenID: Kitchen.ID) throws -> [DeletedRecipe]
+  /// Accepts an immutable choice of an existing accepted Revision.
+  /// Its observed Selection frontier preserves concurrent unseen choices rather than using timestamps.
   func select(_ command: RecipeSelectionCommand) throws
+  /// Returns the locally observed maximal Selection identities for a Recipe.
+  /// Retain this frontier with an edit or choice; it is not evidence of global synchronization.
   func selectionHeads(for recipeID: Recipe.ID) throws -> [RecipeSelectionCommand.ID]
+  /// Reads locally retained Kitchens as domain values without exposing managed records.
   func kitchens() throws -> [Kitchen]
+  /// Reads one Kitchen identity, or nil when absent; ownership decoding errors propagate.
   func kitchen(id: Kitchen.ID) throws -> Kitchen?
-  /// Atomically claims legacy Kitchens and converges only matching ownership.
+  /// Atomically claims eligible unowned Kitchens and converges matching owner scope.
+  /// Explicit evidence of another owner rejects the operation without moving their content.
   func convergeKitchens(into kitchen: Kitchen, ownedBy ownerID: KitchenOwner.ID) throws
+  /// Reads ordinary current Recipe content, or nil for absent, deleted, pruned, or withheld content.
+  /// Use ``recipeAuthority(id:)`` to distinguish withheld classifications; missing required
+  /// revision or invalid stored authority may throw rather than supply partial content.
   func recipe(id: Recipe.ID) throws -> StoredRecipe?
-  /// Projects immutable authority evidence for one Recipe without consulting the V1 pointer.
+  /// Classifies locally retained authority and payload as available, deleted, pruned, Unavailable, or Recovery.
+  /// V5 currentness comes from Selection evidence; the retained pre-V5 compatibility
+  /// path still supports legacy Recipe graphs. No managed records cross this boundary.
   func recipeAuthority(id: Recipe.ID) throws -> RecipeAuthorityProjection?
+  /// Reads unavailable or invalid authority and independently decodable recovery payloads.
+  /// Competing Selections use reconciliation; malformed payloads are not offered as recovered content.
   func recoveryRecipes(in kitchenID: Kitchen.ID) throws -> [RecipeRecovery]
+  /// Rechecks retention eligibility and dependencies before atomically pruning payload with tombstones.
+  /// Age alone does not permit pruning; retained Session media and unreadable dependency evidence block it.
   func maintainDeletedRecipes(in kitchenID: Kitchen.ID, at now: Date) throws -> RecipeRetentionResult
+  /// Returns explicit comparisons for surviving revision branches or competing Selections.
+  /// The compared parent set and observed Selection frontier are retained without choosing a winner.
   func reconciliations(in kitchenID: Kitchen.ID) throws -> [RecipeReconciliation]
+  /// Reads ordinary visible Recipes with selected current content.
+  /// Deleted, pruned, and Recovery items are withheld; missing required payload or decode failures may throw.
   func recipes(in kitchenID: Kitchen.ID) throws -> [StoredRecipe]
-  /// Atomically adds recipes whose stable identities are not already present.
+  /// Atomically installs supplied content through the compatibility authority writer.
+  /// Visible Recipes are preserved; compatible retained content can be made visible
+  /// by resolving known deletion evidence. Conflicting authority or ownership throws.
   func addRecipes(_ recipes: [StoredRecipe], to kitchenID: Kitchen.ID) throws
-  /// Returns every saved revision for a recipe, newest revision first.
+  /// Returns retained revisions in descending revision-number order.
+  /// The descriptive ordering does not select current content or resolve concurrent authority.
   func revisions(for recipeID: Recipe.ID) throws -> [RecipeRevision]
-  /// Atomically replaces every recipe and revision owned by one Kitchen.
+  /// Atomically replaces Recipe content for an explicit Kitchen reset.
+  /// This Recipe-only compatibility operation does not erase Session or organization
+  /// evidence; production reset uses ``KitchenResetRepository``.
   func replaceRecipes(in kitchenID: Kitchen.ID, with recipes: [StoredRecipe]) throws
 }
 
@@ -127,7 +166,9 @@ public enum KitchenMemoryPersistenceError: Error, Equatable {
 
   /// A narrow adapter does not implement immutable Save or authority reads.
   case recipeSaveUnsupported
+  /// The adapter does not implement classified immutable Recipe authority reads.
   case recipeAuthorityUnsupported
+  /// The adapter does not implement reads of the observed Selection frontier.
   case recipeSelectionHeadsUnsupported
 }
 
@@ -150,6 +191,7 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     var capture: RecipeSourceCapture
   }
 
+  /// Creates a main-actor read context over the supplied container; writes use isolated contexts.
   public init(modelContainer: ModelContainer) {
     self.context = ModelContext(modelContainer)
   }
@@ -228,12 +270,15 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     }
   }
 
+  /// Persists Kitchen identity and name without authorizing Recipe or sample installation.
   public func save(_ kitchen: Kitchen) throws {
     try performIsolatedWrite { writer in
       try writer.upsert(kitchen)
     }
   }
 
+  /// Atomically creates a previously absent Kitchen and its initial Recipe authority.
+  /// Throws when the Kitchen already exists or the supplied ownership/identities are invalid.
   public func create(_ kitchen: Kitchen, with recipes: [StoredRecipe]) throws {
     try performIsolatedWrite { writer in
       guard try writer.kitchen(id: kitchen.id) == nil else {
@@ -245,16 +290,23 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     }
   }
 
+  /// Accepts a compatibility Recipe/revision pair through the immutable authority writer.
+  /// Callers needing explicit retry control should retain a ``RecipeSaveCommand`` instead.
   public func save(recipe: Recipe, revision: RecipeRevision) throws {
     try save(try compatibilityCommand(recipe: recipe, revision: revision))
   }
 
+  /// Accepts an immutable Save and Selection in one local transaction.
+  /// Identical command retry coalesces; changed identity reuse throws. Success establishes
+  /// local durability only, and a failed attempt must be retried with the same envelope.
   public func save(_ command: RecipeSaveCommand) throws {
     try performIsolatedWrite { writer in
       try writer.accept(command)
     }
   }
 
+  /// Accepts an immutable choice of an existing accepted Revision.
+  /// Its observed Selection frontier preserves concurrent unseen choices rather than using timestamps.
   public func select(_ command: RecipeSelectionCommand) throws {
     try performIsolatedWrite { writer in
       try writer.acceptSelection(command)
@@ -270,6 +322,7 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     }
   }
 
+  /// Reads one Kitchen identity, or nil when absent; ownership decoding errors propagate.
   public func kitchen(id: Kitchen.ID) throws -> Kitchen? {
     let identifier = id.rawValue
     let descriptor = FetchDescriptor<KitchenRecord>(predicate: #Predicate { $0.id == identifier })
@@ -282,6 +335,7 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     }
   }
 
+  /// Reads locally retained Kitchens as domain values without exposing managed records.
   public func kitchens() throws -> [Kitchen] {
     let descriptor = FetchDescriptor<KitchenRecord>(sortBy: [SortDescriptor(\.name)])
     return try context.fetch(descriptor).uniqued(on: \.id).map {
@@ -293,6 +347,8 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     }
   }
 
+  /// Atomically claims eligible unowned Kitchens and converges matching owner scope.
+  /// Explicit evidence of another owner rejects the operation instead of moving their content.
   public func convergeKitchens(
     into kitchen: Kitchen,
     ownedBy ownerID: KitchenOwner.ID
@@ -302,6 +358,9 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     }
   }
 
+  /// Reads ordinary current Recipe content, or nil for absent, deleted, pruned, or withheld content.
+  /// Use ``recipeAuthority(id:)`` to distinguish withheld classifications; missing required
+  /// revision or invalid stored authority may throw rather than supply partial content.
   public func recipe(id: Recipe.ID) throws -> StoredRecipe? {
     try storedRecipe(from: recipeAuthority(id: id))
   }
@@ -324,7 +383,10 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
   }
 
   // All synchronized authority families must be collected before ownership can be derived.
-  // swiftlint:disable:next function_body_length
+  // swiftlint:disable function_body_length
+  /// Classifies all locally retained Recipe authority and payload evidence.
+  /// Returns nil only when no routing evidence is known. Partial delivery remains
+  /// Unavailable; positive invariant failures require Recovery, without erasing evidence.
   public func recipeAuthority(id: Recipe.ID) throws -> RecipeAuthorityProjection? {
     let recipeID = id.rawValue
     let recipeRecords = try context.fetch(
@@ -431,6 +493,7 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     )
     return RecipeAuthorityProjector.project(evidence)
   }
+  // swiftlint:enable function_body_length
 
   private func recipeSaveEvidence(_ record: RecipeSaveRecord) -> RecipeSaveEvidence {
     RecipeSaveEvidence(
@@ -533,6 +596,8 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     return StoredRecipe(recipe: recipe, revision: try domainRevision(from: revisionRecord))
   }
 
+  /// Returns explicit comparisons for surviving revision branches or competing Selections.
+  /// The compared parent set and observed Selection frontier are retained without choosing a winner.
   public func reconciliations(in kitchenID: Kitchen.ID) throws -> [RecipeReconciliation] {
     try recipeIdentifiers(in: kitchenID.rawValue).compactMap { identifier in
       let recipeID = Recipe.ID(rawValue: identifier)
@@ -558,6 +623,8 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     }
   }
 
+  /// Reads ordinary visible Recipes with selected current content.
+  /// Deleted, pruned, and Recovery items are withheld; missing required payload or decode failures may throw.
   public func recipes(in kitchenID: Kitchen.ID) throws -> [StoredRecipe] {
     let identifier = kitchenID.rawValue
     let deletedIDs = Set(try deletedRecipes(in: kitchenID).map { $0.id.rawValue })
@@ -598,6 +665,9 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     return identifiers.sorted { $0.uuidString < $1.uuidString }
   }
 
+  /// Atomically installs supplied content absent from ordinary current Recipe reads.
+  /// Visible Recipes are preserved. Compatibility acceptance reuses stable authority
+  /// and resolves known deletions; conflicting identity or ownership evidence throws.
   public func addRecipes(_ recipes: [StoredRecipe], to kitchenID: Kitchen.ID) throws {
     try performIsolatedWrite { writer in
       try writer.validate(recipes, in: kitchenID)
@@ -609,6 +679,8 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     }
   }
 
+  /// Reads retained immutable revisions in descending revision-number order.
+  /// Ordering is descriptive and does not decide currentness or resolve competing Selections.
   public func revisions(for recipeID: Recipe.ID) throws -> [RecipeRevision] {
     let identifier = recipeID.rawValue
     let descriptor = FetchDescriptor<RecipeRevisionRecord>(
@@ -635,6 +707,9 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     return lhs.id.uuidString < rhs.id.uuidString
   }
 
+  /// Atomically replaces Recipe contents for an explicit reset of this Kitchen.
+  /// This Recipe-only operation does not erase Session or organization records; use
+  /// ``KitchenResetRepository`` for the complete production reset boundary.
   public func replaceRecipes(in kitchenID: Kitchen.ID, with recipes: [StoredRecipe]) throws {
     try performIsolatedWrite { writer in
       try writer.validate(recipes, in: kitchenID)
@@ -1208,6 +1283,8 @@ public final class SwiftDataRecipeRepository: RecipeRepository {
     }
   }
 
+  /// Returns the locally observed maximal Selection identities for a Recipe.
+  /// Retain this frontier with an edit or choice; it is not evidence of global synchronization.
   public func selectionHeads(
     for recipeID: Recipe.ID
   ) throws -> [RecipeSelectionCommand.ID] {

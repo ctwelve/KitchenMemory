@@ -8,6 +8,11 @@ import Observation
 import SwiftUI
 
 /// A native binding and dialog adapter over one KitchenKit-owned draft.
+///
+/// ``RecipeLibraryModel`` caches this presentation by draft identity; an editor
+/// view's `@Bindable` exposes writable projections of the same object. Binding
+/// writes to ``session`` call the setter, which asks Kit to copy recipe details
+/// while preserving ingredients and captured metadata owned by the live draft.
 @MainActor
 @Observable
 final class RecipeEditingModel: Identifiable {
@@ -33,6 +38,11 @@ final class RecipeEditingModel: Identifiable {
     usesAdvancedEditor = advanced
   }
 
+  /// Resolves each read by identity so row movement does not retarget an edit.
+  ///
+  /// A binding is a getter/setter pair, not a stored copy of the ingredient.
+  /// Writes return through Kit's structured-ingredient operation so text and
+  /// precision representations remain coordinated.
   func ingredientBinding(_ ingredient: RecipeIngredient) -> Binding<RecipeIngredient> {
     Binding(
       get: { self.session.ingredientSections.lazy.flatMap(\.ingredients)

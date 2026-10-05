@@ -5,6 +5,11 @@
 #if os(macOS)
 import SwiftUI
 
+/// Menu definitions evaluated by SwiftUI with the active scene's focused values.
+///
+/// ``LibraryMenuBridge`` supplies the same ``LibraryCommandActions`` used by
+/// toolbars. These commands submit product intentions through those actions;
+/// native text Undo/Redo continues through the text control's undo manager.
 struct RecipeLibraryCommands: Commands {
   static let windowID = "recipe-library"
   static let importWindowID = "recipe-import"
@@ -59,6 +64,7 @@ struct RecipeLibraryCommands: Commands {
     }
   }
 
+  /// Uses focused window actions, or opens a library window when none is present.
   static func resolveNewRecipeActions(
     app: PreparedApp?, focused: LibraryCommandActions?, libraryWindowPresent: Bool,
     openLibrary: @escaping () -> Void
@@ -70,6 +76,7 @@ struct RecipeLibraryCommands: Commands {
     }
   }
 
+  /// Uses focused window actions, or the dedicated import window outside the library.
   static func resolveImportActions(
     app: PreparedApp?, focused: LibraryCommandActions?, libraryWindowPresent: Bool,
     openImport: @escaping () -> Void

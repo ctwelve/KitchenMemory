@@ -45,6 +45,8 @@ struct TagProjection {
     }.sorted { $0.id.rawValue.uuidString < $1.id.rawValue.uuidString }
   }
 
+  // Removal names assignment dots rather than a mutable Recipe/Tag pair. An
+  // assignment the remover never observed remains live, including after Merge.
   var removed: Set<UUID> {
     Set(evidence.actions.flatMap { action -> [UUID] in
       if case let .remove(_, dots) = action.payload { return dots }
@@ -79,7 +81,11 @@ struct TagProjection {
   }
 }
 
+/// Separate live Tag identities with the same normalized Kitchen-wide name.
+///
+/// They remain distinct until a person explicitly renames or merges them.
 public struct TagCollision: Equatable, Sendable {
+  /// The distinct colliding live identities, sorted by UUID for stable repair presentation.
   public let tagIDs: [Tag.ID]
 
   static func detect(in tags: [Tag]) -> [TagCollision] {

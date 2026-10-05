@@ -5,6 +5,9 @@
 import QuartzCore
 import SwiftUI
 
+/// Coalesces repeated native draw reports into one startup-preparation trigger.
+/// Each observation view owns a reporter; ``AppStartupCoordinator`` additionally
+/// guards the app-wide first report when several windows present startup.
 @MainActor
 final class StartupFrameReporter {
   var needsPresentationBoundary: Bool { !hasReportedFrame }
@@ -30,6 +33,11 @@ final class StartupFrameReporter {
 #if os(macOS)
 import AppKit
 
+/// Embeds an invisible AppKit view to report a draw followed by a display-link callback.
+///
+/// SwiftUI creates and updates this view through the representable protocol;
+/// AppKit calls its window and drawing hooks. The callback starts foreground
+/// graph preparation, while window detachment invalidates a pending display link.
 struct StartupFrameObserver: NSViewRepresentable {
   let didPresent: @MainActor () -> Void
 
@@ -98,6 +106,11 @@ final class StartupFrameObservationView: NSView {
 #elseif os(iOS)
 import UIKit
 
+/// Embeds an invisible UIKit view to report a draw followed by a display-link callback.
+///
+/// The native window/drawing hooks schedule the callback rather than assuming
+/// a SwiftUI `body` evaluation means a frame was drawn. Detachment invalidates
+/// pending delivery; app startup coalesces reports from multiple scenes.
 struct StartupFrameObserver: UIViewRepresentable {
   let didPresent: @MainActor () -> Void
 

@@ -4,6 +4,13 @@
 
 import SwiftUI
 
+/// Publishes the invoking library window's actions to SwiftUI's focused commands.
+///
+/// Menus are app-level UI, but their window effects must use the focused scene's
+/// closures. While the library presents an import sheet or reset confirmation,
+/// it publishes no actions but keeps its presence marker. Command resolution
+/// can then distinguish blocked input from no library window and honor the
+/// window's modal state instead of using app-level fallback.
 struct LibraryMenuBridge: ViewModifier {
   let actions: LibraryCommandActions?
   let isAvailable: Bool

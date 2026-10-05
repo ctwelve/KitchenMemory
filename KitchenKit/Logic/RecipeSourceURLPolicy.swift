@@ -13,8 +13,11 @@ import Foundation
 /// embedded credentials, and implausibly large pasted values from becoming
 /// actions. DNS, TLS, and browser navigation remain system responsibilities.
 public enum RecipeSourceURLPolicy {
+  /// Maximum UTF-8 byte length admitted for an actionable source link.
   public static let maximumUTF8Bytes = 4_096
 
+  /// Trims and validates an absolute HTTP or HTTPS link without credentials.
+  /// Returns nil for blank, oversized, relative, or unsupported input; performs no network request.
   public static func validatedURL(from enteredValue: String) -> URL? {
     let value = enteredValue.trimmingCharacters(in: .whitespacesAndNewlines)
     guard !value.isEmpty,
@@ -30,11 +33,13 @@ public enum RecipeSourceURLPolicy {
     return url
   }
 
+  /// Revalidates a URL through the same actionable source-link policy; nil remains nil.
   public static func validatedURL(_ url: URL?) -> URL? {
     guard let url else { return nil }
     return validatedURL(from: url.absoluteString)
   }
 
+  /// Returns a validated host and optional port, bracketing IPv6 for unambiguous display.
   public static func displayHost(for url: URL) -> String? {
     guard let url = validatedURL(url), let host = url.host else { return nil }
     let hostWithUnambiguousIPv6Brackets = host.contains(":") ? "[\(host)]" : host

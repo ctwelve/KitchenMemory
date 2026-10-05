@@ -6,9 +6,13 @@ import Foundation
 
 /// Reconstructs Tag state without depending on persistence or Recipe payloads.
 public struct TagLibrary: Equatable, Sendable {
+  /// The Kitchen ownership boundary for this value; transport identity cannot substitute for it.
   public let kitchenID: Kitchen.ID
+  /// Live identities in canonical UUID order; use `orderedTags` for presentation order.
   public let tags: [Tag]
+  /// Distinct live identities sharing a normalized Kitchen-wide name.
   public let collisions: [TagCollision]
+  /// The causally selected shared ordering mode, defaulting to alphabetical.
   public let ordering: TagOrdering
   let manualIDs: [Tag.ID]
   let aliases: [Tag.ID: Tag.ID]
@@ -17,6 +21,10 @@ public struct TagLibrary: Equatable, Sendable {
   let rawActionIDs: Set<UUID>
   let actions: [OrganizationAction<TagChange>]
 
+  /// Reconstructs available Tag state from immutable actions and checkpoint receipts.
+  ///
+  /// Exact retries coalesce. Wrong ownership, conflicting IDs, causal cycles, or invalid
+  /// payloads throw `TagError`; incomplete delivery never manufactures missing Tags.
   public init(kitchenID: Kitchen.ID, commands: [TagCommand], checkpoints: [TagCheckpoint] = []) throws {
     guard commands.allSatisfy({ $0.kitchenID == kitchenID }),
           checkpoints.allSatisfy({ $0.kitchenID == kitchenID }) else { throw TagError.wrongKitchen }
@@ -47,18 +55,27 @@ public struct TagLibrary: Equatable, Sendable {
     manualIDs = order.manualIDs
   }
 
+  /// Resolves Merge aliases to a live survivor, returning nil for disposed or missing identities.
   public func canonicalTagID(for id: Tag.ID) -> Tag.ID? {
     let canonical = aliases[id] ?? id
     return tags.contains(where: { $0.id == canonical }) ? canonical : nil
   }
 
+  /// Returns the live canonical Tags with surviving assignment dots for this Recipe.
   public func tagIDs(for recipeID: Recipe.ID) -> Set<Tag.ID> { memberships[recipeID] ?? [] }
 
+  /// Returns Recipes assigned to the live canonical survivor of this Tag.
+  ///
+  /// A missing or disposed identity returns an empty set; no Recipe payload is loaded.
   public func recipeIDs(for tagID: Tag.ID) -> Set<Recipe.ID> {
     guard let canonical = canonicalTagID(for: tagID) else { return [] }
     return Set(memberships.compactMap { $0.value.contains(canonical) ? $0.key : nil })
   }
 
+  /// Validates an intention and captures this library’s observed causal frontier.
+  ///
+  /// Removal freezes only observed live assignment dots, so later concurrent assignments
+  /// survive. Retain the returned value for retry; Recipe existence is repository-owned.
   public func prepare(_ intent: TagIntent, id: UUID = UUID(), at date: Date = Date()) throws -> TagCommand {
     try tagBoundary {
       let evidence = try OrganizationEvidence(actions, checkpoints: checkpointEvidence)

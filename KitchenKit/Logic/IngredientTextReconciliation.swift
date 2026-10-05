@@ -10,18 +10,27 @@ import Foundation
 /// Changed rows keep authored wording and retain explicit fields until the caller accepts a
 /// proposal. This value is Codable so unresolved proposals can accompany a local editing draft.
 public struct IngredientTextReconciliation: Codable, Equatable, Sendable {
+    /// A parser proposal withheld to preserve a previously precise ingredient value.
     public struct Conflict: Codable, Equatable, Identifiable, Sendable {
+        /// Identity of the ingredient whose interpretation requires an explicit choice.
         public var id: RecipeIngredient.ID { proposed.id }
+        /// Proposed parsed fields with the same ingredient identity and newly authored wording.
         public let proposed: RecipeIngredient
     }
 
+    /// Reconciled section retaining its identity, title, and input line order.
     public let section: IngredientSection
+    /// Interpretation proposals for changed rows whose prior precision remains authoritative.
     public let conflicts: [Conflict]
 
+    /// One completed source line with optional retained ingredient identity.
     public struct Line: Codable, Equatable, Sendable {
+        /// Existing ingredient identity, or nil for a newly inserted line.
         public let ingredientID: RecipeIngredient.ID?
+        /// Exact authored line wording supplied for reconciliation.
         public let source: String
 
+        /// Creates a line without guessing its correspondence to existing ingredients.
         public init(ingredientID: RecipeIngredient.ID? = nil, source: String) {
             self.ingredientID = ingredientID
             self.source = source
