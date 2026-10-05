@@ -94,7 +94,10 @@ been flattened or silently rewritten.
 Start with the [development documentation map](docs/README.md) for current
 product contracts, engineering guidance, decisions, and historical evidence.
 [AI.md](AI.md) describes AI-assisted development; [AGENTS.md](AGENTS.md) routes
-repository instructions for coding agents.
+repository instructions for coding agents. See [CONTRIBUTING.md](CONTRIBUTING.md)
+for issue, pull request, and validation guidance; the [Code of Conduct](CODE_OF_CONDUCT.md)
+and [Security Policy](SECURITY.md) explain community expectations and private
+vulnerability reporting.
 
 Open `KitchenMemory.xcodeproj` in Xcode. Run the **KitchenMemory** scheme on
 an iPhone, iPad, iOS Simulator, or My Mac destination. Development builds use
