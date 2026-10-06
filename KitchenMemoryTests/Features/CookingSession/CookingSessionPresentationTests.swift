@@ -134,6 +134,7 @@ final class CookingSessionPresentationTests: XCTestCase {
     XCTAssertNil(model.currentSessionID)
     XCTAssertNil(store.currentSessionID)
     XCTAssertEqual(model.finishedSessionCount, 1)
+    XCTAssertEqual(model.observedFinishedSession?.id, sessionID)
   }
 
   func testOutboxRetainsOneIdentityUntilLogicReportsLocalDurability() throws {

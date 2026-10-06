@@ -39,7 +39,7 @@ extension CookingSessionServing {
   }
 }
 
-enum CookingSessionHistoryScope: Equatable {
+enum CookingSessionHistoryScope: Hashable {
   case all
   case recipe(Recipe.ID)
 }

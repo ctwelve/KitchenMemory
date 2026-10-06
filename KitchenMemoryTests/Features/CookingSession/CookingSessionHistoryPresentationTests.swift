@@ -9,6 +9,61 @@ import XCTest
 
 @MainActor
 final class CookingSessionHistoryPresentationTests: XCTestCase {
+  func testDeletedSourceRecipeDoesNotGateHistoryReadingOrContinuation() throws {
+    let app = try AppRuntime.testing()
+    app.libraryModel.loadIfNeeded()
+    app.sessionModel.loadIfNeeded()
+    let recipe = try XCTUnwrap(app.libraryModel.selectedRecipe)
+    XCTAssertTrue(app.sessionModel.start(from: recipe))
+    let sourceID = try XCTUnwrap(app.sessionModel.currentSessionID)
+    XCTAssertTrue(app.sessionModel.setOutcome(.coarse(.great)))
+    XCTAssertTrue(app.sessionModel.finishCurrentSession())
+    let source = try XCTUnwrap(app.sessionModel.observedFinishedSession)
+    XCTAssertNotNil(source.startedAt)
+    app.libraryModel.deleteRecipe(try app.libraryModel.library.prepareDeletion(of: recipe.id))
+    XCTAssertFalse(app.libraryModel.recipes.contains { $0.id == recipe.id })
+    XCTAssertTrue(app.sessionModel.showRecipeSessionHistory(for: recipe.id))
+    XCTAssertEqual(app.sessionModel.displayedHistorySessions, [source])
+    XCTAssertTrue(app.sessionModel.observeFinishedSession(sourceID))
+    XCTAssertFalse(app.sessionModel.setOutcome(.coarse(.okay)))
+    XCTAssertTrue(app.sessionModel.continueSession(sourceID))
+    let continuation = try XCTUnwrap(app.sessionModel.currentSession)
+    XCTAssertEqual(continuation.sourceSessionID, sourceID)
+    XCTAssertEqual(continuation.snapshot.title, source.snapshot.title)
+    XCTAssertEqual(app.sessionModel.retainedSession(sourceID), source)
+    XCTAssertTrue(app.sessionModel.leaveCurrentSession())
+    XCTAssertEqual(app.sessionModel.navigation.destination, .history(.recipe(recipe.id)))
+    app.sessionModel.showSessionHistory()
+    XCTAssertEqual(Set(app.sessionModel.displayedHistorySessions.map(\.id)), [sourceID, continuation.id])
+  }
+
+  func testCompleteHistoryGroupsEveryCookNewestFirstWithinItsLifecycle() throws {
+    let app = try AppRuntime.testing()
+    app.libraryModel.loadIfNeeded()
+    let recipe = try XCTUnwrap(app.libraryModel.selectedRecipe)
+    var ids: [CookingSession.ID] = []
+    for index in 0..<11 {
+      let id = CookingSession.ID()
+      ids.append(id)
+      _ = try app.cookingSessions.start(StartCookingSessionIntention(
+        sessionID: id, recipeID: recipe.id, recipeRevisionID: recipe.revision.id,
+        startedAt: Date(timeIntervalSince1970: TimeInterval(100 + index))
+      ))
+      app.sessionModel.reload()
+      XCTAssertTrue(app.sessionModel.selectSession(id))
+      if index == 7 || index == 8 { XCTAssertTrue(app.sessionModel.stopCurrentSession()) }
+      if index == 9 || index == 10 { XCTAssertTrue(app.sessionModel.finishCurrentSession()) }
+    }
+    app.sessionModel.showSessionHistory()
+    XCTAssertEqual(app.sessionModel.displayedHistorySessions.first?.startedAt,
+                   Date(timeIntervalSince1970: 106))
+    XCTAssertEqual(app.sessionModel.displayedHistorySessions.map(\.id),
+                   [ids[6], ids[5], ids[4], ids[3], ids[2], ids[1], ids[0], ids[8], ids[7], ids[10], ids[9]])
+    XCTAssertTrue(app.sessionModel.showRecipeSessionHistory(for: recipe.id))
+    XCTAssertEqual(app.sessionModel.displayedHistorySessions.map(\.id),
+                   [ids[6], ids[5], ids[4], ids[3], ids[2], ids[1], ids[0], ids[8], ids[7], ids[10], ids[9]])
+  }
+
   func testSidebarKeepsEveryActiveSessionEvenBeyondTheRecentHistoryLimit() throws {
     let app = try AppRuntime.testing()
     app.libraryModel.loadIfNeeded()

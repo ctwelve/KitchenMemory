@@ -166,11 +166,11 @@ extension CookingSessionPresentationModel {
     } else if case .resolveClosure = pending {
       navigation.move(to: .recovery)
     } else if case .continueSession = pending {
-      selectSession(session.id)
+      select(session.id)
       refreshRecipeHistory()
     } else if session.lifecycle == .finished {
       sessions.removeAll { $0.id == session.id }
-      navigation.move(to: .finished(session.id, history: .all))
+      navigation.move(to: .finished(session.id, history: historyScope))
     } else {
       select(pending.sessionID)
     }
@@ -276,6 +276,7 @@ private extension CookingSessionProjection {
     CookingSessionProjection(
       id: id,
       snapshot: snapshot,
+      startedAt: startedAt,
       sourceSessionID: sourceSessionID,
       sourceClosureID: sourceClosureID,
       lifecycle: lifecycle,

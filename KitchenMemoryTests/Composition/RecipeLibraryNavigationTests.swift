@@ -9,6 +9,64 @@ import XCTest
 
 @MainActor
 final class RecipeLibraryNavigationTests: XCTestCase {
+  func testEachHistoryScopeRetainsItsOwnListPosition() {
+    let navigation = RecipeLibraryNavigation()
+    let recipeID = Recipe.ID(), allAnchor = CookingSession.ID(), recipeAnchor = CookingSession.ID()
+    navigation.move(to: .history(.all))
+    navigation.historyListAnchor = allAnchor
+    navigation.move(to: .history(.recipe(recipeID)))
+    XCTAssertNil(navigation.historyListAnchor)
+    navigation.historyListAnchor = recipeAnchor
+    navigation.move(to: .history(.all))
+    XCTAssertEqual(navigation.historyListAnchor, allAnchor)
+    navigation.move(to: .history(.recipe(recipeID)))
+    XCTAssertEqual(navigation.historyListAnchor, recipeAnchor)
+  }
+
+  func testDirectRecipeFinishAndContinuationReturnToTheRecipe() throws {
+    let app = try AppRuntime.testing()
+    app.libraryModel.loadIfNeeded()
+    app.sessionModel.loadIfNeeded()
+    let recipe = try XCTUnwrap(app.libraryModel.selectedRecipe)
+    app.libraryModel.navigation.recipeListAnchor = recipe.id
+    XCTAssertTrue(app.sessionModel.start(from: recipe))
+    let id = try XCTUnwrap(app.sessionModel.currentSessionID)
+    XCTAssertTrue(app.sessionModel.finishCurrentSession())
+    XCTAssertNil(app.sessionModel.historyScope)
+    app.sessionModel.dismissObservedFinishedSession()
+    XCTAssertEqual(app.libraryModel.navigation.destination, .recipe)
+    XCTAssertEqual(app.libraryModel.navigation.selectedRecipeID, recipe.id)
+    XCTAssertEqual(app.libraryModel.navigation.recipeListAnchor, recipe.id)
+    XCTAssertTrue(app.sessionModel.continueSession(id))
+    XCTAssertTrue(app.sessionModel.leaveCurrentSession())
+    XCTAssertEqual(app.libraryModel.navigation.destination, .recipe)
+  }
+
+  func testFinishContinueAndBackPreserveHistoryScopeAndPosition() throws {
+    for recipeScoped in [false, true] {
+      let app = try AppRuntime.testing()
+      app.libraryModel.loadIfNeeded()
+      let model = app.sessionModel
+      model.loadIfNeeded()
+      let recipe = try XCTUnwrap(app.libraryModel.selectedRecipe)
+      XCTAssertTrue(model.start(from: recipe))
+      let id = try XCTUnwrap(model.currentSessionID)
+      let scope: CookingSessionHistoryScope = recipeScoped ? .recipe(recipe.id) : .all
+      if recipeScoped { XCTAssertTrue(model.showRecipeSessionHistory(for: recipe.id)) }
+      else { model.showSessionHistory() }
+      model.navigation.historyListAnchor = id
+      XCTAssertTrue(model.selectSessionFromHistory(id))
+      XCTAssertTrue(model.finishCurrentSession())
+      XCTAssertEqual(model.navigation.destination, .finished(id, history: scope))
+      XCTAssertEqual(model.navigation.historyListAnchor, id)
+      XCTAssertTrue(model.continueSession(id))
+      XCTAssertEqual(model.historyScope, scope)
+      XCTAssertTrue(model.leaveCurrentSession())
+      XCTAssertEqual(model.navigation.destination, .history(scope))
+      XCTAssertEqual(model.navigation.historyListAnchor, id)
+    }
+  }
+
   func testAcceptedIntentDistinguishesBrowsingFromOpeningTheSameRecipe() {
     let navigation = RecipeLibraryNavigation()
     let recipeID = Recipe.ID()
@@ -238,10 +296,13 @@ extension RecipeLibraryNavigationTests {
       if recipeScoped {
         XCTAssertTrue(sessions.showRecipeSessionHistory(for: recipe.id))
         XCTAssertTrue(sessions.observeFinishedSession(finishedID))
+      } else {
+        sessions.showSessionHistory()
+        XCTAssertTrue(sessions.observeFinishedSession(finishedID))
       }
       XCTAssertTrue(sessions.continueSession(finishedID))
       let continuedID = try XCTUnwrap(sessions.currentSessionID)
-      XCTAssertNil(sessions.historyScope)
+      XCTAssertEqual(sessions.historyScope, recipeScoped ? .recipe(recipe.id) : .all)
       XCTAssertEqual(Set(sessions.displayedHistorySessions.map(\.id)), [finishedID, continuedID])
       XCTAssertTrue(sessions.observeFinishedSession(finishedID))
       XCTAssertEqual(sessions.historyScope, recipeScoped ? .recipe(recipe.id) : .all)
@@ -335,7 +396,7 @@ extension RecipeLibraryNavigationTests {
     XCTAssertEqual(library.navigation.destination, .history(.recipe(recipe.id)))
     XCTAssertTrue(sessions.selectSession(id))
     XCTAssertTrue(sessions.finishCurrentSession())
-    XCTAssertEqual(library.navigation.destination, .finished(id, history: .all))
+    XCTAssertEqual(library.navigation.destination, .finished(id, history: nil))
     sessions.dismissObservedFinishedSession()
     XCTAssertTrue(sessions.showRecipeSessionHistory(for: recipe.id))
     XCTAssertTrue(sessions.observeFinishedSession(id))
@@ -346,7 +407,7 @@ extension RecipeLibraryNavigationTests {
     XCTAssertEqual(library.navigation.destination, .history(.recipe(recipe.id)))
     XCTAssertTrue(sessions.continueSession(id))
     XCTAssertNotEqual(sessions.currentSessionID, id)
-    XCTAssertNil(sessions.historyScope)
+    XCTAssertEqual(sessions.historyScope, .recipe(recipe.id))
   }
 
   func testSharedDestinationChangesWithoutStoppingAnActiveSession() throws {

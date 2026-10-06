@@ -18,20 +18,29 @@ extension CookingSessionPresentationModel {
     return available.first { $0.id == observedFinishedSessionID }
   }
 
-  /// The middle list keeps its context even when continuation opens a Session
-  /// whose detail has no history return destination.
+  /// The middle list and detail share the retained history entry context.
   var displayedHistoryScope: CookingSessionHistoryScope? {
     guard case .history(let scope) = navigation.contentDestination else { return nil }
     return scope
   }
 
   var displayedHistorySessions: [CookingSessionProjection] {
-    switch displayedHistoryScope {
-    case .all: sessions + finishedSessions
-    case .recipe:
-      (sessions + finishedSessions).filter { session in recipeHistorySessions.contains { $0.id == session.id } }
-    case nil: []
+    let available = [SessionLifecycle.active, .stopped, .finished].flatMap { lifecycle in
+      (sessions + finishedSessions).filter { $0.lifecycle == lifecycle }.sorted(by: historySessionOrder)
     }
+    switch displayedHistoryScope {
+    case .all: return available
+    case .recipe:
+      return available.filter { session in recipeHistorySessions.contains { $0.id == session.id } }
+    case nil: return []
+    }
+  }
+
+  private func historySessionOrder(_ lhs: CookingSessionProjection, _ rhs: CookingSessionProjection) -> Bool {
+    let lhsDate = lhs.startedAt ?? .distantPast
+    let rhsDate = rhs.startedAt ?? .distantPast
+    if lhsDate != rhsDate { return lhsDate > rhsDate }
+    return lhs.id.rawValue.uuidString < rhs.id.rawValue.uuidString
   }
 
   var currentHistorySession: CookingSessionProjection? {
@@ -91,7 +100,11 @@ extension CookingSessionPresentationModel {
   }
 
   func continuations(of sessionID: CookingSession.ID) -> [CookingSessionProjection] {
-    (sessions + finishedSessions).filter { $0.sourceSessionID == sessionID }
+    (sessions + finishedSessions).filter { $0.sourceSessionID == sessionID }.sorted(by: historySessionOrder)
+  }
+
+  func retainedSession(_ id: CookingSession.ID) -> CookingSessionProjection? {
+    (sessions + finishedSessions + deletedSessions).first { $0.id == id }
   }
 
   @discardableResult
@@ -146,7 +159,7 @@ extension CookingSessionPresentationModel {
   }
 
   func dismissObservedFinishedSession() {
-    navigation.move(to: .history(historyScope ?? .all))
+    navigation.move(to: historyScope.map { .history($0) } ?? .recipe)
   }
 
   @discardableResult
@@ -219,7 +232,7 @@ extension CookingSessionPresentationModel {
     finishedSessionIDs = finishedIDs
     refreshDetachedEntryDraft()
     if let currentSessionID, finishedIDs.contains(currentSessionID) {
-      select(nil, recordsVisit: false)
+      navigation.move(to: .finished(currentSessionID, history: historyScope))
     }
     if let observedFinishedSessionID, !finishedIDs.contains(observedFinishedSessionID) {
       dismissObservedFinishedSession()

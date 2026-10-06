@@ -8214,6 +8214,90 @@
         "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Séances de cuisine" } }
       }
     },
+    "session.history.back.recipe" : {
+      "comment": "Returns from a Finished Session entered directly from a Recipe to that Recipe.",
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Back to Recipe"
+          }
+        },
+        "en-GB": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Back to Recipe"
+          }
+        },
+        "es-MX": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volver a la receta"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retour à la recette"
+          }
+        },
+        "de-DE": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zurück zum Rezept"
+          }
+        },
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Torna alla ricetta"
+          }
+        }
+      }
+    },
+    "session.history.lineage.unavailable" : {
+      "comment": "A continuation retains its predecessor identity but its readable predecessor is not available locally. No raw identifier is shown.",
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Earlier cook is unavailable."
+          }
+        },
+        "en-GB": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Earlier cook is unavailable."
+          }
+        },
+        "es-MX": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La sesión anterior no está disponible."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La séance précédente n’est pas disponible."
+          }
+        },
+        "de-DE": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der frühere Kochvorgang ist nicht verfügbar."
+          }
+        },
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La sessione precedente non è disponibile."
+          }
+        }
+      }
+    },
     "session.history.back" : {
       "comment" : "Action that returns from one observed Finished Session to Session history.",
       "extractionState" : "manual",
@@ -8239,33 +8323,6 @@
         "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Back to Sessions" } },
         "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Volver a sesiones" } },
         "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Retour aux séances" } }
-      }
-    },
-    "session.history.current" : {
-      "comment" : "Heading for the device-local current Cooking Session convenience.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "it-IT": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Attuale"
-          }
-        },
-        "de-DE": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aktuell"
-          }
-        },
-        "en-GB": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Current"
-          }
-        },
-        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Current" } },
-        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Actual" } },
-        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "En cours" } }
       }
     },
     "session.history.empty.message" : {
@@ -8349,33 +8406,6 @@
         "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Aucune entrée n’a été enregistrée." } }
       }
     },
-    "session.history.finished" : {
-      "comment" : "Heading for immutable Finished Session history.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "it-IT": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cronologia"
-          }
-        },
-        "de-DE": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Verlauf"
-          }
-        },
-        "en-GB": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "History"
-          }
-        },
-        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "History" } },
-        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Historial" } },
-        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Historique" } }
-      }
-    },
     "session.history.immutable.message" : {
       "comment" : "Explains that observed Finished Session evidence cannot be edited.",
       "extractionState" : "manual",
@@ -8428,33 +8458,6 @@
         "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Continuation Lineage" } },
         "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Linaje de continuación" } },
         "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Lignée de continuation" } }
-      }
-    },
-    "session.history.lineage.closure" : {
-      "comment" : "Label for the exact source Closure of a continuation.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "it-IT": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Conclusione di origine"
-          }
-        },
-        "de-DE": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ursprünglicher Abschluss"
-          }
-        },
-        "en-GB": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Source Finish"
-          }
-        },
-        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Source Finish" } },
-        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Finalización de origen" } },
-        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Fin d’origine" } }
       }
     },
     "session.history.lineage.continuation" : {
@@ -8536,33 +8539,6 @@
         "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Continued from Session" } },
         "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Continuada desde la sesión" } },
         "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Continuée depuis la séance" } }
-      }
-    },
-    "session.history.recent" : {
-      "comment" : "Heading for other Active and Stopped Sessions.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "it-IT": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Recenti"
-          }
-        },
-        "de-DE": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Zuletzt"
-          }
-        },
-        "en-GB": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Recent"
-          }
-        },
-        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Recent" } },
-        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Recientes" } },
-        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Récentes" } }
       }
     },
     "session.history.recipe.title" : {

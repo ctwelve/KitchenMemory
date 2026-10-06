@@ -79,6 +79,10 @@ struct CookingSessionView: View {
 
               CookingSessionEntriesView(model: model, session: session)
 
+              if session.sourceSessionID != nil {
+                CookingSessionLineageView(model: model, session: session)
+              }
+
               CookingSessionProgressView(
                 model: model,
                 session: session,

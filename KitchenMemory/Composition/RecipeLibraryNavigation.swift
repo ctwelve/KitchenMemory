@@ -24,7 +24,7 @@ final class RecipeLibraryNavigation {
     case drafts
     case session(CookingSession.ID, history: CookingSessionHistoryScope?)
     case history(CookingSessionHistoryScope)
-    case finished(CookingSession.ID, history: CookingSessionHistoryScope)
+    case finished(CookingSession.ID, history: CookingSessionHistoryScope?)
     case deletedItems
     case recovery
   }
@@ -47,7 +47,28 @@ final class RecipeLibraryNavigation {
 
   private(set) var auxiliarySelection: AuxiliarySelection?
   var recipeListAnchor: Recipe.ID?
-  var historyListAnchor: CookingSession.ID?
+  private var historyListAnchors: [CookingSessionHistoryScope: CookingSession.ID] = [:]
+  var historyListAnchor: CookingSession.ID? {
+    get {
+      guard case .history(let scope) = contentDestination else { return nil }
+      return historyListAnchors[scope]
+    }
+    set {
+      guard case .history(let scope) = contentDestination else { return }
+      historyListAnchors[scope] = newValue
+    }
+  }
+
+  func historyListAnchor(for scope: CookingSessionHistoryScope?) -> CookingSession.ID? {
+    scope.flatMap { historyListAnchors[$0] }
+  }
+
+  func rememberHistoryListAnchor(_ id: CookingSession.ID?, for scope: CookingSessionHistoryScope?) {
+    // SwiftUI may emit nil while tearing down a history view. That is not a
+    // person's scroll intent and must not erase the retained return position.
+    guard let scope, let id else { return }
+    historyListAnchors[scope] = id
+  }
 
   @discardableResult
   func selectAuxiliary(_ item: AuxiliarySelection) -> Bool {
@@ -68,8 +89,8 @@ final class RecipeLibraryNavigation {
 
   var historyScope: CookingSessionHistoryScope? {
     switch destination {
-    case .history(let scope), .finished(_, let scope): scope
-    case .session(_, let scope): scope
+    case .history(let scope): scope
+    case .session(_, let scope), .finished(_, let scope): scope
     default: nil
     }
   }
@@ -111,13 +132,13 @@ final class RecipeLibraryNavigation {
     case .recipe: return (.recipes, selectedRecipeID == nil ? .content : .detail)
     case .drafts: return (.drafts, .content)
     case .history(let scope): return (.history(scope), .content)
-    case .finished(_, let scope), .session(_, history: .some(let scope)):
+    case .finished(_, history: .some(let scope)), .session(_, history: .some(let scope)):
       return (.history(scope), .detail)
     case .deletedItems: return (.deletedItems, .content)
     case .recovery: return (.recovery, .content)
     case .editor:
       return (contentDestination == .recipes ? .recipes : .drafts, .detail)
-    case .session(_, history: nil): return (contentDestination, .detail)
+    case .session(_, history: nil), .finished(_, history: nil): return (contentDestination, .detail)
     }
   }
 
