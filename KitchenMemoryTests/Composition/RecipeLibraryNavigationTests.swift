@@ -238,10 +238,13 @@ extension RecipeLibraryNavigationTests {
       if recipeScoped {
         XCTAssertTrue(sessions.showRecipeSessionHistory(for: recipe.id))
         XCTAssertTrue(sessions.observeFinishedSession(finishedID))
+      } else {
+        sessions.showSessionHistory()
+        XCTAssertTrue(sessions.observeFinishedSession(finishedID))
       }
       XCTAssertTrue(sessions.continueSession(finishedID))
       let continuedID = try XCTUnwrap(sessions.currentSessionID)
-      XCTAssertNil(sessions.historyScope)
+      XCTAssertEqual(sessions.historyScope, recipeScoped ? .recipe(recipe.id) : .all)
       XCTAssertEqual(Set(sessions.displayedHistorySessions.map(\.id)), [finishedID, continuedID])
       XCTAssertTrue(sessions.observeFinishedSession(finishedID))
       XCTAssertEqual(sessions.historyScope, recipeScoped ? .recipe(recipe.id) : .all)
@@ -335,7 +338,7 @@ extension RecipeLibraryNavigationTests {
     XCTAssertEqual(library.navigation.destination, .history(.recipe(recipe.id)))
     XCTAssertTrue(sessions.selectSession(id))
     XCTAssertTrue(sessions.finishCurrentSession())
-    XCTAssertEqual(library.navigation.destination, .finished(id, history: .all))
+    XCTAssertEqual(library.navigation.destination, .finished(id, history: nil))
     sessions.dismissObservedFinishedSession()
     XCTAssertTrue(sessions.showRecipeSessionHistory(for: recipe.id))
     XCTAssertTrue(sessions.observeFinishedSession(id))
@@ -346,7 +349,7 @@ extension RecipeLibraryNavigationTests {
     XCTAssertEqual(library.navigation.destination, .history(.recipe(recipe.id)))
     XCTAssertTrue(sessions.continueSession(id))
     XCTAssertNotEqual(sessions.currentSessionID, id)
-    XCTAssertNil(sessions.historyScope)
+    XCTAssertEqual(sessions.historyScope, .recipe(recipe.id))
   }
 
   func testSharedDestinationChangesWithoutStoppingAnActiveSession() throws {

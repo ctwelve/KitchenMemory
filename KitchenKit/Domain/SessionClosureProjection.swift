@@ -64,6 +64,7 @@ extension ProjectionBuilder {
             CookingSessionProjection(
                 id: evidence.sessionID,
                 snapshot: closed.snapshot,
+                startedAt: root.startedAt,
                 sourceSessionID: root.sourceSessionID,
                 sourceClosureID: root.sourceClosureID,
                 lifecycle: .finished,

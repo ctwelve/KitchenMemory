@@ -11,6 +11,7 @@ struct CookingSessionProgressView: View {
   let layoutMode: CookingSessionLayoutMode
 
   @State private var scaleSelection: RecipeScalingState
+  @Environment(\.locale) private var locale
 
   init(
     model: CookingSessionPresentationModel,
@@ -25,7 +26,18 @@ struct CookingSessionProgressView: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: 20) {
-      if !scaleSelection.bases.isEmpty {
+      if session.lifecycle == .finished {
+        if session.snapshot.baseYield != nil || session.workingScale != nil {
+          CookingSessionCard(title: .sessionScaleSection, symbol: "arrow.up.left.and.arrow.down.right") {
+            if session.snapshot.baseYield != nil {
+              Text(scaleSelection.displayedYield(locale: locale))
+            }
+            if let factor = session.workingScale?.exactScale {
+              Text(RecipePresentationFormatter(locale: locale).rational(factor) + "×")
+            }
+          }
+        }
+      } else if !scaleSelection.bases.isEmpty {
         RecipeScalingControls(
           selection: $scaleSelection,
           context: .cookingSession(isEnabled: session.lifecycle == .active)
@@ -34,7 +46,7 @@ struct CookingSessionProgressView: View {
       progressContent
     }
     .onChange(of: scaleSelection) { _, selection in
-      if let scale = selection.scale {
+      if session.lifecycle == .active, let scale = selection.scale {
         model.replaceWorkingScale(with: scale)
       }
     }

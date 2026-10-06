@@ -120,7 +120,7 @@ struct CookingSessionInstructionList: View {
   ) -> some View {
     let state = session.instructionProgress(for: instruction.id)
     return VStack(alignment: .leading, spacing: 8) {
-      if instruction.id == nextInstructionID {
+      if session.lifecycle == .active, instruction.id == nextInstructionID {
         Label(.sessionProgressUpNext, systemImage: "arrow.right.circle.fill")
           .font(.caption.bold())
           .foregroundStyle(.tint)

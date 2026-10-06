@@ -97,7 +97,13 @@ extension CookingSessionPresentationModel {
 
 extension CookingSessionPresentationModel {
   func submitCommand(_ makeCommand: () throws -> PendingCookingSessionCommand?) -> Bool {
-    let report = delivery.submit(makeCommand)
+    let report = delivery.submit {
+      let command = try makeCommand()
+      if let identity = command?.navigationIdentity {
+        pendingNavigationOrigins[identity] = navigation.sessionEntryContext
+      }
+      return command
+    }
     consume(report.events)
     return report.wasAccepted || report.completedRestore
   }
@@ -127,6 +133,9 @@ extension CookingSessionPresentationModel {
     _ resolution: PendingCookingSessionResolution,
     for pending: PendingCookingSessionCommand
   ) {
+    defer {
+      if let identity = pending.navigationIdentity { pendingNavigationOrigins[identity] = nil }
+    }
     switch resolution {
     case let .accepted(session):
       refreshDetachedEntryDraft()
@@ -166,11 +175,13 @@ extension CookingSessionPresentationModel {
     } else if case .resolveClosure = pending {
       navigation.move(to: .recovery)
     } else if case .continueSession = pending {
-      selectSession(session.id)
+      let origin = pending.navigationIdentity.flatMap { pendingNavigationOrigins[$0] } ?? navigation.sessionEntryContext
+      if navigation.openSession(session.id, finished: false, from: origin) { recordVisit(to: session.id) }
       refreshRecipeHistory()
     } else if session.lifecycle == .finished {
       sessions.removeAll { $0.id == session.id }
-      navigation.move(to: .finished(session.id, history: .all))
+      let origin = pending.navigationIdentity.flatMap { pendingNavigationOrigins[$0] } ?? navigation.sessionEntryContext
+      navigation.openSession(session.id, finished: true, from: origin)
     } else {
       select(pending.sessionID)
     }
@@ -258,6 +269,16 @@ extension CookingSessionPresentationModel {
 }
 
 private extension PendingCookingSessionCommand {
+  var navigationIdentity: UUID? {
+    switch self {
+    case .finish(let id, _, _): id.rawValue
+    case .continueSession(let id, _, _): id.rawValue
+    default: nil
+    }
+  }
+}
+
+private extension PendingCookingSessionCommand {
   var refreshesClassification: Bool {
     switch self {
     case .delete, .restore, .resolveClosure: true
@@ -276,6 +297,7 @@ private extension CookingSessionProjection {
     CookingSessionProjection(
       id: id,
       snapshot: snapshot,
+      startedAt: startedAt,
       sourceSessionID: sourceSessionID,
       sourceClosureID: sourceClosureID,
       lifecycle: lifecycle,

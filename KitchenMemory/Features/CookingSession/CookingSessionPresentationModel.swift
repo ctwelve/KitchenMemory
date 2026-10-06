@@ -39,7 +39,7 @@ extension CookingSessionServing {
   }
 }
 
-enum CookingSessionHistoryScope: Equatable {
+enum CookingSessionHistoryScope: Hashable {
   case all
   case recipe(Recipe.ID)
 }
@@ -77,6 +77,7 @@ final class CookingSessionPresentationModel {
   let store: any CookingSessionPresentationStoring
   let now: () -> Date
   let navigation: RecipeLibraryNavigation
+  @ObservationIgnored var pendingNavigationOrigins: [UUID: RecipeLibraryNavigation.SessionEntryContext] = [:]
 
   var sessions: [CookingSessionProjection] = []
   var finishedSessions: [CookingSessionProjection] = []
@@ -163,6 +164,7 @@ final class CookingSessionPresentationModel {
   /// Clears every device-local and projected Session value after durable reset succeeds.
   func resetAfterKitchenReset() {
     delivery.reset()
+    pendingNavigationOrigins = [:]
     sessions = []
     finishedSessions = []
     deletedSessions = []

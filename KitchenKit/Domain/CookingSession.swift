@@ -413,6 +413,9 @@ public struct CookingSessionProjection: Equatable, Sendable {
     public let id: CookingSession.ID
     /// The complete immutable cooking context reconstructed from validated root bytes.
     public let snapshot: ExecutionSnapshot
+    /// The retained root's start time for display ordering, never lifecycle authority.
+    /// Nil is permitted for caller-assembled projections without root metadata.
+    public let startedAt: Date?
     /// The immediate immutable source of a continuation, as provenance rather than a runtime dependency.
     public let sourceSessionID: CookingSession.ID?
     /// The source Closure paired with continuation lineage, independent of source availability.
@@ -445,6 +448,7 @@ public struct CookingSessionProjection: Equatable, Sendable {
     public init(
         id: CookingSession.ID,
         snapshot: ExecutionSnapshot,
+        startedAt: Date? = nil,
         sourceSessionID: CookingSession.ID? = nil,
         sourceClosureID: SessionClosure.ID? = nil,
         lifecycle: SessionLifecycle = .active,
@@ -460,6 +464,7 @@ public struct CookingSessionProjection: Equatable, Sendable {
     ) {
         self.id = id
         self.snapshot = snapshot
+        self.startedAt = startedAt
         self.sourceSessionID = sourceSessionID
         self.sourceClosureID = sourceClosureID
         self.lifecycle = lifecycle

@@ -201,7 +201,12 @@ nor missing source Recipe data changes the inherited evidence contract.
 The inventory for #193 examined the integrated #184/#209 navigation and the
 #213/#214 ownership seams at main commit
 [`e1f8751`](https://github.com/ctwelve/KitchenMemory/commit/e1f8751424922341c20cfbf55923d702e133b1e2).
-These are observations of the old interface, not accepted future behavior:
+These are observations of the old interface, not accepted future behavior.
+The #251 working slice now supplies complete lifecycle history, start-time
+identification, retained return routes and per-history list anchors, observational
+Finished scaling, and readable continuation lineage. Native keyboard, VoiceOver,
+compact/wide, and accessibility text-size walkthrough acceptance remains pending;
+the other interface slices below remain independently gated.
 
 | Existing surface | Gap addressed by this design |
 | --- | --- |

@@ -107,11 +107,6 @@
 			path = Tools;
 			sourceTree = "<group>";
 		};
-		A1BC7B05303F76CE0082EE96 /* skills */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = skills;
-			sourceTree = "<group>";
-		};
 		A1C4E7A0302A63B800E2C0DB /* KitchenMemory */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -188,7 +183,6 @@
 				A1BC7A53303F76CE0082EE96 /* PRIVACY.md */,
 				A1BC7A54303F76CE0082EE96 /* README.md */,
 				A1BC7A45303F76700082EE96 /* docs */,
-				A1BC7B05303F76CE0082EE96 /* skills */,
 				A1BC7A4F303F76990082EE96 /* Tools */,
 				A11F80A53063510C00FA5B46 /* Configurations */,
 				A1C4E7A0302A63B800E2C0DB /* KitchenMemory */,

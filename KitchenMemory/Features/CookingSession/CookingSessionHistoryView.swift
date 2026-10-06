@@ -9,26 +9,8 @@ struct CookingSessionHistoryView: View {
   @Bindable var model: CookingSessionPresentationModel
   var applyNavigationFocus: () -> Void = {}
 
-  private var ordinarySessions: [CookingSessionProjection] {
-    model.displayedHistorySessions.filter { $0.lifecycle != .finished }
-  }
-
-  private var currentSession: CookingSessionProjection? {
-    guard let current = model.currentHistorySession,
-          ordinarySessions.contains(where: { $0.id == current.id })
-    else { return nil }
-    return current
-  }
-
-  private var recentSessions: [CookingSessionProjection] {
-    model.recentHistorySessions(from: ordinarySessions, excluding: currentSession?.id)
-  }
-
-  private var finishedSessions: [CookingSessionProjection] {
-    model.displayedHistorySessions.filter { $0.lifecycle == .finished }
-  }
-
   var body: some View {
+    let scope = model.displayedHistoryScope
     ScrollView {
       LazyVStack(alignment: .leading, spacing: 12) {
         Text(historyTitle)
@@ -36,24 +18,13 @@ struct CookingSessionHistoryView: View {
           .accessibilityHeading(.h1)
           .accessibilityIdentifier("sessions-history")
 
-        if let currentSession {
-          historySection(.sessionHistoryCurrent, identifier: "sessions-current") {
-            sessionButton(currentSession)
-          }
-        }
-        if !recentSessions.isEmpty {
-          historySection(.sessionHistoryRecent, identifier: "sessions-recent") {
-            ForEach(recentSessions, id: \.id) { session in
-              sessionButton(session)
+        ForEach(model.displayedHistoryGroups, id: \.lifecycle) { group in
+            historySection(CookingSessionLifecyclePresentation(group.lifecycle).title,
+                           identifier: "sessions-\(group.lifecycle.rawValue)") {
+              ForEach(group.sessions, id: \.id) { session in
+                sessionButton(session)
+              }
             }
-          }
-        }
-        if !finishedSessions.isEmpty {
-          historySection(.sessionHistoryFinished, identifier: "sessions-finished") {
-            ForEach(finishedSessions, id: \.id) { session in
-              sessionButton(session)
-            }
-          }
         }
         if model.displayedHistorySessions.isEmpty {
           ContentUnavailableView(
@@ -69,8 +40,9 @@ struct CookingSessionHistoryView: View {
       .padding(12)
       .frame(maxWidth: .infinity, alignment: .center)
     }
-    .scrollPosition(id: Binding(get: { model.navigation.historyListAnchor },
-                                set: { model.navigation.historyListAnchor = $0 }), anchor: .top)
+    .scrollPosition(id: Binding(get: { model.navigation.historyListAnchor(for: scope) },
+                                set: { model.navigation.rememberHistoryListAnchor($0, for: scope) }), anchor: .top)
+    .id(scope)
     .background(Color("AppBackground"))
 
   }
@@ -93,31 +65,22 @@ struct CookingSessionHistoryView: View {
         .accessibilityHeading(.h2)
       content()
     }
+    .scrollTargetLayout()
     .accessibilityElement(children: .contain)
     .accessibilityIdentifier(identifier)
   }
 
-  @ViewBuilder
   private func sessionButton(_ session: CookingSessionProjection) -> some View {
-    if session.lifecycle == .finished {
       Button {
-        if model.observeFinishedSession(session.id) { applyNavigationFocus() }
+        let selected = session.lifecycle == .finished
+          ? model.observeFinishedSession(session.id) : model.selectSessionFromHistory(session.id)
+        if selected { applyNavigationFocus() }
       } label: {
         CookingSessionHistoryRow(session: session)
       }
       .buttonStyle(.plain)
       .accessibilityIdentifier(historyRowIdentifier(session))
       .id(session.id)
-    } else {
-      Button {
-        if model.selectSessionFromHistory(session.id) { applyNavigationFocus() }
-      } label: {
-        CookingSessionHistoryRow(session: session)
-      }
-      .buttonStyle(.plain)
-      .accessibilityIdentifier(historyRowIdentifier(session))
-      .id(session.id)
-    }
   }
 
   private func historyRowIdentifier(_ session: CookingSessionProjection) -> String {
@@ -128,6 +91,7 @@ struct CookingSessionHistoryView: View {
 
 struct CookingSessionHistoryRow: View {
   let session: CookingSessionProjection
+  @Environment(\.locale) private var locale
 
   var body: some View {
     let lifecycle = CookingSessionLifecyclePresentation(session.lifecycle)
@@ -142,6 +106,16 @@ struct CookingSessionHistoryRow: View {
         Text(lifecycle.title)
           .font(.caption)
           .foregroundStyle(.secondary)
+        if let startedAt = session.startedAt {
+          Text(startedAt, format: .dateTime.year().month().day().hour().minute().second().locale(locale))
+            .font(.subheadline)
+            .foregroundStyle(.secondary)
+        }
+        if let outcome = session.outcome {
+          Text(cookingSessionOutcomeTitle(outcome))
+            .font(.caption)
+            .foregroundStyle(.secondary)
+        }
       }
       Spacer()
       Image(systemName: "chevron.forward")
@@ -156,6 +130,7 @@ struct CookingSessionHistoryRow: View {
         .stroke(Color("SubtleBorder"), lineWidth: 1)
     }
     .contentShape(.rect)
+    .accessibilityElement(children: .combine)
   }
 }
 
@@ -175,7 +150,7 @@ struct FinishedCookingSessionView: View {
         ScrollView {
           VStack(alignment: .leading, spacing: 24) {
             header
-            lineage
+            CookingSessionLineageView(model: model, session: session)
             FinishedSessionEntriesView(session: session)
             CookingSessionProgressView(model: model, session: session, layoutMode: layoutMode)
           }
@@ -211,27 +186,9 @@ struct FinishedCookingSessionView: View {
     }
   }
 
-  @ViewBuilder
-  private var lineage: some View {
-    CookingSessionCard(title: .sessionHistoryLineage, symbol: "point.3.connected.trianglepath.dotted") {
-      if let sourceSessionID = session.sourceSessionID,
-         let sourceClosureID = session.sourceClosureID {
-        lineageIdentifier(.sessionHistoryLineageSource, id: sourceSessionID.rawValue)
-        lineageIdentifier(.sessionHistoryLineageClosure, id: sourceClosureID.rawValue)
-      } else {
-        Text(.sessionHistoryLineageOriginal)
-          .foregroundStyle(.secondary)
-      }
-      ForEach(model.continuations(of: session.id), id: \.id) { continuation in
-        lineageIdentifier(.sessionHistoryLineageContinuation, id: continuation.id.rawValue)
-      }
-    }
-    .accessibilityIdentifier("session-lineage")
-  }
-
   private var controls: some View {
     HStack {
-      Button(.sessionHistoryBack) {
+      Button(model.historyScope == nil ? .sessionHistoryBackRecipe : .sessionHistoryBack) {
         model.dismissObservedFinishedSession()
       }
       .accessibilityIdentifier("back-to-session-history")
@@ -248,16 +205,6 @@ struct FinishedCookingSessionView: View {
     }
   }
 
-  private func lineageIdentifier(_ title: LocalizedStringResource, id: UUID) -> some View {
-    VStack(alignment: .leading, spacing: 3) {
-      Text(title)
-        .font(.caption)
-        .foregroundStyle(.secondary)
-      Text(id.uuidString)
-        .font(.caption.monospaced())
-        .textSelection(.enabled)
-    }
-  }
 }
 
 private struct FinishedSessionEntriesView: View {
@@ -294,11 +241,17 @@ private struct FinishedSessionEntriesView: View {
   }
 
   private var outcomeTitle: LocalizedStringResource {
-    guard case let .coarse(outcome) = session.outcome else { return .sessionOutcomeNone }
+    session.outcome.map(cookingSessionOutcomeTitle) ?? .sessionOutcomeNone
+  }
+}
+
+func cookingSessionOutcomeTitle(_ value: SessionOutcome) -> LocalizedStringResource {
+  switch value {
+  case .coarse(let outcome):
     switch outcome {
-    case .great: return .sessionOutcomeGreat
-    case .okay: return .sessionOutcomeOkay
-    case .unsuccessful: return .sessionOutcomeUnsuccessful
+    case .great: .sessionOutcomeGreat
+    case .okay: .sessionOutcomeOkay
+    case .unsuccessful: .sessionOutcomeUnsuccessful
     }
   }
 }
