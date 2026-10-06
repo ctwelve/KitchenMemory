@@ -9,6 +9,64 @@ import XCTest
 
 @MainActor
 final class RecipeLibraryNavigationTests: XCTestCase {
+  func testDelayedDirectRecipeFinishRestoresItsRecipeAndListPosition() throws {
+    let app = try AppRuntime.testing()
+    app.libraryModel.loadIfNeeded()
+    let recipe = try XCTUnwrap(app.libraryModel.selectedRecipe)
+    let otherRecipe = try XCTUnwrap(app.libraryModel.recipes.first { $0.id != recipe.id })
+    let service = NavigationRetryService(base: app.cookingSessions)
+    let model = CookingSessionPresentationModel(sessions: service,
+      store: VolatileCookingSessionPresentationStore(), navigation: app.libraryModel.navigation)
+    model.loadIfNeeded()
+    model.navigation.recipeListAnchor = recipe.id
+    XCTAssertTrue(model.start(from: recipe))
+    service.refusesFinish = true
+    XCTAssertFalse(model.finishCurrentSession())
+    XCTAssertTrue(model.leaveCurrentSession())
+    XCTAssertTrue(model.navigation.selectRecipe(otherRecipe.id))
+    model.navigation.recipeListAnchor = otherRecipe.id
+    service.refusesFinish = false
+    model.retryPendingCommands()
+    XCTAssertNotNil(model.observedFinishedSession)
+    XCTAssertNil(model.historyScope)
+    model.dismissObservedFinishedSession()
+    XCTAssertEqual(model.navigation.selectedRecipeID, recipe.id)
+    XCTAssertEqual(model.navigation.recipeListAnchor, recipe.id)
+  }
+
+  func testDelayedFinishAndContinuationRetainTheSubmittingHistoryAfterNavigation() throws {
+    let app = try AppRuntime.testing()
+    app.libraryModel.loadIfNeeded()
+    let recipe = try XCTUnwrap(app.libraryModel.selectedRecipe)
+    let service = NavigationRetryService(base: app.cookingSessions)
+    let model = CookingSessionPresentationModel(sessions: service,
+      store: VolatileCookingSessionPresentationStore(), navigation: app.libraryModel.navigation)
+    model.loadIfNeeded()
+    XCTAssertTrue(model.start(from: recipe))
+    let sourceID = try XCTUnwrap(model.currentSessionID)
+    XCTAssertTrue(model.showRecipeSessionHistory(for: recipe.id))
+    model.navigation.historyListAnchor = sourceID
+    XCTAssertTrue(model.selectSessionFromHistory(sourceID))
+    service.refusesFinish = true
+    XCTAssertFalse(model.finishCurrentSession())
+    XCTAssertTrue(model.leaveCurrentSession())
+    model.showSessionHistory()
+    service.refusesFinish = false
+    model.retryPendingCommands()
+    XCTAssertEqual(model.navigation.destination, .finished(sourceID, history: .recipe(recipe.id)))
+    XCTAssertEqual(model.navigation.historyListAnchor, sourceID)
+    service.refusesContinuation = true
+    XCTAssertFalse(model.continueSession(sourceID))
+    model.showSessionHistory()
+    service.refusesContinuation = false
+    model.retryPendingCommands()
+    XCTAssertNotEqual(model.currentSessionID, sourceID)
+    XCTAssertEqual(model.historyScope, .recipe(recipe.id))
+    XCTAssertTrue(model.leaveCurrentSession())
+    XCTAssertEqual(model.navigation.destination, .history(.recipe(recipe.id)))
+    XCTAssertEqual(model.navigation.historyListAnchor, sourceID)
+  }
+
   func testEachHistoryScopeRetainsItsOwnListPosition() {
     let navigation = RecipeLibraryNavigation()
     let recipeID = Recipe.ID(), allAnchor = CookingSession.ID(), recipeAnchor = CookingSession.ID()
@@ -18,6 +76,8 @@ final class RecipeLibraryNavigationTests: XCTestCase {
     XCTAssertNil(navigation.historyListAnchor)
     navigation.historyListAnchor = recipeAnchor
     navigation.move(to: .history(.all))
+    XCTAssertEqual(navigation.historyListAnchor, allAnchor)
+    navigation.rememberHistoryListAnchor(nil, for: .all)
     XCTAssertEqual(navigation.historyListAnchor, allAnchor)
     navigation.move(to: .history(.recipe(recipeID)))
     XCTAssertEqual(navigation.historyListAnchor, recipeAnchor)

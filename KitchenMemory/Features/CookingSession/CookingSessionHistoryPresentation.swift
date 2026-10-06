@@ -5,6 +5,11 @@
 import Foundation
 import KitchenKit
 
+struct CookingSessionHistoryGroup {
+  let lifecycle: SessionLifecycle
+  let sessions: [CookingSessionProjection]
+}
+
 @MainActor
 extension CookingSessionPresentationModel {
   static let recentSessionLimit = 5
@@ -25,14 +30,21 @@ extension CookingSessionPresentationModel {
   }
 
   var displayedHistorySessions: [CookingSessionProjection] {
-    let available = [SessionLifecycle.active, .stopped, .finished].flatMap { lifecycle in
-      (sessions + finishedSessions).filter { $0.lifecycle == lifecycle }.sorted(by: historySessionOrder)
-    }
+    displayedHistoryGroups.flatMap(\.sessions)
+  }
+
+  var displayedHistoryGroups: [CookingSessionHistoryGroup] {
+    let available: [CookingSessionProjection]
     switch displayedHistoryScope {
-    case .all: return available
+    case .all: available = sessions + finishedSessions
     case .recipe:
-      return available.filter { session in recipeHistorySessions.contains { $0.id == session.id } }
+      let ids = Set(recipeHistorySessions.map(\.id))
+      available = (sessions + finishedSessions).filter { ids.contains($0.id) }
     case nil: return []
+    }
+    return [SessionLifecycle.active, .stopped, .finished].compactMap { lifecycle in
+      let grouped = available.filter { $0.lifecycle == lifecycle }.sorted(by: historySessionOrder)
+      return grouped.isEmpty ? nil : CookingSessionHistoryGroup(lifecycle: lifecycle, sessions: grouped)
     }
   }
 

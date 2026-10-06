@@ -18,6 +18,32 @@ import Observation
 final class RecipeLibraryNavigation {
   enum Focus: Equatable { case content, detail }
 
+  struct SessionEntryContext {
+    let history: CookingSessionHistoryScope?
+    let historyAnchor: CookingSession.ID?
+    let recipeID: Recipe.ID?
+    let recipeAnchor: Recipe.ID?
+  }
+
+  var sessionEntryContext: SessionEntryContext {
+    SessionEntryContext(history: historyScope, historyAnchor: historyListAnchor,
+                        recipeID: selectedRecipeID, recipeAnchor: recipeListAnchor)
+  }
+
+  @discardableResult
+  func openSession(_ id: CookingSession.ID, finished: Bool, from origin: SessionEntryContext) -> Bool {
+    let next: Destination = finished ? .finished(id, history: origin.history) : .session(id, history: origin.history)
+    guard accept(next) else { return false }
+    if let scope = origin.history {
+      historyListAnchors[scope] = origin.historyAnchor
+    } else {
+      contentDestination = .recipes
+      selectedRecipeID = origin.recipeID
+      recipeListAnchor = origin.recipeAnchor
+    }
+    return true
+  }
+
   enum Destination: Equatable {
     case recipe
     case editor(UUID)

@@ -18,16 +18,13 @@ struct CookingSessionHistoryView: View {
           .accessibilityHeading(.h1)
           .accessibilityIdentifier("sessions-history")
 
-        ForEach([SessionLifecycle.active, .stopped, .finished], id: \.self) { lifecycle in
-          let sessions = model.displayedHistorySessions.filter { $0.lifecycle == lifecycle }
-          if !sessions.isEmpty {
-            historySection(CookingSessionLifecyclePresentation(lifecycle).title,
-                           identifier: "sessions-\(lifecycle.rawValue)") {
-              ForEach(sessions, id: \.id) { session in
+        ForEach(model.displayedHistoryGroups, id: \.lifecycle) { group in
+            historySection(CookingSessionLifecyclePresentation(group.lifecycle).title,
+                           identifier: "sessions-\(group.lifecycle.rawValue)") {
+              ForEach(group.sessions, id: \.id) { session in
                 sessionButton(session)
               }
             }
-          }
         }
         if model.displayedHistorySessions.isEmpty {
           ContentUnavailableView(
@@ -73,27 +70,17 @@ struct CookingSessionHistoryView: View {
     .accessibilityIdentifier(identifier)
   }
 
-  @ViewBuilder
   private func sessionButton(_ session: CookingSessionProjection) -> some View {
-    if session.lifecycle == .finished {
       Button {
-        if model.observeFinishedSession(session.id) { applyNavigationFocus() }
+        let selected = session.lifecycle == .finished
+          ? model.observeFinishedSession(session.id) : model.selectSessionFromHistory(session.id)
+        if selected { applyNavigationFocus() }
       } label: {
         CookingSessionHistoryRow(session: session)
       }
       .buttonStyle(.plain)
       .accessibilityIdentifier(historyRowIdentifier(session))
       .id(session.id)
-    } else {
-      Button {
-        if model.selectSessionFromHistory(session.id) { applyNavigationFocus() }
-      } label: {
-        CookingSessionHistoryRow(session: session)
-      }
-      .buttonStyle(.plain)
-      .accessibilityIdentifier(historyRowIdentifier(session))
-      .id(session.id)
-    }
   }
 
   private func historyRowIdentifier(_ session: CookingSessionProjection) -> String {
