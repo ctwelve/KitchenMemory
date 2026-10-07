@@ -170,7 +170,6 @@ struct CookingSessionView: View {
       } label: {
         Label(.sessionLifecycleMoreActions, systemImage: "ellipsis.circle")
       }
-      .accessibilityLabel(Text(.sessionLifecycleMoreActions))
       .accessibilityIdentifier("session-lifecycle-menu")
     }
   }
