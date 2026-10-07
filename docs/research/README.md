@@ -16,6 +16,8 @@ live at fixed Git commits below; recheck their evidence before renewed adoption.
 
 ## Current design inputs
 
+- Localization ([planning #192](https://github.com/ctwelve/KitchenMemory/issues/192)): [global language support evidence and staged plan](global-language-expansion.md), with its [independent model review](global-language-independent-review.md). Locale selection and delivery remain separate; the shipping inventory is unchanged.
+
 - Undo ([delivery gate #204](https://github.com/ctwelve/KitchenMemory/issues/204)): [agreed operation policy](application-undo-policy.md), [native facilities](native-undo-facilities.md), [durable storage](durable-undo-storage.md).
 - Managed storage: [CloudKit schema evolution](cloudkit-production-schema-evolution.md), [Cooking Session reconciliation facts](managed-cloudkit-session-reconciliation.md). These retain platform constraints and uncompleted service experiments.
 - Acquisition ([planning #196](https://github.com/ctwelve/KitchenMemory/issues/196)): [photographs and scans](recipe-photo-and-scan-acquisition.md), [privacy-preserving AI assistance](privacy-preserving-ai-assistance.md).

@@ -11,20 +11,10 @@ struct CookingSessionProgressView: View {
   let layoutMode: CookingSessionLayoutMode
   var showsProgress = true
 
-  @State private var scaleSelection: RecipeScalingState
   @Environment(\.locale) private var locale
 
-  init(
-    model: CookingSessionPresentationModel,
-    session: CookingSessionProjection,
-    layoutMode: CookingSessionLayoutMode,
-    showsProgress: Bool = true
-  ) {
-    self.model = model
-    self.session = session
-    self.layoutMode = layoutMode
-    self.showsProgress = showsProgress
-    _scaleSelection = State(initialValue: Self.scaleSelection(for: session))
+  private var scaleSelection: RecipeScalingState {
+    Self.scaleSelection(for: session)
   }
 
   var body: some View {
@@ -40,22 +30,8 @@ struct CookingSessionProgressView: View {
             }
           }
         }
-      } else if !scaleSelection.bases.isEmpty {
-        RecipeScalingControls(
-          selection: $scaleSelection,
-          context: .cookingSession(isEnabled: session.lifecycle == .active)
-        )
       }
       if showsProgress { progressContent }
-    }
-    .onChange(of: scaleSelection) { _, selection in
-      if session.lifecycle == .active, let scale = selection.scale {
-        model.replaceWorkingScale(with: scale)
-      }
-    }
-    .onChange(of: session.workingScale) { _, _ in
-      let restored = Self.scaleSelection(for: session)
-      if restored != scaleSelection { scaleSelection = restored }
     }
   }
 

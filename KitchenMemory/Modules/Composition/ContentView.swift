@@ -25,6 +25,7 @@ struct ContentView: View {
   @State private var preferredCompactColumn: NavigationSplitViewColumn = .content
   @State private var temporaryOrganization = false
   @State private var isShowingResetConfirmation = false
+  @State private var dismissedDetachedDraftID: CookingSession.ID?
 #if !os(macOS)
   @State private var isShowingSettings = false
 #endif
@@ -72,6 +73,9 @@ struct ContentView: View {
       Button(.actionCancel, role: .cancel) {}
     } message: {
       Text(.sessionEntryDetachedMessage)
+    }
+    .onChange(of: preparedApp?.libraryModel.navigation.destination) { _, _ in
+      dismissedDetachedDraftID = nil
     }
     .modifier(RecipeDraftFailureAlert(model: preparedApp?.libraryModel))
     .alert(.organizationFailed, isPresented: Binding(
@@ -235,7 +239,12 @@ private extension ContentView {
 
   var sessionIssueIsPresented: Binding<Bool> {
     Binding(
-      get: { preparedApp?.sessionModel.isShowingIssue ?? false },
+      get: {
+        guard let model = preparedApp?.sessionModel else { return false }
+        // Save recovery remains beside the readable cook. Clipboard errors and
+        // failures outside a cooking destination retain the shell alert.
+        return model.isShowingIssue && (model.currentSession == nil || model.issue == .clipboard)
+      },
       set: { isPresented in
         if !isPresented { preparedApp?.sessionModel.dismissIssuePresentation() }
       }
@@ -244,8 +253,15 @@ private extension ContentView {
 
   var detachedDraftIsPresented: Binding<Bool> {
     Binding(
-      get: { preparedApp?.sessionModel.detachedEntryDraft != nil },
-      set: { _ in }
+      get: {
+        guard let draft = preparedApp?.sessionModel.detachedEntryDraft else { return false }
+        return draft.sessionID != dismissedDetachedDraftID
+      },
+      set: { isPresented in
+        if !isPresented {
+          dismissedDetachedDraftID = preparedApp?.sessionModel.detachedEntryDraft?.sessionID
+        }
+      }
     )
   }
 

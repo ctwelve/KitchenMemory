@@ -17,7 +17,8 @@ extension CookingSessionPresentationModel {
   }
   @discardableResult
   func stopCurrentSession() -> Bool {
-    guard let session = currentSession, session.lifecycle == .active else { return false }
+    guard let session = currentSession, session.lifecycle == .active,
+          !currentSessionHasPendingFinish else { return false }
     return submitCommand { .stop(
       factID: SessionFact.ID(),
       sessionID: session.id,
@@ -26,7 +27,8 @@ extension CookingSessionPresentationModel {
   }
   @discardableResult
   func resumeCurrentSession() -> Bool {
-    guard let session = currentSession, session.lifecycle == .stopped else { return false }
+    guard let session = currentSession, session.lifecycle == .stopped,
+          !currentSessionHasPendingFinish else { return false }
     return submitCommand { .resume(
       factID: SessionFact.ID(),
       sessionID: session.id,
@@ -87,6 +89,7 @@ extension CookingSessionPresentationModel {
   func finishCurrentSession() -> Bool {
     guard let session = currentSession,
           session.lifecycle == .active || session.lifecycle == .stopped else { return false }
+    guard !hasPendingDeliveryWork else { return false }
     if currentEntryDraft?.isMeaningful == true {
       present(.attention(.meaningfulDraft))
       return false
@@ -144,6 +147,9 @@ extension CookingSessionPresentationModel {
     for pending: PendingCookingSessionCommand
   ) {
     defer {
+      if case let .resume(factID, _, _) = pending {
+        pendingEntryComposerResumes[factID] = nil
+      }
       if let identity = pending.navigationIdentity { pendingNavigationOrigins[identity] = nil }
     }
     switch resolution {
@@ -151,8 +157,21 @@ extension CookingSessionPresentationModel {
       refreshDetachedEntryDraft()
       issue = nil
       isShowingIssue = false
+      let previouslySelectedSessionID = currentSessionID
       upsert(session)
       applySelection(for: session, pending: pending)
+      if currentSessionID != previouslySelectedSessionID {
+        isShowingEntryComposer = false
+        entryComposerOrigin = nil
+      }
+      if case let .resume(factID, sessionID, _) = pending,
+         let request = pendingEntryComposerResumes.removeValue(forKey: factID),
+         request.sessionID == sessionID,
+         previouslySelectedSessionID == sessionID, currentSessionID == sessionID,
+         session.lifecycle == .active {
+        entryComposerOrigin = request.origin
+        isShowingEntryComposer = true
+      }
       if pending.refreshesClassification { reload() }
     case .rejectedByFinishedSource:
       issue = nil
@@ -253,10 +272,13 @@ extension CookingSessionPresentationModel {
     for snapshot: ExecutionSnapshot,
     scale: RecipeScale
   ) -> SessionWorkingScale? {
-    guard snapshot.baseYield?.scalingBases.contains(where: {
-      $0.quantity == scale.baseYield
-    }) == true else { return nil }
-    var workingYield = snapshot.baseYield
+    let bases = snapshot.baseYield?.scalingBases ?? []
+    if bases.isEmpty {
+      guard scale.baseYield == RationalQuantity(numerator: 1) else { return nil }
+    } else {
+      guard bases.contains(where: { $0.quantity == scale.baseYield }) else { return nil }
+    }
+    var workingYield = bases.isEmpty ? nil : snapshot.baseYield
     workingYield?.quantity = QuantityExpression(kind: .exact, lowerBound: scale.workingYield)
     let ingredients = snapshot.ingredientSections.flatMap(\.ingredients)
     var quantities: [SessionIngredientQuantity] = []

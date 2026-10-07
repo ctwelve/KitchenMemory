@@ -339,3 +339,12 @@ String Catalog symbols. The repository localization check compares each file
 with the storyboard label inventory and rejects missing locales, missing or stale
 labels, duplicate keys, malformed entries, and empty translations. Locales without
 a distinct launch image use the neutral base photograph.
+
+## Expanded language planning
+
+The [global language research](research/global-language-expansion.md) recommends
+a staged roster, translation corpus and independent review, locale-specific
+plural-contract work, and native acceptance. It is a selection proposal under
+[#192](https://github.com/ctwelve/KitchenMemory/issues/192), not an amendment to
+the shipping locale inventory or acceptance of its generated wording. The
+selected expanded language set remains required before 1.0.

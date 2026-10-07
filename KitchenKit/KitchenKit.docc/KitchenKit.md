@@ -25,6 +25,13 @@ and helpers. Some concrete Swift types retain bodies beside their declarations
 to preserve private access and natural value semantics; the folder split does
 not add indirection or change Swift visibility.
 
+For two concrete examples, ``SchemaOrgRecipeImporter`` keeps its public capture
+entry points in `Interface/Import` while `Modules/Import` owns bounded discovery,
+normalization, and output accounting. ``SwiftDataRecipeRepository`` keeps public
+operations and transaction ownership in `Interface/Persistence`; its
+`Modules/Persistence` helpers own payload mapping, authority reads/writes, and
+Kitchen ownership. These are internal source boundaries, not additional products.
+
 Newcomers can start with the three domain identities—``Kitchen``, ``Recipe``,
 and ``RecipeRevision``—then move outward to a product-facing service such as
 ``RecipeLibrary`` or ``CookingSessions``. Repository protocols mark the boundary

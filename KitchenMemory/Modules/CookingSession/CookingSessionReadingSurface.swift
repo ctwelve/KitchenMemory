@@ -11,12 +11,15 @@ struct CookingSessionReadingSurface<Context: View>: View {
   let layoutMode: CookingSessionLayoutMode
   @ViewBuilder let context: Context
   @State private var showsIngredients = false
+  @State private var showsScaling = false
+  @State private var deferredNoteTarget: SessionProgressTarget?
   @State private var jump: UUID?
   @State private var isVisible = false
   @State private var awake = ScreenAwakeController()
   @State private var readingOrigin = UUID()
   @Environment(\.scenePhase) private var scenePhase
   @Environment(\.locale) private var locale
+  @Environment(\.cookingSessionComposerOrigin) private var composerOrigin
 
   private var preference: CookingSessionReadingPreference { model.readingPreference(for: session) }
 
@@ -34,21 +37,22 @@ struct CookingSessionReadingSurface<Context: View>: View {
         }
         NativeCookingReader(session: session, readingOrigin: readingOrigin, preference: preference,
           completion: model.readingCompletion, jump: jump,
-          isForeground: scenePhase == .active && !showsIngredients,
+          isForeground: scenePhase == .active && !showsIngredients && !showsScaling && !isShowingOwnEntryComposer,
           save: { model.rememberReadingPosition($0, in: session) }, content: {
           VStack(alignment: .leading, spacing: 24) {
             Text(session.snapshot.title)
               .font(.largeTitle.bold())
               .accessibilityHeading(.h1)
               .accessibilityIdentifier("cooking-session-shell")
+            CookingSessionScaleSummary(session: session) { showsScaling = true }
+            CookingSessionScalingExplanation(model: model, session: session)
             let lifecycle = CookingSessionLifecyclePresentation(session.lifecycle)
             Label(lifecycle.title, systemImage: lifecycle.symbol)
               .foregroundStyle(.secondary)
               .accessibilityIdentifier("session-lifecycle")
             context
-            CookingSessionSnapshotContext(snapshot: session.snapshot)
-            CookingSessionProgressView(model: model, session: session,
-              layoutMode: layoutMode, showsProgress: false)
+            CookingSessionSnapshotContext(snapshot: session.snapshot, showsYield: false)
+            CookingSessionMethodGuidance(session: session)
             CookingSessionInstructionList(model: model, session: session)
             CookingSessionEntriesView(model: model, session: session)
           }
@@ -56,13 +60,16 @@ struct CookingSessionReadingSurface<Context: View>: View {
           .padding(24)
           .frame(maxWidth: .infinity)
           .environment(\.cookingReadingOrigin, readingOrigin)
+          .environment(\.cookingSessionComposerOrigin, composerOrigin)
         })
         .accessibilityIdentifier("cooking-session-scroll")
       }
     }
-    .sheet(isPresented: $showsIngredients) {
+    .sheet(isPresented: $showsIngredients, onDismiss: openDeferredIngredientNote) {
       NavigationStack {
         ScrollView { CookingSessionIngredientList(model: model, session: session).padding() }
+          .environment(\.cookingSessionComposerOrigin, composerOrigin)
+          .environment(\.cookingSessionNoteRequest, requestIngredientNote)
           .navigationTitle(.sessionProgressIngredients)
           .toolbar {
             ToolbarItem(placement: .confirmationAction) {
@@ -71,6 +78,9 @@ struct CookingSessionReadingSurface<Context: View>: View {
           }
       }
       .frame(minWidth: 300, minHeight: 400)
+    }
+    .sheet(isPresented: $showsScaling) {
+      CookingSessionScalingView(model: model, session: session, close: { showsScaling = false })
     }
     .onAppear {
       model.prepareReadingPreference(for: session)
@@ -82,6 +92,21 @@ struct CookingSessionReadingSurface<Context: View>: View {
     .onChange(of: session.lifecycle) { _, _ in updateAwake() }
     .onChange(of: preference.keepsScreenAwake) { _, _ in updateAwake() }
     .onChange(of: model.readingCompletion?.id) { _, _ in announceCompletion() }
+  }
+
+  private func requestIngredientNote(_ target: SessionProgressTarget) {
+    deferredNoteTarget = target
+    showsIngredients = false
+  }
+
+  private func openDeferredIngredientNote() {
+    guard let target = deferredNoteTarget else { return }
+    deferredNoteTarget = nil
+    model.openEntryComposer(target: target, origin: composerOrigin)
+  }
+
+  private var isShowingOwnEntryComposer: Bool {
+    model.isShowingEntryComposer && model.entryComposerOrigin == composerOrigin
   }
 
   private var readingControls: some View {

@@ -11,6 +11,7 @@ struct CookingSessionReadingPreference: Codable, Equatable {
   var emphasizedInstructionID: SessionInstruction.ID?
   var position: CookingSessionReadingPosition?
   var keepsScreenAwake = true
+  var hasDismissedScalingExplanation: Bool?
 }
 
 /// Offset from a retained snapshot instruction; nil instruction means the document top.
