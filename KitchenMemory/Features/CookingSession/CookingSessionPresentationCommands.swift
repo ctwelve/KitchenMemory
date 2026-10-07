@@ -47,7 +47,9 @@ extension CookingSessionPresentationModel {
     ))
   }
   @discardableResult
-  func setInstruction(_ id: SessionInstruction.ID, to state: SessionInstructionProgress) -> Bool {
+  func setInstruction(
+    _ id: SessionInstruction.ID, to state: SessionInstructionProgress, readingOrigin: UUID? = nil
+  ) -> Bool {
     guard let session = currentSession, session.lifecycle == .active,
           session.snapshot.instructionSections.flatMap(\.steps).contains(where: {
             $0.id == id
@@ -63,7 +65,7 @@ extension CookingSessionPresentationModel {
     ))
     if advances, let updated = currentSession, updated.id == session.id,
        updated.instructionProgress(for: id) == .completed {
-      advanceReadingAfterCompletion(id, in: updated)
+      advanceReadingAfterCompletion(id, in: updated, readingOrigin: readingOrigin)
     }
     return accepted
   }

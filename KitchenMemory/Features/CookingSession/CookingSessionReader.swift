@@ -5,6 +5,17 @@
 import KitchenKit
 import SwiftUI
 
+private struct CookingReadingOriginKey: EnvironmentKey {
+  static let defaultValue: UUID? = nil
+}
+
+extension EnvironmentValues {
+  var cookingReadingOrigin: UUID? {
+    get { self[CookingReadingOriginKey.self] }
+    set { self[CookingReadingOriginKey.self] = newValue }
+  }
+}
+
 struct CookingReadingFrames: PreferenceKey {
   static let defaultValue: [SessionInstruction.ID: CGRect] = [:]
   static func reduce(value: inout [SessionInstruction.ID: CGRect], nextValue: () -> [SessionInstruction.ID: CGRect]) {
@@ -15,6 +26,7 @@ struct CookingReadingFrames: PreferenceKey {
 /// Shared geometry/consent policy; native adapters own input delivery and actual scrolling.
 @MainActor
 final class CookingReaderCoordinator {
+  let readingOrigin: UUID
   var frames: [SessionInstruction.ID: CGRect] = [:]
   var motion: ReadingMotionController?
   var offset: () -> Double = { 0 }
@@ -39,7 +51,8 @@ final class CookingReaderCoordinator {
     lastReduceMotion = reduceMotion
   }
 
-  init(position: CookingSessionReadingPosition?, completion: CookingSessionReadingCompletion?) {
+  init(readingOrigin: UUID, position: CookingSessionReadingPosition?, completion: CookingSessionReadingCompletion?) {
+    self.readingOrigin = readingOrigin
     initialPosition = position
     completionID = completion?.id
   }
@@ -48,6 +61,7 @@ final class CookingReaderCoordinator {
               completion: CookingSessionReadingCompletion?, jump: UUID?, reduceMotion: Bool) {
     // Any non-completion projection/selection change cancels existing consent.
     let isNewCompletion = completion?.sessionID == session.id && completion?.id != completionID
+      && completion?.readingOrigin == readingOrigin
     if lastSession != session || lastEmphasis != preference.emphasizedInstructionID
       || lastKeepsAwake != preference.keepsScreenAwake {
       interrupt()

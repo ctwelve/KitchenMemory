@@ -14,6 +14,7 @@ struct CookingSessionReadingSurface<Context: View>: View {
   @State private var jump: UUID?
   @State private var isVisible = false
   @State private var awake = ScreenAwakeController()
+  @State private var readingOrigin = UUID()
   @Environment(\.scenePhase) private var scenePhase
   @Environment(\.locale) private var locale
 
@@ -31,7 +32,7 @@ struct CookingSessionReadingSurface<Context: View>: View {
           .frame(width: 340)
           Divider()
         }
-        NativeCookingReader(session: session, preference: preference,
+        NativeCookingReader(session: session, readingOrigin: readingOrigin, preference: preference,
           completion: model.readingCompletion, jump: jump,
           isForeground: scenePhase == .active && !showsIngredients,
           save: { model.rememberReadingPosition($0, in: session) }, content: {
@@ -45,14 +46,16 @@ struct CookingSessionReadingSurface<Context: View>: View {
               .foregroundStyle(.secondary)
               .accessibilityIdentifier("session-lifecycle")
             context
-            CookingSessionInstructionList(model: model, session: session)
+            CookingSessionSnapshotContext(snapshot: session.snapshot)
             CookingSessionProgressView(model: model, session: session,
               layoutMode: layoutMode, showsProgress: false)
+            CookingSessionInstructionList(model: model, session: session)
             CookingSessionEntriesView(model: model, session: session)
           }
           .frame(maxWidth: 760, alignment: .leading)
           .padding(24)
           .frame(maxWidth: .infinity)
+          .environment(\.cookingReadingOrigin, readingOrigin)
         })
         .accessibilityIdentifier("cooking-session-scroll")
       }
@@ -121,7 +124,8 @@ struct CookingSessionReadingSurface<Context: View>: View {
   }
 
   private func announceCompletion() {
-    guard let completion = model.readingCompletion, completion.sessionID == session.id else { return }
+    guard let completion = model.readingCompletion, completion.sessionID == session.id,
+          completion.readingOrigin == readingOrigin else { return }
     let message: LocalizedStringResource
     if let next = completion.nextNumber {
       message = .sessionReadingCompletedNext(completed: completion.completedNumber, next: next)

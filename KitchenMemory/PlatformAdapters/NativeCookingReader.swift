@@ -9,6 +9,7 @@ import SwiftUI
 /// normal event delivery. SwiftUI retains authored content and semantic controls.
 struct NativeCookingReader<Content: View> {
   let session: CookingSessionProjection
+  let readingOrigin: UUID
   let preference: CookingSessionReadingPreference
   let completion: CookingSessionReadingCompletion?
   let jump: UUID?
@@ -22,7 +23,7 @@ struct NativeCookingReader<Content: View> {
   @Environment(\.layoutDirection) private var direction
 
   func makeCoordinator() -> CookingReaderCoordinator {
-    CookingReaderCoordinator(position: preference.position, completion: completion)
+    CookingReaderCoordinator(readingOrigin: readingOrigin, position: preference.position, completion: completion)
   }
 
   func document(_ coordinator: CookingReaderCoordinator) -> some View {

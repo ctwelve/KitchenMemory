@@ -11,6 +11,7 @@ struct CookingSessionInstructionRow: View {
   let instruction: SessionInstruction
   let number: Int
   @Environment(\.locale) private var locale
+  @Environment(\.cookingReadingOrigin) private var readingOrigin
 
   var body: some View {
     let state = session.instructionProgress(for: instruction.id)
@@ -24,7 +25,7 @@ struct CookingSessionInstructionRow: View {
       }
       HStack(alignment: .top, spacing: 12) {
         Button {
-          model.setInstruction(instruction.id, to: state == .open ? .completed : .open)
+          model.setInstruction(instruction.id, to: state == .open ? .completed : .open, readingOrigin: readingOrigin)
         } label: {
           Image(systemName: instructionSymbol(state))
             .font(.title)
@@ -54,7 +55,7 @@ struct CookingSessionInstructionRow: View {
         }
         .background {
           NativeCookingCompleteSwipe(isEnabled: session.lifecycle == .active && state == .open) {
-            model.setInstruction(instruction.id, to: .completed)
+            model.setInstruction(instruction.id, to: .completed, readingOrigin: readingOrigin)
           }
         }
       }
@@ -93,7 +94,7 @@ struct CookingSessionInstructionRow: View {
     Menu {
       if state == .open {
         Button(.sessionProgressInstructionComplete) {
-          model.setInstruction(instruction.id, to: .completed)
+          model.setInstruction(instruction.id, to: .completed, readingOrigin: readingOrigin)
         }
         Button(.sessionProgressInstructionSkip) {
           model.setInstruction(instruction.id, to: .skipped)

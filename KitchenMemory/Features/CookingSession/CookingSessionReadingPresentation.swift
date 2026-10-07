@@ -23,6 +23,7 @@ struct CookingSessionReadingPosition: Codable, Equatable {
 struct CookingSessionReadingCompletion: Equatable {
   let id = UUID()
   let sessionID: CookingSession.ID
+  let readingOrigin: UUID?
   let completedNumber: Int
   let nextInstructionID: SessionInstruction.ID?
   let nextNumber: Int?
@@ -58,14 +59,16 @@ extension CookingSessionPresentationModel {
     saveReadingPreference(preference)
   }
 
-  func advanceReadingAfterCompletion(_ id: SessionInstruction.ID, in session: CookingSessionProjection) {
+  func advanceReadingAfterCompletion(
+    _ id: SessionInstruction.ID, in session: CookingSessionProjection, readingOrigin: UUID?
+  ) {
     let steps = session.snapshot.instructionSections.flatMap(\.steps)
     guard let index = steps.firstIndex(where: { $0.id == id }) else { return }
     let nextIndex = steps.indices.first { $0 > index && session.instructionProgress(for: steps[$0].id) == .open }
     var preference = readingPreference(for: session)
     preference.emphasizedInstructionID = nextIndex.map { steps[$0].id }
     saveReadingPreference(preference)
-    readingCompletion = CookingSessionReadingCompletion(sessionID: session.id,
+    readingCompletion = CookingSessionReadingCompletion(sessionID: session.id, readingOrigin: readingOrigin,
       completedNumber: index + 1, nextInstructionID: preference.emphasizedInstructionID,
       nextNumber: nextIndex.map { $0 + 1 })
   }

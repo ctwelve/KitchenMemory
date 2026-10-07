@@ -305,7 +305,9 @@ The production reader uses native AppKit/UIKit scrolling around the full authore
 instruction document. Wide layouts retain ingredients alongside it; compact and
 accessibility-size layouts expose ingredients in a separate sheet without replacing
 the reader. Reading selection, progress, and explicit Jump remain separate intentions.
-Only a new deliberate completion of the emphasized open instruction may reveal a later
+Only the invoking window receives completion reveal/announcement consent; other windows
+may refresh shared evidence and emphasis without moving or announcing. Only a new
+deliberate completion of the emphasized open instruction may reveal a later
 unfinished instruction. Travel is incremental and cancelable; input cancellation does
 not replay it. Reduce Motion retains emphasis/announcement and requires explicit Jump.
 Stop/Resume, scale changes, incoming projections, and other progress actions never
