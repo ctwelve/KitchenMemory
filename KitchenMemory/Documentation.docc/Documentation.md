@@ -5,6 +5,13 @@ recipe library and cooking companion.
 
 ## Overview
 
+Start at the source-root `KitchenMemoryApp.swift`. `Interface/` collects the
+application's callable preference, Cooking Session, and sample catalog contracts;
+`Modules/` contains the corresponding presentation and native implementation.
+`Resources/` owns bundled assets, catalogs, and platform configuration. Internal
+contracts remain internal; these folders do not create separate Swift modules.
+
+
 KitchenMemory is the presentation and application-composition layer. It owns
 the SwiftUI experience, platform adapters, preferences, localized resources,
 and bundled sample content. Presentation-independent concepts and product

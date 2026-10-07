@@ -1,0 +1,221 @@
+// Kitchen Memory
+// Copyright © 2026 the Kitchen Memory contributors.
+// SPDX-License-Identifier: MIT
+
+import Foundation
+import KitchenKit
+import Observation
+
+enum CookingSessionHistoryScope: Hashable {
+  case all
+  case recipe(Recipe.ID)
+}
+
+enum CookingSessionPresentationIssue: Equatable {
+  case read
+  case clipboard
+  case command(CookingSessionLogicError)
+  case attention(CookingSessionAttention)
+
+  var message: LocalizedStringResource {
+    switch self {
+    case .read: .sessionIssueRead
+    case .clipboard: .sessionIssueClipboard
+    case .command: .sessionIssueCommand
+    case .attention: .sessionIssueAttention
+    }
+  }
+}
+
+/// Replaceable presentation projection over retained Cooking Session evidence.
+/// It selects and translates commands but never derives lifecycle from view or
+/// process state.
+///
+/// ``PreparedApp`` retains this `@Observable` model. SwiftUI tracks the projected
+/// properties read by views, while ``CookingSessionDelivery`` retains pending
+/// identities and Entry drafts independently of those views' local dialogs.
+/// Optimistic presentation can show pending activity without declaring it accepted.
+@MainActor
+@Observable
+final class CookingSessionPresentationModel {
+  static let staleSessionInterval: TimeInterval = 60 * 60 * 24 * 3
+
+  let service: any CookingSessionServing
+  let store: any CookingSessionPresentationStoring
+  let now: () -> Date
+  let navigation: RecipeLibraryNavigation
+  @ObservationIgnored var pendingNavigationOrigins: [UUID: RecipeLibraryNavigation.SessionEntryContext] = [:]
+
+  var sessions: [CookingSessionProjection] = []
+  var finishedSessions: [CookingSessionProjection] = []
+  var deletedSessions: [CookingSessionProjection] = []
+  var waitingDeletedSessions: [UnavailableSession] = []
+  var waitingSessions: [UnavailableSession] = []
+  var recoverySessions: [SessionRecovery] = []
+  var currentSessionID: CookingSession.ID? { navigation.currentSessionID }
+  var finishedSessionCount = 0
+  var unavailableSessionCount = 0
+  var recoverySessionCount = 0
+  var issue: CookingSessionPresentationIssue?
+  var isShowingIssue = false
+  private(set) var hasLoaded = false
+  let delivery: CookingSessionDelivery
+  var entryDrafts: [CookingSessionEntryDraft] { delivery.entryDrafts }
+  var detachedEntryDraft: CookingSessionEntryDraft?
+  var finishedSessionIDs: Set<CookingSession.ID> = []
+  var historyScope: CookingSessionHistoryScope? { navigation.historyScope }
+  var recipeHistorySessions: [CookingSessionProjection] = []
+  var sidebarSessionIDsByRecipe: [Recipe.ID: Set<CookingSession.ID>] = [:]
+  var observedFinishedSessionID: CookingSession.ID? {
+    guard case .finished(let id, _) = navigation.destination else { return nil }
+    return id
+  }
+  var sessionVisits: [CookingSessionVisit]
+  var readingPreferences: [CookingSessionReadingPreference]
+  var readingCompletion: CookingSessionReadingCompletion?
+
+  init(
+    sessions: any CookingSessionServing,
+    store: any CookingSessionPresentationStoring,
+    now: @escaping () -> Date = Date.init,
+    navigation: RecipeLibraryNavigation = RecipeLibraryNavigation()
+  ) {
+    service = sessions
+    self.store = store
+    self.now = now
+    self.navigation = navigation
+    navigation.installSessionStore(store)
+    delivery = CookingSessionDelivery(service: sessions, store: store)
+    sessionVisits = store.sessionVisits
+    readingPreferences = store.readingPreferences
+  }
+
+  var currentSession: CookingSessionProjection? {
+    guard let session = sessions.first(where: { $0.id == currentSessionID }) else { return nil }
+    return applyingPendingCommands(to: session)
+  }
+
+  var pendingCommands: [PendingCookingSessionCommand] {
+    delivery.pendingCommands
+  }
+
+  var currentEntryDraft: CookingSessionEntryDraft? {
+    guard let currentSessionID else { return nil }
+    return entryDrafts.first { $0.sessionID == currentSessionID }
+  }
+
+  /// Retries retained intentions before the shell's first Session read.
+  ///
+  /// Multiple window tasks may call this entry point; `hasLoaded` belongs to the
+  /// shared model. Retry submits the original stored identities rather than
+  /// turning relaunch into new cooking evidence.
+  func loadIfNeeded() {
+    guard !hasLoaded else { return }
+    if !pendingCommands.isEmpty {
+      retryPendingCommands()
+    }
+    reload()
+    if let currentSession { prepareReadingPreference(for: currentSession) }
+    hasLoaded = true
+  }
+
+  /// Retries pending delivery and rebuilds reads after the repository is refreshed.
+  ///
+  /// Store notifications are only invalidation signals. Delivery still needs
+  /// the Logic result to distinguish acceptance, terminal retirement, and work
+  /// that must remain pending.
+  func reloadAfterExternalStoreChange() {
+    guard hasLoaded else { return }
+    if !pendingCommands.isEmpty {
+      retryPendingCommands()
+    }
+    reload()
+  }
+
+  /// Clears every device-local and projected Session value after durable reset succeeds.
+  func resetAfterKitchenReset() {
+    delivery.reset()
+    pendingNavigationOrigins = [:]
+    sessions = []
+    finishedSessions = []
+    deletedSessions = []
+    waitingDeletedSessions = []
+    waitingSessions = []
+    recoverySessions = []
+    navigation.move(to: .recipe)
+    finishedSessionCount = 0
+    unavailableSessionCount = 0
+    recoverySessionCount = 0
+    issue = nil
+    isShowingIssue = false
+    detachedEntryDraft = nil
+    finishedSessionIDs = []
+    recipeHistorySessions = []
+    sessionVisits = []
+    readingPreferences = []
+    readingCompletion = nil
+    hasLoaded = true
+  }
+
+  func retryCurrentIssue() {
+    if !pendingCommands.isEmpty {
+      retryPendingCommands()
+    } else {
+      reload()
+    }
+  }
+
+  func dismissIssuePresentation() {
+    isShowingIssue = false
+  }
+
+  func present(_ issue: CookingSessionPresentationIssue) {
+    self.issue = issue
+    isShowingIssue = true
+  }
+
+  func upsert(_ session: CookingSessionProjection) {
+    sessions.removeAll { $0.id == session.id }
+    finishedSessions.removeAll { $0.id == session.id }
+    if session.lifecycle != .finished, session.disposition == .ordinary {
+      sessions.append(session)
+      sessions.sort(by: sessionOrder)
+    } else if session.lifecycle == .finished, session.disposition == .ordinary {
+      finishedSessions.insert(session, at: 0)
+      finishedSessionCount = finishedSessions.count
+      finishedSessionIDs.insert(session.id)
+    }
+  }
+
+  @discardableResult
+  func select(_ id: CookingSession.ID?, recordsVisit: Bool = true) -> Bool {
+    let next: RecipeLibraryNavigation.Destination = id.map { .session($0, history: historyScope) }
+      ?? historyScope.map { .history($0) } ?? .recipe
+    guard navigation.move(to: next) else { return false }
+    if let currentSession { prepareReadingPreference(for: currentSession) }
+    if let id, recordsVisit { recordVisit(to: id) }
+    return true
+  }
+
+  func replaceDraft(_ draft: CookingSessionEntryDraft) {
+    delivery.replaceDraft(draft)
+  }
+
+  func removeDraft(for sessionID: CookingSession.ID) {
+    delivery.removeDraft(for: sessionID)
+    refreshDetachedEntryDraft()
+  }
+
+  func refreshDetachedEntryDraft() {
+    detachedEntryDraft = entryDrafts.first { finishedSessionIDs.contains($0.sessionID) }
+  }
+
+  func sessionOrder(
+    _ lhs: CookingSessionProjection,
+    _ rhs: CookingSessionProjection
+  ) -> Bool {
+    let titleOrder = lhs.snapshot.title.localizedStandardCompare(rhs.snapshot.title)
+    if titleOrder != .orderedSame { return titleOrder == .orderedAscending }
+    return lhs.id.rawValue.uuidString < rhs.id.rawValue.uuidString
+  }
+}

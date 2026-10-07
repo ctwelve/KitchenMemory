@@ -215,12 +215,12 @@ the other interface slices below remain independently gated.
 
 | Existing surface | Gap addressed by this design |
 | --- | --- |
-| [Cooking view](../KitchenMemory/Features/CookingSession/CookingSessionView.swift) | Full note/Outcome and scaling forms precede the recipe; bottom actions compete with reading; Stopped incorrectly offers Add-and-Finish without Resume |
-| [Progress rows](../KitchenMemory/Features/CookingSession/CookingSessionProgressRows.swift) | Entire rows change progress; first-open emphasis is derived, with no independent chosen step or saved reading anchor |
-| [Entries](../KitchenMemory/Features/CookingSession/CookingSessionEntriesView.swift) | Composer is always present; contextual row entry points are absent |
-| [History](../KitchenMemory/Features/CookingSession/CookingSessionHistoryView.swift) | Current plus five recent unfinished cooks can hide older work; repeated cooks lack useful identification; Finished exposes raw lineage identifiers |
-| [History presentation](../KitchenMemory/Features/CookingSession/CookingSessionHistoryPresentation.swift) and [navigation](../KitchenMemory/Composition/RecipeLibraryNavigation.swift) | Finish/Continue do not consistently preserve the originating history scope; current reading position is not durably restored |
-| [Delivery](../KitchenMemory/Features/CookingSession/CookingSessionDelivery.swift) | Ordered exact retry already exists; #245 corrects newer-draft clearing and accidental duplicate submissions; ordinary failures currently use a generic root alert |
+| [Cooking view](../KitchenMemory/Modules/CookingSession/CookingSessionView.swift) | Full note/Outcome and scaling forms precede the recipe; bottom actions compete with reading; Stopped incorrectly offers Add-and-Finish without Resume |
+| [Progress rows](../KitchenMemory/Modules/CookingSession/CookingSessionProgressRows.swift) | Entire rows change progress; first-open emphasis is derived, with no independent chosen step or saved reading anchor |
+| [Entries](../KitchenMemory/Modules/CookingSession/CookingSessionEntriesView.swift) | Composer is always present; contextual row entry points are absent |
+| [History](../KitchenMemory/Modules/CookingSession/CookingSessionHistoryView.swift) | Current plus five recent unfinished cooks can hide older work; repeated cooks lack useful identification; Finished exposes raw lineage identifiers |
+| [History presentation](../KitchenMemory/Modules/CookingSession/CookingSessionHistoryPresentation.swift) and [navigation](../KitchenMemory/Modules/Composition/RecipeLibraryNavigation.swift) | Finish/Continue do not consistently preserve the originating history scope; current reading position is not durably restored |
+| [Delivery](../KitchenMemory/Modules/CookingSession/CookingSessionDelivery.swift) | Ordered exact retry already exists; #245 corrects newer-draft clearing and accidental duplicate submissions; ordinary failures currently use a generic root alert |
 
 Keep navigation in the existing navigation owner, ordered delivery in
 `CookingSessionDelivery`, and cooking rules in KitchenKit. New reading

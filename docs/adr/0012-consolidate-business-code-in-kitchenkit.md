@@ -1,6 +1,11 @@
 # Consolidate business code in KitchenKit
 
-- Status: Accepted; peer-framework application clarified by ADR 0022
+- Status: Accepted; peer-framework application clarified by ADR 0022; source organization amended by ADR 0023
+
+[ADR 0023](0023-interface-first-source-organization.md) adopts interface-first
+source organization without changing the single-framework decision below. The
+responsibilities described below now organize `Interface/` and `Modules/`
+subfolders rather than remaining top-level source roots.
 
 Kitchen Memory builds Domain, Import, Logic, and Persistence into one native
 framework and Swift module named `KitchenKit`. Those names remain responsibility

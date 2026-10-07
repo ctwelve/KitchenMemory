@@ -21,7 +21,7 @@ The governing contract separates immutable maintained Recipe intent from Cooking
 
 The public policy rejects analytics, profiling, and content collection; private iCloud synchronization is person-directed and must not become an observation channel. Private support material cannot become evaluation data. Native capabilities are preferred, but dependencies must earn their maintenance, privacy, and licensing costs. [Public privacy commitment](../../PRIVACY.md), [privacy engineering](../privacy.md), [dependency decision](../adr/0014-prefer-native-capabilities-and-evidence-based-dependencies.md).
 
-The current importer already has bounded deterministic parsing and retained source evidence. `RecipeImportSourceSnapshot` preserves the decoded containing JSON-LD block, including unknown properties, but **not** the original HTTP bytes or surrounding HTML. New assistance must describe that fidelity honestly rather than claiming an archive already exists. [Import models](../../KitchenKit/Import/RecipeImportModels.swift), [import service](../../KitchenKit/Logic/RecipeImportService.swift).
+The current importer already has bounded deterministic parsing and retained source evidence. `RecipeImportSourceSnapshot` preserves the decoded containing JSON-LD block, including unknown properties, but **not** the original HTTP bytes or surrounding HTML. New assistance must describe that fidelity honestly rather than claiming an archive already exists. [Import models](../../KitchenKit/Interface/Import/RecipeImportModels.swift), [import service](../../KitchenKit/Interface/Logic/RecipeImportService.swift).
 
 ## Competing hypotheses, recorded before selecting direction
 

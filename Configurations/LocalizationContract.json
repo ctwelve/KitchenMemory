@@ -18,12 +18,12 @@
   },
   "literalExceptions": [
     {
-      "path": "Features/RecipeLibrary/RecipeURLImportView.swift",
+      "path": "Modules/RecipeLibrary/RecipeURLImportView.swift",
       "literal": "https://example.com/recipe",
       "reason": "Non-translatable example HTTPS URL, intentionally rendered verbatim."
     },
     {
-      "path": "Features/RecipeLibrary/RecipeQuantityEditorViews.swift",
+      "path": "Modules/RecipeLibrary/RecipeQuantityEditorViews.swift",
       "literal": "/",
       "reason": "Arithmetic fraction separator, hidden from accessibility because the fields have semantic names."
     }

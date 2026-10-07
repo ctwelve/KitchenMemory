@@ -32,7 +32,7 @@ identifiers. SDK-qualified settings select separate editable iOS and macOS
 property lists and entitlement files, while platform filters keep the localized
 launch-screen resources in iOS products only.
 [Current implementation architecture](../implementation-architecture.md)
-· [Shared app entry point](../../KitchenMemory/Composition/KitchenMemoryApp.swift)
+· [Shared app entry point](../../KitchenMemory/KitchenMemoryApp.swift)
 · [Xcode project](../../KitchenMemory.xcodeproj/project.pbxproj)
 
 The useful merge is therefore **one application target with platform-qualified
@@ -128,8 +128,8 @@ prerequisite for one target. The adopted implementation preserves separate
 source files and conditions `INFOPLIST_FILE` by SDK. This keeps both files
 directly editable in Xcode's property-list editor and keeps the iOS-only
 remote-notification and launch configuration out of the native Mac bundle.
-[iOS property list](../../KitchenMemory/Info-iOS.plist)
-· [macOS property list](../../KitchenMemory/Info-macOS.plist)
+[iOS property list](../../KitchenMemory/Resources/Info-iOS.plist)
+· [macOS property list](../../KitchenMemory/Resources/Info-macOS.plist)
 
 The main settings that need deliberate qualification are:
 
@@ -168,8 +168,8 @@ target capabilities, so the project expresses them through SDK-qualified build
 settings. Testing configurations need no entitlement source file: Xcode
 synthesizes the macOS sandbox values from those settings, while the iOS test
 host requires no source entitlements.
-[iOS production entitlements](../../KitchenMemory/KitchenMemory-iOS.entitlements)
-· [macOS production entitlements](../../KitchenMemory/KitchenMemory-macOS.entitlements)
+[iOS production entitlements](../../KitchenMemory/Resources/KitchenMemory-iOS.entitlements)
+· [macOS production entitlements](../../KitchenMemory/Resources/KitchenMemory-macOS.entitlements)
 
 The production targets already share `net.ctwelve.KitchenMemory`, and both
 development targets already share `net.ctwelve.dev.KitchenMemory`. A unified
@@ -197,8 +197,8 @@ the shared application folder. Keep those shared. Mark the iOS launch
 storyboard, launch asset catalog, and localized launch strings as iOS-only
 resources using Xcode's platform filter. No duplicate Mac app icon or resource
 catalog is required.
-[Shared app icon](../../KitchenMemory/AppIcon.icon/icon.json)
-· [iOS launch storyboard](../../KitchenMemory/Base.lproj/LaunchScreen.storyboard)
+[Shared app icon](../../KitchenMemory/Resources/AppIcon.icon/icon.json)
+· [iOS launch storyboard](../../KitchenMemory/Resources/Base.lproj/LaunchScreen.storyboard)
 
 ## Tests, schemes, and plans
 
@@ -277,9 +277,9 @@ Kitchen Memory already defines `KitchenLoadingView`, but
 `KitchenMemoryApp.init()` synchronously calls `AppRuntime.prepare()` before the
 scene is constructed, so the loading case is not currently part of the
 startup-state enum and the view cannot cover that preparation interval.
-[App entry point](../../KitchenMemory/Composition/KitchenMemoryApp.swift)
-· [Startup view](../../KitchenMemory/Features/Startup/KitchenStartupView.swift)
-· [Runtime preparation](../../KitchenMemory/Composition/AppRuntime.swift)
+[App entry point](../../KitchenMemory/KitchenMemoryApp.swift)
+· [Startup view](../../KitchenMemory/Modules/Startup/KitchenStartupView.swift)
+· [Runtime preparation](../../KitchenMemory/Modules/Composition/AppRuntime.swift)
 
 The Mac-appropriate reuse is therefore:
 

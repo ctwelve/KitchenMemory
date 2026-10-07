@@ -156,7 +156,7 @@ module KitchenMemory
     def validate(root)
       contract = JSON.parse(File.read(File.join(root, "Configurations/LocalizationContract.json")))
       catalogs = %w[Localizable InfoPlist].to_h do |name|
-        [name, JSON.parse(File.read(File.join(root, "KitchenMemory/#{name}.xcstrings")))]
+        [name, JSON.parse(File.read(File.join(root, "KitchenMemory/Resources/#{name}.xcstrings")))]
       end
       errors = catalogs.flat_map do |name, catalog|
         catalog_errors(catalog, contract, metadata: name == "InfoPlist").map { |error| "#{name}: #{error}" }

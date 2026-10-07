@@ -33,10 +33,10 @@ def replace(path, before, after, count=1):
         raise RuntimeError(f'Instrumentation anchor changed: {path}')
     file.write_text(text.replace(before, after))
 
-app = 'KitchenMemory/Composition/'
-replace(app+'KitchenMemoryApp.swift', '    _startup = StateObject',
+app = 'KitchenMemory/Modules/Composition/'
+replace('KitchenMemory/KitchenMemoryApp.swift', '    _startup = StateObject',
         '    StartupMeasurement.start()\n    _startup = StateObject')
-replace('KitchenMemory/Features/Startup/AppStartupCoordinator.swift',
+replace('KitchenMemory/Modules/Startup/AppStartupCoordinator.swift',
         '    live.record(milestone)',
         '    StartupMeasurement.mark(String(describing: milestone))\n    live.record(milestone)')
 replace(app+'AppRuntime.swift', '      let durablePreferences = DefaultsKitchenPreferencesStore(',
@@ -57,18 +57,18 @@ replace(app+'AppRuntime.swift', '    let library = RecipeLibrary(',
         '    StartupMeasurement.mark("kitchenReady")\n    let library = RecipeLibrary(')
 replace(app+'AppRuntime.swift', '    cookingSessionRepository = SwiftDataCookingSessionRepository(',
         '    StartupMeasurement.mark("libraryProjectionCreated")\n    cookingSessionRepository = SwiftDataCookingSessionRepository(')
-replace('KitchenMemory/Features/RecipeLibrary/RecipeLibraryModel.swift',
+replace('KitchenMemory/Modules/RecipeLibrary/RecipeLibraryModel.swift',
         '      let contents = try library.load()',
         '      if !hasLoaded { StartupMeasurement.mark("libraryReadStarted") }\n      let contents = try library.load()')
-replace('KitchenMemory/Features/RecipeLibrary/RecipeLibraryModel.swift',
+replace('KitchenMemory/Modules/RecipeLibrary/RecipeLibraryModel.swift',
         '      hasLoaded = true\n      if !recipes.isEmpty',
         '      StartupMeasurement.libraryDidLoad()\n      hasLoaded = true\n      if !recipes.isEmpty')
 # Location-only exception in the disposable instrumented copy, using the exact
 # same schema, migration plan, and private Development CloudKit adapter.
-replace('KitchenKit/Persistence/KitchenMemorySchema.swift',
+replace('KitchenKit/Interface/Persistence/KitchenMemorySchema.swift',
         'guard !inMemory, storeURL == nil else {', 'guard !inMemory else {')
 shutil.copyfile(root/'Tools/StartupMeasurements/StartupMeasurement.swift.template',
-                out/'KitchenMemory/Composition/StartupMeasurement.swift')
+                out/'KitchenMemory/Modules/Composition/StartupMeasurement.swift')
 provenance = {'sourceCommit': sha, 'kind': 'temporary-instrumented-Develop',
               'overlaySHA256': {name: hashlib.sha256((root/'Tools/StartupMeasurements'/name).read_bytes()).hexdigest()
                                 for name in ['prepare.py', 'StartupMeasurement.swift.template']}}

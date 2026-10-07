@@ -25,7 +25,7 @@ credential-free `GET` for untrusted HTML. Kitchen Memory already exposes that
 operation through the small `RecipeDocumentLoading` seam, while its transport
 implementation is mostly product-specific safety policy rather than generic
 HTTP ceremony. [Alamofire feature and platform summary](https://github.com/Alamofire/Alamofire/tree/5.12.0#features)
-· [Current loader](../../KitchenKit/Import/RecipeURLImporter.swift)
+· [Current loader](../../KitchenKit/Interface/Import/RecipeURLImporter.swift)
 · [Current import architecture](../web-import.md#pipeline)
 
 Using Alamofire would not remove the important code. Kitchen Memory would still
@@ -49,8 +49,8 @@ rejects credentials, literal and ambiguous numeric addresses, local-looking
 hostnames, nonstandard ports, and oversized URL strings, and applies the same
 policy to every redirect. It allows the operating system to perform ordinary
 server-trust evaluation but cancels every other authentication challenge.
-[Loader and URL policy](../../KitchenKit/Import/RecipeURLImporter.swift)
-· [Authentication and redirect delegate](../../KitchenKit/Import/RecipeURLRedirectController.swift)
+[Loader and URL policy](../../KitchenKit/Interface/Import/RecipeURLImporter.swift)
+· [Authentication and redirect delegate](../../KitchenKit/Modules/Import/RecipeURLRedirectController.swift)
 
 An accepted redirect is not Foundation's proposed request carried forward. The
 loader reconstructs a bodyless `GET` containing only Kitchen Memory's `Accept`
@@ -61,7 +61,7 @@ an asynchronous byte sequence into a buffer capped at 2 MiB. Task cancellation
 explicitly cancels the underlying transfer. Both request-idle and whole-resource
 timeouts are 20 seconds by default; Apple defines the resource timeout as the
 maximum duration for the entire resource transfer, beginning when the request
-starts. [Current loader](../../KitchenKit/Import/RecipeURLImporter.swift)
+starts. [Current loader](../../KitchenKit/Interface/Import/RecipeURLImporter.swift)
 · [Apple: resource timeout](https://developer.apple.com/documentation/foundation/urlsessionconfiguration/timeoutintervalforresource)
 · [Apple: asynchronous bytes](https://developer.apple.com/documentation/foundation/urlsession/bytes%28for%3Adelegate%3A%29)
 
@@ -256,7 +256,7 @@ cancellation, exact error mapping, redirect state, and no buffering beyond the
 limit. Recent Alamofire releases fixed rare races in stream creation, response
 serialization, cancellation, suspend/resume, and session teardown, so those
 tests remain product obligations rather than behavior Kitchen Memory can safely
-stop checking. [Existing transport test seam](../../KitchenKit/Import/RecipeURLImporter.swift)
+stop checking. [Existing transport test seam](../../KitchenKit/Interface/Import/RecipeURLImporter.swift)
 · [5.11.1 response-serialization race fix](https://github.com/Alamofire/Alamofire/releases/tag/5.11.1)
 · [5.11.2 stream race fix](https://github.com/Alamofire/Alamofire/releases/tag/5.11.2)
 · [5.12.0 lifecycle fixes](https://github.com/Alamofire/Alamofire/releases/tag/5.12.0)

@@ -60,9 +60,9 @@ module KitchenMemory
       "KitchenMemory" => {
         info_plist_settings: {
           "GENERATE_INFOPLIST_FILE" => "YES",
-          "INFOPLIST_FILE[sdk=iphoneos*]" => "KitchenMemory/Info-iOS.plist",
-          "INFOPLIST_FILE[sdk=iphonesimulator*]" => "KitchenMemory/Info-iOS.plist",
-          "INFOPLIST_FILE[sdk=macosx*]" => "KitchenMemory/Info-macOS.plist",
+          "INFOPLIST_FILE[sdk=iphoneos*]" => "KitchenMemory/Resources/Info-iOS.plist",
+          "INFOPLIST_FILE[sdk=iphonesimulator*]" => "KitchenMemory/Resources/Info-iOS.plist",
+          "INFOPLIST_FILE[sdk=macosx*]" => "KitchenMemory/Resources/Info-macOS.plist",
           "INFOPLIST_KEY_CFBundleDisplayName" => "KitchenMemory",
           "INFOPLIST_KEY_LSApplicationCategoryType" => "public.app-category.food-and-drink",
           "INFOPLIST_KEY_NSHumanReadableCopyright" =>
@@ -74,9 +74,9 @@ module KitchenMemory
           "ENABLE_USER_SELECTED_FILES[sdk=macosx*]" => "readonly"
         },
         production_entitlements: {
-          "CODE_SIGN_ENTITLEMENTS[sdk=iphoneos*]" => "KitchenMemory/KitchenMemory-iOS.entitlements",
-          "CODE_SIGN_ENTITLEMENTS[sdk=iphonesimulator*]" => "KitchenMemory/KitchenMemory-iOS.entitlements",
-          "CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" => "KitchenMemory/KitchenMemory-macOS.entitlements"
+          "CODE_SIGN_ENTITLEMENTS[sdk=iphoneos*]" => "KitchenMemory/Resources/KitchenMemory-iOS.entitlements",
+          "CODE_SIGN_ENTITLEMENTS[sdk=iphonesimulator*]" => "KitchenMemory/Resources/KitchenMemory-iOS.entitlements",
+          "CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" => "KitchenMemory/Resources/KitchenMemory-macOS.entitlements"
         },
         testing_entitlements: {}
       }
@@ -95,26 +95,38 @@ module KitchenMemory
     PLATFORM_INFO_EXCEPTIONS = {
       "KitchenMemory" => "KitchenMemory"
     }.freeze
-    APPLICATION_MEMBERSHIP_EXCEPTIONS = %w[Info-iOS.plist Info-macOS.plist].freeze
+    APPLICATION_MEMBERSHIP_EXCEPTIONS = %w[Resources/Info-iOS.plist Resources/Info-macOS.plist].freeze
     IOS_ONLY_LAUNCH_RESOURCES = [
-      "/Localized: LaunchScreen.storyboard",
-      "LaunchScreenAssets.xcassets"
+      "/Localized: Resources/LaunchScreen.storyboard",
+      "Resources/LaunchScreenAssets.xcassets"
     ].freeze
     APPLICATION_SWIFT_SOURCE_HOMES = %w[
-      KitchenMemory/Composition/
-      KitchenMemory/Features/CookingSession/
-      KitchenMemory/Features/RecipeLibrary/
-      KitchenMemory/Features/Settings/
-      KitchenMemory/Features/Startup/
-      KitchenMemory/PlatformAdapters/
-      KitchenMemory/Resources/
-      KitchenMemory/SharedPresentation/
+      KitchenMemory/Interface/Composition/
+      KitchenMemory/Interface/CookingSession/
+      KitchenMemory/Interface/RecipeLibrary/
+      KitchenMemory/Interface/Settings/
+      KitchenMemory/Interface/Startup/
+      KitchenMemory/Interface/PlatformAdapters/
+      KitchenMemory/Interface/SharedPresentation/
+      KitchenMemory/Interface/Samples/
+      KitchenMemory/Modules/Composition/
+      KitchenMemory/Modules/CookingSession/
+      KitchenMemory/Modules/RecipeLibrary/
+      KitchenMemory/Modules/Settings/
+      KitchenMemory/Modules/Startup/
+      KitchenMemory/Modules/PlatformAdapters/
+      KitchenMemory/Modules/SharedPresentation/
+      KitchenMemory/Modules/Samples/
     ].freeze
     KITCHEN_KIT_SWIFT_SOURCE_HOMES = %w[
-      KitchenKit/Domain/
-      KitchenKit/Import/
-      KitchenKit/Logic/
-      KitchenKit/Persistence/
+      KitchenKit/Interface/Domain/
+      KitchenKit/Interface/Import/
+      KitchenKit/Interface/Logic/
+      KitchenKit/Interface/Persistence/
+      KitchenKit/Modules/Domain/
+      KitchenKit/Modules/Import/
+      KitchenKit/Modules/Logic/
+      KitchenKit/Modules/Persistence/
     ].freeze
     PRESENTATION_FRAMEWORK_IMPORT = %r{
       ^\s*
@@ -267,8 +279,8 @@ module KitchenMemory
       schemes = Dir[scheme_pattern].each_with_object({}) { |path, result| result[path] = File.read(path) }
       plans = Dir[plan_pattern].each_with_object({}) { |path, result| result[path] = File.read(path) }
       validate_info_plist_sources(
-        ios_contents: File.read(File.join(root, "KitchenMemory", "Info-iOS.plist")),
-        macos_contents: File.read(File.join(root, "KitchenMemory", "Info-macOS.plist"))
+        ios_contents: File.read(File.join(root, "KitchenMemory", "Resources", "Info-iOS.plist")),
+        macos_contents: File.read(File.join(root, "KitchenMemory", "Resources", "Info-macOS.plist"))
       )
       validate_application_source_taxonomy(
         application_sources: swift_sources(root, "KitchenMemory"),
@@ -287,7 +299,8 @@ module KitchenMemory
 
     def validate_application_source_taxonomy(application_sources:, kitchen_kit_sources:)
       unexpected_source = application_sources.keys.find do |path|
-        APPLICATION_SWIFT_SOURCE_HOMES.none? { |home| path.start_with?(home) }
+        path != "KitchenMemory/KitchenMemoryApp.swift" &&
+          APPLICATION_SWIFT_SOURCE_HOMES.none? { |home| path.start_with?(home) }
       end
       if unexpected_source
         raise ContractError,

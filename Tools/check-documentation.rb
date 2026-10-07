@@ -153,9 +153,13 @@ module KitchenMemory
       errors = compare("target inventory", table_values(architecture, "Target organization"), targets)
       locales = JSON.parse(read.call("Configurations/LocalizationContract.json")).fetch("locales")
       errors.concat(compare("locale inventory", table_values(localization, "Supported locales"), locales))
-      responsibilities = Dir.children(File.join(root, "KitchenKit")).select { |name| File.directory?(File.join(root, "KitchenKit", name)) && !name.end_with?(".docc") }
+      responsibilities = %w[Interface Modules].flat_map do |home|
+        Dir.children(File.join(root, "KitchenKit", home)).select do |name|
+          File.directory?(File.join(root, "KitchenKit", home, name))
+        end
+      end.uniq
       errors.concat(compare("KitchenKit responsibilities", table_values(architecture, "KitchenKit responsibilities"), responsibilities))
-      schema = read.call("KitchenKit/Persistence/KitchenMemorySchema.swift")[/typealias CurrentKitchenMemorySchema = (\w+)/, 1]
+      schema = read.call("KitchenKit/Interface/Persistence/KitchenMemorySchema.swift")[/typealias CurrentKitchenMemorySchema = (\w+)/, 1]
       errors << "current schema differs from implementation guide" unless schema && architecture.include?("The store's current schema is `#{schema}`")
       ci = read.call("docs/continuous-integration.md")
       plans = Dir.glob(File.join(root, "*.xctestplan"))
