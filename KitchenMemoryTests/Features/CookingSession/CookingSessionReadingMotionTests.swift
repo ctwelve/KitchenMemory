@@ -10,6 +10,24 @@ import XCTest
 
 @MainActor
 final class CookingSessionReadingMotionTests: XCTestCase {
+  func testFirstInputRevokesRestorationWaitingForLayout() {
+    let step = SessionInstruction.ID()
+    var offset = 40.0
+    let reader = CookingReaderCoordinator(readingOrigin: UUID(),
+      position: .init(instructionID: step, offset: 50), completion: nil)
+    reader.isReady = { true }
+    reader.offset = { offset }
+    reader.motion = ReadingMotionController(
+      viewport: { .init(offset: offset, height: 300, contentHeight: 1200) },
+      move: { offset = $0 })
+    reader.applyGeometry()
+    reader.takeControl()
+    reader.setFrames([step: CGRect(x: 0, y: 600, width: 300, height: 100)])
+    XCTAssertEqual(offset, 40)
+    reader.applyGeometry()
+    XCTAssertEqual(offset, 40)
+  }
+
   func testCompletionMovesOnlyInvokingReaderAndReduceMotionRequiresJump() throws {
     let app = try AppRuntime.testing()
     app.libraryModel.loadIfNeeded()

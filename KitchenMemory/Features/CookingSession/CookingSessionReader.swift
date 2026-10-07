@@ -108,6 +108,13 @@ final class CookingReaderCoordinator {
     motion?.interrupt()
   }
 
+  /// First contact also revokes any restoration still waiting for layout.
+  func takeControl() {
+    restored = true
+    initialPosition = nil
+    interrupt()
+  }
+
   func scrolled() {
     saveTask?.cancel()
     saveTask = Task { [weak self] in

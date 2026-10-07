@@ -62,12 +62,20 @@ final class KitchenMemoryUITests: XCTestCase {
     let app = launchApp()
     // The sample fixture starts with Dirty Fried Rice selected; opening the
     // named second recipe explicitly reveals the compact detail column.
-    let row = app.buttons["recipe-row-D1F10000-0000-4000-8000-000000000002"]
+    let row = app.buttons["recipe-row-E3D10000-0000-4000-8000-000000000001"]
     revealSidebar(in: app, exposing: row)
     XCTAssertTrue(row.waitForExistence(timeout: 5))
     activate(row)
     XCTAssertTrue(app.descendants(matching: .any)["recipe-detail"].waitForExistence(timeout: 5))
-    let start = app.buttons["start-cooking"]
+    var start = app.buttons["start-cooking"]
+    if !start.waitForExistence(timeout: 2) {
+      let overflow = app.buttons["OverflowBarButtonItem"]
+      if overflow.exists {
+        activate(overflow)
+        // The system overflow menu retains the accessible name, not the toolbar identifier.
+        start = app.buttons["Start Cooking"]
+      }
+    }
     XCTAssertTrue(start.waitForExistence(timeout: 5))
     activate(start)
     let reading = app.descendants(matching: .any)["cooking-session-shell"]

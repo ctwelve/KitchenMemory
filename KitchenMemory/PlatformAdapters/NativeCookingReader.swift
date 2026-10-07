@@ -78,7 +78,7 @@ extension NativeCookingReader: NSViewRepresentable {
       matching: [.leftMouseDown, .rightMouseDown, .keyDown]
     ) { [weak scroll] event in
       if let scroll, event.window === scroll.window {
-        coordinator.interrupt()
+        coordinator.takeControl()
       }
       return event
     }
@@ -120,7 +120,7 @@ final class CookingReadingScrollView: NSScrollView {
   }
 
   override func scrollWheel(with event: NSEvent) {
-    reader?.interrupt()
+    reader?.takeControl()
     super.scrollWheel(with: event)
   }
 }
@@ -180,7 +180,7 @@ final class CookingReadingViewController: UIViewController, UIScrollViewDelegate
     scroll.delegate = self
     scroll.keyboardDismissMode = .interactive
     let observer = CookingReadingTouchObserver(target: nil, action: nil)
-    observer.onInput = { [weak reader] in reader?.interrupt() }
+    observer.onInput = { [weak reader] in reader?.takeControl() }
     observer.cancelsTouchesInView = false
     observer.delaysTouchesBegan = false
     scroll.addGestureRecognizer(observer)
@@ -211,7 +211,7 @@ final class CookingReadingViewController: UIViewController, UIScrollViewDelegate
     reader?.applyGeometry()
   }
 
-  func scrollViewWillBeginDragging(_ scrollView: UIScrollView) { reader?.interrupt() }
+  func scrollViewWillBeginDragging(_ scrollView: UIScrollView) { reader?.takeControl() }
   func scrollViewDidScroll(_ scrollView: UIScrollView) {
     if !isApplyingReadingMove { reader?.interrupt() }
     reader?.scrolled()
