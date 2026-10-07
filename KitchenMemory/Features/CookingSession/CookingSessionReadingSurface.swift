@@ -115,6 +115,7 @@ struct CookingSessionReadingSurface<Context: View>: View {
       set: { model.setKeepsScreenAwake($0, in: session) }))
       .toggleStyle(.switch)
       .fixedSize(horizontal: false, vertical: true)
+      .accessibilityLabel(Text(.sessionReadingKeepAwake))
       .accessibilityIdentifier("session-reading-keep-awake")
   }
 
