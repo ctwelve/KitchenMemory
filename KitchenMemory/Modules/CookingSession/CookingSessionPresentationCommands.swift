@@ -272,10 +272,13 @@ extension CookingSessionPresentationModel {
     for snapshot: ExecutionSnapshot,
     scale: RecipeScale
   ) -> SessionWorkingScale? {
-    guard snapshot.baseYield?.scalingBases.contains(where: {
-      $0.quantity == scale.baseYield
-    }) == true else { return nil }
-    var workingYield = snapshot.baseYield
+    let bases = snapshot.baseYield?.scalingBases ?? []
+    if bases.isEmpty {
+      guard scale.baseYield == RationalQuantity(numerator: 1) else { return nil }
+    } else {
+      guard bases.contains(where: { $0.quantity == scale.baseYield }) else { return nil }
+    }
+    var workingYield = bases.isEmpty ? nil : snapshot.baseYield
     workingYield?.quantity = QuantityExpression(kind: .exact, lowerBound: scale.workingYield)
     let ingredients = snapshot.ingredientSections.flatMap(\.ingredients)
     var quantities: [SessionIngredientQuantity] = []

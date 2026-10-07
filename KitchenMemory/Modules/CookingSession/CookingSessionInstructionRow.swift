@@ -75,6 +75,18 @@ struct CookingSessionInstructionRow: View {
         }
         .buttonStyle(.borderless)
       }
+      if CookingSessionScalingGuidance(session: session).isNonOriginal {
+        VStack(alignment: .leading, spacing: 6) {
+          if instruction.value.duration != nil {
+            Label(.sessionScaleGuidanceTime, systemImage: "timer")
+          }
+          if instruction.value.temperature != nil {
+            Label(.sessionScaleGuidanceTemperature, systemImage: "thermometer")
+          }
+        }
+        .font(.caption)
+        .foregroundStyle(.secondary)
+      }
       CookingSessionTargetNotes(model: model, session: session, target: .instruction(instruction.id))
     }
     .padding(12)

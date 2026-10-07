@@ -56,6 +56,7 @@ struct CookingSessionIngredientList: View {
           cookingSessionIngredientValue(ingredient, in: session)))
           .frame(maxWidth: .infinity, alignment: .leading)
           .padding(.top, 12)
+        CookingSessionIngredientScaleGuidance(session: session, ingredient: ingredient)
         CookingSessionTargetNotes(model: model, session: session, target: .ingredient(ingredient.id))
       }
     }
