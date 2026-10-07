@@ -58,6 +58,27 @@ final class KitchenMemoryUITests: XCTestCase {
   }
 
   @MainActor
+  func testCookingReadingDestinationExposesNamedStructure() {
+    let app = launchApp()
+    let row = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "recipe-row-")).firstMatch
+    revealSidebar(in: app, exposing: row)
+    XCTAssertTrue(row.waitForExistence(timeout: 5))
+    activate(row)
+    let start = app.buttons["start-cooking"]
+    XCTAssertTrue(start.waitForExistence(timeout: 5))
+    activate(start)
+    let reading = app.descendants(matching: .any)["cooking-session-shell"]
+    XCTAssertTrue(reading.waitForExistence(timeout: 5))
+    assertAccessibleLabel(reading, description: "Cooking Session reading")
+    for identifier in ["session-reading-jump", "session-reading-keep-awake", "stop-session", "leave-session"] {
+      let control = app.descendants(matching: .any)[identifier].firstMatch
+      XCTAssertTrue(control.waitForExistence(timeout: 5))
+      assertAccessibleLabel(control, description: identifier)
+    }
+    app.terminate()
+  }
+
+  @MainActor
   func testRecipeEditorExposesNamedEntryAndModeControls() {
     let app = launchApp()
     let create = app.buttons["new-recipe"].firstMatch

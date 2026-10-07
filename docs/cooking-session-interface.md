@@ -33,6 +33,11 @@ administration form.
   prototype direction. Reading text must not toggle progress. Preserve the
   existing ingredient accounted/open and instruction complete/skip/reopen
   actions and their accessible state descriptions.
+- The accepted #248 prototype review adds swipe-to-complete as an alternate
+  deliberate progress action. Keep explicit Complete/Skip controls and named
+  accessible alternatives; do not add swipe-to-skip. Leftward swiping remains
+  available for possible iOS ingredient navigation. Horizontal completion must
+  not consume ordinary vertical reading scroll.
 - Keep quick access to ingredients without losing the reading position. Show
   ingredients and instructions side by side when space permits; preserve a
   coherent single-column reading order at compact and accessibility text sizes.
@@ -251,7 +256,15 @@ Apple documentation reviewed on 2026-09-26 supplies capability evidence:
   provide an API for assistive technologies; their presence alone does not
   prove that Finish is usable.
 
-The prototype must demonstrate slow-scroll interruption without snapping,
+The maintainer accepted the disposable [#248 prototype](https://github.com/ctwelve/KitchenMemory/issues/248)
+on 2026-10-06 and confirmed hands-on input testing. Its source and evidence are
+retained on `slice/248-cooking-session-prototype`, outside `main`. That acceptance
+settles the interaction direction and releases the reading/progress and
+notes/Finish prototype gates. Production interactions still require proportionate
+rechecks and later comprehensive interface QA; prototype acceptance does not
+establish beta or 1.0 accessibility qualification.
+
+The prototype's native trial contract covers slow-scroll interruption without snapping,
 restarting, or consuming intended taps; deliberate slide completion without
 accidental activation during ordinary handling; and equivalent keyboard,
 VoiceOver, and Switch Control completion. Exercise propped-up touch use,
@@ -278,3 +291,33 @@ Completing #193 or its prototype does not satisfy the comprehensive beta gate
 [#168](https://github.com/ctwelve/KitchenMemory/issues/168). Timers, app voice
 features, Session media, pantry effects, Recipe promotion, and AI-assisted
 recipe completion remain separately scoped.
+
+## Production reading slice (#249)
+
+Reading preferences live in a separate device-local defaults key, scoped by Session identity.
+They retain emphasis, an instruction-relative offset (or document-top offset), and the
+screen-awake override. They do not synchronize, append cooking evidence, or change
+lifecycle. Missing/corrupt preferences fall back to the first unfinished instruction;
+missing snapshot anchors fall back to document top. Native viewport bounds clamp
+restoration when available space changes. Existing draft/outbox decoding is unchanged.
+
+The production reader uses native AppKit/UIKit scrolling around the full authored
+instruction document. Wide layouts retain ingredients alongside it; compact and
+accessibility-size layouts expose ingredients in a separate sheet without replacing
+the reader. Reading selection, progress, and explicit Jump remain separate intentions.
+Only a new deliberate completion of the emphasized open instruction may reveal a later
+unfinished instruction. Travel is incremental and cancelable; input cancellation does
+not replay it. Reduce Motion retains emphasis/announcement and requires explicit Jump.
+Stop/Resume, scale changes, incoming projections, and other progress actions never
+create reveal consent. Active, visible, foreground screens own a scoped awake lease;
+leaving, Stop, background, or the per-Session override release it.
+
+The accepted #248 prototype supplies design/input evidence. Production builds and signed
+hosted/navigation tests check integration, local restoration, lifecycle neutrality,
+completion eligibility, interruption, bounds, and lease ownership. These tests do not
+prove physical gesture delivery or focus quality. Production hands-on acceptance remains
+pending for propped-up touch, swipe/vertical-scroll competition and lost taps, Mac
+pointer/keyboard, VoiceOver continuity, Reduce Motion, wide/constrained windows, and
+accessibility text sizes. The new rightward Complete gesture in particular has no
+hands-on acceptance inherited from the prototype. This slice does not claim beta-level
+accessibility qualification or wider crash durability.

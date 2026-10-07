@@ -9,6 +9,7 @@ struct CookingSessionProgressView: View {
   let model: CookingSessionPresentationModel
   let session: CookingSessionProjection
   let layoutMode: CookingSessionLayoutMode
+  var showsProgress = true
 
   @State private var scaleSelection: RecipeScalingState
   @Environment(\.locale) private var locale
@@ -16,11 +17,13 @@ struct CookingSessionProgressView: View {
   init(
     model: CookingSessionPresentationModel,
     session: CookingSessionProjection,
-    layoutMode: CookingSessionLayoutMode
+    layoutMode: CookingSessionLayoutMode,
+    showsProgress: Bool = true
   ) {
     self.model = model
     self.session = session
     self.layoutMode = layoutMode
+    self.showsProgress = showsProgress
     _scaleSelection = State(initialValue: Self.scaleSelection(for: session))
   }
 
@@ -43,7 +46,7 @@ struct CookingSessionProgressView: View {
           context: .cookingSession(isEnabled: session.lifecycle == .active)
         )
       }
-      progressContent
+      if showsProgress { progressContent }
     }
     .onChange(of: scaleSelection) { _, selection in
       if session.lifecycle == .active, let scale = selection.scale {

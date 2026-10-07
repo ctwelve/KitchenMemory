@@ -53,7 +53,6 @@ struct CookingSessionView: View {
   }
 
   var body: some View {
-    let lifecycle = CookingSessionLifecyclePresentation(session.lifecycle)
     CookingSessionNavigationContainer(embedsInNavigationStack: embedsInNavigationStack) {
       GeometryReader { geometry in
         let layoutMode = CookingSessionLayoutMode.resolve(
@@ -61,39 +60,14 @@ struct CookingSessionView: View {
           usesAccessibilityTextSize: dynamicTypeSize.isAccessibilitySize
         )
         VStack(spacing: 0) {
-          ScrollView {
-            VStack(alignment: .leading, spacing: 24) {
-              VStack(alignment: .leading, spacing: 8) {
-                Text(session.snapshot.title)
-                  .font(.largeTitle.bold())
-                  .accessibilityHeading(.h1)
-                  .accessibilityIdentifier("cooking-session-shell")
-                Label(lifecycle.title, systemImage: lifecycle.symbol)
-                  .foregroundStyle(.secondary)
-                  .accessibilityIdentifier("session-lifecycle")
-              }
-
-              if model.currentSessionNeedsStaleNudge {
-                CookingSessionStaleNudge(model: model, session: session)
-              }
-
-              CookingSessionEntriesView(model: model, session: session)
-
-              if session.sourceSessionID != nil {
-                CookingSessionLineageView(model: model, session: session)
-              }
-
-              CookingSessionProgressView(
-                model: model,
-                session: session,
-                layoutMode: layoutMode
-              )
+          CookingSessionReadingSurface(model: model, session: session, layoutMode: layoutMode) {
+            if model.currentSessionNeedsStaleNudge {
+              CookingSessionStaleNudge(model: model, session: session)
             }
-            .frame(maxWidth: layoutMode == .wide ? 1_220 : 900, alignment: .leading)
-            .padding(28)
-            .frame(maxWidth: .infinity, alignment: .center)
+            if session.sourceSessionID != nil {
+              CookingSessionLineageView(model: model, session: session)
+            }
           }
-          .accessibilityIdentifier("cooking-session-scroll")
           lifecycleControls
             .padding(.horizontal, 28)
             .padding(.vertical, 16)
