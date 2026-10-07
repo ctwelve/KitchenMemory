@@ -207,19 +207,22 @@ The inventory for #193 examined the integrated #184/#209 navigation and the
 #213/#214 ownership seams at main commit
 [`e1f8751`](https://github.com/ctwelve/KitchenMemory/commit/e1f8751424922341c20cfbf55923d702e133b1e2).
 These are observations of the old interface, not accepted future behavior.
-The #251 working slice now supplies complete lifecycle history, start-time
-identification, retained return routes and per-history list anchors, observational
-Finished scaling, and readable continuation lineage. Native keyboard, VoiceOver,
-compact/wide, and accessibility text-size walkthrough acceptance remains pending;
-the other interface slices below remain independently gated.
+[PR #257](https://github.com/ctwelve/KitchenMemory/pull/257) merged the #251
+history/navigation implementation: complete lifecycle history, start-time and
+Outcome identification, retained return routes and per-history list anchors,
+observational Finished presentation, and readable continuation lineage. The
+[history acceptance record](cooking-session-history-acceptance.md) maps hosted
+regressions and the remaining native keyboard, VoiceOver, compact/wide, and
+accessibility text-size walkthroughs. The other interface slices remain
+independently gated.
 
-| Existing surface | Gap addressed by this design |
+| Existing surface | Original gap or implemented history boundary |
 | --- | --- |
 | [Cooking view](../KitchenMemory/Modules/CookingSession/CookingSessionView.swift) | Full note/Outcome and scaling forms precede the recipe; bottom actions compete with reading; Stopped incorrectly offers Add-and-Finish without Resume |
 | [Progress rows](../KitchenMemory/Modules/CookingSession/CookingSessionProgressRows.swift) | Entire rows change progress; first-open emphasis is derived, with no independent chosen step or saved reading anchor |
 | [Entries](../KitchenMemory/Modules/CookingSession/CookingSessionEntriesView.swift) | Composer is always present; contextual row entry points are absent |
-| [History](../KitchenMemory/Modules/CookingSession/CookingSessionHistoryView.swift) | Current plus five recent unfinished cooks can hide older work; repeated cooks lack useful identification; Finished exposes raw lineage identifiers |
-| [History presentation](../KitchenMemory/Modules/CookingSession/CookingSessionHistoryPresentation.swift) and [navigation](../KitchenMemory/Modules/Composition/RecipeLibraryNavigation.swift) | Finish/Continue do not consistently preserve the originating history scope; current reading position is not durably restored |
+| [History](../KitchenMemory/Modules/CookingSession/CookingSessionHistoryView.swift) | PR #257 supplies complete lifecycle groups, start-time/Outcome identification and readable lineage. Native repeated-cook distinction, group reachability and layout/accessibility walkthroughs remain pending |
+| [History presentation](../KitchenMemory/Modules/CookingSession/CookingSessionHistoryPresentation.swift) and [navigation](../KitchenMemory/Modules/Composition/RecipeLibraryNavigation.swift) | PR #257 preserves history scope/list anchors through Finish, Continue and Back, including delayed delivery. Native route/focus acceptance remains pending; cooking-document reading-position persistence belongs to #249 |
 | [Delivery](../KitchenMemory/Modules/CookingSession/CookingSessionDelivery.swift) | Ordered exact retry already exists; #245 corrects newer-draft clearing and accidental duplicate submissions; ordinary failures currently use a generic root alert |
 
 Keep navigation in the existing navigation owner, ordered delivery in
