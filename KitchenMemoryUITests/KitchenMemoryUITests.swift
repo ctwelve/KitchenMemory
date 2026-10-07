@@ -81,7 +81,7 @@ final class KitchenMemoryUITests: XCTestCase {
     let reading = app.descendants(matching: .any)["cooking-session-shell"]
     XCTAssertTrue(reading.waitForExistence(timeout: 5))
     assertAccessibleText(reading, description: "Cooking Session reading")
-    for identifier in ["session-reading-jump", "session-reading-keep-awake", "stop-session", "leave-session"] {
+    for identifier in ["session-reading-jump", "session-reading-keep-awake", "session-lifecycle-menu", "leave-session"] {
       let control = app.descendants(matching: .any)[identifier].firstMatch
       XCTAssertTrue(control.waitForExistence(timeout: 5))
       assertAccessibleLabel(control, description: identifier)

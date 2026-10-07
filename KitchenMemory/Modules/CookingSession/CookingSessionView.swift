@@ -38,6 +38,7 @@ struct CookingSessionView: View {
   @State private var isShowingFinishConfirmation = false
   @State private var isShowingDraftFinishOptions = false
   @State private var isShowingDeleteConfirmation = false
+  @State private var composerOrigin = UUID()
   @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
   init(
@@ -68,6 +69,7 @@ struct CookingSessionView: View {
               CookingSessionLineageView(model: model, session: session)
             }
           }
+          .environment(\.cookingSessionComposerOrigin, composerOrigin)
           lifecycleControls
             .padding(.horizontal, 28)
             .padding(.vertical, 16)
@@ -82,11 +84,7 @@ struct CookingSessionView: View {
       ) {
         Button(.actionCancel, role: .cancel) {}
         Button(.sessionFinishConfirmationAction, role: .destructive) {
-          if model.currentEntryDraft?.isMeaningful == true {
-            isShowingDraftFinishOptions = true
-          } else {
-            model.finishCurrentSession()
-          }
+          requestFinish()
         }
         .accessibilityIdentifier("confirm-finish-session")
       } message: {
@@ -97,8 +95,10 @@ struct CookingSessionView: View {
         isPresented: $isShowingDraftFinishOptions,
         titleVisibility: .visible
       ) {
-        Button(.sessionFinishDraftSubmit) {
-          model.submitCurrentEntryDraftAndFinish()
+        if session.lifecycle == .stopped {
+          Button(.sessionFinishDraftResume) { model.resumeToEditCurrentEntryDraft(origin: composerOrigin) }
+        } else {
+          Button(.sessionFinishDraftSubmit) { model.submitCurrentEntryDraftAndFinish() }
         }
         Button(.sessionFinishDraftCopy) {
           copyDraftThenFinish()
@@ -110,6 +110,10 @@ struct CookingSessionView: View {
       } message: {
         Text(.sessionFinishDraftMessage)
       }
+      .sheet(isPresented: entryComposerIsPresented) {
+        CookingSessionEntryComposer(model: model, session: session,
+          close: { entryComposerIsPresented.wrappedValue = false })
+      }
       .cookingSessionDeletionConfirmation(
         isPresented: $isShowingDeleteConfirmation,
         model: model,
@@ -118,37 +122,88 @@ struct CookingSessionView: View {
     }
   }
 
+  /// The model owns one shared draft; this view owns the window that displays
+  /// its editor. Dismissing an old sheet cannot close another window's request.
+  private var entryComposerIsPresented: Binding<Bool> {
+    Binding(get: {
+      model.isShowingEntryComposer && model.entryComposerOrigin == composerOrigin
+    }, set: { isPresented in
+      guard model.entryComposerOrigin == composerOrigin else { return }
+      if !isPresented { model.dismissEntryComposer(origin: composerOrigin) }
+    })
+  }
+
   private var lifecycleControls: some View {
+    VStack(alignment: .leading, spacing: 12) {
+      CookingSessionSaveStatus(model: model)
+      CookingSessionOutcomePicker(model: model, session: session)
+      ViewThatFits(in: .horizontal) {
+        HStack { navigationActions; Spacer(); finishActions }
+        VStack(alignment: .leading, spacing: 12) {
+          navigationActions
+          finishActions
+        }
+      }
+    }
+  }
+
+  private var navigationActions: some View {
     HStack {
-      Button(.sessionActionLeave) {
-        leaveSession()
+      Button(.sessionActionLeave) { leaveSession() }
+        .accessibilityIdentifier("leave-session")
+      if session.lifecycle == .stopped {
+        Button(.sessionActionResume) { model.resumeCurrentSession() }
+          .buttonStyle(.borderedProminent)
+          .disabled(model.currentSessionHasPendingFinish)
+          .accessibilityIdentifier("resume-session")
       }
-      .accessibilityIdentifier("leave-session")
-
-      Spacer()
-
-      if session.lifecycle == .active {
-        Button(.sessionActionStop) {
-          model.stopCurrentSession()
+      Menu {
+        if session.lifecycle == .active {
+          Button(.sessionActionStop) { model.stopCurrentSession() }
+            .disabled(model.currentSessionHasPendingFinish)
+            .accessibilityIdentifier("stop-session")
         }
-        .accessibilityIdentifier("stop-session")
-      } else if session.lifecycle == .stopped {
-        Button(.sessionActionResume) {
-          model.resumeCurrentSession()
+        Button(.sessionDeleteAction, role: .destructive) {
+          isShowingDeleteConfirmation = true
         }
-        .buttonStyle(.borderedProminent)
-        .accessibilityIdentifier("resume-session")
+        .accessibilityIdentifier("delete-session")
+      } label: {
+        Label(.sessionLifecycleMoreActions, systemImage: "ellipsis.circle")
       }
+      .accessibilityIdentifier("session-lifecycle-menu")
+    }
+  }
 
-      Button(.sessionActionFinish, role: .destructive) {
-        isShowingFinishConfirmation = true
+  @ViewBuilder
+  private var finishActions: some View {
+    if !model.currentSessionHasPendingFinish {
+      ViewThatFits(in: .horizontal) {
+        HStack { finishSlide; namedFinishAction }
+        VStack(alignment: .leading) { finishSlide; namedFinishAction }
       }
+    }
+  }
+
+  private var finishSlide: some View {
+    CookingSessionSlideToFinish(isEnabled: canFinish, finish: requestFinish)
+  }
+
+  private var namedFinishAction: some View {
+    Button(.sessionActionFinish) { isShowingFinishConfirmation = true }
+      .disabled(!canFinish)
       .accessibilityIdentifier("finish-session")
+  }
 
-      Button(.sessionDeleteAction, role: .destructive) {
-        isShowingDeleteConfirmation = true
-      }
-      .accessibilityIdentifier("delete-session")
+  private var canFinish: Bool {
+    session.lifecycle != .finished && !model.currentSessionHasPendingWork
+  }
+
+  private func requestFinish() {
+    guard canFinish else { return }
+    if model.currentEntryDraft?.isMeaningful == true {
+      isShowingDraftFinishOptions = true
+    } else {
+      model.finishCurrentSession()
     }
   }
 

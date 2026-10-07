@@ -75,6 +75,7 @@ struct CookingSessionInstructionRow: View {
         }
         .buttonStyle(.borderless)
       }
+      CookingSessionTargetNotes(model: model, session: session, target: .instruction(instruction.id))
     }
     .padding(12)
     .background(isCurrent ? Color.accentColor.opacity(0.08) : .clear, in: .rect(cornerRadius: 12))

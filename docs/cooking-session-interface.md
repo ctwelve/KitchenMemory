@@ -323,3 +323,33 @@ pointer/keyboard, VoiceOver continuity, Reduce Motion, wide/constrained windows,
 accessibility text sizes. The new rightward Complete gesture in particular has no
 hands-on acceptance inherited from the prototype. This slice does not claim beta-level
 accessibility qualification or wider crash durability.
+
+## Production notes and Finish slice (#252)
+
+The working implementation opens a single on-demand Session Entry composer from
+both general and ingredient/instruction Add Note routes. Meaningful drafts reopen
+with their exact text and target; empty drafts inherit the requested target.
+Draft storage remains Session-scoped and device-local. Composer requests retain
+an originating window identity separately from shared draft ownership.
+
+Retry submits only the original retained Entry identity. Acceptance clears only
+a draft that still matches that Entry's exact text and target; later edits remain
+for deliberate submission. Add-and-Finish requires the returned original Entry
+evidence and no remaining meaningful draft. Earlier pending work blocks Finish
+before any copy/discard effect. A retained Finish instead presents waiting/Retry
+and preserves its Closure identity; leaving or dismissing does not cancel it.
+
+Outcome sits beside Finish. The completed in-view slide supplies confirmation;
+the named keyboard/assistive action uses explicit confirmation. Stopped draft
+choices offer explicit Resume-to-edit, copy-and-finish, discard-and-finish, or
+Cancel. Stop and Delete remain secondary. Failed saves stay alongside readable
+content. Remote-Finish drafts can remain unresolved without repeatedly presenting
+the same dialog; entering a new destination makes the recovery choice available
+again. Existing local-store and synchronized formats are unchanged.
+
+Hosted regression evidence covers newer text/target preservation, original retry
+identity, pending Finish guards, exact Entry acceptance, explicit Resume, and
+retained Closure retry. Native builds and automated tests do not establish
+physical slide delivery, VoiceOver/Switch Control usability, or compact/wide
+accessibility-size walkthrough acceptance. Those production checks remain
+explicit acceptance work; this slice does not close the beta accessibility gate.

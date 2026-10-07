@@ -17,7 +17,8 @@ extension CookingSessionPresentationModel {
   }
   @discardableResult
   func stopCurrentSession() -> Bool {
-    guard let session = currentSession, session.lifecycle == .active else { return false }
+    guard let session = currentSession, session.lifecycle == .active,
+          !currentSessionHasPendingFinish else { return false }
     return submitCommand { .stop(
       factID: SessionFact.ID(),
       sessionID: session.id,
@@ -26,7 +27,8 @@ extension CookingSessionPresentationModel {
   }
   @discardableResult
   func resumeCurrentSession() -> Bool {
-    guard let session = currentSession, session.lifecycle == .stopped else { return false }
+    guard let session = currentSession, session.lifecycle == .stopped,
+          !currentSessionHasPendingFinish else { return false }
     return submitCommand { .resume(
       factID: SessionFact.ID(),
       sessionID: session.id,
@@ -87,6 +89,7 @@ extension CookingSessionPresentationModel {
   func finishCurrentSession() -> Bool {
     guard let session = currentSession,
           session.lifecycle == .active || session.lifecycle == .stopped else { return false }
+    guard !currentSessionHasPendingWork else { return false }
     if currentEntryDraft?.isMeaningful == true {
       present(.attention(.meaningfulDraft))
       return false
@@ -144,6 +147,10 @@ extension CookingSessionPresentationModel {
     for pending: PendingCookingSessionCommand
   ) {
     defer {
+      if case let .resume(factID, _, _) = pending {
+        pendingEntryComposerResumes[factID] = nil
+        pendingEntryComposerResumeOrigins[factID] = nil
+      }
       if let identity = pending.navigationIdentity { pendingNavigationOrigins[identity] = nil }
     }
     switch resolution {
@@ -151,8 +158,20 @@ extension CookingSessionPresentationModel {
       refreshDetachedEntryDraft()
       issue = nil
       isShowingIssue = false
+      let previouslySelectedSessionID = currentSessionID
       upsert(session)
       applySelection(for: session, pending: pending)
+      if currentSessionID != previouslySelectedSessionID {
+        isShowingEntryComposer = false
+        entryComposerOrigin = nil
+      }
+      if case let .resume(factID, sessionID, _) = pending,
+         pendingEntryComposerResumes.removeValue(forKey: factID) == sessionID,
+         previouslySelectedSessionID == sessionID, currentSessionID == sessionID,
+         session.lifecycle == .active {
+        entryComposerOrigin = pendingEntryComposerResumeOrigins.removeValue(forKey: factID)
+        isShowingEntryComposer = true
+      }
       if pending.refreshesClassification { reload() }
     case .rejectedByFinishedSource:
       issue = nil

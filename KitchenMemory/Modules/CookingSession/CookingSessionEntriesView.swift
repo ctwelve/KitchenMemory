@@ -14,6 +14,7 @@ struct CookingSessionEntriesView: View {
   @State private var editingText = ""
   @State private var editingTarget: SessionProgressTarget?
   @Environment(\.locale) private var locale
+  @Environment(\.cookingSessionComposerOrigin) private var composerOrigin
 
   var body: some View {
     VStack(alignment: .leading, spacing: 16) {
@@ -23,7 +24,11 @@ struct CookingSessionEntriesView: View {
 
       CookingSessionEvidenceConflictsView(model: model, session: session)
 
-      draftEditor
+      if session.lifecycle == .active {
+        Button(.sessionEntryActionAdd) { model.openEntryComposer(origin: composerOrigin) }
+          .disabled(model.currentSessionHasPendingFinish)
+          .accessibilityIdentifier("add-session-note")
+      }
 
       if !session.entries.isEmpty {
         VStack(alignment: .leading, spacing: 12) {
@@ -33,7 +38,6 @@ struct CookingSessionEntriesView: View {
         }
       }
 
-      outcomePicker
     }
     .padding(20)
     .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
@@ -41,40 +45,17 @@ struct CookingSessionEntriesView: View {
     .accessibilityIdentifier("session-entries")
   }
 
-  private var draftEditor: some View {
-    VStack(alignment: .leading, spacing: 10) {
-      TextField(.sessionEntryDraftPlaceholder, text: draftText, axis: .vertical)
-        .lineLimit(3...8)
-        .padding(8)
-        .background(.background, in: RoundedRectangle(cornerRadius: 10))
-        .accessibilityIdentifier("session-entry-draft")
-
-      HStack(alignment: .firstTextBaseline) {
-        targetPicker(selection: draftTarget)
-        Spacer()
-        Button(.sessionEntryActionSubmit) {
-          model.submitCurrentEntryDraft()
-        }
-        .buttonStyle(.borderedProminent)
-        .disabled(session.lifecycle != .active || model.currentEntryDraft?.isMeaningful != true)
-        .accessibilityIdentifier("submit-session-entry")
-      }
-
-      Text(.sessionEntryDraftNote)
-        .font(.footnote)
-        .foregroundStyle(.secondary)
-    }
-  }
-
   @ViewBuilder
   private func entryRow(_ entry: SessionEntry) -> some View {
     VStack(alignment: .leading, spacing: 8) {
       if editingEntryID == entry.id {
         TextField(.sessionEntryDraftPlaceholder, text: $editingText, axis: .vertical)
+          .disabled(session.lifecycle != .active || model.currentSessionHasPendingFinish)
           .lineLimit(2...6)
           .padding(6)
           .background(.background, in: RoundedRectangle(cornerRadius: 8))
         targetPicker(selection: $editingTarget)
+          .disabled(session.lifecycle != .active || model.currentSessionHasPendingFinish)
         HStack {
           Button(.actionCancel) { editingEntryID = nil }
           Spacer()
@@ -84,7 +65,8 @@ struct CookingSessionEntriesView: View {
             }
           }
           .buttonStyle(.borderedProminent)
-          .disabled(!CookingSessionEntryDraft.isMeaningful(editingText))
+          .disabled(session.lifecycle != .active || model.currentSessionHasPendingFinish
+            || !CookingSessionEntryDraft.isMeaningful(editingText))
         }
       } else {
         Text(entry.text)
@@ -108,60 +90,11 @@ struct CookingSessionEntriesView: View {
           }
         }
         .buttonStyle(.borderless)
-        .disabled(session.lifecycle != .active)
+        .disabled(session.lifecycle != .active || model.currentSessionHasPendingFinish)
       }
     }
     .padding(12)
     .background(.background.opacity(0.7), in: RoundedRectangle(cornerRadius: 10))
-  }
-
-  private var outcomePicker: some View {
-    VStack(alignment: .leading, spacing: 8) {
-      Text(.sessionOutcomeSection)
-        .font(.headline)
-      Picker(.sessionOutcomeSection, selection: outcomeSelection) {
-        Text(.sessionOutcomeNone).tag(nil as SessionOutcome.CoarseValue?)
-        Text(.sessionOutcomeGreat)
-          .tag(SessionOutcome.CoarseValue.great as SessionOutcome.CoarseValue?)
-        Text(.sessionOutcomeOkay)
-          .tag(SessionOutcome.CoarseValue.okay as SessionOutcome.CoarseValue?)
-        Text(.sessionOutcomeUnsuccessful)
-          .tag(SessionOutcome.CoarseValue.unsuccessful as SessionOutcome.CoarseValue?)
-      }
-      .pickerStyle(.segmented)
-      .disabled(session.lifecycle != .active)
-      .accessibilityIdentifier("session-outcome")
-    }
-  }
-
-  private var draftText: Binding<String> {
-    Binding(
-      get: { model.currentEntryDraft?.text ?? "" },
-      set: { model.updateCurrentEntryDraft(text: $0, target: model.currentEntryDraft?.target) }
-    )
-  }
-
-  private var draftTarget: Binding<SessionProgressTarget?> {
-    Binding(
-      get: { model.currentEntryDraft?.target },
-      set: { model.updateCurrentEntryDraft(text: model.currentEntryDraft?.text ?? "", target: $0) }
-    )
-  }
-
-  private var outcomeSelection: Binding<SessionOutcome.CoarseValue?> {
-    Binding(
-      get: {
-        guard case let .coarse(value) = session.outcome else { return nil }
-        return value
-      },
-      set: { value in
-        if let value {
-          model.setOutcome(.coarse(value))
-        } else if session.outcome != nil {
-          model.clearOutcome()
-        }
-      }
-    )
   }
 
   private func targetPicker(selection: Binding<SessionProgressTarget?>) -> some View {

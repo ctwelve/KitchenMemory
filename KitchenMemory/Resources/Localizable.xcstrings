@@ -7161,6 +7161,150 @@
         "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "La preuve de séance demande votre attention" } }
       }
     },
+    "session.entry.action.add" : {
+      "comment" : "Action that submits a new note as immutable Session evidence.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "it-IT" : { "stringUnit" : { "state" : "translated", "value" : "Aggiungi nota" } },
+        "de-DE" : { "stringUnit" : { "state" : "translated", "value" : "Notiz hinzufügen" } },
+        "en-GB" : { "stringUnit" : { "state" : "translated", "value" : "Add Note" } },
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Add Note" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Agregar nota" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Ajouter une note" } }
+      }
+    },
+    "session.entry.composer.title" : {
+      "comment" : "Title for the composer used to write a new Session note.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "it-IT" : { "stringUnit" : { "state" : "translated", "value" : "Nota della sessione" } },
+        "de-DE" : { "stringUnit" : { "state" : "translated", "value" : "Notiz zum Kochvorgang" } },
+        "en-GB" : { "stringUnit" : { "state" : "translated", "value" : "Session note" } },
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Session note" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Nota de la sesión" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Note de séance" } }
+      }
+    },
+    "session.entry.draft.discard" : {
+      "comment" : "Action that discards only the unsent local Session note draft.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "it-IT" : { "stringUnit" : { "state" : "translated", "value" : "Scarta bozza" } },
+        "de-DE" : { "stringUnit" : { "state" : "translated", "value" : "Entwurf verwerfen" } },
+        "en-GB" : { "stringUnit" : { "state" : "translated", "value" : "Discard draft" } },
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Discard draft" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Descartar borrador" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Jeter le brouillon" } }
+      }
+    },
+    "session.entry.draft.discard.message" : {
+      "comment" : "Explains that discarding removes unsent text while retaining a submitted note waiting to save.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "it-IT" : { "stringUnit" : { "state" : "translated", "value" : "Il testo non inviato verrà rimosso. Le eventuali note inviate in attesa di salvataggio saranno conservate." } },
+        "de-DE" : { "stringUnit" : { "state" : "translated", "value" : "Der nicht gesendete Text wird entfernt. Eine gesendete Notiz, die noch gespeichert werden muss, bleibt erhalten." } },
+        "en-GB" : { "stringUnit" : { "state" : "translated", "value" : "The unsent text will be removed. Any submitted note waiting to save is retained." } },
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "The unsent text will be removed. Any submitted note waiting to save is retained." } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Se eliminará el texto sin enviar. Se conservará cualquier nota enviada que esté esperando a guardarse." } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Le texte non envoyé sera supprimé. Toute note envoyée en attente d’enregistrement sera conservée." } }
+      }
+    },
+    "session.entry.draft.discard.title" : {
+      "comment" : "Confirmation title before discarding the unsent Session note draft.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "it-IT" : { "stringUnit" : { "state" : "translated", "value" : "Vuoi scartare questa bozza di nota?" } },
+        "de-DE" : { "stringUnit" : { "state" : "translated", "value" : "Diesen Notizentwurf verwerfen?" } },
+        "en-GB" : { "stringUnit" : { "state" : "translated", "value" : "Discard this note draft?" } },
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Discard this note draft?" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "¿Descartar este borrador de nota?" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Jeter ce brouillon de note?" } }
+      }
+    },
+    "session.entry.pending-submission" : {
+      "comment" : "Explains that a submitted Session note is waiting to save and that edits in the composer remain a separate draft.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "it-IT" : { "stringUnit" : { "state" : "translated", "value" : "Una nota è in attesa di salvataggio. Riprova salva la nota inviata; le modifiche qui restano una bozza separata." } },
+        "de-DE" : { "stringUnit" : { "state" : "translated", "value" : "Eine Notiz wartet auf das Speichern. Bei erneutem Versuch wird diese gesendete Notiz gespeichert; Änderungen hier bleiben ein separater Entwurf." } },
+        "en-GB" : { "stringUnit" : { "state" : "translated", "value" : "A note is waiting to save. Retry saves that submitted note; edits here remain a separate draft." } },
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "A note is waiting to save. Retry saves that submitted note; edits here remain a separate draft." } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Hay una nota esperando a guardarse. Reintentar guarda esa nota enviada; lo que edites aquí sigue siendo un borrador aparte." } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Une note attend d’être enregistrée. Réessayer enregistre cette note envoyée; vos modifications ici restent un brouillon distinct." } }
+      }
+    },
+    "session.finish.blocked" : {
+      "comment" : "Explains that earlier changes must be saved before this Session can be Finished.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "it-IT" : { "stringUnit" : { "state" : "translated", "value" : "Salva le modifiche precedenti prima di concludere questa sessione." } },
+        "de-DE" : { "stringUnit" : { "state" : "translated", "value" : "Speichere frühere Änderungen, bevor du diesen Kochvorgang abschließt." } },
+        "en-GB" : { "stringUnit" : { "state" : "translated", "value" : "Save earlier changes before finishing this Session." } },
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Save earlier changes before finishing this Session." } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Guarda los cambios anteriores antes de finalizar esta sesión." } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Enregistrez les changements précédents avant de terminer cette séance." } }
+      }
+    },
+    "session.finish.draft.resume" : {
+      "comment" : "Action that resumes a Finished Session so its note can be edited.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "it-IT" : { "stringUnit" : { "state" : "translated", "value" : "Riprendi per modificare la nota" } },
+        "de-DE" : { "stringUnit" : { "state" : "translated", "value" : "Fortsetzen, um die Notiz zu bearbeiten" } },
+        "en-GB" : { "stringUnit" : { "state" : "translated", "value" : "Resume to edit note" } },
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Resume to edit note" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Reanudar para editar la nota" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Reprendre pour modifier la note" } }
+      }
+    },
+    "session.finish.pending" : {
+      "comment" : "Status shown while finishing waits for a submitted change to save.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "it-IT" : { "stringUnit" : { "state" : "translated", "value" : "Conclusione in corso—in attesa di salvataggio" } },
+        "de-DE" : { "stringUnit" : { "state" : "translated", "value" : "Wird abgeschlossen—warte auf das Speichern" } },
+        "en-GB" : { "stringUnit" : { "state" : "translated", "value" : "Finishing—waiting to save" } },
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Finishing—waiting to save" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Finalizando—esperando a guardar" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Fin de la séance — en attente d’enregistrement" } }
+      }
+    },
+    "session.finish.slide" : {
+      "comment" : "Instruction on the control that must be slid to Finish the Session.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "it-IT" : { "stringUnit" : { "state" : "translated", "value" : "Scorri per concludere" } },
+        "de-DE" : { "stringUnit" : { "state" : "translated", "value" : "Zum Abschließen schieben" } },
+        "en-GB" : { "stringUnit" : { "state" : "translated", "value" : "Slide to finish" } },
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Slide to finish" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Desliza para finalizar" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Glisser pour terminer" } }
+      }
+    },
+    "session.lifecycle.more-actions" : {
+      "comment" : "Label for the menu containing additional Session lifecycle actions.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "it-IT" : { "stringUnit" : { "state" : "translated", "value" : "Azioni della sessione" } },
+        "de-DE" : { "stringUnit" : { "state" : "translated", "value" : "Aktionen für den Kochvorgang" } },
+        "en-GB" : { "stringUnit" : { "state" : "translated", "value" : "Session actions" } },
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Session actions" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Acciones de la sesión" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Actions de la séance" } }
+      }
+    },
+    "session.save.retry" : {
+      "comment" : "Action that retries saving a submitted Session change.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "it-IT" : { "stringUnit" : { "state" : "translated", "value" : "Riprova" } },
+        "de-DE" : { "stringUnit" : { "state" : "translated", "value" : "Erneut versuchen" } },
+        "en-GB" : { "stringUnit" : { "state" : "translated", "value" : "Retry" } },
+        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Retry" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Reintentar" } },
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Réessayer" } }
+      }
+    },
     "session.entry.action.edit" : {
       "comment" : "Action that begins a causal revision of a submitted Session Entry.",
       "extractionState" : "manual",
