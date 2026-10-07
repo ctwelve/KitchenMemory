@@ -353,3 +353,31 @@ retained Closure retry. Native builds and automated tests do not establish
 physical slide delivery, VoiceOver/Switch Control usability, or compact/wide
 accessibility-size walkthrough acceptance. Those production checks remain
 explicit acceptance work; this slice does not close the beta accessibility gate.
+
+## Production scaling slice (#250)
+
+The working reader shows a compact yield/factor summary near the title and opens
+adjustment on demand. Absolute ½×, 1×, 1½×, and 2× presets and custom rational
+factors recalculate from the immutable snapshot. Range yields retain an explicit
+base choice. A Session without a numeric yield uses a factor-only scale and
+retains no invented working serving yield. Existing SessionWorkingScale encoding
+and synchronized snapshot formats are unchanged.
+
+Guidance uses the existing ingredient scaling statuses and retained structured
+durations/temperatures. Approximation and both range endpoints remain intact;
+fixed, manual-review, textual, missing, and presentation-overridden amounts get
+specific contextual explanations. Arithmetic rejection restores the displayed
+projection instead of presenting partial success. Authored time, temperature,
+and method remain unchanged. Contextual markers and the method reminder remain
+after banner dismissal.
+
+`hasDismissedScalingExplanation` is an optional device-local reading-preference
+field. Older records decode with no dismissal, preserving existing reading place
+and screen-awake choices. Dismissal belongs to one Session and survives relaunch;
+reset clears the local preferences through the existing store seam. Missing yield
+alone never labels structured ingredient arithmetic uncertain.
+
+Hosted evidence targets absolute factors, explicit range bases, missing-yield
+arithmetic, retained statuses and authored cooking conditions, arithmetic rejection,
+and local preference compatibility/dismissal. Native compact/wide, accessibility
+text-size, keyboard and VoiceOver inspection remains distinct acceptance work.
