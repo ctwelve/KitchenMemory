@@ -49,6 +49,15 @@ saving. Logic coordinates product operations; Persistence fulfills domain-facing
 repository contracts. SwiftUI, UIKit, and AppKit remain outside KitchenKit.
 Package choices and linkage exceptions live in [DEPENDENCIES.md](../DEPENDENCIES.md).
 
+### Import implementation
+
+`Interface/Import/SchemaOrgRecipeImporter.swift` owns configuration and the public
+captured-HTML/JSON-LD entry points. `Modules/Import/` keeps ordered candidate
+discovery, HTML scanning, bounded JSON admission, Schema.org field/content
+normalization, and retained-output accounting separate by responsibility. These
+helpers share the same import limits; hitting a resource ceiling still invalidates
+the whole candidate result. None performs network access or persistence.
+
 ### Application presentation taxonomy
 
 
@@ -228,6 +237,16 @@ composition while stable snapshot row identities survive recomposition.
 main-actor adapters over the same container. Callers receive domain values and
 classified evidence, never live SwiftData records. Each transaction uses its
 actor-bound context; background work cannot move records between actors.
+
+`SwiftDataRecipeRepository` retains its public operations and isolated transaction
+boundary in `Interface/Persistence/`. Its context-bound implementation lives in
+`Modules/Persistence/`: `RecipePayloadStore` owns deployed payload encoding and
+reconstruction, `RecipeAuthorityReader` assembles retained evidence,
+`RecipeAuthorityWriter` validates and accepts immutable commands, and
+`KitchenRecordStore` handles Kitchen ownership and convergence. Each helper uses
+the repository's exact context; a write constructs a fresh repository and helper
+set inside the existing isolated-write lifetime. Codecs and managed records remain
+internal, and this separation does not change stored formats or schema membership.
 Immutable commands, exact retries, duplicate/collision handling, and partial
 CloudKit delivery are resolved behind these interfaces.
 
