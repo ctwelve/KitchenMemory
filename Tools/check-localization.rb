@@ -6,6 +6,7 @@
 # SPDX-License-Identifier: MIT
 
 require "json"
+require "rexml/document"
 
 module KitchenMemory
   # Source/resource checks complement Xcode's generated-symbol type checking and
@@ -153,6 +154,35 @@ module KitchenMemory
       end.compact
     end
 
+    # Launch storyboards do not participate in generated catalog symbols.
+    # Guard their label inventory separately so every supported locale ships it.
+    def launch_screen_errors(storyboard, translations, locales)
+      document = REXML::Document.new(storyboard)
+      keys = REXML::XPath.match(document, "//label[@text]").map { |label| "#{label.attributes.fetch('id')}.text" }.sort
+      errors = []
+      errors << "LaunchScreen: no translatable labels" if keys.empty?
+      locales.each do |locale|
+        source = translations[locale]
+        unless source
+          errors << "LaunchScreen: missing locale #{locale}"
+          next
+        end
+        values = {}
+        remaining = source_without_comments(source).gsub(/("(?:\\.|[^"\\])*")\s*=\s*("(?:\\.|[^"\\])*")\s*;/) do
+          key, value = JSON.parse(Regexp.last_match(1)), JSON.parse(Regexp.last_match(2))
+          errors << "LaunchScreen: duplicate key #{locale}/#{key}" if values.key?(key)
+          values[key] = value
+          ""
+        end
+        errors << "LaunchScreen: malformed strings #{locale}" unless remaining.strip.empty?
+        errors << "LaunchScreen: label mismatch #{locale}" unless values.keys.sort == keys
+        errors << "LaunchScreen: empty translation #{locale}" if values.values.any? { |value| value.strip.empty? }
+      end
+      errors
+    rescue REXML::ParseException, JSON::ParserError => error
+      ["LaunchScreen: invalid resource: #{error.message}"]
+    end
+
     def validate(root)
       contract = JSON.parse(File.read(File.join(root, "Configurations/LocalizationContract.json")))
       catalogs = %w[Localizable InfoPlist].to_h do |name|
@@ -161,6 +191,13 @@ module KitchenMemory
       errors = catalogs.flat_map do |name, catalog|
         catalog_errors(catalog, contract, metadata: name == "InfoPlist").map { |error| "#{name}: #{error}" }
       end
+      resources = File.join(root, "KitchenMemory/Resources")
+      launch_translations = contract.fetch("locales").to_h do |locale|
+        path = File.join(resources, "#{locale}.lproj/LaunchScreen.strings")
+        [locale, File.exist?(path) ? File.read(path) : nil]
+      end
+      errors.concat(launch_screen_errors(File.read(File.join(resources, "Base.lproj/LaunchScreen.storyboard")),
+                                       launch_translations, contract.fetch("locales")))
       sources = Dir.glob(File.join(root, "KitchenMemory/**/*.swift")).to_h { |path| [path, File.read(path)] }
       errors.concat(source_errors(sources, catalogs.fetch("Localizable").fetch("strings"), contract.fetch("retainedKeys"), contract.fetch("literalExceptions")))
       errors.concat(default_name_errors(sources))

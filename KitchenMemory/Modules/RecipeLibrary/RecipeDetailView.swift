@@ -289,7 +289,7 @@ private extension RecipeDetailView {
           }
         } else {
           VStack(alignment: .trailing, spacing: 2) {
-            Text(recipeSource.title ?? recipeSource.kind.rawValue.capitalized)
+            Text(recipeSource.title ?? recipeSource.kind.label.localized(for: locale))
               .foregroundStyle(.primary)
             if recipeSource.canonicalURL != nil {
               Text(.recipeSourceLinkUnavailable)

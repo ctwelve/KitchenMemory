@@ -8,6 +8,13 @@ import SwiftUI
 import AppKit
 #endif
 
+enum SamplePackRemovalCopy {
+  static func message(count: Int, locale: Locale) -> String {
+    LocalizedStringResource.settingsSamplesRemoveMessage.localized(for: locale) + "\n\n"
+      + LocalizedStringResource.settingsSamplesRemoveCount(count: count).localized(for: locale)
+  }
+}
+
 private enum KitchenResetCopy {
   static func title(locale: Locale) -> String {
     LocalizedStringResource.settingsResetConfirmationTitle.localized(for: locale)
@@ -158,9 +165,9 @@ struct KitchenSettingsView: View {
         .disabled(model.samplePackStatus == nil || model.pendingSamplePack != nil)
         .accessibilityIdentifier("sample-pack-enabled")
         if let status = model.samplePackStatus {
-          LabeledContent(.settingsSamplesEdited, value: status.edited.formatted())
-          LabeledContent(.settingsSamplesDeleted, value: status.deleted.formatted())
-          LabeledContent(.settingsSamplesUnavailable, value: status.unavailable.formatted())
+          LabeledContent(.settingsSamplesEdited, value: status.edited.formatted(.number.locale(locale)))
+          LabeledContent(.settingsSamplesDeleted, value: status.deleted.formatted(.number.locale(locale)))
+          LabeledContent(.settingsSamplesUnavailable, value: status.unavailable.formatted(.number.locale(locale)))
           if status.isEnabled, status.installed < status.total {
             Button(.settingsSamplesActionInstallMissing, action: model.acceptSampleRecipes)
               .disabled(model.pendingSamplePack != nil)
@@ -181,8 +188,7 @@ struct KitchenSettingsView: View {
             }
           } message: {
             if let sampleRemoval {
-              Text(String(localized: .settingsSamplesRemoveMessage) + "\n\n"
-                + sampleRemoval.removalIDs.count.formatted())
+              Text(SamplePackRemovalCopy.message(count: sampleRemoval.removalIDs.count, locale: locale))
             }
           }
 

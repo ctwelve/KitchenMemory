@@ -114,8 +114,7 @@ struct RecipeComparisonFormatter {
 
   private func duration(_ value: RecipeDuration?) -> String {
     guard let value else { return unknown }
-    return value.seconds.formatted(.number.locale(locale)) + " "
-      + LocalizedStringResource.recipeComparisonSecondsUnit.localized(for: locale)
+    return LocalizedStringResource.recipeComparisonDurationSeconds(count: value.seconds).localized(for: locale)
   }
 
   private func lines(_ values: [String?]) -> String {

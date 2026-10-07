@@ -9,6 +9,17 @@ import XCTest
 
 @MainActor
 final class NativeIngredientPasteTests: XCTestCase {
+  func testLocaleChangeUpdatesTheExistingNativeAccessibilityLabel() async throws {
+    let draft = RecipeEditingDraft(draft: RecipeDraft())
+    let host = try IngredientPasteHost(draft: draft)
+    defer { host.close() }
+    let text = try host.textView()
+    XCTAssertEqual(host.accessibilityLabel(of: text), "Ingredients")
+    host.locale.identifier = "fr-CA"
+    try await host.waitFor { host.accessibilityLabel(of: text) == "Ingrédients" }
+    XCTAssertIdentical(try host.textView(), text)
+  }
+
   func testReplacementRetiresTheOldNativeControlEvenWhenWordingMatches() async throws {
     let recipeID = Recipe.ID()
     let first = RecipeRevision(recipeID: recipeID, revisionNumber: 1, title: "Soup", ingredientSections: [
@@ -162,19 +173,37 @@ private typealias IngredientPlatformView = UIView
 private typealias IngredientPlatformTextView = UITextView
 #endif
 
+@MainActor
+@Observable
+private final class IngredientEditorLocale {
+  var identifier = "en-US"
+}
+
+private struct LocalizedIngredientEditor: View {
+  let draft: RecipeEditingDraft
+  let actions: IngredientTextActions
+  let locale: IngredientEditorLocale
+
+  var body: some View {
+    NativeIngredientText(draft: draft, actions: actions)
+      .environment(\.locale, Locale(identifier: locale.identifier))
+  }
+}
+
 /// Hosts the actual adapter; no UI automation, global clipboard changes or user store access.
 @MainActor
 private final class IngredientPasteHost {
+  let locale = IngredientEditorLocale()
   private let root: IngredientPlatformView
 #if os(macOS)
   private let window: NSWindow
 #else
-  private let controller: UIHostingController<NativeIngredientText>
+  private let controller: UIHostingController<LocalizedIngredientEditor>
   private let window: UIWindow
 #endif
 
   init(draft: RecipeEditingDraft, actions: IngredientTextActions = .init()) throws {
-    let editor = NativeIngredientText(draft: draft, actions: actions)
+    let editor = LocalizedIngredientEditor(draft: draft, actions: actions, locale: locale)
 #if os(macOS)
     let hosting = NSHostingView(rootView: editor)
     hosting.frame = NSRect(x: 0, y: 0, width: 400, height: 200)
@@ -205,6 +234,14 @@ private final class IngredientPasteHost {
     // Stop here so later undo/redo assertions cannot obscure an incomplete paste.
     _ = try XCTUnwrap(condition() ? true : nil,
                       "Native editor did not reach the expected state. \(diagnostics())", file: file, line: line)
+  }
+
+  func accessibilityLabel(of text: IngredientPlatformTextView) -> String? {
+#if os(macOS)
+    text.accessibilityLabel()
+#else
+    text.accessibilityLabel
+#endif
   }
 
   func editorState(_ text: IngredientPlatformTextView) -> String {

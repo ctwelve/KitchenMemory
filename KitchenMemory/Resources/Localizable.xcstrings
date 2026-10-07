@@ -4083,48 +4083,6 @@
       }
     }
   },
-  "recipe.comparison.seconds-unit": {
-    "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
-    "extractionState": "manual",
-    "localizations": {
-      "it-IT": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "secondi"
-        }
-      },
-      "de-DE": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Sekunden"
-        }
-      },
-      "en-GB": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "seconds"
-        }
-      },
-      "en-US": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "seconds"
-        }
-      },
-      "es-MX": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "segundos"
-        }
-      },
-      "fr-CA": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "secondes"
-        }
-      }
-    }
-  },
   "recipe.comparison.field.title": {
     "comment": "Recipe revision comparison, explicit content choice, or local draft status.",
     "extractionState": "manual",
@@ -5974,30 +5932,45 @@
       }
     },
     "deleted.items.empty-message" : {
-      "comment" : "Deleted Items empty-state explanation.",
+      "comment" : "Shared Deleted Items empty state for both Recipes and Cooking Sessions.",
       "extractionState" : "manual",
       "localizations" : {
-        "it-IT": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Le sessioni di cucina eliminate appariranno qui finché non le ripristini."
+        "it-IT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le ricette e le sessioni di cucina eliminate appariranno qui finché non le ripristini."
           }
         },
-        "de-DE": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Gelöschte Kochvorgänge erscheinen hier, bis du sie wiederherstellst."
+        "de-DE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gelöschte Rezepte und Kochvorgänge erscheinen hier, bis du sie wiederherstellst."
           }
         },
-        "en-GB": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Deleted cooking sessions will appear here until you restore them."
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deleted recipes and cooking sessions will appear here until you restore them."
           }
         },
-        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Deleted cooking sessions will appear here until you restore them." } },
-        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Las sesiones de cocina eliminadas aparecerán aquí hasta que las restaures." } },
-        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Les séances de cuisine supprimées apparaîtront ici jusqu’à leur restauration." } }
+        "en-US" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deleted recipes and cooking sessions will appear here until you restore them."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las recetas y las sesiones de cocina eliminadas aparecerán aquí hasta que las restaures."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les recettes et les séances de cuisine supprimées apparaîtront ici jusqu’à leur restauration."
+          }
+        }
       }
     },
     "deleted.items.empty-title" : {
@@ -8110,27 +8083,42 @@
       "comment" : "Action that creates a new Active continuation from an immutable Finished Session.",
       "extractionState" : "manual",
       "localizations" : {
-        "it-IT": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Prosegui la cucina"
+        "it-IT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continua a cucinare"
           }
         },
-        "de-DE": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Weiterkochen"
+        "de-DE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weiterkochen"
           }
         },
-        "en-GB": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Continue Cooking"
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue Cooking"
           }
         },
-        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Continue Cooking" } },
-        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Continuar cocinando" } },
-        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Continuer à cuisiner" } }
+        "en-US" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue Cooking"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuar cocinando"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuer à cuisiner"
+          }
+        }
       }
     },
     "session.discovery.recipes" : {
@@ -8383,27 +8371,42 @@
       "comment" : "Explains that observed Finished Session evidence cannot be edited.",
       "extractionState" : "manual",
       "localizations" : {
-        "it-IT": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Questo è un resoconto immutabile di quanto è accaduto. Prosegui la cucina crea una nuova Sessione."
+        "it-IT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questo è un resoconto immutabile di quanto è accaduto. «Continua a cucinare» crea una nuova Sessione."
           }
         },
-        "de-DE": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dies ist ein unveränderliches Protokoll des tatsächlichen Ablaufs. „Weiterkochen“ erstellt einen neuen Kochvorgang."
+        "de-DE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dies ist ein unveränderliches Protokoll des tatsächlichen Ablaufs. „Weiterkochen“ erstellt einen neuen Kochvorgang."
           }
         },
-        "en-GB": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "This is an immutable record of what happened. Continue Cooking creates a new Session."
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This is an immutable record of what happened. Continue Cooking creates a new Session."
           }
         },
-        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "This is an immutable record of what happened. Continue Cooking creates a new Session." } },
-        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Este es un registro inmutable de lo ocurrido. Continuar cocinando crea una sesión nueva." } },
-        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Ceci est un registre immuable de ce qui s’est passé. Continuer à cuisiner crée une nouvelle séance." } }
+        "en-US" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This is an immutable record of what happened. Continue Cooking creates a new Session."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este es un registro inmutable de lo ocurrido. Continuar cocinando crea una sesión nueva."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ceci est un registre immuable de ce qui s’est passé. Continuer à cuisiner crée une nouvelle séance."
+          }
+        }
       }
     },
     "session.history.lineage" : {
@@ -10821,44 +10824,44 @@
     },
     "settings.reset.summary" : {
       "localizations" : {
-        "it-IT": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Riporta questa Cucina alle ricette di esempio incluse nella versione attuale di Memoria di cucina."
+        "it-IT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elimina i dati di questa Cucina e ripristina le ricette di esempio incluse solo se il pacchetto di ricette è attivato."
           }
         },
-        "de-DE": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Setze diese Küche auf die Beispielrezepte zurück, die in der aktuellen Version von Küchengedächtnis enthalten sind."
+        "de-DE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lösche die Daten dieser Küche und stelle die mitgelieferten Beispielrezepte nur wieder her, wenn das Rezeptpaket aktiviert ist."
           }
         },
-        "en-GB": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Restore this Kitchen to the sample recipes included with the current version of Kitchen Memory."
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete this Kitchen’s data and restore bundled sample recipes only if the sample pack is enabled."
           }
         },
         "es-MX" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Restaura esta cocina con las recetas de muestra incluidas en la versión actual de Memoria de cocina."
+            "value" : "Elimina los datos de esta cocina y restaura las recetas de muestra incluidas solo si el paquete de recetas está activado."
           }
         },
         "fr-CA" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Restaurez cette cuisine avec les exemples de recettes inclus dans la version actuelle de Mémoire de cuisine."
+            "value" : "Supprimez les données de cette cuisine et restaurez les exemples de recettes inclus seulement si le lot de recettes est activé."
           }
         },
         "en-US" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Restore this Kitchen to the sample recipes included with the current version of Kitchen Memory."
+            "value" : "Delete this Kitchen’s data and restore bundled sample recipes only if the sample pack is enabled."
           }
         }
       },
-      "comment" : "Short explanation of what resetting the Kitchen restores.",
+      "comment" : "Destructive Kitchen reset summary. All Kitchen data is deleted; bundled samples return only when the sample pack is enabled.",
       "extractionState" : "manual"
     },
     "settings.privacy.summary" : {
@@ -20025,6 +20028,234 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Leggi questo passaggio"
+          }
+        }
+      }
+    },
+    "recipe.comparison.duration.seconds" : {
+      "comment" : "Exact duration in the Recipe comparison. The count is seconds and selects the plural; do not round to minutes.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%1$(count)lld second"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%1$(count)lld seconds"
+                }
+              }
+            }
+          }
+        },
+        "en-GB" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%1$(count)lld second"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%1$(count)lld seconds"
+                }
+              }
+            }
+          }
+        },
+        "es-MX" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%1$(count)lld segundo"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%1$(count)lld segundos"
+                }
+              }
+            }
+          }
+        },
+        "fr-CA" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%1$(count)lld seconde"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%1$(count)lld secondes"
+                }
+              }
+            }
+          }
+        },
+        "de-DE" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%1$(count)lld Sekunde"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%1$(count)lld Sekunden"
+                }
+              }
+            }
+          }
+        },
+        "it-IT" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%1$(count)lld secondo"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%1$(count)lld secondi"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "settings.samples.remove-count" : {
+      "comment" : "Complete sentence below the sample-removal explanation. Count is the number of untouched sample Recipes that will move to Deleted Items; edited Recipes are excluded.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en-US" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%1$(count)lld untouched sample will be removed."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%1$(count)lld untouched samples will be removed."
+                }
+              }
+            }
+          }
+        },
+        "en-GB" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%1$(count)lld untouched sample will be removed."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%1$(count)lld untouched samples will be removed."
+                }
+              }
+            }
+          }
+        },
+        "es-MX" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Se quitará %1$(count)lld receta de muestra sin modificar."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Se quitarán %1$(count)lld recetas de muestra sin modificar."
+                }
+              }
+            }
+          }
+        },
+        "fr-CA" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%1$(count)lld exemple de recette non modifié sera retiré."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%1$(count)lld exemples de recettes non modifiés seront retirés."
+                }
+              }
+            }
+          }
+        },
+        "de-DE" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%1$(count)lld unverändertes Beispielrezept wird entfernt."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%1$(count)lld unveränderte Beispielrezepte werden entfernt."
+                }
+              }
+            }
+          }
+        },
+        "it-IT" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Verrà rimossa %1$(count)lld ricetta di esempio non modificata."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Verranno rimosse %1$(count)lld ricette di esempio non modificate."
+                }
+              }
+            }
           }
         }
       }

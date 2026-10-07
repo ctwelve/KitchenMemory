@@ -120,4 +120,15 @@ class LocalizationContractTest < Minitest::Test
         'let name = kitchen?.name ?? LocalizedStringResource.kitchenDefaultName.localized(for: locale)',
     })
   end
+  def test_launch_screen_requires_complete_nonempty_translations_for_every_locale
+    storyboard = '<document><label id="title" text="Title"/></document>'
+    translations = {"en-US" => '"title.text" = "Title";', "fr-CA" => '"title.text" = "Titre";'}
+    locales = translations.keys
+    assert_empty Contract.launch_screen_errors(storyboard, translations, locales)
+    [nil, '', '"other.text" = "Titre";', '"title.text" = " ";',
+     '"title.text" = "Titre"; "title.text" = "Autre";', '"title.text" = "Titre"'].each do |invalid|
+      refute_empty Contract.launch_screen_errors(storyboard, translations.merge("fr-CA" => invalid), locales)
+    end
+  end
+
 end

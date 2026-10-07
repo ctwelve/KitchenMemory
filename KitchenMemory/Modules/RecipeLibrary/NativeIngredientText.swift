@@ -67,6 +67,7 @@ private struct NativeIngredientTextView: NSViewRepresentable {
   func updateNSView(_ scroll: NSScrollView, context: Context) {
     context.coordinator.locale = locale
     guard let text = scroll.documentView as? NSTextView else { return }
+    text.setAccessibilityLabel(LocalizedStringResource.recipeEditorIngredientsSection.localized(for: locale))
     let document = context.coordinator.document
     // Ordinary typing already matches Kit. A mismatched model replacement
     // invalidates native history rather than applying old undo to new contents.
@@ -169,6 +170,7 @@ private struct NativeIngredientTextView: UIViewRepresentable {
 
   func updateUIView(_ text: UITextView, context: Context) {
     context.coordinator.locale = locale
+    text.accessibilityLabel = LocalizedStringResource.recipeEditorIngredientsSection.localized(for: locale)
     let document = context.coordinator.document
     // Model-driven replacement is not another keystroke: old native undo
     // actions refer to the previous contents and must be retired first.

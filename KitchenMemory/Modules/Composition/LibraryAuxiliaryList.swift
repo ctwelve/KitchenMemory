@@ -8,6 +8,7 @@ import SwiftUI
 /// Lists only identities and status. Existing detail surfaces own confirmation
 /// and recovery operations, so a selection cannot itself restore or repair data.
 struct LibraryAuxiliaryList: View {
+  @Environment(\.locale) private var locale
   let library: RecipeLibraryModel
   let sessions: CookingSessionPresentationModel
   let applyNavigationFocus: () -> Void
@@ -29,13 +30,13 @@ struct LibraryAuxiliaryList: View {
   @ViewBuilder private var deletedRows: some View {
     ForEach(library.deletedRecipes) { recipe in
       row(.deletedRecipe(recipe.id), title: recipe.recoverableRecipe?.current.title
-          ?? String(localized: .recipeDeletedFallback), symbol: "book.closed")
+          ?? LocalizedStringResource.recipeDeletedFallback.localized(for: locale), symbol: "book.closed")
     }
     ForEach(sessions.deletedSessions, id: \.id) { session in
       row(.deletedSession(session.id), title: session.snapshot.title, symbol: "flame")
     }
     ForEach(sessions.waitingDeletedSessions, id: \.evidence.sessionID) { item in
-      row(.deletedSession(item.evidence.sessionID), title: String(localized: .deletedItemsWaiting),
+      row(.deletedSession(item.evidence.sessionID), title: LocalizedStringResource.deletedItemsWaiting.localized(for: locale),
           symbol: "icloud.and.arrow.down")
     }
     if library.deletedRecipes.isEmpty, sessions.deletedItemCount == 0 {
@@ -47,18 +48,19 @@ struct LibraryAuxiliaryList: View {
   @ViewBuilder private var recoveryRows: some View {
     ForEach(library.recoveryRecipes) { recipe in
       row(.recoveryRecipe(recipe.id), title: recipe.revisions.first?.title
-          ?? String(localized: .recipeRecoveryTitle), symbol: "book.closed")
+          ?? LocalizedStringResource.recipeRecoveryTitle.localized(for: locale), symbol: "book.closed")
     }
     ForEach(sessions.waitingSessions, id: \.evidence.sessionID) { item in
-      row(.recoverySession(item.evidence.sessionID), title: String(localized: .recoveryWaitingTitle),
+      row(.recoverySession(item.evidence.sessionID), title: LocalizedStringResource.recoveryWaitingTitle.localized(for: locale),
           symbol: "icloud.and.arrow.down")
     }
     ForEach(sessions.recoverySessions, id: \.evidence.sessionID) { item in
-      row(.recoverySession(item.evidence.sessionID), title: String(localized: .recoveryEvidenceTitle),
+      row(.recoverySession(item.evidence.sessionID), title: LocalizedStringResource.recoveryEvidenceTitle.localized(for: locale),
           symbol: "exclamationmark.triangle")
     }
     if library.organization?.requiresRecovery == true {
-      row(.organization, title: String(localized: .organizationTitle), symbol: "folder.badge.questionmark")
+      row(.organization, title: LocalizedStringResource.organizationTitle.localized(for: locale),
+          symbol: "folder.badge.questionmark")
     }
     if library.recoveryRecipes.isEmpty, sessions.recoveryItemCount == 0,
        library.organization?.requiresRecovery != true {

@@ -9,6 +9,43 @@ import XCTest
 
 @MainActor
 final class LocalizationFormattingContractTests: XCTestCase {
+  func testComparisonSecondsUsesCompletePluralMessagesForExplicitLocales() {
+    let examples: [(String, [String])] = [
+      ("en-US", ["0 seconds", "1 second", "2 seconds"]),
+      ("en-GB", ["0 seconds", "1 second", "2 seconds"]),
+      ("es-MX", ["0 segundos", "1 segundo", "2 segundos"]),
+      ("fr-CA", ["0 seconde", "1 seconde", "2 secondes"]),
+      ("de-DE", ["0 Sekunden", "1 Sekunde", "2 Sekunden"]),
+      ("it-IT", ["0 secondi", "1 secondo", "2 secondi"]),
+    ]
+    var revision = RecipeRevision(recipeID: Recipe.ID(), revisionNumber: 1, title: "Authored title")
+    for (language, expected) in examples {
+      let formatter = RecipeComparisonFormatter(locale: Locale(identifier: language))
+      for count in 0...2 {
+        revision.prepDuration = RecipeDuration(seconds: count)
+        XCTAssertEqual(formatter.value(.preparation, revision: revision), expected[count], language)
+        XCTAssertEqual(revision.prepDuration?.seconds, count)
+        XCTAssertEqual(revision.title, "Authored title")
+      }
+    }
+  }
+
+  func testSampleRemovalConfirmationIncludesCompleteCountSentenceInRequestedLocale() {
+    let english = Locale(identifier: "en-US")
+    for count in 0...2 {
+      let expected = count == 1
+        ? "1 untouched sample will be removed."
+        : "\(count) untouched samples will be removed."
+      XCTAssertTrue(SamplePackRemovalCopy.message(count: count, locale: english).hasSuffix("\n\n" + expected))
+    }
+    let french = Locale(identifier: "fr-CA")
+    let message = SamplePackRemovalCopy.message(count: 2, locale: french)
+    XCTAssertNotEqual(message, SamplePackRemovalCopy.message(count: 2, locale: english))
+    XCTAssertFalse(message.contains("untouched"))
+    XCTAssertFalse(message.contains("%"))
+    XCTAssertEqual(message.components(separatedBy: "\n\n").count, 2)
+  }
+
   func testComparisonLocalizesCapturedDateAndPreservesAuthoredUnitsAndEvidence() throws {
     let capturedAt = Date(timeIntervalSince1970: 1_700_000_000)
     let url = try XCTUnwrap(URL(string: "https://example.com/synthetic-recipe"))
