@@ -6756,33 +6756,6 @@
         "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Instructions" } }
       }
     },
-    "session.progress.up-next" : {
-      "comment" : "Label on the first open instruction in authored order.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "it-IT": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Prossimo"
-          }
-        },
-        "de-DE": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Als Nächstes"
-          }
-        },
-        "en-GB": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Up next"
-          }
-        },
-        "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Up next" } },
-        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "A continuación" } },
-        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "À suivre" } }
-      }
-    },
     "session.progress.ingredient.accounted" : {
       "comment" : "Accessibility value for an accounted-for session ingredient.",
       "extractionState" : "manual",
@@ -19800,6 +19773,258 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Échec de l’importation de la recette. %1$(message)@"
+          }
+        }
+      }
+    },
+    "session.reading.completed-last" : {
+      "comment" : "Brief accessibility announcement when no later unfinished step remains; finishing still requires an explicit action.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de-DE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schritt %1$(completed)lld abgeschlossen. Kein späterer Schritt ist offen."
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Step %1$(completed)lld complete. No later unfinished step."
+          }
+        },
+        "en-US" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Step %1$(completed)lld complete. No later unfinished step."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paso %1$(completed)lld completado. No quedan pasos posteriores sin terminar."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Étape %1$(completed)lld terminée. Aucune étape suivante inachevée."
+          }
+        },
+        "it-IT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passaggio %1$(completed)lld completato. Nessun passaggio successivo da completare."
+          }
+        }
+      }
+    },
+    "session.reading.completed-next" : {
+      "comment" : "Brief accessibility announcement after deliberate completion. completed and next are authored-order step numbers. Does not move accessibility focus.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de-DE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schritt %1$(completed)lld abgeschlossen. Als Nächstes: Schritt %2$(next)lld."
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Step %1$(completed)lld complete. Next: step %2$(next)lld."
+          }
+        },
+        "en-US" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Step %1$(completed)lld complete. Next: step %2$(next)lld."
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paso %1$(completed)lld completado. Siguiente: paso %2$(next)lld."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Étape %1$(completed)lld terminée. Prochaine : étape %2$(next)lld."
+          }
+        },
+        "it-IT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passaggio %1$(completed)lld completato. Prossimo: passaggio %2$(next)lld."
+          }
+        }
+      }
+    },
+    "session.reading.current" : {
+      "comment" : "Label on the independently emphasized instruction; does not describe progress.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de-DE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktueller Schritt"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Current step"
+          }
+        },
+        "en-US" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Current step"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paso actual"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Étape actuelle"
+          }
+        },
+        "it-IT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passaggio attuale"
+          }
+        }
+      }
+    },
+    "session.reading.jump" : {
+      "comment" : "Explicitly move the reading viewport to the emphasized instruction; never changes progress.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de-DE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zum aktuellen Schritt"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jump to current step"
+          }
+        },
+        "en-US" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jump to current step"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ir al paso actual"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aller à l’étape actuelle"
+          }
+        },
+        "it-IT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vai al passaggio attuale"
+          }
+        }
+      }
+    },
+    "session.reading.keep-awake" : {
+      "comment" : "Device-local override to prevent idle screen sleep only while this Active cooking screen is visible.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de-DE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bildschirm eingeschaltet lassen"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep screen awake"
+          }
+        },
+        "en-US" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep screen awake"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mantener la pantalla encendida"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Garder l’écran allumé"
+          }
+        },
+        "it-IT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mantieni lo schermo acceso"
+          }
+        }
+      }
+    },
+    "session.reading.select" : {
+      "comment" : "Explicitly emphasize this instruction without changing cooking progress.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de-DE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diesen Schritt lesen"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Read this step"
+          }
+        },
+        "en-US" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Read this step"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leer este paso"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lire cette étape"
+          }
+        },
+        "it-IT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leggi questo passaggio"
           }
         }
       }

@@ -37,7 +37,7 @@ placeholder interface has received release-level proof.
 
 The UI suite verifies only that the recipe library, Settings, and startup
 recovery expose meaningfully named accessibility elements and that the recipe,
-Sessions, Deleted Items, and Recovery destinations are reachable and expose
+Sessions, Cooking Session reading, Deleted Items, and Recovery destinations are reachable and expose
 their named top-level structure.
 
 Stable identifiers locate those elements without depending on translated copy;

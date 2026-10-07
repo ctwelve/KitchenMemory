@@ -47,17 +47,27 @@ extension CookingSessionPresentationModel {
     ))
   }
   @discardableResult
-  func setInstruction(_ id: SessionInstruction.ID, to state: SessionInstructionProgress) -> Bool {
+  func setInstruction(
+    _ id: SessionInstruction.ID, to state: SessionInstructionProgress, readingOrigin: UUID? = nil
+  ) -> Bool {
     guard let session = currentSession, session.lifecycle == .active,
           session.snapshot.instructionSections.flatMap(\.steps).contains(where: {
             $0.id == id
           }) else { return false }
-    return submitIndependentCommand(.progress(
+    let advances = state == .completed && session.instructionProgress(for: id) == .open
+      && readingPreference(for: session).emphasizedInstructionID == id
+    readingCompletion = nil
+    let accepted = submitIndependentCommand(.progress(
       factID: SessionFact.ID(),
       sessionID: session.id,
       authoredAt: Date(),
       progress: SessionProgress(target: .instruction(id), state: .instruction(state))
     ))
+    if advances, let updated = currentSession, updated.id == session.id,
+       updated.instructionProgress(for: id) == .completed {
+      advanceReadingAfterCompletion(id, in: updated, readingOrigin: readingOrigin)
+    }
+    return accepted
   }
   @discardableResult
   func replaceWorkingScale(with scale: RecipeScale) -> Bool {

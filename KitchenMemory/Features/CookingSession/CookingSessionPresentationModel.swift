@@ -104,6 +104,8 @@ final class CookingSessionPresentationModel {
     return id
   }
   var sessionVisits: [CookingSessionVisit]
+  var readingPreferences: [CookingSessionReadingPreference]
+  var readingCompletion: CookingSessionReadingCompletion?
 
   init(
     sessions: any CookingSessionServing,
@@ -118,6 +120,7 @@ final class CookingSessionPresentationModel {
     navigation.installSessionStore(store)
     delivery = CookingSessionDelivery(service: sessions, store: store)
     sessionVisits = store.sessionVisits
+    readingPreferences = store.readingPreferences
   }
 
   var currentSession: CookingSessionProjection? {
@@ -145,6 +148,7 @@ final class CookingSessionPresentationModel {
       retryPendingCommands()
     }
     reload()
+    if let currentSession { prepareReadingPreference(for: currentSession) }
     hasLoaded = true
   }
 
@@ -181,6 +185,8 @@ final class CookingSessionPresentationModel {
     finishedSessionIDs = []
     recipeHistorySessions = []
     sessionVisits = []
+    readingPreferences = []
+    readingCompletion = nil
     hasLoaded = true
   }
 
@@ -219,6 +225,7 @@ final class CookingSessionPresentationModel {
     let next: RecipeLibraryNavigation.Destination = id.map { .session($0, history: historyScope) }
       ?? historyScope.map { .history($0) } ?? .recipe
     guard navigation.move(to: next) else { return false }
+    if let currentSession { prepareReadingPreference(for: currentSession) }
     if let id, recordsVisit { recordVisit(to: id) }
     return true
   }

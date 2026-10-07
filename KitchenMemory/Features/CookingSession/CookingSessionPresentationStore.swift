@@ -153,6 +153,7 @@ protocol CookingSessionPresentationStoring: AnyObject {
   var pendingCommands: [PendingCookingSessionCommand] { get set }
   var entryDrafts: [CookingSessionEntryDraft] { get set }
   var sessionVisits: [CookingSessionVisit] { get set }
+  var readingPreferences: [CookingSessionReadingPreference] { get set }
   func clear()
 }
 
@@ -162,6 +163,7 @@ extension CookingSessionPresentationStoring {
     pendingCommands = []
     entryDrafts = []
     sessionVisits = []
+    readingPreferences = []
   }
 }
 
@@ -174,7 +176,7 @@ final class DefaultsCookingSessionPresentationStore: CookingSessionPresentationS
   static let entryDraftsKey = "cookingSessions.entryDrafts"
   static let sessionVisitsKey = "cookingSessions.sessionVisits"
 
-  private let defaults: UserDefaults
+  let defaults: UserDefaults
   private let encoder = PropertyListEncoder()
   private let decoder = PropertyListDecoder()
 
@@ -258,4 +260,5 @@ final class VolatileCookingSessionPresentationStore: CookingSessionPresentationS
   var pendingCommands: [PendingCookingSessionCommand] = []
   var entryDrafts: [CookingSessionEntryDraft] = []
   var sessionVisits: [CookingSessionVisit] = []
+  var readingPreferences: [CookingSessionReadingPreference] = []
 }

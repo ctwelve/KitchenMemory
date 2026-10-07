@@ -58,6 +58,38 @@ final class KitchenMemoryUITests: XCTestCase {
   }
 
   @MainActor
+  func testCookingReadingDestinationExposesNamedStructure() {
+    let app = launchApp()
+    // The sample fixture starts with Dirty Fried Rice selected; opening the
+    // named second recipe explicitly reveals the compact detail column.
+    let row = app.buttons["recipe-row-E3D10000-0000-4000-8000-000000000001"]
+    revealSidebar(in: app, exposing: row)
+    XCTAssertTrue(row.waitForExistence(timeout: 5))
+    activate(row)
+    XCTAssertTrue(app.descendants(matching: .any)["recipe-detail"].waitForExistence(timeout: 5))
+    var start = app.buttons["start-cooking"]
+    if !start.waitForExistence(timeout: 2) {
+      let overflow = app.buttons["OverflowBarButtonItem"]
+      if overflow.exists {
+        activate(overflow)
+        // The system overflow menu retains the accessible name, not the toolbar identifier.
+        start = app.buttons["Start Cooking"]
+      }
+    }
+    XCTAssertTrue(start.waitForExistence(timeout: 5))
+    activate(start)
+    let reading = app.descendants(matching: .any)["cooking-session-shell"]
+    XCTAssertTrue(reading.waitForExistence(timeout: 5))
+    assertAccessibleText(reading, description: "Cooking Session reading")
+    for identifier in ["session-reading-jump", "session-reading-keep-awake", "stop-session", "leave-session"] {
+      let control = app.descendants(matching: .any)[identifier].firstMatch
+      XCTAssertTrue(control.waitForExistence(timeout: 5))
+      assertAccessibleLabel(control, description: identifier)
+    }
+    app.terminate()
+  }
+
+  @MainActor
   func testRecipeEditorExposesNamedEntryAndModeControls() {
     let app = launchApp()
     let create = app.buttons["new-recipe"].firstMatch

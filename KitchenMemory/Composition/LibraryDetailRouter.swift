@@ -33,6 +33,7 @@ struct LibraryDetailRouter: View {
     case .session:
       if let session = sessionModel.currentSession {
         CookingSessionView(model: sessionModel, session: session, embedsInNavigationStack: false)
+          .id(session.id)
       }
     case .recipe:
       recipeContent
