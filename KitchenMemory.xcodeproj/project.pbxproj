@@ -63,6 +63,7 @@
 /* Begin PBXFileReference section */
 		A15E8F41303912A6009B0A22 /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 		A188D44E3075FD19001F8C79 /* CookingSessionPrototype.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = CookingSessionPrototype.xcodeproj; sourceTree = "<group>"; };
+		A188D87B30761534001F8C79 /* CookingSessionPrototype.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = CookingSessionPrototype.xcodeproj; sourceTree = "<group>"; };
 		A1BC7A50303F76CE0082EE96 /* AGENTS.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = AGENTS.md; sourceTree = "<group>"; };
 		A1BC7A51303F76CE0082EE96 /* AI.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = AI.md; sourceTree = "<group>"; };
 		A1BC7A52303F76CE0082EE96 /* DEPENDENCIES.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = DEPENDENCIES.md; sourceTree = "<group>"; };
@@ -179,6 +180,19 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		A188D81630761534001F8C79 /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				A188D44E3075FD19001F8C79 /* CookingSessionPrototype.xcodeproj */,
+			);
+			name = "Recovered References";
+			sourceTree = "<group>";
+		};
+		A188D8B430761534001F8C79 /* Products */ = {
+			isa = PBXGroup;
+			name = Products;
+			sourceTree = "<group>";
+		};
 		A1C4E795302A63B800E2C0DB = {
 			isa = PBXGroup;
 			children = (
@@ -199,6 +213,7 @@
 				A1F62A8E30434D9C0005E9A5 /* KitchenKit.xctestplan */,
 				A1C9A48C3042896F00F1F13D /* KitchenKitTests */,
 				A1C4E79F302A63B800E2C0DB /* Products */,
+				A188D81630761534001F8C79 /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -414,6 +429,10 @@
 			productRefGroup = A1C4E79F302A63B800E2C0DB /* Products */;
 			projectDirPath = "";
 			projectReferences = (
+				{
+					ProductGroup = A188D8B430761534001F8C79 /* Products */;
+					ProjectRef = A188D87B30761534001F8C79 /* CookingSessionPrototype.xcodeproj */;
+				},
 				{
 					ProductGroup = A188D4873075FD19001F8C79 /* Products */;
 					ProjectRef = A188D44E3075FD19001F8C79 /* CookingSessionPrototype.xcodeproj */;
