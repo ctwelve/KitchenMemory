@@ -77,7 +77,11 @@ struct CookingSessionScalingView: View {
   }
 
   private var isEnabled: Bool {
-    projectedSession.lifecycle == .active && !model.currentSessionHasPendingFinish
+    projectedSession.lifecycle == .active && !isBlockedByPendingWork
+  }
+
+  private var isBlockedByPendingWork: Bool {
+    !model.pendingCommands.allSatisfy { $0.isIndependentActivity(for: projectedSession.id) }
   }
 
   var body: some View {
@@ -129,8 +133,11 @@ struct CookingSessionScalingView: View {
               .foregroundStyle(.secondary)
               .accessibilityIdentifier("session-scale-calculation-failure")
           }
-          if model.currentSessionHasPendingWork, model.isShowingIssue, let issue = model.issue {
-            Text(issue.message).font(.callout).foregroundStyle(.secondary)
+          if model.hasPendingDeliveryWork {
+            if isBlockedByPendingWork { Text(.sessionScalePending).font(.callout) }
+            if model.isShowingIssue, let issue = model.issue {
+              Text(issue.message).font(.callout).foregroundStyle(.secondary)
+            }
             Button(.sessionSaveRetry) { model.retryPendingCommands() }
               .accessibilityIdentifier("retry-session-scaling-save")
           }
@@ -201,8 +208,8 @@ struct CookingSessionScalingExplanation: View {
     if model.scalingExplanationIsVisible(in: session) {
       VStack(alignment: .leading, spacing: 8) {
         if guidance.missingYield { Text(.sessionScaleGuidanceMissingYield) }
-        if hasScaledAmount(guidance) { Text(.sessionScaleGuidanceScaled) }
-        if hasUnchangedAmount(guidance) { Text(.sessionScaleGuidanceMarked) }
+        if guidance.hasScaledAmount { Text(.sessionScaleGuidanceScaled) }
+        if guidance.hasUnchangedAmount { Text(.sessionScaleGuidanceMarked) }
         Text(.sessionScaleGuidanceJudgement)
         Button(.sessionScaleGuidanceDismiss) { model.dismissScalingExplanation(in: session) }
           .accessibilityIdentifier("dismiss-session-scaling-explanation")
@@ -216,17 +223,7 @@ struct CookingSessionScalingExplanation: View {
     }
   }
 
-  private func hasScaledAmount(_ guidance: CookingSessionScalingGuidance) -> Bool {
-    session.snapshot.ingredientSections.flatMap(\.ingredients).contains {
-      guidance.ingredientStatus(for: $0) == .scaled
-    }
-  }
 
-  private func hasUnchangedAmount(_ guidance: CookingSessionScalingGuidance) -> Bool {
-    session.snapshot.ingredientSections.flatMap(\.ingredients).contains {
-      guidance.ingredientStatus(for: $0) != .scaled
-    }
-  }
 }
 
 struct CookingSessionIngredientScaleGuidance: View {

@@ -7215,7 +7215,7 @@
         "en-GB" : { "stringUnit" : { "state" : "translated", "value" : "Marked amounts remain as written." } },
         "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Marked amounts remain as written." } },
         "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Las cantidades marcadas se mantienen tal como están escritas." } },
-        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Les quantités indiquées restent telles qu’elles ont été écrites." } }
+        "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Les quantités signalées comme inchangées restent telles qu’elles ont été écrites." } }
       }
     },
     "session.scale.guidance.judgement" : {
@@ -7327,6 +7327,48 @@
         "en-US" : { "stringUnit" : { "state" : "translated", "value" : "Cooking yield" } },
         "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Rendimiento de cocción" } },
         "fr-CA" : { "stringUnit" : { "state" : "translated", "value" : "Rendement de cuisson" } }
+      }
+    },
+    "session.scale.pending" : {
+      "comment": "Explains that ordered pending delivery must finish before another Session scale adjustment; this is not an arithmetic failure.",
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save earlier changes before adjusting this Session’s scale."
+          }
+        },
+        "en-GB": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save earlier changes before adjusting this Session’s scale."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistrez les changements précédents avant d’ajuster le facteur de cette séance."
+          }
+        },
+        "es-MX": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Guarda los cambios anteriores antes de ajustar la escala de esta sesión."
+          }
+        },
+        "de-DE": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speichere frühere Änderungen, bevor du die Skalierung dieses Kochvorgangs anpasst."
+          }
+        },
+        "it-IT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Salva le modifiche precedenti prima di modificare la scala di questa sessione."
+          }
+        }
       }
     },
     "session.scale.note" : {

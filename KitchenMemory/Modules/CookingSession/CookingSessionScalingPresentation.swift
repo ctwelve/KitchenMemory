@@ -74,11 +74,19 @@ struct CookingSessionScalingGuidance {
   var hasTemperature: Bool {
     session.snapshot.instructionSections.flatMap(\.steps).contains { $0.value.temperature != nil }
   }
+  var hasScaledAmount: Bool {
+    session.snapshot.ingredientSections.flatMap(\.ingredients).contains {
+      ingredientStatus(for: $0) == .scaled
+    }
+  }
+  var hasUnchangedAmount: Bool {
+    session.snapshot.ingredientSections.flatMap(\.ingredients).contains {
+      ingredientStatus(for: $0) != .scaled
+    }
+  }
   var warrantsExplanation: Bool {
     isNonOriginal && (missingYield || hasMethod || hasTime || hasTemperature
-      || session.snapshot.ingredientSections.flatMap(\.ingredients).contains {
-        ingredientStatus(for: $0) != .scaled
-      })
+      || hasUnchangedAmount)
   }
 
   func ingredientStatus(for ingredient: SessionIngredient) -> ScaledRecipeIngredient.Status {
