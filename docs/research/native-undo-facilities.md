@@ -117,7 +117,7 @@ repositories, tagged source, manifests, and release metadata. Recent releases
 are maintenance evidence, not proof of correctness. Dispositions are
 recommendations for this application, not upstream claims. The existing
 [dependency inventory](../../DEPENDENCIES.md) and
-[tooling survey](swift-tooling-ecosystem-survey.md) remain the adoption rules.
+[dependency decision](../adr/0014-prefer-native-capabilities-and-evidence-based-dependencies.md) remain the adoption rules.
 
 | Candidate and maintenance snapshot | Complexity it removes | Fit and adoption trigger |
 | --- | --- | --- |

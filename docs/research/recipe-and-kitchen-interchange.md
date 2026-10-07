@@ -6,7 +6,7 @@ Copyright © 2026 the Kitchen Memory contributors.
 SPDX-License-Identifier: MIT
 -->
 
-Research for [#96](https://github.com/ctwelve/KitchenMemory/issues/96), 2026-09-06. This recommends future contracts; it does not add an importer, exporter, document type, persistence migration, or retention policy. All fixtures are synthetic. The accompanying Python program is a nonshipping reference experiment, not a KitchenKit implementation.
+Research for [#96](https://github.com/ctwelve/KitchenMemory/issues/96), 2026-09-06. This recommends future contracts; it does not add an importer, exporter, document type, persistence migration, or retention policy. All fixtures are synthetic. The completed Python experiment is preserved in Git history; it is a nonshipping reference experiment, not a KitchenKit implementation.
 
 ## Questions and competing hypotheses
 
@@ -99,11 +99,11 @@ Do not re-encode archived image bytes merely to import them: that would change i
 
 Retention: archives are user-owned snapshots and do not expire themselves. Restore preserves original deletion evidence and anti-resurrection promises; extend protection conservatively when needed, never shorten it. Archive creation/import is not proof of replica settlement and must not trigger physical pruning. Session evidence stays retained under the current policy; deeper Session cleanup remains a separate dependency-aware decision. Delete temporary staged bytes and receipts containing content when no longer needed; retain only minimal local retry identity/mapping for the documented retry horizon. Do not upload fixtures, source captures or failures to diagnostics.
 
-## Reproducible experiment
+## Completed synthetic experiment
 
-Accompanying directory: [synthetic interchange fixtures](recipe-and-kitchen-interchange-fixtures/README.md).
+Archived directory: [synthetic interchange program, fixtures and results](https://github.com/ctwelve/KitchenMemory/tree/ed91dc532235e0bd6c1571853c0ccb78eee62b66/docs/research/recipe-and-kitchen-interchange-fixtures).
 
-Run `python3 experiment.py` within that directory. It generates `recipe-unknown-fields.json`, `kitchen.json`, `malformed.json`, `excessive-folder-depth.json`, `synthetic-recipe.zip`, and `results.json`. It uses only Python's standard library, no network, no product database, no image decoding and no Xcode test action.
+At the pinned tree, `python3 experiment.py` within that directory generates `recipe-unknown-fields.json`, `kitchen.json`, `malformed.json`, `excessive-folder-depth.json`, `synthetic-recipe.zip`, and `results.json`. It uses only Python's standard library, no network, no product database, no image decoding and no Xcode test action.
 
 Observed result: **24/24 checks passed**. Both profiles preserve semantic unknown members nested at multiple levels; an opaque future evidence payload preserves exact bytes including numeric spelling and whitespace. The synthetic Recipe carries original wording alongside a rational range, stable ingredient/Equipment order, attribution and opaque source text. The Kitchen fixture includes retained evidence placeholders. Rejection checks cover malformed/duplicate-key/nonfinite JSON, unsupported versions/required features, JSON byte/nesting limits, excessive Folder depth/cycles, oversized names, identity/relationship budgets, dangling edges, unsafe ZIP paths, media hash mismatch, ZIP expansion/entry/aggregate budgets. The maximum permitted 128 identities succeeds under the reduced experiment profile.
 

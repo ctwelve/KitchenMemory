@@ -26,3 +26,9 @@ are not shipping product modules.
 The CloudKit tools require their own named-candidate and signing instructions;
 they do not authorize Production deployment. Keep credentials, private records,
 raw cloud exports, screenshots, and generated result bundles out of the repo.
+
+Completed disposable prototypes and research harnesses are preserved through
+[the history index](../docs/history.md#native-interaction-prototypes) and
+[the research index](../docs/research/README.md#completed-synthetic-experiments).
+Their source and dated observations remain available at fixed Git commits; they
+are outside the current tool and product verification contracts.

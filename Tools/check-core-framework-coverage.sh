@@ -15,9 +15,18 @@ RESULT_BUNDLE=$1
 SCRIPT_DIRECTORY=$(CDPATH= cd "$(dirname "$0")" && pwd)
 PROJECT_ROOT=$(dirname "$SCRIPT_DIRECTORY")
 KITCHEN_KIT_DIRECTORY="$PROJECT_ROOT/KitchenKit"
-PERSISTENCE_DIRECTORY="$KITCHEN_KIT_DIRECTORY/Persistence"
+PERSISTENCE_DIRECTORY="$KITCHEN_KIT_DIRECTORY/Interface/Persistence"
 PERSISTENCE_STATUS_ADAPTER="$PERSISTENCE_DIRECTORY/Cloud/PersonalCloudStatusMonitor.swift"
+PERSISTENCE_ACCOUNT_ADAPTER="$PERSISTENCE_DIRECTORY/Cloud/CloudKitAccountChecker.swift"
 PERSISTENCE_OWNER_ADAPTER="$PERSISTENCE_DIRECTORY/Cloud/CloudKitKitchenOwnerIDResolver.swift"
+
+# Fail explicitly when source moves invalidate the narrowly scoped exceptions.
+for ADAPTER in "$PERSISTENCE_STATUS_ADAPTER" "$PERSISTENCE_ACCOUNT_ADAPTER" "$PERSISTENCE_OWNER_ADAPTER"; do
+  if [ ! -f "$ADAPTER" ]; then
+    echo "Coverage gate error: runtime-adapter exclusion is missing: $ADAPTER" >&2
+    exit 2
+  fi
+done
 
 if [ ! -r "$RESULT_BUNDLE" ]; then
   echo "Coverage gate error: result bundle is not readable: $RESULT_BUNDLE" >&2
@@ -89,13 +98,13 @@ while IFS='|' read -r TARGET MODULE_DIRECTORY; do
 
   EXCLUDED_SOURCE=
   if [ "$TARGET" = "KitchenKit.framework" ]; then
-    # This file is the narrow Apple-runtime bridge: it calls CKContainer and
-    # translates ObjC notifications whose event type has no public initializer.
+    # These files are the narrow Apple-runtime bridges: they call CKContainer and
+    # translate ObjC notifications whose event type has no public initializer.
     # Its deterministic status reducer lives in PersonalCloudStatus.swift and
     # remains inside the exact business-logic gate.
     # Xcode may canonicalize /private/tmp to /tmp in coverage paths, so compare
     # the stable repository-relative suffix rather than the absolute spelling.
-    EXCLUDED_SOURCE="${PERSISTENCE_STATUS_ADAPTER#"$PROJECT_ROOT"}|${PERSISTENCE_OWNER_ADAPTER#"$PROJECT_ROOT"}"
+    EXCLUDED_SOURCE="${PERSISTENCE_STATUS_ADAPTER#"$PROJECT_ROOT"}|${PERSISTENCE_ACCOUNT_ADAPTER#"$PROJECT_ROOT"}|${PERSISTENCE_OWNER_ADAPTER#"$PROJECT_ROOT"}"
   fi
 
   if TARGET_COVERAGE=$(printf '%s\n' "$TARGET_REPORT" | awk \

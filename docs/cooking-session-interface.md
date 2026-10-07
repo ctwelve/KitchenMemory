@@ -258,7 +258,7 @@ Apple documentation reviewed on 2026-09-26 supplies capability evidence:
 
 The maintainer accepted the disposable [#248 prototype](https://github.com/ctwelve/KitchenMemory/issues/248)
 on 2026-10-06 and confirmed hands-on input testing. Its source and evidence are
-retained on `slice/248-cooking-session-prototype`, outside `main`. That acceptance
+retained at [its fixed prototype commit](https://github.com/ctwelve/KitchenMemory/tree/f63c502de30077347731760ceb2da2020d680ed6/Tools/CookingSessionPrototype), outside `main`. That acceptance
 settles the interaction direction and releases the reading/progress and
 notes/Finish prototype gates. Production interactions still require proportionate
 rechecks and later comprehensive interface QA; prototype acceptance does not

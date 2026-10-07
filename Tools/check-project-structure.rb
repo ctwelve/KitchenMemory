@@ -144,6 +144,8 @@ module KitchenMemory
     NON_PRODUCT_TOOLS = %w[
       CloudKitProductionSchemaAdmin
       SessionCloudKitAcceptance
+      CookingSessionPrototype
+      PrimaryScreenPrototype
     ].freeze
     SHARED_SOURCE_INFO_PLIST_KEYS = %w[
       KitchenMemoryCloudKitContainerIdentifier

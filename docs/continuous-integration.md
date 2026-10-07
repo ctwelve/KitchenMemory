@@ -308,7 +308,7 @@ Later runner failures remain failures requiring investigation.
 To temporarily suspend UI tests, disable the UI target in the affected test plan
 and document the reason. Neither the GitHub workflow nor Cloud action needs to
 change. Preserve the target reference so re-enabling it is a plan-only edit.
-Historical context: [the activation research](research/macos-cloud-ui-test-activation.md).
+Historical context: [the activation research](https://github.com/ctwelve/KitchenMemory/blob/ed91dc532235e0bd6c1571853c0ccb78eee62b66/docs/research/macos-cloud-ui-test-activation.md).
 
 Application-hosted XCTest processes also select an in-memory store in those two
 testing configurations by detecting Xcode's hosted-test environment. This keeps
@@ -369,6 +369,14 @@ its rounded percentage. It prints evidence for KitchenKit and fails when the
 target or current source is missing, when even one executable line is uncovered,
 or when source, tests, project membership, or resolved dependencies changed
 after the bundle's recorded build start.
+
+The narrow Apple-runtime exceptions are `PersonalCloudStatusMonitor`,
+`CloudKitAccountChecker`, and `CloudKitKitchenOwnerIDResolver` under
+`KitchenKit/Interface/Persistence/Cloud/`. The account checker was formerly
+colocated with the monitor; splitting its file does not change this boundary.
+Their deterministic status reducer remains inside the exact gate. Missing
+exception paths fail validation explicitly so a source move cannot silently
+change the accounting.
 
 ### Deterministic property-test corpora
 
