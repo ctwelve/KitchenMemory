@@ -62,7 +62,6 @@
 
 /* Begin PBXFileReference section */
 		A15E8F41303912A6009B0A22 /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
-		A188D44E3075FD19001F8C79 /* CookingSessionPrototype.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = CookingSessionPrototype.xcodeproj; sourceTree = "<group>"; };
 		A1BC7A50303F76CE0082EE96 /* AGENTS.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = AGENTS.md; sourceTree = "<group>"; };
 		A1BC7A51303F76CE0082EE96 /* AI.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = AI.md; sourceTree = "<group>"; };
 		A1BC7A52303F76CE0082EE96 /* DEPENDENCIES.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = DEPENDENCIES.md; sourceTree = "<group>"; };
@@ -81,12 +80,12 @@
 		A11789FE303D332A009F963D /* Exceptions for "KitchenMemory" folder in "KitchenMemory" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				"Info-iOS.plist",
-				"Info-macOS.plist",
+				"Resources/Info-iOS.plist",
+				"Resources/Info-macOS.plist",
 			);
 			platformFiltersByRelativePath = {
-				"/Localized: LaunchScreen.storyboard" = (ios, );
-				LaunchScreenAssets.xcassets = (ios, );
+				"/Localized: Resources/LaunchScreen.storyboard" = (ios, );
+				Resources/LaunchScreenAssets.xcassets = (ios, );
 			};
 			target = A1C4E79D302A63B800E2C0DB /* KitchenMemory */;
 		};
@@ -174,11 +173,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		A188D4873075FD19001F8C79 /* Products */ = {
-			isa = PBXGroup;
-			name = Products;
-			sourceTree = "<group>";
-		};
 		A1C4E795302A63B800E2C0DB = {
 			isa = PBXGroup;
 			children = (
@@ -413,12 +407,6 @@
 			preferredProjectObjectVersion = 100;
 			productRefGroup = A1C4E79F302A63B800E2C0DB /* Products */;
 			projectDirPath = "";
-			projectReferences = (
-				{
-					ProductGroup = A188D4873075FD19001F8C79 /* Products */;
-					ProjectRef = A188D44E3075FD19001F8C79 /* CookingSessionPrototype.xcodeproj */;
-				},
-			);
 			projectRoot = "";
 			targets = (
 				A1C4E79D302A63B800E2C0DB /* KitchenMemory */,
@@ -462,8 +450,8 @@
 		C20000000000000000000001 /* Embed Localization Catalog Contract */ = {
 			isa = PBXShellScriptBuildPhase;
 			inputPaths = (
-				"$(SRCROOT)/KitchenMemory/Localizable.xcstrings",
-				"$(SRCROOT)/KitchenMemory/InfoPlist.xcstrings",
+				"$(SRCROOT)/KitchenMemory/Resources/Localizable.xcstrings",
+				"$(SRCROOT)/KitchenMemory/Resources/InfoPlist.xcstrings",
 			);
 			name = "Embed Localization Catalog Contract";
 			outputPaths = (
@@ -691,9 +679,9 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
-				"CODE_SIGN_ENTITLEMENTS[sdk=iphoneos*]" = "KitchenMemory/KitchenMemory-iOS.entitlements";
-				"CODE_SIGN_ENTITLEMENTS[sdk=iphonesimulator*]" = "KitchenMemory/KitchenMemory-iOS.entitlements";
-				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = "KitchenMemory/KitchenMemory-macOS.entitlements";
+				"CODE_SIGN_ENTITLEMENTS[sdk=iphoneos*]" = "KitchenMemory/Resources/KitchenMemory-iOS.entitlements";
+				"CODE_SIGN_ENTITLEMENTS[sdk=iphonesimulator*]" = "KitchenMemory/Resources/KitchenMemory-iOS.entitlements";
+				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = "KitchenMemory/Resources/KitchenMemory-macOS.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -704,9 +692,9 @@
 				ENABLE_PREVIEWS = YES;
 				"ENABLE_USER_SELECTED_FILES[sdk=macosx*]" = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
-				"INFOPLIST_FILE[sdk=iphoneos*]" = "KitchenMemory/Info-iOS.plist";
-				"INFOPLIST_FILE[sdk=iphonesimulator*]" = "KitchenMemory/Info-iOS.plist";
-				"INFOPLIST_FILE[sdk=macosx*]" = "KitchenMemory/Info-macOS.plist";
+				"INFOPLIST_FILE[sdk=iphoneos*]" = "KitchenMemory/Resources/Info-iOS.plist";
+				"INFOPLIST_FILE[sdk=iphonesimulator*]" = "KitchenMemory/Resources/Info-iOS.plist";
+				"INFOPLIST_FILE[sdk=macosx*]" = "KitchenMemory/Resources/Info-macOS.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = KitchenMemory;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.food-and-drink";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Kitchen Memory Project contributors.";
@@ -714,7 +702,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 27.0;
-				MARKETING_VERSION = 0.3.7;
+				MARKETING_VERSION = 0.3.13;
 				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory;
 				PRODUCT_NAME = KitchenMemory;
 				REGISTER_APP_GROUPS = YES;
@@ -741,9 +729,9 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
-				"CODE_SIGN_ENTITLEMENTS[sdk=iphoneos*]" = "KitchenMemory/KitchenMemory-iOS.entitlements";
-				"CODE_SIGN_ENTITLEMENTS[sdk=iphonesimulator*]" = "KitchenMemory/KitchenMemory-iOS.entitlements";
-				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = "KitchenMemory/KitchenMemory-macOS.entitlements";
+				"CODE_SIGN_ENTITLEMENTS[sdk=iphoneos*]" = "KitchenMemory/Resources/KitchenMemory-iOS.entitlements";
+				"CODE_SIGN_ENTITLEMENTS[sdk=iphonesimulator*]" = "KitchenMemory/Resources/KitchenMemory-iOS.entitlements";
+				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = "KitchenMemory/Resources/KitchenMemory-macOS.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -754,9 +742,9 @@
 				ENABLE_PREVIEWS = YES;
 				"ENABLE_USER_SELECTED_FILES[sdk=macosx*]" = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
-				"INFOPLIST_FILE[sdk=iphoneos*]" = "KitchenMemory/Info-iOS.plist";
-				"INFOPLIST_FILE[sdk=iphonesimulator*]" = "KitchenMemory/Info-iOS.plist";
-				"INFOPLIST_FILE[sdk=macosx*]" = "KitchenMemory/Info-macOS.plist";
+				"INFOPLIST_FILE[sdk=iphoneos*]" = "KitchenMemory/Resources/Info-iOS.plist";
+				"INFOPLIST_FILE[sdk=iphonesimulator*]" = "KitchenMemory/Resources/Info-iOS.plist";
+				"INFOPLIST_FILE[sdk=macosx*]" = "KitchenMemory/Resources/Info-macOS.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = KitchenMemory;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.food-and-drink";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Kitchen Memory Project contributors.";
@@ -764,7 +752,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 27.0;
-				MARKETING_VERSION = 0.3.7;
+				MARKETING_VERSION = 0.3.13;
 				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory;
 				PRODUCT_NAME = KitchenMemory;
 				REGISTER_APP_GROUPS = YES;
@@ -1732,9 +1720,9 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
-				"CODE_SIGN_ENTITLEMENTS[sdk=iphoneos*]" = "KitchenMemory/KitchenMemory-iOS.entitlements";
-				"CODE_SIGN_ENTITLEMENTS[sdk=iphonesimulator*]" = "KitchenMemory/KitchenMemory-iOS.entitlements";
-				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = "KitchenMemory/KitchenMemory-macOS.entitlements";
+				"CODE_SIGN_ENTITLEMENTS[sdk=iphoneos*]" = "KitchenMemory/Resources/KitchenMemory-iOS.entitlements";
+				"CODE_SIGN_ENTITLEMENTS[sdk=iphonesimulator*]" = "KitchenMemory/Resources/KitchenMemory-iOS.entitlements";
+				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = "KitchenMemory/Resources/KitchenMemory-macOS.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -1745,9 +1733,9 @@
 				ENABLE_PREVIEWS = YES;
 				"ENABLE_USER_SELECTED_FILES[sdk=macosx*]" = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
-				"INFOPLIST_FILE[sdk=iphoneos*]" = "KitchenMemory/Info-iOS.plist";
-				"INFOPLIST_FILE[sdk=iphonesimulator*]" = "KitchenMemory/Info-iOS.plist";
-				"INFOPLIST_FILE[sdk=macosx*]" = "KitchenMemory/Info-macOS.plist";
+				"INFOPLIST_FILE[sdk=iphoneos*]" = "KitchenMemory/Resources/Info-iOS.plist";
+				"INFOPLIST_FILE[sdk=iphonesimulator*]" = "KitchenMemory/Resources/Info-iOS.plist";
+				"INFOPLIST_FILE[sdk=macosx*]" = "KitchenMemory/Resources/Info-macOS.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = KitchenMemory;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.food-and-drink";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Kitchen Memory Project contributors.";
@@ -1755,7 +1743,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 27.0;
-				MARKETING_VERSION = 0.3.7;
+				MARKETING_VERSION = 0.3.13;
 				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.dev.KitchenMemory;
 				PRODUCT_NAME = KitchenMemory;
 				REGISTER_APP_GROUPS = YES;
@@ -1921,9 +1909,9 @@
 				ENABLE_PREVIEWS = YES;
 				"ENABLE_USER_SELECTED_FILES[sdk=macosx*]" = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
-				"INFOPLIST_FILE[sdk=iphoneos*]" = "KitchenMemory/Info-iOS.plist";
-				"INFOPLIST_FILE[sdk=iphonesimulator*]" = "KitchenMemory/Info-iOS.plist";
-				"INFOPLIST_FILE[sdk=macosx*]" = "KitchenMemory/Info-macOS.plist";
+				"INFOPLIST_FILE[sdk=iphoneos*]" = "KitchenMemory/Resources/Info-iOS.plist";
+				"INFOPLIST_FILE[sdk=iphonesimulator*]" = "KitchenMemory/Resources/Info-iOS.plist";
+				"INFOPLIST_FILE[sdk=macosx*]" = "KitchenMemory/Resources/Info-macOS.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = KitchenMemory;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.food-and-drink";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Kitchen Memory Project contributors.";
@@ -1931,7 +1919,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 27.0;
-				MARKETING_VERSION = 0.3.7;
+				MARKETING_VERSION = 0.3.13;
 				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory;
 				PRODUCT_NAME = KitchenMemory;
 				REGISTER_APP_GROUPS = YES;
@@ -2090,9 +2078,9 @@
 				ENABLE_PREVIEWS = YES;
 				"ENABLE_USER_SELECTED_FILES[sdk=macosx*]" = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
-				"INFOPLIST_FILE[sdk=iphoneos*]" = "KitchenMemory/Info-iOS.plist";
-				"INFOPLIST_FILE[sdk=iphonesimulator*]" = "KitchenMemory/Info-iOS.plist";
-				"INFOPLIST_FILE[sdk=macosx*]" = "KitchenMemory/Info-macOS.plist";
+				"INFOPLIST_FILE[sdk=iphoneos*]" = "KitchenMemory/Resources/Info-iOS.plist";
+				"INFOPLIST_FILE[sdk=iphonesimulator*]" = "KitchenMemory/Resources/Info-iOS.plist";
+				"INFOPLIST_FILE[sdk=macosx*]" = "KitchenMemory/Resources/Info-macOS.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = KitchenMemory;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.food-and-drink";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Kitchen Memory Project contributors.";
@@ -2100,7 +2088,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 27.0;
-				MARKETING_VERSION = 0.3.7;
+				MARKETING_VERSION = 0.3.13;
 				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory;
 				PRODUCT_NAME = KitchenMemory;
 				REGISTER_APP_GROUPS = YES;

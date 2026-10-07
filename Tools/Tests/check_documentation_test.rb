@@ -101,7 +101,7 @@ class DocumentationContractTest < Minitest::Test
   def with_topology
     paths = %w[docs/implementation-architecture.md docs/localization-architecture.md
       docs/continuous-integration.md KitchenMemory.xcodeproj/project.pbxproj
-      Configurations/LocalizationContract.json KitchenKit/Persistence/KitchenMemorySchema.swift]
+      Configurations/LocalizationContract.json KitchenKit/Interface/Persistence/KitchenMemorySchema.swift]
     paths.concat(Dir.glob(File.join(ROOT, "*.xctestplan")).map { |path| path.delete_prefix(ROOT + "/") })
     paths.concat(Dir.glob(File.join(ROOT, "KitchenMemory.xcodeproj/xcshareddata/xcschemes/*.xcscheme")).map { |path| path.delete_prefix(ROOT + "/") })
     files = paths.to_h { |path| [path, File.read(File.join(ROOT, path))] }
@@ -109,7 +109,9 @@ class DocumentationContractTest < Minitest::Test
     files["docs/old.md"] = "# Old record\nKitchenMemoryIOS and KitchenDomain"
     files["docs/adr/0009.md"] = "# Old decision\nKitchenMemoryMacOS"
     with_tree(files) do |root, docs|
-      %w[Domain Import Logic Persistence].each { |name| FileUtils.mkdir_p(File.join(root, "KitchenKit", name)) }
+      %w[Interface Modules].each do |home|
+        %w[Domain Import Logic Persistence].each { |name| FileUtils.mkdir_p(File.join(root, "KitchenKit", home, name)) }
+      end
       yield root, docs
     end
   end
@@ -126,7 +128,7 @@ class DocumentationContractTest < Minitest::Test
   def test_target_and_schema_changes_need_documentation
     with_topology do |root, docs|
       mutate(root, "KitchenMemory.xcodeproj/project.pbxproj") { |text| text.sub("name = KitchenKit;", "name = NewCore;") }
-      mutate(root, "KitchenKit/Persistence/KitchenMemorySchema.swift") { |text| text.sub("= KitchenMemorySchemaV7", "= KitchenMemorySchemaV8") }
+      mutate(root, "KitchenKit/Interface/Persistence/KitchenMemorySchema.swift") { |text| text.sub("= KitchenMemorySchemaV7", "= KitchenMemorySchemaV8") }
       errors = Contract.topology_errors(root, docs)
       assert errors.any? { |error| error.start_with?("target inventory") }
       assert_includes errors, "current schema differs from implementation guide"
@@ -140,7 +142,7 @@ class DocumentationContractTest < Minitest::Test
         value["locales"] << "ja-JP"
         JSON.generate(value)
       end
-      FileUtils.mkdir_p(File.join(root, "KitchenKit/NewBoundary"))
+      FileUtils.mkdir_p(File.join(root, "KitchenKit/Modules/NewBoundary"))
       errors = Contract.topology_errors(root, docs)
       assert errors.any? { |error| error.start_with?("locale inventory") }
       assert errors.any? { |error| error.start_with?("KitchenKit responsibilities") }

@@ -110,14 +110,25 @@ class LocalizationContractTest < Minitest::Test
 
   def test_application_default_name_boundaries_reject_literal_fallbacks
     {
-      "KitchenMemory/Composition/AppRuntime.swift" => 'prepareInitialKitchenWithStatus(named: "Home Kitchen")',
-      "KitchenMemory/PlatformAdapters/AppStoreRefresh.swift" => 'let name = kitchen?.name ?? "Home Kitchen"',
+      "KitchenMemory/Modules/Composition/AppRuntime.swift" => 'prepareInitialKitchenWithStatus(named: "Home Kitchen")',
+      "KitchenMemory/Modules/PlatformAdapters/AppStoreRefresh.swift" => 'let name = kitchen?.name ?? "Home Kitchen"',
     }.each do |path, source|
       refute_empty Contract.default_name_errors({path => source})
     end
     assert_empty Contract.default_name_errors({
-      "KitchenMemory/PlatformAdapters/AppStoreRefresh.swift" =>
+      "KitchenMemory/Modules/PlatformAdapters/AppStoreRefresh.swift" =>
         'let name = kitchen?.name ?? LocalizedStringResource.kitchenDefaultName.localized(for: locale)',
     })
   end
+  def test_launch_screen_requires_complete_nonempty_translations_for_every_locale
+    storyboard = '<document><label id="title" text="Title"/></document>'
+    translations = {"en-US" => '"title.text" = "Title";', "fr-CA" => '"title.text" = "Titre";'}
+    locales = translations.keys
+    assert_empty Contract.launch_screen_errors(storyboard, translations, locales)
+    [nil, '', '"other.text" = "Titre";', '"title.text" = " ";',
+     '"title.text" = "Titre"; "title.text" = "Autre";', '"title.text" = "Titre"'].each do |invalid|
+      refute_empty Contract.launch_screen_errors(storyboard, translations.merge("fr-CA" => invalid), locales)
+    end
+  end
+
 end

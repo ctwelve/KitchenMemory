@@ -18,7 +18,7 @@ package-first rule would outsource product policy and accumulate dependencies
 before their benefit is demonstrated. Building every capability locally would
 discard mature implementations and make the project own unnecessary code.
 
-The [Swift tooling ecosystem survey](../research/swift-tooling-ecosystem-survey.md)
+The [Swift tooling ecosystem survey](https://github.com/ctwelve/KitchenMemory/blob/ed91dc532235e0bd6c1571853c0ccb78eee62b66/docs/research/swift-tooling-ecosystem-survey.md)
 provides the initial evidence base. The existing use of Defaults demonstrates a
 third-party package that earns its place through a focused preferences
 abstraction. The bounded `URLSession` recipe retriever demonstrates the other

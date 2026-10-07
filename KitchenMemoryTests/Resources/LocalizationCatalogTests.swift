@@ -101,6 +101,45 @@ final class LocalizationCatalogTests: XCTestCase {
     }
   }
 
+  #if os(iOS)
+  func testHostedApplicationBundleContainsLocalizedLaunchScreenStrings() throws {
+    let storyboardKeys = ["KmT-it-Le1.text", "PrP-ar-InG.text", "CpR-ig-Ht1.text"]
+    let applicationBundleURL = Bundle.main.bundleURL
+
+    for locale in supportedLocales {
+      let stringsURL = applicationBundleURL
+        .appendingPathComponent("\(locale).lproj", isDirectory: true)
+        .appendingPathComponent("LaunchScreen.strings")
+      XCTAssertTrue(
+        FileManager.default.fileExists(atPath: stringsURL.path),
+        "Missing bundled LaunchScreen.strings for \(locale)"
+      )
+
+      let data = try Data(contentsOf: stringsURL)
+      let propertyList = try PropertyListSerialization.propertyList(
+        from: data,
+        options: [],
+        format: nil
+      )
+      let localizedStrings = try XCTUnwrap(
+        propertyList as? [String: String],
+        "Malformed LaunchScreen.strings for \(locale)"
+      )
+
+      for key in storyboardKeys {
+        let value = try XCTUnwrap(
+          localizedStrings[key],
+          "Missing storyboard key \(key) for \(locale)"
+        )
+        XCTAssertFalse(value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+      }
+
+      let productTitle = try XCTUnwrap(localizedStrings[storyboardKeys[0]])
+      XCTAssertEqual(productTitle, localizedProductNames[locale])
+    }
+  }
+  #endif
+
   private func assertCompleteLocalizations(
     _ localizations: [String: Any],
     key: String

@@ -400,20 +400,49 @@ class CheckProjectStructureTest < Minitest::Test
     assert_includes error.message, "KitchenMemory/LooseView.swift"
   end
 
+  def test_accepts_interface_and_module_homes_with_root_application_entry
+    KitchenMemory::ProjectStructure.validate_application_source_taxonomy(
+      application_sources: {
+        "KitchenMemory/KitchenMemoryApp.swift" => "import SwiftUI\n",
+        "KitchenMemory/Interface/Settings/Preferences.swift" => "import Foundation\n",
+        "KitchenMemory/Modules/Settings/Preferences.swift" => "import Foundation\n"
+      },
+      kitchen_kit_sources: {
+        "KitchenKit/Interface/Persistence/RecipeRepository.swift" => "import Foundation\n",
+        "KitchenKit/Modules/Persistence/RecipeRecords.swift" => "import SwiftData\n"
+      }
+    )
+  end
+
+  def test_rejects_swift_implementation_in_resources_or_legacy_homes
+    %w[KitchenMemory/Resources/Provider.swift KitchenMemory/Features/Settings/Preferences.swift].each do |path|
+      assert_contract_error do
+        KitchenMemory::ProjectStructure.validate_application_source_taxonomy(
+          application_sources: {path => "import Foundation\n"}, kitchen_kit_sources: {}
+        )
+      end
+    end
+    assert_contract_error do
+      KitchenMemory::ProjectStructure.validate_application_source_taxonomy(
+        application_sources: {}, kitchen_kit_sources: {"KitchenKit/Domain/Recipe.swift" => "import Foundation\n"}
+      )
+    end
+  end
+
   def test_rejects_presentation_implementation_in_kitchen_kit
     error = assert_contract_error do
       KitchenMemory::ProjectStructure.validate_application_source_taxonomy(
         application_sources: {
-          "KitchenMemory/Composition/KitchenMemoryApp.swift" => "import SwiftUI\n"
+          "KitchenMemory/KitchenMemoryApp.swift" => "import SwiftUI\n"
         },
         kitchen_kit_sources: {
-          "KitchenKit/Logic/AccidentalView.swift" => "import SwiftUI\n"
+          "KitchenKit/Modules/Logic/AccidentalView.swift" => "import SwiftUI\n"
         }
       )
     end
 
     assert_includes error.message, "presentation implementation must remain outside KitchenKit"
-    assert_includes error.message, "KitchenKit/Logic/AccidentalView.swift"
+    assert_includes error.message, "KitchenKit/Modules/Logic/AccidentalView.swift"
   end
 
   def test_rejects_scoped_and_attributed_presentation_imports_in_kitchen_kit
@@ -424,7 +453,7 @@ class CheckProjectStructureTest < Minitest::Test
       assert_contract_error do
         KitchenMemory::ProjectStructure.validate_application_source_taxonomy(
           application_sources: {},
-          kitchen_kit_sources: {"KitchenKit/Logic/AccidentalView.swift" => contents}
+          kitchen_kit_sources: {"KitchenKit/Modules/Logic/AccidentalView.swift" => contents}
         )
       end
     end
@@ -442,7 +471,7 @@ class CheckProjectStructureTest < Minitest::Test
 
     KitchenMemory::ProjectStructure.validate_application_source_taxonomy(
       application_sources: {},
-      kitchen_kit_sources: {"KitchenKit/Logic/ImportExample.swift" => contents}
+      kitchen_kit_sources: {"KitchenKit/Modules/Logic/ImportExample.swift" => contents}
     )
   end
 
@@ -664,8 +693,8 @@ class CheckProjectStructureTest < Minitest::Test
   def test_rejects_wrong_platform_info_plist
     fixture = Fixture.new
     fixture.project.sub!(
-      '"INFOPLIST_FILE[sdk=macosx*]" = KitchenMemory/Info-macOS.plist;',
-      '"INFOPLIST_FILE[sdk=macosx*]" = KitchenMemory/Info-iOS.plist;'
+      '"INFOPLIST_FILE[sdk=macosx*]" = KitchenMemory/Resources/Info-macOS.plist;',
+      '"INFOPLIST_FILE[sdk=macosx*]" = KitchenMemory/Resources/Info-iOS.plist;'
     )
 
     error = assert_contract_error { validate(fixture) }
@@ -697,7 +726,7 @@ class CheckProjectStructureTest < Minitest::Test
   def test_rejects_missing_ios_info_plist_selection
     fixture = Fixture.new
     fixture.project.sub!(
-      "\t\t\t\t\"INFOPLIST_FILE[sdk=iphoneos*]\" = KitchenMemory/Info-iOS.plist;\n",
+      "\t\t\t\t\"INFOPLIST_FILE[sdk=iphoneos*]\" = KitchenMemory/Resources/Info-iOS.plist;\n",
       ""
     )
 
@@ -711,7 +740,7 @@ class CheckProjectStructureTest < Minitest::Test
     fixture.project.sub!(
       "\t\t\t\tPRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory;\n\t\t\t};\n\t\t\tname = Testing;",
       "\t\t\t\t\"CODE_SIGN_ENTITLEMENTS[sdk=iphoneos*]\" = " \
-        "\"KitchenMemory/KitchenMemory-iOS.entitlements\";\n" \
+        "\"KitchenMemory/Resources/KitchenMemory-iOS.entitlements\";\n" \
         "\t\t\t\tPRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory;\n" \
         "\t\t\t};\n\t\t\tname = Testing;"
     )
@@ -788,8 +817,8 @@ class CheckProjectStructureTest < Minitest::Test
   end
 
   def test_accepts_separate_editable_platform_info_plists
-    ios_contents = File.read(File.expand_path("../../KitchenMemory/Info-iOS.plist", __dir__))
-    macos_contents = File.read(File.expand_path("../../KitchenMemory/Info-macOS.plist", __dir__))
+    ios_contents = File.read(File.expand_path("../../KitchenMemory/Resources/Info-iOS.plist", __dir__))
+    macos_contents = File.read(File.expand_path("../../KitchenMemory/Resources/Info-macOS.plist", __dir__))
 
     KitchenMemory::ProjectStructure.validate_info_plist_sources(
       ios_contents: ios_contents,
@@ -798,8 +827,8 @@ class CheckProjectStructureTest < Minitest::Test
   end
 
   def test_rejects_ios_only_key_in_macos_info_plist
-    ios_contents = File.read(File.expand_path("../../KitchenMemory/Info-iOS.plist", __dir__))
-    macos_contents = File.read(File.expand_path("../../KitchenMemory/Info-macOS.plist", __dir__)).sub(
+    ios_contents = File.read(File.expand_path("../../KitchenMemory/Resources/Info-iOS.plist", __dir__))
+    macos_contents = File.read(File.expand_path("../../KitchenMemory/Resources/Info-macOS.plist", __dir__)).sub(
       "</dict>",
       "\t<key>UILaunchStoryboardName</key>\n\t<string>LaunchScreen</string>\n</dict>"
     )
@@ -816,11 +845,11 @@ class CheckProjectStructureTest < Minitest::Test
   end
 
   def test_rejects_ios_info_plist_without_remote_notification_mode
-    ios_contents = File.read(File.expand_path("../../KitchenMemory/Info-iOS.plist", __dir__)).sub(
+    ios_contents = File.read(File.expand_path("../../KitchenMemory/Resources/Info-iOS.plist", __dir__)).sub(
       "\t\t<string>remote-notification</string>\n",
       ""
     )
-    macos_contents = File.read(File.expand_path("../../KitchenMemory/Info-macOS.plist", __dir__))
+    macos_contents = File.read(File.expand_path("../../KitchenMemory/Resources/Info-macOS.plist", __dir__))
 
     error = assert_contract_error do
       KitchenMemory::ProjectStructure.validate_info_plist_sources(
@@ -833,10 +862,10 @@ class CheckProjectStructureTest < Minitest::Test
   end
 
   def test_rejects_mismatched_background_maintenance_identifier
-    ios_contents = File.read(File.expand_path("../../KitchenMemory/Info-iOS.plist", __dir__)).sub(
+    ios_contents = File.read(File.expand_path("../../KitchenMemory/Resources/Info-iOS.plist", __dir__)).sub(
       "net.ctwelve.KitchenMemory.maintenance", "net.ctwelve.KitchenMemory.wrong-task"
     )
-    macos_contents = File.read(File.expand_path("../../KitchenMemory/Info-macOS.plist", __dir__))
+    macos_contents = File.read(File.expand_path("../../KitchenMemory/Resources/Info-macOS.plist", __dir__))
     error = assert_contract_error do
       KitchenMemory::ProjectStructure.validate_info_plist_sources(
         ios_contents: ios_contents,

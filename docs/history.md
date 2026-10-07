@@ -43,9 +43,16 @@ Use commit-pinned links when citing retired files from issues or pull requests.
 
 - [Primary-screen slice validation](https://github.com/ctwelve/KitchenMemory/blob/f3592ce39af63b737b49ae7dee80cd558cc64b2a/docs/primary-screen-validation.md): completed #182/#189 evidence, integrated through [PR #209](https://github.com/ctwelve/KitchenMemory/pull/209).
 
-The disposable #183 prototype remains in [Git history](https://github.com/ctwelve/KitchenMemory/tree/8aa01d1/Tools/PrimaryScreenPrototype).
-Its implementation has been replaced by the production slice; no prototype
-project reference belongs in the shipping workspace.
+## Native interaction prototypes
+
+| Completed experiment | Retained evidence and boundary |
+| --- | --- |
+| [Primary-screen prototype (#183)](https://github.com/ctwelve/KitchenMemory/tree/8aa01d1c5c72a7862832a15ff3ed2ced0e3ebba6/Tools/PrimaryScreenPrototype) | Superseded by the production primary-screen slice. No prototype project reference belongs in the shipping workspace. |
+| [Cooking Session prototype (#248)](https://github.com/ctwelve/KitchenMemory/tree/f63c502de30077347731760ceb2da2020d680ed6/Tools/CookingSessionPrototype) | [Source and hands-on acceptance record](https://github.com/ctwelve/KitchenMemory/blob/f63c502de30077347731760ceb2da2020d680ed6/Tools/CookingSessionPrototype/EVIDENCE.md), accepted October 6, 2026, on its isolated prototype branch. [The interface contract](cooking-session-interface.md) owns the accepted direction; production input checks and comprehensive beta accessibility remain separate. |
+
+These synthetic, disposable apps are historical design evidence, not shipping
+modules or maintained validation tools. Completed research harnesses are routed
+from [the research index](research/README.md#completed-synthetic-experiments).
 
 ## Platform 27 and release validation
 

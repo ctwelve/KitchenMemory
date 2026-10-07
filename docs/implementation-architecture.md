@@ -12,6 +12,16 @@ the same core; source folders are responsibility boundaries, not Swift modules.
 For symbol entry points, use the [KitchenKit](../KitchenKit/KitchenKit.docc/KitchenKit.md)
 and [application](../KitchenMemory/Documentation.docc/Documentation.md) DocC guides.
 
+## Source organization
+
+[ADR 0023](adr/0023-interface-first-source-organization.md) organizes source into
+`Interface/`, `Modules/`, and `Resources/` so readers can start with contracts and
+descend into implementation. These directories do not create Swift modules or
+new link products. Public declarations retain their existing visibility and
+behavior. Swift declarations that need colocated private state or naturally
+small bodies stay together in `Interface/`; standalone internal implementation
+and helpers live in `Modules/`. No forwarding types are required by the layout.
+
 ## Target organization
 
 | Target | Product |
@@ -24,9 +34,9 @@ and [application](../KitchenMemory/Documentation.docc/Documentation.md) DocC gui
 
 ### KitchenKit responsibilities
 
-KitchenKit has four responsibility roots:
+KitchenKit keeps four responsibilities beneath `Interface/` and `Modules/`:
 
-| Folder | Ownership |
+| Responsibility | Ownership |
 | --- | --- |
 | `Domain` | Values, identities, invariants, evidence projections |
 | `Import` | Bounded webpage retrieval and deterministic Schema.org normalization |
@@ -39,41 +49,53 @@ saving. Logic coordinates product operations; Persistence fulfills domain-facing
 repository contracts. SwiftUI, UIKit, and AppKit remain outside KitchenKit.
 Package choices and linkage exceptions live in [DEPENDENCIES.md](../DEPENDENCIES.md).
 
+### Import implementation
+
+`Interface/Import/SchemaOrgRecipeImporter.swift` owns configuration and the public
+captured-HTML/JSON-LD entry points. `Modules/Import/` keeps ordered candidate
+discovery, HTML scanning, bounded JSON admission, Schema.org field/content
+normalization, and retained-output accounting separate by responsibility. These
+helpers share the same import limits; hitting a resource ceiling still invalidates
+the whole candidate result. None performs network access or persistence.
+
 ### Application presentation taxonomy
 
 
-Application Swift sources use feature and responsibility homes inside the one
+Application Swift sources retain feature and responsibility homes inside the one
 multiplatform `KitchenMemory` target:
 
 ```text
 KitchenMemory/
-├── Composition/             app entry point, launch policy, runtime, and shell
-├── Features/
-│   ├── RecipeLibrary/       browsing, editing, importing, and scaling
-│   ├── CookingSession/      active work, history, recovery, and session outbox
-│   ├── Settings/            preferences, privacy, sync, and destructive reset
-│   └── Startup/             loading, failure, and sample-recipe decisions
-├── SharedPresentation/      localization and cross-feature presentation help
-├── Resources/               application-owned catalog models and providers
-└── PlatformAdapters/        store refresh and platform identity bridges
+├── KitchenMemoryApp.swift   native application entry point
+├── Interface/              callable contracts, grouped by module
+│   ├── CookingSession/     Session operations and local-store contracts
+│   ├── Settings/           preference capabilities
+│   └── Samples/            bundled Recipe values and catalog entry points
+├── Modules/
+│   ├── Composition/        launch policy, runtime, shell and navigation
+│   ├── RecipeLibrary/      browsing, editing, importing and scaling
+│   ├── CookingSession/     active work, history, recovery and delivery
+│   ├── Settings/           preferences, privacy, sync and reset
+│   ├── Startup/            loading, failure and sample decisions
+│   ├── SharedPresentation/ localization and shared display help
+│   ├── Samples/            bundled Recipe provider
+│   └── PlatformAdapters/   store refresh and native bridges
+├── Resources/              catalogs, assets, launch files and configuration
+└── Documentation.docc/     source entry-point guide
 ```
 
-The synchronized `KitchenMemory/` source root still owns all of these folders,
-the String Catalogs, asset catalogs, privacy manifest, property lists,
-entitlements, and localized launch resources. Folders express application
-ownership; they are not new targets, modules, visibility boundaries, or
-dependency seams. Hosted tests mirror feature or responsibility ownership under
-`KitchenMemoryTests/`. The separate `KitchenMemoryUITests/` target remains one
-small accessible top-level navigation suite rather than a second presentation
-consumer.
+Application-internal protocols remain internal in `Interface/`. Views and
+observable presentation implementations remain in their owning `Modules/`
+folders. The synchronized source root still owns the same files and resources;
+resource bundle names and lookup remain unchanged. Hosted tests retain their
+existing feature/responsibility organization under `KitchenMemoryTests/`.
 
-The project-structure contract rejects application Swift files outside this
-taxonomy, rejects new KitchenKit responsibility roots, and rejects SwiftUI,
-UIKit, or AppKit imports in `KitchenKit`. A private `KitchenUI` framework should
-be reconsidered only when evidence establishes at least one of these pressures:
-a second real consumer, a distinct dependency footprint, a need for independent
-evolution, or measured build cost that a separate module would improve. Folder
-size or a desire for tidier navigation alone is not that evidence.
+The project-structure contract checks the interface and implementation homes,
+allows only the application entry point as root Swift source, and rejects Swift
+source in `Resources/` or presentation-framework imports in KitchenKit. A private
+`KitchenUI` framework should be reconsidered only for a second real consumer,
+a distinct dependency footprint, independent evolution, or measured build cost.
+Source organization alone does not require a separate target.
 
 The shared SwiftUI interface remains provisional under
 [ADR 0006](adr/0006-shared-ui-for-foundation-slices.md). Platform-specific
@@ -215,6 +237,16 @@ composition while stable snapshot row identities survive recomposition.
 main-actor adapters over the same container. Callers receive domain values and
 classified evidence, never live SwiftData records. Each transaction uses its
 actor-bound context; background work cannot move records between actors.
+
+`SwiftDataRecipeRepository` retains its public operations and isolated transaction
+boundary in `Interface/Persistence/`. Its context-bound implementation lives in
+`Modules/Persistence/`: `RecipePayloadStore` owns deployed payload encoding and
+reconstruction, `RecipeAuthorityReader` assembles retained evidence,
+`RecipeAuthorityWriter` validates and accepts immutable commands, and
+`KitchenRecordStore` handles Kitchen ownership and convergence. Each helper uses
+the repository's exact context; a write constructs a fresh repository and helper
+set inside the existing isolated-write lifetime. Codecs and managed records remain
+internal, and this separation does not change stored formats or schema membership.
 Immutable commands, exact retries, duplicate/collision handling, and partial
 CloudKit delivery are resolved behind these interfaces.
 
