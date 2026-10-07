@@ -51,10 +51,14 @@ struct CookingSessionIngredientList: View {
         ? LocalizedStringResource.sessionProgressIngredientAccounted
         : .sessionProgressIngredientOpen))
       .accessibilityIdentifier("session-ingredient-\(ingredient.id.rawValue.uuidString)")
-      Text(RecipePresentationFormatter(locale: locale).ingredient(
-        cookingSessionIngredientValue(ingredient, in: session)))
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.top, 12)
+      VStack(alignment: .leading, spacing: 8) {
+        Text(RecipePresentationFormatter(locale: locale).ingredient(
+          cookingSessionIngredientValue(ingredient, in: session)))
+          .frame(maxWidth: .infinity, alignment: .leading)
+          .padding(.top, 12)
+        CookingSessionIngredientScaleGuidance(session: session, ingredient: ingredient)
+        CookingSessionTargetNotes(model: model, session: session, target: .ingredient(ingredient.id))
+      }
     }
   }
 }

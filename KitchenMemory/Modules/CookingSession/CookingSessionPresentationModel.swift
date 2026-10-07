@@ -58,6 +58,9 @@ final class CookingSessionPresentationModel {
   var recoverySessionCount = 0
   var issue: CookingSessionPresentationIssue?
   var isShowingIssue = false
+  var isShowingEntryComposer = false
+  var entryComposerOrigin: UUID?
+  @ObservationIgnored var pendingEntryComposerResumes: [SessionFact.ID: PendingEntryComposerResume] = [:]
   private(set) var hasLoaded = false
   let delivery: CookingSessionDelivery
   var entryDrafts: [CookingSessionEntryDraft] { delivery.entryDrafts }
@@ -136,6 +139,9 @@ final class CookingSessionPresentationModel {
   func resetAfterKitchenReset() {
     delivery.reset()
     pendingNavigationOrigins = [:]
+    pendingEntryComposerResumes = [:]
+    isShowingEntryComposer = false
+    entryComposerOrigin = nil
     sessions = []
     finishedSessions = []
     deletedSessions = []
@@ -191,7 +197,12 @@ final class CookingSessionPresentationModel {
   func select(_ id: CookingSession.ID?, recordsVisit: Bool = true) -> Bool {
     let next: RecipeLibraryNavigation.Destination = id.map { .session($0, history: historyScope) }
       ?? historyScope.map { .history($0) } ?? .recipe
+    let previousSessionID = currentSessionID
     guard navigation.move(to: next) else { return false }
+    if currentSessionID != previousSessionID {
+      isShowingEntryComposer = false
+      entryComposerOrigin = nil
+    }
     if let currentSession { prepareReadingPreference(for: currentSession) }
     if let id, recordsVisit { recordVisit(to: id) }
     return true

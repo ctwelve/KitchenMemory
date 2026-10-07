@@ -8,6 +8,7 @@ import SwiftUI
 /// Read retained cooking context without reconstructing a live Recipe revision.
 struct CookingSessionSnapshotContext: View {
   let snapshot: ExecutionSnapshot
+  var showsYield = true
   @Environment(\.locale) private var locale
 
   var body: some View {
@@ -15,7 +16,7 @@ struct CookingSessionSnapshotContext: View {
       if let summary = snapshot.summary { Text(summary).font(.title3) }
       if let author = snapshot.authorName { Text(.recipeDetailAuthor(author: author)) }
       durations
-      if let yield = snapshot.baseYield {
+      if showsYield, let yield = snapshot.baseYield {
         LabeledContent(.recipeMetadataYield,
           value: RecipeScalingState(recipeYield: yield).displayedYield(locale: locale))
       }

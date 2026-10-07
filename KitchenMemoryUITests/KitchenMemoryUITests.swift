@@ -20,7 +20,7 @@ final class KitchenMemoryUITests: XCTestCase {
     let shell = app.descendants(matching: .any)["recipe-library-shell"]
     revealSidebar(in: app, exposing: shell)
     XCTAssertTrue(shell.waitForExistence(timeout: 5))
-    assertAccessibleLabel(shell, description: "recipe library")
+    assertAccessibleName(shell, description: "recipe library")
 
     visitTopLevelDestination(
       "sessions-destination",
@@ -40,7 +40,7 @@ final class KitchenMemoryUITests: XCTestCase {
     let allRecipes = app.buttons["all-recipes-destination"]
     revealSidebar(in: app, exposing: allRecipes)
     XCTAssertTrue(allRecipes.waitForExistence(timeout: 5))
-    assertAccessibleLabel(allRecipes, description: "All Recipes")
+    assertAccessibleName(allRecipes, description: "All Recipes")
     activate(allRecipes)
 
     let recipeRow = app.buttons
@@ -48,12 +48,12 @@ final class KitchenMemoryUITests: XCTestCase {
       .firstMatch
     revealSidebar(in: app, exposing: recipeRow)
     XCTAssertTrue(recipeRow.waitForExistence(timeout: 5))
-    assertAccessibleLabel(recipeRow, description: "recipe")
+    assertAccessibleName(recipeRow, description: "recipe")
     activate(recipeRow)
 
     let recipeDetail = app.descendants(matching: .any)["recipe-detail"]
     XCTAssertTrue(recipeDetail.waitForExistence(timeout: 5))
-    assertAccessibleLabel(recipeDetail, description: "recipe detail")
+    assertAccessibleName(recipeDetail, description: "recipe detail")
     app.terminate()
   }
 
@@ -81,10 +81,10 @@ final class KitchenMemoryUITests: XCTestCase {
     let reading = app.descendants(matching: .any)["cooking-session-shell"]
     XCTAssertTrue(reading.waitForExistence(timeout: 5))
     assertAccessibleText(reading, description: "Cooking Session reading")
-    for identifier in ["session-reading-jump", "session-reading-keep-awake", "stop-session", "leave-session"] {
+    for identifier in ["session-reading-jump", "session-reading-keep-awake", "session-lifecycle-menu", "leave-session"] {
       let control = app.descendants(matching: .any)[identifier].firstMatch
       XCTAssertTrue(control.waitForExistence(timeout: 5))
-      assertAccessibleLabel(control, description: identifier)
+      assertAccessibleName(control, description: identifier)
     }
     app.terminate()
   }
@@ -95,21 +95,21 @@ final class KitchenMemoryUITests: XCTestCase {
     let create = app.buttons["new-recipe"].firstMatch
     revealSidebar(in: app, exposing: create)
     XCTAssertTrue(create.waitForExistence(timeout: 5))
-    assertAccessibleLabel(create, description: "New Recipe")
+    assertAccessibleName(create, description: "New Recipe")
     activate(create)
     let title = app.textFields["recipe-editor-title"]
     XCTAssertTrue(title.waitForExistence(timeout: 5))
-    assertAccessibleLabel(title, description: "Recipe title")
+    assertAccessibleName(title, description: "Recipe title")
     let ingredients = app.textViews["simple-ingredient-text"]
     XCTAssertTrue(ingredients.waitForExistence(timeout: 5))
-    assertAccessibleLabel(ingredients, description: "Ingredients")
+    assertAccessibleName(ingredients, description: "Ingredients")
     let mode = app.buttons["recipe-editor-mode"]
     XCTAssertTrue(mode.waitForExistence(timeout: 5))
-    assertAccessibleLabel(mode, description: "Editor mode")
+    assertAccessibleName(mode, description: "Editor mode")
     activate(mode)
     let summary = app.textFields["recipe-editor-summary"]
     XCTAssertTrue(summary.waitForExistence(timeout: 5))
-    assertAccessibleLabel(summary, description: "Recipe summary")
+    assertAccessibleName(summary, description: "Recipe summary")
     app.terminate()
   }
 
@@ -119,11 +119,11 @@ final class KitchenMemoryUITests: XCTestCase {
     let destination = app.buttons["organization-management"].firstMatch
     revealSidebar(in: app, exposing: destination)
     XCTAssertTrue(destination.waitForExistence(timeout: 5))
-    assertAccessibleLabel(destination, description: "organization management")
+    assertAccessibleName(destination, description: "organization management")
     activate(destination)
     let content = app.descendants(matching: .any)["organization-management-content"]
     XCTAssertTrue(content.waitForExistence(timeout: 5))
-    assertAccessibleLabel(content, description: "organization management content")
+    assertAccessibleName(content, description: "organization management content")
     app.terminate()
   }
 
@@ -158,7 +158,7 @@ final class KitchenMemoryUITests: XCTestCase {
     let retry = app.buttons["retry-startup"]
     ensurePrimaryWindow(in: app, exposing: retry)
     XCTAssertTrue(retry.waitForExistence(timeout: 5))
-    assertAccessibleLabel(retry, description: "startup recovery action")
+    assertAccessibleName(retry, description: "startup recovery action")
     app.terminate()
   }
 
@@ -171,7 +171,7 @@ final class KitchenMemoryUITests: XCTestCase {
         "-AppleTextDirection", "YES", "-NSForceRightToLeftWritingDirection", "YES",
       ], readyIdentifier: "sessions-destination")
       let sessions = app.buttons["sessions-destination"]
-      assertAccessibleLabel(sessions, description: "localized Sessions destination")
+      assertAccessibleName(sessions, description: "localized Sessions destination")
       openSettings(in: app)
       app.terminate()
     }
@@ -187,7 +187,7 @@ final class KitchenMemoryUITests: XCTestCase {
     let destination = app.buttons[identifier]
     revealSidebar(in: app, exposing: destination)
     XCTAssertTrue(destination.waitForExistence(timeout: 5))
-    assertAccessibleLabel(destination, description: "\(description) destination")
+    assertAccessibleName(destination, description: "\(description) destination")
     XCTAssertTrue(
       destination.isEnabled,
       "Expected the \(description) destination to be enabled."
@@ -267,11 +267,12 @@ final class KitchenMemoryUITests: XCTestCase {
   }
 
   @MainActor
-  private func assertAccessibleLabel(_ element: XCUIElement, description: String) {
+  private func assertAccessibleName(_ element: XCUIElement, description: String) {
     let label = element.label.trimmingCharacters(in: .whitespacesAndNewlines)
+    let title = element.title.trimmingCharacters(in: .whitespacesAndNewlines)
     XCTAssertFalse(
-      label.isEmpty,
-      "Expected the \(description) to expose a meaningful accessibility label."
+      label.isEmpty && title.isEmpty,
+      "Expected the \(description) to expose a meaningful accessibility name."
     )
   }
 
@@ -295,16 +296,16 @@ extension KitchenMemoryUITests {
 #else
     let openSettings = app.buttons["open-settings"]
     XCTAssertTrue(openSettings.waitForExistence(timeout: 2))
-    assertAccessibleLabel(openSettings, description: "Settings action")
+    assertAccessibleName(openSettings, description: "Settings action")
     activate(openSettings)
 #endif
     let form = app.descendants(matching: .any)["settings-form"].firstMatch
     XCTAssertTrue(form.waitForExistence(timeout: 5))
-    assertAccessibleLabel(form, description: "Settings landmark")
+    assertAccessibleName(form, description: "Settings landmark")
 #if os(iOS)
     let done = app.buttons["dismiss-settings"]
     XCTAssertTrue(done.waitForExistence(timeout: 5))
-    assertAccessibleLabel(done, description: "Settings dismissal action")
+    assertAccessibleName(done, description: "Settings dismissal action")
     XCTAssertTrue(done.isEnabled)
 #endif
   }
@@ -324,7 +325,7 @@ extension KitchenMemoryUITests {
     XCTAssertTrue(
       allRecipes.waitForExistence(timeout: 5), "RTL navigation must expose Organization destinations"
     )
-    assertAccessibleLabel(allRecipes, description: "All Recipes in right-to-left navigation")
+    assertAccessibleName(allRecipes, description: "All Recipes in right-to-left navigation")
   }
 }
 #endif
@@ -337,19 +338,19 @@ extension KitchenMemoryUITests {
     defer { app.terminate() }
     let hide = app.buttons["Hide Sidebar"]
     XCTAssertTrue(hide.waitForExistence(timeout: 5))
-    assertAccessibleLabel(hide, description: "Hide Sidebar")
+    assertAccessibleName(hide, description: "Hide Sidebar")
     XCTAssertTrue(hide.isEnabled)
     activate(hide)
     let show = app.buttons["Show Sidebar"]
     XCTAssertTrue(show.waitForExistence(timeout: 5))
-    assertAccessibleLabel(show, description: "Show Sidebar")
+    assertAccessibleName(show, description: "Show Sidebar")
     XCTAssertTrue(show.isEnabled)
     activate(show)
     XCTAssertTrue(hide.waitForExistence(timeout: 5))
     for identifier in ["all-recipes-destination", "sessions-destination", "deleted-items-destination"] {
       let destination = app.buttons[identifier]
       XCTAssertTrue(destination.waitForExistence(timeout: 5))
-      assertAccessibleLabel(destination, description: identifier)
+      assertAccessibleName(destination, description: identifier)
       XCTAssertTrue(destination.isEnabled)
     }
   }

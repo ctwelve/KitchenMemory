@@ -142,6 +142,29 @@ final class CookingSessionProgressPresentationTests: XCTestCase {
     )
   }
 
+  func testFactorOnlyScalingWithoutNumericYieldScalesFromSnapshotWithoutInventingServings() throws {
+    let fixture = WorkingScalePresentationFixture(hasNumericYield: false)
+    let scale = try XCTUnwrap(RecipeScale(baseYield: RationalQuantity(numerator: 1),
+      workingYield: RationalQuantity(numerator: 3, denominator: 2)))
+    XCTAssertTrue(fixture.model.replaceWorkingScale(with: scale))
+    let replacement = try XCTUnwrap(fixture.service.intentions.last?.workingScaleValue)
+    XCTAssertNil(replacement.workingYield)
+    XCTAssertEqual(replacement.exactScale, RationalQuantity(numerator: 3, denominator: 2))
+    XCTAssertEqual(replacement.quantities.first?.quantity.lowerBound,
+      RationalQuantity(numerator: 3, denominator: 2))
+    XCTAssertNil(fixture.model.currentSession?.snapshot.baseYield)
+  }
+
+  func testFactorOnlyScalingRejectsInventedBaseAndKeepsCurrentProjection() throws {
+    let fixture = WorkingScalePresentationFixture(hasNumericYield: false)
+    let scale = try XCTUnwrap(RecipeScale(baseYield: RationalQuantity(numerator: 2),
+      workingYield: RationalQuantity(numerator: 4)))
+    XCTAssertFalse(fixture.model.replaceWorkingScale(with: scale))
+    XCTAssertTrue(fixture.service.intentions.isEmpty)
+    XCTAssertNil(fixture.model.currentSession?.workingScale)
+    XCTAssertTrue(fixture.model.pendingCommands.isEmpty)
+  }
+
   func testArithmeticFailureDoesNotStageAPartialWorkingScale() throws {
     let fixture = WorkingScalePresentationFixture(
       ingredientQuantity: exactQuantity(Int.max)
@@ -178,7 +201,7 @@ private struct WorkingScalePresentationFixture {
   let service: WorkingScaleSessionService
   let model: CookingSessionPresentationModel
 
-  init(ingredientQuantity: QuantityExpression = exactQuantity(1)) {
+  init(ingredientQuantity: QuantityExpression = exactQuantity(1), hasNumericYield: Bool = true) {
     let sessionID = CookingSession.ID()
     let ingredientID = SessionIngredient.ID()
     let ingredient = SessionIngredient(
@@ -196,16 +219,16 @@ private struct WorkingScalePresentationFixture {
       id: sessionID,
       snapshot: ExecutionSnapshot(
         title: "Soup",
-        baseYield: RecipeYield(
+        baseYield: hasNumericYield ? RecipeYield(
           quantity: exactQuantity(2),
           unitText: "servings",
           originalText: "2 servings"
-        ),
+        ) : nil,
         ingredientSections: [
           SessionIngredientSection(title: nil, ingredients: [ingredient]),
         ]
       ),
-      workingScale: SessionWorkingScale(
+      workingScale: hasNumericYield ? SessionWorkingScale(
         workingYield: RecipeYield(
           quantity: exactQuantity(4),
           unitText: "servings",
@@ -215,7 +238,7 @@ private struct WorkingScalePresentationFixture {
         quantities: [
           SessionIngredientQuantity(ingredientID: ingredientID, quantity: exactQuantity(2)),
         ]
-      )
+      ) : nil
     )
     service = WorkingScaleSessionService(session: session)
     let store = VolatileCookingSessionPresentationStore()

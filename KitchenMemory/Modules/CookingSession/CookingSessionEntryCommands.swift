@@ -8,7 +8,8 @@ import KitchenKit
 @MainActor
 extension CookingSessionPresentationModel {
   func updateCurrentEntryDraft(text: String, target: SessionProgressTarget?) {
-    guard let session = currentSession else { return }
+    guard let session = currentSession, session.lifecycle == .active,
+          !currentSessionHasPendingFinish else { return }
     replaceDraft(CookingSessionEntryDraft(sessionID: session.id, text: text, target: target))
   }
 
@@ -20,7 +21,16 @@ extension CookingSessionPresentationModel {
   @discardableResult
   func submitCurrentEntryDraft() -> Bool {
     guard let session = currentSession, session.lifecycle == .active,
-          let draft = currentEntryDraft, draft.isMeaningful else { return false }
+          !currentSessionHasPendingFinish, let draft = currentEntryDraft, draft.isMeaningful else { return false }
+    if let pending = pendingCommands.first(where: { command in
+      guard command.sessionID == session.id, case .submitEntry = command else { return false }
+      return true
+    }) {
+      retryPendingCommands()
+      guard !pendingCommands.contains(pending),
+            let accepted = sessions.first(where: { $0.id == session.id }) else { return false }
+      return pending.hasAcceptedEntry(in: accepted)
+    }
     return submitCommand { .submitEntry(
       factID: SessionFact.ID(),
       sessionID: session.id,
@@ -37,7 +47,7 @@ extension CookingSessionPresentationModel {
     target: SessionProgressTarget?
   ) -> Bool {
     guard let session = currentSession, session.lifecycle == .active,
-          CookingSessionEntryDraft.isMeaningful(text),
+          !currentSessionHasPendingFinish, CookingSessionEntryDraft.isMeaningful(text),
           session.knowsEntry(entryID) else { return false }
     return submitCommand { .reviseEntry(
       factID: SessionFact.ID(),
@@ -52,7 +62,7 @@ extension CookingSessionPresentationModel {
   @discardableResult
   func retargetEntry(_ entryID: SessionEntry.ID, to target: SessionProgressTarget?) -> Bool {
     guard let session = currentSession, session.lifecycle == .active,
-          session.entries.contains(where: { $0.id == entryID }) else { return false }
+          !currentSessionHasPendingFinish, session.entries.contains(where: { $0.id == entryID }) else { return false }
     return submitCommand { .retargetEntry(
       factID: SessionFact.ID(),
       sessionID: session.id,
@@ -65,7 +75,7 @@ extension CookingSessionPresentationModel {
   @discardableResult
   func withdrawEntry(_ entryID: SessionEntry.ID) -> Bool {
     guard let session = currentSession, session.lifecycle == .active,
-          session.knowsEntry(entryID) else { return false }
+          !currentSessionHasPendingFinish, session.knowsEntry(entryID) else { return false }
     return submitCommand { .withdrawEntry(
       factID: SessionFact.ID(),
       sessionID: session.id,
@@ -76,7 +86,8 @@ extension CookingSessionPresentationModel {
 
   @discardableResult
   func setOutcome(_ outcome: SessionOutcome) -> Bool {
-    guard let session = currentSession, session.lifecycle == .active else { return false }
+    guard let session = currentSession, session.lifecycle == .active,
+          !currentSessionHasPendingFinish else { return false }
     return submitCommand { .setOutcome(
       factID: SessionFact.ID(),
       sessionID: session.id,
@@ -88,7 +99,7 @@ extension CookingSessionPresentationModel {
   @discardableResult
   func clearOutcome() -> Bool {
     guard let session = currentSession, session.lifecycle == .active,
-          session.outcome != nil || session.hasOutcomeConflict else { return false }
+          !currentSessionHasPendingFinish, session.outcome != nil || session.hasOutcomeConflict else { return false }
     return submitCommand { .clearOutcome(
       factID: SessionFact.ID(),
       sessionID: session.id,
@@ -98,18 +109,21 @@ extension CookingSessionPresentationModel {
 
   @discardableResult
   func finishDiscardingCurrentEntryDraft() -> Bool {
+    guard !hasPendingDeliveryWork else { return false }
     discardCurrentEntryDraft()
     return finishCurrentSession()
   }
 
   @discardableResult
   func submitCurrentEntryDraftAndFinish() -> Bool {
-    guard submitCurrentEntryDraft() else { return false }
+    guard !currentSessionHasPendingFinish, submitCurrentEntryDraft(),
+          currentEntryDraft?.isMeaningful != true else { return false }
     return finishCurrentSession()
   }
 
   @discardableResult
   func copyCurrentEntryDraftAndFinish(using copy: (String) -> Bool) -> Bool {
+    guard !hasPendingDeliveryWork else { return false }
     guard let draft = currentEntryDraft, copy(draft.text) else {
       present(.clipboard)
       return false

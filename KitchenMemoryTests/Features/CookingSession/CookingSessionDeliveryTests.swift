@@ -75,6 +75,11 @@ final class CookingSessionDeliveryTests: XCTestCase {
     let command = PendingCookingSessionCommand.submitEntry(factID: SessionFact.ID(), sessionID: sessionID,
       authoredAt: Date(), text: "Exact text", target: nil)
     let service = DeliveryTestService(sessionID: sessionID)
+    if case let .submitEntry(factID, _, _, text, target) = command {
+      service.result = .accepted(CookingSessionProjection(id: sessionID,
+        snapshot: ExecutionSnapshot(title: "Soup"),
+        entries: [.init(id: .init(rawValue: factID.rawValue), target: target, text: text)]))
+    }
     let delivery = CookingSessionDelivery(service: service, store: store)
     store.events = []
     XCTAssertTrue(delivery.submit { command }.wasAccepted)
@@ -86,6 +91,18 @@ final class CookingSessionDeliveryTests: XCTestCase {
     _ = replay.retry()
     XCTAssertTrue(store.pendingCommands.isEmpty)
     XCTAssertTrue(store.entryDrafts.isEmpty)
+  }
+
+  func testAcceptedProjectionWithoutSubmittedEntryPreservesDraftAndDoesNotReportAcceptance() {
+    let sessionID = CookingSession.ID()
+    let store = RecordingEntryStore()
+    store.entryDrafts = [.init(sessionID: sessionID, text: "Original note", target: nil)]
+    let command = PendingCookingSessionCommand.submitEntry(factID: SessionFact.ID(),
+      sessionID: sessionID, authoredAt: Date(), text: "Original note", target: nil)
+    let delivery = CookingSessionDelivery(service: DeliveryTestService(sessionID: sessionID), store: store)
+    XCTAssertFalse(delivery.submit { command }.wasAccepted)
+    XCTAssertEqual(store.entryDrafts.first?.text, "Original note")
+    XCTAssertTrue(store.pendingCommands.isEmpty)
   }
 
   func testContinuationMovesExactDraftAndMappedTargetBeforeRetirement() {

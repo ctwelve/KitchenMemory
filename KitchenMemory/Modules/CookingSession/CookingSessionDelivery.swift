@@ -35,8 +35,8 @@ final class CookingSessionDelivery {
 
     var wasAccepted: Bool {
       events.contains {
-        guard case .resolved(let command, .accepted) = $0 else { return false }
-        return command == requested
+        guard case .resolved(let command, .accepted(let session)) = $0 else { return false }
+        return command == requested && command.hasAcceptedEntry(in: session)
       }
     }
 
@@ -148,8 +148,11 @@ final class CookingSessionDelivery {
   private func applyDraftAcceptance(for pending: PendingCookingSessionCommand,
                                     session: CookingSessionProjection) {
     switch pending {
-    case .submitEntry:
-      removeDraft(for: pending.sessionID)
+    case let .submitEntry(_, sessionID, _, text, target):
+      guard pending.hasAcceptedEntry(in: session),
+            let draft = entryDrafts.first(where: { $0.sessionID == sessionID }),
+            draft.text == text, draft.target == target else { return }
+      removeDraft(for: sessionID)
     case let .continueSession(destinationID, sourceID, _):
       guard let draft = entryDrafts.first(where: { $0.sessionID == sourceID }) else { return }
       let target = draft.target.flatMap { sourceTarget in
@@ -164,6 +167,17 @@ final class CookingSessionDelivery {
          .retargetEntry, .withdrawEntry, .setOutcome, .clearOutcome, .finish,
          .delete, .restore, .resolveClosure:
       break
+    }
+  }
+}
+
+
+extension PendingCookingSessionCommand {
+  /// Entry acceptance must include the exact authored fact, not merely a Session read.
+  func hasAcceptedEntry(in session: CookingSessionProjection) -> Bool {
+    guard case let .submitEntry(factID, sessionID, _, text, target) = self else { return true }
+    return session.id == sessionID && session.entries.contains {
+      $0.id.rawValue == factID.rawValue && $0.text == text && $0.target == target
     }
   }
 }

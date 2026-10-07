@@ -277,7 +277,7 @@ struct QuantityExpressionEditor: View {
   }
 }
 
-private struct RationalQuantityEditor: View {
+struct RationalQuantityEditor: View {
   let label: LocalizedStringResource
   @Binding var quantity: RationalQuantity
   let accessibilityIdentifier: String?

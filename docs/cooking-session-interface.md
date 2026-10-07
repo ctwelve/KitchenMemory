@@ -207,19 +207,22 @@ The inventory for #193 examined the integrated #184/#209 navigation and the
 #213/#214 ownership seams at main commit
 [`e1f8751`](https://github.com/ctwelve/KitchenMemory/commit/e1f8751424922341c20cfbf55923d702e133b1e2).
 These are observations of the old interface, not accepted future behavior.
-The #251 working slice now supplies complete lifecycle history, start-time
-identification, retained return routes and per-history list anchors, observational
-Finished scaling, and readable continuation lineage. Native keyboard, VoiceOver,
-compact/wide, and accessibility text-size walkthrough acceptance remains pending;
-the other interface slices below remain independently gated.
+[PR #257](https://github.com/ctwelve/KitchenMemory/pull/257) merged the #251
+history/navigation implementation: complete lifecycle history, start-time and
+Outcome identification, retained return routes and per-history list anchors,
+observational Finished presentation, and readable continuation lineage. The
+[history acceptance record](cooking-session-history-acceptance.md) maps hosted
+regressions and the remaining native keyboard, VoiceOver, compact/wide, and
+accessibility text-size walkthroughs. The other interface slices remain
+independently gated.
 
-| Existing surface | Gap addressed by this design |
+| Existing surface | Original gap or implemented history boundary |
 | --- | --- |
 | [Cooking view](../KitchenMemory/Modules/CookingSession/CookingSessionView.swift) | Full note/Outcome and scaling forms precede the recipe; bottom actions compete with reading; Stopped incorrectly offers Add-and-Finish without Resume |
 | [Progress rows](../KitchenMemory/Modules/CookingSession/CookingSessionProgressRows.swift) | Entire rows change progress; first-open emphasis is derived, with no independent chosen step or saved reading anchor |
 | [Entries](../KitchenMemory/Modules/CookingSession/CookingSessionEntriesView.swift) | Composer is always present; contextual row entry points are absent |
-| [History](../KitchenMemory/Modules/CookingSession/CookingSessionHistoryView.swift) | Current plus five recent unfinished cooks can hide older work; repeated cooks lack useful identification; Finished exposes raw lineage identifiers |
-| [History presentation](../KitchenMemory/Modules/CookingSession/CookingSessionHistoryPresentation.swift) and [navigation](../KitchenMemory/Modules/Composition/RecipeLibraryNavigation.swift) | Finish/Continue do not consistently preserve the originating history scope; current reading position is not durably restored |
+| [History](../KitchenMemory/Modules/CookingSession/CookingSessionHistoryView.swift) | PR #257 supplies complete lifecycle groups, start-time/Outcome identification and readable lineage. Native repeated-cook distinction, group reachability and layout/accessibility walkthroughs remain pending |
+| [History presentation](../KitchenMemory/Modules/CookingSession/CookingSessionHistoryPresentation.swift) and [navigation](../KitchenMemory/Modules/Composition/RecipeLibraryNavigation.swift) | PR #257 preserves history scope/list anchors through Finish, Continue and Back, including delayed delivery. Native route/focus acceptance remains pending; cooking-document reading-position persistence belongs to #249 |
 | [Delivery](../KitchenMemory/Modules/CookingSession/CookingSessionDelivery.swift) | Ordered exact retry already exists; #245 corrects newer-draft clearing and accidental duplicate submissions; ordinary failures currently use a generic root alert |
 
 Keep navigation in the existing navigation owner, ordered delivery in
@@ -323,3 +326,61 @@ pointer/keyboard, VoiceOver continuity, Reduce Motion, wide/constrained windows,
 accessibility text sizes. The new rightward Complete gesture in particular has no
 hands-on acceptance inherited from the prototype. This slice does not claim beta-level
 accessibility qualification or wider crash durability.
+
+## Production notes and Finish slice (#252)
+
+The working implementation opens a single on-demand Session Entry composer from
+both general and ingredient/instruction Add Note routes. Meaningful drafts reopen
+with their exact text and target; empty drafts inherit the requested target.
+Draft storage remains Session-scoped and device-local. Composer requests retain
+an originating window identity separately from shared draft ownership.
+
+Retry submits only the original retained Entry identity. Acceptance clears only
+a draft that still matches that Entry's exact text and target; later edits remain
+for deliberate submission. Add-and-Finish requires the returned original Entry
+evidence and no remaining meaningful draft. Earlier pending work blocks Finish
+before any copy/discard effect. A retained Finish instead presents waiting/Retry
+and preserves its Closure identity; leaving or dismissing does not cancel it.
+
+Outcome sits beside Finish. The completed in-view slide supplies confirmation;
+the named keyboard/assistive action uses explicit confirmation. Stopped draft
+choices offer explicit Resume-to-edit, copy-and-finish, discard-and-finish, or
+Cancel. Stop and Delete remain secondary. Failed saves stay alongside readable
+content. Remote-Finish drafts can remain unresolved without repeatedly presenting
+the same dialog; entering a new destination makes the recovery choice available
+again. Existing local-store and synchronized formats are unchanged.
+
+Hosted regression evidence covers newer text/target preservation, original retry
+identity, pending Finish guards, exact Entry acceptance, explicit Resume, and
+retained Closure retry. Native builds and automated tests do not establish
+physical slide delivery, VoiceOver/Switch Control usability, or compact/wide
+accessibility-size walkthrough acceptance. Those production checks remain
+explicit acceptance work; this slice does not close the beta accessibility gate.
+
+## Production scaling slice (#250)
+
+The working reader shows a compact yield/factor summary near the title and opens
+adjustment on demand. Absolute ½×, 1×, 1½×, and 2× presets and custom rational
+factors recalculate from the immutable snapshot. Range yields retain an explicit
+base choice. A Session without a numeric yield uses a factor-only scale and
+retains no invented working serving yield. Existing SessionWorkingScale encoding
+and synchronized snapshot formats are unchanged.
+
+Guidance uses the existing ingredient scaling statuses and retained structured
+durations/temperatures. Approximation and both range endpoints remain intact;
+fixed, manual-review, textual, missing, and presentation-overridden amounts get
+specific contextual explanations. Arithmetic rejection restores the displayed
+projection instead of presenting partial success. Authored time, temperature,
+and method remain unchanged. Contextual markers and the method reminder remain
+after banner dismissal.
+
+`hasDismissedScalingExplanation` is an optional device-local reading-preference
+field. Older records decode with no dismissal, preserving existing reading place
+and screen-awake choices. Dismissal belongs to one Session and survives relaunch;
+reset clears the local preferences through the existing store seam. Missing yield
+alone never labels structured ingredient arithmetic uncertain.
+
+Hosted evidence targets absolute factors, explicit range bases, missing-yield
+arithmetic, retained statuses and authored cooking conditions, arithmetic rejection,
+and local preference compatibility/dismissal. Native compact/wide, accessibility
+text-size, keyboard and VoiceOver inspection remains distinct acceptance work.
