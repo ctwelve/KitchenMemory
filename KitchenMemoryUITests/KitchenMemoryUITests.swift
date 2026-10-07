@@ -60,10 +60,13 @@ final class KitchenMemoryUITests: XCTestCase {
   @MainActor
   func testCookingReadingDestinationExposesNamedStructure() {
     let app = launchApp()
-    let row = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "recipe-row-")).firstMatch
+    // The sample fixture starts with Dirty Fried Rice selected; opening the
+    // named second recipe explicitly reveals the compact detail column.
+    let row = app.buttons["recipe-row-D1F10000-0000-4000-8000-000000000002"]
     revealSidebar(in: app, exposing: row)
     XCTAssertTrue(row.waitForExistence(timeout: 5))
     activate(row)
+    XCTAssertTrue(app.descendants(matching: .any)["recipe-detail"].waitForExistence(timeout: 5))
     let start = app.buttons["start-cooking"]
     XCTAssertTrue(start.waitForExistence(timeout: 5))
     activate(start)

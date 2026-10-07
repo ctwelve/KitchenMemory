@@ -375,13 +375,4 @@ nonisolated extension RecipeImportConcern {
 
 private extension RecipeSource.Kind {
   static var allCases: [Self] { [.original, .webpage, .book, .person, .imported] }
-  var label: LocalizedStringResource {
-    switch self {
-    case .original: .recipeSourceKindOriginal
-    case .webpage: .recipeSourceKindWebpage
-    case .book: .recipeSourceKindBook
-    case .person: .recipeSourceKindPerson
-    case .imported: .recipeSourceKindImported
-    }
-  }
 }

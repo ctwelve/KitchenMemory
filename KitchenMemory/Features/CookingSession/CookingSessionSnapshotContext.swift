@@ -67,7 +67,7 @@ struct CookingSessionSnapshotContext: View {
           }
         } else {
           VStack(alignment: .leading, spacing: 4) {
-            Text(source.title ?? source.kind.rawValue.capitalized)
+            Text(source.title ?? source.kind.label.localized(for: locale))
             if source.canonicalURL != nil { Text(.recipeSourceLinkUnavailable).font(.caption) }
           }
         }

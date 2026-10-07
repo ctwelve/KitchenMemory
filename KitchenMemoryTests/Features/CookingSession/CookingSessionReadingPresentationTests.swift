@@ -50,7 +50,7 @@ final class CookingSessionReadingPresentationTests: XCTestCase {
     let first = session.snapshot.instructionSections.flatMap(\.steps).first?.id
     let missing = SessionInstruction.ID(rawValue: UUID())
     store.readingPreferences = [.init(sessionID: session.id, emphasizedInstructionID: missing,
-      position: .init(instructionID: missing, offset: 80), keepsScreenAwake: false)]
+      position: .init(instructionID: missing, offset: 80), keepsScreenAwake: false),]
     let reopened = CookingSessionPresentationModel(sessions: app.cookingSessions, store: store)
     reopened.loadIfNeeded()
     let preference = reopened.readingPreference(for: try XCTUnwrap(reopened.currentSession))

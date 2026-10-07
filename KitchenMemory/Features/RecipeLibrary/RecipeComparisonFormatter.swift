@@ -105,21 +105,11 @@ struct RecipeComparisonFormatter {
   }
 
   private func source(_ revision: RecipeRevision) -> String {
-    lines([revision.source.map { sourceKind($0.kind).localized(for: locale) },
+    lines([revision.source.map { $0.kind.label.localized(for: locale) },
            revision.source?.title, revision.source?.authorName, revision.source?.publisherName,
            revision.source?.canonicalURL?.absoluteString, revision.sourceCapture?.sourceURL.absoluteString,
            revision.sourceCapture?.capturedAt.formatted(.dateTime.locale(locale)),
     ])
-  }
-
-  private func sourceKind(_ kind: RecipeSource.Kind) -> LocalizedStringResource {
-    switch kind {
-    case .original: .recipeSourceKindOriginal
-    case .webpage: .recipeSourceKindWebpage
-    case .book: .recipeSourceKindBook
-    case .person: .recipeSourceKindPerson
-    case .imported: .recipeSourceKindImported
-    }
   }
 
   private func duration(_ value: RecipeDuration?) -> String {
