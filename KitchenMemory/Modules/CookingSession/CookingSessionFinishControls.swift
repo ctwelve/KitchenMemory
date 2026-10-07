@@ -79,19 +79,19 @@ struct CookingSessionSaveStatus: View {
   let model: CookingSessionPresentationModel
 
   var body: some View {
-    if model.currentSessionHasPendingWork || model.isShowingIssue {
+    if model.hasPendingDeliveryWork || model.isShowingIssue {
       VStack(alignment: .leading, spacing: 8) {
         if model.currentSessionHasPendingFinish {
           Label(.sessionFinishPending, systemImage: "clock")
             .font(.callout.bold())
-        } else if model.currentSessionHasPendingWork {
+        } else if model.hasPendingDeliveryWork {
           Text(.sessionFinishBlocked).font(.callout)
         }
         if let issue = model.issue, model.isShowingIssue {
           Text(issue.message).font(.callout).foregroundStyle(.secondary)
         }
         Button(.sessionSaveRetry) {
-          if model.currentSessionHasPendingWork { model.retryPendingCommands() }
+          if model.hasPendingDeliveryWork { model.retryPendingCommands() }
           else { model.retryCurrentIssue() }
         }
           .accessibilityIdentifier("retry-session-save")

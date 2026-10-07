@@ -89,7 +89,7 @@ extension CookingSessionPresentationModel {
   func finishCurrentSession() -> Bool {
     guard let session = currentSession,
           session.lifecycle == .active || session.lifecycle == .stopped else { return false }
-    guard !currentSessionHasPendingWork else { return false }
+    guard !hasPendingDeliveryWork else { return false }
     if currentEntryDraft?.isMeaningful == true {
       present(.attention(.meaningfulDraft))
       return false
@@ -149,7 +149,6 @@ extension CookingSessionPresentationModel {
     defer {
       if case let .resume(factID, _, _) = pending {
         pendingEntryComposerResumes[factID] = nil
-        pendingEntryComposerResumeOrigins[factID] = nil
       }
       if let identity = pending.navigationIdentity { pendingNavigationOrigins[identity] = nil }
     }
@@ -166,10 +165,11 @@ extension CookingSessionPresentationModel {
         entryComposerOrigin = nil
       }
       if case let .resume(factID, sessionID, _) = pending,
-         pendingEntryComposerResumes.removeValue(forKey: factID) == sessionID,
+         let request = pendingEntryComposerResumes.removeValue(forKey: factID),
+         request.sessionID == sessionID,
          previouslySelectedSessionID == sessionID, currentSessionID == sessionID,
          session.lifecycle == .active {
-        entryComposerOrigin = pendingEntryComposerResumeOrigins.removeValue(forKey: factID)
+        entryComposerOrigin = request.origin
         isShowingEntryComposer = true
       }
       if pending.refreshesClassification { reload() }

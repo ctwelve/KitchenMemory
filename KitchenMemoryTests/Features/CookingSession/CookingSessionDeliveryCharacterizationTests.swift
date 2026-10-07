@@ -207,6 +207,25 @@ final class SessionDeliveryCharacterizationTests: XCTestCase {
     XCTAssertTrue(service.finishIDs.isEmpty)
   }
 
+  func testRelaunchRetainsFinishConsentAndRetriesSameClosureWithoutAnotherFinish() throws {
+    let (model, service) = try fixture()
+    service.blocksFinish = true
+    XCTAssertFalse(model.finishCurrentSession())
+    let pending = try XCTUnwrap(model.pendingCommands.first)
+    let relaunched = CookingSessionPresentationModel(sessions: service, store: model.store)
+    relaunched.loadIfNeeded()
+    XCTAssertTrue(relaunched.currentSessionHasPendingFinish)
+    XCTAssertEqual(relaunched.pendingCommands, [pending])
+    relaunched.dismissIssuePresentation()
+    XCTAssertEqual(relaunched.pendingCommands, [pending])
+    service.blocksFinish = false
+    relaunched.retryPendingCommands()
+    XCTAssertTrue(relaunched.pendingCommands.isEmpty)
+    XCTAssertNil(relaunched.currentSession)
+    guard case let .finish(closureID, _, _) = pending else { return XCTFail("Expected Finish") }
+    XCTAssertEqual(service.finishIDs, [closureID, closureID, closureID])
+  }
+
   private func fixture() throws -> (CookingSessionPresentationModel, EntryRetryProbe) {
     let app = try AppRuntime.testing()
     app.libraryModel.loadIfNeeded()

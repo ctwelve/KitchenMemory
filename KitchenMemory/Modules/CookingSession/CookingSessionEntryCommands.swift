@@ -109,7 +109,7 @@ extension CookingSessionPresentationModel {
 
   @discardableResult
   func finishDiscardingCurrentEntryDraft() -> Bool {
-    guard !currentSessionHasPendingWork else { return false }
+    guard !hasPendingDeliveryWork else { return false }
     discardCurrentEntryDraft()
     return finishCurrentSession()
   }
@@ -123,7 +123,7 @@ extension CookingSessionPresentationModel {
 
   @discardableResult
   func copyCurrentEntryDraftAndFinish(using copy: (String) -> Bool) -> Bool {
-    guard !currentSessionHasPendingWork else { return false }
+    guard !hasPendingDeliveryWork else { return false }
     guard let draft = currentEntryDraft, copy(draft.text) else {
       present(.clipboard)
       return false

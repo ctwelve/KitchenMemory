@@ -5,6 +5,11 @@
 import Foundation
 import KitchenKit
 
+struct PendingEntryComposerResume {
+  let sessionID: CookingSession.ID
+  let origin: UUID?
+}
+
 @MainActor
 extension CookingSessionPresentationModel {
   var currentSessionHasPendingEntrySubmission: Bool {
@@ -22,10 +27,10 @@ extension CookingSessionPresentationModel {
   }
 
   /// Delivery is globally ordered: another Session's unsaved work also blocks Finish.
-  var currentSessionHasPendingWork: Bool { !pendingCommands.isEmpty }
+  var hasPendingDeliveryWork: Bool { !pendingCommands.isEmpty }
 
   var finishBlockedByEarlierWork: Bool {
-    currentSessionHasPendingWork && !currentSessionHasPendingFinish
+    hasPendingDeliveryWork && !currentSessionHasPendingFinish
   }
 
   /// All Add Note routes reopen meaningful work without replacing text or target.
@@ -49,11 +54,10 @@ extension CookingSessionPresentationModel {
   @discardableResult
   func resumeToEditCurrentEntryDraft(origin: UUID? = nil) -> Bool {
     guard let session = currentSession, session.lifecycle == .stopped,
-          !currentSessionHasPendingWork else { return false }
+          !hasPendingDeliveryWork else { return false }
     return submitCommand {
       let factID = SessionFact.ID()
-      self.pendingEntryComposerResumes[factID] = session.id
-      self.pendingEntryComposerResumeOrigins[factID] = origin
+      self.pendingEntryComposerResumes[factID] = PendingEntryComposerResume(sessionID: session.id, origin: origin)
       return .resume(factID: factID, sessionID: session.id, authoredAt: Date())
     }
   }

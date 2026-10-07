@@ -60,8 +60,7 @@ final class CookingSessionPresentationModel {
   var isShowingIssue = false
   var isShowingEntryComposer = false
   var entryComposerOrigin: UUID?
-  @ObservationIgnored var pendingEntryComposerResumes: [SessionFact.ID: CookingSession.ID] = [:]
-  @ObservationIgnored var pendingEntryComposerResumeOrigins: [SessionFact.ID: UUID] = [:]
+  @ObservationIgnored var pendingEntryComposerResumes: [SessionFact.ID: PendingEntryComposerResume] = [:]
   private(set) var hasLoaded = false
   let delivery: CookingSessionDelivery
   var entryDrafts: [CookingSessionEntryDraft] { delivery.entryDrafts }
@@ -141,7 +140,6 @@ final class CookingSessionPresentationModel {
     delivery.reset()
     pendingNavigationOrigins = [:]
     pendingEntryComposerResumes = [:]
-    pendingEntryComposerResumeOrigins = [:]
     isShowingEntryComposer = false
     entryComposerOrigin = nil
     sessions = []

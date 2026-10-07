@@ -170,6 +170,7 @@ struct CookingSessionView: View {
       } label: {
         Label(.sessionLifecycleMoreActions, systemImage: "ellipsis.circle")
       }
+      .accessibilityLabel(Text(.sessionLifecycleMoreActions))
       .accessibilityIdentifier("session-lifecycle-menu")
     }
   }
@@ -195,7 +196,7 @@ struct CookingSessionView: View {
   }
 
   private var canFinish: Bool {
-    session.lifecycle != .finished && !model.currentSessionHasPendingWork
+    session.lifecycle != .finished && !model.hasPendingDeliveryWork
   }
 
   private func requestFinish() {
