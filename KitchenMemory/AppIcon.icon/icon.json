@@ -32,21 +32,28 @@
           "image-name" : "05-LowTray.svg",
           "name" : "Low Tray",
           "position" : {
-            "scale" : 1,
+            "scale" : 1.06,
             "translation-in-points" : [
               0,
-              -30
+              -31.799999999999898
             ]
           }
         }
       ],
+      "position" : {
+        "scale" : 1.06,
+        "translation-in-points" : [
+          0,
+          0
+        ]
+      },
       "shadow" : {
         "kind" : "neutral",
-        "opacity" : 0.34999999999999998
+        "opacity" : 0.35
       },
       "translucency" : {
         "enabled" : true,
-        "value" : 0.17999999999999999
+        "value" : 0.18
       }
     },
     {
@@ -70,14 +77,21 @@
           "image-name" : "04-RecipeMarks.svg",
           "name" : "Recipe Marks",
           "position" : {
-            "scale" : 1,
+            "scale" : 1.06,
             "translation-in-points" : [
               0,
-              -30
+              -31.799999999999898
             ]
           }
         }
       ],
+      "position" : {
+        "scale" : 1.06,
+        "translation-in-points" : [
+          0,
+          0
+        ]
+      },
       "shadow" : {
         "kind" : "neutral",
         "opacity" : 0.12
@@ -106,10 +120,10 @@
           "image-name" : "03-FeaturedCard.svg",
           "name" : "Featured Card",
           "position" : {
-            "scale" : 1,
+            "scale" : 1.06,
             "translation-in-points" : [
               0,
-              -30
+              -31.799999999999898
             ]
           }
         },
@@ -130,10 +144,10 @@
           "image-name" : "02-MiddleCard.svg",
           "name" : "Middle Card",
           "position" : {
-            "scale" : 1,
+            "scale" : 1.06,
             "translation-in-points" : [
               0,
-              -30
+              -31.799999999999898
             ]
           }
         },
@@ -154,21 +168,28 @@
           "image-name" : "01-RearCard.svg",
           "name" : "Rear Card",
           "position" : {
-            "scale" : 1,
+            "scale" : 1.06,
             "translation-in-points" : [
               0,
-              -30
+              -31.799999999999898
             ]
           }
         }
       ],
+      "position" : {
+        "scale" : 1.06,
+        "translation-in-points" : [
+          0,
+          0
+        ]
+      },
       "shadow" : {
         "kind" : "neutral",
         "opacity" : 0.25
       },
       "translucency" : {
         "enabled" : true,
-        "value" : 0.080000000000000002
+        "value" : 0.08
       }
     }
   ],
