@@ -41,6 +41,17 @@ final class ClosureInterruptionSessionService: CookingSessionServing {
   }
 
   func sessions() throws -> [SessionProjectionResult] { results }
+  func history() throws -> CookingSessionHistoryRead {
+    fixtureHistoryRead(sessions: results, sessionIDsByRecipe: [:])
+  }
+  func sessions(for recipeID: Recipe.ID) throws -> [SessionProjectionResult] {
+    _ = recipeID
+    throw CookingSessionTestSupportError.unsupportedRead("sessions(for:)")
+  }
+  func unresolvedDeletionIDs(for sessionID: CookingSession.ID) throws -> [SessionDeletion.ID] {
+    _ = sessionID
+    throw CookingSessionTestSupportError.unsupportedRead("unresolvedDeletionIDs(for:)")
+  }
 
   func start(_ intention: StartCookingSessionIntention) throws -> CookingSessionCommandResult {
     _ = intention

@@ -2,9 +2,6 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
-import Foundation
-import SwiftData
-
 /// Keeps Logic-only repository doubles source-compatible without Session storage.
 @MainActor
 final class RecipeOnlyKitchenResetRepository: KitchenResetRepository {

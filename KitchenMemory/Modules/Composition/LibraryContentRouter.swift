@@ -2,7 +2,6 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
-import KitchenKit
 import SwiftUI
 
 struct LibraryContentRouter: View {

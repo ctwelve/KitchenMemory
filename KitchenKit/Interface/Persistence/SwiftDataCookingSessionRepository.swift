@@ -67,6 +67,14 @@ public final class SwiftDataCookingSessionRepository: CookingSessionRepository {
       .map(\.projection)
   }
 
+  /// Classifies each retained Session once and shares the result across history selections.
+  public func history(in kitchenID: Kitchen.ID) throws -> CookingSessionHistoryRead {
+    let entries = try storedEvidence(in: kitchenID).map { stored in
+      (evidence: stored.evidence, projection: stored.projection)
+    }
+    return cookingSessionHistoryRead(in: kitchenID, from: entries)
+  }
+
   private func storedEvidence(in kitchenID: Kitchen.ID) throws -> [StoredSessionEvidence] {
     let identifier = kitchenID.rawValue
     var ids = Set(try context.fetch(

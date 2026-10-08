@@ -2,6 +2,7 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
+import Foundation
 import KitchenKit
 import SwiftUI
 
@@ -70,7 +71,9 @@ struct RecipeReconciliationView: View {
         ForEach(Array(section.ingredients.enumerated()), id: \.offset) { index, ingredient in
           Menu {
             ForEach(Array(editor.session.ingredientSections.enumerated()), id: \.offset) { target, section in
-              Section(section.title ?? LocalizedStringResource.recipeComparisonFieldIngredients.localized(for: locale)) {
+              Section(
+                section.title ?? LocalizedStringResource.recipeComparisonFieldIngredients.localized(for: locale)
+              ) {
                 Button(.recipeComparisonAddIngredient) {
                   choose {
                     try editor.draft.chooseIngredient(from: revision.id, section: sectionIndex,

@@ -2,6 +2,7 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
+import Foundation
 import KitchenKit
 import SwiftUI
 
@@ -36,7 +37,8 @@ struct LibraryAuxiliaryList: View {
       row(.deletedSession(session.id), title: session.snapshot.title, symbol: "flame")
     }
     ForEach(sessions.waitingDeletedSessions, id: \.evidence.sessionID) { item in
-      row(.deletedSession(item.evidence.sessionID), title: LocalizedStringResource.deletedItemsWaiting.localized(for: locale),
+      row(.deletedSession(item.evidence.sessionID),
+          title: LocalizedStringResource.deletedItemsWaiting.localized(for: locale),
           symbol: "icloud.and.arrow.down")
     }
     if library.deletedRecipes.isEmpty, sessions.deletedItemCount == 0 {
@@ -51,11 +53,13 @@ struct LibraryAuxiliaryList: View {
           ?? LocalizedStringResource.recipeRecoveryTitle.localized(for: locale), symbol: "book.closed")
     }
     ForEach(sessions.waitingSessions, id: \.evidence.sessionID) { item in
-      row(.recoverySession(item.evidence.sessionID), title: LocalizedStringResource.recoveryWaitingTitle.localized(for: locale),
+      row(.recoverySession(item.evidence.sessionID),
+          title: LocalizedStringResource.recoveryWaitingTitle.localized(for: locale),
           symbol: "icloud.and.arrow.down")
     }
     ForEach(sessions.recoverySessions, id: \.evidence.sessionID) { item in
-      row(.recoverySession(item.evidence.sessionID), title: LocalizedStringResource.recoveryEvidenceTitle.localized(for: locale),
+      row(.recoverySession(item.evidence.sessionID),
+          title: LocalizedStringResource.recoveryEvidenceTitle.localized(for: locale),
           symbol: "exclamationmark.triangle")
     }
     if library.organization?.requiresRecovery == true {

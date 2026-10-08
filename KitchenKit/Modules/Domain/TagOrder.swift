@@ -2,8 +2,6 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
-import Foundation
-
 struct TagOrder {
   let evidence: OrganizationEvidence<TagChange>
   let tags: [Tag]

@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 #if os(macOS)
+import Foundation
 import SwiftUI
 
 /// Menu definitions evaluated by SwiftUI with the active scene's focused values.

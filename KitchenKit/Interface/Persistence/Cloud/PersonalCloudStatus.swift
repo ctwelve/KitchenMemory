@@ -2,8 +2,6 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
-import Foundation
-
 /// Account and managed-operation status for presentation, never proof that all evidence synchronized.
 public enum PersonalCloudStatus: Equatable, Sendable {
   /// This device's selected store configuration does not participate in personal cloud sync.

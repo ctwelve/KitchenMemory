@@ -4,7 +4,6 @@
 
 @testable import KitchenKit
 import CoreData
-import Foundation
 import SwiftData
 
 enum SchemaInspection {

@@ -2,6 +2,7 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
+import Foundation
 import KitchenKit
 import SwiftUI
 
@@ -61,8 +62,11 @@ struct CookingSessionScalingView: View {
   @State private var showsCalculationFailure = false
   @Environment(\.locale) private var locale
 
-  init(model: CookingSessionPresentationModel, session: CookingSessionProjection,
-    close: @escaping () -> Void) {
+  init(
+    model: CookingSessionPresentationModel,
+    session: CookingSessionProjection,
+    close: @escaping () -> Void
+  ) {
     self.model = model
     self.session = session
     self.close = close
@@ -158,8 +162,12 @@ struct CookingSessionScalingView: View {
     .onChange(of: projectedSession.workingScale) { _, _ in restoreSelection() }
   }
 
-  private func preset(_ title: LocalizedStringResource, accessibility: LocalizedStringResource,
-    factor: RationalQuantity, identifier: String) -> some View {
+  private func preset(
+    _ title: LocalizedStringResource,
+    accessibility: LocalizedStringResource,
+    factor: RationalQuantity,
+    identifier: String
+  ) -> some View {
     Button(title) {
       var proposed = selection
       proposed.selectFactor(factor)
@@ -222,7 +230,6 @@ struct CookingSessionScalingExplanation: View {
       .accessibilityIdentifier("session-scaling-explanation")
     }
   }
-
 
 }
 

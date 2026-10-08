@@ -2,13 +2,7 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
-import Algorithms
 import Foundation
-import SwiftData
-
-// Persistence reconstruction is deliberately kept beside its inverse mapping
-// so schema changes can be reviewed in both directions.
-// swiftlint:disable file_length type_body_length
 
 /// A recipe together with the revision selected as its current content.
 public struct StoredRecipe: Codable, Equatable, Identifiable, Sendable {

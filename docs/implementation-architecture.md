@@ -49,6 +49,15 @@ saving. Logic coordinates product operations; Persistence fulfills domain-facing
 repository contracts. SwiftUI, UIKit, and AppKit remain outside KitchenKit.
 Package choices and linkage exceptions live in [DEPENDENCIES.md](../DEPENDENCIES.md).
 
+Cooking Session history refresh crosses `CookingSessions.history()` once. Both
+repository adapters classify each retained Session once per read and return
+complete classifications, Closure-based ordering, and Recipe associations from
+the same evidence pass. The returned value has no lifetime beyond its caller's
+observed presentation state; no persistent cache or new authority is introduced.
+Recipe history and sidebar associations reuse that value until the next explicit
+or external-store refresh. Read failures preserve the last complete presentation,
+and accepted Start/Continue commands refresh their retained associations.
+
 ### Import implementation
 
 `Interface/Import/SchemaOrgRecipeImporter.swift` owns configuration and the public

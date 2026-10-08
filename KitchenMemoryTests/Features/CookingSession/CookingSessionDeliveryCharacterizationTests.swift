@@ -56,7 +56,9 @@ final class SessionDeliveryCharacterizationTests: XCTestCase {
   func testComposerReopensMeaningfulDraftWithoutRetargetingAndRequiresActiveSession() throws {
     let (model, _) = try fixture()
     let first = try XCTUnwrap(model.currentSession)
-    let originalTarget = SessionProgressTarget.instruction(try XCTUnwrap(first.snapshot.instructionSections.first?.steps.first?.id))
+    let originalTarget = SessionProgressTarget.instruction(
+      try XCTUnwrap(first.snapshot.instructionSections.first?.steps.first?.id)
+    )
     model.openEntryComposer(target: originalTarget)
     model.updateCurrentEntryDraft(text: "  Keep this 🌮  ", target: originalTarget)
     model.isShowingEntryComposer = false
@@ -88,7 +90,10 @@ final class SessionDeliveryCharacterizationTests: XCTestCase {
     XCTAssertEqual(model.currentSession?.lifecycle, .active)
     XCTAssertEqual(model.currentEntryDraft?.text, "Stopped thought")
     XCTAssertTrue(model.pendingCommands.isEmpty)
-    guard case let .resume(factID, _, _) = pending else { return XCTFail("Expected Resume") }
+    guard case let .resume(factID, _, _) = pending else {
+      XCTFail("Expected Resume")
+      return
+    }
     XCTAssertEqual(service.resumeIDs, [factID, factID])
   }
 
@@ -105,7 +110,10 @@ final class SessionDeliveryCharacterizationTests: XCTestCase {
     service.blocksFinish = false
     model.retryPendingCommands()
     XCTAssertTrue(model.pendingCommands.isEmpty)
-    guard case let .finish(closureID, _, _) = pending else { return XCTFail("Expected Finish") }
+    guard case let .finish(closureID, _, _) = pending else {
+      XCTFail("Expected Finish")
+      return
+    }
     XCTAssertEqual(service.finishIDs, [closureID, closureID])
     XCTAssertNil(model.currentSession)
   }
@@ -131,7 +139,9 @@ final class SessionDeliveryCharacterizationTests: XCTestCase {
 
   func testRetryPreservesNewerTargetEvenWithIdenticalText() throws {
     let (model, _) = try fixture()
-    let target = SessionProgressTarget.instruction(try XCTUnwrap(model.currentSession?.snapshot.instructionSections.first?.steps.first?.id))
+    let target = SessionProgressTarget.instruction(
+      try XCTUnwrap(model.currentSession?.snapshot.instructionSections.first?.steps.first?.id)
+    )
     model.updateCurrentEntryDraft(text: "Same text", target: nil)
     XCTAssertFalse(model.submitCurrentEntryDraft())
     model.updateCurrentEntryDraft(text: "Same text", target: target)
@@ -166,7 +176,9 @@ final class SessionDeliveryCharacterizationTests: XCTestCase {
 
   func testRelaunchRetriesOriginalEntryAndPreservesNewerDraftAndTarget() throws {
     let (model, service) = try fixture()
-    let target = SessionProgressTarget.instruction(try XCTUnwrap(model.currentSession?.snapshot.instructionSections.first?.steps.first?.id))
+    let target = SessionProgressTarget.instruction(
+      try XCTUnwrap(model.currentSession?.snapshot.instructionSections.first?.steps.first?.id)
+    )
     model.updateCurrentEntryDraft(text: "Original", target: nil)
     XCTAssertFalse(model.submitCurrentEntryDraft())
     model.updateCurrentEntryDraft(text: "Newer", target: target)
@@ -176,7 +188,10 @@ final class SessionDeliveryCharacterizationTests: XCTestCase {
     XCTAssertEqual(relaunched.currentEntryDraft?.text, "Newer")
     XCTAssertEqual(relaunched.currentEntryDraft?.target, target)
     XCTAssertTrue(relaunched.pendingCommands.isEmpty)
-    guard case let .submitEntry(factID, _, _, _, _) = pending else { return XCTFail("Expected Entry") }
+    guard case let .submitEntry(factID, _, _, _, _) = pending else {
+      XCTFail("Expected Entry")
+      return
+    }
     XCTAssertEqual(service.submissions, [factID, factID])
   }
 
@@ -222,7 +237,10 @@ final class SessionDeliveryCharacterizationTests: XCTestCase {
     relaunched.retryPendingCommands()
     XCTAssertTrue(relaunched.pendingCommands.isEmpty)
     XCTAssertNil(relaunched.currentSession)
-    guard case let .finish(closureID, _, _) = pending else { return XCTFail("Expected Finish") }
+    guard case let .finish(closureID, _, _) = pending else {
+      XCTFail("Expected Finish")
+      return
+    }
     XCTAssertEqual(service.finishIDs, [closureID, closureID, closureID])
   }
 
@@ -248,7 +266,17 @@ private final class EntryRetryProbe: CookingSessionServing {
   var resumeIDs: [SessionFact.ID] = []
   var finishIDs: [SessionClosure.ID] = []
   init(base: CookingSessions) { self.base = base }
+  func history() throws -> CookingSessionHistoryRead { try base.history() }
   func sessions() throws -> [SessionProjectionResult] { try base.sessions() }
+  func sessions(for recipeID: Recipe.ID) throws -> [SessionProjectionResult] {
+    try base.sessions(for: recipeID)
+  }
+  func finishedSessions(limit: Int) throws -> [SessionProjectionResult] {
+    try base.finishedSessions(limit: limit)
+  }
+  func unresolvedDeletionIDs(for sessionID: CookingSession.ID) throws -> [SessionDeletion.ID] {
+    try base.unresolvedDeletionIDs(for: sessionID)
+  }
   func start(_ intention: StartCookingSessionIntention) throws -> CookingSessionCommandResult {
     try base.start(intention)
   }

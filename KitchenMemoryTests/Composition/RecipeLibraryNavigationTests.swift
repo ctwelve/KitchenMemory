@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: MIT
 
 @testable import KitchenMemory
-import KitchenKit
 import Foundation
+import KitchenKit
 import XCTest
 
 @MainActor

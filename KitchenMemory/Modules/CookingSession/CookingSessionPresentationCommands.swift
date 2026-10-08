@@ -12,7 +12,7 @@ extension CookingSessionPresentationModel {
       sessionID: CookingSession.ID(),
       recipeID: recipe.recipe.id,
       revisionID: recipe.revision.id,
-      startedAt: Date()
+      startedAt: now()
     ) }
   }
   @discardableResult
@@ -22,7 +22,7 @@ extension CookingSessionPresentationModel {
     return submitCommand { .stop(
       factID: SessionFact.ID(),
       sessionID: session.id,
-      authoredAt: Date()
+      authoredAt: now()
     ) }
   }
   @discardableResult
@@ -32,7 +32,7 @@ extension CookingSessionPresentationModel {
     return submitCommand { .resume(
       factID: SessionFact.ID(),
       sessionID: session.id,
-      authoredAt: Date()
+      authoredAt: now()
     ) }
   }
   @discardableResult
@@ -44,7 +44,7 @@ extension CookingSessionPresentationModel {
     return submitIndependentCommand(.progress(
       factID: SessionFact.ID(),
       sessionID: session.id,
-      authoredAt: Date(),
+      authoredAt: now(),
       progress: SessionProgress(target: .ingredient(id), state: .ingredient(state))
     ))
   }
@@ -62,7 +62,7 @@ extension CookingSessionPresentationModel {
     let accepted = submitIndependentCommand(.progress(
       factID: SessionFact.ID(),
       sessionID: session.id,
-      authoredAt: Date(),
+      authoredAt: now(),
       progress: SessionProgress(target: .instruction(id), state: .instruction(state))
     ))
     if advances, let updated = currentSession, updated.id == session.id,
@@ -80,7 +80,7 @@ extension CookingSessionPresentationModel {
     return submitIndependentCommand(.replaceWorkingScale(
       factID: SessionFact.ID(),
       sessionID: session.id,
-      authoredAt: Date(),
+      authoredAt: now(),
       scale: replacement
     ))
   }
@@ -98,7 +98,7 @@ extension CookingSessionPresentationModel {
     return submitCommand { .finish(
       closureID: SessionClosure.ID(),
       sessionID: session.id,
-      finishedAt: Date()
+      finishedAt: now()
     ) }
   }
 
@@ -313,7 +313,7 @@ private extension PendingCookingSessionCommand {
 private extension PendingCookingSessionCommand {
   var refreshesClassification: Bool {
     switch self {
-    case .delete, .restore, .resolveClosure: true
+    case .start, .continueSession, .delete, .restore, .resolveClosure: true
     default: false
     }
   }

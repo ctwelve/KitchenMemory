@@ -58,7 +58,7 @@ extension CookingSessionPresentationModel {
     return submitCommand {
       let factID = SessionFact.ID()
       self.pendingEntryComposerResumes[factID] = PendingEntryComposerResume(sessionID: session.id, origin: origin)
-      return .resume(factID: factID, sessionID: session.id, authoredAt: Date())
+      return .resume(factID: factID, sessionID: session.id, authoredAt: now())
     }
   }
 }

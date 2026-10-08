@@ -2,6 +2,7 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
+import Foundation
 @testable import KitchenKit
 import XCTest
 
@@ -11,6 +12,12 @@ import XCTest
 @MainActor
 // swiftlint:disable:next type_body_length
 final class CookingSessionsContractTests: XCTestCase {
+  func testHistoryReadMapsRepositoryFailureToSessionReadFailure() {
+    let stored = recipe(seed: 540)
+    let logic = sessions(stored, repository: ReadFailureCookingSessionRepository())
+    XCTAssertThrowsError(try logic.history()) { assertSessionReadFailure($0) }
+  }
+
   func testStartReturnsTypedRecipeAndSnapshotFailuresWithoutCreatingHistory() throws {
     let stored = recipe(seed: 1)
     let repository = InMemoryCookingSessionRepository()
@@ -624,6 +631,7 @@ private final class ReadFailureCookingSessionRepository: CookingSessionRepositor
   func append(_ transaction: CookingSessionTransaction) throws { throw ProbeError.read }
   func evidence(id: CookingSession.ID) throws -> SessionEvidence? { throw ProbeError.read }
   func session(id: CookingSession.ID) throws -> SessionProjectionResult? { throw ProbeError.read }
+  func history(in id: Kitchen.ID) throws -> CookingSessionHistoryRead { throw ProbeError.read }
   func sessions(in id: Kitchen.ID) throws -> [SessionProjectionResult] { throw ProbeError.read }
   func sessions(for id: Recipe.ID) throws -> [SessionProjectionResult] { throw ProbeError.read }
   func sessions(for id: Recipe.ID, in kitchenID: Kitchen.ID) throws -> [SessionProjectionResult] {
@@ -659,6 +667,7 @@ private final class ClassifiedReadRepository: CookingSessionRepository {
     if mode == .throwing { throw ProbeError.read }
     return nil
   }
+  func history(in id: Kitchen.ID) throws -> CookingSessionHistoryRead { try base.history(in: id) }
   func sessions(in id: Kitchen.ID) throws -> [SessionProjectionResult] { try base.sessions(in: id) }
   func sessions(for id: Recipe.ID) throws -> [SessionProjectionResult] { try base.sessions(for: id) }
   func sessions(for id: Recipe.ID, in kitchenID: Kitchen.ID) throws -> [SessionProjectionResult] {

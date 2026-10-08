@@ -4,7 +4,6 @@
 
 @testable import KitchenKit
 import Foundation
-import SwiftData
 import XCTest
 
 @MainActor

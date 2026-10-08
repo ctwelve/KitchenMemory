@@ -2,8 +2,6 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
-import Foundation
-
 /// An interpretation of one source line; annotations refer to its unchanged UTF-16 text.
 public struct IngredientLineInterpretation: Equatable, Sendable {
     /// The provisional meaning of a span in the unchanged authored source line.

@@ -2,6 +2,7 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
+import Foundation
 import KitchenKit
 import SwiftUI
 
@@ -132,8 +133,11 @@ struct CookingSessionTargetNotes: View {
       }
       if session.lifecycle == .active {
         Button {
-          if let requestNote { requestNote(target) }
-          else { model.openEntryComposer(target: target, origin: composerOrigin) }
+          if let requestNote {
+            requestNote(target)
+          } else {
+            model.openEntryComposer(target: target, origin: composerOrigin)
+          }
         } label: {
           Label(.sessionEntryActionAdd, systemImage: "square.and.pencil")
         }

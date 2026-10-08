@@ -69,6 +69,7 @@ final class CookingSessionPresentationModel {
   var historyScope: CookingSessionHistoryScope? { navigation.historyScope }
   var recipeHistorySessions: [CookingSessionProjection] = []
   var sidebarSessionIDsByRecipe: [Recipe.ID: Set<CookingSession.ID>] = [:]
+  var historySessionIDsByRecipe: [Recipe.ID: Set<CookingSession.ID>] = [:]
   var observedFinishedSessionID: CookingSession.ID? {
     guard case .finished(let id, _) = navigation.destination else { return nil }
     return id
@@ -157,6 +158,8 @@ final class CookingSessionPresentationModel {
     detachedEntryDraft = nil
     finishedSessionIDs = []
     recipeHistorySessions = []
+    sidebarSessionIDsByRecipe = [:]
+    historySessionIDsByRecipe = [:]
     sessionVisits = []
     readingPreferences = []
     readingCompletion = nil

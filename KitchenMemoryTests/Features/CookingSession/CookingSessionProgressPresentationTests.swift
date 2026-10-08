@@ -310,6 +310,17 @@ private final class ProgressSessionService: CookingSessionServing {
   }
 
   func sessions() throws -> [SessionProjectionResult] { [.session(session)] }
+  func history() throws -> CookingSessionHistoryRead {
+    fixtureHistoryRead(sessions: [.session(session)], sessionIDsByRecipe: [:])
+  }
+  func sessions(for recipeID: Recipe.ID) throws -> [SessionProjectionResult] {
+    _ = recipeID
+    throw CookingSessionTestSupportError.unsupportedRead("sessions(for:)")
+  }
+  func unresolvedDeletionIDs(for sessionID: CookingSession.ID) throws -> [SessionDeletion.ID] {
+    _ = sessionID
+    throw CookingSessionTestSupportError.unsupportedRead("unresolvedDeletionIDs(for:)")
+  }
 
   func start(_ intention: StartCookingSessionIntention) throws -> CookingSessionCommandResult {
     throw CookingSessionLogicError.invalidIntention
@@ -339,6 +350,17 @@ private final class WorkingScaleSessionService: CookingSessionServing {
   }
 
   func sessions() throws -> [SessionProjectionResult] { [.session(session)] }
+  func history() throws -> CookingSessionHistoryRead {
+    fixtureHistoryRead(sessions: [.session(session)], sessionIDsByRecipe: [:])
+  }
+  func sessions(for recipeID: Recipe.ID) throws -> [SessionProjectionResult] {
+    _ = recipeID
+    throw CookingSessionTestSupportError.unsupportedRead("sessions(for:)")
+  }
+  func unresolvedDeletionIDs(for sessionID: CookingSession.ID) throws -> [SessionDeletion.ID] {
+    _ = sessionID
+    throw CookingSessionTestSupportError.unsupportedRead("unresolvedDeletionIDs(for:)")
+  }
 
   func start(_ intention: StartCookingSessionIntention) throws -> CookingSessionCommandResult {
     throw CookingSessionLogicError.invalidIntention

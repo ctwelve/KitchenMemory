@@ -4,6 +4,7 @@
 
 #if DEVELOP && os(macOS)
 import CoreData
+import Foundation
 import SwiftData
 
 /// Creates or additively updates the development CloudKit schema on demand.

@@ -2,10 +2,10 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
+import Foundation
 import KitchenKit
 @testable import KitchenMemory
 import XCTest
-import SwiftData
 
 @MainActor
 final class SamplePackSettingsTests: XCTestCase {

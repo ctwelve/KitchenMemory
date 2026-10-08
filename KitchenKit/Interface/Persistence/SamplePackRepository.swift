@@ -2,9 +2,6 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
-import Foundation
-import SwiftData
-
 /// Main-actor boundary for reversible sample-pack intent and locally atomic acceptance.
 @MainActor
 public protocol SamplePackRepository {

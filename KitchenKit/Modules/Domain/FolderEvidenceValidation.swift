@@ -2,8 +2,6 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
-import Foundation
-
 /// Positive integrity failures remain explicit, including after a transport decode.
 enum FolderEvidenceValidation {
   static func validate(_ actions: [OrganizationAction<FolderChange>]) throws {

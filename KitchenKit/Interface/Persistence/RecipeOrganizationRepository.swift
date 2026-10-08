@@ -2,9 +2,6 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
-import Foundation
-import SwiftData
-
 /// Main-actor boundary for Kitchen organization reads and atomic batch acceptance.
 @MainActor
 public protocol RecipeOrganizationRepository {

@@ -3,18 +3,9 @@
 // SPDX-License-Identifier: MIT
 
 import Foundation
-#if canImport(Darwin)
-import Darwin
-#elseif canImport(Glibc)
-import Glibc
-#endif
-#if canImport(FoundationNetworking)
-import FoundationNetworking
-#endif
 
 // These related public values and their caller contracts form one domain boundary.
 // Keep their documentation beside the declarations rather than splitting the contract.
-// swiftlint:disable file_length
 
 /// Bounded transport bytes and final response metadata before text interpretation.
 ///

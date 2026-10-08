@@ -3,8 +3,6 @@
 // SPDX-License-Identifier: MIT
 
 @testable import KitchenKit
-import Foundation
-import SwiftData
 import XCTest
 
 @MainActor

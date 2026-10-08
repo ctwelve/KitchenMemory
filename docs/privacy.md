@@ -15,11 +15,15 @@ advertising profiles, engagement measurements, or saleable data.
 
 The shipped privacy manifest must describe the code in the current release. The
 application declares no tracking and no collected data. Its only declared
-required-reason API is `UserDefaults`, used to retain the app-local answer to the
-sample-recipe onboarding question and the device-local iCloud synchronization
-choice. One application preferences store owns both keys while preserving those
-different scopes. Only the onboarding answer uses iCloud key-value storage; the
-synchronization choice must not travel to another device. Private iCloud
+required-reason API is `UserDefaults`, used for the sample-recipe onboarding
+answer, the device-local iCloud synchronization choice, local organization/display
+preferences, and recoverable Cooking Session presentation state. The latter
+includes the current Session, ordered pending commands, Session Entry Drafts,
+local visits, and reading preferences. These presentation values remain on the
+device; accepted cooking evidence has its separate persistence and synchronization
+contract. Only the onboarding answer uses iCloud key-value storage; the
+synchronization choice and other local presentation preferences must not travel
+through that preference transport. Private iCloud
 synchronization is a person-directed product function, not telemetry, and must
 never be repurposed as an analytics channel.
 

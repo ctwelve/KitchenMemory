@@ -2,8 +2,8 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
+import Foundation
 import KitchenKit
-import SwiftUI
 
 extension RecipeSource.Kind {
   var label: LocalizedStringResource {

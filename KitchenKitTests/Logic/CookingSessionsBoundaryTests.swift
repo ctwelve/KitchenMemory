@@ -2,11 +2,23 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
+import Foundation
 @testable import KitchenKit
 import XCTest
 
 @MainActor
 final class CookingSessionsBoundaryTests: XCTestCase {
+  func testHistoryReadRetainsRecipeProvenanceAcrossRecipeReadFailure() throws {
+    let fixture = try BoundaryFixture.started(seed: 950)
+    fixture.recipes.readError = BoundaryError.injected
+
+    let history = try fixture.logic.history()
+    XCTAssertEqual(history.sessions, try fixture.logic.sessions())
+    XCTAssertEqual(history.sessions.count, 1)
+    XCTAssertEqual(history.sessionIDsByRecipe, [fixture.start.recipeID: [fixture.sessionID]])
+    XCTAssertTrue(history.finishedSessions.isEmpty)
+  }
+
   func testStartIsRetrySafeAcrossBothSidesOfDurability() throws {
     for mode in BoundaryRepository.FailureMode.allCases {
       let fixture = BoundaryFixture(seed: 400 + mode.rawValue)
@@ -293,6 +305,7 @@ private final class BoundaryRepository: CookingSessionRepository {
 
   func evidence(id: CookingSession.ID) throws -> SessionEvidence? { try base.evidence(id: id) }
   func session(id: CookingSession.ID) throws -> SessionProjectionResult? { try base.session(id: id) }
+  func history(in id: Kitchen.ID) throws -> CookingSessionHistoryRead { try base.history(in: id) }
   func sessions(in id: Kitchen.ID) throws -> [SessionProjectionResult] { try base.sessions(in: id) }
   func sessions(for id: Recipe.ID) throws -> [SessionProjectionResult] { try base.sessions(for: id) }
   func sessions(for id: Recipe.ID, in kitchenID: Kitchen.ID) throws -> [SessionProjectionResult] {

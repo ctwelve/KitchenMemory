@@ -2,6 +2,7 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
+import Foundation
 import SwiftUI
 
 /// A person-facing summary of the privacy contract enforced by the app's

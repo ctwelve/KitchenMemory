@@ -171,6 +171,17 @@ final class DeliveryTestService: CookingSessionServing {
     result = .accepted(CookingSessionProjection(id: sessionID, snapshot: ExecutionSnapshot(title: "Soup")))
   }
   func sessions() throws -> [SessionProjectionResult] { [] }
+  func history() throws -> CookingSessionHistoryRead {
+    fixtureHistoryRead(sessions: [], sessionIDsByRecipe: [:])
+  }
+  func sessions(for recipeID: Recipe.ID) throws -> [SessionProjectionResult] {
+    _ = recipeID
+    throw CookingSessionTestSupportError.unsupportedRead("sessions(for:)")
+  }
+  func unresolvedDeletionIDs(for sessionID: CookingSession.ID) throws -> [SessionDeletion.ID] {
+    _ = sessionID
+    throw CookingSessionTestSupportError.unsupportedRead("unresolvedDeletionIDs(for:)")
+  }
   func start(_ intention: StartCookingSessionIntention) throws -> CookingSessionCommandResult { result }
   func perform(_ intention: CookingSessionIntention) throws -> CookingSessionCommandResult {
     beforeAttempt()

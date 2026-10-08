@@ -2,8 +2,6 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
-import Foundation
-
 enum FolderChange: OrganizationPayload {
   case create(id: Folder.ID, name: String, parentID: Folder.ID?)
   case move(id: Folder.ID, parentID: Folder.ID?)

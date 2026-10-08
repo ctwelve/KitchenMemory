@@ -2,6 +2,7 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
+import Dispatch
 @testable import KitchenKit
 import CloudKit
 import Foundation
