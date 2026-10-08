@@ -5,7 +5,6 @@
 import Foundation
 import KitchenKit
 @testable import KitchenMemory
-import SwiftData
 import XCTest
 
 @MainActor

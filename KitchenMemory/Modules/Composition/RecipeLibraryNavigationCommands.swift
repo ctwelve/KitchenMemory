@@ -2,8 +2,6 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
-import KitchenKit
-
 extension RecipeLibraryNavigation {
   func canPerform(_ command: LibraryCommandActions.Command, library: RecipeLibraryModel,
                   sessions: CookingSessionPresentationModel) -> Bool {

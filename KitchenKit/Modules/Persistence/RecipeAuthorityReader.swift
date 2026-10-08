@@ -2,9 +2,9 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
+import Algorithms
 import Foundation
 import SwiftData
-import Algorithms
 
 /// Reconstructs complete retained evidence before the pure authority projector classifies it.
 @MainActor

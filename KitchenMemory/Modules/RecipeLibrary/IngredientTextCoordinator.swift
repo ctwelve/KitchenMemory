@@ -2,8 +2,8 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
+import Foundation
 import KitchenKit
-import SwiftUI
 #if os(macOS)
 import AppKit
 #else

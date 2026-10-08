@@ -2,8 +2,6 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
-import Foundation
-
 /// One complete local append boundary from the frozen V3 persistence contract.
 public enum CookingSessionTransaction: Equatable, Sendable {
   /// One complete root with no continuation source fields.

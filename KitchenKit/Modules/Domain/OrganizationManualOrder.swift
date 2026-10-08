@@ -2,8 +2,6 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
-import Foundation
-
 extension OrganizationEvidence {
   /// Replay independent neighbor choices while retaining creation order across mode changes.
   func manualOrder<ID: Hashable>(live: Set<ID>, creation: (Payload) -> ID?,

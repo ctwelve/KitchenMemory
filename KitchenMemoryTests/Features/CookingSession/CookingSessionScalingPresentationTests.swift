@@ -21,7 +21,7 @@ final class CookingSessionScalingPresentationTests: XCTestCase {
     var selection = CookingSessionScaleSelection(session: session)
     XCTAssertEqual(selection.selectedBasisIndex, 1)
     let factors = [RationalQuantity(numerator: 1, denominator: 2), .init(numerator: 1),
-      .init(numerator: 3, denominator: 2), .init(numerator: 2)]
+      .init(numerator: 3, denominator: 2), .init(numerator: 2), ]
     for factor in factors {
       selection.selectFactor(factor)
       selection.selectFactor(factor)
@@ -45,7 +45,7 @@ final class CookingSessionScalingPresentationTests: XCTestCase {
 
   func testMissingOrTextualYieldOffersFactorOnlyWithoutIngredientUncertainty() throws {
     for yield in [nil, RecipeYield(originalText: "one pot"),
-      RecipeYield(quantity: .init(kind: .exact, lowerBound: .init(numerator: 0)), originalText: "unknown")] {
+      RecipeYield(quantity: .init(kind: .exact, lowerBound: .init(numerator: 0)), originalText: "unknown"), ] {
       let ingredient = scalingIngredient(quantity: .init(kind: .exact, lowerBound: .init(numerator: 1)))
       let session = scalingSession(yield: yield, ingredients: [ingredient], factor: .init(numerator: 2))
       let selection = CookingSessionScaleSelection(session: session)
@@ -69,7 +69,7 @@ final class CookingSessionScalingPresentationTests: XCTestCase {
       .init(kind: .text, text: "to taste"), .init(kind: .none), nil,
     ]
     let expected: [ScaledRecipeIngredient.Status] = [.scaled, .scaled, .scaled,
-      .unchangedText, .unchangedText, .unchangedWithoutQuantity]
+      .unchangedText, .unchangedText, .unchangedWithoutQuantity, ]
     for (quantity, status) in zip(expressions, expected) {
       let ingredient = scalingIngredient(quantity: quantity)
       let session = scalingSession(ingredients: [ingredient], factor: .init(numerator: 2))
@@ -84,7 +84,7 @@ final class CookingSessionScalingPresentationTests: XCTestCase {
       XCTAssertEqual(session.snapshot.ingredientSections.first?.ingredients.first, ingredient)
     }
     for (policy, status) in [(RecipeIngredient.ScalingBehavior.fixed, ScaledRecipeIngredient.Status.unchangedFixed),
-      (.manualReview, .unchangedManualReview)] {
+      (.manualReview, .unchangedManualReview), ] {
       let ingredient = scalingIngredient(quantity: .init(kind: .exact, lowerBound: .init(numerator: 1)), policy: policy)
       XCTAssertEqual(CookingSessionScalingGuidance(session: scalingSession(ingredients: [ingredient],
         factor: .init(numerator: 2))).ingredientStatus(for: ingredient), status)
@@ -107,7 +107,7 @@ final class CookingSessionScalingPresentationTests: XCTestCase {
     XCTAssertTrue(guidance.warrantsExplanation)
     XCTAssertEqual(session.snapshot.instructionSections.first?.steps.first, step)
     let proseSession = scalingSession(instructions: [.init(sourceInstructionID: nil,
-      value: .init(text: "Bake at 180 degrees for ten minutes"))], factor: .init(numerator: 2))
+      value: .init(text: "Bake at 180 degrees for ten minutes")), ], factor: .init(numerator: 2))
     let prose = CookingSessionScalingGuidance(session: proseSession)
     XCTAssertTrue(prose.hasMethod)
     XCTAssertFalse(prose.hasTime)
@@ -130,7 +130,7 @@ final class CookingSessionScalingPresentationTests: XCTestCase {
     XCTAssertFalse(reopened.scalingExplanationIsVisible(in: changedPreset))
     XCTAssertTrue(reopened.scalingExplanationIsVisible(in: scalingSession(factor: .init(numerator: 2))))
     XCTAssertTrue(reopened.pendingCommands.isEmpty)
-    XCTAssertEqual(reopened.readingPreference(for: session).hasDismissedScalingExplanation, true)
+    XCTAssertTrue(try XCTUnwrap(reopened.readingPreference(for: session).hasDismissedScalingExplanation))
   }
 
   func testExplanationOnlyAppearsForApplicableNonOriginalConditions() {
@@ -154,7 +154,10 @@ final class CookingSessionScalingPresentationTests: XCTestCase {
     let old = LegacyScalingReadingPreference(sessionID: sessionID, emphasizedInstructionID: stepID,
       position: .init(instructionID: stepID, offset: 37), keepsScreenAwake: false)
     let defaults = try makeTestUserDefaults(suiteNamePrefix: "LegacyScalingExplanation").defaults
-    defaults.set(try PropertyListEncoder().encode([old]), forKey: DefaultsCookingSessionPresentationStore.readingPreferencesKey)
+    defaults.set(
+      try PropertyListEncoder().encode([old]),
+      forKey: DefaultsCookingSessionPresentationStore.readingPreferencesKey
+    )
     let restored = try XCTUnwrap(DefaultsCookingSessionPresentationStore(defaults: defaults).readingPreferences.first)
     XCTAssertEqual(restored.sessionID, sessionID)
     XCTAssertEqual(restored.emphasizedInstructionID, stepID)
@@ -164,13 +167,20 @@ final class CookingSessionScalingPresentationTests: XCTestCase {
   }
 }
 
-private func scalingIngredient(quantity: QuantityExpression?, policy: RecipeIngredient.ScalingBehavior = .linear) -> SessionIngredient {
+private func scalingIngredient(
+  quantity: QuantityExpression?,
+  policy: RecipeIngredient.ScalingBehavior = .linear
+) -> SessionIngredient {
   SessionIngredient(sourceIngredientID: nil, value: RecipeIngredient(originalText: "broth", quantity: quantity,
     ingredientText: "broth", scalingBehavior: policy, parseState: .reviewed))
 }
 
-private func scalingSession(yield: RecipeYield? = nil, ingredients: [SessionIngredient] = [],
-  instructions: [SessionInstruction] = [], factor: RationalQuantity) -> CookingSessionProjection {
+private func scalingSession(
+  yield: RecipeYield? = nil,
+  ingredients: [SessionIngredient] = [],
+  instructions: [SessionInstruction] = [],
+  factor: RationalQuantity
+) -> CookingSessionProjection {
   CookingSessionProjection(id: CookingSession.ID(), snapshot: .init(title: "Soup", baseYield: yield,
     ingredientSections: [.init(title: nil, ingredients: ingredients)],
     instructionSections: [.init(title: nil, steps: instructions)]),

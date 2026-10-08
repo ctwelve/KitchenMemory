@@ -3,8 +3,6 @@
 // SPDX-License-Identifier: MIT
 
 import CloudKit
-import CoreData
-import Foundation
 
 /// Maps one container's CloudKit account availability into plain presentation status.
 @MainActor

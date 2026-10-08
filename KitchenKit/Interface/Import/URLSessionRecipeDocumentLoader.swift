@@ -12,8 +12,6 @@ import Glibc
 import FoundationNetworking
 #endif
 
-// swiftlint:disable file_length
-
 /// Privacy-conscious system networking for person-initiated recipe imports.
 ///
 /// A fresh ephemeral session is used for every import. It carries no cookie or
@@ -326,5 +324,3 @@ private extension URLSessionRecipeDocumentLoader {
     return false
   }
 }
-
-// swiftlint:enable file_length

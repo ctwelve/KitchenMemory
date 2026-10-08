@@ -51,7 +51,7 @@ final class CookingSessionReadingMotionTests: XCTestCase {
       move: { otherOffset = $0 }, schedule: { _ in XCTFail("Other reader moved"); return {} })
     first.isReady = { true }; other.isReady = { true }
     let frames = [steps[0].id: CGRect(x: 0, y: 20, width: 300, height: 100),
-                  steps[1].id: CGRect(x: 0, y: 600, width: 300, height: 100),]
+                  steps[1].id: CGRect(x: 0, y: 600, width: 300, height: 100), ]
     for reader in [first, other] {
       reader.update(session: session, preference: model.readingPreference(for: session),
         completion: nil, jump: nil, reduceMotion: false)

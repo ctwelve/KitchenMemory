@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MIT
 
 import Foundation
-import SwiftData
 
 /// Durable acceptance and reconstruction of Kitchen-owned Folder commands.
 @MainActor

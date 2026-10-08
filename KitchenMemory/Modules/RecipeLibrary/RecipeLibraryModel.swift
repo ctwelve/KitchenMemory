@@ -2,8 +2,8 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
-import KitchenKit
 import Foundation
+import KitchenKit
 import Observation
 
 /// Presentation state for one prepared Kitchen's recipe library.

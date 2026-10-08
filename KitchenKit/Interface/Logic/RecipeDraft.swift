@@ -2,8 +2,6 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
-import Foundation
-
 /// The editable representation of a recipe revision.
 ///
 /// It deliberately carries the recipe's authored structure rather than a

@@ -2,6 +2,7 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
+import Foundation
 import XCTest
 
 /// Accessibility-oriented checks for the durable application shell.
@@ -81,7 +82,9 @@ final class KitchenMemoryUITests: XCTestCase {
     let reading = app.descendants(matching: .any)["cooking-session-shell"]
     XCTAssertTrue(reading.waitForExistence(timeout: 5))
     assertAccessibleText(reading, description: "Cooking Session reading")
-    for identifier in ["session-reading-jump", "session-reading-keep-awake", "session-lifecycle-menu", "leave-session"] {
+    for identifier in [
+      "session-reading-jump", "session-reading-keep-awake", "session-lifecycle-menu", "leave-session",
+    ] {
       let control = app.descendants(matching: .any)[identifier].firstMatch
       XCTAssertTrue(control.waitForExistence(timeout: 5))
       assertAccessibleName(control, description: identifier)

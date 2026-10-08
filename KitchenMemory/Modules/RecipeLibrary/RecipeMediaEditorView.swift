@@ -4,7 +4,6 @@
 
 import KitchenKit
 import SwiftUI
-import UniformTypeIdentifiers
 
 struct RecipeMediaEditorView: View {
   @Binding var session: RecipeEditSession

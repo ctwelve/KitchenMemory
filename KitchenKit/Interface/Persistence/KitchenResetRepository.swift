@@ -2,9 +2,6 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
-import Foundation
-import SwiftData
-
 /// One atomic persistence boundary for returning a Kitchen to bundled samples.
 @MainActor
 public protocol KitchenResetRepository: AnyObject {

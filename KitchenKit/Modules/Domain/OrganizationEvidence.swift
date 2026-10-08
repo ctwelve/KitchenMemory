@@ -2,8 +2,8 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
-import Foundation
 import Collections
+import Foundation
 
 /// Shared immutable identity and causal context for organization policies.
 struct OrganizationAction<Payload: OrganizationPayload>: Codable, Equatable, Sendable {

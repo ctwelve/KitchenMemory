@@ -2,6 +2,7 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
+import CoreGraphics
 import KitchenKit
 import SwiftUI
 
@@ -25,8 +26,7 @@ struct CookingSessionOutcomePicker: View {
       guard case let .coarse(value) = session.outcome else { return nil }
       return value
     }, set: { value in
-      if let value { model.setOutcome(.coarse(value)) }
-      else if session.outcome != nil { model.clearOutcome() }
+      if let value { model.setOutcome(.coarse(value)) } else if session.outcome != nil { model.clearOutcome() }
     })
   }
 }
@@ -91,8 +91,7 @@ struct CookingSessionSaveStatus: View {
           Text(issue.message).font(.callout).foregroundStyle(.secondary)
         }
         Button(.sessionSaveRetry) {
-          if model.hasPendingDeliveryWork { model.retryPendingCommands() }
-          else { model.retryCurrentIssue() }
+          if model.hasPendingDeliveryWork { model.retryPendingCommands() } else { model.retryCurrentIssue() }
         }
           .accessibilityIdentifier("retry-session-save")
       }

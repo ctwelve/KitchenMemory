@@ -2,8 +2,6 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
-import KitchenKit
-
 /// Window-specific effects around the shared app graph's navigation intentions.
 @MainActor
 struct LibraryCommandActions {

@@ -2,8 +2,6 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
-import Foundation
-
 /// Directed merge promises, including deterministic opposite-merge cycle repair.
 struct OrganizationAliases<ID: Hashable, Payload: OrganizationPayload> {
   let evidence: OrganizationEvidence<Payload>

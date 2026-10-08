@@ -2,8 +2,6 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
-import Foundation
-
 /// Locally completed maintenance, never a claim of synchronization completion.
 public struct RecipeRetentionResult: Equatable, Sendable {
   /// Recipe identities whose eligible payload was removed in this local pass.

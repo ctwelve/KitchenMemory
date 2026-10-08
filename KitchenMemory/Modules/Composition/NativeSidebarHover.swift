@@ -4,6 +4,7 @@
 
 #if os(macOS)
 import AppKit
+import CoreGraphics
 import SwiftUI
 
 /// Adds temporary reveal to the system sidebar control without replacing its action or accessibility.

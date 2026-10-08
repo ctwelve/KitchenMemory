@@ -2,8 +2,6 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
-import Foundation
-
 public extension RecipeEditingDraft {
   /// Applies editable recipe details from a snapshot, retaining the live ingredient state.
   ///

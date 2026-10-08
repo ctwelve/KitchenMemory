@@ -171,7 +171,6 @@ final class CookingSessionDelivery {
   }
 }
 
-
 extension PendingCookingSessionCommand {
   /// Entry acceptance must include the exact authored fact, not merely a Session read.
   func hasAcceptedEntry(in session: CookingSessionProjection) -> Bool {

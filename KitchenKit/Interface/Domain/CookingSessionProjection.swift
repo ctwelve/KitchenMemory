@@ -2,8 +2,6 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
-import Foundation
-
 /// Reconstructs one complete Session from retained, unordered evidence.
 public enum SessionEvidenceProjector {
     /// Reconstructs a complete Session, then applies independent deletion disposition.

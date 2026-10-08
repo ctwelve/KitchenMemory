@@ -2,8 +2,6 @@
 // Copyright © 2026 the Kitchen Memory contributors.
 // SPDX-License-Identifier: MIT
 
-import Foundation
-
 extension RecipeIngredientTextDraft {
   /// Rebases a text-undo snapshot over subsequent explicit precision edits.
   /// Only fields changed outside the text history are carried over; historical wording and
