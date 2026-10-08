@@ -313,7 +313,7 @@ private extension PendingCookingSessionCommand {
 private extension PendingCookingSessionCommand {
   var refreshesClassification: Bool {
     switch self {
-    case .delete, .restore, .resolveClosure: true
+    case .start, .continueSession, .delete, .restore, .resolveClosure: true
     default: false
     }
   }

@@ -74,19 +74,8 @@ extension CookingSessionPresentationModel {
   }
 
   func refreshSidebarAssociations(for recipeIDs: [Recipe.ID]) {
-    do {
-      var associations: [Recipe.ID: Set<CookingSession.ID>] = [:]
-      for recipeID in recipeIDs {
-        associations[recipeID] = Set(try service.sessions(for: recipeID).compactMap { result in
-          guard case let .session(session) = result else { return nil }
-          return session.id
-        })
-      }
-      sidebarSessionIDsByRecipe = associations
-    } catch {
-      sidebarSessionIDsByRecipe = [:]
-      present(.read)
-    }
+    let visibleIDs = Set(recipeIDs)
+    sidebarSessionIDsByRecipe = historySessionIDsByRecipe.filter { visibleIDs.contains($0.key) }
   }
 
   func recentHistorySessions(
@@ -147,15 +136,9 @@ extension CookingSessionPresentationModel {
 
   @discardableResult
   func showRecipeSessionHistory(for recipeID: Recipe.ID) -> Bool {
-    do {
-      let matching = try recipeHistory(for: recipeID)
-      guard navigation.move(to: .history(.recipe(recipeID))) else { return false }
-      recipeHistorySessions = matching
-      return true
-    } catch {
-      present(.read)
-      return false
-    }
+    guard navigation.move(to: .history(.recipe(recipeID))) else { return false }
+    recipeHistorySessions = recipeHistory(for: recipeID)
+    return true
   }
 
   func showRecipes() {
@@ -195,8 +178,11 @@ extension CookingSessionPresentationModel {
 
   func reload() {
     do {
-      let classified = SessionHistoryClassification(try service.sessions())
-      let finished = try ordinaryFinishedSessions()
+      let read = try service.history()
+      let classified = SessionHistoryClassification(read.sessions)
+      let finished = ordinaryFinishedSessions(in: read)
+      historySessionIDsByRecipe = read.sessionIDsByRecipe
+      sidebarSessionIDsByRecipe = read.sessionIDsByRecipe
       apply(classified: classified, finished: finished)
       refreshRecipeHistory()
     } catch {
@@ -206,19 +192,16 @@ extension CookingSessionPresentationModel {
 
   func refreshRecipeHistory() {
     guard case .recipe(let id) = displayedHistoryScope else { return }
-    do { recipeHistorySessions = try recipeHistory(for: id) } catch { present(.read) }
+    recipeHistorySessions = recipeHistory(for: id)
   }
 
-  private func recipeHistory(for recipeID: Recipe.ID) throws -> [CookingSessionProjection] {
-    let matchingIDs = Set(try service.sessions(for: recipeID).compactMap { result -> CookingSession.ID? in
-      guard case let .session(session) = result, session.disposition == .ordinary else { return nil }
-      return session.id
-    })
+  private func recipeHistory(for recipeID: Recipe.ID) -> [CookingSessionProjection] {
+    let matchingIDs = historySessionIDsByRecipe[recipeID] ?? []
     return (sessions + finishedSessions).filter { matchingIDs.contains($0.id) }
   }
 
-  private func ordinaryFinishedSessions() throws -> [CookingSessionProjection] {
-    try service.finishedSessions(limit: Int.max).compactMap {
+  private func ordinaryFinishedSessions(in read: CookingSessionHistoryRead) -> [CookingSessionProjection] {
+    read.finishedSessions.compactMap {
       guard case let .session(session) = $0,
             session.disposition == .ordinary,
             session.lifecycle == .finished
