@@ -8,6 +8,17 @@ import XCTest
 
 @MainActor
 final class CookingSessionsBoundaryTests: XCTestCase {
+  func testHistoryReadRetainsRecipeProvenanceAcrossRecipeReadFailure() throws {
+    let fixture = try BoundaryFixture.started(seed: 950)
+    fixture.recipes.readError = BoundaryError.injected
+
+    let history = try fixture.logic.history()
+    XCTAssertEqual(history.sessions, try fixture.logic.sessions())
+    XCTAssertEqual(history.sessions.count, 1)
+    XCTAssertEqual(history.sessionIDsByRecipe, [fixture.start.recipeID: [fixture.sessionID]])
+    XCTAssertTrue(history.finishedSessions.isEmpty)
+  }
+
   func testStartIsRetrySafeAcrossBothSidesOfDurability() throws {
     for mode in BoundaryRepository.FailureMode.allCases {
       let fixture = BoundaryFixture(seed: 400 + mode.rawValue)

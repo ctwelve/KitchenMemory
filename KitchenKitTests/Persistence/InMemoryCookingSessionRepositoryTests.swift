@@ -25,6 +25,10 @@ final class InMemoryCookingSessionRepositoryTests: XCTestCase {
 
     XCTAssertEqual(try repository.evidence(id: root.id)?.facts, [fact])
     XCTAssertEqual(try repository.sessions(in: root.kitchenID).count, 1)
+    let history = try repository.history(in: root.kitchenID)
+    XCTAssertEqual(history.sessions, try repository.sessions(in: root.kitchenID))
+    XCTAssertEqual(history.finishedSessions.map(\.sessionID), [root.id])
+    XCTAssertTrue(history.sessionIDsByRecipe.isEmpty)
   }
 
   func testStartAndActivityProjectThroughTheRepositorySeam() throws {
@@ -51,7 +55,7 @@ final class InMemoryCookingSessionRepositoryTests: XCTestCase {
     let collision = CookingSessionRootEvidence(
       id: root.id,
       kitchenID: root.kitchenID,
-      recipeID: root.recipeID,
+      recipeID: Recipe.ID(rawValue: id(90)),
       recipeRevisionID: root.recipeRevisionID,
       startedAt: Date(timeIntervalSince1970: 101),
       snapshotFormatVersion: root.snapshotFormatVersion,
@@ -66,6 +70,10 @@ final class InMemoryCookingSessionRepositoryTests: XCTestCase {
     }
     XCTAssertEqual(recovery.reasons, [.rootCollision])
     XCTAssertEqual(recovery.evidence.roots.count, 3)
+    let history = try repository.history(in: root.kitchenID)
+    XCTAssertEqual(history.sessions, [.recovery(recovery)])
+    XCTAssertEqual(history.sessionIDsByRecipe, [root.recipeID: [root.id], Recipe.ID(rawValue: id(90)): [root.id]])
+    XCTAssertTrue(history.finishedSessions.isEmpty)
   }
 
   func testKitchenAndRecipeQueriesDoNotCrossOwnership() throws {
@@ -104,6 +112,10 @@ final class InMemoryCookingSessionRepositoryTests: XCTestCase {
 
     XCTAssertTrue(try repository.sessions(in: localKitchenID).isEmpty)
     XCTAssertTrue(try repository.finishedSessions(in: localKitchenID, limit: 1).isEmpty)
+    let history = try repository.history(in: localKitchenID)
+    XCTAssertTrue(history.sessions.isEmpty)
+    XCTAssertTrue(history.finishedSessions.isEmpty)
+    XCTAssertTrue(history.sessionIDsByRecipe.isEmpty)
     XCTAssertEqual(try repository.sessions(in: foreign.kitchenID).map(\.sessionID), [foreign.id])
   }
 
@@ -124,9 +136,7 @@ final class InMemoryCookingSessionRepositoryTests: XCTestCase {
     XCTAssertEqual(try repository.finishedSessions(in: root.kitchenID, limit: 1).count, 1)
     XCTAssertEqual(try repository.deletions(in: root.kitchenID), [deletion])
     XCTAssertEqual(try repository.deletions(for: root.id), [deletion])
-    XCTAssertTrue(
-      try repository.deletions(for: CookingSession.ID(rawValue: id(99))).isEmpty
-    )
+    XCTAssertTrue(try repository.deletions(for: CookingSession.ID(rawValue: id(99))).isEmpty)
     XCTAssertEqual(try repository.deletions(id: deletion.id), [deletion])
     XCTAssertEqual(try repository.restorations(for: deletion.id), [restoration])
   }
@@ -213,6 +223,11 @@ final class InMemoryCookingSessionRepositoryTests: XCTestCase {
       try repository.finishedSessions(in: first.kitchenID, limit: 3).map(\.sessionID),
       [second.id, third.id, first.id]
     )
+
+    let history = try repository.history(in: first.kitchenID)
+    XCTAssertEqual(history.sessions, try repository.sessions(in: first.kitchenID))
+    XCTAssertEqual(history.finishedSessions.map(\.sessionID), [second.id, third.id, first.id])
+    XCTAssertEqual(history.sessionIDsByRecipe, [first.recipeID: [first.id, second.id, third.id]])
 
     let earlier = makeDeletion(
       root: first,

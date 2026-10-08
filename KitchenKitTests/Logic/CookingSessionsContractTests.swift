@@ -12,6 +12,12 @@ import XCTest
 @MainActor
 // swiftlint:disable:next type_body_length
 final class CookingSessionsContractTests: XCTestCase {
+  func testHistoryReadMapsRepositoryFailureToSessionReadFailure() {
+    let stored = recipe(seed: 540)
+    let logic = sessions(stored, repository: ReadFailureCookingSessionRepository())
+    XCTAssertThrowsError(try logic.history()) { assertSessionReadFailure($0) }
+  }
+
   func testStartReturnsTypedRecipeAndSnapshotFailuresWithoutCreatingHistory() throws {
     let stored = recipe(seed: 1)
     let repository = InMemoryCookingSessionRepository()
