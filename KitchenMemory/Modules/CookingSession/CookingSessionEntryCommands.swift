@@ -34,7 +34,7 @@ extension CookingSessionPresentationModel {
     return submitCommand { .submitEntry(
       factID: SessionFact.ID(),
       sessionID: session.id,
-      authoredAt: Date(),
+      authoredAt: now(),
       text: draft.text,
       target: draft.target
     ) }
@@ -52,7 +52,7 @@ extension CookingSessionPresentationModel {
     return submitCommand { .reviseEntry(
       factID: SessionFact.ID(),
       sessionID: session.id,
-      authoredAt: Date(),
+      authoredAt: now(),
       entryID: entryID,
       text: text,
       target: target
@@ -66,7 +66,7 @@ extension CookingSessionPresentationModel {
     return submitCommand { .retargetEntry(
       factID: SessionFact.ID(),
       sessionID: session.id,
-      authoredAt: Date(),
+      authoredAt: now(),
       entryID: entryID,
       target: target
     ) }
@@ -79,7 +79,7 @@ extension CookingSessionPresentationModel {
     return submitCommand { .withdrawEntry(
       factID: SessionFact.ID(),
       sessionID: session.id,
-      authoredAt: Date(),
+      authoredAt: now(),
       entryID: entryID
     ) }
   }
@@ -91,7 +91,7 @@ extension CookingSessionPresentationModel {
     return submitCommand { .setOutcome(
       factID: SessionFact.ID(),
       sessionID: session.id,
-      authoredAt: Date(),
+      authoredAt: now(),
       outcome: outcome
     ) }
   }
@@ -103,7 +103,7 @@ extension CookingSessionPresentationModel {
     return submitCommand { .clearOutcome(
       factID: SessionFact.ID(),
       sessionID: session.id,
-      authoredAt: Date()
+      authoredAt: now()
     ) }
   }
 
@@ -152,7 +152,7 @@ extension CookingSessionPresentationModel {
     return submitCommand { .continueSession(
       sessionID: CookingSession.ID(),
       sourceSessionID: draft.sessionID,
-      startedAt: Date()
+      startedAt: now()
     ) }
   }
 }
