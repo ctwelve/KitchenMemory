@@ -266,7 +266,17 @@ private final class EntryRetryProbe: CookingSessionServing {
   var resumeIDs: [SessionFact.ID] = []
   var finishIDs: [SessionClosure.ID] = []
   init(base: CookingSessions) { self.base = base }
+  func history() throws -> CookingSessionHistoryRead { try base.history() }
   func sessions() throws -> [SessionProjectionResult] { try base.sessions() }
+  func sessions(for recipeID: Recipe.ID) throws -> [SessionProjectionResult] {
+    try base.sessions(for: recipeID)
+  }
+  func finishedSessions(limit: Int) throws -> [SessionProjectionResult] {
+    try base.finishedSessions(limit: limit)
+  }
+  func unresolvedDeletionIDs(for sessionID: CookingSession.ID) throws -> [SessionDeletion.ID] {
+    try base.unresolvedDeletionIDs(for: sessionID)
+  }
   func start(_ intention: StartCookingSessionIntention) throws -> CookingSessionCommandResult {
     try base.start(intention)
   }

@@ -6,6 +6,7 @@ import KitchenKit
 
 @MainActor
 protocol CookingSessionServing {
+  func history() throws -> CookingSessionHistoryRead
   func sessions() throws -> [SessionProjectionResult]
   func sessions(for recipeID: Recipe.ID) throws -> [SessionProjectionResult]
   func finishedSessions(limit: Int) throws -> [SessionProjectionResult]
@@ -19,15 +20,6 @@ extension CookingSessions: CookingSessionServing {}
 
 @MainActor
 extension CookingSessionServing {
-  func unresolvedDeletionIDs(for sessionID: CookingSession.ID) throws -> [SessionDeletion.ID] {
-    _ = sessionID
-    return []
-  }
-  func sessions(for recipeID: Recipe.ID) throws -> [SessionProjectionResult] {
-    _ = recipeID
-    return []
-  }
-
   func finishedSessions(limit: Int) throws -> [SessionProjectionResult] {
     guard limit > 0 else { return [] }
     return Array(try sessions().filter { result in

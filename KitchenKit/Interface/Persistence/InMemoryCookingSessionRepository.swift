@@ -55,6 +55,14 @@ public final class InMemoryCookingSessionRepository: CookingSessionRepository {
     }
   }
 
+  /// Classifies each retained Session once and shares the result across history selections.
+  public func history(in kitchenID: Kitchen.ID) throws -> CookingSessionHistoryRead {
+    let entries = evidenceBySession.values.filter { $0.belongs(to: kitchenID) }.map {
+      (evidence: $0, projection: SessionEvidenceProjector.project($0))
+    }
+    return cookingSessionHistoryRead(in: kitchenID, from: entries)
+  }
+
   /// Reads classifications through retained root Recipe provenance, even when the source Recipe is hidden.
   public func sessions(for recipeID: Recipe.ID) throws -> [SessionProjectionResult] {
     classifiedEvidence {

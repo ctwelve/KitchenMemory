@@ -44,6 +44,7 @@ extension RecipeLibraryNavigationTests {
     XCTAssertTrue(model.start(from: recipe))
     let sourceID = try XCTUnwrap(model.currentSessionID)
     XCTAssertTrue(model.showRecipeSessionHistory(for: recipe.id))
+    XCTAssertEqual(model.displayedHistorySessions.map(\.id), [sourceID])
     model.navigation.historyListAnchor = sourceID
     XCTAssertTrue(model.selectSessionFromHistory(sourceID))
     service.refusesFinish = true

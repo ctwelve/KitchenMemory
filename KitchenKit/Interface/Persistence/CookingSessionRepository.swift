@@ -37,6 +37,9 @@ public enum CookingSessionRepositoryError: Error, Equatable {
 /// this seam.
 @MainActor
 public protocol CookingSessionRepository: AnyObject {
+  /// Captures classifications, Closure ordering and retained Recipe provenance
+  /// from one locally observed evidence pass. Never retains a cache across refreshes.
+  func history(in kitchenID: Kitchen.ID) throws -> CookingSessionHistoryRead
   /// Appends the complete local transaction or throws before local acceptance completes.
   /// Evidence remains immutable. Local atomicity does not require managed CloudKit to
   /// deliver the remote transaction together; Logic owns exact-intention retry checks.

@@ -294,6 +294,7 @@ private final class BoundaryRepository: CookingSessionRepository {
 
   func evidence(id: CookingSession.ID) throws -> SessionEvidence? { try base.evidence(id: id) }
   func session(id: CookingSession.ID) throws -> SessionProjectionResult? { try base.session(id: id) }
+  func history(in id: Kitchen.ID) throws -> CookingSessionHistoryRead { try base.history(in: id) }
   func sessions(in id: Kitchen.ID) throws -> [SessionProjectionResult] { try base.sessions(in: id) }
   func sessions(for id: Recipe.ID) throws -> [SessionProjectionResult] { try base.sessions(for: id) }
   func sessions(for id: Recipe.ID, in kitchenID: Kitchen.ID) throws -> [SessionProjectionResult] {

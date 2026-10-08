@@ -21,6 +21,17 @@ final class AmbiguousEntryService: CookingSessionServing {
   }
 
   func sessions() -> [SessionProjectionResult] { [.session(active)] }
+  func history() -> CookingSessionHistoryRead {
+    fixtureHistoryRead(sessions: [.session(active)], sessionIDsByRecipe: [:])
+  }
+  func sessions(for recipeID: Recipe.ID) throws -> [SessionProjectionResult] {
+    _ = recipeID
+    throw CookingSessionTestSupportError.unsupportedRead("sessions(for:)")
+  }
+  func unresolvedDeletionIDs(for sessionID: CookingSession.ID) throws -> [SessionDeletion.ID] {
+    _ = sessionID
+    throw CookingSessionTestSupportError.unsupportedRead("unresolvedDeletionIDs(for:)")
+  }
 
   func start(_ intention: StartCookingSessionIntention) throws -> CookingSessionCommandResult {
     throw AmbiguousEntryError.unexpectedCommand
@@ -66,6 +77,17 @@ final class ContinuationAcceptanceService: CookingSessionServing {
   }
 
   func sessions() -> [SessionProjectionResult] { [.session(source)] }
+  func history() -> CookingSessionHistoryRead {
+    fixtureHistoryRead(sessions: [.session(source)], sessionIDsByRecipe: [:])
+  }
+  func sessions(for recipeID: Recipe.ID) throws -> [SessionProjectionResult] {
+    _ = recipeID
+    throw CookingSessionTestSupportError.unsupportedRead("sessions(for:)")
+  }
+  func unresolvedDeletionIDs(for sessionID: CookingSession.ID) throws -> [SessionDeletion.ID] {
+    _ = sessionID
+    throw CookingSessionTestSupportError.unsupportedRead("unresolvedDeletionIDs(for:)")
+  }
 
   func start(_ intention: StartCookingSessionIntention) throws -> CookingSessionCommandResult {
     throw AmbiguousEntryError.unexpectedCommand
@@ -99,6 +121,17 @@ final class RemoteFinishDuringSubmitService: CookingSessionServing {
         lifecycle: isRemotelyFinished ? .finished : .active
       )),
     ]
+  }
+  func history() throws -> CookingSessionHistoryRead {
+    fixtureHistoryRead(sessions: try sessions(), sessionIDsByRecipe: [:])
+  }
+  func sessions(for recipeID: Recipe.ID) throws -> [SessionProjectionResult] {
+    _ = recipeID
+    throw CookingSessionTestSupportError.unsupportedRead("sessions(for:)")
+  }
+  func unresolvedDeletionIDs(for sessionID: CookingSession.ID) throws -> [SessionDeletion.ID] {
+    _ = sessionID
+    throw CookingSessionTestSupportError.unsupportedRead("unresolvedDeletionIDs(for:)")
   }
 
   func start(_ intention: StartCookingSessionIntention) throws -> CookingSessionCommandResult {

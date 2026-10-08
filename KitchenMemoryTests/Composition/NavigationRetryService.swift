@@ -12,7 +12,17 @@ final class NavigationRetryService: CookingSessionServing {
   var refusesFinish = false
   var refusesContinuation = false
   init(base: any CookingSessionServing) { self.base = base }
+  func history() throws -> CookingSessionHistoryRead { try base.history() }
   func sessions() throws -> [SessionProjectionResult] { try base.sessions() }
+  func sessions(for recipeID: Recipe.ID) throws -> [SessionProjectionResult] {
+    try base.sessions(for: recipeID)
+  }
+  func finishedSessions(limit: Int) throws -> [SessionProjectionResult] {
+    try base.finishedSessions(limit: limit)
+  }
+  func unresolvedDeletionIDs(for sessionID: CookingSession.ID) throws -> [SessionDeletion.ID] {
+    try base.unresolvedDeletionIDs(for: sessionID)
+  }
   func start(_ intention: StartCookingSessionIntention) throws -> CookingSessionCommandResult {
     if refusesStart { throw CookingSessionLogicError.sessionWriteFailed }
     return try base.start(intention)

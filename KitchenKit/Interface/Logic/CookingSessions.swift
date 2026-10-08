@@ -67,6 +67,15 @@ public struct CookingSessions {
     }
   }
 
+  /// Captures complete Session history and retained Recipe associations in one
+  /// local read. A later refresh obtains fresh evidence; this value is not cached.
+  /// Repository failures become ``CookingSessionLogicError/sessionReadFailed``.
+  public func history() throws -> CookingSessionHistoryRead {
+    do { return try sessionRepository.history(in: kitchenID) } catch {
+      throw CookingSessionLogicError.sessionReadFailed
+    }
+  }
+
   /// Reads Session history through retained Recipe provenance within this Kitchen.
   /// Deleting or hiding the source Recipe does not remove its independently owned Sessions.
   public func sessions(for recipeID: Recipe.ID) throws -> [SessionProjectionResult] {
