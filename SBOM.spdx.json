@@ -2,10 +2,10 @@
   "spdxVersion": "SPDX-2.3",
   "dataLicense": "CC0-1.0",
   "SPDXID": "SPDXRef-DOCUMENT",
-  "name": "Kitchen Memory 0.3.17 source dependency inventory",
-  "documentNamespace": "https://github.com/ctwelve/KitchenMemory/sbom/0.3.17/2026-09-26-cooking-session-design",
+  "name": "Kitchen Memory 0.3.18 source dependency inventory",
+  "documentNamespace": "https://github.com/ctwelve/KitchenMemory/sbom/0.3.18/2026-10-19-undokit-qualification",
   "creationInfo": {
-    "created": "2026-09-26T18:39:59Z",
+    "created": "2026-10-19T22:00:00Z",
     "creators": [
       "Organization: Kitchen Memory contributors"
     ]
@@ -17,7 +17,7 @@
     {
       "name": "Kitchen Memory",
       "SPDXID": "SPDXRef-Package-KitchenMemory",
-      "versionInfo": "0.3.17",
+      "versionInfo": "0.3.18",
       "downloadLocation": "https://github.com/ctwelve/KitchenMemory",
       "filesAnalyzed": false,
       "licenseConcluded": "NOASSERTION",
@@ -28,7 +28,7 @@
         {
           "referenceCategory": "PACKAGE-MANAGER",
           "referenceType": "purl",
-          "referenceLocator": "pkg:github/ctwelve/KitchenMemory@0.3.17"
+          "referenceLocator": "pkg:github/ctwelve/KitchenMemory@0.3.18"
         }
       ]
     },
@@ -178,6 +178,36 @@
       ]
     },
     {
+      "name": "UndoKit",
+      "SPDXID": "SPDXRef-Package-UndoKit",
+      "versionInfo": "0.2.1",
+      "downloadLocation": "https://github.com/Folio-Suite/UndoKit",
+      "filesAnalyzed": false,
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "7b77677bf8c079fbb03fc7719e9bae4244c5d92f"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT",
+      "copyrightText": "Copyright 2026 the Folio Project",
+      "primaryPackagePurpose": "LIBRARY",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:github/Folio-Suite/UndoKit@0.2.1"
+        },
+        {
+          "referenceCategory": "OTHER",
+          "referenceType": "resolved-package-identity",
+          "referenceLocator": "undokit"
+        }
+      ],
+      "comment": "Resolved source package for Kitchen Memory issue #236 qualification only. The manifest declares a dynamic product, macOS 14 and iOS 17 minimums, Core Data model and privacy manifest resources, and a ScaleProbe executable target. No external package dependencies, plugins, or binary targets. No Kitchen Memory history integration is implemented; package resolution does not establish product linkage, runtime qualification, signing, or shipped product contents."
+    },
+    {
       "name": "SwiftLintPlugins",
       "SPDXID": "SPDXRef-Package-SwiftLintPlugins",
       "versionInfo": "0.65.1",
@@ -291,6 +321,12 @@
       "spdxElementId": "SPDXRef-Package-KitchenMemory",
       "relationshipType": "DEPENDS_ON",
       "relatedSpdxElement": "SPDXRef-Package-Defaults"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-KitchenMemory",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-UndoKit",
+      "comment": "Resolved source package for issue #236 qualification only; application history integration is not implemented. This relationship does not establish product linkage or runtime qualification."
     },
     {
       "spdxElementId": "SPDXRef-Package-KitchenMemory",

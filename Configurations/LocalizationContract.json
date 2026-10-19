@@ -26,6 +26,31 @@
       "path": "Modules/RecipeLibrary/RecipeQuantityEditorViews.swift",
       "literal": "/",
       "reason": "Arithmetic fraction separator, hidden from accessibility because the fields have semantic names."
+    },
+    {
+      "path": "Modules/Composition/UndoQualificationView.swift",
+      "literal": "Apply",
+      "reason": "Synthetic qualification control compiled only under TESTING; absent from distributed builds and intentionally verbatim, not a shipping localized interface."
+    },
+    {
+      "path": "Modules/Composition/UndoQualificationView.swift",
+      "literal": "Apply and lose reply",
+      "reason": "Synthetic qualification control compiled only under TESTING; absent from distributed builds and intentionally verbatim, not a shipping localized interface."
+    },
+    {
+      "path": "Modules/Composition/UndoQualificationView.swift",
+      "literal": "Undo",
+      "reason": "Synthetic qualification control compiled only under TESTING; absent from distributed builds and intentionally verbatim, not a shipping localized interface."
+    },
+    {
+      "path": "Modules/Composition/UndoQualificationView.swift",
+      "literal": "Redo",
+      "reason": "Synthetic qualification control compiled only under TESTING; absent from distributed builds and intentionally verbatim, not a shipping localized interface."
+    },
+    {
+      "path": "Modules/Composition/UndoQualificationView.swift",
+      "literal": "Remove test files",
+      "reason": "Synthetic qualification control compiled only under TESTING; absent from distributed builds and intentionally verbatim, not a shipping localized interface."
     }
   ]
 }

@@ -35,6 +35,7 @@ history provide background when needed. GitHub Issues owns the live plan and dep
 
 - [Apple platform direction](apple-platform.md)
 - [Agreed UndoKit architecture](adr/0022-shared-durable-undo-framework.md) — durable undo implementation remains pending
+- [UndoKit consumer qualification](undokit-integration.md) — Swift package integration, native proof harness and remaining gates
 - [Localization and authored resources](localization-architecture.md)
 - [Accessibility and alpha/beta acceptance](accessibility-engineering.md)
 - [Dependency inventory](../DEPENDENCIES.md) and [AI use](../AI.md)

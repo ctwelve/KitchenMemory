@@ -67,6 +67,18 @@ struct KitchenMemoryApp: App {
 
   @ViewBuilder
   private var applicationContent: some View {
+#if TESTING
+    if let identifier = UndoQualificationModel.launchIdentifier {
+      UndoQualificationView(identifier: identifier)
+    } else {
+      ordinaryApplicationContent
+    }
+#else
+    ordinaryApplicationContent
+#endif
+  }
+
+  private var ordinaryApplicationContent: some View {
     ContentView(
       startupState: startup.state,
       retryStartup: retryPreparation
