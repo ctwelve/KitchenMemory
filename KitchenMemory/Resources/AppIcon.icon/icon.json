@@ -32,7 +32,7 @@
           "image-name" : "05-LowTray.svg",
           "name" : "Low Tray",
           "position" : {
-            "scale" : 1.06,
+            "scale" : 1,
             "translation-in-points" : [
               0,
               -31.799999999999898
@@ -41,7 +41,7 @@
         }
       ],
       "position" : {
-        "scale" : 1.06,
+        "scale" : 1,
         "translation-in-points" : [
           0,
           0
@@ -77,7 +77,7 @@
           "image-name" : "04-RecipeMarks.svg",
           "name" : "Recipe Marks",
           "position" : {
-            "scale" : 1.06,
+            "scale" : 1,
             "translation-in-points" : [
               0,
               -31.799999999999898
@@ -86,7 +86,7 @@
         }
       ],
       "position" : {
-        "scale" : 1.06,
+        "scale" : 1,
         "translation-in-points" : [
           0,
           0
@@ -120,7 +120,7 @@
           "image-name" : "03-FeaturedCard.svg",
           "name" : "Featured Card",
           "position" : {
-            "scale" : 1.06,
+            "scale" : 1,
             "translation-in-points" : [
               0,
               -31.799999999999898
@@ -144,7 +144,7 @@
           "image-name" : "02-MiddleCard.svg",
           "name" : "Middle Card",
           "position" : {
-            "scale" : 1.06,
+            "scale" : 1,
             "translation-in-points" : [
               0,
               -31.799999999999898
@@ -168,7 +168,7 @@
           "image-name" : "01-RearCard.svg",
           "name" : "Rear Card",
           "position" : {
-            "scale" : 1.06,
+            "scale" : 1,
             "translation-in-points" : [
               0,
               -31.799999999999898
@@ -177,7 +177,7 @@
         }
       ],
       "position" : {
-        "scale" : 1.06,
+        "scale" : 1,
         "translation-in-points" : [
           0,
           0

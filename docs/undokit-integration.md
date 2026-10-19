@@ -119,9 +119,9 @@ revision above; KitchenMemory's working slice is 0.3.18.
 | Independent review | Standards policy finding resolved through ADR 0007's narrow process-lifecycle exception; spec proof-scope findings resolved by the two additional admission/identity checks, which passed in the full Mac run |
 
 The full Mac result also reports six internal QoS-inversion runtime warnings;
-it is not a warning-free performance qualification. Local native builds retain
-the maintainer's unrelated uncommitted icon edit; these results are local evidence,
-not reusable CI proof for an identical committed tree. No physical device,
+it is not a warning-free performance qualification. Local native builds included the
+maintainer's approved icon scale adjustment, now committed in this slice. These
+local results do not replace required review-ready CI on the final committed tree. No physical device,
 distribution archive, human assistive-technology walkthrough or actual history
 SQLite write-fault result is claimed. An iOS-device product build remains separate
 from simulator qualification. The incomplete iPad run is not a pass.
