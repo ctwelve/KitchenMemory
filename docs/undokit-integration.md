@@ -15,6 +15,13 @@ operation eligibility, lifecycle, scope and domain authority.
 
 ## Supply route and ownership
 
+The maintainer approves either the Swift package or the available XCFramework.
+This slice retains the source package: its exact pin is inspectable, it builds
+with KitchenMemory's toolchain, and subsequent beta fixes can be qualified through
+the existing resolver/inventory workflow. XCFramework availability is not a
+blocker. Adopting that route later would require matching its binary resources,
+signing and toolchain evidence; do not mix two UndoKit supply routes in one process.
+
 The dynamic `UndoKit` package product links to KitchenKit. The application embeds
 and signs it beside KitchenKit, rather than nesting it inside KitchenKit. The
 Testing-only demonstrator and hosted test bundle also link that same product;
@@ -95,6 +102,29 @@ Run these through [Xcode's Test action](agents/xcode.md). The app/UI tests use
 signed native hosts. Their synthetic control names are explicit localization
 contract exceptions, compiled out of distributed builds; they are not the
 shipping localized action-name proof.
+
+## Qualification evidence, 2026-10-19
+
+Toolchain: Xcode 27.1 (`27A9275`), Apple Swift 6.4. The package pin is the 0.2.1
+revision above; KitchenMemory's working slice is 0.3.18.
+
+| Check | Observed result |
+| --- | --- |
+| KitchenKit standalone clean workflow, native arm64 Mac, macOS 27.0.1 | 606 tests passed; 14,666/14,666 business-logic executable lines covered, with the existing 130 runtime-adapter exclusions; ordinary-consumer interface and 13 forbidden mutation routes passed |
+| Native Mac Testing bundle inspection | KitchenKit links `@rpath/UndoKit.framework/Versions/A/UndoKit`; UndoKit is embedded beside KitchenKit in the app; its compiled Core Data model and privacy manifest are present in `UndoKit_UndoKit.bundle`; deep strict app signature verification and strict UndoKit verification pass with normal certificate-trust access |
+| Full native Mac application plan, macOS 27.0.1 arm64 | 291/291 tests passed, no failures or skips, including all 14 qualification checks and both review-requested immediate-admission/mismatched-identity proofs; completed xcresult read directly after the bridge response timeout |
+| iPhone SE (3rd generation) simulator, iOS 27.0 | Initial 12 checks passed across the first run and focused correction of the UIKit typing-group test; the test now leaves UIKit's private groups under UIKit's control |
+| iPad (A16) simulator, iOS 27.0 | 11 passed; the unacknowledged-acceptance relaunch scenario stalled during simulator app launch and was explicitly stopped after the bridge's 300-second timeout; its retained result reports “Testing was canceled” |
+| Repository checks and draft PR CI | Passed; draft CI deliberately skips native lanes and does not establish review-ready native CI acceptance |
+| Independent review | Standards policy finding resolved through ADR 0007's narrow process-lifecycle exception; spec proof-scope findings resolved by the two additional admission/identity checks, which passed in the full Mac run |
+
+The full Mac result also reports six internal QoS-inversion runtime warnings;
+it is not a warning-free performance qualification. Local native builds retain
+the maintainer's unrelated uncommitted icon edit; these results are local evidence,
+not reusable CI proof for an identical committed tree. No physical device,
+distribution archive, human assistive-technology walkthrough or actual history
+SQLite write-fault result is claimed. An iOS-device product build remains separate
+from simulator qualification. The incomplete iPad run is not a pass.
 
 ## Remaining qualification requirements
 
