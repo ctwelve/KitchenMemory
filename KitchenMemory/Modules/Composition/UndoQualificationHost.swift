@@ -84,6 +84,9 @@ final class UndoQualificationHost: MainActorHistoryOperationHandler, HistoryHost
   var loseNextReply = false
   var withholdOutcomes = false
   var rejectNextInverse = false
+  var pauseNextInverse = false
+  private(set) var inverseIsPaused = false
+  private var inverseContinuation: CheckedContinuation<Void, Never>?
 
   init(url: URL, initial: [UndoQualificationItem]) {
     self.url = url
@@ -118,7 +121,18 @@ final class UndoQualificationHost: MainActorHistoryOperationHandler, HistoryHost
   func undo(
     _ effects: [(UUID, Effect)], context: HistoryOperationContext
   ) async -> HistoryTypedOutcome<Effect> {
-    execute(effects, token: context.token, inverse: true)
+    if pauseNextInverse {
+      pauseNextInverse = false
+      inverseIsPaused = true
+      await withCheckedContinuation { inverseContinuation = $0 }
+      inverseIsPaused = false
+    }
+    return execute(effects, token: context.token, inverse: true)
+  }
+
+  func resumeInverse() {
+    inverseContinuation?.resume()
+    inverseContinuation = nil
   }
 
   func redo(

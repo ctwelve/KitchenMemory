@@ -9,6 +9,33 @@ import XCTest
 
 @MainActor
 final class UndoKitRecoveryQualificationTests: XCTestCase {
+  func testNativeRequestReservesAdmissionBeforeReturningAndWaitsForHostCompletion() async throws {
+    let rig = try await UndoQualificationRig()
+    addTeardownBlock { await rig.remove() }
+    let commands = try rig.session.commands(for: rig.operation)
+    assertAccepted(await commands.submit(UndoQualificationChange(before: rig.host.values,
+      after: Array(rig.host.values.reversed()))))
+    let attachment = try rig.session.attach(owner: rig.host)
+    defer { attachment.disconnect() }
+    rig.host.pauseNextInverse = true
+    defer { rig.host.resumeInverse() }
+    attachment.undoManager.undo()
+    XCTAssertTrue(rig.session.snapshot.hasPending, "The native callback must reserve before returning")
+    XCTAssertFalse(attachment.undoManager.canUndo)
+    XCTAssertFalse(attachment.undoManager.canRedo)
+    let deadline = ContinuousClock.now.advanced(by: .seconds(3))
+    while !rig.host.inverseIsPaused, ContinuousClock.now < deadline {
+      try await Task.sleep(for: .milliseconds(10))
+    }
+    XCTAssertTrue(rig.host.inverseIsPaused)
+    XCTAssertEqual(rig.host.acceptanceCount, 1, "Admission must not claim completed semantic acceptance")
+    rig.host.resumeInverse()
+    await rig.session.waitForNativeOperations()
+    XCTAssertEqual(rig.host.acceptanceCount, 2)
+    XCTAssertEqual(rig.host.values.map(\.title), ["Soup", "Bread"])
+    XCTAssertTrue(attachment.undoManager.canRedo)
+  }
+
   func testAcceptedEffectWithLostReplyRecoversByReceiptWithoutRedelivery() async throws {
     let rig = try await UndoQualificationRig()
     addTeardownBlock { await rig.remove() }

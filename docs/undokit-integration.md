@@ -79,11 +79,13 @@ The native application plan includes:
 - `UndoKitQualificationTests`: typed ordered identities, native Undo/Redo and
   reopening without replay.
 - `UndoKitRecoveryQualificationTests`: accepted reply loss, durable authoritative
-  recovery, unresolved outcomes remaining blocked, and durable inverse rejection
-  without false Redo or fallback to an older action.
+  recovery, unresolved outcomes remaining blocked, synchronous native admission
+  before suspended host completion, and durable inverse rejection without false
+  Redo or fallback to an older action.
 - `UndoKitBoundaryQualificationTests`: all-or-nothing batch rejection, proved
   pre-write host failure, 100-group retention/depth, generation disposal and
-  unreadable-store refusal without replacement.
+  unreadable-store refusal without replacement, including attempts to reopen a
+  retained store with a mismatched working identity or unknown scope.
 - `UndoKitNativeRoutingTests`: local text priority, empty-local-stack isolation,
   independent windows and restored/disposed presentation history.
 - `UndoKitRelaunchTests`: actual application termination/relaunch after finalized

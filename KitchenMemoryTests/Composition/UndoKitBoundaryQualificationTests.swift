@@ -9,6 +9,33 @@ import XCTest
 
 @MainActor
 final class UndoKitBoundaryQualificationTests: XCTestCase {
+  func testPersistedHistoryRefusesMismatchedWorkingIdentityAndUnknownScopeWithoutReplacement() async throws {
+    let rig = try await UndoQualificationRig()
+    addTeardownBlock { await rig.remove() }
+    let commands = try rig.session.commands(for: rig.operation)
+    assertAccepted(await commands.submit(UndoQualificationChange(before: rig.host.values,
+      after: Array(rig.host.values.reversed()))))
+    await rig.session.close()
+    let historyURL = rig.directory.appendingPathComponent("History.sqlite")
+    let original = try Data(contentsOf: historyURL)
+    let mismatches = [(rig.scope, UUID()), (UUID(), rig.working)]
+    for (scope, working) in mismatches {
+      let owners = HistorySessions()
+      let refused = await owners.open(configuration: qualificationConfiguration(rig.directory,
+        scope: scope, working: working, mode: .existing), lease: rig.host, operations: [rig.operation.erased])
+      XCTAssertEqual(refused.status.phase, .blocked)
+      XCTAssertFalse(refused.status.canUndo)
+      XCTAssertFalse(refused.status.canRedo)
+      await refused.close()
+      XCTAssertEqual(try Data(contentsOf: historyURL), original)
+      XCTAssertEqual(rig.host.acceptanceCount, 1)
+    }
+    try await rig.reopen()
+    XCTAssertEqual(rig.session.status.phase, .ready)
+    assertAccepted(await rig.session.undo())
+    XCTAssertEqual(rig.host.values.map(\.title), ["Soup", "Bread"])
+  }
+
   func testInvalidBatchAndProvedHostWriteFailureLeaveNoPartialEffectOrHistory() async throws {
     let rig = try await UndoQualificationRig()
     addTeardownBlock { await rig.remove() }
