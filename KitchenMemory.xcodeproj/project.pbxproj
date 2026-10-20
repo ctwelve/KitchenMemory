@@ -2259,7 +2259,7 @@
 			repositoryURL = "https://github.com/Folio-Suite/UndoKit";
 			requirement = {
 				kind = exactVersion;
-				version = 0.2.1;
+				version = 0.2.2;
 			};
 		};
 		A12691A8302E7ECF004E6195 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */ = {

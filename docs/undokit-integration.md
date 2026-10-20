@@ -7,8 +7,8 @@ SPDX-License-Identifier: MIT
 -->
 
 KitchenMemory [#236](https://github.com/ctwelve/KitchenMemory/issues/236) qualifies
-the independently maintained **UndoKit 0.2.1** source package at revision
-`7b77677bf8c079fbb03fc7719e9bae4244c5d92f`. It does not implement production Recipe
+the independently maintained **UndoKit 0.2.2** source package at revision
+`9d04950fb314846e701890ac3095d28056820918`. It does not implement production Recipe
 undo or close the [delivery gate](https://github.com/ctwelve/KitchenMemory/issues/204).
 The [accepted policy](adr/0022-shared-durable-undo-framework.md) continues to own
 operation eligibility, lifecycle, scope and domain authority.
@@ -66,6 +66,12 @@ another reciprocal callback or claim the semantic inverse finishes inside the
 native callback. AppKit/UIKit bindings preserve focused local text priority,
 including refusal to fall through from an empty local stack to an older app action.
 
+Install `session.setNativeActionNameResolver(_:)` to map retained host presentation
+metadata to localized action names. Reinstall it after reopening or a language
+change. The framework owns native label refresh; hosts retain meaning and
+localization. The synthetic test stores an action identifier, resolves it to an
+English label, then reopens with a French resolver without changing domain values.
+
 The host must map each logical scene plus owner/store/Kitchen boundary to stable
 history scope and working identities. Independent test windows use independent
 stores and identities. Disconnecting a presentation does not dispose its history.
@@ -84,7 +90,7 @@ setting the depth alone does not satisfy the retention policy.
 The native application plan includes:
 
 - `UndoKitQualificationTests`: typed ordered identities, native Undo/Redo and
-  reopening without replay.
+  reopening without replay, with host-resolved native action names.
 - `UndoKitRecoveryQualificationTests`: accepted reply loss, durable authoritative
   recovery, unresolved outcomes remaining blocked, synchronous native admission
   before suspended host completion, and durable inverse rejection without false
@@ -105,8 +111,9 @@ shipping localized action-name proof.
 
 ## Qualification evidence, 2026-10-19
 
-Toolchain: Xcode 27.1 (`27A9275`), Apple Swift 6.4. The package pin is the 0.2.1
-revision above; KitchenMemory's working slice is 0.3.18.
+Toolchain: Xcode 27.1 (`27A9275`), Apple Swift 6.4. KitchenMemory's working slice
+is 0.3.18. The following baseline used UndoKit 0.2.1; results for the updated
+0.2.2 pin are recorded separately below.
 
 | Check | Observed result |
 | --- | --- |
@@ -115,7 +122,7 @@ revision above; KitchenMemory's working slice is 0.3.18.
 | Full native Mac application plan, macOS 27.0.1 arm64 | 291/291 tests passed, no failures or skips, including all 14 qualification checks and both review-requested immediate-admission/mismatched-identity proofs; completed xcresult read directly after the bridge response timeout |
 | iPhone SE (3rd generation) simulator, iOS 27.0 | Initial 12 checks passed across the first run and focused correction of the UIKit typing-group test; the test now leaves UIKit's private groups under UIKit's control |
 | iPad (A16) simulator, iOS 27.0 | 11 passed; the unacknowledged-acceptance relaunch scenario stalled during simulator app launch and was explicitly stopped after the bridge's 300-second timeout; its retained result reports “Testing was canceled” |
-| Repository checks and draft PR CI | Passed; draft CI deliberately skips native lanes and does not establish review-ready native CI acceptance |
+| Review-ready CI, commit `55e69f28c83c2dccd26acf665db01f4901e4a103` | [All required lanes passed](https://github.com/ctwelve/KitchenMemory/actions/runs/39338571118): repository contracts, KitchenKit tests/coverage, both production builds and signed/native app/UI tests on Mac and iPhone simulator |
 | Independent review | Standards policy finding resolved through ADR 0007's narrow process-lifecycle exception; spec proof-scope findings resolved by the two additional admission/identity checks, which passed in the full Mac run |
 
 The full Mac result also reports six internal QoS-inversion runtime warnings;
@@ -126,13 +133,31 @@ distribution archive, human assistive-technology walkthrough or actual history
 SQLite write-fault result is claimed. An iOS-device product build remains separate
 from simulator qualification. The incomplete iPad run is not a pass.
 
+## UndoKit 0.2.2 update
+
+[UndoKit #73](https://github.com/Folio-Suite/UndoKit/issues/73) is fixed by the
+0.2.2 ordinary-session resolver. The consumer regression check first failed on
+0.2.1 with empty native names at submission, Undo, Redo and reopen. The source
+pin and inventory now select the published 0.2.2 revision above. Its package
+manifest, license and privacy declaration are unchanged from 0.2.1. The
+strengthened native Mac roundtrip check passed on 0.2.2, including the
+English Undo/Redo names and French name after reopening. Independent standards
+and spec reviews found no concrete defects in this update. Full updated-tree
+checks remain required before merge. This resolves the upstream API
+gap; it does not establish shipping KitchenMemory translations or human menu
+acceptance.
+
+| Updated 0.2.2 check | Observed result |
+| --- | --- |
+| Signed native Mac application plan | 291/291 passed, zero failures/skips; the name regression also passed again after extracting its shared metadata lookup |
+| KitchenKit standalone clean workflow | 606 passed; 14,666/14,666 business-logic lines covered; consumer-interface and forbidden-route checks passed |
+| Repository contracts, scoped pinned SwiftLint and diff whitespace | Passed |
+| Independent standards/spec review | Clear for the 0.2.2 delta |
+
+These updated local results do not replace review-ready CI on the final commit.
+
 ## Remaining qualification requirements
 
-- **Localized native names:** [UndoKit #73](https://github.com/Folio-Suite/UndoKit/issues/73)
-  records that 0.2.1's `advanced.nativeActionNames(resolve:)` resolves retained
-  presentation metadata but has no public bridge into the ordinary attachment's
-  native UndoManager names. A supported upstream route or a separately verified
-  host presentation adapter is required. Preserve local/live text names and routing.
 - **Actual history write failure:** the typed finalization injector is guarded by
   UndoKit's `#if DEBUG` and is absent from the package compiled by this project's
   Testing configuration. Host pre-write rejection and accepted reply loss do not

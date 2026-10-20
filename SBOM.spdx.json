@@ -180,13 +180,13 @@
     {
       "name": "UndoKit",
       "SPDXID": "SPDXRef-Package-UndoKit",
-      "versionInfo": "0.2.1",
+      "versionInfo": "0.2.2",
       "downloadLocation": "https://github.com/Folio-Suite/UndoKit",
       "filesAnalyzed": false,
       "checksums": [
         {
           "algorithm": "SHA1",
-          "checksumValue": "7b77677bf8c079fbb03fc7719e9bae4244c5d92f"
+          "checksumValue": "9d04950fb314846e701890ac3095d28056820918"
         }
       ],
       "licenseConcluded": "NOASSERTION",
@@ -197,7 +197,7 @@
         {
           "referenceCategory": "PACKAGE-MANAGER",
           "referenceType": "purl",
-          "referenceLocator": "pkg:github/Folio-Suite/UndoKit@0.2.1"
+          "referenceLocator": "pkg:github/Folio-Suite/UndoKit@0.2.2"
         },
         {
           "referenceCategory": "OTHER",

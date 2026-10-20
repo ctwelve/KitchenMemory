@@ -11,7 +11,7 @@ SPDX-License-Identifier: MIT
 
 Integration update, 2026-10-19: UndoKit is now an independently maintained,
 Swift-only source package. KitchenMemory qualifies the dynamic `UndoKit` product
-from release `0.2.1` through [#236](https://github.com/ctwelve/KitchenMemory/issues/236).
+from release `0.2.2` through [#236](https://github.com/ctwelve/KitchenMemory/issues/236).
 Earlier XCFramework and Objective-C distribution assumptions are superseded for
 this consumer; domain ownership and accepted operation policy below are unchanged.
 Adding the package does not establish production Recipe undo or complete #204.

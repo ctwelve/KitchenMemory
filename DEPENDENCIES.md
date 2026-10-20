@@ -21,7 +21,7 @@ package inventory.
 
 | Component | Version | License | Purpose |
 | --- | --- | --- | --- |
-| [UndoKit](https://github.com/Folio-Suite/UndoKit) | 0.2.1 | MIT | Dynamic local durable-history framework; synthetic consumer qualification only, production Recipe undo remains pending |
+| [UndoKit](https://github.com/Folio-Suite/UndoKit) | 0.2.2 | MIT | Dynamic local durable-history framework; synthetic consumer qualification only, production Recipe undo remains pending |
 | [Defaults](https://github.com/sindresorhus/Defaults) | 9.0.9 | MIT | Typed local application preferences and observation; iCloud key-value synchronization only for the sample-onboarding preference |
 | [swift-collections](https://github.com/apple/swift-collections) | 1.7.0 | Apache-2.0 WITH Swift-exception | `DequeModule` for the ordered Cooking Session outbox, stack-safe causal-graph worklists, and Logic dependency discovery; `OrderedCollections` for first-seen identity coalescing; `HeapModule` for ready organization receipts |
 | [swift-algorithms](https://github.com/apple/swift-algorithms) | 1.2.1 | Apache-2.0 WITH Swift-exception | `Algorithms` coalesces duplicate immutable Recipe rows, preserves first-seen uniqueness, selects bounded maintenance pages, and stops import yield discovery at the first valid value |
@@ -108,7 +108,7 @@ checks alone does not prove those files were packaged.
 
 ### UndoKit consumer qualification
 
-UndoKit 0.2.1 is present in the resolved source graph for issue #236
+UndoKit 0.2.2 is present in the resolved source graph for issue #236
 qualification. A Testing-only demonstrator persists synthetic values and history;
 production Recipe undo remains unimplemented. KitchenKit, the app and the hosted
 tests link the same dynamic product, which the app embeds and signs. The
@@ -172,7 +172,7 @@ external package dependency or changes the reviewed license text.
 | [Algorithms 1.2.1](https://github.com/apple/swift-algorithms/releases/tag/1.2.1) | Latest stable; Swift 5.7. Same Swift-project license; Numerics is its only package dependency. No plugin, executable/binary target, privacy manifest, or runtime network operation. |
 | [Numerics 1.1.1](https://github.com/apple/swift-numerics/releases/tag/1.1.1) | Latest stable; Swift 5.9. Same Swift-project license; no further package dependency or executable/plugin/binary target. Its C shim remains a build input; no direct application import or new runtime transport. |
 | [SwiftSyntax 604.0.0](https://github.com/swiftlang/swift-syntax/releases/tag/604.0.0) | Latest stable; Swift 5.9 manifest, matching the installed Swift 6.4 generation. Apache 2.0. No root package dependency, plugin, binary target, or privacy manifest. 604.0.0 is now stable and within Defaults’ declared dependency range; prerelease 605 versions are excluded. |
-| [UndoKit 0.2.1](https://github.com/Folio-Suite/UndoKit/tree/7b77677bf8c079fbb03fc7719e9bae4244c5d92f) | Reviewed qualification source; Swift tools 6.0, macOS 14/iOS 17 minimums, dynamic library product, Core Data model resource, privacy manifest, and a ScaleProbe executable target. MIT. No external package dependencies, plugins, or binary targets. Its source manifest declares no tracking or collected data and lists File Timestamp reasons C617.1/3B52.1 and Disk Space reason E174.1. No Kitchen Memory history integration is implemented yet. |
+| [UndoKit 0.2.2](https://github.com/Folio-Suite/UndoKit/tree/9d04950fb314846e701890ac3095d28056820918) | Reviewed qualification source; Swift tools 6.0, macOS 14/iOS 17 minimums, dynamic library product, Core Data model resource, privacy manifest, and a ScaleProbe executable target. MIT. No external package dependencies, plugins, or binary targets. Its source manifest declares no tracking or collected data and lists File Timestamp reasons C617.1/3B52.1 and Disk Space reason E174.1. Only synthetic consumer qualification is implemented; production Recipe undo remains pending. |
 | [SwiftLintPlugins 0.65.1](https://github.com/SimplyDanny/SwiftLintPlugins/releases/tag/0.65.1) / [SwiftLint binary](https://github.com/realm/SwiftLint/releases/tag/0.65.1) | Latest stable patch; MIT, Swift tools 5.9/macOS 12 plugin minimum. Build and command plugins wrap the checksum-pinned executable; command-plugin write permission applies to explicit fixes. No product runtime linkage or new permissions. |
 
 The selected revisions and SwiftLint binary checksum are recorded in the SBOM.

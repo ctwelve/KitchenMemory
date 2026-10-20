@@ -27,7 +27,7 @@ through that preference transport. Private iCloud
 synchronization is a person-directed product function, not telemetry, and must
 never be repurposed as an analytics channel.
 
-UndoKit 0.2.1 is linked for [consumer qualification](undokit-integration.md).
+UndoKit 0.2.2 is linked for [consumer qualification](undokit-integration.md).
 Production Recipe undo remains unimplemented. A Testing-only demonstrator stores
 synthetic collection values, receipts and a separate local Core Data history
 under a UUID-scoped test directory; it never opens a production Kitchen or
