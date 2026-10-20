@@ -30,6 +30,12 @@ temporarily revealed, and pinned modes are core primary-navigation accessibility
 states. Bounded native checks of destination reachability and accessibility-tree
 availability across those modes are within the shell suite's scope.
 
+Amended on 2026-10-19 for authorized [UndoKit qualification #236](https://github.com/ctwelve/KitchenMemory/issues/236):
+the UI runner may terminate and relaunch a disposable native host to prove a
+process-lifecycle contract that a hosted test cannot establish within its own
+process. This narrowly scoped exception uses synthetic stores and stable
+diagnostic identifiers; it does not expand ordinary feature-workflow automation.
+
 Amended by [ADR 0019](0019-stage-accessibility-acceptance-at-beta.md): Issue 132
 has settled the staged alpha/beta accessibility policy. Its former future-decision
 references below are historical; the current protocol is in
@@ -80,6 +86,14 @@ provisional editor layout, scrolling, disclosure state, exact visible strings,
 or incidental accessibility-tree shape. Do not locate controls by coordinates.
 A feature whose behavior can be verified below the view layer must be tested
 there.
+
+For the process-lifecycle qualification exception above, the runner may seed one
+synthetic action, terminate the app, relaunch with the same isolated fixture
+identity, and inspect minimal diagnostic state and Undo/Redo availability.
+The diagnostic value is test evidence, not a shipping-copy assertion. Lower-level
+tests still own domain behavior, failure semantics, native text priority and
+window isolation. The harness is compiled only under `TESTING`, cannot select a
+production store, and does not establish human accessibility acceptance.
 
 The current suite checks only a narrow semantic floor: required landmarks and
 actions exist in the accessibility hierarchy, have meaningful names, are

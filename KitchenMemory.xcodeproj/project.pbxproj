@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A11537F23086CA4400A44573 /* UndoKit in Frameworks */ = {isa = PBXBuildFile; productRef = A11537F13086CA4400A44573 /* UndoKit */; };
+		A11537F33086CA4900A44573 /* UndoKit in Embed Frameworks */ = {isa = PBXBuildFile; productRef = A11537F13086CA4400A44573 /* UndoKit */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		A18D21BE303D64A000009405 /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = A18D21BD303D64A000009405 /* Defaults */; };
 		A1C9A4893042896F00F1F13D /* KitchenKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1C9A47E3042896F00F1F13D /* KitchenKit.framework */; };
 		A1C9E0033042896F00F1F13D /* KitchenKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1C9A47E3042896F00F1F13D /* KitchenKit.framework */; };
@@ -15,6 +17,8 @@
 		D30000000000000000000021 /* Collections in Frameworks */ = {isa = PBXBuildFile; productRef = D30000000000000000000014 /* Collections */; };
 		D40000000000000000000001 /* KitchenKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A1C9A47E3042896F00F1F13D /* KitchenKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D40000000000000000000003 /* Collections in Frameworks */ = {isa = PBXBuildFile; productRef = D40000000000000000000004 /* Collections */; };
+		E23600000000000000000001 /* UndoKit in Frameworks */ = {isa = PBXBuildFile; productRef = E23600000000000000000004 /* UndoKit */; };
+		E23600000000000000000002 /* UndoKit in Frameworks */ = {isa = PBXBuildFile; productRef = E23600000000000000000003 /* UndoKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,6 +59,7 @@
 			dstSubfolder = Frameworks;
 			files = (
 				D40000000000000000000001 /* KitchenKit.framework in Embed Frameworks */,
+				A11537F33086CA4900A44573 /* UndoKit in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 		};
@@ -141,6 +146,7 @@
 		A1C4E79B302A63B800E2C0DB /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
+				E23600000000000000000002 /* UndoKit in Frameworks */,
 				A1C9E0033042896F00F1F13D /* KitchenKit.framework in Frameworks */,
 				A18D21BE303D64A000009405 /* Defaults in Frameworks */,
 				D30000000000000000000021 /* Collections in Frameworks */,
@@ -149,6 +155,7 @@
 		A1C4E7AA302A63B900E2C0DB /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
+				E23600000000000000000001 /* UndoKit in Frameworks */,
 			);
 		};
 		A1C4E7B4302A63B900E2C0DB /* Frameworks */ = {
@@ -159,6 +166,7 @@
 		A1C9A47B3042896F00F1F13D /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
+				A11537F23086CA4400A44573 /* UndoKit in Frameworks */,
 				D30000000000000000000003 /* Algorithms in Frameworks */,
 				D30000000000000000000001 /* Collections in Frameworks */,
 			);
@@ -239,6 +247,7 @@
 			);
 			name = KitchenMemory;
 			packageProductDependencies = (
+				E23600000000000000000003 /* UndoKit */,
 				A18D21BD303D64A000009405 /* Defaults */,
 				D30000000000000000000014 /* Collections */,
 			);
@@ -266,6 +275,9 @@
 				A1C4E7B0302A63B900E2C0DB /* KitchenMemoryTests */,
 			);
 			name = KitchenMemoryTests;
+			packageProductDependencies = (
+				E23600000000000000000004 /* UndoKit */,
+			);
 			productName = KitchenMemoryTests;
 			productReference = A1C4E7AD302A63B900E2C0DB /* KitchenMemoryTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -312,6 +324,7 @@
 			packageProductDependencies = (
 				D30000000000000000000013 /* Algorithms */,
 				D30000000000000000000011 /* Collections */,
+				A11537F13086CA4400A44573 /* UndoKit */,
 			);
 			productName = KitchenKit;
 			productReference = A1C9A47E3042896F00F1F13D /* KitchenKit.framework */;
@@ -403,6 +416,7 @@
 				A18D21B7303D644B00009405 /* XCRemoteSwiftPackageReference "Defaults" */,
 				D30000000000000000000004 /* XCRemoteSwiftPackageReference "swift-collections" */,
 				D30000000000000000000005 /* XCRemoteSwiftPackageReference "swift-algorithms" */,
+				A11537F03086CA4400A44573 /* XCRemoteSwiftPackageReference "UndoKit" */,
 			);
 			preferredProjectObjectVersion = 100;
 			productRefGroup = A1C4E79F302A63B800E2C0DB /* Products */;
@@ -702,7 +716,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 27.0;
-				MARKETING_VERSION = 0.3.17;
+				MARKETING_VERSION = 0.3.18;
 				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory;
 				PRODUCT_NAME = KitchenMemory;
 				REGISTER_APP_GROUPS = YES;
@@ -752,7 +766,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 27.0;
-				MARKETING_VERSION = 0.3.17;
+				MARKETING_VERSION = 0.3.18;
 				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory;
 				PRODUCT_NAME = KitchenMemory;
 				REGISTER_APP_GROUPS = YES;
@@ -1743,7 +1757,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 27.0;
-				MARKETING_VERSION = 0.3.17;
+				MARKETING_VERSION = 0.3.18;
 				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.dev.KitchenMemory;
 				PRODUCT_NAME = KitchenMemory;
 				REGISTER_APP_GROUPS = YES;
@@ -1919,7 +1933,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 27.0;
-				MARKETING_VERSION = 0.3.17;
+				MARKETING_VERSION = 0.3.18;
 				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory;
 				PRODUCT_NAME = KitchenMemory;
 				REGISTER_APP_GROUPS = YES;
@@ -2088,7 +2102,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 27.0;
-				MARKETING_VERSION = 0.3.17;
+				MARKETING_VERSION = 0.3.18;
 				PRODUCT_BUNDLE_IDENTIFIER = net.ctwelve.KitchenMemory;
 				PRODUCT_NAME = KitchenMemory;
 				REGISTER_APP_GROUPS = YES;
@@ -2240,6 +2254,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		A11537F03086CA4400A44573 /* XCRemoteSwiftPackageReference "UndoKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Folio-Suite/UndoKit";
+			requirement = {
+				kind = exactVersion;
+				version = 0.2.2;
+			};
+		};
 		A12691A8302E7ECF004E6195 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SimplyDanny/SwiftLintPlugins";
@@ -2275,6 +2297,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		A11537F13086CA4400A44573 /* UndoKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A11537F03086CA4400A44573 /* XCRemoteSwiftPackageReference "UndoKit" */;
+			productName = UndoKit;
+		};
 		A12691A9302E7F04004E6195 /* SwiftLintBuildToolPlugin */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = A12691A8302E7ECF004E6195 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */;
@@ -2304,6 +2331,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = D30000000000000000000004 /* XCRemoteSwiftPackageReference "swift-collections" */;
 			productName = Collections;
+		};
+		E23600000000000000000003 /* UndoKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A11537F03086CA4400A44573 /* XCRemoteSwiftPackageReference "UndoKit" */;
+			productName = UndoKit;
+		};
+		E23600000000000000000004 /* UndoKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A11537F03086CA4400A44573 /* XCRemoteSwiftPackageReference "UndoKit" */;
+			productName = UndoKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

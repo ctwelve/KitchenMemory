@@ -270,8 +270,12 @@ the live cutover evidence when it is performed.
 
 ## Native test boundary
 
-The UI target contains only accessible top-level structure and navigation
-checks. It does not re-prove feature workflows or standard control activation.
+The UI target contains accessible top-level structure and navigation checks,
+plus the narrowly scoped disposable process-termination/relaunch qualification
+allowed by ADR 0007. The latter uses synthetic diagnostic state to prove a
+process boundary that cannot be tested within a hosted test's own process.
+It does not expand ordinary feature workflows or standard control activation
+coverage. Production builds omit the qualification harness.
 Localization of durable copy and formatting proceeds independently, while
 comprehensive localized-layout assertions, accessibility audits, focus and
 grouping checks, and interaction-specific UI suites are deferred until the

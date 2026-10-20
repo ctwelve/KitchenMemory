@@ -27,6 +27,17 @@ through that preference transport. Private iCloud
 synchronization is a person-directed product function, not telemetry, and must
 never be repurposed as an analytics channel.
 
+UndoKit 0.2.2 is linked for [consumer qualification](undokit-integration.md).
+Production Recipe undo remains unimplemented. A Testing-only demonstrator stores
+synthetic collection values, receipts and a separate local Core Data history
+under a UUID-scoped test directory; it never opens a production Kitchen or
+synchronizes that history. The reviewed package source includes a privacy
+manifest declaring no tracking or collected data and required-reason use of file
+timestamps (C617.1, 3B52.1) and disk space (E174.1). Source inspection does not
+establish distribution packaging; release review must inspect the actual signed
+product and its privacy manifests. Future production history retains the agreed
+host-owned location, scope and local-only storage policy.
+
 Cooking Session Delete is reversible. The app retains the Session's
 authoritative evidence, deletion markers, and later Restore evidence in the
 person's local store and, when private iCloud synchronization is enabled, their

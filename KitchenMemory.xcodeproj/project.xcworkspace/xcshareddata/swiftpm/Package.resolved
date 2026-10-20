@@ -1,5 +1,5 @@
 {
-  "originHash" : "8be8ec6455ce1b14a77ffd093d9dde19d58033745322d08efa53cac422ae4795",
+  "originHash" : "26b2a7236bd9ea527dbb5fff638fe8a3b4b0caeba0b46baa856a0a731e9a40c1",
   "pins" : [
     {
       "identity" : "defaults",
@@ -53,6 +53,15 @@
       "state" : {
         "revision" : "ef7d692fc6706e8f5628e26bcafaefa445c58a97",
         "version" : "0.65.1"
+      }
+    },
+    {
+      "identity" : "undokit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Folio-Suite/UndoKit",
+      "state" : {
+        "revision" : "9d04950fb314846e701890ac3095d28056820918",
+        "version" : "0.2.2"
       }
     }
   ],
