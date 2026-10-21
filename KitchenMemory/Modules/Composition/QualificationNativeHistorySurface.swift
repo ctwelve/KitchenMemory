@@ -41,25 +41,45 @@ import AppKit
 struct QualificationNativeHistorySurface: NSViewRepresentable {
   let manager: UndoManager
 
-  func makeNSView(context: Context) -> QualificationHistoryTextView {
-    let view = QualificationHistoryTextView()
-    view.isEditable = false
-    view.string = "Click here, then use Edit > Undo or Edit > Redo."
-    view.font = .preferredFont(forTextStyle: .body)
+  func makeNSView(context: Context) -> QualificationHistoryResponder {
+    let view = QualificationHistoryResponder()
+    view.setAccessibilityElement(true)
+    view.setAccessibilityRole(.group)
     view.setAccessibilityLabel("Collection history")
     view.setAccessibilityIdentifier("undo-qualification-native-history")
     view.historyManager = manager
     return view
   }
 
-  func updateNSView(_ view: QualificationHistoryTextView, context: Context) {
+  func updateNSView(_ view: QualificationHistoryResponder, context: Context) {
     view.historyManager = manager
   }
 }
 
-final class QualificationHistoryTextView: NSTextView {
+final class QualificationHistoryResponder: NSView, NSUserInterfaceValidations {
   var historyManager: UndoManager?
   override var undoManager: UndoManager? { historyManager }
+  override var acceptsFirstResponder: Bool { true }
+
+  override func mouseDown(with event: NSEvent) { window?.makeFirstResponder(self) }
+
+  @objc func undo(_ sender: Any?) { historyManager?.undo() }
+  @objc func redo(_ sender: Any?) { historyManager?.redo() }
+
+  func validateUserInterfaceItem(_ item: any NSValidatedUserInterfaceItem) -> Bool {
+    switch item.action {
+    case #selector(undo(_:)): historyManager?.canUndo ?? false
+    case #selector(redo(_:)): historyManager?.canRedo ?? false
+    default: false
+    }
+  }
+
+  override func draw(_ dirtyRect: NSRect) {
+    super.draw(dirtyRect)
+    ("Click here, then use Edit > Undo or Edit > Redo." as NSString).draw(
+      in: bounds.insetBy(dx: 8, dy: 8),
+      withAttributes: [.font: NSFont.preferredFont(forTextStyle: .body), .foregroundColor: NSColor.labelColor])
+  }
 }
 #endif
 #endif

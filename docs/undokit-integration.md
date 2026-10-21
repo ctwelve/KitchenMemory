@@ -156,9 +156,9 @@ acceptance.
 
 These updated local results do not replace review-ready CI on the final commit.
 
-## Remaining qualification requirements
+## Bounded acceptance, 2026-10-21
 
-### Agreed scope, 2026-10-21
+### Agreed scope
 
 The maintainer selected recovery between two individually atomic stores as the
 remaining persistence proof: the host may have accepted an action while history
@@ -172,15 +172,27 @@ pre-effect rejection proves the host stays untouched.
 The maintainer waived physical-iPad and hardware-keyboard acceptance because the
 iPad is unavailable and no hardware keyboard is available. Jeeves IV is the
 available iPhone 16 Pro Max on iOS 27.0.1. These waivers do not claim those checks
-passed. Touch/gesture and VoiceOver acceptance on Jeeves IV, and Mac native menu
-and accessibility acceptance, remain in scope.
+passed. The maintainer subsequently confirmed that touch gestures and VoiceOver
+both worked on Jeeves IV. Mac native menu routing and accessible names/focus
+were checked through the actual application UI.
 
 The 2026-10-21 Xcode `Develop` build for **Any iOS Device (arm64)** succeeded
 with the pinned 0.2.2 package. The app retains its iOS 27.0 minimum; KitchenKit
 links `@rpath/UndoKit.framework/UndoKit`, embedded beside it in the app.
 `UndoKit_UndoKit.bundle` contains the compiled `History.momd` and privacy manifest.
 Deep strict app signature verification passed with normal certificate-trust
-access. This establishes the device product build, not a completed phone test run.
+access.
+
+### Completed evidence
+
+| Check | Observed result |
+| --- | --- |
+| Physical iPhone 16 Pro Max, iOS 27.0.1, signed Xcode qualification checks | 13/14 initially passed; the new recovery assertion incorrectly equated an unresolved durable outcome with active admission (`snapshot.hasPending`). After asserting the documented suspended session status instead, the focused recovery rerun passed 1/1, including exact receipt identity and duplicate-free repeated reopening |
+| Full signed native Mac application plan | 290/291 passed; the existing `testAttentionEvidenceExposesAccessibleRecoveryNavigation` UI check failed once and passed its focused rerun 1/1. All UndoKit qualification checks passed in the full run. The result also recorded eight internal QoS-inversion warnings |
+| Final Mac qualification checks after the responder correction | 14/14 passed, zero failures/skips, including native routing, recovery and both application relaunch scenarios |
+| Actual Mac Edit menu, Testing host | Apply produced `Bread, Soup; accepted: 1`; Edit > Undo produced `Soup, Bread; accepted: 2`; Edit > Redo produced `Bread, Soup; accepted: 3`. Native menu availability changed correctly and focus stayed on Collection history. The Mac fixture uses a focusable responder forwarding to the existing facade because read-only NSTextView editing validation disables its Undo menu |
+| Human iPhone acceptance | Maintainer confirmed gestures and VoiceOver both worked; exact walkthrough order was not required |
+| Repository contracts, scoped pinned SwiftLint, independent standards/spec review | Passed; both review axes reported zero findings, including the final Mac responder change |
 
 ### Short native walkthrough
 
@@ -198,11 +210,9 @@ relaunches (`--ui-testing --undo-qualification <UUID>`):
 5. Select **Remove test files** when finished. Record platform, observations and
    any refusal or unexpected focus change in #236.
 
-- **Native acceptance:** simulator/hosted automation does not establish physical
-  iPhone/iPad keyboard/menu/gesture or human assistive-technology acceptance.
-  Record the actual environments, modalities and omissions in #236. Comprehensive
-  beta accessibility remains [#168](https://github.com/ctwelve/KitchenMemory/issues/168).
-
-Until these requirements are reconciled, #236 remains open and #237 remains
-blocked. Qualification results do not authorize expanding the approved operation
-matrix, changing production domain schemas or publishing KitchenMemory.
+The follow-up [PR #271](https://github.com/ctwelve/KitchenMemory/pull/271) records
+this bounded acceptance and closes #236 when integrated. Required CI still
+applies to that PR's final tree. Comprehensive beta accessibility remains
+[#168](https://github.com/ctwelve/KitchenMemory/issues/168). Qualification does not
+expand the approved operation matrix, change production domain schemas, implement
+production Recipe undo or authorize a KitchenMemory release.
