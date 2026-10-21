@@ -113,7 +113,8 @@ extension SwiftDataRecipeOrganizationRepository: RecipeOrganizationHistoryReposi
         }
       }
       guard try historyWitness(delivery.change, folders: folders, context: context) == delivery.beforeWitness,
-            try foldedHistoryWitness(delivery.change, token: delivery.token, receipts: receipts) == delivery.beforeWitness
+            try foldedHistoryWitness(delivery.change, token: delivery.token, receipts: receipts)
+              == delivery.beforeWitness
       else { throw RecipeOrganizationHistoryError.ineligible }
       try accept(delivery.command, firstSave: nil, context: context)
       let after = try SwiftDataFolderRepository(modelContainer: container).library(
