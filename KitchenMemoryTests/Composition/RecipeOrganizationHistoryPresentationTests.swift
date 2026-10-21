@@ -71,6 +71,43 @@ final class OrganizationHistoryPresentationTests: XCTestCase {
     await history.disconnect()
   }
 
+  func testTagSelectionNativeNamesAndReopenPreserveNavigationAndFilters() async throws {
+    let app = try AppRuntime.testing()
+    app.libraryModel.loadIfNeeded()
+    let library = app.libraryModel
+    let model = try XCTUnwrap(library.organization)
+    let ids = Set(library.recipes.prefix(2).map(\.id))
+    XCTAssertEqual(ids.count, 2)
+    let tag = Tag.ID()
+    model.perform { try $0.prepare(tag: .create(id: tag, name: "Dinner")) }
+    let history = app.organizationHistory.presentation(for: UUID())
+    history.updateLocale(Locale(identifier: "en-US"))
+    await history.open()
+    model.filter.search = "retained query"
+    let destination = library.navigation.destination
+    let focus = library.navigation.focus
+    await model.classify(ids, tagID: tag, adding: true, history: history)
+    XCTAssertEqual(history.nativeUndoManager?.undoActionName, "Add Tag")
+    for id in ids { XCTAssertEqual(model.snapshot?.tags.tagIDs(for: id).contains(tag), true) }
+    await model.classify(ids, tagID: tag, adding: false, history: history)
+    XCTAssertEqual(history.nativeUndoManager?.undoActionName, "Remove Tag")
+    await history.undo()
+    for id in ids { XCTAssertEqual(model.snapshot?.tags.tagIDs(for: id).contains(tag), true) }
+    await history.disconnect()
+    history.updateLocale(Locale(identifier: "fr-CA"))
+    await history.open()
+    XCTAssertEqual(history.nativeUndoManager?.redoActionName, "Retirer une étiquette")
+    await history.redo()
+    for id in ids { XCTAssertEqual(model.snapshot?.tags.tagIDs(for: id).contains(tag), false) }
+    await history.undo()
+    await history.undo()
+    for id in ids { XCTAssertEqual(model.snapshot?.tags.tagIDs(for: id).contains(tag), false) }
+    XCTAssertEqual(library.navigation.destination, destination)
+    XCTAssertEqual(library.navigation.focus, focus)
+    XCTAssertEqual(model.filter.search, "retained query")
+    await history.disconnect()
+  }
+
   func testUndoLeavesEditingFocusAndNavigationVetoIntact() async throws {
     let app = try AppRuntime.testing()
     let model = try XCTUnwrap(app.libraryModel.organization)
@@ -114,6 +151,13 @@ final class OrganizationHistoryPresentationTests: XCTestCase {
     XCTAssertNil(model.snapshot?.folders.primaryFolder(for: recipe.id))
     XCTAssertFalse(model.dropRecipes(["km-recipe:" + recipe.id.rawValue.uuidString], recipes: [recipe], to: folder))
     XCTAssertNil(model.snapshot?.folders.primaryFolder(for: recipe.id))
+    let tag = Tag.ID()
+    model.perform { try $0.prepare(tag: .create(id: tag, name: "Dinner")) }
+    await model.classify([recipe.id], tagID: tag, adding: true, history: nil)
+    XCTAssertEqual(model.snapshot?.tags.tagIDs(for: recipe.id).contains(tag), false)
+    XCTAssertFalse(model.dropTag(["km-recipe:" + recipe.id.rawValue.uuidString], recipes: [recipe], onto: tag))
+    XCTAssertNil(model.pending)
+
   }
 
   func testResetRetiresActiveAndRestoredSceneHistoryBeforeChangingKitchen() async throws {

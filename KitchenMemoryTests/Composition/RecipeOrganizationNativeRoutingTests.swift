@@ -61,6 +61,42 @@ final class RecipeOrganizationNativeRoutingTests: XCTestCase {
     XCTAssertNil(model.snapshot?.folders.primaryFolder(for: recipes[1].id))
     XCTAssertTrue(first.canRedo)
   }
+
+  func testTagAndFolderTimelineKeepsFocusedTextUndoAndSceneRouting() async throws {
+    let app = try AppRuntime.testing()
+    app.libraryModel.loadIfNeeded()
+    let model = try XCTUnwrap(app.libraryModel.organization)
+    let recipe = try XCTUnwrap(app.libraryModel.recipes.first)
+    let folder = Folder.ID(), tag = Tag.ID()
+    model.perform { try $0.prepare(folder: .create(id: folder, name: "Dinner", parentID: nil)) }
+    model.perform { try $0.prepare(tag: .create(id: tag, name: "Quick")) }
+    let history = app.organizationHistory.presentation(for: UUID())
+    await history.open()
+    await model.move([recipe.id], to: folder, history: history)
+    await model.classify([recipe.id], tagID: tag, adding: true, history: history)
+    let native = try RecipeOrganizationNativeFixture(history: history)
+    defer { native.close() }
+    XCTAssertTrue(native.focusText())
+    native.typeText("temporary note")
+    native.routedManager?.undo()
+    XCTAssertEqual(native.text, "")
+    XCTAssertEqual(model.snapshot?.tags.tagIDs(for: recipe.id).contains(tag), true)
+    XCTAssertFalse(try XCTUnwrap(native.routedManager).canUndo)
+    native.routedManager?.undo()
+    await history.waitForNativeOperations()
+    XCTAssertEqual(model.snapshot?.tags.tagIDs(for: recipe.id).contains(tag), true)
+    native.leaveText()
+    native.routedManager?.undo()
+    await history.waitForNativeOperations()
+    XCTAssertEqual(model.snapshot?.tags.tagIDs(for: recipe.id).contains(tag), false)
+    XCTAssertEqual(model.snapshot?.folders.primaryFolder(for: recipe.id), folder)
+    native.routedManager?.undo()
+    await history.waitForNativeOperations()
+    XCTAssertNil(model.snapshot?.folders.primaryFolder(for: recipe.id))
+    XCTAssertTrue(history.canRedo)
+    await history.disconnect()
+  }
+
 }
 
 #if os(macOS)

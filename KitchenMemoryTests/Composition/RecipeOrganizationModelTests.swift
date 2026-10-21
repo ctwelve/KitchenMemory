@@ -122,7 +122,9 @@ final class RecipeOrganizationModelTests: XCTestCase {
     await history.waitForPendingOperation()
     XCTAssertFalse(model.dropRecipes(["https://example.com"], recipes: [stored], to: folder))
     XCTAssertFalse(model.dropRecipes(["km-recipe:" + UUID().uuidString], recipes: [stored], to: folder))
-    model.classify([recipe.id], tagID: tag, adding: true)
+    XCTAssertTrue(model.dropTag(["km-recipe:" + recipe.id.rawValue.uuidString], recipes: [stored], onto: tag,
+      history: history))
+    await history.waitForPendingOperation()
     model.toggleTag(tag)
     model.filter.location = .folder(folder)
     XCTAssertEqual(model.recipes([stored], locale: .current).map(\.id), [recipe.id])
