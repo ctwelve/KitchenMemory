@@ -36,10 +36,11 @@ extension SwiftDataRecipeOrganizationRepository {
     let context = ModelContext(container)
     let tags = try SwiftDataTagRepository(modelContainer: container).library(in: scope.kitchenID, context: context)
     let receipts = try historyReceipts(in: scope.kitchenID, context: context)
+    let authoredAt = Date()
     let commands = try tagHistoryCommands(intent, token: OrganizationHistoryToken(token), scope: scope,
-      tags: tags, receipts: receipts)
+      tags: tags, receipts: receipts, date: authoredAt)
     let command = RecipeOrganizationCommand(id: token.command, kitchenID: scope.kitchenID,
-      authoredAt: commands.first?.action.authoredAt ?? Date(), folders: [], tags: commands)
+      authoredAt: authoredAt, folders: [], tags: commands)
     return RecipeOrganizationHistoryDelivery(scope: scope, token: OrganizationHistoryToken(token), memberID: memberID,
       change: change, command: command, beforeWitness: try tagBatchWitness(intent, tags: tags, context: context))
   }

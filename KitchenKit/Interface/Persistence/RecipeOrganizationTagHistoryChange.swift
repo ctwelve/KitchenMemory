@@ -22,8 +22,9 @@ struct RecipeOrganizationTagHistoryMember: Codable, Equatable, Sendable {
 
 extension RecipeOrganizationHistoryChange {
   init(tagChange: RecipeOrganizationTagHistoryChange) {
-    let first = tagChange.members.first
-    self.init(anchorID: first?.anchorID ?? UUID(), recipeID: first?.recipeID ?? Recipe.ID(),
+    // Preparation and version-3 decoding both require a nonempty member set.
+    let first = tagChange.members[0]
+    self.init(anchorID: first.anchorID, recipeID: first.recipeID,
       before: nil, after: nil, baseline: Data(), folderBaseline: Data(), tagChange: tagChange)
   }
 }
