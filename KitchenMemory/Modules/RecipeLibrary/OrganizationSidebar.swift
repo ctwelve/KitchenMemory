@@ -64,7 +64,7 @@ struct OrganizationSidebar: View {
                 .contextMenu { OrganizationTagActions(model: model, tag: tag, presentation: presentation) }
                 .draggable("km-tag:" + tag.id.rawValue.uuidString)
                 .dropDestination(for: String.self) { values, _ -> Bool in
-                  model.dropTag(values, recipes: recipes, onto: tag.id)
+                  model.dropTag(values, recipes: recipes, onto: tag.id, history: history)
                 }
               }
             } label: { Label(.organizationTags, systemImage: "tag") }

@@ -55,6 +55,9 @@ extension SwiftDataRecipeOrganizationRepository: RecipeOrganizationHistoryReposi
     _ change: RecipeOrganizationHistoryChange, memberID: UUID, token: UndoKit.HistoryToken,
     in scope: RecipeOrganizationHistoryScope
   ) throws -> RecipeOrganizationHistoryDelivery {
+    if change.tagChange != nil {
+      return try prepareTagHistoryDelivery(change, memberID: memberID, token: token, scope: scope)
+    }
     guard token.scope == scope.identity else { throw RecipeOrganizationHistoryError.invalidScope }
     let context = ModelContext(container)
     let folders = try SwiftDataFolderRepository(modelContainer: container).library(
@@ -94,6 +97,10 @@ extension SwiftDataRecipeOrganizationRepository: RecipeOrganizationHistoryReposi
       if let receipt = prior.first(where: { $0.delivery.token == delivery.token }) {
         guard receipt.delivery == delivery else { throw RecipeOrganizationHistoryError.invalidEvidence }
         accepted = receipt
+        return
+      }
+      if delivery.change.tagChange != nil {
+        accepted = try commitTagHistory(delivery, recovery: recovery, receipts: receipts, context: context)
         return
       }
       try validateHistoryScope(delivery.scope, context: context)
@@ -173,6 +180,11 @@ extension SwiftDataRecipeOrganizationRepository: RecipeOrganizationHistoryReposi
     var seen: Set<UUID> = []
     for receipt in owned {
       let change = receipt.delivery.change
+      if let tagChange = change.tagChange {
+        guard try tagHistoryIsEligible(tagChange, scope: scope, token: receipt.delivery.token,
+          receipts: receipts, context: context) else { return false }
+        continue
+      }
       for member in change.changedMembers where seen.insert(member.anchorID).inserted {
         guard (try? requireHistoryRecipe(member.recipeID, scope: scope, context: context)) != nil,
               (try? requireHistoryFolder(member.before, folders: folders)) != nil,
@@ -186,13 +198,13 @@ extension SwiftDataRecipeOrganizationRepository: RecipeOrganizationHistoryReposi
     return true
   }
 
-  private func historyReceiptStore(recovery: Bool = false) -> OrganizationStore<OrganizationHistoryReceiptPayload> {
+  func historyReceiptStore(recovery: Bool = false) -> OrganizationStore<OrganizationHistoryReceiptPayload> {
     OrganizationStore(modelContainer: container,
       namespace: recovery ? "organization-history-recoveries-v1" : "organization-history-receipts-v1",
       recipeID: { _ in nil })
   }
 
-  private func historyReceipts(in kitchenID: Kitchen.ID, context: ModelContext, recovery: Bool = false)
+  func historyReceipts(in kitchenID: Kitchen.ID, context: ModelContext, recovery: Bool = false)
     throws -> [RecipeOrganizationHistoryReceipt] {
     let snapshot = try historyReceiptStore(recovery: recovery).load(in: kitchenID, context: context)
     guard snapshot.checkpoints.isEmpty else { throw RecipeOrganizationHistoryError.invalidEvidence }
@@ -227,7 +239,8 @@ extension SwiftDataRecipeOrganizationRepository: RecipeOrganizationHistoryReposi
     }
       .sorted { $0.delivery.token.sequence < $1.delivery.token.sequence }
     for receipt in owned {
-      guard receipt.delivery.change.changedMembers.contains(where: { $0.recipeID == member.recipeID }),
+      guard receipt.delivery.change.tagChange == nil,
+        receipt.delivery.change.changedMembers.contains(where: { $0.recipeID == member.recipeID }),
         let before = batchMemberWitness(receipt.delivery.beforeWitness, recipeID: member.recipeID,
           single: receipt.delivery.change.members == nil),
         let after = batchMemberWitness(receipt.afterWitness, recipeID: member.recipeID,
@@ -290,7 +303,7 @@ extension SwiftDataRecipeOrganizationRepository: RecipeOrganizationHistoryReposi
     })
   }
 
-  private func requireHistoryRecipe(_ recipeID: Recipe.ID, scope: RecipeOrganizationHistoryScope,
+  func requireHistoryRecipe(_ recipeID: Recipe.ID, scope: RecipeOrganizationHistoryScope,
                                     context: ModelContext) throws {
     guard let recipe = try SwiftDataRecipeRepository(context: context).recipe(id: recipeID),
           recipe.recipe.kitchenID == scope.kitchenID else { throw RecipeOrganizationHistoryError.ineligible }
@@ -302,7 +315,7 @@ extension SwiftDataRecipeOrganizationRepository: RecipeOrganizationHistoryReposi
     }
   }
 
-  private func validateHistoryScope(_ scope: RecipeOrganizationHistoryScope, context: ModelContext) throws {
+  func validateHistoryScope(_ scope: RecipeOrganizationHistoryScope, context: ModelContext) throws {
     guard !scope.storeID.isEmpty, !scope.ownerID.rawValue.isEmpty,
           let kitchen = try KitchenRecordStore(context: context).kitchen(id: scope.kitchenID),
           kitchen.ownerID == nil || kitchen.ownerID == scope.ownerID else {
@@ -311,7 +324,7 @@ extension SwiftDataRecipeOrganizationRepository: RecipeOrganizationHistoryReposi
   }
 }
 
-private struct OrganizationHistoryReceiptPayload: OrganizationPayload {
+struct OrganizationHistoryReceiptPayload: OrganizationPayload {
   let version: Int
   let receipt: RecipeOrganizationHistoryReceipt
   var compactableRegister: String? { nil }

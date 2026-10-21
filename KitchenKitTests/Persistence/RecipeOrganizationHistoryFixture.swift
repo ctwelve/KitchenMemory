@@ -72,6 +72,10 @@ final class ControlledHistoryRepository: RecipeOrganizationHistoryRepository {
   func prepareHistoryMove(_ recipeIDs: Set<Recipe.ID>, to folderID: Folder.ID?,
                           in scope: RecipeOrganizationHistoryScope)
     throws -> RecipeOrganizationHistoryChange? { try base.prepareHistoryMove(recipeIDs, to: folderID, in: scope) }
+  func prepareHistoryTags(_ recipeIDs: Set<Recipe.ID>, tagID: Tag.ID, adding: Bool,
+                          in scope: RecipeOrganizationHistoryScope) throws -> RecipeOrganizationHistoryChange? {
+    try base.prepareHistoryTags(recipeIDs, tagID: tagID, adding: adding, in: scope)
+  }
   func prepareHistoryDelivery(_ change: RecipeOrganizationHistoryChange, memberID: UUID, token: UndoKit.HistoryToken,
                               in scope: RecipeOrganizationHistoryScope) throws -> RecipeOrganizationHistoryDelivery {
     try base.prepareHistoryDelivery(change, memberID: memberID, token: token, in: scope)

@@ -77,6 +77,12 @@ final class OrganizationHistoryPresentation {
       if payload.data == Data("move-recipes".utf8) {
         return LocalizedStringResource.organizationUndoMoveRecipes.localized(for: self?.locale ?? .current)
       }
+      if payload.data == Data("add-tag".utf8) {
+        return LocalizedStringResource.organizationAddTag.localized(for: self?.locale ?? .current)
+      }
+      if payload.data == Data("remove-tag".utf8) {
+        return LocalizedStringResource.organizationRemoveTag.localized(for: self?.locale ?? .current)
+      }
       return nil
     }
   }
@@ -86,6 +92,25 @@ final class OrganizationHistoryPresentation {
     pendingMove = Task {
       await move(ids, to: folder)
       pendingMove = nil
+    }
+  }
+
+  func requestClassify(_ ids: Set<Recipe.ID>, tagID: Tag.ID, adding: Bool) {
+    guard pendingMove == nil else { failed = true; return }
+    pendingMove = Task {
+      await classify(ids, tagID: tagID, adding: adding)
+      pendingMove = nil
+    }
+  }
+
+  func classify(_ ids: Set<Recipe.ID>, tagID: Tag.ID, adding: Bool) async {
+    await open()
+    guard available, ready, !busy else { failed = true; return }
+    busy = true
+    defer { busy = false; refresh() }
+    do { receive(try await history.classify(ids, tagID: tagID, adding: adding)) } catch {
+      failed = true
+      failureMessage = .organizationUndoFailureMessage
     }
   }
 

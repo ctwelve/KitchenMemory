@@ -144,14 +144,16 @@ final class RecipeOrganizationModel {
     return dropRecipes(values, recipes: recipes, to: folderID, history: history)
   }
 
-  func dropTag(_ values: [String], recipes: [StoredRecipe], onto tagID: Tag.ID) -> Bool {
+  func dropTag(_ values: [String], recipes: [StoredRecipe], onto tagID: Tag.ID,
+               history: OrganizationHistoryPresentation? = nil) -> Bool {
     if values.count == 1, snapshot?.tags.ordering == .manual, let id = identifier(values[0], prefix: "km-tag:") {
       perform { try $0.prepare(tag: .reorder(id: Tag.ID(rawValue: id), afterID: tagID)) }
       return !failed
     }
     guard let ids = recipeIDs(values, recipes: recipes) else { return false }
-    classify(ids, tagID: tagID, adding: true)
-    return !failed
+    guard let history else { failed = true; return false }
+    history.requestClassify(ids, tagID: tagID, adding: true)
+    return true
   }
 
   func clearForReset() {
@@ -177,6 +179,12 @@ final class RecipeOrganizationModel {
 
   func classify(_ ids: Set<Recipe.ID>, tagID: Tag.ID, adding: Bool) {
     perform { try $0.classify(ids, tagID: tagID, adding: adding) }
+  }
+
+  func classify(_ ids: Set<Recipe.ID>, tagID: Tag.ID, adding: Bool,
+                history: OrganizationHistoryPresentation?) async {
+    guard !storageInvalid, pending == nil, snapshot != nil, let history else { failed = true; return }
+    await history.classify(ids, tagID: tagID, adding: adding)
   }
 
   func toggleTag(_ id: Tag.ID) {

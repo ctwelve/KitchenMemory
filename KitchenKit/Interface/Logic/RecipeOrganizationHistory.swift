@@ -34,10 +34,13 @@ public final class RecipeOrganizationHistory {
       pendingURL: historyURL.appendingPathExtension("organization-pending.json"))
     let operation = try HistoryOperation(operation: "kitchenmemory.recipe-organization", commandCodec: .json(),
       effectCodec: .json(), handler: host, fingerprint: { try OrganizationCoding.digest($0) }, metadata: { changes in
-        let changedRecipeCount = changes.reduce(0) { $0 + $1.changedMembers.count }
+        let name: String
+        if let tag = changes.first?.tagChange { name = tag.adding ? "add-tag" : "remove-tag" } else {
+          let changedRecipeCount = changes.reduce(0) { $0 + $1.changedMembers.count }
+          name = changedRecipeCount == 1 ? "move-recipe" : "move-recipes"
+        }
         return HistoryOperationMetadata(presentation: HistoryPayload(
-          family: "kitchenmemory.recipe-organization.action",
-          data: Data((changedRecipeCount == 1 ? "move-recipe" : "move-recipes").utf8)))
+          family: "kitchenmemory.recipe-organization.action", data: Data(name.utf8)))
       })
     let existing = FileManager.default.fileExists(atPath: historyURL.path)
       || FileManager.default.fileExists(atPath: historyURL.appendingPathExtension("organization-pending.json").path)
@@ -61,6 +64,16 @@ public final class RecipeOrganizationHistory {
     _ = try await invalidateInterference()
     guard host.pending == nil else { throw RecipeOrganizationHistoryError.ineligible }
     guard let change = try repository.prepareHistoryMove(recipeIDs, to: folderID, in: host.scope)
+    else { return .rejected }
+    return await (try session.commands(for: operation)).submit(change)
+  }
+
+  /// Adds or removes one Tag for the changed selected Recipes as one accepted group.
+  public func classify(_ recipeIDs: Set<Recipe.ID>, tagID: Tag.ID, adding: Bool) async throws -> HistorySubmissionResult {
+    guard let session, let host, let operation else { throw RecipeOrganizationHistoryError.notOpen }
+    _ = try await invalidateInterference()
+    guard host.pending == nil else { throw RecipeOrganizationHistoryError.ineligible }
+    guard let change = try repository.prepareHistoryTags(recipeIDs, tagID: tagID, adding: adding, in: host.scope)
     else { return .rejected }
     return await (try session.commands(for: operation)).submit(change)
   }

@@ -15,11 +15,12 @@ public struct RecipeOrganizationHistoryChange: Codable, Equatable, Sendable {
   let folderBaseline: Data
   /// Present for an atomic multi-Recipe move. Omitted by older persisted single moves.
   let members: [RecipeOrganizationHistoryMember]?
+  let tagChange: RecipeOrganizationTagHistoryChange?
 
   init(anchorID: UUID, recipeID: Recipe.ID, before: Folder.ID?, after: Folder.ID?, baseline: Data,
-       folderBaseline: Data, members: [RecipeOrganizationHistoryMember]? = nil) {
+       folderBaseline: Data, members: [RecipeOrganizationHistoryMember]? = nil, tagChange: RecipeOrganizationTagHistoryChange? = nil) {
     self.anchorID = anchorID; self.recipeID = recipeID; self.before = before; self.after = after
-    self.baseline = baseline; self.folderBaseline = folderBaseline; self.members = members
+    self.baseline = baseline; self.folderBaseline = folderBaseline; self.members = members; self.tagChange = tagChange
   }
 
   var changedMembers: [RecipeOrganizationHistoryMember] {
@@ -30,6 +31,7 @@ public struct RecipeOrganizationHistoryChange: Codable, Equatable, Sendable {
   }
 
   var inverse: Self {
+    if let tagChange { return Self(tagChange: tagChange.inverse) }
     let reversed = changedMembers.map { $0.inverse }
     let first = reversed[0]
     return Self(anchorID: first.anchorID, recipeID: first.recipeID, before: first.before, after: first.after,
@@ -37,16 +39,21 @@ public struct RecipeOrganizationHistoryChange: Codable, Equatable, Sendable {
   }
 
   private enum CodingKeys: String, CodingKey {
-    case version, members, anchorID, recipeID, before, after, baseline, folderBaseline
+    case version, members, tagChange, anchorID, recipeID, before, after, baseline, folderBaseline
   }
 
   public init(from decoder: Decoder) throws {
     let values = try decoder.container(keyedBy: CodingKeys.self)
     let version = try values.decodeIfPresent(Int.self, forKey: .version)
-    if let version, version != 2 {
+    if let version, version != 2 && version != 3 {
       throw DecodingError.dataCorruptedError(forKey: .version, in: values,
         debugDescription: "Unsupported history change version")
     }
+    if version == 3 {
+      self = Self(tagChange: try values.decode(RecipeOrganizationTagHistoryChange.self, forKey: .tagChange))
+      return
+    }
+    tagChange = nil
     if version == 2 {
       let decoded = try values.decode([RecipeOrganizationHistoryMember].self, forKey: .members)
       let sortedIDs = decoded.map(\.recipeID).sorted { $0.rawValue.uuidString < $1.rawValue.uuidString }
@@ -70,7 +77,10 @@ public struct RecipeOrganizationHistoryChange: Codable, Equatable, Sendable {
 
   public func encode(to encoder: Encoder) throws {
     var values = encoder.container(keyedBy: CodingKeys.self)
-    if let members {
+    if let tagChange {
+      try values.encode(3, forKey: .version)
+      try values.encode(tagChange, forKey: .tagChange)
+    } else if let members {
       try values.encode(2, forKey: .version)
       try values.encode(members, forKey: .members)
     } else {
@@ -123,6 +133,8 @@ public protocol RecipeOrganizationHistoryRepository: RecipeOrganizationRepositor
   func prepareHistoryMove(_ recipeID: Recipe.ID, to folderID: Folder.ID?,
                           in scope: RecipeOrganizationHistoryScope) throws -> RecipeOrganizationHistoryChange?
   func prepareHistoryMove(_ recipeIDs: Set<Recipe.ID>, to folderID: Folder.ID?,
+                          in scope: RecipeOrganizationHistoryScope) throws -> RecipeOrganizationHistoryChange?
+  func prepareHistoryTags(_ recipeIDs: Set<Recipe.ID>, tagID: Tag.ID, adding: Bool,
                           in scope: RecipeOrganizationHistoryScope) throws -> RecipeOrganizationHistoryChange?
   func prepareHistoryDelivery(_ change: RecipeOrganizationHistoryChange, memberID: UUID, token: HistoryToken,
                               in scope: RecipeOrganizationHistoryScope) throws -> RecipeOrganizationHistoryDelivery
