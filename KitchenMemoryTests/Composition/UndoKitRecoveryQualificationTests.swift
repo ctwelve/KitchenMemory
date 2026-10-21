@@ -49,12 +49,22 @@ final class UndoKitRecoveryQualificationTests: XCTestCase {
       return
     }
     XCTAssertEqual(rig.host.acceptanceCount, 1)
+    let acceptedToken = try XCTUnwrap(rig.host.receiptTokens.first)
+    XCTAssertTrue(rig.session.snapshot.hasPending)
     XCTAssertFalse(rig.session.status.canUndo)
+    XCTAssertFalse(rig.session.status.canRedo)
     try await rig.reopen()
     XCTAssertEqual(rig.session.status.phase, .ready)
     XCTAssertEqual(rig.host.values.map(\.title), ["Bread", "Soup"])
     XCTAssertEqual(rig.host.acceptanceCount, 1)
+    XCTAssertEqual(rig.host.receiptTokens, [acceptedToken])
+    XCTAssertFalse(rig.session.snapshot.hasPending)
+    XCTAssertTrue(rig.session.status.canUndo)
+    XCTAssertFalse(rig.session.status.canRedo)
     XCTAssertGreaterThan(rig.host.outcomeLookupCount, 0)
+    try await rig.reopen()
+    XCTAssertEqual(rig.host.receiptTokens, [acceptedToken])
+    XCTAssertTrue(rig.session.status.canUndo)
     assertAccepted(await rig.session.undo())
     XCTAssertEqual(rig.host.values.map(\.title), ["Soup", "Bread"])
   }

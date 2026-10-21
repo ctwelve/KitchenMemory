@@ -158,12 +158,46 @@ These updated local results do not replace review-ready CI on the final commit.
 
 ## Remaining qualification requirements
 
-- **Actual history write failure:** the typed finalization injector is guarded by
-  UndoKit's `#if DEBUG` and is absent from the package compiled by this project's
-  Testing configuration. Host pre-write rejection and accepted reply loss do not
-  establish failure of UndoKit's preparation/finalization SQLite writes. Do not
-  describe orderly reopen, reply loss or this Debug injector as abrupt power-loss
-  evidence. Retain the remaining storage-boundary proof explicitly in #236.
+### Agreed scope, 2026-10-21
+
+The maintainer selected recovery between two individually atomic stores as the
+remaining persistence proof: the host may have accepted an action while history
+has not finalized it. Power-loss simulation and lower-level SQLite write-fault
+qualification are not required for this consumer gate. The accepted-reply-loss
+scenario creates that committed-host/unresolved-history mismatch and proves
+recovery by the exact durable receipt, without replay, across repeated reopening.
+Existing refusal tests cover unreadable history and mismatched identities;
+pre-effect rejection proves the host stays untouched.
+
+The maintainer waived physical-iPad and hardware-keyboard acceptance because the
+iPad is unavailable and no hardware keyboard is available. Jeeves IV is the
+available iPhone 16 Pro Max on iOS 27.0.1. These waivers do not claim those checks
+passed. Touch/gesture and VoiceOver acceptance on Jeeves IV, and Mac native menu
+and accessibility acceptance, remain in scope.
+
+The 2026-10-21 Xcode `Develop` build for **Any iOS Device (arm64)** succeeded
+with the pinned 0.2.2 package. The app retains its iOS 27.0 minimum; KitchenKit
+links `@rpath/UndoKit.framework/UndoKit`, embedded beside it in the app.
+`UndoKit_UndoKit.bundle` contains the compiled `History.momd` and privacy manifest.
+Deep strict app signature verification passed with normal certificate-trust
+access. This establishes the device product build, not a completed phone test run.
+
+### Short native walkthrough
+
+Use the Testing app's qualification screen with the same disposable UUID across
+relaunches (`--ui-testing --undo-qualification <UUID>`):
+
+1. Apply once: the state becomes `Bread, Soup; accepted: 1`.
+2. Focus **Collection history**. On Mac use Edit > Undo and Edit > Redo; on
+   iPhone use the system three-finger Undo/Redo gestures. Undo restores
+   `Soup, Bread; accepted: 2`; Redo returns `Bread, Soup; accepted: 3`.
+3. Relaunch with the same UUID. The values and available history survive; a
+   relaunch alone must not increment the accepted count.
+4. With VoiceOver, reach and activate Apply/Undo/Redo and read the state. Check
+   that names, availability and focus make the action and result understandable.
+5. Select **Remove test files** when finished. Record platform, observations and
+   any refusal or unexpected focus change in #236.
+
 - **Native acceptance:** simulator/hosted automation does not establish physical
   iPhone/iPad keyboard/menu/gesture or human assistive-technology acceptance.
   Record the actual environments, modalities and omissions in #236. Comprehensive
