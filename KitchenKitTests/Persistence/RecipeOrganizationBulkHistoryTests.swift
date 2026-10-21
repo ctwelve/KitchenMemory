@@ -195,4 +195,37 @@ final class RecipeOrganizationBulkHistoryTests: XCTestCase {
     XCTAssertNil(try fixture.repository.load(in: fixture.kitchenID).folders.primaryFolder(for: extra.id))
     await reopened.close()
   }
+
+  func testBulkAndSingleMovesShareOneOrderedUndoRedoTimeline() async throws {
+    let fixture = try HistoryFixture()
+    defer { fixture.removeFiles() }
+    let secondID = try RecipeEditor(repository: fixture.recipes).create(in: fixture.kitchenID,
+      from: RecipeDraft(title: "Bread")).id
+    let history = RecipeOrganizationHistory(repository: fixture.repository)
+    try await history.open(scope: fixture.scope, historyURL: fixture.historyURL)
+
+    assertOrganizationHistoryAccepted(try await history.move([fixture.recipeID], to: fixture.first))
+    assertOrganizationHistoryAccepted(try await history.move([fixture.recipeID, secondID], to: fixture.second))
+    XCTAssertEqual(try fixture.placement(), fixture.second)
+    XCTAssertEqual(try fixture.repository.load(in: fixture.kitchenID).folders.primaryFolder(for: secondID),
+      fixture.second)
+
+    assertOrganizationHistoryAccepted(await history.undo())
+    XCTAssertEqual(try fixture.placement(), fixture.first)
+    XCTAssertNil(try fixture.repository.load(in: fixture.kitchenID).folders.primaryFolder(for: secondID))
+
+    assertOrganizationHistoryAccepted(await history.undo())
+    XCTAssertNil(try fixture.placement())
+    XCTAssertFalse(try XCTUnwrap(history.session).status.canUndo)
+
+    assertOrganizationHistoryAccepted(await history.redo())
+    XCTAssertEqual(try fixture.placement(), fixture.first)
+    XCTAssertNil(try fixture.repository.load(in: fixture.kitchenID).folders.primaryFolder(for: secondID))
+
+    assertOrganizationHistoryAccepted(await history.redo())
+    XCTAssertEqual(try fixture.placement(), fixture.second)
+    XCTAssertEqual(try fixture.repository.load(in: fixture.kitchenID).folders.primaryFolder(for: secondID),
+      fixture.second)
+    await history.close()
+  }
 }
