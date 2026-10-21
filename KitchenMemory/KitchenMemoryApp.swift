@@ -18,6 +18,9 @@ import SwiftUI
 /// ``ContentView`` owns its own sheets and split-view columns.
 @main
 struct KitchenMemoryApp: App {
+#if !os(macOS)
+  @UIApplicationDelegateAdaptor(OrganizationHistoryApplicationDelegate.self) private var historyLifecycle
+#endif
   @Environment(\.scenePhase) private var scenePhase
   @StateObject private var startup: AppStartupCoordinator
 
@@ -33,6 +36,7 @@ struct KitchenMemoryApp: App {
     }
     .commands {
       SidebarCommands()
+      OrganizationHistoryCommands()
       RecipeLibraryCommands(app: startup.state.preparedApp)
       KitchenCommands(model: startup.state.preparedApp?.libraryModel)
     }

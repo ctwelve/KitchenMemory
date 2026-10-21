@@ -130,12 +130,13 @@ final class RecipeOrganizationModel {
     refresh()
   }
 
-  func dropFolder(_ values: [String], recipes: [StoredRecipe], onto folderID: Folder.ID) -> Bool {
+  func dropFolder(_ values: [String], recipes: [StoredRecipe], onto folderID: Folder.ID,
+                  history: OrganizationHistoryPresentation? = nil) -> Bool {
     if values.count == 1, let id = identifier(values[0], prefix: "km-folder:") {
       perform { try $0.prepare(folder: .move(id: Folder.ID(rawValue: id), parentID: folderID)) }
       return !failed
     }
-    return dropRecipes(values, recipes: recipes, to: folderID)
+    return dropRecipes(values, recipes: recipes, to: folderID, history: history)
   }
 
   func dropTag(_ values: [String], recipes: [StoredRecipe], onto tagID: Tag.ID) -> Bool {
@@ -163,6 +164,13 @@ final class RecipeOrganizationModel {
     perform { try $0.move(ids, to: folderID) }
   }
 
+  func move(_ ids: Set<Recipe.ID>, to folderID: Folder.ID?, history: OrganizationHistoryPresentation?) async {
+    guard !storageInvalid, pending == nil, snapshot != nil else { failed = true; return }
+    if ids.count > 1 { move(ids, to: folderID); return }
+    guard let history else { failed = true; return }
+    await history.move(ids, to: folderID)
+  }
+
   func classify(_ ids: Set<Recipe.ID>, tagID: Tag.ID, adding: Bool) {
     perform { try $0.classify(ids, tagID: tagID, adding: adding) }
   }
@@ -183,8 +191,15 @@ final class RecipeOrganizationModel {
     return ids
   }
 
-  func dropRecipes(_ values: [String], recipes: [StoredRecipe], to folder: Folder.ID?) -> Bool {
-    guard let ids = recipeIDs(values, recipes: recipes) else { return false }
+  func dropRecipes(_ values: [String], recipes: [StoredRecipe], to folder: Folder.ID?,
+                   history: OrganizationHistoryPresentation? = nil) -> Bool {
+    guard !storageInvalid, pending == nil, snapshot != nil,
+          let ids = recipeIDs(values, recipes: recipes) else { return false }
+    if ids.count == 1, let history {
+      history.requestMove(ids, to: folder)
+      return true
+    }
+    if ids.count == 1 { failed = true; return false }
     move(ids, to: folder)
     return !failed
   }

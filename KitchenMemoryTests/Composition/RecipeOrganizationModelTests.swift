@@ -96,12 +96,12 @@ final class RecipeOrganizationModelTests: XCTestCase {
     XCTAssertEqual(library.navigation.contentDestination, .recovery)
   }
 
-  func testLocalPreferencesFilteringDropsAndExpansionSurviveRelaunch() throws {
+  func testLocalPreferencesFilteringDropsAndExpansionSurviveRelaunch() async throws {
     let fixture = try makeTestUserDefaults(suiteNamePrefix: "organization")
     let container = try KitchenMemorySchema.makeContainer(inMemory: true)
     let repository = SwiftDataRecipeOrganizationRepository(modelContainer: container)
     let recipes = SwiftDataRecipeRepository(modelContainer: container)
-    let kitchen = Kitchen(name: "Home")
+    let kitchen = Kitchen(ownerID: KitchenOwner.ID(rawValue: "owner-a"), name: "Home")
     try recipes.save(kitchen)
     let recipe = try RecipeEditor(repository: recipes).create(in: kitchen.id, from: RecipeDraft(title: "Soup"))
     let stored = try XCTUnwrap(recipes.recipe(id: recipe.id))
@@ -111,7 +111,15 @@ final class RecipeOrganizationModelTests: XCTestCase {
     let folder = Folder.ID(), tag = Tag.ID()
     model.perform { try $0.prepare(folder: .create(id: folder, name: "Dinner", parentID: nil)) }
     model.perform { try $0.prepare(tag: .create(id: tag, name: "Quick")) }
-    XCTAssertTrue(model.dropRecipes(["km-recipe:" + recipe.id.rawValue.uuidString], recipes: [stored], to: folder))
+    let history = OrganizationHistoryPresentation(history: RecipeOrganizationHistory(repository: repository),
+      organization: model, scope: RecipeOrganizationHistoryScope(ownerID: KitchenOwner.ID(rawValue: "owner-a"),
+        storeID: "test", kitchenID: kitchen.id, logicalSceneID: UUID()),
+      historyURL: FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        .appendingPathComponent("History.sqlite"))
+    await history.open()
+    XCTAssertTrue(model.dropRecipes(["km-recipe:" + recipe.id.rawValue.uuidString], recipes: [stored], to: folder,
+                                   history: history))
+    await history.waitForPendingOperation()
     XCTAssertFalse(model.dropRecipes(["https://example.com"], recipes: [stored], to: folder))
     XCTAssertFalse(model.dropRecipes(["km-recipe:" + UUID().uuidString], recipes: [stored], to: folder))
     model.classify([recipe.id], tagID: tag, adding: true)

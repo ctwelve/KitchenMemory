@@ -245,6 +245,7 @@ enum AppRuntime {
 @MainActor
 struct PreparedCore {
   let kitchenID: Kitchen.ID
+  let organizationHistory: OrganizationHistoryRegistry
   let modelContainer: ModelContainer
   let libraryModel: RecipeLibraryModel
   let cookingSessionRepository: SwiftDataCookingSessionRepository
@@ -288,7 +289,8 @@ struct PreparedCore {
     if plan.sampleFixture == .installed {
       try SampleRecipeInstallService(repository: recipeRepository, samples: samples).install(in: kitchenID)
     }
-    let organizationScope = ownerID.rawValue + "." + (plan.store.personalCloudContainerIdentifier ?? "local")
+    let organization = try PreparedOrganization(plan: plan, ownerID: ownerID, preferences: preferences,
+      kitchenID: kitchenID, container: modelContainer)
     libraryModel = RecipeLibraryModel(
       library: library,
       samplePreferences: preferences,
@@ -296,14 +298,10 @@ struct PreparedCore {
       editingStore: plan.store.isInMemory
         ? VolatileRecipeEditingStore()
         : try FileRecipeEditingStore.deviceLocal(ownerID: ownerID),
-      organization: RecipeOrganizationModel(
-        repository: SwiftDataRecipeOrganizationRepository(modelContainer: modelContainer),
-        kitchenID: preparedKitchen.kitchen.id,
-        scope: organizationScope,
-        preferences: preferences.organizationPreferences(scope: organizationScope, kitchenID: kitchenID),
-        defaults: plan.store.isInMemory ? try organizationTestingDefaults() : .standard
-      )
+      organization: organization.model
     )
+    organizationHistory = organization.history
+    libraryModel.installPrepareForResetHandler { [organizationHistory] in try organizationHistory.prepareForReset() }
     cookingSessionRepository = SwiftDataCookingSessionRepository(
       modelContainer: modelContainer
     )
@@ -313,12 +311,4 @@ struct PreparedCore {
       sessionRepository: cookingSessionRepository
     )
   }
-}
-
-@MainActor
-private func organizationTestingDefaults() throws -> UserDefaults {
-  guard let defaults = UserDefaults(suiteName: "organization-testing." + UUID().uuidString) else {
-    throw CocoaError(.fileWriteUnknown)
-  }
-  return defaults
 }

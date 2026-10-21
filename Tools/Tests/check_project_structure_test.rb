@@ -284,6 +284,9 @@ class CheckProjectStructureTest < Minitest::Test
             "name" => target_name
           }
         end
+        if policy[:environment_variables]
+          default_options["environmentVariableEntries"] = policy[:environment_variables]
+        end
         result[filename] = JSON.pretty_generate(
           "configurations" => [
             {
@@ -991,6 +994,62 @@ class CheckProjectStructureTest < Minitest::Test
     assert_includes error.message, "expand variables against KitchenMemory"
   end
 
+  def test_rejects_framework_scheme_without_debug_package_build
+    fixture = Fixture.new
+    fixture.schemes["KitchenKit.xcscheme"] = fixture.schemes.fetch("KitchenKit.xcscheme").sub(
+      'TestAction buildConfiguration="Debug"', 'TestAction buildConfiguration="Testing"'
+    )
+
+    error = assert_contract_error { validate(fixture) }
+
+    assert_includes error.message, "KitchenKit TestAction must use Debug"
+  end
+
+  def test_rejects_framework_plan_using_application_variable_expansion
+    fixture = Fixture.new
+    plan = JSON.parse(fixture.plans.fetch("KitchenKit.xctestplan"))
+    plan["defaultOptions"]["targetForVariableExpansion"] = {
+      "containerPath" => "container:KitchenMemory.xcodeproj",
+      "identifier" => fixture.target_ids.fetch("KitchenMemory"),
+      "name" => "KitchenMemory"
+    }
+    fixture.plans["KitchenKit.xctestplan"] = JSON.generate(plan)
+
+    error = assert_contract_error { validate(fixture) }
+
+    assert_includes error.message, "expand variables against KitchenKitTests"
+  end
+
+  def test_requires_exact_framework_resource_bundle_override
+    overrides = [nil, [], [{"key" => "PACKAGE_RESOURCE_BUNDLE_PATH", "value" => "/tmp"}],
+                 [{"key" => "PACKAGE_RESOURCE_BUNDLE_PATH", "value" => "$(BUILT_PRODUCTS_DIR)", "enabled" => false}],
+                 [{"key" => "PACKAGE_RESOURCE_BUNDLE_PATH", "value" => "$(BUILT_PRODUCTS_DIR)"},
+                  {"key" => "OTHER_OVERRIDE", "value" => "unexpected"}]]
+    overrides.each do |override|
+      fixture = Fixture.new
+      plan = JSON.parse(fixture.plans.fetch("KitchenKit.xctestplan"))
+      plan["defaultOptions"]["environmentVariableEntries"] = override
+      fixture.plans["KitchenKit.xctestplan"] = JSON.generate(plan)
+
+      error = assert_contract_error { validate(fixture) }
+
+      assert_includes error.message, "package resource-bundle override"
+    end
+  end
+
+  def test_rejects_resource_bundle_override_in_application_plan
+    fixture = Fixture.new
+    plan = JSON.parse(fixture.plans.fetch("KitchenMemory.xctestplan"))
+    plan["defaultOptions"]["environmentVariableEntries"] = [
+      {"key" => "PACKAGE_RESOURCE_BUNDLE_PATH", "value" => "$(BUILT_PRODUCTS_DIR)"}
+    ]
+    fixture.plans["KitchenMemory.xctestplan"] = JSON.generate(plan)
+
+    error = assert_contract_error { validate(fixture) }
+
+    assert_includes error.message, "KitchenMemory.xctestplan must retain Xcode's default diagnostics"
+  end
+
   def test_rejects_platform_scheme_using_debug_for_tests
     fixture = Fixture.new
     fixture.schemes["KitchenMemory.xcscheme"] = fixture.schemes.fetch(
@@ -1068,8 +1127,8 @@ class CheckProjectStructureTest < Minitest::Test
   def test_rejects_automatic_plan_creation_alongside_explicit_plan
     fixture = Fixture.new
     fixture.schemes["KitchenKit.xcscheme"] = fixture.schemes.fetch("KitchenKit.xcscheme").sub(
-      '<TestAction buildConfiguration="Testing">',
-      '<TestAction buildConfiguration="Testing" shouldAutocreateTestPlan="YES">'
+      '<TestAction buildConfiguration="Debug">',
+      '<TestAction buildConfiguration="Debug" shouldAutocreateTestPlan="YES">'
     )
 
     error = assert_contract_error { validate(fixture) }

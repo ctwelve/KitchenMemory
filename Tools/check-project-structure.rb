@@ -170,7 +170,12 @@ module KitchenMemory
     PLAN_POLICIES = {
       "KitchenKit.xctestplan" => {
         configuration: "Test Scheme Action",
-        parallel_targets: %w[KitchenKitTests]
+        parallel_targets: %w[KitchenKitTests],
+        variable_expansion_target: "KitchenKitTests",
+        environment_variables: [{
+          "key" => "PACKAGE_RESOURCE_BUNDLE_PATH",
+          "value" => "$(BUILT_PRODUCTS_DIR)"
+        }]
       },
       "KitchenMemoryCloud.xctestplan" => {
         configuration: "Test Scheme Action",
@@ -192,7 +197,7 @@ module KitchenMemory
         "ArchiveAction" => "Production"
       },
       "KitchenKit" => {
-        "TestAction" => "Testing",
+        "TestAction" => "Debug",
         "LaunchAction" => "Debug",
         "ProfileAction" => "Production",
         "AnalyzeAction" => "Testing",
@@ -876,12 +881,16 @@ module KitchenMemory
             "name" => expansion_target[:name]
           }
         end
+        if policy[:environment_variables]
+          expected_default_options["environmentVariableEntries"] = policy[:environment_variables]
+        end
         unless plan.fetch("defaultOptions", {}) == expected_default_options
           detail = if policy[:variable_expansion_target]
                      " and expand variables against #{policy[:variable_expansion_target]}"
                    else
                      " without an application variable-expansion target"
                    end
+          detail += " and the package resource-bundle override" if policy[:environment_variables]
           raise ContractError, "#{filename} must retain Xcode's default diagnostics#{detail}"
         end
 

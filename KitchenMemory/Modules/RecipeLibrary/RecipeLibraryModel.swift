@@ -39,6 +39,7 @@ final class RecipeLibraryModel {
   private let samplePreferences: any SampleRecipeOnboardingStoring
   private var hasEstablishedKitchenEvidence: Bool
   private var resetPresentationState: () -> Void = {}
+  private var prepareForReset: () throws -> Void = {}
 
   private(set) var recipes: [StoredRecipe] = []
   private(set) var reconciliations: [RecipeReconciliation] = []
@@ -99,6 +100,10 @@ final class RecipeLibraryModel {
 
   var selectedRecipe: StoredRecipe? {
     recipes.first { $0.recipe.id == selectedRecipeID }
+  }
+
+  func installPrepareForResetHandler(_ handler: @escaping () throws -> Void) {
+    prepareForReset = handler
   }
 
   func installResetPresentationHandler(_ handler: @escaping () -> Void) {
@@ -249,6 +254,7 @@ final class RecipeLibraryModel {
   @discardableResult
   func resetKitchen() -> Bool {
     do {
+      try prepareForReset()
       // Only this explicitly confirmed destructive action may replace a document
       // that could not be decoded. Ordinary autosave never does so.
       // Purge local authoring first: a failed file write must leave shared data

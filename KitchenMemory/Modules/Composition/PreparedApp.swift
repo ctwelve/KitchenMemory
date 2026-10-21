@@ -19,6 +19,7 @@ import SwiftData
 /// properties is functional: releasing an observer stops its notification bridge.
 @MainActor
 struct PreparedApp {
+  let organizationHistory: OrganizationHistoryRegistry
   let modelContainer: ModelContainer
   let libraryModel: RecipeLibraryModel
   let cookingSessionRepository: SwiftDataCookingSessionRepository
@@ -59,6 +60,7 @@ struct PreparedApp {
       sessionRepository.refreshFromPersistentStore()
       sessionModel.resetAfterKitchenReset()
     }
+    organizationHistory = core.organizationHistory
     modelContainer = core.modelContainer
     libraryModel = core.libraryModel
     cookingSessionRepository = core.cookingSessionRepository

@@ -9,7 +9,18 @@
     }
   ],
   "defaultOptions" : {
-    "performanceAntipatternCheckerEnabled" : true
+    "environmentVariableEntries" : [
+      {
+        "key" : "PACKAGE_RESOURCE_BUNDLE_PATH",
+        "value" : "$(BUILT_PRODUCTS_DIR)"
+      }
+    ],
+    "performanceAntipatternCheckerEnabled" : true,
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:KitchenMemory.xcodeproj",
+      "identifier" : "A1C9A4873042896F00F1F13D",
+      "name" : "KitchenKitTests"
+    }
   },
   "testTargets" : [
     {

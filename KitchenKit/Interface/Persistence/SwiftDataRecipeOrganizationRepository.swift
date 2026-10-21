@@ -8,7 +8,7 @@ import SwiftData
 /// Owns the one local commit boundary for bulk organization and first-Save assignment.
 @MainActor
 public final class SwiftDataRecipeOrganizationRepository: RecipeOrganizationRepository {
-  private let container: ModelContainer
+  let container: ModelContainer
 
   /// Binds the shared container used for Folder, Tag, receipt, and optional first-Save acceptance.
   public init(modelContainer: ModelContainer) { container = modelContainer }
@@ -31,24 +31,26 @@ public final class SwiftDataRecipeOrganizationRepository: RecipeOrganizationRepo
       }
     }
     let context = ModelContext(container)
-    try context.transaction {
-      if let firstSave { try SwiftDataRecipeRepository(context: context).accept(firstSave) }
-      // A retained batch receipt rejects reuse with a changed selection or operation,
-      // including an empty batch. Child receipts separately preserve causal retry behavior.
-      let receipt = OrganizationAction(id: command.id, authoredAt: command.authoredAt, observed: [],
-        payload: BatchReceipt(commandDigest: try OrganizationCoding.digest(command),
-                              saveDigest: try firstSave.map(OrganizationCoding.digest)))
-      let receipts = OrganizationStore<BatchReceipt>(modelContainer: container,
-                                                     namespace: "organization-batches", recipeID: { _ in nil })
-      try receipts.append(receipt, in: command.kitchenID, context: context) { snapshot in
-        guard snapshot.checkpoints.isEmpty else { throw FolderError.invalidEvidence }
-        _ = try OrganizationEvidence(snapshot.actions)
-      }
-      let folders = SwiftDataFolderRepository(modelContainer: container)
-      try folders.append(command.folders, in: command.kitchenID, context: context)
-      let tags = SwiftDataTagRepository(modelContainer: container)
-      try tags.append(command.tags, in: command.kitchenID, context: context)
+    try context.transaction { try accept(command, firstSave: firstSave, context: context) }
+  }
+
+  func accept(_ command: RecipeOrganizationCommand, firstSave: RecipeSaveCommand?, context: ModelContext) throws {
+    if let firstSave { try SwiftDataRecipeRepository(context: context).accept(firstSave) }
+    // A retained batch receipt rejects reuse with a changed selection or operation,
+    // including an empty batch. Child receipts separately preserve causal retry behavior.
+    let receipt = OrganizationAction(id: command.id, authoredAt: command.authoredAt, observed: [],
+      payload: BatchReceipt(commandDigest: try OrganizationCoding.digest(command),
+                            saveDigest: try firstSave.map(OrganizationCoding.digest)))
+    let receipts = OrganizationStore<BatchReceipt>(modelContainer: container,
+                                                   namespace: "organization-batches", recipeID: { _ in nil })
+    try receipts.append(receipt, in: command.kitchenID, context: context) { snapshot in
+      guard snapshot.checkpoints.isEmpty else { throw FolderError.invalidEvidence }
+      _ = try OrganizationEvidence(snapshot.actions)
     }
+    let folders = SwiftDataFolderRepository(modelContainer: container)
+    try folders.append(command.folders, in: command.kitchenID, context: context)
+    let tags = SwiftDataTagRepository(modelContainer: container)
+    try tags.append(command.tags, in: command.kitchenID, context: context)
   }
 }
 

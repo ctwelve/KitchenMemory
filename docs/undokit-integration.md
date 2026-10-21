@@ -1,4 +1,4 @@
-# UndoKit consumer qualification
+# UndoKit integration and consumer qualification
 
 <!--
 Kitchen Memory
@@ -6,12 +6,65 @@ Copyright © 2026 the Kitchen Memory contributors.
 SPDX-License-Identifier: MIT
 -->
 
-KitchenMemory [#236](https://github.com/ctwelve/KitchenMemory/issues/236) qualifies
+The historical consumer qualification in KitchenMemory [#236](https://github.com/ctwelve/KitchenMemory/issues/236) qualifies
 the independently maintained **UndoKit 0.2.2** source package at revision
-`9d04950fb314846e701890ac3095d28056820918`. It does not implement production Recipe
+`9d04950fb314846e701890ac3095d28056820918`. That qualification does not implement production Recipe
 undo or close the [delivery gate](https://github.com/ctwelve/KitchenMemory/issues/204).
 The [accepted policy](adr/0022-shared-durable-undo-framework.md) continues to own
 operation eligibility, lifecycle, scope and domain authority.
+
+## Production foundation: #237
+
+[#237](https://github.com/ctwelve/KitchenMemory/issues/237) adds durable Folder
+history for moving one saved Recipe, including a move to Unfiled. A placement
+no-op creates no history group or receipt. Tag changes and bulk moves remain
+separate delivery work; this foundation does not close the app-wide #204 gate or
+expand [ADR 0022's accepted policy](adr/0022-shared-durable-undo-framework.md).
+
+KitchenKit owns the typed change, eligibility checks and compensation through
+`RecipeOrganizationHistory` and `RecipeOrganizationHistoryRepository`. The
+SwiftData adapter checks current Recipe, Folder and causal evidence inside the
+same transaction that accepts the assignment and its complete-token receipt.
+An exact retained receipt resolves an already accepted outcome before checking
+later interference; recovery does not replay an accepted action.
+
+### Persistence compatibility
+
+The current SwiftData schema remains **V7**. Existing organization action records
+carry two additive versioned namespaces: `organization-history-receipts-v1` and
+`organization-history-recoveries-v1`. Their version-1 payloads contain the full
+frozen delivery and outcome witness. The existing `organization-batches`
+`BatchReceipt` format and ordinary organization pending-command format remain
+unchanged. No existing schema declaration or receipt payload is repurposed.
+
+Each local UndoKit history database has a separate
+`History.sqlite.organization-pending.json` sidecar. Its version-1 envelope freezes
+the scope, token, member, command, effect and inverse intent before host delivery;
+it also retains a proved terminal inverse rejection. Retry uses that exact
+frozen delivery. Missing receipts remain unresolved unless rejection is durably
+proved. Recovering a rejected compensation uses the separate recovery receipt
+namespace and retires actionable history instead of inventing Redo. Explicitly
+discarding a proved rejected compensation retains current domain organization.
+These local history files do not replace the authoritative SwiftData receipts.
+
+### Scope and invalidation
+
+The app registry retains local history under Application Support's
+`RecipeOrganizationHistory`, scoped by owner, store, Kitchen and initiating logical
+scene. Scene disconnection closes presentation without disposing eligible history;
+explicit disposal writes a durable marker. Owner/store/Kitchen changes and reset
+retire the prior generation, with an invalidation-intent marker blocking restoration
+if the generation write fails.
+
+Eligibility uses Recipe membership/deletion/restoration evidence and relevant
+source/target Folder evidence. Interference conservatively clears the initiating
+scope's actionable history when any retained anchor is ineligible; it does not
+attempt to salvage unrelated groups within that scope. Domain acceptance repeats
+the checks even if the presentation previously reported Undo available.
+
+This section describes the working implementation, not completed #237 acceptance.
+The dated #236 results below remain historical qualification evidence and do not
+prove the production adapter, scene wiring or current test tree passed.
 
 ## Supply route and ownership
 
@@ -46,7 +99,8 @@ meaning, guarded whole-group acceptance, inverse values and authoritative receip
 The demonstration atomically replaces one JSON file containing domain values and
 full-token receipts. That single-writer demonstration contract is not a new
 Recipe repository, persisted organization format or production receipt design.
-Real Folder and Tag compensation remains in #237–#239.
+The production Folder foundation is described above; Tag and bulk compensation
+remain separate work in #238–#239.
 
 ## Public integration contract
 

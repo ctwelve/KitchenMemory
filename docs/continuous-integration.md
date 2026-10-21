@@ -30,7 +30,8 @@ through ordinary resolution. Its selected plan is the sole owner of test-target
 membership: `KitchenKit.xctestplan` contains the unhosted framework target,
 while the default local application plan includes hosted and UI tests, and the
 Cloud release plan includes framework, hosted, and serial UI tests. Development
-schemes use `Testing`; `KitchenMemory Release` uses `ProductionTesting` for Test
+application tests use `Testing`; the standalone `KitchenKit` Test action uses
+`Debug`. `KitchenMemory Release` uses `ProductionTesting` for Test
 and `Production` for Archive. This explicit release scheme preserves ordinary
 local test settings while exercising optimized code in Cloud.
 
@@ -353,7 +354,7 @@ Tools/run-core-framework-coverage.sh
 
 The runner creates a unique evidence directory under `/private/tmp`, prints its
 location, runs the shared `KitchenKit` scheme and its explicit plan with
-explicit code coverage, and invokes the checker only after Xcode succeeds. This
+explicit code coverage in `Debug`, and invokes the checker only after Xcode succeeds. This
 macOS result is the canonical exact line-coverage artifact for KitchenKit. It
 does not replace either app correctness lane or the separately selected UI
 smoke target. The runner also compiles an ordinary `import KitchenKit` client
@@ -361,6 +362,16 @@ against that build with `Tools/check-ingredient-authoring-interface.rb`. Support
 live-draft operations must compile; direct session replacement, ingredient writes,
 and retired low-level text/history APIs must fail access checking. This gate uses
 neither `@testable` nor access-control overrides.
+
+The standalone plan supplies `PACKAGE_RESOURCE_BUNDLE_PATH=$(BUILT_PRODUCTS_DIR)`
+for UndoKit's generated Swift-package resource accessor. That accessor honors the
+override only when the package is compiled with `DEBUG`; Xcode maps the custom
+`Testing` configuration to an optimized package build without that condition.
+Using `Debug` keeps the framework suite unhosted while locating the package's
+compiled model bundle. The ordinary-consumer interface check reads the same
+`Debug` products. This harness configuration does not establish optimized
+production acceptance; the application and release lanes retain their own
+configurations.
 
 To check an existing result bundle directly, pass it to:
 
