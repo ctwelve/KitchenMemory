@@ -171,7 +171,6 @@ final class RecipeOrganizationModel {
 
   func move(_ ids: Set<Recipe.ID>, to folderID: Folder.ID?, history: OrganizationHistoryPresentation?) async {
     guard !storageInvalid, pending == nil, snapshot != nil else { failed = true; return }
-    if ids.count > 1 { move(ids, to: folderID); return }
     guard let history else { failed = true; return }
     await history.move(ids, to: folderID)
   }
@@ -200,12 +199,11 @@ final class RecipeOrganizationModel {
                    history: OrganizationHistoryPresentation? = nil) -> Bool {
     guard !storageInvalid, pending == nil, snapshot != nil,
           let ids = recipeIDs(values, recipes: recipes) else { return false }
-    if ids.count == 1, let history {
+    if let history {
       history.requestMove(ids, to: folder)
       return true
     }
-    if ids.count == 1 { failed = true; return false }
-    move(ids, to: folder)
-    return !failed
+    failed = true
+    return false
   }
 }

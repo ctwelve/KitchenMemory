@@ -17,8 +17,8 @@ operation eligibility, lifecycle, scope and domain authority.
 
 [#237](https://github.com/ctwelve/KitchenMemory/issues/237) adds durable Folder
 history for moving one saved Recipe, including a move to Unfiled. A placement
-no-op creates no history group or receipt. Tag changes and bulk moves remain
-separate delivery work; this foundation does not close the app-wide #204 gate or
+no-op creates no history group or receipt. Tag changes remain separate delivery
+work; this foundation does not close the app-wide #204 gate or
 expand [ADR 0022's accepted policy](adr/0022-shared-durable-undo-framework.md).
 
 KitchenKit owns the typed change, eligibility checks and compensation through
@@ -65,6 +65,25 @@ the checks even if the presentation previously reported Undo available.
 This section describes the working implementation, not completed #237 acceptance.
 The dated #236 results below remain historical qualification evidence and do not
 prove the production adapter, scene wiring or current test tree passed.
+
+## Atomic Folder selections: #238
+
+[#238](https://github.com/ctwelve/KitchenMemory/issues/238) routes selected Recipe
+moves and multi-Recipe drops through the same scene owner. One accepted action
+contains the sorted changed-member set, including each Recipe's original Folder
+or Unfiled placement. Unchanged members do not enter the group. Every member's
+eligibility is checked before one organization transaction accepts the complete
+batch and receipt; a stale member refuses the entire compensation.
+
+The history change codec reads #237's original singular shape unchanged. New
+multi-member changes use an explicit version-2 wrapper with sorted members;
+older readers lack the required singular fields and refuse that new shape.
+Unknown explicit versions are refused. The delivery's before/after witnesses
+carry the member-specific evidence needed to advance the shared scene timeline.
+The V7 schema, ordinary batch receipts and organization checkpoints remain
+unchanged. Native action names resolve to singular or plural according to the
+changed-member count. This remains local atomic acceptance; remote delivery can
+arrive incrementally.
 
 ## Supply route and ownership
 

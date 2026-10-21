@@ -33,9 +33,10 @@ public final class RecipeOrganizationHistory {
     let host = OrganizationHistoryHost(repository: repository, scope: scope,
       pendingURL: historyURL.appendingPathExtension("organization-pending.json"))
     let operation = try HistoryOperation(operation: "kitchenmemory.recipe-organization", commandCodec: .json(),
-      effectCodec: .json(), handler: host, fingerprint: { try OrganizationCoding.digest($0) }, metadata: { _ in
+      effectCodec: .json(), handler: host, fingerprint: { try OrganizationCoding.digest($0) }, metadata: { change in
         HistoryOperationMetadata(presentation: HistoryPayload(
-          family: "kitchenmemory.recipe-organization.action", data: Data("move-recipe".utf8)))
+          family: "kitchenmemory.recipe-organization.action",
+          data: Data((change.changedMembers.count == 1 ? "move-recipe" : "move-recipes").utf8)))
       })
     let existing = FileManager.default.fileExists(atPath: historyURL.path)
       || FileManager.default.fileExists(atPath: historyURL.appendingPathExtension("organization-pending.json").path)
@@ -53,16 +54,12 @@ public final class RecipeOrganizationHistory {
     }
   }
 
-  /// Moves one saved Recipe. A placement no-op creates no history group or receipt.
-  /// The set boundary will also serve the separately qualified bulk operation.
+  /// Moves the selected saved Recipes as one atomic, undoable history group.
   public func move(_ recipeIDs: Set<Recipe.ID>, to folderID: Folder.ID?) async throws -> HistorySubmissionResult {
-    guard recipeIDs.count == 1 else { throw RecipeOrganizationHistoryError.singleRecipeRequired }
     guard let session, let host, let operation else { throw RecipeOrganizationHistoryError.notOpen }
     _ = try await invalidateInterference()
     guard host.pending == nil else { throw RecipeOrganizationHistoryError.ineligible }
-    guard let recipeID = recipeIDs.first,
-          let change = try repository.prepareHistoryMove(recipeID, to: folderID, in: host.scope)
-    else { return .rejected }
+    guard let change = try repository.prepareHistoryMove(recipeIDs, to: folderID, in: host.scope) else { return .rejected }
     return await (try session.commands(for: operation)).submit(change)
   }
 

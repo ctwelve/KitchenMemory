@@ -70,8 +70,14 @@ final class OrganizationHistoryPresentation {
   private func installActionNameResolver() {
     history.session?.setNativeActionNameResolver { [weak self] payload in
       guard payload.family == RecipeOrganizationHistory.actionPresentationFamily,
-            payload.version == 1, payload.data == Data("move-recipe".utf8) else { return nil }
-      return LocalizedStringResource.organizationUndoMoveRecipe.localized(for: self?.locale ?? .current)
+            payload.version == 1 else { return nil }
+      if payload.data == Data("move-recipe".utf8) {
+        return LocalizedStringResource.organizationUndoMoveRecipe.localized(for: self?.locale ?? .current)
+      }
+      if payload.data == Data("move-recipes".utf8) {
+        return LocalizedStringResource.organizationUndoMoveRecipes.localized(for: self?.locale ?? .current)
+      }
+      return nil
     }
   }
 

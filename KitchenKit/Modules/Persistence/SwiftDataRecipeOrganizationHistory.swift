@@ -16,13 +16,36 @@ extension SwiftDataRecipeOrganizationRepository: RecipeOrganizationHistoryReposi
       in: scope.kitchenID, context: context)
     try requireHistoryRecipe(recipeID, scope: scope, context: context)
     try requireHistoryFolder(folderID, folders: folders)
+    return try prepareHistoryMember(recipeID, to: folderID, folders: folders, context: context)
+      .map { member in RecipeOrganizationHistoryChange(anchorID: member.anchorID, recipeID: recipeID,
+        before: member.before, after: member.after, baseline: member.baseline, folderBaseline: member.folderBaseline) }
+  }
+
+  private func prepareHistoryMember(_ recipeID: Recipe.ID, to folderID: Folder.ID?, folders: FolderLibrary,
+                                   context: ModelContext) throws -> RecipeOrganizationHistoryMember? {
     let before = folders.primaryFolder(for: recipeID)
     guard before != folderID else { return nil }
-    let seed = RecipeOrganizationHistoryChange(anchorID: UUID(), recipeID: recipeID,
-      before: before, after: folderID, baseline: Data(), folderBaseline: Data())
-    return RecipeOrganizationHistoryChange(anchorID: seed.anchorID, recipeID: recipeID, before: before, after: folderID,
-      baseline: try historyWitness(seed, folders: folders, context: context),
-      folderBaseline: try historyFolderWitness(seed, folders: folders))
+    let seed = RecipeOrganizationHistoryMember(anchorID: UUID(), recipeID: recipeID, before: before,
+      after: folderID, baseline: Data(), folderBaseline: Data())
+    return RecipeOrganizationHistoryMember(anchorID: seed.anchorID, recipeID: recipeID, before: before, after: folderID,
+      baseline: try historyWitness(recipeID, folders: folders, context: context),
+      folderBaseline: try historyFolderWitness(before: before, after: folderID, folders: folders))
+  }
+
+  public func prepareHistoryMove(_ recipeIDs: Set<Recipe.ID>, to folderID: Folder.ID?,
+                                in scope: RecipeOrganizationHistoryScope) throws -> RecipeOrganizationHistoryChange? {
+    let context = ModelContext(container)
+    try validateHistoryScope(scope, context: context)
+    let folders = try SwiftDataFolderRepository(modelContainer: container).library(in: scope.kitchenID, context: context)
+    try requireHistoryFolder(folderID, folders: folders)
+    let members = try recipeIDs.sorted { $0.rawValue.uuidString < $1.rawValue.uuidString }.compactMap { recipeID in
+      try requireHistoryRecipe(recipeID, scope: scope, context: context)
+      return try prepareHistoryMember(recipeID, to: folderID, folders: folders, context: context)
+    }
+    guard let first = members.first else { return nil }
+    return RecipeOrganizationHistoryChange(anchorID: first.anchorID, recipeID: first.recipeID,
+      before: first.before, after: first.after, baseline: first.baseline, folderBaseline: first.folderBaseline,
+      members: members.count == 1 ? nil : members)
   }
 
   public func prepareHistoryDelivery(
@@ -36,13 +59,14 @@ extension SwiftDataRecipeOrganizationRepository: RecipeOrganizationHistoryReposi
     // Freeze even an ineligible inverse before acceptance. Its exact intent remains retryable;
     // eligibility and all effects are still checked together by acceptHistory's fresh transaction.
     let evidence = try OrganizationEvidence(folders.actions, checkpoints: folders.checkpointEvidence)
+    let commands = change.changedMembers.map { member in
+      FolderCommand(kitchenID: scope.kitchenID, action: OrganizationAction(
+        id: derivedID(namespace: token.command, kind: "history-folder", source: member.recipeID.rawValue),
+        authoredAt: Date(), observed: evidence.heads,
+        payload: .assign(recipeID: member.recipeID, folderID: member.after)))
+    }
     let command = RecipeOrganizationCommand(id: token.command, kitchenID: scope.kitchenID, authoredAt: Date(),
-      folders: [
-        FolderCommand(kitchenID: scope.kitchenID, action: OrganizationAction(
-          id: derivedID(namespace: token.command, kind: "history-folder", source: change.recipeID.rawValue),
-          authoredAt: Date(), observed: evidence.heads,
-          payload: .assign(recipeID: change.recipeID, folderID: change.after))),
-      ], tags: [])
+      folders: commands, tags: [])
     return RecipeOrganizationHistoryDelivery(scope: scope, token: OrganizationHistoryToken(token), memberID: memberID,
       change: change, command: command, beforeWitness: try historyWitness(change, folders: folders, context: context))
   }
@@ -73,27 +97,40 @@ extension SwiftDataRecipeOrganizationRepository: RecipeOrganizationHistoryReposi
       guard delivery.token.scope == delivery.scope.identity,
             delivery.command.kitchenID == delivery.scope.kitchenID,
             delivery.command.id == delivery.token.command,
-            delivery.command.tags.isEmpty, delivery.command.folders.count == 1,
-            delivery.command.folders.first?.kitchenID == delivery.scope.kitchenID,
-            delivery.command.folders.first?.action.payload
-              == .assign(recipeID: delivery.change.recipeID, folderID: delivery.change.after) else {
+            delivery.command.tags.isEmpty, delivery.command.folders.count == delivery.change.changedMembers.count,
+            delivery.command.folders.allSatisfy({ $0.kitchenID == delivery.scope.kitchenID }),
+            Set(delivery.command.folders.compactMap { command -> Recipe.ID? in
+              guard case let .assign(recipeID, _) = command.action.payload else { return nil }
+              return recipeID
+            }) == Set(delivery.change.changedMembers.map(\.recipeID)),
+            delivery.command.folders.allSatisfy({ command in
+              delivery.change.changedMembers.contains { member in
+                command.action.payload == .assign(recipeID: member.recipeID, folderID: member.after)
+              }
+            }) else {
         throw RecipeOrganizationHistoryError.invalidScope
       }
       let folders = try SwiftDataFolderRepository(modelContainer: container).library(
         in: delivery.scope.kitchenID, context: context)
-      try requireHistoryRecipe(delivery.change.recipeID, scope: delivery.scope, context: context)
-      try requireHistoryFolder(delivery.change.before, folders: folders)
-      try requireHistoryFolder(delivery.change.after, folders: folders)
-      guard try historyFolderWitness(delivery.change, folders: folders) == delivery.change.folderBaseline,
-            folders.primaryFolder(for: delivery.change.recipeID) == delivery.change.before,
-            try historyWitness(delivery.change, folders: folders, context: context) == delivery.beforeWitness,
+      for member in delivery.change.changedMembers {
+        try requireHistoryRecipe(member.recipeID, scope: delivery.scope, context: context)
+        try requireHistoryFolder(member.before, folders: folders)
+        try requireHistoryFolder(member.after, folders: folders)
+        guard try historyFolderWitness(before: member.before, after: member.after, folders: folders) == member.folderBaseline,
+              folders.primaryFolder(for: member.recipeID) == member.before,
+              try historyWitness(member.recipeID, folders: folders, context: context)
+                == foldedHistoryWitness(member, token: delivery.token, receipts: receipts) else {
+          throw RecipeOrganizationHistoryError.ineligible
+        }
+      }
+      guard try historyWitness(delivery.change, folders: folders, context: context) == delivery.beforeWitness,
             foldedHistoryWitness(delivery.change, token: delivery.token, receipts: receipts) == delivery.beforeWitness
       else { throw RecipeOrganizationHistoryError.ineligible }
       try accept(delivery.command, firstSave: nil, context: context)
       let after = try SwiftDataFolderRepository(modelContainer: container).library(
         in: delivery.scope.kitchenID, context: context)
       let receipt = RecipeOrganizationHistoryReceipt(delivery: delivery,
-        afterWitness: try historyWitness(delivery.change, folders: after, context: context))
+            afterWitness: try historyWitness(delivery.change, folders: after, context: context))
       let receiptID = recovery ? delivery.token.recoveryReceiptID : delivery.token.receiptID
       let action = OrganizationAction(id: receiptID, authoredAt: delivery.command.authoredAt,
         observed: [], payload: OrganizationHistoryReceiptPayload(version: 1, receipt: receipt))
@@ -125,14 +162,17 @@ extension SwiftDataRecipeOrganizationRepository: RecipeOrganizationHistoryReposi
     let owned = receipts.filter { $0.delivery.scope == scope && $0.delivery.token.generation == generation }
       .sorted { $0.delivery.token.sequence < $1.delivery.token.sequence }
     var seen: Set<UUID> = []
-    for receipt in owned where seen.insert(receipt.delivery.change.anchorID).inserted {
+    for receipt in owned {
       let change = receipt.delivery.change
-      guard (try? requireHistoryRecipe(change.recipeID, scope: scope, context: context)) != nil,
-            (try? requireHistoryFolder(change.before, folders: folders)) != nil,
-            (try? requireHistoryFolder(change.after, folders: folders)) != nil,
-            try historyFolderWitness(change, folders: folders) == change.folderBaseline,
-            try historyWitness(change, folders: folders, context: context)
-              == foldedHistoryWitness(change, token: receipt.delivery.token, receipts: receipts) else { return false }
+      for member in change.changedMembers where seen.insert(member.anchorID).inserted {
+        guard (try? requireHistoryRecipe(member.recipeID, scope: scope, context: context)) != nil,
+              (try? requireHistoryFolder(member.before, folders: folders)) != nil,
+              (try? requireHistoryFolder(member.after, folders: folders)) != nil,
+              try historyFolderWitness(before: member.before, after: member.after, folders: folders)
+                == member.folderBaseline,
+              try historyWitness(member.recipeID, folders: folders, context: context)
+                == foldedHistoryWitness(member, token: receipt.delivery.token, receipts: receipts) else { return false }
+      }
     }
     return true
   }
@@ -160,20 +200,55 @@ extension SwiftDataRecipeOrganizationRepository: RecipeOrganizationHistoryReposi
 
   private func foldedHistoryWitness(_ change: RecipeOrganizationHistoryChange, token: OrganizationHistoryToken,
                                     receipts: [RecipeOrganizationHistoryReceipt]) -> Data {
-    var witness = change.baseline
-    let owned = receipts.filter { $0.delivery.token.scope == token.scope
-      && $0.delivery.token.generation == token.generation && $0.delivery.change.recipeID == change.recipeID }
+    guard change.members != nil else {
+      return foldedHistoryWitness(change.changedMembers[0], token: token, receipts: receipts)
+    }
+    let entries = change.changedMembers.map { member in
+      OrganizationBatchWitnessEntry(recipeID: member.recipeID,
+        witness: foldedHistoryWitness(member, token: token, receipts: receipts))
+    }
+    return (try? OrganizationCoding.encode(OrganizationBatchWitness(entries: entries))) ?? Data()
+  }
+
+  private func foldedHistoryWitness(_ member: RecipeOrganizationHistoryMember, token: OrganizationHistoryToken,
+                                    receipts: [RecipeOrganizationHistoryReceipt]) -> Data {
+    var witness = member.baseline
+    let owned = receipts.filter { $0.delivery.token.scope == token.scope && $0.delivery.token.generation == token.generation }
       .sorted { $0.delivery.token.sequence < $1.delivery.token.sequence }
-    for receipt in owned where receipt.delivery.beforeWitness == witness { witness = receipt.afterWitness }
+    for receipt in owned {
+      guard receipt.delivery.change.changedMembers.contains(where: { $0.recipeID == member.recipeID }),
+        let before = batchMemberWitness(receipt.delivery.beforeWitness, recipeID: member.recipeID,
+          single: receipt.delivery.change.members == nil),
+        let after = batchMemberWitness(receipt.afterWitness, recipeID: member.recipeID,
+          single: receipt.delivery.change.members == nil) else { continue }
+      if before == witness { witness = after }
+    }
     return witness
   }
 
   private func historyWitness(_ change: RecipeOrganizationHistoryChange, folders: FolderLibrary,
                               context: ModelContext) throws -> Data {
+    if change.members == nil {
+      return try historyWitness(change.recipeID, folders: folders, context: context)
+    }
+    let entries = try change.changedMembers.map { member in
+      OrganizationBatchWitnessEntry(recipeID: member.recipeID,
+        witness: try historyWitness(member.recipeID, folders: folders, context: context))
+    }
+    return try OrganizationCoding.encode(OrganizationBatchWitness(entries: entries))
+  }
+
+  private func batchMemberWitness(_ data: Data, recipeID: Recipe.ID, single: Bool) -> Data? {
+    if single { return data }
+    return (try? JSONDecoder().decode(OrganizationBatchWitness.self, from: data))?.entries
+      .first(where: { $0.recipeID == recipeID })?.witness
+  }
+
+  private func historyWitness(_ recipeID: Recipe.ID, folders: FolderLibrary, context: ModelContext) throws -> Data {
     let evidence = try OrganizationEvidence(folders.actions, checkpoints: folders.checkpointEvidence)
-    let register = "membership:\(change.recipeID.rawValue.uuidString)"
+    let register = "membership:\(recipeID.rawValue.uuidString)"
     let assignments = evidence.receipts.filter { $0.register == register }
-    let recipe = change.recipeID.rawValue
+    let recipe = recipeID.rawValue
     let deletions = try context.fetch(FetchDescriptor<RecipeDeletionRecord>(predicate: #Predicate {
       $0.recipeID == recipe
     }))
@@ -186,8 +261,8 @@ extension SwiftDataRecipeOrganizationRepository: RecipeOrganizationHistoryReposi
       restorations: restorations.map(\.id).sorted { $0.uuidString < $1.uuidString }))
   }
 
-  private func historyFolderWitness(_ change: RecipeOrganizationHistoryChange, folders: FolderLibrary) throws -> Data {
-    let folderIDs = Set([change.before, change.after].compactMap { $0 })
+  private func historyFolderWitness(before: Folder.ID?, after: Folder.ID?, folders: FolderLibrary) throws -> Data {
+    let folderIDs = Set([before, after].compactMap { $0 })
     let actions = folders.actions.filter { action in
       switch action.payload {
       case .assign: return false
@@ -235,4 +310,13 @@ private struct OrganizationHistoryWitness: Codable {
   let organization: [OrganizationReceipt]
   let deletions: [UUID]
   let restorations: [UUID]
+}
+
+private struct OrganizationBatchWitness: Codable {
+  let entries: [OrganizationBatchWitnessEntry]
+}
+
+private struct OrganizationBatchWitnessEntry: Codable {
+  let recipeID: Recipe.ID
+  let witness: Data
 }

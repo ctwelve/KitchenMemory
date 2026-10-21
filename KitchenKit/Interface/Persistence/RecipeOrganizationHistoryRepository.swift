@@ -13,10 +13,80 @@ public struct RecipeOrganizationHistoryChange: Codable, Equatable, Sendable {
   let after: Folder.ID?
   let baseline: Data
   let folderBaseline: Data
+  /// Present for an atomic multi-Recipe move. Omitted by older persisted single moves.
+  let members: [RecipeOrganizationHistoryMember]?
+
+  init(anchorID: UUID, recipeID: Recipe.ID, before: Folder.ID?, after: Folder.ID?, baseline: Data,
+       folderBaseline: Data, members: [RecipeOrganizationHistoryMember]? = nil) {
+    self.anchorID = anchorID; self.recipeID = recipeID; self.before = before; self.after = after
+    self.baseline = baseline; self.folderBaseline = folderBaseline; self.members = members
+  }
+
+  var changedMembers: [RecipeOrganizationHistoryMember] {
+    members ?? [RecipeOrganizationHistoryMember(anchorID: anchorID, recipeID: recipeID,
+      before: before, after: after, baseline: baseline, folderBaseline: folderBaseline)]
+  }
+
+  var inverse: Self {
+    let reversed = changedMembers.map { $0.inverse }
+    let first = reversed[0]
+    return Self(anchorID: first.anchorID, recipeID: first.recipeID, before: first.before, after: first.after,
+      baseline: first.baseline, folderBaseline: first.folderBaseline, members: members == nil ? nil : reversed)
+  }
+
+  private enum CodingKeys: String, CodingKey { case version, members, anchorID, recipeID, before, after, baseline, folderBaseline }
+
+  public init(from decoder: Decoder) throws {
+    let values = try decoder.container(keyedBy: CodingKeys.self)
+    let version = try values.decodeIfPresent(Int.self, forKey: .version)
+    if let version, version != 2 {
+      throw DecodingError.dataCorruptedError(forKey: .version, in: values, debugDescription: "Unsupported history change version")
+    }
+    if version == 2 {
+      let decoded = try values.decode([RecipeOrganizationHistoryMember].self, forKey: .members)
+      let sortedIDs = decoded.map(\.recipeID).sorted { $0.rawValue.uuidString < $1.rawValue.uuidString }
+      guard decoded.count > 1, decoded.map(\.recipeID).count == Set(decoded.map(\.recipeID)).count,
+            decoded.map(\.recipeID) == sortedIDs else {
+        throw DecodingError.dataCorruptedError(forKey: .members, in: values, debugDescription: "Invalid batch members")
+      }
+      let first = decoded[0]
+      anchorID = first.anchorID; recipeID = first.recipeID; before = first.before; after = first.after
+      baseline = first.baseline; folderBaseline = first.folderBaseline; members = decoded
+    } else {
+      anchorID = try values.decode(UUID.self, forKey: .anchorID)
+      recipeID = try values.decode(Recipe.ID.self, forKey: .recipeID)
+      before = try values.decodeIfPresent(Folder.ID.self, forKey: .before)
+      after = try values.decodeIfPresent(Folder.ID.self, forKey: .after)
+      baseline = try values.decode(Data.self, forKey: .baseline)
+      folderBaseline = try values.decode(Data.self, forKey: .folderBaseline)
+      members = nil
+    }
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var values = encoder.container(keyedBy: CodingKeys.self)
+    if let members {
+      try values.encode(2, forKey: .version)
+      try values.encode(members, forKey: .members)
+    } else {
+      try values.encode(anchorID, forKey: .anchorID); try values.encode(recipeID, forKey: .recipeID)
+      try values.encodeIfPresent(before, forKey: .before); try values.encodeIfPresent(after, forKey: .after)
+      try values.encode(baseline, forKey: .baseline); try values.encode(folderBaseline, forKey: .folderBaseline)
+    }
+  }
+}
+
+public struct RecipeOrganizationHistoryMember: Codable, Equatable, Sendable {
+  let anchorID: UUID
+  let recipeID: Recipe.ID
+  let before: Folder.ID?
+  let after: Folder.ID?
+  let baseline: Data
+  let folderBaseline: Data
 
   var inverse: Self {
     Self(anchorID: anchorID, recipeID: recipeID, before: after, after: before,
-         baseline: baseline, folderBaseline: folderBaseline)
+      baseline: baseline, folderBaseline: folderBaseline)
   }
 }
 
@@ -46,6 +116,8 @@ public struct RecipeOrganizationHistoryReceipt: Codable, Equatable, Sendable {
 @MainActor
 public protocol RecipeOrganizationHistoryRepository: RecipeOrganizationRepository {
   func prepareHistoryMove(_ recipeID: Recipe.ID, to folderID: Folder.ID?,
+                          in scope: RecipeOrganizationHistoryScope) throws -> RecipeOrganizationHistoryChange?
+  func prepareHistoryMove(_ recipeIDs: Set<Recipe.ID>, to folderID: Folder.ID?,
                           in scope: RecipeOrganizationHistoryScope) throws -> RecipeOrganizationHistoryChange?
   func prepareHistoryDelivery(_ change: RecipeOrganizationHistoryChange, memberID: UUID, token: HistoryToken,
                               in scope: RecipeOrganizationHistoryScope) throws -> RecipeOrganizationHistoryDelivery
