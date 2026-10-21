@@ -107,18 +107,7 @@ extension SwiftDataRecipeOrganizationRepository: RecipeOrganizationHistoryReposi
       try validateHistoryDeliveryShape(delivery)
       let folders = try SwiftDataFolderRepository(modelContainer: container).library(
         in: delivery.scope.kitchenID, context: context)
-      for member in delivery.change.changedMembers {
-        try requireHistoryRecipe(member.recipeID, scope: delivery.scope, context: context)
-        try requireHistoryFolder(member.before, folders: folders)
-        try requireHistoryFolder(member.after, folders: folders)
-        guard try historyFolderWitness(before: member.before, after: member.after, folders: folders)
-                == member.folderBaseline,
-              folders.primaryFolder(for: member.recipeID) == member.before,
-              try historyWitness(member.recipeID, folders: folders, context: context)
-                == foldedHistoryWitness(member, token: delivery.token, receipts: receipts) else {
-          throw RecipeOrganizationHistoryError.ineligible
-        }
-      }
+      try validateHistoryMembers(delivery, folders: folders, receipts: receipts, context: context)
       guard try historyWitness(delivery.change, folders: folders, context: context) == delivery.beforeWitness,
             try foldedHistoryWitness(delivery.change, token: delivery.token, receipts: receipts)
               == delivery.beforeWitness
@@ -141,6 +130,24 @@ extension SwiftDataRecipeOrganizationRepository: RecipeOrganizationHistoryReposi
     }
     guard let accepted else { throw RecipeOrganizationHistoryError.invalidEvidence }
     return accepted
+  }
+
+  private func validateHistoryMembers(
+    _ delivery: RecipeOrganizationHistoryDelivery, folders: FolderLibrary,
+    receipts: [RecipeOrganizationHistoryReceipt], context: ModelContext
+  ) throws {
+    for member in delivery.change.changedMembers {
+      try requireHistoryRecipe(member.recipeID, scope: delivery.scope, context: context)
+      try requireHistoryFolder(member.before, folders: folders)
+      try requireHistoryFolder(member.after, folders: folders)
+      guard try historyFolderWitness(before: member.before, after: member.after, folders: folders)
+              == member.folderBaseline,
+            folders.primaryFolder(for: member.recipeID) == member.before,
+            try historyWitness(member.recipeID, folders: folders, context: context)
+              == foldedHistoryWitness(member, token: delivery.token, receipts: receipts) else {
+        throw RecipeOrganizationHistoryError.ineligible
+      }
+    }
   }
 
   private func validateHistoryDeliveryShape(_ delivery: RecipeOrganizationHistoryDelivery) throws {
@@ -303,8 +310,9 @@ extension SwiftDataRecipeOrganizationRepository: RecipeOrganizationHistoryReposi
     })
   }
 
-  func requireHistoryRecipe(_ recipeID: Recipe.ID, scope: RecipeOrganizationHistoryScope,
-                                    context: ModelContext) throws {
+  func requireHistoryRecipe(
+    _ recipeID: Recipe.ID, scope: RecipeOrganizationHistoryScope, context: ModelContext
+  ) throws {
     guard let recipe = try SwiftDataRecipeRepository(context: context).recipe(id: recipeID),
           recipe.recipe.kitchenID == scope.kitchenID else { throw RecipeOrganizationHistoryError.ineligible }
   }
