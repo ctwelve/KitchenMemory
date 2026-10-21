@@ -1857,7 +1857,8 @@
       "en-GB": { "stringUnit": { "state": "translated", "value": "Move Recipes" } },
       "es-MX": { "stringUnit": { "state": "translated", "value": "Mover recetas" } },
       "fr-CA": { "stringUnit": { "state": "translated", "value": "Déplacer les recettes" } },
-      "de-DE": { "stringUnit": { "state": "translated", "value": "Rezepte verschieben" } }
+      "de-DE": { "stringUnit": { "state": "translated", "value": "Rezepte verschieben" } },
+      "it-IT": { "stringUnit": { "state": "translated", "value": "Sposta ricette" } }
     }
   },
   "organization.undo-move-recipe": {

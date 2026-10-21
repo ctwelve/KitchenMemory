@@ -247,7 +247,7 @@ struct OrganizationHistoryAppFixture {
   let recipe: StoredRecipe
   let folder: Folder.ID
   let registry: OrganizationHistoryRegistry
-  private let kitchenID: Kitchen.ID
+  let kitchenID: Kitchen.ID
   private let ownerID = KitchenOwner.ID(rawValue: "history-owner")
 
   init() throws {
