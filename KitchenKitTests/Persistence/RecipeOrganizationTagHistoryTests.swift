@@ -246,3 +246,56 @@ final class RecipeOrganizationTagHistoryTests: XCTestCase {
   }
 
 }
+
+extension RecipeOrganizationTagHistoryTests {
+  func testDominatedTagRenameCompactionPreservesUndoAcrossReopen() async throws {
+    let fixture = try HistoryFixture()
+    defer { fixture.removeFiles() }
+    let tag = try createTag(fixture)
+    try fixture.repository.accept(fixture.repository.load(in: fixture.kitchenID).prepare(
+      tag: .rename(id: tag, name: "Meals")))
+    try fixture.repository.accept(fixture.repository.load(in: fixture.kitchenID).prepare(
+      tag: .rename(id: tag, name: "Dinner")))
+    let history = RecipeOrganizationHistory(repository: fixture.repository)
+    try await history.open(scope: fixture.scope, historyURL: fixture.historyURL)
+    assertOrganizationHistoryAccepted(try await history.classify([fixture.recipeID], tagID: tag, adding: true))
+    let tags = SwiftDataTagRepository(modelContainer: fixture.container)
+    XCTAssertNotNil(try tags.compact(in: fixture.kitchenID, at: Date().addingTimeInterval(40 * 86_400)))
+    await history.close()
+    let reopened = RecipeOrganizationHistory(repository: fixture.repository)
+    try await reopened.open(scope: fixture.scope, historyURL: fixture.historyURL)
+    XCTAssertTrue(try XCTUnwrap(reopened.session).status.canUndo)
+    assertOrganizationHistoryAccepted(await reopened.undo())
+    XCTAssertFalse(try contains(fixture, recipeID: fixture.recipeID, tagID: tag))
+    assertOrganizationHistoryAccepted(await reopened.redo())
+    XCTAssertTrue(try contains(fixture, recipeID: fixture.recipeID, tagID: tag))
+    await reopened.close()
+  }
+
+  func testFrozenTagDeliveryRetriesAfterUnrelatedTagEvidenceWithoutNewPreparation() async throws {
+    let fixture = try HistoryFixture()
+    defer { fixture.removeFiles() }
+    let tag = try createTag(fixture)
+    let boundary = ControlledHistoryRepository(fixture.repository)
+    let history = RecipeOrganizationHistory(repository: boundary)
+    try await history.open(scope: fixture.scope, historyURL: fixture.historyURL)
+    boundary.failNextAcceptance = true
+    let result = try await history.classify([fixture.recipeID], tagID: tag, adding: true)
+    guard case .unresolved = result else {
+      XCTFail("A pre-effect storage interruption must retain its frozen delivery")
+      return
+    }
+    let frozen = try XCTUnwrap(boundary.deliveries.last)
+    try fixture.repository.accept(fixture.repository.load(in: fixture.kitchenID).prepare(
+      tag: .create(id: Tag.ID(), name: "Unrelated")))
+    let retry = try await history.retryPending()
+    let retried = try XCTUnwrap(retry)
+    assertOrganizationHistoryAccepted(retried)
+    XCTAssertEqual(boundary.deliveries.last, frozen)
+    XCTAssertTrue(try contains(fixture, recipeID: fixture.recipeID, tagID: tag))
+    assertOrganizationHistoryAccepted(await history.undo())
+    XCTAssertFalse(try contains(fixture, recipeID: fixture.recipeID, tagID: tag))
+    await history.close()
+  }
+
+}

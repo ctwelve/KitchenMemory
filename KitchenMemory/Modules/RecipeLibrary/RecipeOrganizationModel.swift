@@ -146,6 +146,7 @@ final class RecipeOrganizationModel {
 
   func dropTag(_ values: [String], recipes: [StoredRecipe], onto tagID: Tag.ID,
                history: OrganizationHistoryPresentation? = nil) -> Bool {
+    guard !storageInvalid, pending == nil, snapshot != nil else { return false }
     if values.count == 1, snapshot?.tags.ordering == .manual, let id = identifier(values[0], prefix: "km-tag:") {
       perform { try $0.prepare(tag: .reorder(id: Tag.ID(rawValue: id), afterID: tagID)) }
       return !failed

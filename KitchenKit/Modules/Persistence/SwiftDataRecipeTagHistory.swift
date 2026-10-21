@@ -57,7 +57,17 @@ extension SwiftDataRecipeOrganizationRepository {
       context: context) else { throw RecipeOrganizationHistoryError.ineligible }
     let expected = try tagHistoryCommands(intent, token: delivery.token, scope: delivery.scope,
       tags: tags, receipts: receipts, date: delivery.command.authoredAt, requireCurrent: true)
-    guard delivery.command.tags == expected,
+    let known = Set(try OrganizationEvidence(tags.actions, checkpoints: tags.checkpointEvidence).receipts.map(\.id))
+    // The frozen frontier belongs to preparation. Unrelated later heads cannot
+    // replace it; payload, identity, date and relevant witnesses still must match.
+    guard delivery.command.tags.count == expected.count,
+          zip(delivery.command.tags, expected).allSatisfy({ frozen, expected in
+            frozen.kitchenID == expected.kitchenID && frozen.id == expected.id
+              && frozen.action.authoredAt == expected.action.authoredAt
+              && frozen.action.payload == expected.action.payload
+              && Set(frozen.action.observed).count == frozen.action.observed.count
+              && Set(frozen.action.observed).isSubset(of: known)
+          }),
           try tagBatchWitness(intent, tags: tags, context: context) == delivery.beforeWitness else {
       throw RecipeOrganizationHistoryError.ineligible
     }
@@ -171,7 +181,7 @@ extension SwiftDataRecipeOrganizationRepository {
     let restorations = try context.fetch(FetchDescriptor<RecipeDeletionResolutionRecord>(
       predicate: #Predicate { $0.recipeID == recipe }))
     return try OrganizationCoding.encode(TagHistoryWitness(organization: evidence.receipts.filter {
-      relevant.contains($0.id)
+      relevant.contains($0.id) || $0.register == "name:\(tagID.rawValue.uuidString)"
     }, deletions: deletions.map(\.id).sorted { $0.uuidString < $1.uuidString },
       restorations: restorations.map(\.id).sorted { $0.uuidString < $1.uuidString }))
   }

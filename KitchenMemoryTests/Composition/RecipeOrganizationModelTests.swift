@@ -263,6 +263,50 @@ final class RecipeOrganizationModelTests: XCTestCase {
 
 }
 
+extension RecipeOrganizationModelTests {
+  func testTagDropCannotBypassRetainedOrUnreadableOrganizationCommand() async throws {
+    let fixture = try makeTestUserDefaults(suiteNamePrefix: "organization-tag-drop-recovery")
+    let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+    defer { try? FileManager.default.removeItem(at: directory) }
+    let container = try KitchenMemorySchema.makeContainer(inMemory: true)
+    let repository = SwiftDataRecipeOrganizationRepository(modelContainer: container)
+    let recipes = SwiftDataRecipeRepository(modelContainer: container)
+    let owner = KitchenOwner.ID(rawValue: "owner-a")
+    let kitchen = Kitchen(ownerID: owner, name: "Home")
+    try recipes.save(kitchen)
+    let recipe = try RecipeEditor(repository: recipes).create(in: kitchen.id, from: RecipeDraft(title: "Soup"))
+    let stored = try XCTUnwrap(recipes.recipe(id: recipe.id))
+    let tag = Tag.ID()
+    try repository.accept(repository.load(in: kitchen.id).prepare(tag: .create(id: tag, name: "Dinner")))
+    let retained = try repository.load(in: kitchen.id).prepare(tag: .rename(id: tag, name: "Retained"))
+    let pendingKey = "organization.owner-a." + kitchen.id.rawValue.uuidString + ".pending"
+    for unreadable in [false, true] {
+      let retainedData = try unreadable ? Data([0xff]) : JSONEncoder().encode(retained)
+      fixture.defaults.set(retainedData, forKey: pendingKey)
+      let model = makeOrganizationModel(repository: repository, kitchenID: kitchen.id,
+        scope: "owner-a", defaults: fixture.defaults)
+      let history = OrganizationHistoryPresentation(history: RecipeOrganizationHistory(repository: repository),
+        organization: model, scope: RecipeOrganizationHistoryScope(ownerID: owner, storeID: "test",
+          kitchenID: kitchen.id, logicalSceneID: UUID()),
+        historyURL: directory.appendingPathComponent(UUID().uuidString).appendingPathComponent("History.sqlite"))
+      await history.open()
+      XCTAssertTrue(history.ready)
+      let before = try repository.load(in: kitchen.id)
+      XCTAssertFalse(model.dropTag(["km-recipe:" + recipe.id.rawValue.uuidString], recipes: [stored],
+        onto: tag, history: history))
+      await history.waitForPendingOperation()
+      XCTAssertEqual(try repository.load(in: kitchen.id), before)
+      XCTAssertEqual(fixture.defaults.data(forKey: pendingKey), retainedData)
+      XCTAssertEqual(model.storageInvalid, unreadable)
+      XCTAssertEqual(model.pending, unreadable ? nil : retained)
+      XCTAssertFalse(history.canUndo)
+      XCTAssertFalse(history.canRedo)
+      await history.disconnect()
+    }
+  }
+
+}
+
 @MainActor
 private final class UncertainOrganizationRepository: RecipeOrganizationRepository {
   let base: SwiftDataRecipeOrganizationRepository
