@@ -50,7 +50,7 @@ final class UndoKitRecoveryQualificationTests: XCTestCase {
     }
     XCTAssertEqual(rig.host.acceptanceCount, 1)
     let acceptedToken = try XCTUnwrap(rig.host.receiptTokens.first)
-    XCTAssertTrue(rig.session.snapshot.hasPending)
+    XCTAssertEqual(rig.session.status.phase, .suspended)
     XCTAssertFalse(rig.session.status.canUndo)
     XCTAssertFalse(rig.session.status.canRedo)
     try await rig.reopen()
