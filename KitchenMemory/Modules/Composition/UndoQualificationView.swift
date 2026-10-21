@@ -30,6 +30,7 @@ final class UndoQualificationModel {
   var canUndo = false
   var canRedo = false
   var ready = false
+  private(set) var nativeUndoManager: UndoManager?
 
   init(identifier: UUID) { self.identifier = identifier }
 
@@ -67,6 +68,7 @@ final class UndoQualificationModel {
       }
       commands = try session.commands(for: operation)
       attachment = try session.attach(owner: self) { owner, _ in owner.refresh() }
+      nativeUndoManager = attachment?.undoManager
       refresh()
     } catch { state = "Blocked" }
   }
@@ -93,6 +95,7 @@ final class UndoQualificationModel {
 
   func cleanup() async {
     attachment?.disconnect()
+    nativeUndoManager = nil
     await session?.close()
     guard session?.status.phase == .closed, let directory else { return }
     do {
@@ -119,6 +122,9 @@ struct UndoQualificationView: View {
   var body: some View {
     VStack(spacing: 16) {
       Text(verbatim: model.state).accessibilityIdentifier("undo-qualification-state")
+      if let manager = model.nativeUndoManager {
+        QualificationNativeHistorySurface(manager: manager).frame(height: 72)
+      }
       Button(action: { Task { await model.apply() } }, label: { Text(verbatim: "Apply") })
         .accessibilityIdentifier("undo-qualification-apply").disabled(!model.ready)
       Button(action: { Task { await model.apply(losingReply: true) } },
