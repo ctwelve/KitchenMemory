@@ -8,12 +8,13 @@ import UndoKit
 
 extension SwiftDataRecipeOrganizationRepository {
   public func prepareHistoryTags(_ recipeIDs: Set<Recipe.ID>, tagID: Tag.ID, adding: Bool,
-                                in scope: RecipeOrganizationHistoryScope) throws -> RecipeOrganizationHistoryChange? {
+                                 in scope: RecipeOrganizationHistoryScope) throws -> RecipeOrganizationHistoryChange? {
     let context = ModelContext(container)
     try validateHistoryScope(scope, context: context)
     let tags = try SwiftDataTagRepository(modelContainer: container).library(in: scope.kitchenID, context: context)
     try requireHistoryTag(tagID, tags: tags)
-    let projection = TagProjection(evidence: try OrganizationEvidence(tags.actions, checkpoints: tags.checkpointEvidence))
+    let projection = TagProjection(evidence: try OrganizationEvidence(
+      tags.actions, checkpoints: tags.checkpointEvidence))
     let members = try recipeIDs.sorted { $0.rawValue.uuidString < $1.rawValue.uuidString }.compactMap { recipeID in
       try requireHistoryRecipe(recipeID, scope: scope, context: context)
       let dots = projection.assignments(recipeID: recipeID, tagID: tagID)
@@ -27,8 +28,8 @@ extension SwiftDataRecipeOrganizationRepository {
       tagID: tagID, adding: adding, members: members))
   }
 
-  func prepareTagHistoryDelivery(_ change: RecipeOrganizationHistoryChange, memberID: UUID, token: HistoryToken,
-                                scope: RecipeOrganizationHistoryScope) throws -> RecipeOrganizationHistoryDelivery {
+  func prepareTagHistoryDelivery(_ change: RecipeOrganizationHistoryChange, memberID: UUID, token: UndoKit.HistoryToken,
+                                 scope: RecipeOrganizationHistoryScope) throws -> RecipeOrganizationHistoryDelivery {
     guard token.scope == scope.identity, let intent = change.tagChange else {
       throw RecipeOrganizationHistoryError.invalidScope
     }
@@ -44,13 +45,14 @@ extension SwiftDataRecipeOrganizationRepository {
   }
 
   func commitTagHistory(_ delivery: RecipeOrganizationHistoryDelivery, recovery: Bool,
-                       receipts: [RecipeOrganizationHistoryReceipt], context: ModelContext)
+                        receipts: [RecipeOrganizationHistoryReceipt], context: ModelContext)
     throws -> RecipeOrganizationHistoryReceipt {
     try validateHistoryScope(delivery.scope, context: context)
     guard let intent = delivery.change.tagChange, delivery.token.scope == delivery.scope.identity,
           delivery.command.id == delivery.token.command, delivery.command.kitchenID == delivery.scope.kitchenID,
           delivery.command.folders.isEmpty else { throw RecipeOrganizationHistoryError.invalidScope }
-    let tags = try SwiftDataTagRepository(modelContainer: container).library(in: delivery.scope.kitchenID, context: context)
+    let tags = try SwiftDataTagRepository(modelContainer: container)
+      .library(in: delivery.scope.kitchenID, context: context)
     guard try tagHistoryIsEligible(intent, scope: delivery.scope, token: delivery.token, receipts: receipts,
       context: context) else { throw RecipeOrganizationHistoryError.ineligible }
     let expected = try tagHistoryCommands(intent, token: delivery.token, scope: delivery.scope,
@@ -60,7 +62,8 @@ extension SwiftDataRecipeOrganizationRepository {
       throw RecipeOrganizationHistoryError.ineligible
     }
     try accept(delivery.command, firstSave: nil, context: context)
-    let after = try SwiftDataTagRepository(modelContainer: container).library(in: delivery.scope.kitchenID, context: context)
+    let after = try SwiftDataTagRepository(modelContainer: container)
+      .library(in: delivery.scope.kitchenID, context: context)
     let receipt = RecipeOrganizationHistoryReceipt(delivery: delivery,
       afterWitness: try tagBatchWitness(intent, tags: after, context: context))
     let action = OrganizationAction(id: recovery ? delivery.token.recoveryReceiptID : delivery.token.receiptID,
@@ -74,8 +77,8 @@ extension SwiftDataRecipeOrganizationRepository {
   }
 
   func tagHistoryIsEligible(_ intent: RecipeOrganizationTagHistoryChange, scope: RecipeOrganizationHistoryScope,
-                           token: OrganizationHistoryToken, receipts: [RecipeOrganizationHistoryReceipt],
-                           context: ModelContext) throws -> Bool {
+                            token: OrganizationHistoryToken, receipts: [RecipeOrganizationHistoryReceipt],
+                            context: ModelContext) throws -> Bool {
     let tags = try SwiftDataTagRepository(modelContainer: container).library(in: scope.kitchenID, context: context)
     guard tags.canonicalTagID(for: intent.tagID) == intent.tagID,
           !intent.members.isEmpty,
@@ -122,10 +125,12 @@ extension SwiftDataRecipeOrganizationRepository {
         && Set(dots).isSubset(of: projection.assignments(recipeID: member.recipeID, tagID: intent.tagID))) else {
         throw RecipeOrganizationHistoryError.ineligible
       }
-      return [TagCommand(kitchenID: scope.kitchenID, action: OrganizationAction(
+      return [
+        TagCommand(kitchenID: scope.kitchenID, action: OrganizationAction(
         id: derivedID(namespace: token.command, kind: "history-tag-remove", source: member.anchorID),
         authoredAt: date, observed: evidence.heads,
-        payload: .remove(recipeID: member.recipeID, assignments: dots.sorted { $0.uuidString < $1.uuidString })))]
+        payload: .remove(recipeID: member.recipeID, assignments: dots.sorted { $0.uuidString < $1.uuidString }))),
+      ]
     }
   }
 
@@ -147,16 +152,22 @@ extension SwiftDataRecipeOrganizationRepository {
                                  context: ModelContext) throws -> Data {
     let evidence = try OrganizationEvidence(tags.actions, checkpoints: tags.checkpointEvidence)
     let projection = TagProjection(evidence: evidence)
+    let pairAssignments = Set(evidence.actions.compactMap { action -> UUID? in
+      guard case let .assign(recipe, tag) = action.payload, recipe == recipeID,
+            (projection.aliases[tag] ?? tag) == tagID else { return nil }
+      return action.id
+    })
     let relevant = Set(evidence.actions.filter { action in
       switch action.payload {
       case let .assign(recipe, tag): return recipe == recipeID && (projection.aliases[tag] ?? tag) == tagID
-      case let .remove(recipe, _): return recipe == recipeID
+      case let .remove(recipe, dots): return recipe == recipeID && !pairAssignments.isDisjoint(with: dots)
       case let .merge(ids, survivor, _): return ids.contains(tagID) || survivor == tagID
       default: return action.payload.tagID == tagID
       }
     }.map(\.id))
     let recipe = recipeID.rawValue
-    let deletions = try context.fetch(FetchDescriptor<RecipeDeletionRecord>(predicate: #Predicate { $0.recipeID == recipe }))
+    let deletions = try context.fetch(FetchDescriptor<RecipeDeletionRecord>(
+      predicate: #Predicate { $0.recipeID == recipe }))
     let restorations = try context.fetch(FetchDescriptor<RecipeDeletionResolutionRecord>(
       predicate: #Predicate { $0.recipeID == recipe }))
     return try OrganizationCoding.encode(TagHistoryWitness(organization: evidence.receipts.filter {

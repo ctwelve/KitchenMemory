@@ -17,8 +17,8 @@ operation eligibility, lifecycle, scope and domain authority.
 
 [#237](https://github.com/ctwelve/KitchenMemory/issues/237) adds durable Folder
 history for moving one saved Recipe, including a move to Unfiled. A placement
-no-op creates no history group or receipt. Tag changes remain separate delivery
-work; this foundation does not close the app-wide #204 gate or
+no-op creates no history group or receipt. Tag changes are described in #239 below;
+this foundation does not close the app-wide #204 gate or
 expand [ADR 0022's accepted policy](adr/0022-shared-durable-undo-framework.md).
 
 KitchenKit owns the typed change, eligibility checks and compensation through
@@ -85,6 +85,27 @@ unchanged. Native action names resolve to singular or plural according to the
 changed-member count. This remains local atomic acceptance; remote delivery can
 arrive incrementally.
 
+## Tag assignments: #239
+
+[#239](https://github.com/ctwelve/KitchenMemory/issues/239) uses the same initiating
+scene timeline for Add Tag and Remove Tag on one saved Recipe or a selection.
+Only changed members enter one atomic group. Add excludes existing membership;
+Remove freezes each observed assignment identity. Undo/Redo append fresh accepted
+compensation instead of reviving removed dots. Receipts retain the lineage from
+each logical assignment to its fresh replacements, so Undo of an older Add can
+follow its own replacement after Undo Remove without claiming other assignments.
+Known relevant external evidence, unavailable Recipes and changed/merged/deleted
+Tags refuse the entire group. A frozen removal never absorbs later assignments.
+
+New Tag commands/effects use an explicit version-3 Tag shape. The original
+singular Folder shape and sorted version-2 Folder batch shape remain readable;
+unknown explicit versions and malformed Tag members fail closed. Existing
+version-1 pending envelopes and accepted/recovery receipts carry this additive
+change shape unchanged. Receipt lookup precedes eligibility, including after
+accepted reply loss, and exact retry retains the original command identity.
+V7 declarations, legacy `BatchReceipt`, and organization checkpoints are unchanged.
+Tag creation, rename, merge and deletion remain outside undo eligibility.
+
 ## Supply route and ownership
 
 The maintainer approves either the Swift package or the available XCFramework.
@@ -119,7 +140,7 @@ The demonstration atomically replaces one JSON file containing domain values and
 full-token receipts. That single-writer demonstration contract is not a new
 Recipe repository, persisted organization format or production receipt design.
 The production Folder foundation is described above; Tag and bulk compensation
-remain separate work in #238–#239.
+are described separately in #238–#239 above.
 
 ## Public integration contract
 

@@ -25,12 +25,16 @@ struct RecipeOrganizationMenus: View {
       if model.preferences.tagsEnabled {
         Menu(.organizationAddTag) {
           ForEach(snapshot.tags.orderedTags(locale: locale)) { tag in
-            Button(tag.displayName) { Task { await model.classify(recipeIDs, tagID: tag.id, adding: true, history: history) } }
+            Button(tag.displayName) {
+              Task { await model.classify(recipeIDs, tagID: tag.id, adding: true, history: history) }
+            }
           }
         }
         Menu(.organizationRemoveTag) {
           ForEach(snapshot.tags.orderedTags(locale: locale)) { tag in
-            Button(tag.displayName) { Task { await model.classify(recipeIDs, tagID: tag.id, adding: false, history: history) } }
+            Button(tag.displayName) {
+              Task { await model.classify(recipeIDs, tagID: tag.id, adding: false, history: history) }
+            }
           }
         }
       }

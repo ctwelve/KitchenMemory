@@ -18,7 +18,8 @@ public struct RecipeOrganizationHistoryChange: Codable, Equatable, Sendable {
   let tagChange: RecipeOrganizationTagHistoryChange?
 
   init(anchorID: UUID, recipeID: Recipe.ID, before: Folder.ID?, after: Folder.ID?, baseline: Data,
-       folderBaseline: Data, members: [RecipeOrganizationHistoryMember]? = nil, tagChange: RecipeOrganizationTagHistoryChange? = nil) {
+       folderBaseline: Data, members: [RecipeOrganizationHistoryMember]? = nil,
+       tagChange: RecipeOrganizationTagHistoryChange? = nil) {
     self.anchorID = anchorID; self.recipeID = recipeID; self.before = before; self.after = after
     self.baseline = baseline; self.folderBaseline = folderBaseline; self.members = members; self.tagChange = tagChange
   }
@@ -50,7 +51,15 @@ public struct RecipeOrganizationHistoryChange: Codable, Equatable, Sendable {
         debugDescription: "Unsupported history change version")
     }
     if version == 3 {
-      self = Self(tagChange: try values.decode(RecipeOrganizationTagHistoryChange.self, forKey: .tagChange))
+      let tag = try values.decode(RecipeOrganizationTagHistoryChange.self, forKey: .tagChange)
+      let ids = tag.members.map(\.recipeID)
+      guard !ids.isEmpty, Set(ids).count == ids.count,
+            ids == ids.sorted(by: { $0.rawValue.uuidString < $1.rawValue.uuidString }),
+            tag.members.allSatisfy({ !$0.logicalDots.isEmpty
+              && Set($0.logicalDots).count == $0.logicalDots.count }) else {
+        throw DecodingError.dataCorruptedError(forKey: .tagChange, in: values, debugDescription: "Invalid Tag members")
+      }
+      self = Self(tagChange: tag)
       return
     }
     tagChange = nil

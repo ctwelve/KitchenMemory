@@ -69,7 +69,8 @@ public final class RecipeOrganizationHistory {
   }
 
   /// Adds or removes one Tag for the changed selected Recipes as one accepted group.
-  public func classify(_ recipeIDs: Set<Recipe.ID>, tagID: Tag.ID, adding: Bool) async throws -> HistorySubmissionResult {
+  public func classify(_ recipeIDs: Set<Recipe.ID>, tagID: Tag.ID, adding: Bool)
+    async throws -> HistorySubmissionResult {
     guard let session, let host, let operation else { throw RecipeOrganizationHistoryError.notOpen }
     _ = try await invalidateInterference()
     guard host.pending == nil else { throw RecipeOrganizationHistoryError.ineligible }
