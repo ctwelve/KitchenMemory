@@ -23,8 +23,10 @@ public struct RecipeOrganizationHistoryChange: Codable, Equatable, Sendable {
   }
 
   var changedMembers: [RecipeOrganizationHistoryMember] {
-    members ?? [RecipeOrganizationHistoryMember(anchorID: anchorID, recipeID: recipeID,
-      before: before, after: after, baseline: baseline, folderBaseline: folderBaseline)]
+    members ?? [
+      RecipeOrganizationHistoryMember(anchorID: anchorID, recipeID: recipeID,
+        before: before, after: after, baseline: baseline, folderBaseline: folderBaseline),
+    ]
   }
 
   var inverse: Self {
@@ -34,13 +36,16 @@ public struct RecipeOrganizationHistoryChange: Codable, Equatable, Sendable {
       baseline: first.baseline, folderBaseline: first.folderBaseline, members: members == nil ? nil : reversed)
   }
 
-  private enum CodingKeys: String, CodingKey { case version, members, anchorID, recipeID, before, after, baseline, folderBaseline }
+  private enum CodingKeys: String, CodingKey {
+    case version, members, anchorID, recipeID, before, after, baseline, folderBaseline
+  }
 
   public init(from decoder: Decoder) throws {
     let values = try decoder.container(keyedBy: CodingKeys.self)
     let version = try values.decodeIfPresent(Int.self, forKey: .version)
     if let version, version != 2 {
-      throw DecodingError.dataCorruptedError(forKey: .version, in: values, debugDescription: "Unsupported history change version")
+      throw DecodingError.dataCorruptedError(forKey: .version, in: values,
+        debugDescription: "Unsupported history change version")
     }
     if version == 2 {
       let decoded = try values.decode([RecipeOrganizationHistoryMember].self, forKey: .members)

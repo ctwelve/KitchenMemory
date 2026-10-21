@@ -32,42 +32,23 @@ final class RecipeOrganizationBulkHistoryTests: XCTestCase {
     try repository.accept(repository.load(in: kitchen.id).move([third.id], to: otherFolder))
     let scope = RecipeOrganizationHistoryScope(ownerID: KitchenOwner.ID(rawValue: "test-owner"), storeID: "local-test",
       kitchenID: kitchen.id, logicalSceneID: UUID())
-    let preparedBatch = try XCTUnwrap(repository.prepareHistoryMove([first.id, second.id, third.id],
-      to: folder, in: scope))
-    let batchData = try JSONEncoder().encode(preparedBatch)
-    let batchObject = try XCTUnwrap(JSONSerialization.jsonObject(with: batchData) as? [String: Any])
-    XCTAssertEqual(batchObject["version"] as? Int, 2)
-    XCTAssertNotNil(batchObject["members"])
-    XCTAssertNil(batchObject["recipeID"], "Older readers must fail closed on a batch")
-    XCTAssertEqual(try JSONDecoder().decode(RecipeOrganizationHistoryChange.self, from: batchData), preparedBatch)
-    let legacySingle = try XCTUnwrap(repository.prepareHistoryMove(first.id, to: otherFolder, in: scope))
-    let legacyData = try JSONEncoder().encode(legacySingle)
-    let legacyObject = try XCTUnwrap(JSONSerialization.jsonObject(with: legacyData) as? [String: Any])
-    XCTAssertNil(legacyObject["version"])
-    XCTAssertNotNil(legacyObject["anchorID"])
-    XCTAssertEqual(try JSONDecoder().decode(RecipeOrganizationHistoryChange.self, from: legacyData), legacySingle)
-    var futureObject = legacyObject
-    futureObject["version"] = 3
-    XCTAssertThrowsError(try JSONDecoder().decode(RecipeOrganizationHistoryChange.self,
-      from: JSONSerialization.data(withJSONObject: futureObject)))
+    try assertEncodingCompatibility(repository: repository, scope: scope,
+      recipeIDs: [first.id, second.id, third.id],
+      destination: folder, legacyDestination: otherFolder)
     let history = RecipeOrganizationHistory(repository: repository)
     try await history.open(scope: scope, historyURL: directory.appendingPathComponent("History.sqlite"))
 
-    do {
-      _ = try await history.move([first.id, Recipe.ID()], to: folder)
-      XCTFail("A batch containing an unavailable Recipe must be rejected")
-    } catch RecipeOrganizationHistoryError.ineligible {}
+    try await assertInvalidBatchRejected(history: history, repository: repository,
+      validRecipeID: first.id, kitchenID: kitchen.id, destination: folder)
     XCTAssertEqual(try repository.load(in: kitchen.id).folders.primaryFolder(for: first.id), folder)
     XCTAssertFalse(try XCTUnwrap(history.session).status.canUndo)
 
     let moved = try await history.move([first.id, second.id, third.id], to: folder)
     assertOrganizationHistoryAccepted(moved)
-    XCTAssertEqual(try repository.load(in: kitchen.id).folders.primaryFolder(for: first.id), folder)
-    XCTAssertEqual(try repository.load(in: kitchen.id).folders.primaryFolder(for: second.id), folder)
-    XCTAssertEqual(try repository.load(in: kitchen.id).folders.primaryFolder(for: third.id), folder)
+    try assertPlacements(repository: repository, kitchenID: kitchen.id, recipeIDs: [first.id, second.id, third.id],
+      expected: folder)
     XCTAssertTrue(try XCTUnwrap(history.session).status.canUndo)
-    let noOp = try await history.move([first.id, second.id, third.id], to: folder)
-    XCTAssertEqual(noOp, .rejected)
+    try await assertNoOpRejected(history: history, recipeIDs: [first.id, second.id, third.id], destination: folder)
 
     assertOrganizationHistoryAccepted(await history.undo())
     XCTAssertEqual(try repository.load(in: kitchen.id).folders.primaryFolder(for: first.id), folder,
@@ -84,6 +65,57 @@ final class RecipeOrganizationBulkHistoryTests: XCTestCase {
     assertOrganizationHistoryAccepted(await restored.redo())
     XCTAssertEqual(try repository.load(in: kitchen.id).folders.primaryFolder(for: second.id), folder)
     await restored.close()
+  }
+
+  private func assertEncodingCompatibility(
+    repository: SwiftDataRecipeOrganizationRepository, scope: RecipeOrganizationHistoryScope,
+    recipeIDs: [Recipe.ID], destination: Folder.ID, legacyDestination: Folder.ID
+  ) throws {
+    let batch = try XCTUnwrap(repository.prepareHistoryMove(Set(recipeIDs), to: destination, in: scope))
+    let batchData = try JSONEncoder().encode(batch)
+    let batchObject = try XCTUnwrap(JSONSerialization.jsonObject(with: batchData) as? [String: Any])
+    XCTAssertEqual(batchObject["version"] as? Int, 2)
+    XCTAssertNotNil(batchObject["members"])
+    XCTAssertNil(batchObject["recipeID"], "Older readers must fail closed on a batch")
+    XCTAssertEqual(try JSONDecoder().decode(RecipeOrganizationHistoryChange.self, from: batchData), batch)
+    let single = try XCTUnwrap(repository.prepareHistoryMove(recipeIDs[0], to: legacyDestination, in: scope))
+    let singleData = try JSONEncoder().encode(single)
+    let singleObject = try XCTUnwrap(JSONSerialization.jsonObject(with: singleData) as? [String: Any])
+    XCTAssertNil(singleObject["version"])
+    XCTAssertNotNil(singleObject["anchorID"])
+    XCTAssertEqual(try JSONDecoder().decode(RecipeOrganizationHistoryChange.self, from: singleData), single)
+    var futureObject = singleObject
+    futureObject["version"] = 3
+    XCTAssertThrowsError(try JSONDecoder().decode(RecipeOrganizationHistoryChange.self,
+      from: JSONSerialization.data(withJSONObject: futureObject)))
+  }
+
+  private func assertPlacements(
+    repository: SwiftDataRecipeOrganizationRepository, kitchenID: Kitchen.ID,
+    recipeIDs: [Recipe.ID], expected: Folder.ID
+  ) throws {
+    for recipeID in recipeIDs {
+      XCTAssertEqual(try repository.load(in: kitchenID).folders.primaryFolder(for: recipeID), expected)
+    }
+  }
+
+  private func assertNoOpRejected(
+    history: RecipeOrganizationHistory, recipeIDs: [Recipe.ID], destination: Folder.ID
+  ) async throws {
+    let result = try await history.move(Set(recipeIDs), to: destination)
+    XCTAssertEqual(result, .rejected)
+  }
+
+  private func assertInvalidBatchRejected(
+    history: RecipeOrganizationHistory, repository: SwiftDataRecipeOrganizationRepository,
+    validRecipeID: Recipe.ID, kitchenID: Kitchen.ID, destination: Folder.ID
+  ) async throws {
+    do {
+      _ = try await history.move([validRecipeID, Recipe.ID()], to: destination)
+      XCTFail("A batch containing an unavailable Recipe must be rejected")
+    } catch RecipeOrganizationHistoryError.ineligible {}
+    XCTAssertEqual(try repository.load(in: kitchenID).folders.primaryFolder(for: validRecipeID), destination)
+    XCTAssertFalse(try XCTUnwrap(history.session).status.canUndo)
   }
 
   func testStaleMemberRejectsTheEntirePreparedBatch() throws {
@@ -132,9 +164,13 @@ final class RecipeOrganizationBulkHistoryTests: XCTestCase {
     boundary.loseNextReply = true
     boundary.withholdReceipts = true
     let unresolved = try await history.move([fixture.recipeID, extra.id], to: fixture.first)
-    guard case .unresolved = unresolved else { return XCTFail("A lost bulk reply must require reconciliation") }
+    guard case .unresolved = unresolved else {
+      XCTFail("A lost bulk reply must require reconciliation")
+      return
+    }
     XCTAssertEqual(try fixture.placement(), fixture.first)
-    XCTAssertEqual(try fixture.repository.load(in: fixture.kitchenID).folders.primaryFolder(for: extra.id), fixture.first)
+    XCTAssertEqual(try fixture.repository.load(in: fixture.kitchenID).folders
+      .primaryFolder(for: extra.id), fixture.first)
     let delivery = try XCTUnwrap(boundary.deliveries.last)
     XCTAssertEqual(delivery.change.changedMembers.map(\.recipeID), [fixture.recipeID, extra.id]
       .sorted { $0.rawValue.uuidString < $1.rawValue.uuidString })

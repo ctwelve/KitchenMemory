@@ -33,10 +33,11 @@ public final class RecipeOrganizationHistory {
     let host = OrganizationHistoryHost(repository: repository, scope: scope,
       pendingURL: historyURL.appendingPathExtension("organization-pending.json"))
     let operation = try HistoryOperation(operation: "kitchenmemory.recipe-organization", commandCodec: .json(),
-      effectCodec: .json(), handler: host, fingerprint: { try OrganizationCoding.digest($0) }, metadata: { change in
+      effectCodec: .json(), handler: host, fingerprint: { try OrganizationCoding.digest($0) }, metadata: { changes in
+        let changedRecipeCount = changes.reduce(0) { $0 + $1.changedMembers.count }
         HistoryOperationMetadata(presentation: HistoryPayload(
           family: "kitchenmemory.recipe-organization.action",
-          data: Data((change.changedMembers.count == 1 ? "move-recipe" : "move-recipes").utf8)))
+          data: Data((changedRecipeCount == 1 ? "move-recipe" : "move-recipes").utf8)))
       })
     let existing = FileManager.default.fileExists(atPath: historyURL.path)
       || FileManager.default.fileExists(atPath: historyURL.appendingPathExtension("organization-pending.json").path)
@@ -59,7 +60,8 @@ public final class RecipeOrganizationHistory {
     guard let session, let host, let operation else { throw RecipeOrganizationHistoryError.notOpen }
     _ = try await invalidateInterference()
     guard host.pending == nil else { throw RecipeOrganizationHistoryError.ineligible }
-    guard let change = try repository.prepareHistoryMove(recipeIDs, to: folderID, in: host.scope) else { return .rejected }
+    guard let change = try repository.prepareHistoryMove(recipeIDs, to: folderID, in: host.scope)
+    else { return .rejected }
     return await (try session.commands(for: operation)).submit(change)
   }
 

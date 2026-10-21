@@ -40,6 +40,37 @@ final class OrganizationHistoryPresentationTests: XCTestCase {
     XCTAssertEqual(organization.snapshot?.folders.primaryFolder(for: recipe.id), folder)
     XCTAssertEqual(library.navigation.destination, destination)
   }
+
+  func testBulkDropUsesPluralNativeNameAndOneUndoRestoresBothPriorPlacements() async throws {
+    let fixture = try OrganizationHistoryAppFixture()
+    defer { try? FileManager.default.removeItem(at: fixture.directory.deletingLastPathComponent()) }
+    let secondID = try RecipeEditor(repository: fixture.recipes)
+      .create(in: fixture.kitchenID, from: RecipeDraft(title: "Bread")).id
+    let second = try XCTUnwrap(fixture.recipes.recipe(id: secondID))
+    let priorFolder = Folder.ID()
+    fixture.model.perform { try $0.prepare(folder: .create(id: priorFolder, name: "Other", parentID: nil)) }
+    fixture.model.perform { try $0.move([second.id], to: priorFolder) }
+    XCTAssertNil(fixture.model.snapshot?.folders.primaryFolder(for: fixture.recipe.id))
+    XCTAssertEqual(fixture.model.snapshot?.folders.primaryFolder(for: second.id), priorFolder)
+
+    let history = fixture.registry.presentation(for: UUID())
+    history.updateLocale(Locale(identifier: "en-US"))
+    await history.open()
+    let dragged = [fixture.recipe, second]
+    let values = dragged.map { "km-recipe:" + $0.id.rawValue.uuidString }
+    XCTAssertTrue(fixture.model.dropRecipes(values, recipes: dragged, to: fixture.folder, history: history))
+    await history.waitForPendingOperation()
+    XCTAssertEqual(fixture.model.snapshot?.folders.primaryFolder(for: fixture.recipe.id), fixture.folder)
+    XCTAssertEqual(fixture.model.snapshot?.folders.primaryFolder(for: second.id), fixture.folder)
+    XCTAssertEqual(history.nativeUndoManager?.undoActionName, "Move Recipes")
+
+    await history.undo()
+    XCTAssertNil(fixture.model.snapshot?.folders.primaryFolder(for: fixture.recipe.id))
+    XCTAssertEqual(fixture.model.snapshot?.folders.primaryFolder(for: second.id), priorFolder)
+    XCTAssertFalse(history.canUndo)
+    await history.disconnect()
+  }
+
   func testUndoLeavesEditingFocusAndNavigationVetoIntact() async throws {
     let app = try AppRuntime.testing()
     let model = try XCTUnwrap(app.libraryModel.organization)
@@ -211,6 +242,7 @@ final class OrganizationHistoryPresentationTests: XCTestCase {
 struct OrganizationHistoryAppFixture {
   let directory: URL
   let repository: SwiftDataRecipeOrganizationRepository
+  let recipes: SwiftDataRecipeRepository
   let model: RecipeOrganizationModel
   let recipe: StoredRecipe
   let folder: Folder.ID
@@ -224,6 +256,7 @@ struct OrganizationHistoryAppFixture {
       .appendingPathComponent(String(repeating: "a", count: 64))
     let container = try KitchenMemorySchema.makeContainer(inMemory: true)
     let recipes = SwiftDataRecipeRepository(modelContainer: container)
+    self.recipes = recipes
     let kitchen = Kitchen(ownerID: ownerID, name: "Home")
     kitchenID = kitchen.id
     try recipes.save(kitchen)
