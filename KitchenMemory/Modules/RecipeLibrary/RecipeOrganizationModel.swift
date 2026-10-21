@@ -14,6 +14,7 @@ final class RecipeOrganizationModel {
   private let defaults: UserDefaults
   let preferences: any OrganizationPreferencesStoring
   private let prefix: String
+  @ObservationIgnored private var organizationChange: () -> Void = {}
   private(set) var snapshot: RecipeOrganization?
   private(set) var pending: RecipeOrganizationCommand?
   private(set) var storageInvalid = false
@@ -44,6 +45,9 @@ final class RecipeOrganizationModel {
     }
     refresh()
   }
+
+  func installOrganizationChangeHandler(_ handler: @escaping () -> Void) { organizationChange = handler }
+  func organizationDidChange() { organizationChange() }
 
   var collisionCount: Int { (snapshot?.folders.collisions.count ?? 0) + (snapshot?.tags.collisions.count ?? 0) }
   var requiresRecovery: Bool { snapshot == nil || storageInvalid || pending != nil || collisionCount > 0 }
@@ -101,6 +105,7 @@ final class RecipeOrganizationModel {
       failed = false
       changeRejected = false
       refresh()
+      organizationDidChange()
     } catch {
       changeRejected = error is FolderError || error is TagError
       failed = true

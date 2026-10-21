@@ -100,9 +100,11 @@ final class OrganizationHistoryHost: MainActorHistoryOperationHandler, HistoryHo
         if pending.terminalRejected { return .rejected }
         retained = pending
       } else {
-        let delivery = try repository.prepareHistoryDelivery(change, memberID: memberID, token: context.token, in: scope)
+        let delivery = try repository.prepareHistoryDelivery(
+          change, memberID: memberID, token: context.token, in: scope)
         retained = Pending(version: 1, delivery: delivery, inverse: inverse, terminalRejected: false)
-        try FileManager.default.createDirectory(at: pendingURL.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try FileManager.default.createDirectory(
+          at: pendingURL.deletingLastPathComponent(), withIntermediateDirectories: true)
         try OrganizationCoding.encode(retained).write(to: pendingURL, options: .atomic)
         pending = retained
       }

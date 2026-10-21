@@ -61,7 +61,8 @@ public final class RecipeOrganizationHistory {
     _ = try await invalidateInterference()
     guard host.pending == nil else { throw RecipeOrganizationHistoryError.ineligible }
     guard let recipeID = recipeIDs.first,
-          let change = try repository.prepareHistoryMove(recipeID, to: folderID, in: host.scope) else { return .rejected }
+          let change = try repository.prepareHistoryMove(recipeID, to: folderID, in: host.scope)
+    else { return .rejected }
     return await (try session.commands(for: operation)).submit(change)
   }
 
@@ -79,7 +80,10 @@ public final class RecipeOrganizationHistory {
   public func reconcile() async -> HistorySubmissionResult? {
     guard let session else { return nil }
     let result = await session.reconcile()
-    do { _ = try await invalidateInterference() } catch { return .unresolved(historyFailure(error)) }
+    do { _ = try await invalidateInterference() } catch {
+      await close()
+      return .unresolved(historyFailure(error))
+    }
     return result
   }
 

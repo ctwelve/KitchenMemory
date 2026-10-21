@@ -104,6 +104,7 @@ struct PreparedApp {
       sessionRepository: cookingSessionRepository,
       sessionModel: sessionModel
     )
+    organizationHistory.requestReconciliation()
   }
 
   static var preview: PreparedApp {

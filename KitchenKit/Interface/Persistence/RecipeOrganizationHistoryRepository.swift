@@ -14,7 +14,10 @@ public struct RecipeOrganizationHistoryChange: Codable, Equatable, Sendable {
   let baseline: Data
   let folderBaseline: Data
 
-  var inverse: Self { Self(anchorID: anchorID, recipeID: recipeID, before: after, after: before, baseline: baseline, folderBaseline: folderBaseline) }
+  var inverse: Self {
+    Self(anchorID: anchorID, recipeID: recipeID, before: after, after: before,
+         baseline: baseline, folderBaseline: folderBaseline)
+  }
 }
 
 /// An exact frozen transaction retained locally before attempting domain acceptance.
@@ -33,8 +36,9 @@ public struct RecipeOrganizationHistoryReceipt: Codable, Equatable, Sendable {
   let afterWitness: Data
 
   var outcome: HistoryTypedOutcome<RecipeOrganizationHistoryChange> {
-    .accepted([HistoryTypedEffect(memberID: delivery.memberID,
-      undo: delivery.change.inverse, redo: delivery.change)])
+    .accepted([
+      HistoryTypedEffect(memberID: delivery.memberID, undo: delivery.change.inverse, redo: delivery.change),
+    ])
   }
 }
 

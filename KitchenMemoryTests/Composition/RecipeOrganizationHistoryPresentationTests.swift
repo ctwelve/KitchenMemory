@@ -119,7 +119,8 @@ final class OrganizationHistoryPresentationTests: XCTestCase {
     let restored = reopened.presentation(for: sceneID)
     await restored.open()
     XCTAssertTrue(restored.canUndo)
-    OrganizationHistoryRegistry.discardSceneSessions(["saved-scene-session"])
+    OrganizationHistoryRegistry.discardSceneSessions(["saved-scene-session"],
+      recordingAt: fixture.directory.deletingLastPathComponent())
     XCTAssertFalse(restored.canUndo)
     await restored.disconnect()
     let afterDiscard = try fixture.makeRegistry()
@@ -207,7 +208,7 @@ final class OrganizationHistoryPresentationTests: XCTestCase {
 }
 
 @MainActor
-private struct OrganizationHistoryAppFixture {
+struct OrganizationHistoryAppFixture {
   let directory: URL
   let repository: SwiftDataRecipeOrganizationRepository
   let model: RecipeOrganizationModel

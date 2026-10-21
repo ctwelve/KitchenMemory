@@ -24,9 +24,11 @@ struct PreparedOrganization {
     let repository = SwiftDataRecipeOrganizationRepository(modelContainer: container)
     model = RecipeOrganizationModel(repository: repository, kitchenID: kitchenID, scope: scope,
       preferences: preferences.organizationPreferences(scope: scope, kitchenID: kitchenID), defaults: defaults)
-    history = try OrganizationHistoryRegistry(repository: repository, organization: model, ownerID: ownerID,
+    let history = try OrganizationHistoryRegistry(repository: repository, organization: model, ownerID: ownerID,
       storeID: scope, kitchenID: kitchenID,
       directory: OrganizationHistoryRegistry.directory(ownerID: ownerID, storeID: scope,
         kitchenID: kitchenID, inMemory: plan.store.isInMemory))
+    self.history = history
+    model.installOrganizationChangeHandler { [weak history] in history?.requestReconciliation() }
   }
 }

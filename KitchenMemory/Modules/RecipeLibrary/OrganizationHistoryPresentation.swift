@@ -140,7 +140,7 @@ final class OrganizationHistoryPresentation {
   }
 
   func reconcile() async {
-    guard available, ready, !busy else { return }
+    guard available, ready, !busy, history.session?.snapshot.hasPending != true else { return }
     if let result = await history.reconcile() { receive(result) }
     refresh()
   }
@@ -176,7 +176,9 @@ final class OrganizationHistoryPresentation {
   }
 
   func refresh() {
+    let previous = organization.snapshot
     organization.refresh()
+    if previous != organization.snapshot { organization.organizationDidChange() }
     ready = available && history.session?.status.phase == .ready
     canUndo = ready && history.session?.status.canUndo == true
     canRedo = ready && history.session?.status.canRedo == true

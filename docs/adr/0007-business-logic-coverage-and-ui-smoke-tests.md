@@ -18,8 +18,18 @@ Each shared scheme builds only its primary product and references one checked-in
 test plan; the plan is the sole owner of test-target membership.
 `KitchenMemory.xctestplan` runs hosted tests plus the shared top-level UI target on
 both native destinations, while `KitchenKit.xctestplan` runs the unhosted
-framework suite. Both use `Testing` as the default Test configuration. Names
+framework suite. Both originally used `Testing` as the default Test configuration. Names
 below record historical topology where applicable, not the live project contract.
+
+Amended on 2026-10-21 for [saved-Recipe undo #237](https://github.com/ctwelve/KitchenMemory/issues/237):
+the unhosted KitchenKit Test action uses `Debug`, with the test plan's package
+resource path pointing to its built products. UndoKit's generated resource
+accessor supports that override only in a Debug package build; the custom
+`Testing` configuration builds the package without it. This keeps real durable
+history tests unhosted and preserves the exact business-logic coverage gate.
+Application tests retain `Testing`. See the
+[test matrix](../continuous-integration.md#scheme-plan-and-destination-contract) for the
+current harness contract.
 
 Amended on 2026-09-02 to clarify that the current UI target proves only
 accessible top-level structure and navigation. It does not repeat feature

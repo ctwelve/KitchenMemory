@@ -11,6 +11,9 @@ import Observation
 @MainActor
 @Observable
 final class OrganizationHistoryRegistry {
+  private static var pendingDisposals: [String: Set<String>] = [:]
+  @ObservationIgnored private var reconciliationTask: Task<Void, Never>?
+  private var reconciliationRequested = false
   private static var active: [String: WeakOrganizationHistoryRegistry] = [:]
   private var sceneSessions: [String: UUID] = [:]
   private let repository: any RecipeOrganizationHistoryRepository
@@ -45,7 +48,17 @@ final class OrganizationHistoryRegistry {
     if FileManager.default.fileExists(atPath: sessionsURL.path) {
       sceneSessions = try JSONDecoder().decode([String: UUID].self, from: Data(contentsOf: sessionsURL))
     }
-    let ownershipKey = directory.deletingLastPathComponent().path
+    let disposalRoot = directory.deletingLastPathComponent()
+    let disposalStore = OrganizationHistorySceneDisposals(root: disposalRoot)
+    if let pending = Self.pendingDisposals[disposalRoot.path] {
+      try disposalStore.record(pending)
+      Self.pendingDisposals[disposalRoot.path] = nil
+    }
+    for (sessionID, sceneID) in sceneSessions where disposalStore.contains(sessionID) {
+      let marker = directory.appendingPathComponent(sceneID.uuidString + ".disposed")
+      try Data("disposed".utf8).write(to: marker, options: .atomic)
+    }
+    let ownershipKey = disposalRoot.path
     if let previous = Self.active[ownershipKey]?.value, previous.directory != directory {
       previous.presentations.values.forEach { $0.block() }
       previous.unavailable = true
@@ -83,15 +96,52 @@ final class OrganizationHistoryRegistry {
     unavailable = false
   }
 
-  static func discardSceneSessions(_ identifiers: Set<String>) {
-    for registry in active.values.compactMap(\.value) {
+  /// Records the system callback before consulting presentations, including during startup preparation.
+  static func discardSceneSessions(_ identifiers: Set<String>, recordingAt root: URL? = nil) {
+    if let durableRoot = root ?? (try? OrganizationHistorySceneDisposals.deviceLocalRoot()) {
+      recordDisposals(identifiers, at: durableRoot)
+    }
+    for registry in active.values.compactMap(\.value) where
+      root == nil || registry.directory.deletingLastPathComponent() == root {
+      let registryRoot = registry.directory.deletingLastPathComponent()
+      recordDisposals(identifiers, at: registryRoot)
       for identifier in identifiers {
         if let sceneID = registry.sceneSessions[identifier] { registry.dispose(sceneID) }
       }
     }
   }
 
+  private static func recordDisposals(_ identifiers: Set<String>, at root: URL) {
+    pendingDisposals[root.path, default: []].formUnion(identifiers)
+    do {
+      try OrganizationHistorySceneDisposals(root: root).record(pendingDisposals[root.path] ?? [])
+      pendingDisposals[root.path] = nil
+    } catch {
+      // Retain failed writes for the next preparation; history cannot open before they are durable.
+    }
+  }
+
+  /// Explicit delivery and accepted-change signals coalesce; ordinary projection refresh does not schedule work.
+  func requestReconciliation() {
+    reconciliationRequested = true
+    guard reconciliationTask == nil else { return }
+    reconciliationTask = Task { [weak self] in
+      guard let self else { return }
+      repeat {
+        self.reconciliationRequested = false
+        for presentation in Array(self.presentations.values) { await presentation.reconcile() }
+      } while self.reconciliationRequested
+      self.reconciliationTask = nil
+    }
+  }
+
+  func waitForReconciliation() async { await reconciliationTask?.value }
+
   private func recordSession(_ identifier: String, for sceneID: UUID) {
+    if OrganizationHistorySceneDisposals(root: directory.deletingLastPathComponent()).contains(identifier) {
+      dispose(sceneID)
+      return
+    }
     guard sceneSessions[identifier] != sceneID else { return }
     sceneSessions[identifier] = sceneID
     do {
