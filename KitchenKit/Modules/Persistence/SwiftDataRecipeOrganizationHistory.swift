@@ -113,7 +113,7 @@ extension SwiftDataRecipeOrganizationRepository: RecipeOrganizationHistoryReposi
         }
       }
       guard try historyWitness(delivery.change, folders: folders, context: context) == delivery.beforeWitness,
-            foldedHistoryWitness(delivery.change, token: delivery.token, receipts: receipts) == delivery.beforeWitness
+            try foldedHistoryWitness(delivery.change, token: delivery.token, receipts: receipts) == delivery.beforeWitness
       else { throw RecipeOrganizationHistoryError.ineligible }
       try accept(delivery.command, firstSave: nil, context: context)
       let after = try SwiftDataFolderRepository(modelContainer: container).library(
@@ -207,7 +207,7 @@ extension SwiftDataRecipeOrganizationRepository: RecipeOrganizationHistoryReposi
   }
 
   private func foldedHistoryWitness(_ change: RecipeOrganizationHistoryChange, token: OrganizationHistoryToken,
-                                    receipts: [RecipeOrganizationHistoryReceipt]) -> Data {
+                                    receipts: [RecipeOrganizationHistoryReceipt]) throws -> Data {
     guard change.members != nil else {
       return foldedHistoryWitness(change.changedMembers[0], token: token, receipts: receipts)
     }
@@ -215,7 +215,7 @@ extension SwiftDataRecipeOrganizationRepository: RecipeOrganizationHistoryReposi
       OrganizationBatchWitnessEntry(recipeID: member.recipeID,
         witness: foldedHistoryWitness(member, token: token, receipts: receipts))
     }
-    return (try? OrganizationCoding.encode(OrganizationBatchWitness(entries: entries))) ?? Data()
+    return try OrganizationCoding.encode(OrganizationBatchWitness(entries: entries))
   }
 
   private func foldedHistoryWitness(_ member: RecipeOrganizationHistoryMember, token: OrganizationHistoryToken,

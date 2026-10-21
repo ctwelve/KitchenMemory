@@ -78,6 +78,12 @@ final class RecipeOrganizationBulkHistoryTests: XCTestCase {
     XCTAssertNotNil(batchObject["members"])
     XCTAssertNil(batchObject["recipeID"], "Older readers must fail closed on a batch")
     XCTAssertEqual(try JSONDecoder().decode(RecipeOrganizationHistoryChange.self, from: batchData), batch)
+    var duplicateMembersObject = batchObject
+    let encodedMembers = try XCTUnwrap(batchObject["members"] as? [[String: Any]])
+    duplicateMembersObject["members"] = [encodedMembers[0], encodedMembers[0]]
+    XCTAssertThrowsError(try JSONDecoder().decode(RecipeOrganizationHistoryChange.self,
+      from: JSONSerialization.data(withJSONObject: duplicateMembersObject)),
+      "A batch with duplicate Recipe members must fail closed")
     let single = try XCTUnwrap(repository.prepareHistoryMove(recipeIDs[0], to: legacyDestination, in: scope))
     let singleData = try JSONEncoder().encode(single)
     let singleObject = try XCTUnwrap(JSONSerialization.jsonObject(with: singleData) as? [String: Any])
