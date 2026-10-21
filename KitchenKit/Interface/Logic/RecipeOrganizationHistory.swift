@@ -35,7 +35,7 @@ public final class RecipeOrganizationHistory {
     let operation = try HistoryOperation(operation: "kitchenmemory.recipe-organization", commandCodec: .json(),
       effectCodec: .json(), handler: host, fingerprint: { try OrganizationCoding.digest($0) }, metadata: { changes in
         let changedRecipeCount = changes.reduce(0) { $0 + $1.changedMembers.count }
-        HistoryOperationMetadata(presentation: HistoryPayload(
+        return HistoryOperationMetadata(presentation: HistoryPayload(
           family: "kitchenmemory.recipe-organization.action",
           data: Data((changedRecipeCount == 1 ? "move-recipe" : "move-recipes").utf8)))
       })
