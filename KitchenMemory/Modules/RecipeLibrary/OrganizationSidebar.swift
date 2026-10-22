@@ -10,6 +10,7 @@ struct OrganizationSidebar: View {
   @Bindable var model: RecipeOrganizationModel
   let recipes: [StoredRecipe]
   let browse: (@escaping () -> Void) -> Void
+  @Environment(\.organizationHistory) private var history
   @Environment(\.locale) private var locale
   let presentation: OrganizationActionPresentation
 
@@ -24,7 +25,7 @@ struct OrganizationSidebar: View {
               }
               .accessibilityAddTraits(model.filter.location == .unfiled ? .isSelected : [])
               .dropDestination(for: String.self) { values, _ -> Bool in
-                model.dropRecipes(values, recipes: recipes, to: nil)
+                model.dropRecipes(values, recipes: recipes, to: nil, history: history)
               }
             }
             ForEach(snapshot.folders.children(of: nil, locale: locale)) { folder in
@@ -63,7 +64,7 @@ struct OrganizationSidebar: View {
                 .contextMenu { OrganizationTagActions(model: model, tag: tag, presentation: presentation) }
                 .draggable("km-tag:" + tag.id.rawValue.uuidString)
                 .dropDestination(for: String.self) { values, _ -> Bool in
-                  model.dropTag(values, recipes: recipes, onto: tag.id)
+                  model.dropTag(values, recipes: recipes, onto: tag.id, history: history)
                 }
               }
             } label: { Label(.organizationTags, systemImage: "tag") }
@@ -88,6 +89,7 @@ private struct OrganizationFolderBranch: View {
   let recipes: [StoredRecipe]
   let presentation: OrganizationActionPresentation
   let browse: (@escaping () -> Void) -> Void
+  @Environment(\.organizationHistory) private var history
   @Environment(\.locale) private var locale
 
   var body: some View {
@@ -114,7 +116,7 @@ private struct OrganizationFolderBranch: View {
     .contextMenu { OrganizationFolderActions(model: model, folder: folder, presentation: presentation) }
     .draggable("km-folder:" + folder.id.rawValue.uuidString)
     .dropDestination(for: String.self) { values, _ -> Bool in
-      model.dropFolder(values, recipes: recipes, onto: folder.id)
+      model.dropFolder(values, recipes: recipes, onto: folder.id, history: history)
     }
   }
 

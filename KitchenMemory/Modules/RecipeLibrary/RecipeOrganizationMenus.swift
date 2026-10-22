@@ -8,27 +8,33 @@ import SwiftUI
 struct RecipeOrganizationMenus: View {
   @Bindable var model: RecipeOrganizationModel
   let recipeIDs: Set<Recipe.ID>
+  @Environment(\.organizationHistory) private var history
   @Environment(\.locale) private var locale
 
   var body: some View {
     if let snapshot = model.snapshot {
       if model.preferences.foldersEnabled {
         Menu(.organizationMove) {
-          Button(.organizationUnfiled) { model.move(recipeIDs, to: nil) }
+          Button(.organizationUnfiled) { Task { await model.move(recipeIDs, to: nil, history: history) } }
           ForEach(snapshot.folders.destinations(locale: locale)) { destination in
-            Button(destination.path) { model.move(recipeIDs, to: destination.id) }
+            Button(destination.path) { Task { await model.move(recipeIDs, to: destination.id, history: history) } }
           }
         }
+        .disabled(recipeIDs.count == 1 && history == nil)
       }
       if model.preferences.tagsEnabled {
         Menu(.organizationAddTag) {
           ForEach(snapshot.tags.orderedTags(locale: locale)) { tag in
-            Button(tag.displayName) { model.classify(recipeIDs, tagID: tag.id, adding: true) }
+            Button(tag.displayName) {
+              Task { await model.classify(recipeIDs, tagID: tag.id, adding: true, history: history) }
+            }
           }
         }
         Menu(.organizationRemoveTag) {
           ForEach(snapshot.tags.orderedTags(locale: locale)) { tag in
-            Button(tag.displayName) { model.classify(recipeIDs, tagID: tag.id, adding: false) }
+            Button(tag.displayName) {
+              Task { await model.classify(recipeIDs, tagID: tag.id, adding: false, history: history) }
+            }
           }
         }
       }

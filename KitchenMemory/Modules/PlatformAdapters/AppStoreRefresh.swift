@@ -30,6 +30,7 @@ func makePersistentStoreChangeObserver(
       sessionRepository: core.cookingSessionRepository,
       sessionModel: sessionModel
     )
+    core.organizationHistory.requestReconciliation()
     afterRefresh()
   }
 }

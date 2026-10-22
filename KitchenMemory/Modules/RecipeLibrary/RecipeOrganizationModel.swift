@@ -14,6 +14,7 @@ final class RecipeOrganizationModel {
   private let defaults: UserDefaults
   let preferences: any OrganizationPreferencesStoring
   private let prefix: String
+  @ObservationIgnored private var organizationChange: () -> Void = {}
   private(set) var snapshot: RecipeOrganization?
   private(set) var pending: RecipeOrganizationCommand?
   private(set) var storageInvalid = false
@@ -44,6 +45,9 @@ final class RecipeOrganizationModel {
     }
     refresh()
   }
+
+  func installOrganizationChangeHandler(_ handler: @escaping () -> Void) { organizationChange = handler }
+  func organizationDidChange() { organizationChange() }
 
   var collisionCount: Int { (snapshot?.folders.collisions.count ?? 0) + (snapshot?.tags.collisions.count ?? 0) }
   var requiresRecovery: Bool { snapshot == nil || storageInvalid || pending != nil || collisionCount > 0 }
@@ -101,6 +105,7 @@ final class RecipeOrganizationModel {
       failed = false
       changeRejected = false
       refresh()
+      organizationDidChange()
     } catch {
       changeRejected = error is FolderError || error is TagError
       failed = true
@@ -130,22 +135,26 @@ final class RecipeOrganizationModel {
     refresh()
   }
 
-  func dropFolder(_ values: [String], recipes: [StoredRecipe], onto folderID: Folder.ID) -> Bool {
+  func dropFolder(_ values: [String], recipes: [StoredRecipe], onto folderID: Folder.ID,
+                  history: OrganizationHistoryPresentation? = nil) -> Bool {
     if values.count == 1, let id = identifier(values[0], prefix: "km-folder:") {
       perform { try $0.prepare(folder: .move(id: Folder.ID(rawValue: id), parentID: folderID)) }
       return !failed
     }
-    return dropRecipes(values, recipes: recipes, to: folderID)
+    return dropRecipes(values, recipes: recipes, to: folderID, history: history)
   }
 
-  func dropTag(_ values: [String], recipes: [StoredRecipe], onto tagID: Tag.ID) -> Bool {
+  func dropTag(_ values: [String], recipes: [StoredRecipe], onto tagID: Tag.ID,
+               history: OrganizationHistoryPresentation? = nil) -> Bool {
+    guard !storageInvalid, pending == nil, snapshot != nil else { return false }
     if values.count == 1, snapshot?.tags.ordering == .manual, let id = identifier(values[0], prefix: "km-tag:") {
       perform { try $0.prepare(tag: .reorder(id: Tag.ID(rawValue: id), afterID: tagID)) }
       return !failed
     }
     guard let ids = recipeIDs(values, recipes: recipes) else { return false }
-    classify(ids, tagID: tagID, adding: true)
-    return !failed
+    guard let history else { failed = true; return false }
+    history.requestClassify(ids, tagID: tagID, adding: true)
+    return true
   }
 
   func clearForReset() {
@@ -163,8 +172,20 @@ final class RecipeOrganizationModel {
     perform { try $0.move(ids, to: folderID) }
   }
 
+  func move(_ ids: Set<Recipe.ID>, to folderID: Folder.ID?, history: OrganizationHistoryPresentation?) async {
+    guard !storageInvalid, pending == nil, snapshot != nil else { failed = true; return }
+    guard let history else { failed = true; return }
+    await history.move(ids, to: folderID)
+  }
+
   func classify(_ ids: Set<Recipe.ID>, tagID: Tag.ID, adding: Bool) {
     perform { try $0.classify(ids, tagID: tagID, adding: adding) }
+  }
+
+  func classify(_ ids: Set<Recipe.ID>, tagID: Tag.ID, adding: Bool,
+                history: OrganizationHistoryPresentation?) async {
+    guard !storageInvalid, pending == nil, snapshot != nil, let history else { failed = true; return }
+    await history.classify(ids, tagID: tagID, adding: adding)
   }
 
   func toggleTag(_ id: Tag.ID) {
@@ -183,9 +204,15 @@ final class RecipeOrganizationModel {
     return ids
   }
 
-  func dropRecipes(_ values: [String], recipes: [StoredRecipe], to folder: Folder.ID?) -> Bool {
-    guard let ids = recipeIDs(values, recipes: recipes) else { return false }
-    move(ids, to: folder)
-    return !failed
+  func dropRecipes(_ values: [String], recipes: [StoredRecipe], to folder: Folder.ID?,
+                   history: OrganizationHistoryPresentation? = nil) -> Bool {
+    guard !storageInvalid, pending == nil, snapshot != nil,
+          let ids = recipeIDs(values, recipes: recipes) else { return false }
+    if let history {
+      history.requestMove(ids, to: folder)
+      return true
+    }
+    failed = true
+    return false
   }
 }

@@ -19,6 +19,7 @@
 		D40000000000000000000003 /* Collections in Frameworks */ = {isa = PBXBuildFile; productRef = D40000000000000000000004 /* Collections */; };
 		E23600000000000000000001 /* UndoKit in Frameworks */ = {isa = PBXBuildFile; productRef = E23600000000000000000004 /* UndoKit */; };
 		E23600000000000000000002 /* UndoKit in Frameworks */ = {isa = PBXBuildFile; productRef = E23600000000000000000003 /* UndoKit */; };
+		E23700000000000000000001 /* UndoKit in Frameworks */ = {isa = PBXBuildFile; productRef = E23700000000000000000002 /* UndoKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -174,6 +175,7 @@
 		A1C9A4853042896F00F1F13D /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
+				E23700000000000000000001 /* UndoKit in Frameworks */,
 				A1C9A4893042896F00F1F13D /* KitchenKit.framework in Frameworks */,
 				D40000000000000000000003 /* Collections in Frameworks */,
 			);
@@ -349,6 +351,7 @@
 			);
 			name = KitchenKitTests;
 			packageProductDependencies = (
+				E23700000000000000000002 /* UndoKit */,
 				D40000000000000000000004 /* Collections */,
 			);
 			productName = KitchenKitTests;
@@ -2338,6 +2341,11 @@
 			productName = UndoKit;
 		};
 		E23600000000000000000004 /* UndoKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A11537F03086CA4400A44573 /* XCRemoteSwiftPackageReference "UndoKit" */;
+			productName = UndoKit;
+		};
+		E23700000000000000000002 /* UndoKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = A11537F03086CA4400A44573 /* XCRemoteSwiftPackageReference "UndoKit" */;
 			productName = UndoKit;

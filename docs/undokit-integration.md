@@ -1,4 +1,4 @@
-# UndoKit consumer qualification
+# UndoKit integration and consumer qualification
 
 <!--
 Kitchen Memory
@@ -6,12 +6,105 @@ Copyright © 2026 the Kitchen Memory contributors.
 SPDX-License-Identifier: MIT
 -->
 
-KitchenMemory [#236](https://github.com/ctwelve/KitchenMemory/issues/236) qualifies
+The historical consumer qualification in KitchenMemory [#236](https://github.com/ctwelve/KitchenMemory/issues/236) qualifies
 the independently maintained **UndoKit 0.2.2** source package at revision
-`9d04950fb314846e701890ac3095d28056820918`. It does not implement production Recipe
+`9d04950fb314846e701890ac3095d28056820918`. That qualification does not implement production Recipe
 undo or close the [delivery gate](https://github.com/ctwelve/KitchenMemory/issues/204).
 The [accepted policy](adr/0022-shared-durable-undo-framework.md) continues to own
 operation eligibility, lifecycle, scope and domain authority.
+
+## Production foundation: #237
+
+[#237](https://github.com/ctwelve/KitchenMemory/issues/237) adds durable Folder
+history for moving one saved Recipe, including a move to Unfiled. A placement
+no-op creates no history group or receipt. Tag changes are described in #239 below;
+this foundation does not close the app-wide #204 gate or
+expand [ADR 0022's accepted policy](adr/0022-shared-durable-undo-framework.md).
+
+KitchenKit owns the typed change, eligibility checks and compensation through
+`RecipeOrganizationHistory` and `RecipeOrganizationHistoryRepository`. The
+SwiftData adapter checks current Recipe, Folder and causal evidence inside the
+same transaction that accepts the assignment and its complete-token receipt.
+An exact retained receipt resolves an already accepted outcome before checking
+later interference; recovery does not replay an accepted action.
+
+### Persistence compatibility
+
+The current SwiftData schema remains **V7**. Existing organization action records
+carry two additive versioned namespaces: `organization-history-receipts-v1` and
+`organization-history-recoveries-v1`. Their version-1 payloads contain the full
+frozen delivery and outcome witness. The existing `organization-batches`
+`BatchReceipt` format and ordinary organization pending-command format remain
+unchanged. No existing schema declaration or receipt payload is repurposed.
+
+Each local UndoKit history database has a separate
+`History.sqlite.organization-pending.json` sidecar. Its version-1 envelope freezes
+the scope, token, member, command, effect and inverse intent before host delivery;
+it also retains a proved terminal inverse rejection. Retry uses that exact
+frozen delivery. Missing receipts remain unresolved unless rejection is durably
+proved. Recovering a rejected compensation uses the separate recovery receipt
+namespace and retires actionable history instead of inventing Redo. Explicitly
+discarding a proved rejected compensation retains current domain organization.
+These local history files do not replace the authoritative SwiftData receipts.
+
+### Scope and invalidation
+
+The app registry retains local history under Application Support's
+`RecipeOrganizationHistory`, scoped by owner, store, Kitchen and initiating logical
+scene. Scene disconnection closes presentation without disposing eligible history;
+explicit disposal writes a durable marker. Owner/store/Kitchen changes and reset
+retire the prior generation, with an invalidation-intent marker blocking restoration
+if the generation write fails.
+
+Eligibility uses Recipe membership/deletion/restoration evidence and relevant
+source/target Folder evidence. Interference conservatively clears the initiating
+scope's actionable history when any retained anchor is ineligible; it does not
+attempt to salvage unrelated groups within that scope. Domain acceptance repeats
+the checks even if the presentation previously reported Undo available.
+
+This section describes the working implementation, not completed #237 acceptance.
+The dated #236 results below remain historical qualification evidence and do not
+prove the production adapter, scene wiring or current test tree passed.
+
+## Atomic Folder selections: #238
+
+[#238](https://github.com/ctwelve/KitchenMemory/issues/238) routes selected Recipe
+moves and multi-Recipe drops through the same scene owner. One accepted action
+contains the sorted changed-member set, including each Recipe's original Folder
+or Unfiled placement. Unchanged members do not enter the group. Every member's
+eligibility is checked before one organization transaction accepts the complete
+batch and receipt; a stale member refuses the entire compensation.
+
+The history change codec reads #237's original singular shape unchanged. New
+multi-member changes use an explicit version-2 wrapper with sorted members;
+older readers lack the required singular fields and refuse that new shape.
+Unknown explicit versions are refused. The delivery's before/after witnesses
+carry the member-specific evidence needed to advance the shared scene timeline.
+The V7 schema, ordinary batch receipts and organization checkpoints remain
+unchanged. Native action names resolve to singular or plural according to the
+changed-member count. This remains local atomic acceptance; remote delivery can
+arrive incrementally.
+
+## Tag assignments: #239
+
+[#239](https://github.com/ctwelve/KitchenMemory/issues/239) uses the same initiating
+scene timeline for Add Tag and Remove Tag on one saved Recipe or a selection.
+Only changed members enter one atomic group. Add excludes existing membership;
+Remove freezes each observed assignment identity. Undo/Redo append fresh accepted
+compensation instead of reviving removed dots. Receipts retain the lineage from
+each logical assignment to its fresh replacements, so Undo of an older Add can
+follow its own replacement after Undo Remove without claiming other assignments.
+Known relevant external evidence, unavailable Recipes and changed/merged/deleted
+Tags refuse the entire group. A frozen removal never absorbs later assignments.
+
+New Tag commands/effects use an explicit version-3 Tag shape. The original
+singular Folder shape and sorted version-2 Folder batch shape remain readable;
+unknown explicit versions and malformed Tag members fail closed. Existing
+version-1 pending envelopes and accepted/recovery receipts carry this additive
+change shape unchanged. Receipt lookup precedes eligibility, including after
+accepted reply loss, and exact retry retains the original command identity.
+V7 declarations, legacy `BatchReceipt`, and organization checkpoints are unchanged.
+Tag creation, rename, merge and deletion remain outside undo eligibility.
 
 ## Supply route and ownership
 
@@ -46,7 +139,8 @@ meaning, guarded whole-group acceptance, inverse values and authoritative receip
 The demonstration atomically replaces one JSON file containing domain values and
 full-token receipts. That single-writer demonstration contract is not a new
 Recipe repository, persisted organization format or production receipt design.
-Real Folder and Tag compensation remains in #237–#239.
+The production Folder foundation is described above; Tag and bulk compensation
+are described separately in #238–#239 above.
 
 ## Public integration contract
 

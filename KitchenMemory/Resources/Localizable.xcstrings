@@ -1849,6 +1849,144 @@
       }
     }
   },
+  "organization.undo-move-recipes": {
+    "comment": "Saved Recipe organization undo: native action name for moving multiple Recipes.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": { "stringUnit": { "state": "translated", "value": "Move Recipes" } },
+      "en-GB": { "stringUnit": { "state": "translated", "value": "Move Recipes" } },
+      "es-MX": { "stringUnit": { "state": "translated", "value": "Mover recetas" } },
+      "fr-CA": { "stringUnit": { "state": "translated", "value": "Déplacer les recettes" } },
+      "de-DE": { "stringUnit": { "state": "translated", "value": "Rezepte verschieben" } },
+      "it-IT": { "stringUnit": { "state": "translated", "value": "Sposta ricette" } }
+    }
+  },
+  "organization.undo-move-recipe": {
+    "comment": "Saved Recipe organization undo: native action name or actionable recovery feedback.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Move Recipe"
+        }
+      },
+      "en-GB": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Move Recipe"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Mover receta"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Déplacer la recette"
+        }
+      },
+      "de-DE": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Rezept verschieben"
+        }
+      },
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Sposta ricetta"
+        }
+      }
+    }
+  },
+  "organization.undo-failure-message": {
+    "comment": "Saved Recipe organization undo: native action name or actionable recovery feedback.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The organization change could not be reversed. Try again to recover a retained change, or review the current Folder or Tags before making a new change."
+        }
+      },
+      "en-GB": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The organisation change could not be reversed. Try again to recover a retained change, or review the current Folder or Tags before making a new change."
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "No se pudo deshacer el cambio de organización. Reintenta recuperar un cambio conservado, o revisa la carpeta o las etiquetas actuales antes de hacer un cambio nuevo."
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "La modification d’organisation n’a pas pu être annulée. Réessayez pour récupérer une modification conservée, ou vérifiez le dossier ou les étiquettes actuels avant d’effectuer une nouvelle modification."
+        }
+      },
+      "de-DE": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Die Organisationsänderung konnte nicht rückgängig gemacht werden. Versuche erneut, eine aufbewahrte Änderung wiederherzustellen, oder prüfe den aktuellen Ordner und die Tags, bevor du eine neue Änderung vornimmst."
+        }
+      },
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Non è stato possibile annullare la modifica all’organizzazione. Riprova a recuperare una modifica conservata oppure controlla la cartella o i tag attuali prima di apportare una nuova modifica."
+        }
+      }
+    }
+  },
+  "organization.undo-unavailable-message": {
+    "comment": "Saved Recipe organization undo: native action name or actionable recovery feedback.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Undo history could not be opened. Try again before making this change."
+        }
+      },
+      "en-GB": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Undo history could not be opened. Try again before making this change."
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "No se pudo abrir el historial de deshacer. Reintenta antes de hacer este cambio."
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "L’historique d’annulation n’a pas pu être ouvert. Réessayez avant d’effectuer cette modification."
+        }
+      },
+      "de-DE": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Der Rückgängig-Verlauf konnte nicht geöffnet werden. Versuche es erneut, bevor du diese Änderung vornimmst."
+        }
+      },
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Non è stato possibile aprire la cronologia di annullamento. Riprova prima di apportare questa modifica."
+        }
+      }
+    }
+  },
   "organization.move": {
     "comment": "Recipe Library organization: Move to Folder. Folder location and Tag classification are independent of Recipe content.",
     "extractionState": "manual",

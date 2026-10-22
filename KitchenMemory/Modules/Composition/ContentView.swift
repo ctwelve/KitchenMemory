@@ -20,6 +20,8 @@ struct ContentView: View {
   let startupState: AppStartupState
   let retryStartup: () -> Void
   @Environment(\.locale) private var locale
+  @SceneStorage("recipeOrganization.logicalSceneID") private var logicalSceneID = UUID().uuidString
+  @State private var organizationHistory: OrganizationHistoryPresentation?
   @State private var activeSheet: ActiveRecipeSheet?
   @State private var columnVisibility = LibraryNavigationPolicy.initialVisibility
   @State private var preferredCompactColumn: NavigationSplitViewColumn = .content
@@ -33,7 +35,10 @@ struct ContentView: View {
   var body: some View {
     Group {
       if let dependencies = preparedApp {
-        persistentRecipeLibrary(dependencies)
+        OrganizationHistoryNativeHost(history: organizationHistory) {
+          persistentRecipeLibrary(dependencies)
+            .environment(\.organizationHistory, organizationHistory)
+        }
       } else {
         phaseContent
       }
@@ -45,6 +50,27 @@ struct ContentView: View {
       preparedApp?.libraryModel.loadIfNeeded()
       preparedApp?.sessionModel.loadIfNeeded()
     }
+    .task(id: preparedApp?.organizationHistory.generation) {
+      guard let registry = preparedApp?.organizationHistory,
+            let sceneID = UUID(uuidString: logicalSceneID) else { return }
+      let presentation = registry.presentation(for: sceneID)
+      organizationHistory = presentation
+      presentation.updateLocale(locale)
+      await presentation.open()
+    }
+    .onChange(of: locale) { _, locale in organizationHistory?.updateLocale(locale) }
+    .alert(.organizationFailed, isPresented: Binding(
+      get: { organizationHistory?.failed == true },
+      set: { organizationHistory?.failed = $0 }
+    )) {
+      Button(.actionTryAgain) { Task { await organizationHistory?.retry() } }
+      if organizationHistory?.canDiscardRejectedCompensation == true {
+        Button(.organizationDiscardRejected, role: .destructive) {
+          Task { await organizationHistory?.discardRejectedCompensation() }
+        }
+      }
+      Button(.actionCancel, role: .cancel) {}
+    } message: { Text(organizationHistory?.failureMessage ?? .organizationUndoUnavailableMessage) }
     .tint(Color("AccentColor"))
     .alert(.sessionIssueTitle, isPresented: sessionIssueIsPresented) {
       if preparedApp?.sessionModel.issue != .clipboard {
