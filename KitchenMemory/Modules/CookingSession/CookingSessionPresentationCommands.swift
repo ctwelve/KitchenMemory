@@ -120,12 +120,15 @@ extension CookingSessionPresentationModel {
 
   /// Consumes delivery results without minting replacement intention identities.
   func retryPendingCommands() {
+    guard !delivery.historyRecoveryUnavailable() else { present(.read); return }
+    if !delivery.pendingHistorySessions().isEmpty { delivery.retryRetainedHistory(); return }
     consume(delivery.retry())
   }
 }
 
 extension CookingSessionPresentationModel {
   func submitCommand(_ makeCommand: () throws -> PendingCookingSessionCommand?) -> Bool {
+    guard !delivery.historyRecoveryUnavailable() else { present(.read); return false }
     let report = delivery.submit {
       let command = try makeCommand()
       if let identity = command?.navigationIdentity {

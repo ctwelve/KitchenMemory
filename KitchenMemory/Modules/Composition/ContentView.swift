@@ -104,7 +104,7 @@ struct ContentView: View {
       dismissedDetachedDraftID = nil
     }
     .modifier(RecipeDraftFailureAlert(model: preparedApp?.libraryModel))
-    .alert(.historyNeedsAttention, isPresented: Binding(
+    .alert(.organizationFailed, isPresented: Binding(
       get: { preparedApp?.libraryModel.organization?.failed == true },
       set: { preparedApp?.libraryModel.organization?.failed = $0 }
     )) { Button(.actionCancel, role: .cancel) {} } message: { Text(.organizationFailureMessage) }

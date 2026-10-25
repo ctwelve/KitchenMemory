@@ -33,6 +33,14 @@ public final class RecipeOrganizationHistory {
   /// Session whose frozen change is still awaiting a conclusive result.
   public var pendingSessionID: CookingSession.ID? { host?.pending?.delivery.change.sessionProgress?.sessionID }
 
+  /// Discovers unresolved Session delivery before opening any scene. Unreadable
+  /// recovery evidence throws and must continue to block ordinary delivery.
+  public static func pendingSessionID(in scope: RecipeOrganizationHistoryScope, historyURL: URL)
+    throws -> CookingSession.ID? {
+    try OrganizationHistoryHost.readPending(at: historyURL.appendingPathExtension("organization-pending.json"),
+      scope: scope)?.delivery.change.sessionProgress?.sessionID
+  }
+
   /// Pending domain work temporarily withholds this scene's app history without deleting it.
   public var sessionDeliveryIsBlocked: Bool {
     guard let host, let generation = session?.snapshot.generation else { return false }
@@ -48,7 +56,11 @@ public final class RecipeOrganizationHistory {
     let operation = try HistoryOperation(operation: "kitchenmemory.recipe-organization", commandCodec: .json(),
       effectCodec: .json(), handler: host, fingerprint: { try OrganizationCoding.digest($0) }, metadata: { changes in
         let name: String
-        if changes.first?.sessionProgress != nil { name = "session-progress" } else if let tag = changes.first?.tagChange { name = tag.adding ? "add-tag" : "remove-tag" } else {
+        if changes.first?.sessionProgress != nil {
+          name = "session-progress"
+        } else if let tag = changes.first?.tagChange {
+          name = tag.adding ? "add-tag" : "remove-tag"
+        } else {
           let changedRecipeCount = changes.reduce(0) { $0 + $1.changedMembers.count }
           name = changedRecipeCount == 1 ? "move-recipe" : "move-recipes"
         }

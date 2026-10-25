@@ -102,15 +102,7 @@ extension SwiftDataRecipeOrganizationRepository: RecipeOrganizationHistoryReposi
         accepted = receipt
         return
       }
-      // A Session boundary retires the entire interleaved scene generation, even
-      // when its next native callback happens to compensate a Folder or Tag.
-      for receipt in receipts where receipt.delivery.scope == delivery.scope
-        && receipt.delivery.token.generation == delivery.token.generation {
-        if let progress = receipt.delivery.change.sessionProgress {
-          guard try sessionHistoryIsEligible(progress, scope: delivery.scope, token: delivery.token,
-            receipts: receipts, context: context) else { throw RecipeOrganizationHistoryError.ineligible }
-        }
-      }
+      try validateSessionHistoryGeneration(delivery, receipts: receipts, context: context)
       if delivery.change.sessionProgress != nil {
         accepted = try commitSessionHistory(delivery, recovery: recovery, receipts: receipts, context: context)
         return
@@ -146,6 +138,19 @@ extension SwiftDataRecipeOrganizationRepository: RecipeOrganizationHistoryReposi
     }
     guard let accepted else { throw RecipeOrganizationHistoryError.invalidEvidence }
     return accepted
+  }
+
+  private func validateSessionHistoryGeneration(_ delivery: RecipeOrganizationHistoryDelivery,
+                                               receipts: [RecipeOrganizationHistoryReceipt], context: ModelContext) throws {
+  // A Session boundary retires the entire interleaved scene generation, even
+  // when its next native callback happens to compensate a Folder or Tag.
+  for receipt in receipts where receipt.delivery.scope == delivery.scope
+    && receipt.delivery.token.generation == delivery.token.generation {
+    if let progress = receipt.delivery.change.sessionProgress {
+      guard try sessionHistoryIsEligible(progress, scope: delivery.scope, token: delivery.token,
+        receipts: receipts, context: context) else { throw RecipeOrganizationHistoryError.ineligible }
+    }
+  }
   }
 
   private func validateHistoryMembers(

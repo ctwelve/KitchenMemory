@@ -31,7 +31,11 @@ final class OrganizationHistoryPresentation {
   private(set) var canDiscardRejectedCompensation = false
   var failed = false
   private(set) var failureMessage: LocalizedStringResource = .organizationUndoUnavailableMessage
-  var nativeUndoManager: UndoManager? { available ? attachment?.undoManager : nil }
+  @ObservationIgnored private let withheldUndoManager = UndoManager()
+  var nativeUndoManager: UndoManager? {
+    guard available else { return nil }
+    return history.sessionDeliveryIsBlocked ? withheldUndoManager : attachment?.undoManager
+  }
 
   init(history: RecipeOrganizationHistory, organization: RecipeOrganizationModel,
        scope: RecipeOrganizationHistoryScope, historyURL: URL, available: Bool = true,

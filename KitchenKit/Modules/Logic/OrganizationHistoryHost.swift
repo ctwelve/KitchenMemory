@@ -32,12 +32,15 @@ final class OrganizationHistoryHost: MainActorHistoryOperationHandler, HistoryHo
   }
 
   func open(_ mode: HistoryOpenMode) async throws {
-    if FileManager.default.fileExists(atPath: pendingURL.path) {
-      let retained = try JSONDecoder().decode(Pending.self, from: Data(contentsOf: pendingURL))
-      guard retained.version == 1, retained.delivery.scope == scope,
-            retained.delivery.token.scope == scope.identity else { throw RecipeOrganizationHistoryError.invalidScope }
-      pending = retained
-    }
+    pending = try Self.readPending(at: pendingURL, scope: scope)
+  }
+
+  static func readPending(at url: URL, scope: RecipeOrganizationHistoryScope) throws -> Pending? {
+    guard FileManager.default.fileExists(atPath: url.path) else { return nil }
+    let retained = try JSONDecoder().decode(Pending.self, from: Data(contentsOf: url))
+    guard retained.version == 1, retained.delivery.scope == scope,
+          retained.delivery.token.scope == scope.identity else { throw RecipeOrganizationHistoryError.invalidScope }
+    return retained
   }
 
   func close() async throws {}
@@ -77,6 +80,29 @@ final class OrganizationHistoryHost: MainActorHistoryOperationHandler, HistoryHo
       inverse: pending.inverse, retainRejection: true)
   }
 
+  private func freeze(changes change: Effect, memberID: UUID, context: HistoryOperationContext,
+                      inverse: Bool) throws -> Pending {
+    if let pending {
+      guard pending.delivery.token == OrganizationHistoryToken(context.token),
+            pending.delivery.memberID == memberID, pending.delivery.change == change else {
+        throw RecipeOrganizationHistoryError.invalidEvidence
+      }
+      return pending
+    }
+    let delivery = try repository.prepareHistoryDelivery(change, memberID: memberID, token: context.token, in: scope)
+    let retained = Pending(version: 1, delivery: delivery, inverse: inverse, terminalRejected: false)
+    try FileManager.default.createDirectory(at: pendingURL.deletingLastPathComponent(), withIntermediateDirectories: true)
+    try OrganizationCoding.encode(retained).write(to: pendingURL, options: .atomic)
+    pending = retained
+    return retained
+  }
+
+  private func admitsSessionDelivery(_ change: Effect, token: HistoryToken) throws -> Bool {
+    var affected = try repository.historySessionIDs(in: scope, generation: token.generation)
+    if let sessionID = change.sessionProgress?.sessionID { affected.insert(sessionID) }
+    return affected.allSatisfy(sessionAdmission)
+  }
+
   private func recordRejection(inverse: Bool) -> HistoryTypedOutcome<Effect> {
     do {
       if inverse, var retained = pending {
@@ -96,24 +122,10 @@ final class OrganizationHistoryHost: MainActorHistoryOperationHandler, HistoryHo
         if pending?.delivery.token == OrganizationHistoryToken(context.token) { try clearPending() }
         return receipt.outcome
       }
-      let retained: Pending
-      if let pending {
-        guard pending.delivery.token == OrganizationHistoryToken(context.token),
-              pending.delivery.memberID == memberID, pending.delivery.change == change else { return .unresolved }
-        if pending.terminalRejected { return .rejected }
-        retained = pending
-      } else {
-        let delivery = try repository.prepareHistoryDelivery(
-          change, memberID: memberID, token: context.token, in: scope)
-        retained = Pending(version: 1, delivery: delivery, inverse: inverse, terminalRejected: false)
-        try FileManager.default.createDirectory(
-          at: pendingURL.deletingLastPathComponent(), withIntermediateDirectories: true)
-        try OrganizationCoding.encode(retained).write(to: pendingURL, options: .atomic)
-        pending = retained
-      }
-      var affected = try repository.historySessionIDs(in: scope, generation: context.token.generation)
-      if let sessionID = change.sessionProgress?.sessionID { affected.insert(sessionID) }
-      guard affected.allSatisfy(sessionAdmission) else { return .unresolved }
+      if pending == nil, try !admitsSessionDelivery(change, token: context.token) { return .rejected }
+      let retained = try freeze(changes: change, memberID: memberID, context: context, inverse: inverse)
+      if retained.terminalRejected { return .rejected }
+      guard try admitsSessionDelivery(change, token: context.token) else { return .unresolved }
       let receipt = try repository.acceptHistory(retained.delivery)
       try clearPending()
       return receipt.outcome

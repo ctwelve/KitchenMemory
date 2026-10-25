@@ -176,14 +176,14 @@ extension CookingSessionPresentationModel {
     persistSessionVisits()
   }
 
-  func reload() {
+  func reload(preservingNavigation: Bool = false) {
     do {
       let read = try service.history()
       let classified = SessionHistoryClassification(read.sessions)
       let finished = ordinaryFinishedSessions(in: read)
       historySessionIDsByRecipe = read.sessionIDsByRecipe
       sidebarSessionIDsByRecipe = read.sessionIDsByRecipe
-      apply(classified: classified, finished: finished)
+      apply(classified: classified, finished: finished, preservingNavigation: preservingNavigation)
       refreshRecipeHistory()
     } catch {
       present(.read)
@@ -212,7 +212,8 @@ extension CookingSessionPresentationModel {
 
   private func apply(
     classified: SessionHistoryClassification,
-    finished: [CookingSessionProjection]
+    finished: [CookingSessionProjection],
+    preservingNavigation: Bool = false
   ) {
     let finishedIDs = Set(finished.map(\.id))
     sessions = classified.ordinary.sorted(by: sessionOrder)
@@ -226,10 +227,10 @@ extension CookingSessionPresentationModel {
     recoverySessionCount = classified.recovery.count
     finishedSessionIDs = finishedIDs
     refreshDetachedEntryDraft()
-    if let currentSessionID, finishedIDs.contains(currentSessionID) {
+    if !preservingNavigation, let currentSessionID, finishedIDs.contains(currentSessionID) {
       navigation.move(to: .finished(currentSessionID, history: historyScope))
     }
-    if let observedFinishedSessionID, !finishedIDs.contains(observedFinishedSessionID) {
+    if !preservingNavigation, let observedFinishedSessionID, !finishedIDs.contains(observedFinishedSessionID) {
       dismissObservedFinishedSession()
     }
     if pendingCommands.isEmpty {

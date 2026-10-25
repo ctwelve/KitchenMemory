@@ -68,34 +68,15 @@ final class OrganizationHistoryRegistry {
     Self.active[ownershipKey] = WeakOrganizationHistoryRegistry(value: self)
   }
 
-  func installSessions(_ model: CookingSessionPresentationModel, repository: SwiftDataCookingSessionRepository) {
-    sessionModel = model
-    sessionRepository = repository
-    model.delivery.pendingHistorySessions = { [weak self] in
-      Set(self?.presentations.values.compactMap(\.pendingSessionID) ?? [])
-    }
-    model.delivery.didChange = { [weak self] in
-      self?.presentations.values.forEach { $0.refreshAvailability() }
-      self?.requestReconciliation()
-    }
-  }
-
-  private func refreshSessions() {
-    guard let sessionModel else { return }
-    let previous = sessionModel.sessions
-    sessionRepository?.refreshFromPersistentStore()
-    sessionModel.reload()
-    if previous != sessionModel.sessions { requestReconciliation() }
-  }
-
   func presentation(for sceneID: UUID) -> OrganizationHistoryPresentation {
     if let existing = presentations[sceneID] { return existing }
     let disposed = directory.appendingPathComponent(sceneID.uuidString + ".disposed")
     let value = OrganizationHistoryPresentation(
       history: RecipeOrganizationHistory(repository: repository, sessionAdmission: { [weak self] id in
         guard let self else { return false }
+        guard let pending = try? self.pendingSessionHistory() else { return false }
         return self.sessionModel?.pendingCommands.contains(where: { $0.sessionID == id }) != true
-          && !self.presentations.contains { $0.key != sceneID && $0.value.pendingSessionID == id }
+          && !pending.contains { $0.key != sceneID && $0.value == id }
       }), organization: organization,
       scope: RecipeOrganizationHistoryScope(ownerID: ownerID, storeID: storeID,
         kitchenID: kitchenID, logicalSceneID: sceneID),
@@ -218,6 +199,60 @@ final class OrganizationHistoryRegistry {
     return base.appendingPathComponent("RecipeOrganizationHistory", isDirectory: true)
       .appendingPathComponent(digest, isDirectory: true)
   }
+}
+
+extension OrganizationHistoryRegistry {
+  func installSessions(_ model: CookingSessionPresentationModel, repository: SwiftDataCookingSessionRepository) {
+    sessionModel = model
+    sessionRepository = repository
+    model.delivery.pendingHistorySessions = { [weak self] in
+      Set((try? self?.pendingSessionHistory().values.map { $0 }) ?? [])
+    }
+    model.delivery.historyRecoveryUnavailable = { [weak self] in
+      guard let self else { return true }
+      do { _ = try self.pendingSessionHistory(); return false } catch { return true }
+    }
+    model.delivery.retryRetainedHistory = { [weak self, weak model] in
+      Task {
+        guard let self, let model else { return }
+        do {
+          for sceneID in try self.pendingSessionHistory().keys {
+            await self.presentation(for: sceneID).retry()
+          }
+          if try self.pendingSessionHistory().isEmpty { model.retryPendingCommands() }
+        } catch { model.present(.read) }
+      }
+    }
+    model.delivery.didChange = { [weak self] in
+      self?.presentations.values.forEach { $0.refreshAvailability() }
+      self?.requestReconciliation()
+    }
+  }
+
+  /// Read durable barriers even when their owning scene has not been opened.
+  private func pendingSessionHistory() throws -> [UUID: CookingSession.ID] {
+    let root = directory.appendingPathComponent(generation.uuidString, isDirectory: true)
+    guard FileManager.default.fileExists(atPath: root.path) else { return [:] }
+    var result: [UUID: CookingSession.ID] = [:]
+    for scene in try FileManager.default.contentsOfDirectory(at: root, includingPropertiesForKeys: nil,
+                                                            options: .skipsHiddenFiles) {
+      guard let id = UUID(uuidString: scene.lastPathComponent) else { continue }
+      let scope = RecipeOrganizationHistoryScope(ownerID: ownerID, storeID: storeID,
+        kitchenID: kitchenID, logicalSceneID: id)
+      if let sessionID = try RecipeOrganizationHistory.pendingSessionID(in: scope,
+        historyURL: scene.appendingPathComponent("History.sqlite")) { result[id] = sessionID }
+    }
+    return result
+  }
+
+  private func refreshSessions() {
+    guard let sessionModel else { return }
+    let previous = sessionModel.sessions
+    sessionRepository?.refreshFromPersistentStore()
+    sessionModel.reload(preservingNavigation: true)
+    if previous != sessionModel.sessions { requestReconciliation() }
+  }
+
 }
 
 @MainActor

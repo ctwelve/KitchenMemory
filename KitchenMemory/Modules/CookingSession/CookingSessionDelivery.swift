@@ -22,12 +22,14 @@ final class CookingSessionDelivery {
   var historyInFlight = false
   @ObservationIgnored var pendingHistorySessions: () -> Set<CookingSession.ID> = { [] }
   @ObservationIgnored var didChange: () -> Void = {}
+  @ObservationIgnored var historyRecoveryUnavailable: () -> Bool = { false }
+  @ObservationIgnored var retryRetainedHistory: () -> Void = {}
 
   /// Serializes progress with the existing FIFO. The history host retains its
   /// frozen command in the durable sidecar before crossing domain acceptance.
   func submitHistoryProgress(_ progress: SessionProgress, sessionID: CookingSession.ID,
                              history: OrganizationHistoryPresentation, completion: @escaping (Bool) -> Void) -> Bool {
-    guard !historyInFlight, outbox.isEmpty, pendingHistorySessions().isEmpty else { return false }
+    guard !historyRecoveryUnavailable(), !historyInFlight, outbox.isEmpty, pendingHistorySessions().isEmpty else { return false }
     historyInFlight = true
     didChange()
     historyTask = Task {
@@ -89,7 +91,7 @@ final class CookingSessionDelivery {
   /// Prepare ordinary commands only after earlier work is retired. In
   /// particular, restore consent must observe the post-retry deletion frontier.
   func submit(_ makeCommand: () throws -> PendingCookingSessionCommand?) -> Report {
-    guard !historyInFlight, pendingHistorySessions().isEmpty else { return Report(requested: nil, events: []) }
+    guard !historyRecoveryUnavailable(), !historyInFlight, pendingHistorySessions().isEmpty else { return Report(requested: nil, events: []) }
     defer { didChange() }
     var events = retry()
     guard outbox.isEmpty else { return Report(requested: nil, events: events) }
@@ -108,7 +110,7 @@ final class CookingSessionDelivery {
   /// Progress and scale may queue behind activity for the same Session, but
   /// cannot overtake ordinary commands or activity for another Session.
   func submitIndependent(_ command: PendingCookingSessionCommand) -> Report {
-    guard !historyInFlight, !pendingHistorySessions().contains(command.sessionID) else {
+    guard !historyRecoveryUnavailable(), !historyInFlight, !pendingHistorySessions().contains(command.sessionID) else {
       return Report(requested: command, events: [])
     }
     defer { didChange() }
@@ -128,7 +130,7 @@ final class CookingSessionDelivery {
   /// it pending and stop later work from overtaking it. Returned events let
   /// presentation choose dialogs and navigation after delivery is resolved.
   func retry() -> [Event] {
-    guard !historyInFlight else { return [] }
+    guard !historyRecoveryUnavailable(), !historyInFlight else { return [] }
     defer { didChange() }
     var events: [Event] = []
     while let pending = outbox.head {

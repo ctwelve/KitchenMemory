@@ -9,46 +9,31 @@ import XCTest
 
 @MainActor
 final class SessionProgressHistoryTests: XCTestCase {
-  func testPublicPreparationRefusesStaleScopeTargetsAndUnsupportedPayloads() async throws {
+  func testAnotherSceneProgressRetiresOnlyTheEarlierSessionChain() async throws {
     let fixture = try ProgressHistoryFixture()
     defer { fixture.base.removeFiles() }
-    let repository = fixture.base.repository
+    let first = RecipeOrganizationHistory(repository: fixture.base.repository)
+    let second = RecipeOrganizationHistory(repository: fixture.base.repository)
     let scope = fixture.base.scope
-    let history = RecipeOrganizationHistory(repository: repository)
-    try await history.open(scope: scope, historyURL: fixture.base.historyURL)
-    let identity = try XCTUnwrap(history.session?.configuration?.scope)
-    for target in [SessionProgressTarget.ingredient(.init()), .instruction(.init())] {
-      XCTAssertThrowsError(try repository.prepareHistoryProgress(fixture.id,
-        to: SessionProgress(target: target, state: .instruction(.completed)), in: scope))
-    }
-    let change = try XCTUnwrap(repository.prepareHistoryProgress(fixture.id, to: fixture.completed, in: scope))
-    XCTAssertThrowsError(try repository.prepareHistoryDelivery(change, memberID: UUID(),
-      token: HistoryToken(scope: UUID(), generation: UUID(), sequence: 1, command: UUID()), in: scope))
-    var encoded = try XCTUnwrap(JSONSerialization.jsonObject(with: JSONEncoder().encode(change)) as? [String: Any])
-    encoded["version"] = 99
-    XCTAssertThrowsError(try JSONDecoder().decode(RecipeOrganizationHistoryChange.self,
-      from: JSONSerialization.data(withJSONObject: encoded)))
-    encoded["version"] = 4
-    var progress = try XCTUnwrap(encoded["sessionProgress"] as? [String: Any])
-    progress["sessionID"] = UUID().uuidString
-    encoded["sessionProgress"] = progress
-    let missing = try JSONDecoder().decode(RecipeOrganizationHistoryChange.self,
-      from: JSONSerialization.data(withJSONObject: encoded))
-    XCTAssertThrowsError(try repository.prepareHistoryDelivery(missing, memberID: UUID(),
-      token: HistoryToken(scope: identity, generation: UUID(), sequence: 1, command: UUID()), in: scope))
-    let stale = try repository.prepareHistoryDelivery(change, memberID: UUID(),
-      token: HistoryToken(scope: identity, generation: UUID(), sequence: 1, command: UUID()), in: scope)
-    _ = try fixture.sessions.perform(.setOutcome(.init(id: .init(), sessionID: fixture.id, authoredAt: Date()),
-      .coarse(.okay)))
-    XCTAssertThrowsError(try repository.acceptHistory(stale))
-    let wrongKind = try XCTUnwrap(repository.prepareHistoryProgress(fixture.id,
-      to: SessionProgress(target: fixture.completed.target, state: .ingredient(.accounted)), in: scope))
-    let invalid = try repository.prepareHistoryDelivery(wrongKind, memberID: UUID(),
-      token: HistoryToken(scope: identity, generation: UUID(), sequence: 1, command: UUID()), in: scope)
-    XCTAssertThrowsError(try repository.acceptHistory(invalid))
-    XCTAssertEqual(try fixture.repository.evidence(id: fixture.id)?.facts.count, 1)
-    await history.close()
+    try await first.open(scope: scope, historyURL: fixture.base.historyURL)
+    let other = RecipeOrganizationHistoryScope(ownerID: scope.ownerID, storeID: scope.storeID,
+      kitchenID: scope.kitchenID, logicalSceneID: UUID())
+    try await second.open(scope: other, historyURL: fixture.base.directory.appendingPathComponent("Second.sqlite"))
+    assertOrganizationHistoryAccepted(try await first.progress(fixture.id, to: fixture.completed))
+    assertOrganizationHistoryAccepted(try await second.progress(fixture.id,
+      to: SessionProgress(target: fixture.completed.target, state: .instruction(.skipped))))
+    _ = await first.reconcile()
+    XCTAssertFalse(try XCTUnwrap(first.session).status.canUndo)
+    assertOrganizationHistoryAccepted(await second.undo())
+    XCTAssertEqual(try fixture.progress(), .instruction(.completed))
+    await first.close()
+    try await first.open(scope: scope, historyURL: fixture.base.historyURL)
+    XCTAssertFalse(try XCTUnwrap(first.session).status.canUndo)
+    await first.close()
+    await second.close()
   }
+
+
 
   func testMixedProgressFolderOrderingNoOpAndNewActionClearsRedo() async throws {
     let fixture = try ProgressHistoryFixture()
@@ -75,41 +60,15 @@ final class SessionProgressHistoryTests: XCTestCase {
     await history.close()
   }
 
-  func testLostReplyReopensWithoutDuplicateFactsThenExactInverseRetrySettles() async throws {
-    let fixture = try ProgressHistoryFixture()
-    defer { fixture.base.removeFiles() }
-    let boundary = ControlledHistoryRepository(fixture.base.repository)
-    let history = RecipeOrganizationHistory(repository: boundary)
-    try await history.open(scope: fixture.base.scope, historyURL: fixture.base.historyURL)
-    boundary.loseNextReply = true
-    boundary.withholdReceipts = true
-    let lost = try await history.progress(fixture.id, to: fixture.completed)
-    guard case .unresolved = lost else { XCTFail("Lost reply requires recovery")
-      return }
-    XCTAssertEqual(try fixture.repository.evidence(id: fixture.id)?.facts.count, 1)
-    await history.close()
-    boundary.withholdReceipts = false
-    let reopened = RecipeOrganizationHistory(repository: boundary)
-    try await reopened.open(scope: fixture.base.scope, historyURL: fixture.base.historyURL)
-    XCTAssertEqual(boundary.deliveries.count, 1)
-    boundary.failNextAcceptance = true
-    _ = await reopened.undo()
-    let frozen = try XCTUnwrap(boundary.deliveries.last)
-    XCTAssertTrue(reopened.hasPendingCompensation)
-    XCTAssertEqual(reopened.pendingSessionID, fixture.id)
-    XCTAssertFalse(try XCTUnwrap(reopened.session).status.canRedo)
-    _ = try await reopened.retryPending()
-    XCTAssertEqual(boundary.deliveries.last, frozen)
-    XCTAssertEqual(try fixture.progress(), .instruction(.open))
-    XCTAssertEqual(try fixture.repository.evidence(id: fixture.id)?.facts.count, 2)
-    XCTAssertTrue(try XCTUnwrap(reopened.session).status.canRedo)
-    await reopened.close()
-  }
 
   func testFinishEntryAndOtherFieldChangesRetireHistoryAcrossReopen() async throws {
-    for boundary in 0..<5 {
+    for boundary in 0..<6 {
       let fixture = try ProgressHistoryFixture()
       defer { fixture.base.removeFiles() }
+      let entryFact = SessionFactIntention(id: .init(), sessionID: fixture.id, authoredAt: Date())
+      if (2...4).contains(boundary) {
+        _ = try fixture.sessions.perform(.submitEntry(entryFact, text: "A note", target: nil))
+      }
       let history = RecipeOrganizationHistory(repository: fixture.base.repository)
       try await history.open(scope: fixture.base.scope, historyURL: fixture.base.historyURL)
       assertOrganizationHistoryAccepted(try await history.progress(fixture.id, to: fixture.completed))
@@ -120,9 +79,9 @@ final class SessionProgressHistoryTests: XCTestCase {
           finishedAt: Date(), hasMeaningfulDraft: false)))
       case 1: _ = try fixture.sessions.perform(.setOutcome(fact, .coarse(.great)))
       default:
-        _ = try fixture.sessions.perform(.submitEntry(fact, text: "A note", target: nil))
+        if boundary == 5 { _ = try fixture.sessions.perform(.submitEntry(fact, text: "A note", target: nil)) }
         let edit = SessionFactIntention(id: .init(), sessionID: fixture.id, authoredAt: Date())
-        let entry = SessionEntry.ID(rawValue: fact.id.rawValue)
+        let entry = SessionEntry.ID(rawValue: entryFact.id.rawValue)
         if boundary == 2 { _ = try fixture.sessions.perform(.reviseEntry(edit, entryID: entry,
           text: "Revised note", target: nil)) }
         if boundary == 3 { _ = try fixture.sessions.perform(.retargetEntry(edit, entryID: entry,

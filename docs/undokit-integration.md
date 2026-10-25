@@ -122,7 +122,10 @@ The existing ordered Session delivery owner admits progress only after its FIFO
 settles. The history sidecar freezes the progress delivery before domain writes;
 it is the recovery owner for that history operation, rather than a second copy
 of the intention in UserDefaults. Pending history prevents later Session work
-from overtaking it. Normal Entry delivery retains its original acceptance and
+from overtaking it. Registry startup and delivery inspect durable sidecars for
+unopened and disconnected scenes; unreadable evidence remains a delivery barrier.
+A late native callback checks admission before freezing a new compensation, so
+it cannot deadlock the earlier ordinary retry owner. Normal Entry delivery retains its original acceptance and
 newer-draft rules. Native history availability also consults unresolved Session
 work; final delivery repeats this admission check.
 

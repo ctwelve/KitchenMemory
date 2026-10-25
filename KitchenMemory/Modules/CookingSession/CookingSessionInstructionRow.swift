@@ -69,7 +69,9 @@ struct CookingSessionInstructionRow: View {
             .frame(minHeight: 44)
           Spacer()
           if state == .open {
-            Button(.sessionProgressInstructionSkip) { model.setInstruction(instruction.id, to: .skipped, history: history) }
+            Button(.sessionProgressInstructionSkip) {
+              model.setInstruction(instruction.id, to: .skipped, history: history)
+            }
               .disabled(session.lifecycle != .active || model.delivery.historyInFlight)
               .frame(minHeight: 44)
           }
