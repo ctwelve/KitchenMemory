@@ -55,6 +55,7 @@ struct PreparedApp {
       store: sessionPresentationStore,
       navigation: core.libraryModel.navigation
     )
+    core.organizationHistory.installSessions(sessionModel, repository: core.cookingSessionRepository)
     let sessionRepository = core.cookingSessionRepository
     core.libraryModel.installResetPresentationHandler {
       sessionRepository.refreshFromPersistentStore()

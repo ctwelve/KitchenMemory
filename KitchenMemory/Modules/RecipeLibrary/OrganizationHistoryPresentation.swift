@@ -17,6 +17,8 @@ final class OrganizationHistoryPresentation {
   private let historyURL: URL
   private let dispose: () -> Void
   private let recordSession: (String) -> Void
+  private let refreshSessions: () -> Void
+  var pendingSessionID: CookingSession.ID? { history.pendingSessionID }
   private var locale = Locale.current
   private var available: Bool
   private var opening = false
@@ -29,11 +31,16 @@ final class OrganizationHistoryPresentation {
   private(set) var canDiscardRejectedCompensation = false
   var failed = false
   private(set) var failureMessage: LocalizedStringResource = .organizationUndoUnavailableMessage
-  var nativeUndoManager: UndoManager? { available ? attachment?.undoManager : nil }
+  @ObservationIgnored private let withheldUndoManager = UndoManager()
+  var nativeUndoManager: UndoManager? {
+    guard available else { return nil }
+    return history.sessionDeliveryIsBlocked ? withheldUndoManager : attachment?.undoManager
+  }
 
   init(history: RecipeOrganizationHistory, organization: RecipeOrganizationModel,
        scope: RecipeOrganizationHistoryScope, historyURL: URL, available: Bool = true,
-       dispose: @escaping () -> Void = {}, recordSession: @escaping (String) -> Void = { _ in }) {
+       dispose: @escaping () -> Void = {}, recordSession: @escaping (String) -> Void = { _ in },
+       refreshSessions: @escaping () -> Void = {}) {
     self.history = history
     self.organization = organization
     self.scope = scope
@@ -41,6 +48,7 @@ final class OrganizationHistoryPresentation {
     self.available = available
     self.dispose = dispose
     self.recordSession = recordSession
+    self.refreshSessions = refreshSessions
   }
 
   func open() async {
@@ -71,6 +79,9 @@ final class OrganizationHistoryPresentation {
     history.session?.setNativeActionNameResolver { [weak self] payload in
       guard payload.family == RecipeOrganizationHistory.actionPresentationFamily,
             payload.version == 1 else { return nil }
+      if payload.data == Data("session-progress".utf8) {
+        return LocalizedStringResource.sessionUndoProgress.localized(for: self?.locale ?? .current)
+      }
       if payload.data == Data("move-recipe".utf8) {
         return LocalizedStringResource.organizationUndoMoveRecipe.localized(for: self?.locale ?? .current)
       }
@@ -85,6 +96,25 @@ final class OrganizationHistoryPresentation {
       }
       return nil
     }
+  }
+
+  func progress(_ sessionID: CookingSession.ID, to progress: SessionProgress) async -> Bool {
+    await open()
+    guard available, ready, !busy else { failed = true; return false }
+    busy = true
+    defer { busy = false; refresh() }
+    do {
+      let result = try await history.progress(sessionID, to: progress)
+      receive(result)
+      if case .accepted = result { return true }
+    } catch { failed = true; failureMessage = .historyUndoFailureMessage }
+    return false
+  }
+
+  func refreshAvailability() {
+    attachment?.isAvailable = available && !history.sessionDeliveryIsBlocked
+    canUndo = ready && !history.sessionDeliveryIsBlocked && history.session?.status.canUndo == true
+    canRedo = ready && !history.sessionDeliveryIsBlocked && history.session?.status.canRedo == true
   }
 
   func requestMove(_ ids: Set<Recipe.ID>, to folder: Folder.ID?) {
@@ -110,7 +140,7 @@ final class OrganizationHistoryPresentation {
     defer { busy = false; refresh() }
     do { receive(try await history.classify(ids, tagID: tagID, adding: adding)) } catch {
       failed = true
-      failureMessage = .organizationUndoFailureMessage
+      failureMessage = .historyUndoFailureMessage
     }
   }
 
@@ -123,7 +153,7 @@ final class OrganizationHistoryPresentation {
     defer { busy = false; refresh() }
     do { receive(try await history.move(ids, to: folder)) } catch {
       failed = true
-      failureMessage = .organizationUndoFailureMessage
+      failureMessage = .historyUndoFailureMessage
     }
   }
 
@@ -207,19 +237,19 @@ final class OrganizationHistoryPresentation {
   }
 
   func refresh() {
+    refreshSessions()
     let previous = organization.snapshot
     organization.refresh()
     if previous != organization.snapshot { organization.organizationDidChange() }
     ready = available && history.session?.status.phase == .ready
-    canUndo = ready && history.session?.status.canUndo == true
-    canRedo = ready && history.session?.status.canRedo == true
+    refreshAvailability()
     canDiscardRejectedCompensation = available && history.canDiscardRejectedCompensation
     if history.hasPendingCompensation {
       failed = true
-      failureMessage = .organizationUndoFailureMessage
+      failureMessage = .historyUndoFailureMessage
     } else if history.session?.status.issue != nil {
       failed = true
-      failureMessage = ready ? .organizationUndoFailureMessage : .organizationUndoUnavailableMessage
+      failureMessage = ready ? .historyUndoFailureMessage : .organizationUndoUnavailableMessage
     }
   }
 
@@ -228,7 +258,7 @@ final class OrganizationHistoryPresentation {
     case .accepted, .rejected: break
     case .failed, .unexecuted, .unresolved:
       failed = true
-      failureMessage = .organizationUndoFailureMessage
+      failureMessage = .historyUndoFailureMessage
     }
   }
 }

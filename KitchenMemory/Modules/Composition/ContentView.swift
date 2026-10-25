@@ -59,7 +59,7 @@ struct ContentView: View {
       await presentation.open()
     }
     .onChange(of: locale) { _, locale in organizationHistory?.updateLocale(locale) }
-    .alert(.organizationFailed, isPresented: Binding(
+    .alert(.historyNeedsAttention, isPresented: Binding(
       get: { organizationHistory?.failed == true },
       set: { organizationHistory?.failed = $0 }
     )) {
@@ -75,6 +75,11 @@ struct ContentView: View {
     .alert(.sessionIssueTitle, isPresented: sessionIssueIsPresented) {
       if preparedApp?.sessionModel.issue != .clipboard {
         Button(.actionTryAgain) { preparedApp?.sessionModel.retryCurrentIssue() }
+      }
+      if preparedApp?.sessionModel.delivery.canDiscardRetainedHistory == true {
+        Button(.organizationDiscardRejected, role: .destructive) {
+          preparedApp?.sessionModel.delivery.discardRetainedHistory()
+        }
       }
       Button(.actionCancel, role: .cancel) {}
     } message: {

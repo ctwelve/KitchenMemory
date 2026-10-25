@@ -19,23 +19,48 @@ public final class RecipeOrganizationHistory {
 
   private let repository: any RecipeOrganizationHistoryRepository
   private let sessions: HistorySessions
+  private let sessionAdmission: (CookingSession.ID) -> Bool
   private var host: OrganizationHistoryHost?
   private var operation: HistoryOperation<RecipeOrganizationHistoryChange>?
 
-  public init(repository: any RecipeOrganizationHistoryRepository, sessions: HistorySessions = HistorySessions()) {
+  public init(repository: any RecipeOrganizationHistoryRepository, sessions: HistorySessions = HistorySessions(),
+              sessionAdmission: @escaping (CookingSession.ID) -> Bool = { _ in true }) {
     self.repository = repository
     self.sessions = sessions
+    self.sessionAdmission = sessionAdmission
+  }
+
+  /// Session whose frozen change is still awaiting a conclusive result.
+  public var pendingSessionID: CookingSession.ID? { host?.pending?.delivery.change.sessionProgress?.sessionID }
+
+  /// Discovers unresolved Session delivery before opening any scene. Unreadable
+  /// recovery evidence throws and must continue to block ordinary delivery.
+  public static func pendingSessionID(in scope: RecipeOrganizationHistoryScope, historyURL: URL)
+    throws -> CookingSession.ID? {
+    try OrganizationHistoryHost.readPending(at: historyURL.appendingPathExtension("organization-pending.json"),
+      scope: scope)?.delivery.change.sessionProgress?.sessionID
+  }
+
+  /// Pending domain work temporarily withholds this scene's app history without deleting it.
+  public var sessionDeliveryIsBlocked: Bool {
+    guard let host, let generation = session?.snapshot.generation else { return false }
+    guard let ids = try? repository.historySessionIDs(in: host.scope, generation: generation) else { return true }
+    return ids.contains { !sessionAdmission($0) }
   }
 
   /// Opens existing history without replay; missing existing local evidence is never replaced.
   public func open(scope: RecipeOrganizationHistoryScope, historyURL: URL) async throws {
     guard session == nil else { throw RecipeOrganizationHistoryError.invalidScope }
     let host = OrganizationHistoryHost(repository: repository, scope: scope,
-      pendingURL: historyURL.appendingPathExtension("organization-pending.json"))
+      pendingURL: historyURL.appendingPathExtension("organization-pending.json"), sessionAdmission: sessionAdmission)
     let operation = try HistoryOperation(operation: "kitchenmemory.recipe-organization", commandCodec: .json(),
       effectCodec: .json(), handler: host, fingerprint: { try OrganizationCoding.digest($0) }, metadata: { changes in
         let name: String
-        if let tag = changes.first?.tagChange { name = tag.adding ? "add-tag" : "remove-tag" } else {
+        if changes.first?.sessionProgress != nil {
+          name = "session-progress"
+        } else if let tag = changes.first?.tagChange {
+          name = tag.adding ? "add-tag" : "remove-tag"
+        } else {
           let changedRecipeCount = changes.reduce(0) { $0 + $1.changedMembers.count }
           name = changedRecipeCount == 1 ? "move-recipe" : "move-recipes"
         }
@@ -62,7 +87,7 @@ public final class RecipeOrganizationHistory {
   public func move(_ recipeIDs: Set<Recipe.ID>, to folderID: Folder.ID?) async throws -> HistorySubmissionResult {
     guard let session, let host, let operation else { throw RecipeOrganizationHistoryError.notOpen }
     _ = try await invalidateInterference()
-    guard host.pending == nil else { throw RecipeOrganizationHistoryError.ineligible }
+    guard host.pending == nil, !sessionDeliveryIsBlocked else { throw RecipeOrganizationHistoryError.ineligible }
     guard let change = try repository.prepareHistoryMove(recipeIDs, to: folderID, in: host.scope)
     else { return .rejected }
     return await (try session.commands(for: operation)).submit(change)
@@ -73,19 +98,31 @@ public final class RecipeOrganizationHistory {
     async throws -> HistorySubmissionResult {
     guard let session, let host, let operation else { throw RecipeOrganizationHistoryError.notOpen }
     _ = try await invalidateInterference()
-    guard host.pending == nil else { throw RecipeOrganizationHistoryError.ineligible }
+    guard host.pending == nil, !sessionDeliveryIsBlocked else { throw RecipeOrganizationHistoryError.ineligible }
     guard let change = try repository.prepareHistoryTags(recipeIDs, tagID: tagID, adding: adding, in: host.scope)
     else { return .rejected }
     return await (try session.commands(for: operation)).submit(change)
   }
 
+  /// Records one accepted resulting progress state in the initiating scene's timeline.
+  public func progress(_ sessionID: CookingSession.ID, to progress: SessionProgress)
+    async throws -> HistorySubmissionResult {
+    guard let session, let host, let operation else { throw RecipeOrganizationHistoryError.notOpen }
+    _ = try await invalidateInterference()
+    guard host.pending == nil, !sessionDeliveryIsBlocked else { throw RecipeOrganizationHistoryError.ineligible }
+    guard sessionAdmission(sessionID) else { throw RecipeOrganizationHistoryError.ineligible }
+    guard let change = try repository.prepareHistoryProgress(sessionID, to: progress, in: host.scope)
+    else { return .rejected }
+    return await (try session.commands(for: operation)).submit(change)
+  }
+
   public func undo() async -> HistorySubmissionResult {
-    guard let session else { return .rejected }
+    guard let session, !sessionDeliveryIsBlocked else { return .rejected }
     return await session.undo()
   }
 
   public func redo() async -> HistorySubmissionResult {
-    guard let session else { return .rejected }
+    guard let session, !sessionDeliveryIsBlocked else { return .rejected }
     return await session.redo()
   }
 

@@ -10,6 +10,7 @@ struct CookingSessionIngredientList: View {
   let model: CookingSessionPresentationModel
   let session: CookingSessionProjection
   @Environment(\.locale) private var locale
+  @Environment(\.organizationHistory) private var history
 
   var body: some View {
     CookingSessionCard(title: .sessionProgressIngredients, symbol: "carrot") {
@@ -36,7 +37,7 @@ struct CookingSessionIngredientList: View {
     let isAccounted = state == .accounted
     return HStack(alignment: .top, spacing: 12) {
       Button {
-        model.setIngredient(ingredient.id, to: isAccounted ? .open : .accounted)
+        model.setIngredient(ingredient.id, to: isAccounted ? .open : .accounted, history: history)
       } label: {
         Image(systemName: isAccounted ? "checkmark.circle.fill" : "circle")
           .font(.title2)
@@ -45,7 +46,7 @@ struct CookingSessionIngredientList: View {
           .contentShape(.rect)
       }
       .buttonStyle(.plain)
-      .disabled(session.lifecycle != .active)
+      .disabled(session.lifecycle != .active || model.delivery.historyInFlight)
       .accessibilityLabel(RecipePresentationFormatter(locale: locale).ingredient(
         cookingSessionIngredientValue(ingredient, in: session)))
       .accessibilityValue(Text(isAccounted

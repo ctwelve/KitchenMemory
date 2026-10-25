@@ -6,6 +6,7 @@ import CryptoKit
 import Foundation
 import KitchenKit
 import Observation
+import UndoKit
 
 /// Owns durable scene identities independently from their current native presentations.
 @MainActor
@@ -25,6 +26,9 @@ final class OrganizationHistoryRegistry {
   private(set) var generation: UUID
   private var presentations: [UUID: OrganizationHistoryPresentation] = [:]
   private var unavailable = false
+  private weak var sessionModel: CookingSessionPresentationModel?
+  private var sessionRepository: SwiftDataCookingSessionRepository?
+  private var rejectedSessionScenes: Set<UUID> = []
 
   init(repository: any RecipeOrganizationHistoryRepository, organization: RecipeOrganizationModel,
        ownerID: KitchenOwner.ID, storeID: String, kitchenID: Kitchen.ID, directory: URL) throws {
@@ -70,14 +74,20 @@ final class OrganizationHistoryRegistry {
     if let existing = presentations[sceneID] { return existing }
     let disposed = directory.appendingPathComponent(sceneID.uuidString + ".disposed")
     let value = OrganizationHistoryPresentation(
-      history: RecipeOrganizationHistory(repository: repository), organization: organization,
+      history: RecipeOrganizationHistory(repository: repository, sessionAdmission: { [weak self] id in
+        guard let self else { return false }
+        guard let pending = try? self.pendingSessionHistory() else { return false }
+        return self.sessionModel?.pendingCommands.contains(where: { $0.sessionID == id }) != true
+          && !pending.contains { $0.key != sceneID && $0.value == id }
+      }), organization: organization,
       scope: RecipeOrganizationHistoryScope(ownerID: ownerID, storeID: storeID,
         kitchenID: kitchenID, logicalSceneID: sceneID),
       historyURL: directory.appendingPathComponent(generation.uuidString, isDirectory: true)
         .appendingPathComponent(sceneID.uuidString, isDirectory: true).appendingPathComponent("History.sqlite"),
       available: !unavailable && !FileManager.default.fileExists(atPath: disposed.path),
       dispose: { [weak self] in self?.dispose(sceneID) },
-      recordSession: { [weak self] sessionID in self?.recordSession(sessionID, for: sceneID) })
+      recordSession: { [weak self] sessionID in self?.recordSession(sessionID, for: sceneID) },
+      refreshSessions: { [weak self] in self?.refreshSessions() })
     presentations[sceneID] = value
     return value
   }
@@ -191,6 +201,97 @@ final class OrganizationHistoryRegistry {
     return base.appendingPathComponent("RecipeOrganizationHistory", isDirectory: true)
       .appendingPathComponent(digest, isDirectory: true)
   }
+}
+
+extension OrganizationHistoryRegistry {
+  func installSessions(_ model: CookingSessionPresentationModel, repository: SwiftDataCookingSessionRepository) {
+    sessionModel = model
+    sessionRepository = repository
+    model.delivery.pendingHistorySessions = { [weak self] in
+      guard let self, let pending = try? self.pendingSessionHistory() else { return [] }
+      return Set(pending.values)
+    }
+    model.delivery.historyRecoveryUnavailable = { [weak self] in
+      guard let self else { return true }
+      do { _ = try self.pendingSessionHistory(); return false } catch { return true }
+    }
+    model.delivery.retryRetainedHistory = { [weak self] in
+      Task { await self?.recoverRetainedSessionHistory() }
+    }
+    model.delivery.discardRetainedHistory = { [weak self] in
+      Task { await self?.recoverRetainedSessionHistory(discardRejected: true) }
+    }
+    model.delivery.didChange = { [weak self] in
+      self?.presentations.values.forEach { $0.refreshAvailability() }
+      self?.requestReconciliation()
+    }
+  }
+
+  /// Recovery is independent of presentation availability; disposal never revives Undo.
+  func recoverRetainedSessionHistory(discardRejected: Bool = false) async {
+    do {
+      let sceneIDs = discardRejected ? rejectedSessionScenes : Set(try pendingSessionHistory().keys)
+      for sceneID in sceneIDs { try await recoverScene(sceneID, discardRejected: discardRejected) }
+      refreshSessions()
+      if try pendingSessionHistory().isEmpty { sessionModel?.retryPendingCommands() }
+    } catch { sessionModel?.present(.read) }
+    sessionModel?.delivery.canDiscardRetainedHistory = !rejectedSessionScenes.isEmpty
+  }
+
+  private func recoverScene(_ sceneID: UUID, discardRejected: Bool) async throws {
+    await presentations[sceneID]?.disconnect()
+    let history = RecipeOrganizationHistory(repository: repository)
+    let scope = RecipeOrganizationHistoryScope(ownerID: ownerID, storeID: storeID,
+      kitchenID: kitchenID, logicalSceneID: sceneID)
+    let url = directory.appendingPathComponent(generation.uuidString).appendingPathComponent(sceneID.uuidString)
+      .appendingPathComponent("History.sqlite")
+    do {
+      try await history.open(scope: scope, historyURL: url)
+      if discardRejected { try await history.discardRejectedCompensation() } else {
+        _ = try await history.retryPending()
+        _ = await history.reconcile()
+      }
+      if history.canDiscardRejectedCompensation { rejectedSessionScenes.insert(sceneID) } else {
+        rejectedSessionScenes.remove(sceneID)
+      }
+      let disposed = directory.appendingPathComponent(sceneID.uuidString + ".disposed")
+      if history.pendingSessionID == nil, FileManager.default.fileExists(atPath: disposed.path) {
+        _ = try history.session?.advanced.clearHistory(adopting:
+          HistoryPayload(family: "kitchenmemory.recipe-organization.baseline", data: Data("disposed".utf8)))
+      }
+      await history.close()
+      if !FileManager.default.fileExists(atPath: disposed.path) { await presentations[sceneID]?.open() }
+    } catch {
+      if history.canDiscardRejectedCompensation { rejectedSessionScenes.insert(sceneID) }
+      await history.close()
+      throw error
+    }
+  }
+
+  /// Read durable barriers even when their owning scene has not been opened.
+  private func pendingSessionHistory() throws -> [UUID: CookingSession.ID] {
+    let root = directory.appendingPathComponent(generation.uuidString, isDirectory: true)
+    guard FileManager.default.fileExists(atPath: root.path) else { return [:] }
+    var result: [UUID: CookingSession.ID] = [:]
+    for scene in try FileManager.default.contentsOfDirectory(at: root, includingPropertiesForKeys: nil,
+                                                            options: .skipsHiddenFiles) {
+      guard let id = UUID(uuidString: scene.lastPathComponent) else { continue }
+      let scope = RecipeOrganizationHistoryScope(ownerID: ownerID, storeID: storeID,
+        kitchenID: kitchenID, logicalSceneID: id)
+      if let sessionID = try RecipeOrganizationHistory.pendingSessionID(in: scope,
+        historyURL: scene.appendingPathComponent("History.sqlite")) { result[id] = sessionID }
+    }
+    return result
+  }
+
+  private func refreshSessions() {
+    guard let sessionModel else { return }
+    let previous = sessionModel.sessions
+    sessionRepository?.refreshFromPersistentStore()
+    sessionModel.reload(preservingNavigation: true)
+    if previous != sessionModel.sessions { requestReconciliation() }
+  }
+
 }
 
 @MainActor

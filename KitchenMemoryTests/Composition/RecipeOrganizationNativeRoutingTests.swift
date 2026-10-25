@@ -101,7 +101,7 @@ final class RecipeOrganizationNativeRoutingTests: XCTestCase {
 
 #if os(macOS)
 @MainActor
-private final class RecipeOrganizationNativeFixture {
+final class RecipeOrganizationNativeFixture {
   private let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 300, height: 100),
                                 styleMask: [.titled], backing: .buffered, defer: false)
   private let scratch = NSTextView(frame: NSRect(x: 0, y: 0, width: 300, height: 100))
@@ -118,6 +118,7 @@ private final class RecipeOrganizationNativeFixture {
     OrganizationHistoryNativeRouting.manager(history: history, responder: window.firstResponder)
   }
   var text: String { scratch.string }
+  var textIsFirstResponder: Bool { window.firstResponder === scratch }
   func focusText() -> Bool {
     window.makeKeyAndOrderFront(nil)
     return window.makeFirstResponder(scratch)
@@ -133,7 +134,7 @@ private final class RecipeOrganizationNativeFixture {
 }
 #else
 @MainActor
-private final class RecipeOrganizationNativeFixture {
+final class RecipeOrganizationNativeFixture {
   private let window: UIWindow
   private let controller: OrganizationHistoryHostingController<Text>
   private let scratch = UITextView(frame: CGRect(x: 0, y: 0, width: 300, height: 100))
@@ -151,6 +152,7 @@ private final class RecipeOrganizationNativeFixture {
   var hostIsFirstResponder: Bool { controller.isFirstResponder }
   var routedManager: UndoManager? { controller.undoManager }
   var text: String { scratch.text }
+  var textIsFirstResponder: Bool { scratch.isFirstResponder }
   func focusText() -> Bool { window.makeKeyAndVisible(); return scratch.becomeFirstResponder() }
   func typeText(_ value: String) { scratch.insertText(value) }
   func leaveText() { window.makeKeyAndVisible(); scratch.resignFirstResponder() }

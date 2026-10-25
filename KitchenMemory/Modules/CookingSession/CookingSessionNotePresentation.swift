@@ -27,7 +27,10 @@ extension CookingSessionPresentationModel {
   }
 
   /// Delivery is globally ordered: another Session's unsaved work also blocks Finish.
-  var hasPendingDeliveryWork: Bool { !pendingCommands.isEmpty }
+  var hasPendingDeliveryWork: Bool {
+    !pendingCommands.isEmpty || delivery.historyInFlight || delivery.historyRecoveryUnavailable()
+      || !delivery.pendingHistorySessions().isEmpty
+  }
 
   var finishBlockedByEarlierWork: Bool {
     hasPendingDeliveryWork && !currentSessionHasPendingFinish

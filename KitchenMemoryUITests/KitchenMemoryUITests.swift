@@ -70,7 +70,9 @@ final class KitchenMemoryUITests: XCTestCase {
     XCTAssertTrue(app.descendants(matching: .any)["recipe-detail"].waitForExistence(timeout: 5))
     var start = app.buttons["start-cooking"]
     if !start.waitForExistence(timeout: 2) {
-      let overflow = app.buttons["OverflowBarButtonItem"]
+      // The system toolbar uses different overflow identifiers across iOS runtimes.
+      let overflow = app.buttons.matching(NSPredicate(format: "identifier IN %@",
+        ["OverflowBarButtonItem", "TopOverflowBarButtonItem"])).firstMatch
       if overflow.exists {
         activate(overflow)
         // The system overflow menu retains the accessible name, not the toolbar identifier.

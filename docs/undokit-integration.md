@@ -106,6 +106,49 @@ accepted reply loss, and exact retry retains the original command identity.
 V7 declarations, legacy `BatchReceipt`, and organization checkpoints are unchanged.
 Tag creation, rename, merge and deletion remain outside undo eligibility.
 
+## Active Session progress: #277
+
+Ingredient and instruction progress uses the same scene history owner and
+100-group limit. The new explicit version-4 change shape retains the Session,
+exact before/after target states, and expected immutable evidence. Existing
+singular Folder, version-2 Folder batch, and version-3 Tag shapes remain readable.
+Older readers refuse version 4; unknown versions and unreadable pending evidence
+are not replaced by empty history. The pending envelope and receipt remain
+version 1, with an optional frozen Session Fact identity, time, and causal heads.
+V7 SwiftData declarations, Session V3 envelopes/codecs, ordinary organization
+batch receipts, and existing Session outbox encoding remain unchanged.
+
+The existing ordered Session delivery owner admits progress only after its FIFO
+settles. The history sidecar freezes the progress delivery before domain writes;
+it is the recovery owner for that history operation, rather than a second copy
+of the intention in UserDefaults. Pending history prevents later Session work
+from overtaking it. Registry startup and delivery inspect durable sidecars for
+unopened and disconnected scenes; unreadable evidence remains a delivery barrier.
+A late native callback checks admission before freezing a new compensation, so
+it cannot deadlock the earlier ordinary retry owner. Normal Entry delivery retains its original acceptance and
+newer-draft rules. Native history availability also consults unresolved Session
+work; final delivery repeats this admission check.
+
+Within one SwiftData transaction, acceptance checks owner/Kitchen scope, Active
+lifecycle, ordinary disposition, target validity, exact prior progress, and the
+expected Session evidence. It appends the Fact and complete-token receipt
+together. Receipt lookup precedes eligibility, so an accepted reply loss can be
+resolved after later lifecycle changes without replay. Only same-scene accepted
+progress receipts advance the expected evidence; another field or scene cannot
+silently rebase an older inverse.
+
+A Session boundary retires the whole affected scene generation, even when the
+next native callback addresses an interleaved Folder or Tag. Reconciliation
+removes eligible history details through UndoKit's generation retirement;
+uncertain or rejected compensation retains its exact pending evidence until
+settled or explicitly discarded. Neither retirement nor failed compensation
+creates Redo or deletes domain Facts. Native compensation refreshes Session
+presentation without invoking command navigation or reading advancement.
+
+The Cooking Session history walkthrough #267 is complete; its evidence is
+separate from the new Undo acceptance. The app-wide delivery gate #204 remains
+open, as do the separately scoped working-scale and Outcome slices.
+
 ## Supply route and ownership
 
 The maintainer approves either the Swift package or the available XCFramework.
