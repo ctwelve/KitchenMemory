@@ -260,6 +260,7 @@ extension OrganizationHistoryRegistry {
           HistoryPayload(family: "kitchenmemory.recipe-organization.baseline", data: Data("disposed".utf8)))
       }
       await history.close()
+      if !FileManager.default.fileExists(atPath: disposed.path) { await presentations[sceneID]?.open() }
     } catch {
       if history.canDiscardRejectedCompensation { rejectedSessionScenes.insert(sceneID) }
       await history.close()
