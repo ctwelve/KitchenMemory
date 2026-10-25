@@ -36,11 +36,17 @@ extension CookingSessionPresentationModel {
     ) }
   }
   @discardableResult
-  func setIngredient(_ id: SessionIngredient.ID, to state: SessionIngredientProgress) -> Bool {
+  func setIngredient(_ id: SessionIngredient.ID, to state: SessionIngredientProgress,
+                     history: OrganizationHistoryPresentation? = nil) -> Bool {
     guard let session = currentSession, session.lifecycle == .active,
           session.snapshot.ingredientSections.flatMap(\.ingredients).contains(where: {
             $0.id == id
           }) else { return false }
+    if let history {
+      guard session.ingredientProgress(for: id) != state else { return true }
+      return delivery.submitHistoryProgress(SessionProgress(target: .ingredient(id), state: .ingredient(state)),
+        sessionID: session.id, history: history) { _ in }
+    }
     return submitIndependentCommand(.progress(
       factID: SessionFact.ID(),
       sessionID: session.id,
@@ -50,7 +56,8 @@ extension CookingSessionPresentationModel {
   }
   @discardableResult
   func setInstruction(
-    _ id: SessionInstruction.ID, to state: SessionInstructionProgress, readingOrigin: UUID? = nil
+    _ id: SessionInstruction.ID, to state: SessionInstructionProgress, readingOrigin: UUID? = nil,
+    history: OrganizationHistoryPresentation? = nil
   ) -> Bool {
     guard let session = currentSession, session.lifecycle == .active,
           session.snapshot.instructionSections.flatMap(\.steps).contains(where: {
@@ -59,6 +66,15 @@ extension CookingSessionPresentationModel {
     let advances = state == .completed && session.instructionProgress(for: id) == .open
       && readingPreference(for: session).emphasizedInstructionID == id
     readingCompletion = nil
+    if let history {
+      guard session.instructionProgress(for: id) != state else { return true }
+      return delivery.submitHistoryProgress(SessionProgress(target: .instruction(id), state: .instruction(state)),
+        sessionID: session.id, history: history) { [weak self] accepted in
+          guard let self, accepted, advances, let updated = self.currentSession, updated.id == session.id,
+                updated.instructionProgress(for: id) == .completed else { return }
+          self.advanceReadingAfterCompletion(id, in: updated, readingOrigin: readingOrigin)
+        }
+    }
     let accepted = submitIndependentCommand(.progress(
       factID: SessionFact.ID(),
       sessionID: session.id,

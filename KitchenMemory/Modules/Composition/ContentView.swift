@@ -59,7 +59,7 @@ struct ContentView: View {
       await presentation.open()
     }
     .onChange(of: locale) { _, locale in organizationHistory?.updateLocale(locale) }
-    .alert(.organizationFailed, isPresented: Binding(
+    .alert(.historyNeedsAttention, isPresented: Binding(
       get: { organizationHistory?.failed == true },
       set: { organizationHistory?.failed = $0 }
     )) {
@@ -104,7 +104,7 @@ struct ContentView: View {
       dismissedDetachedDraftID = nil
     }
     .modifier(RecipeDraftFailureAlert(model: preparedApp?.libraryModel))
-    .alert(.organizationFailed, isPresented: Binding(
+    .alert(.historyNeedsAttention, isPresented: Binding(
       get: { preparedApp?.libraryModel.organization?.failed == true },
       set: { preparedApp?.libraryModel.organization?.failed = $0 }
     )) { Button(.actionCancel, role: .cancel) {} } message: { Text(.organizationFailureMessage) }

@@ -145,16 +145,37 @@ Session, copy the draft, discard it, or leave it unresolved; continuation maps
 the target through the captured continuation baseline instead of silently
 retargeting it.
 
-Characterization tests record two pre-existing defects requiring separate,
-bounded fixes: accepting an older pending submission can clear text edited since
-that submission, and submitting again after retry can create a second Entry,
-including a duplicate when the text is unchanged. These are known defects, not
-intended draft or submission semantics; the delivery extraction preserves and
-reports them rather than expanding its product scope.
-[#245](https://github.com/ctwelve/KitchenMemory/issues/245) now owns their
-correction under the [accepted retry and draft interaction](cooking-session-interface.md#notes-and-outcome):
+[#245](https://github.com/ctwelve/KitchenMemory/issues/245), delivered in
+[#261](https://github.com/ctwelve/KitchenMemory/pull/261), corrected Entry retry:
 Retry saves the original submission, newer text/target edits remain a draft,
-and a later Entry requires a separate deliberate submission.
+and a later Entry requires a separate deliberate submission. Undo delivery
+preserves those boundaries; it never treats an uncertain submission as cancelled.
+
+## Active Session Undo
+
+Ingredient and instruction progress joins the initiating logical scene's
+chronological Folder/Tag Undo timeline. Each deliberate changed state earns one
+group after acceptance. Undo restores the exact previous resulting state,
+including Skipped, by appending a fresh compensating Fact; Redo does likewise.
+Exact retries retain the same frozen Fact identity, time, and causal frontier.
+No-op choices earn no group. Focused native text retains responder priority.
+
+Undo is a convenience, not data assurance. Any unresolved Session operation
+withholds Session Undo/Redo. Stop, Finish, accepted Entry submission/revision/
+retargeting/withdrawal, or any externally accepted change to that Session retires
+the affected scene's entire app history, including interleaved Folder/Tag groups.
+Resume begins a fresh editable period. Independent scenes and native text history
+remain separate. Merely typing an unsubmitted Entry or navigating away does not
+retire history. Compensation does not navigate, move focus, or rewind reading
+position/emphasis; reading state is not durable Undo content.
+
+Retirement removes actionable history and its unneeded local details. Pending
+acceptance evidence remains available for exact recovery; original Session Facts
+and authored content remain untouched. Working-scale and Outcome compensation
+are follow-up slices #278 and #279. Start, Stop/Resume compensation, Finish,
+submit-and-Finish, Continuation, and Entry compensation remain excluded. See
+[the agreed policy](https://github.com/ctwelve/KitchenMemory/issues/242#issuecomment-6353741632)
+and [integration details](undokit-integration.md#active-session-progress-277).
 
 Session Outcome is optional and distinct from lifecycle. Its initial coarse
 values are great, okay, and unsuccessful. Finishing with no Entries or Outcome

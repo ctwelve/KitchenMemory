@@ -65,6 +65,19 @@ organization deletion/merge, draft discard, Sample Pack requests, reset and
 pruning stay outside the initial undo policy. [#204](https://github.com/ctwelve/KitchenMemory/issues/204)
 still requires a separately selected and validated app-wide acceptance scope.
 
+## Active Session amendment, 2026-10-22
+
+The [maintainer agreement under #242](https://github.com/ctwelve/KitchenMemory/issues/242#issuecomment-6353741632)
+adds Active Session progress, working scale, and Outcome as three separately
+implemented slices. #277 delivers progress first. These actions append
+compensating Facts while editing remains eligible; they never erase accepted
+Facts. Stop, Finish, accepted Entry operations, and externally accepted changes
+to the same Session retire its preceding chain. Resume starts a fresh period.
+The approved conservative retirement clears the whole affected scene's app
+history. Unsubmitted Entry text and reading state remain outside this policy.
+[Cooking Sessions](../cooking-sessions.md#active-session-undo) records the full
+boundary; this amendment does not close #204 or authorize the excluded actions.
+
 ## Consequences and remaining proofs
 
 - KitchenMemory's scene scope, retention limit and conservative invalidation are

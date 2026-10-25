@@ -20,12 +20,15 @@ final class OrganizationHistoryHost: MainActorHistoryOperationHandler, HistoryHo
   let scope: RecipeOrganizationHistoryScope
   private let repository: any RecipeOrganizationHistoryRepository
   private let pendingURL: URL
+  private let sessionAdmission: (CookingSession.ID) -> Bool
   private(set) var pending: Pending?
 
-  init(repository: any RecipeOrganizationHistoryRepository, scope: RecipeOrganizationHistoryScope, pendingURL: URL) {
+  init(repository: any RecipeOrganizationHistoryRepository, scope: RecipeOrganizationHistoryScope, pendingURL: URL,
+       sessionAdmission: @escaping (CookingSession.ID) -> Bool) {
     self.repository = repository
     self.scope = scope
     self.pendingURL = pendingURL
+    self.sessionAdmission = sessionAdmission
   }
 
   func open(_ mode: HistoryOpenMode) async throws {
@@ -108,6 +111,9 @@ final class OrganizationHistoryHost: MainActorHistoryOperationHandler, HistoryHo
         try OrganizationCoding.encode(retained).write(to: pendingURL, options: .atomic)
         pending = retained
       }
+      var affected = try repository.historySessionIDs(in: scope, generation: context.token.generation)
+      if let sessionID = change.sessionProgress?.sessionID { affected.insert(sessionID) }
+      guard affected.allSatisfy(sessionAdmission) else { return .unresolved }
       let receipt = try repository.acceptHistory(retained.delivery)
       try clearPending()
       return receipt.outcome

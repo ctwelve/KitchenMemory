@@ -21,7 +21,7 @@ struct HistoryFixture {
   let scope: RecipeOrganizationHistoryScope
   var historyURL: URL { directory.appendingPathComponent("History.sqlite") }
 
-  init() throws {
+  init(draft: RecipeDraft = RecipeDraft(title: "Soup")) throws {
     directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
     try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
     container = try KitchenMemorySchema.makeContainer(storeURL: directory.appendingPathComponent("Kitchen.store"))
@@ -35,7 +35,7 @@ struct HistoryFixture {
       folder: .create(id: first, name: "Meals", parentID: nil)))
     try repository.accept(repository.load(in: kitchen.id).prepare(
       folder: .create(id: second, name: "Other", parentID: nil)))
-    let save = try RecipeEditor(repository: recipes).prepareSave(in: kitchen.id, from: RecipeDraft(title: "Soup"),
+    let save = try RecipeEditor(repository: recipes).prepareSave(in: kitchen.id, from: draft,
                                                                original: nil, observedSelectionIDs: [])
     try recipes.save(save)
     recipeID = save.recipe.id
@@ -63,6 +63,13 @@ final class ControlledHistoryRepository: RecipeOrganizationHistoryRepository {
   var withholdReceipts = false
   var deliveries: [RecipeOrganizationHistoryDelivery] = []
   init(_ base: SwiftDataRecipeOrganizationRepository) { self.base = base }
+  func historySessionIDs(in scope: RecipeOrganizationHistoryScope, generation: UUID) throws -> Set<CookingSession.ID> {
+    try base.historySessionIDs(in: scope, generation: generation)
+  }
+  func prepareHistoryProgress(_ sessionID: CookingSession.ID, to progress: SessionProgress,
+                              in scope: RecipeOrganizationHistoryScope) throws -> RecipeOrganizationHistoryChange? {
+    try base.prepareHistoryProgress(sessionID, to: progress, in: scope)
+  }
   func load(in kitchenID: Kitchen.ID) throws -> RecipeOrganization { try base.load(in: kitchenID) }
   func accept(_ command: RecipeOrganizationCommand, firstSave: RecipeSaveCommand?) throws {
     try base.accept(command, firstSave: firstSave)

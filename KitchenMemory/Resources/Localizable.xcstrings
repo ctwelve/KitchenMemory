@@ -1861,6 +1861,48 @@
       "it-IT": { "stringUnit": { "state": "translated", "value": "Sposta ricette" } }
     }
   },
+  "session.undo-progress": {
+    "comment": "Native Undo/Redo action name for one ingredient or instruction progress change in an Active Session. The system supplies Undo or Redo.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Change Cooking Progress"
+        }
+      },
+      "en-GB": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Change Cooking Progress"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Cambiar progreso de cocina"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Modifier la progression de cuisson"
+        }
+      },
+      "de-DE": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Kochfortschritt ändern"
+        }
+      },
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Modifica avanzamento della preparazione"
+        }
+      }
+    }
+  },
   "organization.undo-move-recipe": {
     "comment": "Saved Recipe organization undo: native action name or actionable recovery feedback.",
     "extractionState": "manual",
@@ -1903,44 +1945,86 @@
       }
     }
   },
-  "organization.undo-failure-message": {
-    "comment": "Saved Recipe organization undo: native action name or actionable recovery feedback.",
+  "history.needs-attention": {
+    "comment": "Alert title when application Undo or Redo requires recovery, for Folder, Tag or Cooking Session changes.",
     "extractionState": "manual",
     "localizations": {
       "en-US": {
         "stringUnit": {
           "state": "translated",
-          "value": "The organization change could not be reversed. Try again to recover a retained change, or review the current Folder or Tags before making a new change."
+          "value": "Undo Needs Attention"
         }
       },
       "en-GB": {
         "stringUnit": {
           "state": "translated",
-          "value": "The organisation change could not be reversed. Try again to recover a retained change, or review the current Folder or Tags before making a new change."
+          "value": "Undo Needs Attention"
         }
       },
       "es-MX": {
         "stringUnit": {
           "state": "translated",
-          "value": "No se pudo deshacer el cambio de organización. Reintenta recuperar un cambio conservado, o revisa la carpeta o las etiquetas actuales antes de hacer un cambio nuevo."
+          "value": "Deshacer requiere atención"
         }
       },
       "fr-CA": {
         "stringUnit": {
           "state": "translated",
-          "value": "La modification d’organisation n’a pas pu être annulée. Réessayez pour récupérer une modification conservée, ou vérifiez le dossier ou les étiquettes actuels avant d’effectuer une nouvelle modification."
+          "value": "L’annulation nécessite votre attention"
         }
       },
       "de-DE": {
         "stringUnit": {
           "state": "translated",
-          "value": "Die Organisationsänderung konnte nicht rückgängig gemacht werden. Versuche erneut, eine aufbewahrte Änderung wiederherzustellen, oder prüfe den aktuellen Ordner und die Tags, bevor du eine neue Änderung vornimmst."
+          "value": "Rückgängig benötigt Aufmerksamkeit"
         }
       },
       "it-IT": {
         "stringUnit": {
           "state": "translated",
-          "value": "Non è stato possibile annullare la modifica all’organizzazione. Riprova a recuperare una modifica conservata oppure controlla la cartella o i tag attuali prima di apportare una nuova modifica."
+          "value": "L’annullamento richiede attenzione"
+        }
+      }
+    }
+  },
+  "history.undo-failure-message": {
+    "comment": "Application Undo recovery feedback shared by Folder, Tag and Cooking Session progress changes. Recovery retries the retained operation; it does not cancel an uncertain save.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The change could not be reversed. Try again to recover the retained change, or review the current state before making another change."
+        }
+      },
+      "en-GB": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The change could not be reversed. Try again to recover the retained change, or review the current state before making another change."
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "No se pudo deshacer el cambio. Reintenta recuperar el cambio conservado o revisa el estado actual antes de hacer otro cambio."
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "La modification n’a pas pu être annulée. Réessayez pour récupérer la modification conservée, ou vérifiez l’état actuel avant d’effectuer une autre modification."
+        }
+      },
+      "de-DE": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Die Änderung konnte nicht rückgängig gemacht werden. Versuche erneut, die aufbewahrte Änderung wiederherzustellen, oder prüfe den aktuellen Zustand, bevor du eine weitere Änderung vornimmst."
+        }
+      },
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Non è stato possibile annullare la modifica. Riprova a recuperare la modifica conservata oppure controlla lo stato attuale prima di apportare un’altra modifica."
         }
       }
     }

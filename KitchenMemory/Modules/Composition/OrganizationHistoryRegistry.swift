@@ -25,6 +25,8 @@ final class OrganizationHistoryRegistry {
   private(set) var generation: UUID
   private var presentations: [UUID: OrganizationHistoryPresentation] = [:]
   private var unavailable = false
+  private weak var sessionModel: CookingSessionPresentationModel?
+  private var sessionRepository: SwiftDataCookingSessionRepository?
 
   init(repository: any RecipeOrganizationHistoryRepository, organization: RecipeOrganizationModel,
        ownerID: KitchenOwner.ID, storeID: String, kitchenID: Kitchen.ID, directory: URL) throws {
@@ -66,18 +68,43 @@ final class OrganizationHistoryRegistry {
     Self.active[ownershipKey] = WeakOrganizationHistoryRegistry(value: self)
   }
 
+  func installSessions(_ model: CookingSessionPresentationModel, repository: SwiftDataCookingSessionRepository) {
+    sessionModel = model
+    sessionRepository = repository
+    model.delivery.pendingHistorySessions = { [weak self] in
+      Set(self?.presentations.values.compactMap(\.pendingSessionID) ?? [])
+    }
+    model.delivery.didChange = { [weak self] in
+      self?.presentations.values.forEach { $0.refreshAvailability() }
+      self?.requestReconciliation()
+    }
+  }
+
+  private func refreshSessions() {
+    guard let sessionModel else { return }
+    let previous = sessionModel.sessions
+    sessionRepository?.refreshFromPersistentStore()
+    sessionModel.reload()
+    if previous != sessionModel.sessions { requestReconciliation() }
+  }
+
   func presentation(for sceneID: UUID) -> OrganizationHistoryPresentation {
     if let existing = presentations[sceneID] { return existing }
     let disposed = directory.appendingPathComponent(sceneID.uuidString + ".disposed")
     let value = OrganizationHistoryPresentation(
-      history: RecipeOrganizationHistory(repository: repository), organization: organization,
+      history: RecipeOrganizationHistory(repository: repository, sessionAdmission: { [weak self] id in
+        guard let self else { return false }
+        return self.sessionModel?.pendingCommands.contains(where: { $0.sessionID == id }) != true
+          && !self.presentations.contains { $0.key != sceneID && $0.value.pendingSessionID == id }
+      }), organization: organization,
       scope: RecipeOrganizationHistoryScope(ownerID: ownerID, storeID: storeID,
         kitchenID: kitchenID, logicalSceneID: sceneID),
       historyURL: directory.appendingPathComponent(generation.uuidString, isDirectory: true)
         .appendingPathComponent(sceneID.uuidString, isDirectory: true).appendingPathComponent("History.sqlite"),
       available: !unavailable && !FileManager.default.fileExists(atPath: disposed.path),
       dispose: { [weak self] in self?.dispose(sceneID) },
-      recordSession: { [weak self] sessionID in self?.recordSession(sessionID, for: sceneID) })
+      recordSession: { [weak self] sessionID in self?.recordSession(sessionID, for: sceneID) },
+      refreshSessions: { [weak self] in self?.refreshSessions() })
     presentations[sceneID] = value
     return value
   }

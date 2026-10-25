@@ -12,6 +12,7 @@ struct CookingSessionInstructionRow: View {
   let instruction: SessionInstruction
   let number: Int
   @Environment(\.locale) private var locale
+  @Environment(\.organizationHistory) private var history
   @Environment(\.cookingReadingOrigin) private var readingOrigin
 
   var body: some View {
@@ -26,7 +27,8 @@ struct CookingSessionInstructionRow: View {
       }
       HStack(alignment: .top, spacing: 12) {
         Button {
-          model.setInstruction(instruction.id, to: state == .open ? .completed : .open, readingOrigin: readingOrigin)
+          model.setInstruction(instruction.id, to: state == .open ? .completed : .open,
+            readingOrigin: readingOrigin, history: history)
         } label: {
           Image(systemName: instructionSymbol(state))
             .font(.title)
@@ -35,7 +37,7 @@ struct CookingSessionInstructionRow: View {
             .contentShape(.rect)
         }
         .buttonStyle(.plain)
-        .disabled(session.lifecycle != .active)
+        .disabled(session.lifecycle != .active || model.delivery.historyInFlight)
         .accessibilityLabel(RecipeInstructionAccessibilityFormatter(locale: locale).label(
           number: number, step: instruction.value))
         .accessibilityValue(Text(instructionValue(state)))
@@ -56,7 +58,7 @@ struct CookingSessionInstructionRow: View {
         }
         .background {
           NativeCookingCompleteSwipe(isEnabled: session.lifecycle == .active && state == .open) {
-            model.setInstruction(instruction.id, to: .completed, readingOrigin: readingOrigin)
+            model.setInstruction(instruction.id, to: .completed, readingOrigin: readingOrigin, history: history)
           }
         }
       }
@@ -67,8 +69,8 @@ struct CookingSessionInstructionRow: View {
             .frame(minHeight: 44)
           Spacer()
           if state == .open {
-            Button(.sessionProgressInstructionSkip) { model.setInstruction(instruction.id, to: .skipped) }
-              .disabled(session.lifecycle != .active)
+            Button(.sessionProgressInstructionSkip) { model.setInstruction(instruction.id, to: .skipped, history: history) }
+              .disabled(session.lifecycle != .active || model.delivery.historyInFlight)
               .frame(minHeight: 44)
           }
           instructionMenu(instruction, state: state)
@@ -108,20 +110,20 @@ struct CookingSessionInstructionRow: View {
     Menu {
       if state == .open {
         Button(.sessionProgressInstructionComplete) {
-          model.setInstruction(instruction.id, to: .completed, readingOrigin: readingOrigin)
+          model.setInstruction(instruction.id, to: .completed, readingOrigin: readingOrigin, history: history)
         }
         Button(.sessionProgressInstructionSkip) {
-          model.setInstruction(instruction.id, to: .skipped)
+          model.setInstruction(instruction.id, to: .skipped, history: history)
         }
       } else {
         Button(.sessionProgressInstructionReopen) {
-          model.setInstruction(instruction.id, to: .open)
+          model.setInstruction(instruction.id, to: .open, history: history)
         }
       }
     } label: {
       Image(systemName: "ellipsis.circle")
     }
-    .disabled(session.lifecycle != .active)
+    .disabled(session.lifecycle != .active || model.delivery.historyInFlight)
     .accessibilityLabel(Text(.sessionProgressInstructionMoreActions))
     .accessibilityIdentifier("session-instruction-menu-\(instruction.id.rawValue.uuidString)")
   }

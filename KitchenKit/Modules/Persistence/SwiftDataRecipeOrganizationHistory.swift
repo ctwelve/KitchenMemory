@@ -55,6 +55,9 @@ extension SwiftDataRecipeOrganizationRepository: RecipeOrganizationHistoryReposi
     _ change: RecipeOrganizationHistoryChange, memberID: UUID, token: UndoKit.HistoryToken,
     in scope: RecipeOrganizationHistoryScope
   ) throws -> RecipeOrganizationHistoryDelivery {
+    if change.sessionProgress != nil {
+      return try prepareSessionHistoryDelivery(change, memberID: memberID, token: token, scope: scope)
+    }
     if change.tagChange != nil {
       return try prepareTagHistoryDelivery(change, memberID: memberID, token: token, scope: scope)
     }
@@ -97,6 +100,19 @@ extension SwiftDataRecipeOrganizationRepository: RecipeOrganizationHistoryReposi
       if let receipt = prior.first(where: { $0.delivery.token == delivery.token }) {
         guard receipt.delivery == delivery else { throw RecipeOrganizationHistoryError.invalidEvidence }
         accepted = receipt
+        return
+      }
+      // A Session boundary retires the entire interleaved scene generation, even
+      // when its next native callback happens to compensate a Folder or Tag.
+      for receipt in receipts where receipt.delivery.scope == delivery.scope
+        && receipt.delivery.token.generation == delivery.token.generation {
+        if let progress = receipt.delivery.change.sessionProgress {
+          guard try sessionHistoryIsEligible(progress, scope: delivery.scope, token: delivery.token,
+            receipts: receipts, context: context) else { throw RecipeOrganizationHistoryError.ineligible }
+        }
+      }
+      if delivery.change.sessionProgress != nil {
+        accepted = try commitSessionHistory(delivery, recovery: recovery, receipts: receipts, context: context)
         return
       }
       if delivery.change.tagChange != nil {
@@ -187,6 +203,11 @@ extension SwiftDataRecipeOrganizationRepository: RecipeOrganizationHistoryReposi
     var seen: Set<UUID> = []
     for receipt in owned {
       let change = receipt.delivery.change
+      if let progress = change.sessionProgress {
+        guard try sessionHistoryIsEligible(progress, scope: scope, token: receipt.delivery.token,
+          receipts: receipts, context: context) else { return false }
+        continue
+      }
       if let tagChange = change.tagChange {
         guard try tagHistoryIsEligible(tagChange, scope: scope, token: receipt.delivery.token,
           receipts: receipts, context: context) else { return false }

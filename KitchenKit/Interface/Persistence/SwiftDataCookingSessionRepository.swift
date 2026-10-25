@@ -17,7 +17,7 @@ public final class SwiftDataCookingSessionRepository: CookingSessionRepository {
     context = ModelContext(modelContainer)
   }
 
-  private init(context: ModelContext) {
+  init(context: ModelContext) {
     modelContainer = context.container
     self.context = context
   }
@@ -219,7 +219,7 @@ public final class SwiftDataCookingSessionRepository: CookingSessionRepository {
     }
   }
 
-  private func insert(_ records: CookingSessionTransactionRecords) {
+  func insert(_ records: CookingSessionTransactionRecords) {
     records.roots.forEach { context.insert(CookingSessionRecord($0)) }
     records.facts.forEach { context.insert(SessionFactRecord($0)) }
     records.closures.forEach { context.insert(SessionClosureRecord($0)) }
