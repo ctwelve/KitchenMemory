@@ -29,7 +29,8 @@ final class SessionProgressHistoryPresentationTests: XCTestCase {
     let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
       .appendingPathComponent(String(repeating: "a", count: 64))
     defer { try? FileManager.default.removeItem(at: directory.deletingLastPathComponent()) }
-    let boundary = InterruptedProgressHistoryRepository(SwiftDataRecipeOrganizationRepository(modelContainer: app.modelContainer))
+    let boundary = InterruptedProgressHistoryRepository(
+      SwiftDataRecipeOrganizationRepository(modelContainer: app.modelContainer))
     let registry = try OrganizationHistoryRegistry(repository: boundary, organization: organization,
       ownerID: app.ownerID, storeID: "test", kitchenID: recipe.recipe.kitchenID, directory: directory)
     registry.installSessions(app.sessionModel, repository: app.cookingSessionRepository)
@@ -69,7 +70,6 @@ final class SessionProgressHistoryPresentationTests: XCTestCase {
     }
     await assertRecoveredAvailability(resumed, model: relaunched, disposed: disposed)
     XCTAssertEqual(try app.cookingSessionRepository.evidence(id: session.id)?.facts.count, rejectedInverse ? 2 : 1)
-    await resumed.disconnect()
     let sidecar = directory.appendingPathComponent(restored.generation.uuidString)
       .appendingPathComponent(sceneID.uuidString).appendingPathComponent("History.sqlite.organization-pending.json")
     try assertUnreadableRecoveryIsPreserved(at: sidecar, model: relaunched, recipe: recipe)
@@ -84,6 +84,7 @@ final class SessionProgressHistoryPresentationTests: XCTestCase {
       resumed.updateLocale(Locale(identifier: "en-US"))
       XCTAssertEqual(resumed.nativeUndoManager?.undoActionName, "Change Cooking Progress")
     }
+    await resumed.disconnect()
   }
 
   func testPendingSessionCommandDisablesTheActualNativeUndoRoute() async throws {
@@ -198,7 +199,8 @@ final class SessionProgressHistoryPresentationTests: XCTestCase {
     await history.disconnect()
   }
   private func assertUnreadableRecoveryIsPreserved(at sidecar: URL,
-                                                   model: CookingSessionPresentationModel, recipe: StoredRecipe) throws {
+                                                   model: CookingSessionPresentationModel,
+                                                   recipe: StoredRecipe) throws {
     let unreadable = Data("unsupported recovery envelope".utf8)
     try unreadable.write(to: sidecar)
     XCTAssertTrue(model.delivery.historyRecoveryUnavailable())
