@@ -33,8 +33,6 @@ final class SessionProgressHistoryTests: XCTestCase {
     await second.close()
   }
 
-
-
   func testMixedProgressFolderOrderingNoOpAndNewActionClearsRedo() async throws {
     let fixture = try ProgressHistoryFixture()
     defer { fixture.base.removeFiles() }
@@ -59,7 +57,6 @@ final class SessionProgressHistoryTests: XCTestCase {
     XCTAssertEqual(try fixture.progress(), .instruction(.completed))
     await history.close()
   }
-
 
   func testFinishEntryAndOtherFieldChangesRetireHistoryAcrossReopen() async throws {
     for boundary in 0..<6 {

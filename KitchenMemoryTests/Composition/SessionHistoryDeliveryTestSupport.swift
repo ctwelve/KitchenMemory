@@ -11,11 +11,6 @@ final class InterruptedProgressHistoryRepository: RecipeOrganizationHistoryRepos
   let base: SwiftDataRecipeOrganizationRepository
   var rejectNextAcceptance = false
   var failNextAcceptance = false
-  var failNextEligibilityRead = false
-  var rejectNextScope = false
-  var loseNextReply = false
-  var withholdReceipts = false
-  var deliveries: [RecipeOrganizationHistoryDelivery] = []
   init(_ base: SwiftDataRecipeOrganizationRepository) { self.base = base }
   func historySessionIDs(in scope: RecipeOrganizationHistoryScope, generation: UUID) throws -> Set<CookingSession.ID> {
     try base.historySessionIDs(in: scope, generation: generation)
@@ -42,27 +37,21 @@ final class InterruptedProgressHistoryRepository: RecipeOrganizationHistoryRepos
     try base.prepareHistoryDelivery(change, memberID: memberID, token: token, in: scope)
   }
   func acceptHistory(_ delivery: RecipeOrganizationHistoryDelivery) throws -> RecipeOrganizationHistoryReceipt {
-    deliveries.append(delivery)
     if failNextAcceptance { failNextAcceptance = false; throw LostReply() }
-    if rejectNextScope { rejectNextScope = false; throw RecipeOrganizationHistoryError.invalidScope }
     if rejectNextAcceptance {
       rejectNextAcceptance = false
       throw RecipeOrganizationHistoryError.ineligible
     }
-    let receipt = try base.acceptHistory(delivery)
-    if loseNextReply { loseNextReply = false; throw LostReply() }
-    return receipt
+    return try base.acceptHistory(delivery)
   }
   func recoverHistory(_ delivery: RecipeOrganizationHistoryDelivery) throws -> RecipeOrganizationHistoryReceipt {
-    deliveries.append(delivery)
     return try base.recoverHistory(delivery)
   }
   func historyReceipt(for token: UndoKit.HistoryToken, in scope: RecipeOrganizationHistoryScope)
     throws -> RecipeOrganizationHistoryReceipt? {
-    withholdReceipts ? nil : try base.historyReceipt(for: token, in: scope)
+    try base.historyReceipt(for: token, in: scope)
   }
   func historyIsEligible(in scope: RecipeOrganizationHistoryScope, generation: UUID) throws -> Bool {
-    if failNextEligibilityRead { failNextEligibilityRead = false; throw LostReply() }
     return try base.historyIsEligible(in: scope, generation: generation)
   }
   private struct LostReply: Error {}

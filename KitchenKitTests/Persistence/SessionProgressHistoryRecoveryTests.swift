@@ -9,6 +9,27 @@ import XCTest
 
 @MainActor
 final class SessionProgressHistoryRecoveryTests: XCTestCase {
+  func testFrozenCompensationCannotCrossFinishDeletionOrRestoration() async throws {
+    let fixture = try ProgressHistoryFixture()
+    defer { fixture.base.removeFiles() }
+    let history = RecipeOrganizationHistory(repository: fixture.base.repository)
+    try await history.open(scope: fixture.base.scope, historyURL: fixture.base.historyURL)
+    let change = try XCTUnwrap(fixture.base.repository.prepareHistoryProgress(fixture.id,
+      to: fixture.completed, in: fixture.base.scope))
+    let identity = try XCTUnwrap(history.session?.configuration?.scope)
+    _ = try fixture.sessions.perform(.finish(.init(closureID: .init(), sessionID: fixture.id,
+      finishedAt: Date(), hasMeaningfulDraft: false)))
+    let deletionID = SessionDeletion.ID()
+    _ = try fixture.sessions.perform(.delete(.init(deletionID: deletionID, sessionID: fixture.id, deletedAt: Date())))
+    _ = try fixture.sessions.perform(.restore(.init(id: .init(), sessionID: fixture.id, restoredAt: Date(),
+      observedDeletionIDs: [deletionID])))
+    let frozen = try fixture.base.repository.prepareHistoryDelivery(change, memberID: UUID(),
+      token: HistoryToken(scope: identity, generation: UUID(), sequence: 1, command: UUID()), in: fixture.base.scope)
+    XCTAssertThrowsError(try fixture.base.repository.acceptHistory(frozen))
+    XCTAssertEqual(try fixture.repository.evidence(id: fixture.id)?.facts.count, 0)
+    await history.close()
+  }
+
   func testLateNativeCallbackCannotCreateASecondPendingOwner() async throws {
     let fixture = try ProgressHistoryFixture()
     defer { fixture.base.removeFiles() }

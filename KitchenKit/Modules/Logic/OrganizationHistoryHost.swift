@@ -82,16 +82,13 @@ final class OrganizationHistoryHost: MainActorHistoryOperationHandler, HistoryHo
 
   private func freeze(changes change: Effect, memberID: UUID, context: HistoryOperationContext,
                       inverse: Bool) throws -> Pending {
-    if let pending {
-      guard pending.delivery.token == OrganizationHistoryToken(context.token),
-            pending.delivery.memberID == memberID, pending.delivery.change == change else {
-        throw RecipeOrganizationHistoryError.invalidEvidence
-      }
-      return pending
-    }
+    // New submissions are withheld while pending; retryPending supplies the
+    // retained delivery itself, including its member, token and exact payload.
+    if let pending { return pending }
     let delivery = try repository.prepareHistoryDelivery(change, memberID: memberID, token: context.token, in: scope)
     let retained = Pending(version: 1, delivery: delivery, inverse: inverse, terminalRejected: false)
-    try FileManager.default.createDirectory(at: pendingURL.deletingLastPathComponent(), withIntermediateDirectories: true)
+    try FileManager.default.createDirectory(
+      at: pendingURL.deletingLastPathComponent(), withIntermediateDirectories: true)
     try OrganizationCoding.encode(retained).write(to: pendingURL, options: .atomic)
     pending = retained
     return retained

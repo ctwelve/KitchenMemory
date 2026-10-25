@@ -24,12 +24,16 @@ final class CookingSessionDelivery {
   @ObservationIgnored var didChange: () -> Void = {}
   @ObservationIgnored var historyRecoveryUnavailable: () -> Bool = { false }
   @ObservationIgnored var retryRetainedHistory: () -> Void = {}
+  @ObservationIgnored var discardRetainedHistory: () -> Void = {}
+  var canDiscardRetainedHistory = false
 
   /// Serializes progress with the existing FIFO. The history host retains its
   /// frozen command in the durable sidecar before crossing domain acceptance.
   func submitHistoryProgress(_ progress: SessionProgress, sessionID: CookingSession.ID,
                              history: OrganizationHistoryPresentation, completion: @escaping (Bool) -> Void) -> Bool {
-    guard !historyRecoveryUnavailable(), !historyInFlight, outbox.isEmpty, pendingHistorySessions().isEmpty else { return false }
+    guard !historyRecoveryUnavailable(), !historyInFlight, outbox.isEmpty, pendingHistorySessions().isEmpty else {
+      return false
+    }
     historyInFlight = true
     didChange()
     historyTask = Task {
@@ -91,7 +95,9 @@ final class CookingSessionDelivery {
   /// Prepare ordinary commands only after earlier work is retired. In
   /// particular, restore consent must observe the post-retry deletion frontier.
   func submit(_ makeCommand: () throws -> PendingCookingSessionCommand?) -> Report {
-    guard !historyRecoveryUnavailable(), !historyInFlight, pendingHistorySessions().isEmpty else { return Report(requested: nil, events: []) }
+    guard !historyRecoveryUnavailable(), !historyInFlight, pendingHistorySessions().isEmpty else {
+      return Report(requested: nil, events: [])
+    }
     defer { didChange() }
     var events = retry()
     guard outbox.isEmpty else { return Report(requested: nil, events: events) }

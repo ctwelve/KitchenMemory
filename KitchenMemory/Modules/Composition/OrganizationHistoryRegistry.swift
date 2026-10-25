@@ -6,6 +6,7 @@ import CryptoKit
 import Foundation
 import KitchenKit
 import Observation
+import UndoKit
 
 /// Owns durable scene identities independently from their current native presentations.
 @MainActor
@@ -27,6 +28,7 @@ final class OrganizationHistoryRegistry {
   private var unavailable = false
   private weak var sessionModel: CookingSessionPresentationModel?
   private var sessionRepository: SwiftDataCookingSessionRepository?
+  private var rejectedSessionScenes: Set<UUID> = []
 
   init(repository: any RecipeOrganizationHistoryRepository, organization: RecipeOrganizationModel,
        ownerID: KitchenOwner.ID, storeID: String, kitchenID: Kitchen.ID, directory: URL) throws {
@@ -206,26 +208,62 @@ extension OrganizationHistoryRegistry {
     sessionModel = model
     sessionRepository = repository
     model.delivery.pendingHistorySessions = { [weak self] in
-      Set((try? self?.pendingSessionHistory().values.map { $0 }) ?? [])
+      guard let self, let pending = try? self.pendingSessionHistory() else { return [] }
+      return Set(pending.values)
     }
     model.delivery.historyRecoveryUnavailable = { [weak self] in
       guard let self else { return true }
       do { _ = try self.pendingSessionHistory(); return false } catch { return true }
     }
-    model.delivery.retryRetainedHistory = { [weak self, weak model] in
-      Task {
-        guard let self, let model else { return }
-        do {
-          for sceneID in try self.pendingSessionHistory().keys {
-            await self.presentation(for: sceneID).retry()
-          }
-          if try self.pendingSessionHistory().isEmpty { model.retryPendingCommands() }
-        } catch { model.present(.read) }
-      }
+    model.delivery.retryRetainedHistory = { [weak self] in
+      Task { await self?.recoverRetainedSessionHistory() }
+    }
+    model.delivery.discardRetainedHistory = { [weak self] in
+      Task { await self?.recoverRetainedSessionHistory(discardRejected: true) }
     }
     model.delivery.didChange = { [weak self] in
       self?.presentations.values.forEach { $0.refreshAvailability() }
       self?.requestReconciliation()
+    }
+  }
+
+  /// Recovery is independent of presentation availability; disposal never revives Undo.
+  func recoverRetainedSessionHistory(discardRejected: Bool = false) async {
+    do {
+      let sceneIDs = discardRejected ? rejectedSessionScenes : Set(try pendingSessionHistory().keys)
+      for sceneID in sceneIDs { try await recoverScene(sceneID, discardRejected: discardRejected) }
+      refreshSessions()
+      if try pendingSessionHistory().isEmpty { sessionModel?.retryPendingCommands() }
+    } catch { sessionModel?.present(.read) }
+    sessionModel?.delivery.canDiscardRetainedHistory = !rejectedSessionScenes.isEmpty
+  }
+
+  private func recoverScene(_ sceneID: UUID, discardRejected: Bool) async throws {
+    await presentations[sceneID]?.disconnect()
+    let history = RecipeOrganizationHistory(repository: repository)
+    let scope = RecipeOrganizationHistoryScope(ownerID: ownerID, storeID: storeID,
+      kitchenID: kitchenID, logicalSceneID: sceneID)
+    let url = directory.appendingPathComponent(generation.uuidString).appendingPathComponent(sceneID.uuidString)
+      .appendingPathComponent("History.sqlite")
+    do {
+      try await history.open(scope: scope, historyURL: url)
+      if discardRejected { try await history.discardRejectedCompensation() } else {
+        _ = try await history.retryPending()
+        _ = await history.reconcile()
+      }
+      if history.canDiscardRejectedCompensation { rejectedSessionScenes.insert(sceneID) } else {
+        rejectedSessionScenes.remove(sceneID)
+      }
+      let disposed = directory.appendingPathComponent(sceneID.uuidString + ".disposed")
+      if history.pendingSessionID == nil, FileManager.default.fileExists(atPath: disposed.path) {
+        _ = try history.session?.advanced.clearHistory(adopting:
+          HistoryPayload(family: "kitchenmemory.recipe-organization.baseline", data: Data("disposed".utf8)))
+      }
+      await history.close()
+    } catch {
+      if history.canDiscardRejectedCompensation { rejectedSessionScenes.insert(sceneID) }
+      await history.close()
+      throw error
     }
   }
 

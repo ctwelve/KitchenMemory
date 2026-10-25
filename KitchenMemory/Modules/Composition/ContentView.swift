@@ -76,6 +76,11 @@ struct ContentView: View {
       if preparedApp?.sessionModel.issue != .clipboard {
         Button(.actionTryAgain) { preparedApp?.sessionModel.retryCurrentIssue() }
       }
+      if preparedApp?.sessionModel.delivery.canDiscardRetainedHistory == true {
+        Button(.organizationDiscardRejected, role: .destructive) {
+          preparedApp?.sessionModel.delivery.discardRetainedHistory()
+        }
+      }
       Button(.actionCancel, role: .cancel) {}
     } message: {
       if let issue = preparedApp?.sessionModel.issue {

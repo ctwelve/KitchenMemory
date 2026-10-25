@@ -140,17 +140,18 @@ extension SwiftDataRecipeOrganizationRepository: RecipeOrganizationHistoryReposi
     return accepted
   }
 
-  private func validateSessionHistoryGeneration(_ delivery: RecipeOrganizationHistoryDelivery,
-                                               receipts: [RecipeOrganizationHistoryReceipt], context: ModelContext) throws {
-  // A Session boundary retires the entire interleaved scene generation, even
-  // when its next native callback happens to compensate a Folder or Tag.
-  for receipt in receipts where receipt.delivery.scope == delivery.scope
-    && receipt.delivery.token.generation == delivery.token.generation {
-    if let progress = receipt.delivery.change.sessionProgress {
-      guard try sessionHistoryIsEligible(progress, scope: delivery.scope, token: delivery.token,
-        receipts: receipts, context: context) else { throw RecipeOrganizationHistoryError.ineligible }
+  private func validateSessionHistoryGeneration(
+    _ delivery: RecipeOrganizationHistoryDelivery, receipts: [RecipeOrganizationHistoryReceipt], context: ModelContext
+  ) throws {
+    // A Session boundary retires the entire interleaved scene generation, even
+    // when its next native callback happens to compensate a Folder or Tag.
+    for receipt in receipts where receipt.delivery.scope == delivery.scope
+      && receipt.delivery.token.generation == delivery.token.generation {
+      if let progress = receipt.delivery.change.sessionProgress {
+        guard try sessionHistoryIsEligible(progress, scope: delivery.scope, token: delivery.token,
+          receipts: receipts, context: context) else { throw RecipeOrganizationHistoryError.ineligible }
+      }
     }
-  }
   }
 
   private func validateHistoryMembers(

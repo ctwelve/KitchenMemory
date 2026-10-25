@@ -10,6 +10,14 @@ import XCTest
 @MainActor
 final class SessionProgressHistoryPresentationTests: XCTestCase {
   func testUnopenedScenePendingHistoryBlocksOrdinaryDeliveryAfterRegistryRecreation() async throws {
+    try await verifyDisposedRecovery(rejectedInverse: false)
+  }
+
+  func testDisposedRejectedInverseOffersExplicitDiscardWithoutChangingFacts() async throws {
+    try await verifyDisposedRecovery(rejectedInverse: true)
+  }
+
+  private func verifyDisposedRecovery(rejectedInverse: Bool) async throws {
     let app = try AppRuntime.testing()
     app.libraryModel.loadIfNeeded()
     let recipe = try XCTUnwrap(app.libraryModel.recipes.first)
@@ -30,10 +38,17 @@ final class SessionProgressHistoryPresentationTests: XCTestCase {
     let sceneID = UUID()
     let history = registry.presentation(for: sceneID)
     await history.open()
-    boundary.failNextAcceptance = true
+    boundary.failNextAcceptance = !rejectedInverse
     XCTAssertTrue(model.setInstruction(instruction.id, to: .completed, history: history))
     await model.delivery.waitForHistoryDelivery()
+    if rejectedInverse {
+      boundary.rejectNextAcceptance = true
+      await history.undo()
+      _ = try app.cookingSessions.perform(.setOutcome(
+        .init(id: .init(), sessionID: session.id, authoredAt: Date()), .coarse(.okay)))
+    }
     await history.disconnect()
+    history.disposeScene()
 
     let restored = try OrganizationHistoryRegistry(repository: boundary, organization: organization,
       ownerID: app.ownerID, storeID: "test", kitchenID: recipe.recipe.kitchenID, directory: directory)
@@ -43,17 +58,20 @@ final class SessionProgressHistoryPresentationTests: XCTestCase {
     XCTAssertEqual(relaunched.delivery.pendingHistorySessions(), [session.id])
     XCTAssertFalse(relaunched.start(from: recipe), "No scene has opened, but its durable pending barrier still applies")
     let resumed = restored.presentation(for: sceneID)
-    await resumed.retry()
+    await restored.recoverRetainedSessionHistory()
+    if rejectedInverse {
+      XCTAssertTrue(relaunched.delivery.canDiscardRetainedHistory)
+      XCTAssertEqual(relaunched.delivery.pendingHistorySessions(), [session.id])
+      await restored.recoverRetainedSessionHistory(discardRejected: true)
+    }
     XCTAssertTrue(relaunched.delivery.pendingHistorySessions().isEmpty)
-    XCTAssertEqual(try app.cookingSessionRepository.evidence(id: session.id)?.facts.count, 1)
+    await resumed.open()
+    XCTAssertFalse(resumed.canUndo)
+    XCTAssertEqual(try app.cookingSessionRepository.evidence(id: session.id)?.facts.count, rejectedInverse ? 2 : 1)
     await resumed.disconnect()
     let sidecar = directory.appendingPathComponent(restored.generation.uuidString)
       .appendingPathComponent(sceneID.uuidString).appendingPathComponent("History.sqlite.organization-pending.json")
-    let unreadable = Data("unsupported recovery envelope".utf8)
-    try unreadable.write(to: sidecar)
-    XCTAssertTrue(relaunched.delivery.historyRecoveryUnavailable())
-    XCTAssertFalse(relaunched.start(from: recipe))
-    XCTAssertEqual(try Data(contentsOf: sidecar), unreadable)
+    try assertUnreadableRecoveryIsPreserved(at: sidecar, model: relaunched, recipe: recipe)
   }
 
   func testPendingSessionCommandDisablesTheActualNativeUndoRoute() async throws {
@@ -161,4 +179,13 @@ final class SessionProgressHistoryPresentationTests: XCTestCase {
     XCTAssertEqual(model.currentSession?.instructionProgress(for: instruction.id), .completed)
     await history.disconnect()
   }
+  private func assertUnreadableRecoveryIsPreserved(at sidecar: URL,
+                                                  model: CookingSessionPresentationModel, recipe: StoredRecipe) throws {
+    let unreadable = Data("unsupported recovery envelope".utf8)
+    try unreadable.write(to: sidecar)
+    XCTAssertTrue(model.delivery.historyRecoveryUnavailable())
+    XCTAssertFalse(model.start(from: recipe))
+    XCTAssertEqual(try Data(contentsOf: sidecar), unreadable)
+  }
+
 }
