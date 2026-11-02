@@ -134,8 +134,8 @@ lifecycle, ordinary disposition, target validity, exact prior progress, and the
 expected Session evidence. It appends the Fact and complete-token receipt
 together. Receipt lookup precedes eligibility, so an accepted reply loss can be
 resolved after later lifecycle changes without replay. Only same-scene accepted
-progress and scale receipts advance the expected evidence; another field or scene cannot
-silently rebase an older inverse.
+progress, scale and Outcome receipts advance the expected evidence. Other Session
+fields or another scene cannot silently rebase an older inverse.
 
 A Session boundary retires the whole affected scene generation, even when the
 next native callback addresses an interleaved Folder or Tag. Reconciliation
