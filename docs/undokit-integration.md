@@ -134,7 +134,7 @@ lifecycle, ordinary disposition, target validity, exact prior progress, and the
 expected Session evidence. It appends the Fact and complete-token receipt
 together. Receipt lookup precedes eligibility, so an accepted reply loss can be
 resolved after later lifecycle changes without replay. Only same-scene accepted
-progress receipts advance the expected evidence; another field or scene cannot
+progress and scale receipts advance the expected evidence; another field or scene cannot
 silently rebase an older inverse.
 
 A Session boundary retires the whole affected scene generation, even when the
@@ -147,7 +147,7 @@ presentation without invoking command navigation or reading advancement.
 
 The Cooking Session history walkthrough #267 is complete; its evidence is
 separate from the new Undo acceptance. The app-wide delivery gate #204 remains
-open, as do the separately scoped working-scale and Outcome slices.
+open. Working-scale integration follows below; Outcome remains separately scoped.
 
 ## Active Session working scale: #278
 

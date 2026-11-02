@@ -87,6 +87,36 @@ final class SessionScaleHistoryPresentationTests: XCTestCase {
     await history.disconnect()
   }
 
+  func testSeparateCommittedScaleChoicesRemainDistinctNativeGroups() async throws {
+    let app = try AppRuntime.testing()
+    app.libraryModel.loadIfNeeded()
+    let model = app.sessionModel
+    model.loadIfNeeded()
+    XCTAssertTrue(model.start(from: try XCTUnwrap(app.libraryModel.recipes.first)))
+    let original = try XCTUnwrap(model.currentSession)
+    let history = app.organizationHistory.presentation(for: UUID())
+    await history.open()
+    var selection = CookingSessionScaleSelection(session: original)
+    for factor in [2, 2, 3] {
+      selection.selectFactor(.init(numerator: factor))
+      XCTAssertTrue(model.replaceWorkingScale(with: try XCTUnwrap(selection.scale), history: history))
+      await model.delivery.waitForHistoryDelivery()
+    }
+    XCTAssertEqual(try app.cookingSessionRepository.evidence(id: original.id)?.facts.count, 2)
+    let native = try RecipeOrganizationNativeFixture(history: history)
+    defer { native.close() }
+    native.leaveText()
+    native.routedManager?.undo()
+    await history.waitForNativeOperations()
+    XCTAssertEqual(model.currentSession?.workingScale?.exactScale, .init(numerator: 2))
+    XCTAssertTrue(history.canUndo)
+    native.routedManager?.undo()
+    await history.waitForNativeOperations()
+    XCTAssertEqual(model.currentSession?.workingScale, original.workingScale)
+    XCTAssertFalse(history.canUndo)
+    await history.disconnect()
+  }
+
   func testPendingOrdinaryWorkBlocksScaleAndTheNativeHistoryRoute() async throws {
     let app = try AppRuntime.testing()
     app.libraryModel.loadIfNeeded()

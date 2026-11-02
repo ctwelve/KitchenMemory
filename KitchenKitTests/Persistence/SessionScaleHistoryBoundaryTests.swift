@@ -67,6 +67,36 @@ final class SessionScaleHistoryBoundaryTests: XCTestCase {
     await history.close()
   }
 
+  func testMissingFrozenFactAndForgedPriorProgressAreRefusedBeforeAcceptance() async throws {
+    let fixture = try ProgressHistoryFixture()
+    defer { fixture.base.removeFiles() }
+    let history = RecipeOrganizationHistory(repository: fixture.base.repository)
+    try await history.open(scope: fixture.base.scope, historyURL: fixture.base.historyURL)
+    let identity = try XCTUnwrap(history.session?.configuration?.scope)
+    let scale = try XCTUnwrap(fixture.base.repository.prepareHistoryScale(fixture.id,
+      to: SessionWorkingScale(exactScale: RationalQuantity(numerator: 2)), in: fixture.base.scope))
+    let frozen = try fixture.base.repository.prepareHistoryDelivery(scale, memberID: UUID(),
+      token: HistoryToken(scope: identity, generation: UUID(), sequence: 1, command: UUID()), in: fixture.base.scope)
+    var delivery = try XCTUnwrap(JSONSerialization.jsonObject(with: JSONEncoder().encode(frozen)) as? [String: Any])
+    delivery.removeValue(forKey: "sessionFact")
+    let missingFact = try JSONDecoder().decode(RecipeOrganizationHistoryDelivery.self,
+      from: JSONSerialization.data(withJSONObject: delivery))
+    XCTAssertThrowsError(try fixture.base.repository.acceptHistory(missingFact))
+    let progress = try XCTUnwrap(fixture.base.repository.prepareHistoryProgress(fixture.id,
+      to: fixture.completed, in: fixture.base.scope))
+    var object = try XCTUnwrap(JSONSerialization.jsonObject(with: JSONEncoder().encode(progress)) as? [String: Any])
+    var payload = try XCTUnwrap(object["sessionProgress"] as? [String: Any])
+    payload["before"] = try JSONSerialization.jsonObject(with: JSONEncoder().encode(
+      SessionProgress(target: fixture.completed.target, state: .instruction(.skipped))))
+    object["sessionProgress"] = payload
+    let forged = try fixture.base.repository.prepareHistoryDelivery(decodeChange(object), memberID: UUID(),
+      token: HistoryToken(scope: identity, generation: UUID(), sequence: 1, command: UUID()), in: fixture.base.scope)
+    XCTAssertThrowsError(try fixture.base.repository.acceptHistory(forged))
+    XCTAssertEqual(try fixture.repository.evidence(id: fixture.id)?.facts.count, 0)
+    XCTAssertTrue(try fixture.session().progress.isEmpty)
+    await history.close()
+  }
+
   private func assertMalformedProgressRefused(fixture: ProgressHistoryFixture, identity: UUID) throws {
     let progress = try XCTUnwrap(fixture.base.repository.prepareHistoryProgress(fixture.id,
       to: fixture.completed, in: fixture.base.scope))

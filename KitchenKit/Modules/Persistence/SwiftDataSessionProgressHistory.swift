@@ -163,8 +163,8 @@ extension SwiftDataRecipeOrganizationRepository {
   }
 
   private func foldedSessionWitness(_ change: RecipeOrganizationHistoryChange, token: OrganizationHistoryToken,
-                                    receipts: [RecipeOrganizationHistoryReceipt]) -> Data {
-    var witness = change.sessionBaseline ?? Data()
+                                    receipts: [RecipeOrganizationHistoryReceipt]) -> Data? {
+    var witness = change.sessionBaseline
     for receipt in receipts.filter({ $0.delivery.token.scope == token.scope
       && $0.delivery.token.generation == token.generation }).sorted(by: {
         $0.delivery.token.sequence < $1.delivery.token.sequence
