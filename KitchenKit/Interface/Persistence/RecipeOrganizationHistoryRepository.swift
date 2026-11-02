@@ -17,18 +17,20 @@ public struct RecipeOrganizationHistoryChange: Codable, Equatable, Sendable {
   let members: [RecipeOrganizationHistoryMember]?
   let tagChange: RecipeOrganizationTagHistoryChange?
   let sessionProgress: SessionProgressHistoryChange?
+  let sessionScale: SessionScaleHistoryChange?
 
   init(anchorID: UUID, recipeID: Recipe.ID, before: Folder.ID?, after: Folder.ID?, baseline: Data,
        folderBaseline: Data, members: [RecipeOrganizationHistoryMember]? = nil,
        tagChange: RecipeOrganizationTagHistoryChange? = nil,
-       sessionProgress: SessionProgressHistoryChange? = nil) {
+       sessionProgress: SessionProgressHistoryChange? = nil,
+       sessionScale: SessionScaleHistoryChange? = nil) {
     self.anchorID = anchorID; self.recipeID = recipeID; self.before = before; self.after = after
     self.baseline = baseline; self.folderBaseline = folderBaseline; self.members = members; self.tagChange = tagChange
-    self.sessionProgress = sessionProgress
+    self.sessionProgress = sessionProgress; self.sessionScale = sessionScale
   }
 
   var changedMembers: [RecipeOrganizationHistoryMember] {
-    if sessionProgress != nil { return [] }
+    if sessionID != nil { return [] }
     return members ?? [
       RecipeOrganizationHistoryMember(anchorID: anchorID, recipeID: recipeID,
         before: before, after: after, baseline: baseline, folderBaseline: folderBaseline),
@@ -37,6 +39,7 @@ public struct RecipeOrganizationHistoryChange: Codable, Equatable, Sendable {
 
   var inverse: Self {
     if let sessionProgress { return Self(sessionProgress: sessionProgress.inverse) }
+    if let sessionScale { return Self(sessionScale: sessionScale.inverse) }
     if let tagChange { return Self(tagChange: tagChange.inverse) }
     let reversed = changedMembers.map { $0.inverse }
     let first = reversed[0]
@@ -45,15 +48,20 @@ public struct RecipeOrganizationHistoryChange: Codable, Equatable, Sendable {
   }
 
   private enum CodingKeys: String, CodingKey {
-    case version, members, tagChange, sessionProgress, anchorID, recipeID, before, after, baseline, folderBaseline
+    case version, members, tagChange, sessionProgress, sessionScale
+    case anchorID, recipeID, before, after, baseline, folderBaseline
   }
 
   public init(from decoder: Decoder) throws {
     let values = try decoder.container(keyedBy: CodingKeys.self)
     let version = try values.decodeIfPresent(Int.self, forKey: .version)
-    if let version, version != 2 && version != 3 && version != 4 {
+    if let version, version != 2 && version != 3 && version != 4 && version != 5 {
       throw DecodingError.dataCorruptedError(forKey: .version, in: values,
         debugDescription: "Unsupported history change version")
+    }
+    if version == 5 {
+      self = Self(sessionScale: try values.decode(SessionScaleHistoryChange.self, forKey: .sessionScale))
+      return
     }
     if version == 4 {
       self = Self(sessionProgress: try values.decode(SessionProgressHistoryChange.self, forKey: .sessionProgress))
@@ -71,6 +79,7 @@ public struct RecipeOrganizationHistoryChange: Codable, Equatable, Sendable {
       self = Self(tagChange: tag)
       return
     }
+    sessionScale = nil
     sessionProgress = nil
     tagChange = nil
     if version == 2 {
@@ -96,7 +105,10 @@ public struct RecipeOrganizationHistoryChange: Codable, Equatable, Sendable {
 
   public func encode(to encoder: Encoder) throws {
     var values = encoder.container(keyedBy: CodingKeys.self)
-    if let sessionProgress {
+    if let sessionScale {
+      try values.encode(5, forKey: .version)
+      try values.encode(sessionScale, forKey: .sessionScale)
+    } else if let sessionProgress {
       try values.encode(4, forKey: .version)
       try values.encode(sessionProgress, forKey: .sessionProgress)
     } else if let tagChange {
@@ -156,6 +168,8 @@ public protocol RecipeOrganizationHistoryRepository: RecipeOrganizationRepositor
   func historySessionIDs(in scope: RecipeOrganizationHistoryScope, generation: UUID) throws -> Set<CookingSession.ID>
   func prepareHistoryProgress(_ sessionID: CookingSession.ID, to progress: SessionProgress,
                               in scope: RecipeOrganizationHistoryScope) throws -> RecipeOrganizationHistoryChange?
+  func prepareHistoryScale(_ sessionID: CookingSession.ID, to scale: SessionWorkingScale,
+                           in scope: RecipeOrganizationHistoryScope) throws -> RecipeOrganizationHistoryChange?
   func prepareHistoryMove(_ recipeID: Recipe.ID, to folderID: Folder.ID?,
                           in scope: RecipeOrganizationHistoryScope) throws -> RecipeOrganizationHistoryChange?
   func prepareHistoryMove(_ recipeIDs: Set<Recipe.ID>, to folderID: Folder.ID?,

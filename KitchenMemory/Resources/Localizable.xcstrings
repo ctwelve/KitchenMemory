@@ -1861,6 +1861,18 @@
       "it-IT": { "stringUnit": { "state": "translated", "value": "Sposta ricette" } }
     }
   },
+  "session.undo-scale": {
+    "comment": "Native Undo/Redo action name for a committed working-scale change in an Active Session. The system supplies Undo or Redo; this changes cooking amounts, not text size.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": { "stringUnit": { "state": "translated", "value": "Change Cooking Scale" } },
+      "en-GB": { "stringUnit": { "state": "translated", "value": "Change Cooking Scale" } },
+      "es-MX": { "stringUnit": { "state": "translated", "value": "Cambiar escala de cocina" } },
+      "fr-CA": { "stringUnit": { "state": "translated", "value": "Modifier les proportions de cuisson" } },
+      "de-DE": { "stringUnit": { "state": "translated", "value": "Kochmengen ändern" } },
+      "it-IT": { "stringUnit": { "state": "translated", "value": "Modifica proporzioni della preparazione" } }
+    }
+  },
   "session.undo-progress": {
     "comment": "Native Undo/Redo action name for one ingredient or instruction progress change in an Active Session. The system supplies Undo or Redo.",
     "extractionState": "manual",

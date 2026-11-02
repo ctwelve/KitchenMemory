@@ -31,14 +31,14 @@ public final class RecipeOrganizationHistory {
   }
 
   /// Session whose frozen change is still awaiting a conclusive result.
-  public var pendingSessionID: CookingSession.ID? { host?.pending?.delivery.change.sessionProgress?.sessionID }
+  public var pendingSessionID: CookingSession.ID? { host?.pending?.delivery.change.sessionID }
 
   /// Discovers unresolved Session delivery before opening any scene. Unreadable
   /// recovery evidence throws and must continue to block ordinary delivery.
   public static func pendingSessionID(in scope: RecipeOrganizationHistoryScope, historyURL: URL)
     throws -> CookingSession.ID? {
     try OrganizationHistoryHost.readPending(at: historyURL.appendingPathExtension("organization-pending.json"),
-      scope: scope)?.delivery.change.sessionProgress?.sessionID
+      scope: scope)?.delivery.change.sessionID
   }
 
   /// Pending domain work temporarily withholds this scene's app history without deleting it.
@@ -58,6 +58,8 @@ public final class RecipeOrganizationHistory {
         let name: String
         if changes.first?.sessionProgress != nil {
           name = "session-progress"
+        } else if changes.first?.sessionScale != nil {
+          name = "session-scale"
         } else if let tag = changes.first?.tagChange {
           name = tag.adding ? "add-tag" : "remove-tag"
         } else {
@@ -112,6 +114,18 @@ public final class RecipeOrganizationHistory {
     guard host.pending == nil, !sessionDeliveryIsBlocked else { throw RecipeOrganizationHistoryError.ineligible }
     guard sessionAdmission(sessionID) else { throw RecipeOrganizationHistoryError.ineligible }
     guard let change = try repository.prepareHistoryProgress(sessionID, to: progress, in: host.scope)
+    else { return .rejected }
+    return await (try session.commands(for: operation)).submit(change)
+  }
+
+  /// Records one complete accepted scale replacement in the initiating scene's timeline.
+  public func scale(_ sessionID: CookingSession.ID, to scale: SessionWorkingScale)
+    async throws -> HistorySubmissionResult {
+    guard let session, let host, let operation else { throw RecipeOrganizationHistoryError.notOpen }
+    _ = try await invalidateInterference()
+    guard host.pending == nil, !sessionDeliveryIsBlocked else { throw RecipeOrganizationHistoryError.ineligible }
+    guard sessionAdmission(sessionID) else { throw RecipeOrganizationHistoryError.ineligible }
+    guard let change = try repository.prepareHistoryScale(sessionID, to: scale, in: host.scope)
     else { return .rejected }
     return await (try session.commands(for: operation)).submit(change)
   }

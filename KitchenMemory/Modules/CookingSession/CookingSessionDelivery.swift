@@ -31,13 +31,23 @@ final class CookingSessionDelivery {
   /// frozen command in the durable sidecar before crossing domain acceptance.
   func submitHistoryProgress(_ progress: SessionProgress, sessionID: CookingSession.ID,
                              history: OrganizationHistoryPresentation, completion: @escaping (Bool) -> Void) -> Bool {
+    submitHistory({ await history.progress(sessionID, to: progress) }, completion: completion)
+  }
+
+  func submitHistoryScale(_ scale: SessionWorkingScale, sessionID: CookingSession.ID,
+                          history: OrganizationHistoryPresentation) -> Bool {
+    submitHistory({ await history.scale(sessionID, to: scale) }, completion: { _ in })
+  }
+
+  private func submitHistory(_ operation: @escaping @MainActor () async -> Bool,
+                             completion: @escaping (Bool) -> Void) -> Bool {
     guard !historyRecoveryUnavailable(), !historyInFlight, outbox.isEmpty, pendingHistorySessions().isEmpty else {
       return false
     }
     historyInFlight = true
     didChange()
     historyTask = Task {
-      let accepted = await history.progress(sessionID, to: progress)
+      let accepted = await operation()
       historyInFlight = false
       completion(accepted)
       didChange()

@@ -11,7 +11,7 @@ extension SwiftDataRecipeOrganizationRepository {
     throws -> Set<CookingSession.ID> {
     Set(try historyReceipts(in: scope.kitchenID, context: ModelContext(container)).compactMap {
       $0.delivery.scope == scope && $0.delivery.token.generation == generation
-        ? $0.delivery.change.sessionProgress?.sessionID : nil
+        ? $0.delivery.change.sessionID : nil
     })
   }
 
@@ -28,14 +28,27 @@ extension SwiftDataRecipeOrganizationRepository {
       baseline: try sessionHistoryWitness(evidence)))
   }
 
+  public func prepareHistoryScale(
+    _ sessionID: CookingSession.ID, to scale: SessionWorkingScale, in scope: RecipeOrganizationHistoryScope
+  ) throws -> RecipeOrganizationHistoryChange? {
+    let context = ModelContext(container)
+    try validateHistoryScope(scope, context: context)
+    let (evidence, session) = try editableHistorySession(sessionID, scope: scope, context: context)
+    guard let before = session.workingScale else { throw RecipeOrganizationHistoryError.ineligible }
+    guard before != scale else { return nil }
+    return RecipeOrganizationHistoryChange(sessionScale: SessionScaleHistoryChange(sessionID: sessionID,
+      recipeID: evidence.roots[0].recipeID, before: before, after: scale,
+      baseline: try sessionHistoryWitness(evidence)))
+  }
+
   func prepareSessionHistoryDelivery(_ change: RecipeOrganizationHistoryChange, memberID: UUID,
                                      token: UndoKit.HistoryToken, scope: RecipeOrganizationHistoryScope)
     throws -> RecipeOrganizationHistoryDelivery {
-    guard token.scope == scope.identity, let progress = change.sessionProgress else {
+    guard token.scope == scope.identity, let sessionID = change.sessionID else {
       throw RecipeOrganizationHistoryError.invalidScope
     }
     let repository = SwiftDataCookingSessionRepository(modelContainer: container)
-    guard let evidence = try repository.evidence(id: progress.sessionID) else {
+    guard let evidence = try repository.evidence(id: sessionID) else {
       throw RecipeOrganizationHistoryError.ineligible
     }
     let now = Date()
@@ -52,21 +65,23 @@ extension SwiftDataRecipeOrganizationRepository {
                             receipts: [RecipeOrganizationHistoryReceipt], context: ModelContext)
     throws -> RecipeOrganizationHistoryReceipt {
     try validateHistoryScope(delivery.scope, context: context)
-    guard let change = delivery.change.sessionProgress, let frozen = delivery.sessionFact,
+    guard let sessionID = delivery.change.sessionID, let frozen = delivery.sessionFact,
           delivery.token.scope == delivery.scope.identity, delivery.command.id == delivery.token.command,
           delivery.command.kitchenID == delivery.scope.kitchenID,
           delivery.command.folders.isEmpty, delivery.command.tags.isEmpty,
-          frozen.id.rawValue == delivery.token.command, frozen.authoredAt == delivery.command.authoredAt,
-          change.before.target == change.after.target else { throw RecipeOrganizationHistoryError.invalidScope }
-    let (evidence, session) = try editableHistorySession(change.sessionID, scope: delivery.scope, context: context)
+          frozen.id.rawValue == delivery.token.command, frozen.authoredAt == delivery.command.authoredAt else {
+      throw RecipeOrganizationHistoryError.invalidScope
+    }
+    let (evidence, session) = try editableHistorySession(sessionID, scope: delivery.scope, context: context)
     guard try sessionHistoryWitness(evidence) == delivery.beforeWitness,
-          foldedSessionWitness(change, token: delivery.token, receipts: receipts) == delivery.beforeWitness,
-          try historyProgress(change.before.target, in: session) == change.before else {
+          foldedSessionWitness(delivery.change, token: delivery.token, receipts: receipts) == delivery.beforeWitness
+    else {
       throw RecipeOrganizationHistoryError.ineligible
     }
-    let payload = try SessionFactPayloadCodec.encode(.progress(change.after.state))
-    let fact = SessionFactEvidence(id: frozen.id, sessionID: change.sessionID, kitchenID: delivery.scope.kitchenID,
-      kind: SessionFact.Kind.progress.rawValue, targetSnapshotElementID: change.after.target.rawIdentifier,
+    let meaning = try sessionHistoryMeaning(delivery.change, in: session)
+    let payload = try SessionFactPayloadCodec.encode(meaning.payload)
+    let fact = SessionFactEvidence(id: frozen.id, sessionID: sessionID, kitchenID: delivery.scope.kitchenID,
+      kind: meaning.kind.rawValue, targetSnapshotElementID: meaning.target,
       authoredAt: frozen.authoredAt, causalHeadsFormatVersion: 1, causalHeadsData: frozen.heads,
       payloadFormatVersion: payload.formatVersion, payloadData: payload.data, payloadDigest: payload.digest)
     var after = evidence
@@ -91,13 +106,30 @@ extension SwiftDataRecipeOrganizationRepository {
     return receipt
   }
 
-  func sessionHistoryIsEligible(_ change: SessionProgressHistoryChange, scope: RecipeOrganizationHistoryScope,
+  func sessionHistoryIsEligible(_ change: RecipeOrganizationHistoryChange, scope: RecipeOrganizationHistoryScope,
                                 token: OrganizationHistoryToken, receipts: [RecipeOrganizationHistoryReceipt],
                                 context: ModelContext) throws -> Bool {
-    guard let (evidence, _) = try? editableHistorySession(change.sessionID, scope: scope, context: context) else {
+    guard let sessionID = change.sessionID,
+          let (evidence, _) = try? editableHistorySession(sessionID, scope: scope, context: context) else {
       return false
     }
     return try sessionHistoryWitness(evidence) == foldedSessionWitness(change, token: token, receipts: receipts)
+  }
+
+  private func sessionHistoryMeaning(_ change: RecipeOrganizationHistoryChange, in session: CookingSessionProjection)
+    throws -> SessionHistoryMeaning {
+    if let scale = change.sessionScale {
+      guard session.workingScale == scale.before else { throw RecipeOrganizationHistoryError.ineligible }
+      return SessionHistoryMeaning(kind: .workingScale, target: nil, payload: .workingScale(scale.after))
+    }
+    guard let progress = change.sessionProgress, progress.before.target == progress.after.target else {
+      throw RecipeOrganizationHistoryError.invalidScope
+    }
+    guard try historyProgress(progress.before.target, in: session) == progress.before else {
+      throw RecipeOrganizationHistoryError.ineligible
+    }
+    return SessionHistoryMeaning(kind: .progress, target: progress.after.target.rawIdentifier,
+      payload: .progress(progress.after.state))
   }
 
   private func editableHistorySession(_ id: CookingSession.ID, scope: RecipeOrganizationHistoryScope,
@@ -130,13 +162,13 @@ extension SwiftDataRecipeOrganizationRepository {
     return session.progress.first { $0.target == target } ?? SessionProgress(target: target, state: initial)
   }
 
-  private func foldedSessionWitness(_ change: SessionProgressHistoryChange, token: OrganizationHistoryToken,
+  private func foldedSessionWitness(_ change: RecipeOrganizationHistoryChange, token: OrganizationHistoryToken,
                                     receipts: [RecipeOrganizationHistoryReceipt]) -> Data {
-    var witness = change.baseline
+    var witness = change.sessionBaseline ?? Data()
     for receipt in receipts.filter({ $0.delivery.token.scope == token.scope
       && $0.delivery.token.generation == token.generation }).sorted(by: {
         $0.delivery.token.sequence < $1.delivery.token.sequence
-      }) where receipt.delivery.change.sessionProgress?.sessionID == change.sessionID {
+      }) where receipt.delivery.change.sessionID == change.sessionID {
       if receipt.delivery.beforeWitness == witness { witness = receipt.afterWitness }
     }
     return witness
@@ -150,4 +182,10 @@ extension SwiftDataRecipeOrganizationRepository {
     ]
     return try OrganizationCoding.encode(identities.map { Set($0).sorted { $0.uuidString < $1.uuidString } })
   }
+}
+
+private struct SessionHistoryMeaning {
+  let kind: SessionFact.Kind
+  let target: UUID?
+  let payload: SessionFactPayload
 }

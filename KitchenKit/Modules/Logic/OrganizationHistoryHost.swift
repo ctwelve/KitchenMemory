@@ -96,7 +96,7 @@ final class OrganizationHistoryHost: MainActorHistoryOperationHandler, HistoryHo
 
   private func admitsSessionDelivery(_ change: Effect, token: HistoryToken) throws -> Bool {
     var affected = try repository.historySessionIDs(in: scope, generation: token.generation)
-    if let sessionID = change.sessionProgress?.sessionID { affected.insert(sessionID) }
+    if let sessionID = change.sessionID { affected.insert(sessionID) }
     return affected.allSatisfy(sessionAdmission)
   }
 

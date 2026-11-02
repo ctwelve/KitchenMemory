@@ -79,6 +79,9 @@ final class OrganizationHistoryPresentation {
     history.session?.setNativeActionNameResolver { [weak self] payload in
       guard payload.family == RecipeOrganizationHistory.actionPresentationFamily,
             payload.version == 1 else { return nil }
+      if payload.data == Data("session-scale".utf8) {
+        return LocalizedStringResource.sessionUndoScale.localized(for: self?.locale ?? .current)
+      }
       if payload.data == Data("session-progress".utf8) {
         return LocalizedStringResource.sessionUndoProgress.localized(for: self?.locale ?? .current)
       }
@@ -105,6 +108,19 @@ final class OrganizationHistoryPresentation {
     defer { busy = false; refresh() }
     do {
       let result = try await history.progress(sessionID, to: progress)
+      receive(result)
+      if case .accepted = result { return true }
+    } catch { failed = true; failureMessage = .historyUndoFailureMessage }
+    return false
+  }
+
+  func scale(_ sessionID: CookingSession.ID, to scale: SessionWorkingScale) async -> Bool {
+    await open()
+    guard available, ready, !busy else { failed = true; return false }
+    busy = true
+    defer { busy = false; refresh() }
+    do {
+      let result = try await history.scale(sessionID, to: scale)
       receive(result)
       if case .accepted = result { return true }
     } catch { failed = true; failureMessage = .historyUndoFailureMessage }

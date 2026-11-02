@@ -149,6 +149,35 @@ The Cooking Session history walkthrough #267 is complete; its evidence is
 separate from the new Undo acceptance. The app-wide delivery gate #204 remains
 open, as do the separately scoped working-scale and Outcome slices.
 
+## Active Session working scale: #278
+
+Committed scale controls join the same scene history as progress, Folders and
+Tags. Each changed preset, basis selection or custom-factor Apply creates one
+group; editing a custom factor does not submit it, and an unchanged complete
+scale creates no group. The history change retains the exact before/after
+`SessionWorkingScale`, including working yield and ingredient quantities. Undo
+and Redo append fresh working-scale Facts, without inverse arithmetic or changes
+to the Execution Snapshot or source Recipe. A missing prior scale is ineligible.
+
+Scale uses an explicit version-5 history change. Existing singular Folder,
+version-2 Folder batch, version-3 Tag and version-4 progress changes remain
+readable. Older readers refuse version 5. The version-1 pending envelope, frozen
+Fact evidence and receipt formats, SwiftData V7, Session V3 and ordinary Session
+outbox encoding remain unchanged. Unknown changes and unreadable pending evidence
+remain blocking rather than being replaced with empty history.
+
+Progress and scale share Session evidence folding: only accepted actions from
+the same scene generation advance an older inverse's expected frontier. Scale
+uses the existing FIFO admission, atomic domain Fact/receipt acceptance,
+receipt-first recovery, exact frozen retry and whole-scene retirement rules.
+Pending work blocks further scale submission and Session Undo/Redo. Native
+compensation refreshes amounts without navigating, moving focus or restoring
+reading position or emphasis. Localized native action names describe cooking
+amounts separately from text size.
+
+This integration does not close #204 or implement Outcome or Entry compensation.
+Validation results belong to the feature PR and do not establish beta acceptance.
+
 ## Supply route and ownership
 
 The maintainer approves either the Swift package or the available XCFramework.

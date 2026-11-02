@@ -88,11 +88,14 @@ extension CookingSessionPresentationModel {
     return accepted
   }
   @discardableResult
-  func replaceWorkingScale(with scale: RecipeScale) -> Bool {
+  func replaceWorkingScale(with scale: RecipeScale, history: OrganizationHistoryPresentation? = nil) -> Bool {
     guard let session = currentSession, session.lifecycle == .active,
           let replacement = workingScale(for: session.snapshot, scale: scale)
     else { return false }
     guard session.workingScale != replacement else { return true }
+    if let history {
+      return delivery.submitHistoryScale(replacement, sessionID: session.id, history: history)
+    }
     return submitIndependentCommand(.replaceWorkingScale(
       factID: SessionFact.ID(),
       sessionID: session.id,
