@@ -41,6 +41,18 @@ extension SwiftDataRecipeOrganizationRepository {
       baseline: try sessionHistoryWitness(evidence)))
   }
 
+  public func prepareHistoryOutcome(
+    _ sessionID: CookingSession.ID, to outcome: SessionOutcome?, in scope: RecipeOrganizationHistoryScope
+  ) throws -> RecipeOrganizationHistoryChange? {
+    let context = ModelContext(container)
+    try validateHistoryScope(scope, context: context)
+    let (evidence, session) = try editableHistorySession(sessionID, scope: scope, context: context)
+    guard session.outcome != outcome else { return nil }
+    return RecipeOrganizationHistoryChange(sessionOutcome: SessionOutcomeHistoryChange(sessionID: sessionID,
+      recipeID: evidence.roots[0].recipeID, before: session.outcome, after: outcome,
+      baseline: try sessionHistoryWitness(evidence)))
+  }
+
   func prepareSessionHistoryDelivery(_ change: RecipeOrganizationHistoryChange, memberID: UUID,
                                      token: UndoKit.HistoryToken, scope: RecipeOrganizationHistoryScope)
     throws -> RecipeOrganizationHistoryDelivery {
@@ -118,6 +130,11 @@ extension SwiftDataRecipeOrganizationRepository {
 
   private func sessionHistoryMeaning(_ change: RecipeOrganizationHistoryChange, in session: CookingSessionProjection)
     throws -> SessionHistoryMeaning {
+    if let outcome = change.sessionOutcome {
+      guard session.outcome == outcome.before else { throw RecipeOrganizationHistoryError.ineligible }
+      let replacement = outcome.after.map(SessionOutcomeChange.set) ?? .clear
+      return SessionHistoryMeaning(kind: .sessionOutcome, target: nil, payload: .sessionOutcome(replacement))
+    }
     if let scale = change.sessionScale {
       guard session.workingScale == scale.before else { throw RecipeOrganizationHistoryError.ineligible }
       return SessionHistoryMeaning(kind: .workingScale, target: nil, payload: .workingScale(scale.after))

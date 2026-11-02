@@ -147,7 +147,7 @@ presentation without invoking command navigation or reading advancement.
 
 The Cooking Session history walkthrough #267 is complete; its evidence is
 separate from the new Undo acceptance. The app-wide delivery gate #204 remains
-open. Working-scale integration follows below; Outcome remains separately scoped.
+open. Working-scale and Outcome integration follow below.
 
 ## Active Session working scale: #278
 
@@ -175,8 +175,32 @@ compensation refreshes amounts without navigating, moving focus or restoring
 reading position or emphasis. Localized native action names describe cooking
 amounts separately from text size.
 
-This integration does not close #204 or implement Outcome or Entry compensation.
-Validation results belong to the feature PR and do not establish beta acceptance.
+Scale integration does not close #204. Outcome integration follows below;
+Entry compensation remains excluded. Validation results belong to the feature PR
+and do not establish beta acceptance.
+
+## Active Session Outcome: #279
+
+Set, changed and cleared optional Outcomes join the same scene timeline as
+progress, scale, Folders and Tags. Each deliberate changed choice earns one group;
+choosing the current value or clearing an absent Outcome earns none and preserves
+Redo. Undo restores the exact prior coarse value or none, and Redo restores the
+resulting value. Both append new Session Outcome Facts without modifying earlier
+accepted evidence or finishing the Session.
+
+The explicit version-6 change retains optional before/after Outcomes. All earlier
+history shapes remain readable; older readers refuse version 6. The frozen Fact,
+version-1 pending/receipt formats, SwiftData V7, Session V3 and ordinary outbox
+encoding remain unchanged. Outcome uses the shared serialized Session admission,
+atomic Fact/receipt acceptance, same-scene witness folding, receipt-first recovery,
+exact retry and whole-scene retirement. It introduces no independent queue.
+
+Only unambiguous eligible Active Sessions enter Outcome history. Existing Outcome
+conflict resolution remains an ordinary non-undo Session command, preserving its
+causal resolution behavior when no single prior Outcome exists. Native Set/Clear
+action names are localized; compensation preserves reading state, navigation and
+focus. Finish, Entry compensation and the remaining app-wide #204 gate are outside
+this slice. Validation and candidate-specific acceptance remain distinct.
 
 ## Supply route and ownership
 

@@ -23,6 +23,8 @@ extension RecipeOrganizationHistoryChange {
       before: nil, after: nil, baseline: Data(), folderBaseline: Data(), sessionScale: sessionScale)
   }
 
-  var sessionID: CookingSession.ID? { sessionProgress?.sessionID ?? sessionScale?.sessionID }
-  var sessionBaseline: Data? { sessionProgress?.baseline ?? sessionScale?.baseline }
+  var sessionID: CookingSession.ID? {
+    sessionProgress?.sessionID ?? sessionScale?.sessionID ?? sessionOutcome?.sessionID
+  }
+  var sessionBaseline: Data? { sessionProgress?.baseline ?? sessionScale?.baseline ?? sessionOutcome?.baseline }
 }

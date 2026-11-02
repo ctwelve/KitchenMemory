@@ -39,6 +39,11 @@ final class CookingSessionDelivery {
     submitHistory({ await history.scale(sessionID, to: scale) }, completion: { _ in })
   }
 
+  func submitHistoryOutcome(_ outcome: SessionOutcome?, sessionID: CookingSession.ID,
+                            history: OrganizationHistoryPresentation) -> Bool {
+    submitHistory({ await history.outcome(sessionID, to: outcome) }, completion: { _ in })
+  }
+
   private func submitHistory(_ operation: @escaping @MainActor () async -> Bool,
                              completion: @escaping (Bool) -> Void) -> Bool {
     guard !historyRecoveryUnavailable(), !historyInFlight, outbox.isEmpty, pendingHistorySessions().isEmpty else {

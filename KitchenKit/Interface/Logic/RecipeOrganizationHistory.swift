@@ -60,6 +60,8 @@ public final class RecipeOrganizationHistory {
           name = "session-progress"
         } else if changes.first?.sessionScale != nil {
           name = "session-scale"
+        } else if let outcome = changes.first?.sessionOutcome {
+          name = outcome.after == nil ? "session-clear-outcome" : "session-set-outcome"
         } else if let tag = changes.first?.tagChange {
           name = tag.adding ? "add-tag" : "remove-tag"
         } else {
@@ -126,6 +128,18 @@ public final class RecipeOrganizationHistory {
     guard host.pending == nil, !sessionDeliveryIsBlocked else { throw RecipeOrganizationHistoryError.ineligible }
     guard sessionAdmission(sessionID) else { throw RecipeOrganizationHistoryError.ineligible }
     guard let change = try repository.prepareHistoryScale(sessionID, to: scale, in: host.scope)
+    else { return .rejected }
+    return await (try session.commands(for: operation)).submit(change)
+  }
+
+  /// Records one accepted assessment choice, including removal of the assessment.
+  public func outcome(_ sessionID: CookingSession.ID, to outcome: SessionOutcome?)
+    async throws -> HistorySubmissionResult {
+    guard let session, let host, let operation else { throw RecipeOrganizationHistoryError.notOpen }
+    _ = try await invalidateInterference()
+    guard host.pending == nil, !sessionDeliveryIsBlocked else { throw RecipeOrganizationHistoryError.ineligible }
+    guard sessionAdmission(sessionID) else { throw RecipeOrganizationHistoryError.ineligible }
+    guard let change = try repository.prepareHistoryOutcome(sessionID, to: outcome, in: host.scope)
     else { return .rejected }
     return await (try session.commands(for: operation)).submit(change)
   }
