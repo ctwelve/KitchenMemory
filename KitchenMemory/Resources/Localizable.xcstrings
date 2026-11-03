@@ -1861,6 +1861,90 @@
       "it-IT": { "stringUnit": { "state": "translated", "value": "Sposta ricette" } }
     }
   },
+  "session.undo-set-outcome": {
+    "comment": "Native Undo/Redo action name for set of the optional coarse assessment in an Active Session. The system supplies Undo or Redo. This does not finish the Session or rate the Recipe.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Set Cooking Outcome"
+        }
+      },
+      "en-GB": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Set Cooking Outcome"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Definir resultado de cocina"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Définir le résultat de cuisson"
+        }
+      },
+      "de-DE": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Kochergebnis festlegen"
+        }
+      },
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Imposta esito della preparazione"
+        }
+      }
+    }
+  },
+  "session.undo-clear-outcome": {
+    "comment": "Native Undo/Redo action name for clear of the optional coarse assessment in an Active Session. The system supplies Undo or Redo. This does not finish the Session or rate the Recipe.",
+    "extractionState": "manual",
+    "localizations": {
+      "en-US": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Clear Cooking Outcome"
+        }
+      },
+      "en-GB": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Clear Cooking Outcome"
+        }
+      },
+      "es-MX": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Borrar resultado de cocina"
+        }
+      },
+      "fr-CA": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Effacer le résultat de cuisson"
+        }
+      },
+      "de-DE": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Kochergebnis löschen"
+        }
+      },
+      "it-IT": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Cancella esito della preparazione"
+        }
+      }
+    }
+  },
   "session.undo-scale": {
     "comment": "Native Undo/Redo action name for a committed working-scale change in an Active Session. The system supplies Undo or Redo; this changes cooking amounts, not text size.",
     "extractionState": "manual",

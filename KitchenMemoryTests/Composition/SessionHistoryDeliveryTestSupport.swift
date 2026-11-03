@@ -23,6 +23,10 @@ final class InterruptedProgressHistoryRepository: RecipeOrganizationHistoryRepos
                            in scope: RecipeOrganizationHistoryScope) throws -> RecipeOrganizationHistoryChange? {
     try base.prepareHistoryScale(sessionID, to: scale, in: scope)
   }
+  func prepareHistoryOutcome(_ sessionID: CookingSession.ID, to outcome: SessionOutcome?,
+                             in scope: RecipeOrganizationHistoryScope) throws -> RecipeOrganizationHistoryChange? {
+    try base.prepareHistoryOutcome(sessionID, to: outcome, in: scope)
+  }
   func load(in kitchenID: Kitchen.ID) throws -> RecipeOrganization { try base.load(in: kitchenID) }
   func accept(_ command: RecipeOrganizationCommand, firstSave: RecipeSaveCommand?) throws {
     try base.accept(command, firstSave: firstSave)
