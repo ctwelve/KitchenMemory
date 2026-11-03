@@ -60,6 +60,7 @@ struct CookingSessionScalingView: View {
   @State private var selection: CookingSessionScaleSelection
   @State private var customFactor: RationalQuantity
   @State private var showsCalculationFailure = false
+  @Environment(\.organizationHistory) private var history
   @Environment(\.locale) private var locale
 
   init(
@@ -85,7 +86,7 @@ struct CookingSessionScalingView: View {
   }
 
   private var isBlockedByPendingWork: Bool {
-    !model.pendingCommands.allSatisfy { $0.isIndependentActivity(for: projectedSession.id) }
+    model.hasPendingDeliveryWork
   }
 
   var body: some View {
@@ -194,7 +195,7 @@ struct CookingSessionScalingView: View {
       restoreSelection()
       return
     }
-    let accepted = model.replaceWorkingScale(with: scale)
+    let accepted = model.replaceWorkingScale(with: scale, history: history)
     // A delayed save can retain a valid optimistic scale. Arithmetic rejection
     // cannot: always redisplay the actual model projection rather than proposed UI.
     restoreSelection()

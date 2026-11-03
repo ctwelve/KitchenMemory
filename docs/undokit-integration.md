@@ -134,8 +134,8 @@ lifecycle, ordinary disposition, target validity, exact prior progress, and the
 expected Session evidence. It appends the Fact and complete-token receipt
 together. Receipt lookup precedes eligibility, so an accepted reply loss can be
 resolved after later lifecycle changes without replay. Only same-scene accepted
-progress receipts advance the expected evidence; another field or scene cannot
-silently rebase an older inverse.
+progress, scale and Outcome receipts advance the expected evidence. Other Session
+fields or another scene cannot silently rebase an older inverse.
 
 A Session boundary retires the whole affected scene generation, even when the
 next native callback addresses an interleaved Folder or Tag. Reconciliation
@@ -147,7 +147,60 @@ presentation without invoking command navigation or reading advancement.
 
 The Cooking Session history walkthrough #267 is complete; its evidence is
 separate from the new Undo acceptance. The app-wide delivery gate #204 remains
-open, as do the separately scoped working-scale and Outcome slices.
+open. Working-scale and Outcome integration follow below.
+
+## Active Session working scale: #278
+
+Committed scale controls join the same scene history as progress, Folders and
+Tags. Each changed preset, basis selection or custom-factor Apply creates one
+group; editing a custom factor does not submit it, and an unchanged complete
+scale creates no group. The history change retains the exact before/after
+`SessionWorkingScale`, including working yield and ingredient quantities. Undo
+and Redo append fresh working-scale Facts, without inverse arithmetic or changes
+to the Execution Snapshot or source Recipe. A missing prior scale is ineligible.
+
+Scale uses an explicit version-5 history change. Existing singular Folder,
+version-2 Folder batch, version-3 Tag and version-4 progress changes remain
+readable. Older readers refuse version 5. The version-1 pending envelope, frozen
+Fact evidence and receipt formats, SwiftData V7, Session V3 and ordinary Session
+outbox encoding remain unchanged. Unknown changes and unreadable pending evidence
+remain blocking rather than being replaced with empty history.
+
+Progress and scale share Session evidence folding: only accepted actions from
+the same scene generation advance an older inverse's expected frontier. Scale
+uses the existing FIFO admission, atomic domain Fact/receipt acceptance,
+receipt-first recovery, exact frozen retry and whole-scene retirement rules.
+Pending work blocks further scale submission and Session Undo/Redo. Native
+compensation refreshes amounts without navigating, moving focus or restoring
+reading position or emphasis. Localized native action names describe cooking
+amounts separately from text size.
+
+Scale integration does not close #204. Outcome integration follows below;
+Entry compensation remains excluded. Validation results belong to the feature PR
+and do not establish beta acceptance.
+
+## Active Session Outcome: #279
+
+Set, changed and cleared optional Outcomes join the same scene timeline as
+progress, scale, Folders and Tags. Each deliberate changed choice earns one group;
+choosing the current value or clearing an absent Outcome earns none and preserves
+Redo. Undo restores the exact prior coarse value or none, and Redo restores the
+resulting value. Both append new Session Outcome Facts without modifying earlier
+accepted evidence or finishing the Session.
+
+The explicit version-6 change retains optional before/after Outcomes. All earlier
+history shapes remain readable; older readers refuse version 6. The frozen Fact,
+version-1 pending/receipt formats, SwiftData V7, Session V3 and ordinary outbox
+encoding remain unchanged. Outcome uses the shared serialized Session admission,
+atomic Fact/receipt acceptance, same-scene witness folding, receipt-first recovery,
+exact retry and whole-scene retirement. It introduces no independent queue.
+
+Only unambiguous eligible Active Sessions enter Outcome history. Existing Outcome
+conflict resolution remains an ordinary non-undo Session command, preserving its
+causal resolution behavior when no single prior Outcome exists. Native Set/Clear
+action names are localized; compensation preserves reading state, navigation and
+focus. Finish, Entry compensation and the remaining app-wide #204 gate are outside
+this slice. Validation and candidate-specific acceptance remain distinct.
 
 ## Supply route and ownership
 

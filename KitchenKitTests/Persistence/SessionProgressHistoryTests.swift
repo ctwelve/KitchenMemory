@@ -197,9 +197,9 @@ struct ProgressHistoryFixture {
     return session.progress.first { $0.target == completed.target }?.state
   }
 
-  init() throws {
-    base = try HistoryFixture(draft: RecipeDraft(title: "Soup", ingredientLines: ["Water"],
-      instructionLines: ["Simmer"]))
+  init(draft: RecipeDraft = RecipeDraft(title: "Soup", ingredientLines: ["Water"],
+      instructionLines: ["Simmer"])) throws {
+    base = try HistoryFixture(draft: draft)
     repository = SwiftDataCookingSessionRepository(modelContainer: base.container)
     sessions = CookingSessions(kitchenID: base.kitchenID, recipeRepository: base.recipes, sessionRepository: repository)
     let recipe = try XCTUnwrap(base.recipes.recipe(id: base.recipeID))

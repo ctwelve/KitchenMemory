@@ -35,7 +35,7 @@ history provide background when needed. GitHub Issues owns the live plan and dep
 
 - [Apple platform direction](apple-platform.md)
 - [Agreed UndoKit architecture](adr/0022-shared-durable-undo-framework.md) — accepted operation policy and remaining app-wide delivery gate
-- [UndoKit integration and qualification](undokit-integration.md) — Folder/Tag and Session progress integration, persistence compatibility, native proof harness and historical evidence
+- [UndoKit integration and qualification](undokit-integration.md) — Folder/Tag and Session progress/scale/Outcome integration, persistence compatibility, native proof harness and historical evidence
 - [Localization and authored resources](localization-architecture.md)
 - [Accessibility and alpha/beta acceptance](accessibility-engineering.md)
 - [Dependency inventory](../DEPENDENCIES.md) and [AI use](../AI.md)

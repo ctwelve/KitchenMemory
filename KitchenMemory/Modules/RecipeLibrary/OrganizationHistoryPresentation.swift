@@ -79,6 +79,15 @@ final class OrganizationHistoryPresentation {
     history.session?.setNativeActionNameResolver { [weak self] payload in
       guard payload.family == RecipeOrganizationHistory.actionPresentationFamily,
             payload.version == 1 else { return nil }
+      if payload.data == Data("session-set-outcome".utf8) {
+        return LocalizedStringResource.sessionUndoSetOutcome.localized(for: self?.locale ?? .current)
+      }
+      if payload.data == Data("session-clear-outcome".utf8) {
+        return LocalizedStringResource.sessionUndoClearOutcome.localized(for: self?.locale ?? .current)
+      }
+      if payload.data == Data("session-scale".utf8) {
+        return LocalizedStringResource.sessionUndoScale.localized(for: self?.locale ?? .current)
+      }
       if payload.data == Data("session-progress".utf8) {
         return LocalizedStringResource.sessionUndoProgress.localized(for: self?.locale ?? .current)
       }
@@ -99,12 +108,24 @@ final class OrganizationHistoryPresentation {
   }
 
   func progress(_ sessionID: CookingSession.ID, to progress: SessionProgress) async -> Bool {
+    await submitSessionChange { try await history.progress(sessionID, to: progress) }
+  }
+
+  func scale(_ sessionID: CookingSession.ID, to scale: SessionWorkingScale) async -> Bool {
+    await submitSessionChange { try await history.scale(sessionID, to: scale) }
+  }
+
+  func outcome(_ sessionID: CookingSession.ID, to outcome: SessionOutcome?) async -> Bool {
+    await submitSessionChange { try await history.outcome(sessionID, to: outcome) }
+  }
+
+  private func submitSessionChange(_ submit: @MainActor () async throws -> HistorySubmissionResult) async -> Bool {
     await open()
     guard available, ready, !busy else { failed = true; return false }
     busy = true
     defer { busy = false; refresh() }
     do {
-      let result = try await history.progress(sessionID, to: progress)
+      let result = try await submit()
       receive(result)
       if case .accepted = result { return true }
     } catch { failed = true; failureMessage = .historyUndoFailureMessage }

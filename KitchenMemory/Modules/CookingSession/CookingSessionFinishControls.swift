@@ -9,6 +9,7 @@ import SwiftUI
 struct CookingSessionOutcomePicker: View {
   let model: CookingSessionPresentationModel
   let session: CookingSessionProjection
+  @Environment(\.organizationHistory) private var history
 
   var body: some View {
     Picker(.sessionOutcomeSection, selection: selection) {
@@ -17,7 +18,7 @@ struct CookingSessionOutcomePicker: View {
       Text(.sessionOutcomeOkay).tag(SessionOutcome.CoarseValue.okay as SessionOutcome.CoarseValue?)
       Text(.sessionOutcomeUnsuccessful).tag(SessionOutcome.CoarseValue.unsuccessful as SessionOutcome.CoarseValue?)
     }
-    .disabled(session.lifecycle != .active || model.currentSessionHasPendingFinish)
+    .disabled(session.lifecycle != .active || model.hasPendingDeliveryWork)
     .accessibilityIdentifier("session-outcome")
   }
 
@@ -26,7 +27,11 @@ struct CookingSessionOutcomePicker: View {
       guard case let .coarse(value) = session.outcome else { return nil }
       return value
     }, set: { value in
-      if let value { model.setOutcome(.coarse(value)) } else if session.outcome != nil { model.clearOutcome() }
+      if let value {
+        model.setOutcome(.coarse(value), history: history)
+      } else {
+        model.clearOutcome(history: history)
+      }
     })
   }
 }

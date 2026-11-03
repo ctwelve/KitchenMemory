@@ -153,12 +153,19 @@ preserves those boundaries; it never treats an uncertain submission as cancelled
 
 ## Active Session Undo
 
-Ingredient and instruction progress joins the initiating logical scene's
-chronological Folder/Tag Undo timeline. Each deliberate changed state earns one
+Ingredient and instruction progress, committed working-scale changes, and
+optional Outcome choices join the initiating logical scene's chronological
+Folder/Tag Undo timeline. Each deliberate changed state earns one
 group after acceptance. Undo restores the exact previous resulting state,
 including Skipped, by appending a fresh compensating Fact; Redo does likewise.
 Exact retries retain the same frozen Fact identity, time, and causal frontier.
-No-op choices earn no group. Focused native text retains responder priority.
+No-op choices earn no group. Working-scale Undo restores the complete prior
+yield, exact factor and ingredient quantities; it never compounds inverse
+arithmetic. Presets, basis selections and custom-factor Apply commit separately;
+intermediate custom-factor edits do not. Outcome Undo restores the exact prior
+assessment, including none; setting or clearing an unchanged value earns no group.
+Conflict resolution remains on its ordinary non-undo path because there is no
+unambiguous prior value. Focused native text retains responder priority.
 
 Undo is a convenience, not data assurance. Any unresolved Session operation
 withholds Session Undo/Redo. Stop, Finish, accepted Entry submission/revision/
@@ -172,7 +179,7 @@ position/emphasis; reading state is not durable Undo content.
 Retirement removes actionable history and its unneeded local details. Pending
 acceptance evidence remains available for exact recovery; original Session Facts
 and authored content remain untouched. Working-scale and Outcome compensation
-are follow-up slices #278 and #279. Start, Stop/Resume compensation, Finish,
+are delivered by #278 and #279. Start, Stop/Resume compensation, Finish,
 submit-and-Finish, Continuation, and Entry compensation remain excluded. See
 [the agreed policy](https://github.com/ctwelve/KitchenMemory/issues/242#issuecomment-6353741632)
 and [integration details](undokit-integration.md#active-session-progress-277).

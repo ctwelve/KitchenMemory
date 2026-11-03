@@ -55,7 +55,7 @@ extension SwiftDataRecipeOrganizationRepository: RecipeOrganizationHistoryReposi
     _ change: RecipeOrganizationHistoryChange, memberID: UUID, token: UndoKit.HistoryToken,
     in scope: RecipeOrganizationHistoryScope
   ) throws -> RecipeOrganizationHistoryDelivery {
-    if change.sessionProgress != nil {
+    if change.sessionID != nil {
       return try prepareSessionHistoryDelivery(change, memberID: memberID, token: token, scope: scope)
     }
     if change.tagChange != nil {
@@ -103,7 +103,7 @@ extension SwiftDataRecipeOrganizationRepository: RecipeOrganizationHistoryReposi
         return
       }
       try validateSessionHistoryGeneration(delivery, receipts: receipts, context: context)
-      if delivery.change.sessionProgress != nil {
+      if delivery.change.sessionID != nil {
         accepted = try commitSessionHistory(delivery, recovery: recovery, receipts: receipts, context: context)
         return
       }
@@ -147,8 +147,8 @@ extension SwiftDataRecipeOrganizationRepository: RecipeOrganizationHistoryReposi
     // when its next native callback happens to compensate a Folder or Tag.
     for receipt in receipts where receipt.delivery.scope == delivery.scope
       && receipt.delivery.token.generation == delivery.token.generation {
-      if let progress = receipt.delivery.change.sessionProgress {
-        guard try sessionHistoryIsEligible(progress, scope: delivery.scope, token: delivery.token,
+      if receipt.delivery.change.sessionID != nil {
+        guard try sessionHistoryIsEligible(receipt.delivery.change, scope: delivery.scope, token: delivery.token,
           receipts: receipts, context: context) else { throw RecipeOrganizationHistoryError.ineligible }
       }
     }
@@ -209,8 +209,8 @@ extension SwiftDataRecipeOrganizationRepository: RecipeOrganizationHistoryReposi
     var seen: Set<UUID> = []
     for receipt in owned {
       let change = receipt.delivery.change
-      if let progress = change.sessionProgress {
-        guard try sessionHistoryIsEligible(progress, scope: scope, token: receipt.delivery.token,
+      if change.sessionID != nil {
+        guard try sessionHistoryIsEligible(change, scope: scope, token: receipt.delivery.token,
           receipts: receipts, context: context) else { return false }
         continue
       }

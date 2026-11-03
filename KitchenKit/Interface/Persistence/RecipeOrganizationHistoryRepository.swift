@@ -17,18 +17,22 @@ public struct RecipeOrganizationHistoryChange: Codable, Equatable, Sendable {
   let members: [RecipeOrganizationHistoryMember]?
   let tagChange: RecipeOrganizationTagHistoryChange?
   let sessionProgress: SessionProgressHistoryChange?
+  let sessionScale: SessionScaleHistoryChange?
+  let sessionOutcome: SessionOutcomeHistoryChange?
 
   init(anchorID: UUID, recipeID: Recipe.ID, before: Folder.ID?, after: Folder.ID?, baseline: Data,
        folderBaseline: Data, members: [RecipeOrganizationHistoryMember]? = nil,
        tagChange: RecipeOrganizationTagHistoryChange? = nil,
-       sessionProgress: SessionProgressHistoryChange? = nil) {
+       sessionProgress: SessionProgressHistoryChange? = nil,
+       sessionScale: SessionScaleHistoryChange? = nil,
+       sessionOutcome: SessionOutcomeHistoryChange? = nil) {
     self.anchorID = anchorID; self.recipeID = recipeID; self.before = before; self.after = after
     self.baseline = baseline; self.folderBaseline = folderBaseline; self.members = members; self.tagChange = tagChange
-    self.sessionProgress = sessionProgress
+    self.sessionProgress = sessionProgress; self.sessionScale = sessionScale; self.sessionOutcome = sessionOutcome
   }
 
   var changedMembers: [RecipeOrganizationHistoryMember] {
-    if sessionProgress != nil { return [] }
+    if sessionID != nil { return [] }
     return members ?? [
       RecipeOrganizationHistoryMember(anchorID: anchorID, recipeID: recipeID,
         before: before, after: after, baseline: baseline, folderBaseline: folderBaseline),
@@ -37,6 +41,8 @@ public struct RecipeOrganizationHistoryChange: Codable, Equatable, Sendable {
 
   var inverse: Self {
     if let sessionProgress { return Self(sessionProgress: sessionProgress.inverse) }
+    if let sessionScale { return Self(sessionScale: sessionScale.inverse) }
+    if let sessionOutcome { return Self(sessionOutcome: sessionOutcome.inverse) }
     if let tagChange { return Self(tagChange: tagChange.inverse) }
     let reversed = changedMembers.map { $0.inverse }
     let first = reversed[0]
@@ -45,18 +51,19 @@ public struct RecipeOrganizationHistoryChange: Codable, Equatable, Sendable {
   }
 
   private enum CodingKeys: String, CodingKey {
-    case version, members, tagChange, sessionProgress, anchorID, recipeID, before, after, baseline, folderBaseline
+    case version, members, tagChange, sessionProgress, sessionScale, sessionOutcome
+    case anchorID, recipeID, before, after, baseline, folderBaseline
   }
 
   public init(from decoder: Decoder) throws {
     let values = try decoder.container(keyedBy: CodingKeys.self)
     let version = try values.decodeIfPresent(Int.self, forKey: .version)
-    if let version, version != 2 && version != 3 && version != 4 {
+    if let version, version != 2 && version != 3 && version != 4 && version != 5 && version != 6 {
       throw DecodingError.dataCorruptedError(forKey: .version, in: values,
         debugDescription: "Unsupported history change version")
     }
-    if version == 4 {
-      self = Self(sessionProgress: try values.decode(SessionProgressHistoryChange.self, forKey: .sessionProgress))
+    if let session = try Self.decodeSessionChange(version: version, values: values) {
+      self = session
       return
     }
     if version == 3 {
@@ -71,6 +78,8 @@ public struct RecipeOrganizationHistoryChange: Codable, Equatable, Sendable {
       self = Self(tagChange: tag)
       return
     }
+    sessionOutcome = nil
+    sessionScale = nil
     sessionProgress = nil
     tagChange = nil
     if version == 2 {
@@ -94,9 +103,27 @@ public struct RecipeOrganizationHistoryChange: Codable, Equatable, Sendable {
     }
   }
 
+  private static func decodeSessionChange(version: Int?, values: KeyedDecodingContainer<CodingKeys>) throws -> Self? {
+    switch version {
+    case .some(4):
+      Self(sessionProgress: try values.decode(SessionProgressHistoryChange.self, forKey: .sessionProgress))
+    case .some(5):
+      Self(sessionScale: try values.decode(SessionScaleHistoryChange.self, forKey: .sessionScale))
+    case .some(6):
+      Self(sessionOutcome: try values.decode(SessionOutcomeHistoryChange.self, forKey: .sessionOutcome))
+    default: nil
+    }
+  }
+
   public func encode(to encoder: Encoder) throws {
     var values = encoder.container(keyedBy: CodingKeys.self)
-    if let sessionProgress {
+    if let sessionOutcome {
+      try values.encode(6, forKey: .version)
+      try values.encode(sessionOutcome, forKey: .sessionOutcome)
+    } else if let sessionScale {
+      try values.encode(5, forKey: .version)
+      try values.encode(sessionScale, forKey: .sessionScale)
+    } else if let sessionProgress {
       try values.encode(4, forKey: .version)
       try values.encode(sessionProgress, forKey: .sessionProgress)
     } else if let tagChange {
@@ -156,6 +183,10 @@ public protocol RecipeOrganizationHistoryRepository: RecipeOrganizationRepositor
   func historySessionIDs(in scope: RecipeOrganizationHistoryScope, generation: UUID) throws -> Set<CookingSession.ID>
   func prepareHistoryProgress(_ sessionID: CookingSession.ID, to progress: SessionProgress,
                               in scope: RecipeOrganizationHistoryScope) throws -> RecipeOrganizationHistoryChange?
+  func prepareHistoryScale(_ sessionID: CookingSession.ID, to scale: SessionWorkingScale,
+                           in scope: RecipeOrganizationHistoryScope) throws -> RecipeOrganizationHistoryChange?
+  func prepareHistoryOutcome(_ sessionID: CookingSession.ID, to outcome: SessionOutcome?,
+                             in scope: RecipeOrganizationHistoryScope) throws -> RecipeOrganizationHistoryChange?
   func prepareHistoryMove(_ recipeID: Recipe.ID, to folderID: Folder.ID?,
                           in scope: RecipeOrganizationHistoryScope) throws -> RecipeOrganizationHistoryChange?
   func prepareHistoryMove(_ recipeIDs: Set<Recipe.ID>, to folderID: Folder.ID?,

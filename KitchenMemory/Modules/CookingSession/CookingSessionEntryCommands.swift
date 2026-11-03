@@ -85,9 +85,13 @@ extension CookingSessionPresentationModel {
   }
 
   @discardableResult
-  func setOutcome(_ outcome: SessionOutcome) -> Bool {
+  func setOutcome(_ outcome: SessionOutcome, history: OrganizationHistoryPresentation? = nil) -> Bool {
     guard let session = currentSession, session.lifecycle == .active,
           !currentSessionHasPendingFinish else { return false }
+    if let history, !session.hasOutcomeConflict {
+      guard session.outcome != outcome else { return true }
+      return delivery.submitHistoryOutcome(outcome, sessionID: session.id, history: history)
+    }
     return submitCommand { .setOutcome(
       factID: SessionFact.ID(),
       sessionID: session.id,
@@ -97,9 +101,14 @@ extension CookingSessionPresentationModel {
   }
 
   @discardableResult
-  func clearOutcome() -> Bool {
+  func clearOutcome(history: OrganizationHistoryPresentation? = nil) -> Bool {
     guard let session = currentSession, session.lifecycle == .active,
-          !currentSessionHasPendingFinish, session.outcome != nil || session.hasOutcomeConflict else { return false }
+          !currentSessionHasPendingFinish else { return false }
+    if let history, !session.hasOutcomeConflict {
+      guard session.outcome != nil else { return true }
+      return delivery.submitHistoryOutcome(nil, sessionID: session.id, history: history)
+    }
+    guard session.outcome != nil || session.hasOutcomeConflict else { return false }
     return submitCommand { .clearOutcome(
       factID: SessionFact.ID(),
       sessionID: session.id,
